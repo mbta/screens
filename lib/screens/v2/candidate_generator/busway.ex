@@ -35,7 +35,7 @@ defmodule Screens.V2.CandidateGenerator.Busway do
 
     [
       fn -> header_instances(config, now) end,
-      fn -> deps.departures_instances.(config, now: now) end,
+      fn -> deps.departures_instances.(config, now) end,
       fn -> placeholder_instances() end
     ]
     |> Task.async_stream(& &1.(), timeout: 15_000)

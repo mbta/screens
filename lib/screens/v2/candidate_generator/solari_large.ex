@@ -31,7 +31,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
       ) do
     [
       fn -> header_instances(config, now) end,
-      fn -> departures_instances_fn.(config, now: now) end,
+      fn -> departures_instances_fn.(config, now) end,
       fn -> placeholder_instances() end
     ]
     |> Task.async_stream(& &1.(), timeout: 15_000)

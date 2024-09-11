@@ -89,7 +89,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     [
       fn -> header_instances(config, now, fetch_destination_fn) end,
       fn ->
-        departures_instances_fn.(config, post_process_fn: &departures_post_processing/2, now: now)
+        departures_instances_fn.(config, now, post_process_fn: &departures_post_processing/2)
       end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,

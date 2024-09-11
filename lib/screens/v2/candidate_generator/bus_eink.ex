@@ -59,7 +59,7 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
       ) do
     [
       fn -> header_instances(config, now, fetch_stop_name_fn) end,
-      fn -> departures_instances_fn.(config, now: now) end,
+      fn -> departures_instances_fn.(config, now) end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
       fn -> evergreen_content_instances_fn.(config) end,

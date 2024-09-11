@@ -36,10 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           | OvernightDepartures.t()
 
   @spec departures_instances(Screen.t(), options()) :: [widget()]
-  def departures_instances(
-        %Screen{app_params: %app{}} = config,
-        options
-      )
+  def departures_instances(%Screen{app_params: %app{}} = config, now, options \\ [])
       when app in [BusEink, BusShelter, Busway, GlEink, SolariLarge] do
     disabled_modes =
       Keyword.get(options, :disabled_modes_fn, &Screens.Config.Cache.disabled_modes/0).()
@@ -53,7 +50,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2),
         Keyword.get(options, :post_process_fn, fn results, _config -> results end),
         Keyword.get(options, :route_fetch_fn, &Route.fetch/1),
-        options[:now]
+        now
       )
     end
   end
