@@ -1118,7 +1118,26 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                departure_groups: [
                  {:normal,
                   %{
-                    id: "1B2M2Y8AsgTpgAmY7PhCfg==",
+                    type: :departure_row,
+                    headsign: %{headsign: "Test", variation: nil},
+                    route: %{track_number: nil, vehicle_type: :train, route_text: nil},
+                    times_with_crowding: [
+                      %{id: nil, time: %{type: :minutes, minutes: 5}, crowding: nil},
+                      %{id: nil, time: %{type: :minutes, minutes: 6}, crowding: nil}
+                    ],
+                    inline_alerts: []
+                  }}
+               ],
+               header: "Section Header"
+             } = Departures.audio_serialize_section(section, screen, now)
+
+      screen = struct(Screen, %{app_id: :bus_shelter_v2})
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [
+                 {:normal,
+                  %{
                     type: :departure_row,
                     headsign: %{headsign: "Test", variation: nil},
                     route: %{track_number: nil, vehicle_type: :train, route_text: nil},
