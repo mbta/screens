@@ -64,8 +64,14 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<s><%= content %></s>|
   end
 
-  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, _headsign) do
-    route_headsign_rendered = render_route_headsign(route, nil)
+  defp render_time_with_crowding({%{crowding: crowding, time: time}, _}, route, headsign) do
+    route_headsign_rendered =
+      if String.starts_with?(route.id, "Green") do
+        render_route_headsign(route, headsign)
+      else
+        render_route_headsign(route, nil)
+      end
+
     crowding_rendered = render_crowding_level(crowding)
     preposition = preposition_for_time_type(time.type)
 
@@ -96,9 +102,13 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
       {route_text, &render_route/1},
       {vehicle_type || "trip", fn v -> ~E|<%= v %>| end},
       {headsign, fn h -> ~E|to <%= render_headsign(h) %>| end},
-      {track_number, fn tn -> ~E|on track <%= tn %>| end}
+      {track_number, fn tn -> render_track_number(tn, vehicle_type) end}
     ])
   end
+
+  defp render_track_number(nil, _), do: ~E""
+  defp render_track_number(track_number, :bus), do: ~E|at berth <%= track_number %><break/>|
+  defp render_track_number(track_number, _), do: ~E|on track <%= track_number %><break/>|
 
   defp render_route(route_text) do
     cond do

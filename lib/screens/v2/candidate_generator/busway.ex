@@ -12,7 +12,7 @@ defmodule Screens.V2.CandidateGenerator.Busway do
   defmodule Deps do
     @moduledoc false
     defstruct now: &DateTime.utc_now/0,
-              departures_instances: &Widgets.Departures.departures_instances/1
+              departures_instances: &Widgets.Departures.departures_instances/2
   end
 
   @behaviour CandidateGenerator
@@ -31,9 +31,11 @@ defmodule Screens.V2.CandidateGenerator.Busway do
 
   @impl CandidateGenerator
   def candidate_instances(config, _opts, deps \\ %Deps{}) do
+    now = deps.now.()
+
     [
-      fn -> header_instances(config, deps.now.()) end,
-      fn -> deps.departures_instances.(config) end,
+      fn -> header_instances(config, now) end,
+      fn -> deps.departures_instances.(config, now) end,
       fn -> placeholder_instances() end
     ]
     |> Task.async_stream(& &1.(), timeout: 15_000)

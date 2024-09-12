@@ -15,9 +15,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias ScreensConfig.V2.Departures.Layout
   alias ScreensConfig.V2.FreeTextLine
 
-  defstruct screen: nil,
-            section_data: [],
-            slot_names: []
+  defstruct screen: nil, section_data: [], slot_names: [], now: nil
 
   @type normal_section :: %{
           type: :normal_section,
@@ -62,7 +60,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
               | overnight_section()
               | no_data_section()
             ),
-          slot_names: list(atom())
+          slot_names: list(atom()),
+          now: DateTime.t()
         }
 
   # The maximum number of departures to send back to the client.
@@ -72,12 +71,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
 
-    def serialize(%Departures{section_data: section_data, screen: screen}) do
+    def serialize(%Departures{section_data: section_data, screen: screen, now: now}) do
       %{
         sections:
           Enum.map(
             section_data,
-            &Departures.serialize_section(&1, screen, length(section_data) == 1)
+            &Departures.serialize_section(&1, screen, now, length(section_data) == 1)
           )
       }
     end
@@ -91,8 +90,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     def valid_candidate?(_instance), do: true
 
-    def audio_serialize(%Departures{section_data: section_data, screen: screen}) do
-      %{sections: Enum.map(section_data, &Departures.audio_serialize_section(&1, screen))}
+    def audio_serialize(%Departures{section_data: section_data, screen: screen, now: now}) do
+      %{sections: Enum.map(section_data, &Departures.audio_serialize_section(&1, screen, now))}
     end
 
     def audio_sort_key(_instance), do: [1]
@@ -102,13 +101,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.DeparturesView
   end
 
-  def serialize_section(section, screen, is_only_section \\ false)
+  def serialize_section(section, screen, now, is_only_section \\ false)
 
-  def serialize_section(%{type: :notice_section, text: text}, _screen, _) do
+  def serialize_section(%{type: :notice_section, text: text}, _screen, _now, _) do
     %{type: :notice_section, text: text}
   end
 
-  def serialize_section(%{type: :no_data_section, route: route}, _screen, _) do
+  def serialize_section(%{type: :no_data_section, route: route}, _screen, _now, _) do
     text = %FreeTextLine{
       icon: Route.icon(route),
       text: ["Updates unavailable"]
@@ -120,6 +119,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(
         %{type: :headway_section, route: route, time_range: {lo, hi}, headsign: headsign},
         _screen,
+        _now,
         is_only_section
       ) do
     pill_color = Route.color(route)
@@ -165,13 +165,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(
         %{type: :normal_section, rows: departures, layout: layout, header: header},
         screen,
+        now,
         _
       ) do
     rows =
       departures
       |> Enum.take(@max_departures)
       |> group_consecutive_departures(screen)
-      |> Enum.map(&serialize_row(&1, screen))
+      |> Enum.map(&serialize_row(&1, screen, now))
 
     %{
       type: :normal_section,
@@ -181,7 +182,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  def serialize_section(%{type: :overnight_section, routes: routes}, _, _) do
+  def serialize_section(%{type: :overnight_section, routes: routes}, _, _now, _) do
     route_pill =
       routes
       |> Enum.map(&Route.icon/1)
@@ -199,11 +200,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :overnight_section, text: FreeTextLine.to_json(text)}
   end
 
-  def audio_serialize_section(%{type: :notice_section, text: text}, _screen) do
+  def audio_serialize_section(%{type: :notice_section, text: text}, _screen, _now) do
     %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
   end
 
-  def audio_serialize_section(%{type: :normal_section, rows: departures, header: header}, screen) do
+  def audio_serialize_section(
+        %{type: :normal_section, rows: departures, header: header},
+        screen,
+        now
+      ) do
     header =
       case header do
         %{read_as: header} when is_binary(header) -> header
@@ -213,8 +218,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     serialized_departure_groups =
       departures
-      |> group_all_departures(2)
-      |> Enum.map(&audio_serialize_departure_group(&1, screen))
+      |> group_all_departures(now, screen.app_id)
+      |> Enum.map(&audio_serialize_departure_group(&1, screen, now))
 
     %{
       type: :normal_section,
@@ -223,12 +228,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  defp audio_serialize_departure_group({:notice, %{text: text}}, _) do
+  defp audio_serialize_departure_group({:notice, %{text: text}}, _, _now) do
     {:notice, FreeTextLine.to_plaintext(text)}
   end
 
-  defp audio_serialize_departure_group({:normal, departures}, screen) do
-    {:normal, serialize_row(departures, screen, &RoutePill.serialize_for_audio_departure/4)}
+  defp audio_serialize_departure_group({:normal, departures}, screen, now) do
+    {:normal, serialize_row(departures, screen, now, &RoutePill.serialize_for_audio_departure/4)}
   end
 
   @doc """
@@ -258,19 +263,21 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end)
   end
 
-  @doc """
-  Groups all departures of the same route and headsign, limiting each group to `max_entries_per_group` entries.
-  `notice` rows are never grouped.
+  # Groups all departures of the same route and headsign.
+  # `notice` rows are never grouped.
 
-  The list is ordered by the occurrence of the _first_ departure of each group--later departures can "leap frog"
-  ahead of other ones of a different route/headsign if there's an earlier departure of the same route/headsign.
-  """
-  @spec group_all_departures(list(Departure.t() | notice), integer) ::
+  # The list is ordered by the occurrence of the _first_ departure of each group--later departures can "leap frog"
+  # ahead of other ones of a different route/headsign if there's an earlier departure of the same route/headsign.
+  @spec group_all_departures(
+          list(Departure.t() | notice),
+          DateTime.t(),
+          Screen.app_id()
+        ) ::
           list(
             {:normal, list(Departure.t())}
             | {:notice, notice}
           )
-  def group_all_departures(departures, max_entries_per_group) do
+  defp group_all_departures(departures, now, app_id) do
     departures
     |> Util.group_by_with_order(fn
       %{text: %FreeTextLine{}} -> make_ref()
@@ -281,17 +288,33 @@ defmodule Screens.V2.WidgetInstance.Departures do
         {:notice, notice}
 
       {_key, departure_group} ->
-        {:normal, Enum.take(departure_group, max_entries_per_group)}
+        departures =
+          if app_id == :busway_v2 do
+            filter_departure_group(departure_group, now)
+          else
+            Enum.take(departure_group, 2)
+          end
+
+        {:normal, departures}
     end)
+  end
+
+  defp filter_departure_group([first_departure | _] = departure_group, now) do
+    if first_departure |> Departure.time() |> DateTime.diff(now, :minute) <= 2 do
+      Enum.take(departure_group, 2)
+    else
+      [first_departure]
+    end
   end
 
   defp serialize_row(
          departures_or_notice,
          screen,
+         now,
          route_pill_serializer \\ &RoutePill.serialize_for_departure/4
        )
 
-  defp serialize_row([%Departure{} | _] = departures, screen, route_pill_serializer) do
+  defp serialize_row([%Departure{} | _] = departures, screen, now, route_pill_serializer) do
     departure_id_string =
       departures
       |> Enum.map(&Departure.id/1)
@@ -305,12 +328,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :departure_row,
       route: serialize_route(departures, route_pill_serializer),
       headsign: serialize_headsign(departures, screen),
-      times_with_crowding: serialize_times_with_crowding(departures, screen),
+      times_with_crowding: serialize_times_with_crowding(departures, screen, now),
       inline_alerts: serialize_inline_alerts(departures)
     }
   end
 
-  defp serialize_row([%{text: %FreeTextLine{} = text}], _screen, _pill_serializer) do
+  defp serialize_row([%{text: %FreeTextLine{} = text}], _screen, _now, _pill_serializer) do
     %{
       type: :notice_row,
       text: FreeTextLine.to_json(text)
@@ -354,7 +377,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{headsign: headsign, variation: variation}
   end
 
-  def serialize_times_with_crowding(departures, screen, now \\ DateTime.utc_now()) do
+  def serialize_times_with_crowding(departures, screen, now) do
     Enum.map(departures, &serialize_time_with_crowding(&1, screen, now))
   end
 

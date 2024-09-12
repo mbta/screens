@@ -17,7 +17,7 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
       app_id: :solari_test_v2
     }
 
-    deps = %Busway.Deps{departures_instances: fn _ -> [] end}
+    deps = %Busway.Deps{departures_instances: fn _, _ -> [] end}
 
     %{config: config, deps: deps}
   end
@@ -44,7 +44,7 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
 
     test "includes departures instances", %{config: config, deps: deps} do
       no_data = %DeparturesNoData{screen: config, show_alternatives?: true}
-      deps = struct!(deps, departures_instances: fn ^config -> [no_data] end)
+      deps = struct!(deps, departures_instances: fn ^config, _ -> [no_data] end)
 
       assert no_data in Busway.candidate_instances(config, [], deps)
     end

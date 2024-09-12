@@ -25,7 +25,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           departure_fetch_fn: Departure.fetch(),
           disabled_modes_fn: (-> RouteType.t()),
           post_process_fn: (Departure.result(), Screen.t() -> Departure.result() | :overnight),
-          route_fetch_fn: (Route.params() -> {:ok, [Route.t()]} | :error)
+          route_fetch_fn: (Route.params() -> {:ok, [Route.t()]} | :error),
+          now: DateTime.t()
         ]
 
   @type widget ::
@@ -34,9 +35,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           | DeparturesWidget.t()
           | OvernightDepartures.t()
 
-  @spec departures_instances(Screen.t()) :: [widget()]
   @spec departures_instances(Screen.t(), options()) :: [widget()]
-  def departures_instances(%Screen{app_params: %app{}} = config, options \\ [])
+  def departures_instances(%Screen{app_params: %app{}} = config, now, options \\ [])
       when app in [BusEink, BusShelter, Busway, GlEink, SolariLarge] do
     disabled_modes =
       Keyword.get(options, :disabled_modes_fn, &Screens.Config.Cache.disabled_modes/0).()
@@ -49,7 +49,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         disabled_modes,
         Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2),
         Keyword.get(options, :post_process_fn, fn results, _config -> results end),
-        Keyword.get(options, :route_fetch_fn, &Route.fetch/1)
+        Keyword.get(options, :route_fetch_fn, &Route.fetch/1),
+        now
       )
     end
   end
@@ -60,7 +61,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
          disabled_modes,
          departure_fetch_fn,
          post_process_fn,
-         route_fetch_fn
+         route_fetch_fn,
+         now
        ) do
     has_multiple_sections = match?([_, _ | _], sections)
 
@@ -102,7 +104,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
                 }
             end)
 
-          %DeparturesWidget{screen: config, section_data: sections}
+          %DeparturesWidget{screen: config, section_data: sections, now: now}
       end
 
     [departures_instance]

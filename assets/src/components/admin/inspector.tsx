@@ -86,7 +86,7 @@ const Inspector: ComponentType = () => {
                 <ConfigControls screen={screen} />
                 <ViewControls zoom={zoom} setZoom={setZoom} />
                 <DataControls sendToFrame={sendToFrame} />
-                <AudioControls config={config} screen={screen} />
+                <AudioControls screen={screen} />
               </>
             )}
           </>
@@ -305,10 +305,7 @@ const DataControls: ComponentType<{
   );
 };
 
-const AudioControls: ComponentType<{
-  config: Config;
-  screen: ScreenWithId;
-}> = ({ config, screen }) => {
+const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [ssml, setSSML] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -318,24 +315,9 @@ const AudioControls: ComponentType<{
     [dialogRef, ssml],
   );
 
-  let audioPath: string | null = null;
-  let v1ScreenId: string | null = null;
-
-  if (AUDIO_SCREEN_TYPES.has(screen.config.app_id)) {
-    // Temporarily special-case Busway screens while V2 doesn't support audio
-    // yet, in a way that aligns with how they're configured in reality (using
-    // the audio endpoint of a corresponding V1 screen).
-    if (screen.config.app_id == "busway_v2") {
-      const maybeV1Id = screen.id.replace(/-V2$/, "");
-
-      if (maybeV1Id != screen.id && config.screens[maybeV1Id]) {
-        audioPath = `/audio/${maybeV1Id}`;
-        v1ScreenId = maybeV1Id;
-      }
-    } else {
-      audioPath = `/v2/audio/${screen.id}`;
-    }
-  }
+  const audioPath = AUDIO_SCREEN_TYPES.has(screen.config.app_id)
+    ? `/v2/audio/${screen.id}`
+    : null;
 
   return (
     <fieldset>
@@ -360,14 +342,6 @@ const AudioControls: ComponentType<{
               {isPlaying ? "⏹️ Stop Audio" : "▶️ Play Audio"}
             </button>
           </div>
-
-          {v1ScreenId && (
-            <div>
-              <span>
-                (from v1 screen <code>{v1ScreenId}</code>)
-              </span>
-            </div>
-          )}
 
           <dialog className="viewer__modal" ref={dialogRef}>
             <button

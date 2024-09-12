@@ -124,7 +124,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           %DeparturesWidget{
             screen: config,
             section_data: sections,
-            slot_names: [slot_id]
+            slot_names: [slot_id],
+            now: now
           }
       end
     end)

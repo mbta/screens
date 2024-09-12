@@ -31,7 +31,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     }
   end
 
-  describe "departures_instances/1" do
+  describe "departures_instances/3" do
     defp build_config(section_route_ids) do
       %Screen{
         app_params: %BusShelter{
@@ -62,6 +62,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     defp departures_instances(config, options) do
       Departures.departures_instances(
         config,
+        nil,
         Keyword.merge(
           [
             departure_fetch_fn: fn _, _ -> :error end,

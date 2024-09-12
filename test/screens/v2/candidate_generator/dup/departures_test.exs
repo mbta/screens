@@ -347,7 +347,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -397,7 +398,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -437,7 +439,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -520,7 +523,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -570,7 +574,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -620,7 +625,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -706,7 +712,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -756,7 +763,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -806,7 +814,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -864,7 +873,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -887,7 +897,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -910,7 +921,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -998,7 +1010,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1051,7 +1064,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1104,7 +1118,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -1168,7 +1183,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               headsign: "Test A"
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1180,7 +1196,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               headsign: "Test A"
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1192,7 +1209,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               headsign: "Test A"
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -1298,7 +1316,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1351,7 +1370,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1404,7 +1424,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -1521,7 +1542,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1544,7 +1566,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1567,7 +1590,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -1659,7 +1683,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               headsign: "Westbound"
             }
           ],
-          slot_names: [:main_content_reduced_zero]
+          slot_names: [:main_content_reduced_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1671,7 +1696,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               headsign: "Westbound"
             }
           ],
-          slot_names: [:main_content_reduced_one]
+          slot_names: [:main_content_reduced_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1683,7 +1709,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               headsign: "Westbound"
             }
           ],
-          slot_names: [:main_content_reduced_two]
+          slot_names: [:main_content_reduced_two],
+          now: now
         }
       ]
 
@@ -1757,7 +1784,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1784,7 +1812,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1811,7 +1840,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               route: %{id: "Green", type: :light_rail}
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -1941,7 +1971,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1964,7 +1995,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -1996,7 +2028,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -2074,7 +2107,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -2097,7 +2131,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -2129,7 +2164,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -2194,21 +2230,24 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
           section_data: [
             %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
           section_data: [
             %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -2265,21 +2304,24 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           section_data: [
             %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
           section_data: [
             %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
           section_data: [
             %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
           ],
-          slot_names: [:main_content_two]
+          slot_names: [:main_content_two],
+          now: now
         }
       ]
 
@@ -2364,7 +2406,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_zero]
+          slot_names: [:main_content_zero],
+          now: now
         },
         %DeparturesWidget{
           screen: config,
@@ -2387,7 +2430,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               ]
             }
           ],
-          slot_names: [:main_content_one]
+          slot_names: [:main_content_one],
+          now: now
         },
         %OvernightDepartures{screen: config, routes: [:bus], slot_names: [:main_content_two]}
       ]

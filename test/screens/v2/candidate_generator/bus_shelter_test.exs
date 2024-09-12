@@ -74,7 +74,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
 
   describe "candidate_instances/3" do
     test "returns expected header and footer", %{config: config} do
-      departures_instances_fn = fn _ -> [] end
+      departures_instances_fn = fn _, _ -> [] end
       alert_instances_fn = fn _ -> [] end
       fetch_stop_fn = fn "1216" -> "Columbus Ave @ Dimock St" end
       now = ~U[2020-04-06T10:00:00Z]
@@ -111,7 +111,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       config =
         put_in(config.app_params.header, %V2.Header.CurrentStopName{stop_name: "Walnut Ave"})
 
-      departures_instances_fn = fn _ -> [] end
+      departures_instances_fn = fn _, _ -> [] end
       alert_instances_fn = fn _ -> [] end
       fetch_stop_fn = fn "1216" -> raise "This should not be called!" end
       now = ~U[2020-04-06T10:00:00Z]
