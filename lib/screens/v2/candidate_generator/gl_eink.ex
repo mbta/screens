@@ -81,7 +81,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         _opts,
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
-        departures_instances_fn \\ &Widgets.Departures.departures_instances/2,
+        departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
         subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
