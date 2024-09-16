@@ -17,7 +17,7 @@ defmodule Screens.Stops.Stop do
   alias Screens.Stops
   alias Screens.Util
   alias Screens.V3Api
-  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare, Triptych}
+  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
 
   defstruct id: nil,
             name: nil,
@@ -33,7 +33,7 @@ defmodule Screens.Stops.Stop do
           platform_name: String.t() | nil
         }
 
-  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup | Triptych
+  @type screen_type :: BusEink | BusShelter | GlEink | PreFare | Dup
 
   @blue_line_stops [
     {"place-wondl", {"Wonderland", "Wonderland"}},
@@ -447,7 +447,6 @@ defmodule Screens.Stops.Stop do
   # Ashmont should not show Mattapan alerts for PreFare or Dup
   def get_route_type_filter(app, "place-asmnl") when app in [PreFare, Dup], do: [:subway]
   def get_route_type_filter(PreFare, _), do: [:light_rail, :subway]
-  def get_route_type_filter(Triptych, _), do: [:light_rail, :subway]
   # WTC is a special bus-only case
   def get_route_type_filter(Dup, "place-wtcst"), do: [:bus]
   def get_route_type_filter(Dup, _), do: [:light_rail, :subway]
@@ -483,14 +482,12 @@ defmodule Screens.Stops.Stop do
     RoutePattern.fetch_tagged_stop_sequences_through_stop(stop_id)
   end
 
-  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
-       when app in [Dup, Triptych] do
+  defp fetch_tagged_stop_sequences_by_app(Dup, stop_id, routes_at_stop) do
     route_ids = Route.route_ids(routes_at_stop)
     RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids)
   end
 
-  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
-       when app == PreFare do
+  defp fetch_tagged_stop_sequences_by_app(PreFare, stop_id, routes_at_stop) do
     route_ids = Route.route_ids(routes_at_stop)
 
     # We limit results to canonical route patterns only--no stop sequences for nonstandard patterns.

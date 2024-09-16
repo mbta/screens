@@ -14,7 +14,6 @@ Some examples of the various client apps, as of January 2023:
 | [Multimodal LCD][solari sample]             | used at high-traffic transfer stations served by many routes/modes                                                            |
 | [Pre-fare duo LCD][pre_fare sample]         | posted outside of fare gates at rapid transit stations; content is split across two portrait-oriented 1080p physical displays |
 | ["Digital Urban Panel" LCD][dup sample]     | content appears in rotation with ads on screens posted outside rapid transit station entrances                                |
-| Triptych trio LCD                           | (:construction: WIP!) posted across the tracks from platforms at major stations; content is split across three portrait-oriented 1080p physical displays and appears in rotation with ads |
 
 and more to come!
 
@@ -28,11 +27,11 @@ On <sup>almost</sup> all of our screen types, we use a common "framework" to fet
 
 Check out [ARCHITECTURE.md](/ARCHITECTURE.md) for an overview of the application architecture, as well as links to further more detailed documentation.
 
-## Packaging the DUP and Triptych apps
+## Packaging the DUP app
 
-The DUP and Triptych screens require the client app to be packaged into a single HTML file rather than dynamically served from our Phoenix server.
+The DUP screens require the client app to be packaged into a single HTML file rather than dynamically served from our Phoenix server.
 
-You can find instructions on the DUP packaging process [here](assets/src/components/v2/dup/README.md), the triptych packaging process [here](assets/src/components/v2/triptych/README.md).
+You can find instructions on the DUP packaging process [here](assets/src/components/v2/dup/README.md).
 
 ## Version upgrade guide
 

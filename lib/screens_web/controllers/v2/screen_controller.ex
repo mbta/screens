@@ -6,7 +6,7 @@ defmodule ScreensWeb.V2.ScreenController do
   alias ScreensConfig.Screen
 
   @default_app_id :bus_eink
-  @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 gl_eink_v2 solari_large_v2 pre_fare_v2 triptych_v2]a
+  @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 gl_eink_v2 solari_large_v2 pre_fare_v2]a
   @app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   plug(:check_config)
@@ -51,15 +51,6 @@ defmodule ScreensWeb.V2.ScreenController do
       "0" -> "0"
       "1" -> "1"
       "2" -> "2"
-      _ -> nil
-    end
-  end
-
-  defp triptych_pane(params) do
-    case params["pane"] do
-      "left" -> "left"
-      "middle" -> "middle"
-      "right" -> "right"
       _ -> nil
     end
   end
@@ -145,7 +136,6 @@ defmodule ScreensWeb.V2.ScreenController do
       screen_side: screen_side(params),
       requestor: params["requestor"],
       rotation_index: rotation_index(params),
-      triptych_pane: triptych_pane(params),
       variant: params["variant"],
       is_pending: false
     ]

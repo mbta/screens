@@ -33,5 +33,4 @@ maybe_cp() {
 
 maybe_cp s3://mbta-ctd-config/screens/screens-"$1".json priv/local.json
 maybe_cp s3://mbta-ctd-config/screens/pending-screens-"$1".json priv/local_pending.json
-maybe_cp s3://mbta-ctd-config/screens/triptych-player-"$1".json priv/triptych_player_to_screen_id.json
 maybe_cp s3://mbta-signs/config.json priv/signs_ui_config.json

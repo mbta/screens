@@ -91,13 +91,11 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   # A screen is valid for self-refresh if all of these are true:
   # - It's a v2 screen (i.e., it shows widgets)
   # - It's not hidden from Screenplay
-  # - It's a screen type that can show alerts in some capacity
   defp valid_for_self_refresh?(screen_config) do
     is_v2 = Screen.v2_screen?(screen_config)
     is_visible_to_screenplay = not screen_config.hidden_from_screenplay
-    shows_alerts = Screen.shows_alerts?(screen_config)
 
-    is_v2 and is_visible_to_screenplay and shows_alerts
+    is_v2 and is_visible_to_screenplay
   end
 
   defp schedule_run do

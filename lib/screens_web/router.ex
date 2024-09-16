@@ -72,9 +72,6 @@ defmodule ScreensWeb.Router do
     get "/image_filenames", AdminApiController, :image_filenames
     post "/image", AdminApiController, :upload_image
     delete "/image/:filename", AdminApiController, :delete_image
-    get "/triptych_players", AdminApiController, :index_triptych_players
-    post "/triptych_players/validate", AdminApiController, :validate_triptych_players
-    post "/triptych_players/confirm", AdminApiController, :confirm_triptych_players
   end
 
   scope "/screen", ScreensWeb do
@@ -108,7 +105,6 @@ defmodule ScreensWeb.Router do
       get "/:id/simulation", ScreenApiController, :simulation
 
       get "/:id/dup", ScreenApiController, :show_dup
-      get "/:player_name/triptych", ScreenApiController, :show_triptych
 
       get "/pending/:id", ScreenApiController, :show_pending
       get "/pending/:id/simulation", ScreenApiController, :simulation_pending

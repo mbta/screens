@@ -3,12 +3,11 @@ import useDriftlessInterval from "Hooks/use_driftless_interval";
 import React, { useEffect, useMemo, useState } from "react";
 import { getDatasetValue } from "Util/dataset";
 import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
-import { isDup, isOFM, isTriptych, getTriptychPane } from "Util/outfront";
+import { isDup } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/util";
 import * as SentryLogger from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 import { DUP_VERSION } from "Components/v2/dup/version";
-import { TRIPTYCH_VERSION } from "Components/v2/triptych/version";
 import useRefreshRate from "./use_refresh_rate";
 
 const BASE_PATH = "/v2/api/screen";
@@ -119,11 +118,6 @@ const loggingParams = () => {
       rotation_index: ROTATION_INDEX.toString(),
       version: DUP_VERSION,
     };
-  } else if (isTriptych()) {
-    return {
-      pane: getTriptychPane() ?? "UNKNOWN",
-      version: TRIPTYCH_VERSION,
-    };
   } else {
     return {};
   }
@@ -131,7 +125,7 @@ const loggingParams = () => {
 
 const useApiPath = (screenId: string, appendPath?: string): string => {
   return useMemo(() => {
-    const base = isOFM() ? OUTFRONT_BASE_URI : document.baseURI;
+    const base = isDup() ? OUTFRONT_BASE_URI : document.baseURI;
     const path = [
       BASE_PATH,
       getDatasetValue("isPending") === "true" ? "pending" : null,
@@ -281,18 +275,14 @@ const useApiResponse = ({ id }) => useBaseApiResponse(id);
 const useSimulationApiResponse = ({ id }) =>
   useBaseApiResponse(id, "simulation");
 
-// For OFM apps--DUP, triptych--we need to request a different
+// For OFM apps--DUPs--we need to request a different
 // route that's more permissive of CORS, since these clients are loaded from a local html file
 // (and thus their data requests to our server are cross-origin).
 //
 // The /dup endpoint only has the CORS stuff, and otherwise runs exactly the same backend logic as
 // the normal one used by `useApiResponse`.
-//
-// The /triptych endpoint has the CORS stuff, plus an additional step that maps the player name of
-// the individual triptych pane to a screen ID representing the collective trio.
 const useDUPApiResponse = ({ id }) => useBaseApiResponse(id, "dup");
-const useTriptychApiResponse = ({ id }) => useBaseApiResponse(id, "triptych");
 
 export default useApiResponse;
 export type { ApiResponse, SimulationData };
-export { useSimulationApiResponse, useDUPApiResponse, useTriptychApiResponse };
+export { useSimulationApiResponse, useDUPApiResponse };

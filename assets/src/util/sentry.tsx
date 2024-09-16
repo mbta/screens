@@ -1,4 +1,4 @@
-import { isOFM } from "Util/outfront";
+import { isDup } from "Util/outfront";
 import { isRealScreen } from "Util/util";
 import { getDataset } from "Util/dataset";
 // Previously tried @sentry/react and @sentry/browser as the SDK, but the QtWeb browser on e-inks could not
@@ -29,7 +29,7 @@ const initSentry = (appString: string) => {
   if (sentryDsn && isRealScreen()) {
     Raven.config(sentryDsn, { environment: env }).install();
 
-    if (isOFM()) {
+    if (isDup()) {
       const today = new Date();
       const hour = today.getHours();
       const min = today.getMinutes();

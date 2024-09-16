@@ -19,10 +19,8 @@ import {
   BusShelterV2ScreensTable,
   PreFareV2ScreensTable,
   DupV2ScreensTable,
-  TriptychV2ScreensTable,
 } from "Components/admin/admin_tables";
 import AdminScreenConfigForm from "Components/admin/admin_screen_config_form";
-import AdminTriptychPlayerForm from "Components/admin/admin_triptych_player_form";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
 import Inspector from "Components/admin/inspector";
@@ -37,13 +35,9 @@ const routes: [string, string, ComponentType][][] = [
     ["gl-eink-v2-screens", "GL E-ink", GLEinkV2ScreensTable],
     ["pre-fare-v2-screens", "Pre-Fare", PreFareV2ScreensTable],
     ["busway-v2-screens", "Sectional", BuswayV2ScreensTable],
-    ["triptych-v2-screens", "Triptych", TriptychV2ScreensTable],
   ],
   [["solari-screens", "Solari (v1)", SolariScreensTable]],
-  [
-    ["screens-json-editor", "Config Editor", AdminScreenConfigForm],
-    ["triptych-player-json-editor", "Triptych Editor", AdminTriptychPlayerForm],
-  ],
+  [["screens-json-editor", "Config Editor", AdminScreenConfigForm]],
   [["image-manager", "Image Manager", ImageManager]],
   [["devops", "Devops", Devops]],
 ];

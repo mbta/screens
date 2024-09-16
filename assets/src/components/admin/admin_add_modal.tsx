@@ -25,7 +25,6 @@ const fields = [
       "solari",
       "solari_large",
       "solari_large_v2",
-      "triptych_v2",
     ]),
   },
   {
@@ -86,11 +85,6 @@ const defaultAppParamsByAppId = {
     header: {},
   },
   pre_fare_v2: {
-    header: {
-      stop_name: "",
-    },
-  },
-  triptych_v2: {
     header: {
       stop_name: "",
     },

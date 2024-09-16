@@ -1,7 +1,7 @@
 # DUP app packaging v2
 
 - Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the DUP-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/v2/screen_api_controller.ex#L9) in the API controller--if it is, you don't need to do anything for this step.
-- Double check that any behavior specific to the DUP screen environment happens inside of an `isDup()` or `isOFM()` check. This includes:
+- Double check that any behavior specific to the DUP screen environment happens inside of an `isDup()` check. This includes:
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
 - Create priv/static/dup-app.html if it doesn’t already exist. Copy paste the following contents in:
@@ -44,7 +44,7 @@
     ```
     This sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
     The MRAID object gives our client info about which screen it's running on.
-  - replace the definition of `OUTFRONT_BASE_URI` in `assets/src/hooks/v2/use_api_response.tsx` with `"http://localhost:4000"`.
+  - replace the definition of `getOutfrontAbsolutePath` in assets/src/hooks/v2/use_api_response.tsx with `const getOutfrontAbsolutePath = () => isDup() ? "http://localhost:4000" : "";`.
 - `cd` to priv/static and run the following:
   ```sh
   for ROTATION_INDEX in {0..2}; do

@@ -10,12 +10,11 @@ import useApiResponse, {
   ApiResponse,
   SimulationData,
   useDUPApiResponse,
-  useTriptychApiResponse,
 } from "Hooks/v2/use_api_response";
 import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
-import { isDup, isOFM, isTriptych } from "Util/outfront";
+import { isDup } from "Util/outfront";
 
 type ResponseMapper = (apiResponse: ApiResponse) => WidgetData | SimulationData;
 
@@ -92,7 +91,7 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   showBlink,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
-  const ErrorBoundaryOrFragment = isOFM() ? Fragment : WidgetTreeErrorBoundary;
+  const ErrorBoundaryOrFragment = isDup() ? Fragment : WidgetTreeErrorBoundary;
 
   // We know this can only be `WidgetData` and not `SimulationData` here because
   // `ScreenPage` is only used in contexts where a "non-simulation" API response
@@ -114,8 +113,6 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
 const getApiResponseHook = () => {
   if (isDup()) {
     return useDUPApiResponse;
-  } else if (isTriptych()) {
-    return useTriptychApiResponse;
   } else {
     return useApiResponse;
   }

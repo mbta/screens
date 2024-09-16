@@ -4,8 +4,6 @@ defmodule ScreensWeb.AdminApiController do
   alias Screens.Config.Cache, as: ConfigCache
   alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.Image
-  alias Screens.TriptychPlayer
-  alias Screens.TriptychPlayer.Fetch, as: TriptychPlayerFetch
   alias ScreensConfig.{Config, Devops, Screen}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
@@ -54,36 +52,6 @@ defmodule ScreensWeb.AdminApiController do
 
     success =
       case ConfigFetch.put_config(new_config_json) do
-        :ok -> true
-        :error -> false
-      end
-
-    json(conn, %{success: success})
-  end
-
-  def index_triptych_players(conn, _params) do
-    {:ok, mapping, _version} = TriptychPlayerFetch.fetch_config()
-    json(conn, %{config: mapping})
-  end
-
-  def validate_triptych_players(conn, %{"config" => config}) do
-    with {:ok, mapping} <- Jason.decode(config),
-         :ok <- TriptychPlayer.validate(mapping) do
-      json(conn, %{success: true, config: mapping})
-    else
-      {:error, message} when is_binary(message) ->
-        json(conn, %{success: false, message: message})
-
-      {:error, jason_exception} when is_exception(jason_exception) ->
-        json(conn, %{success: false, message: Exception.message(jason_exception)})
-    end
-  end
-
-  def confirm_triptych_players(conn, %{"config" => config}) do
-    pretty_json = config |> Jason.decode!() |> Jason.encode!(pretty: true)
-
-    success =
-      case TriptychPlayerFetch.put_config(pretty_json) do
         :ok -> true
         :error -> false
       end
