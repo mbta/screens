@@ -270,6 +270,7 @@ defmodule Screens.Stops.Stop do
     end
   end
 
+  @callback fetch_stop_name(id()) :: String.t() | nil
   def fetch_stop_name(stop_id) do
     Screens.Telemetry.span(~w[screens stops stop fetch_stop_name]a, %{stop_id: stop_id}, fn ->
       case Screens.V3Api.get_json("stops", %{"filter[id]" => stop_id}) do

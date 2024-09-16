@@ -162,3 +162,5 @@ config :screens, :screens_by_alert,
 config :screens, Screens.V2.ScreenData,
   config_cache_module: Screens.Config.MockCache,
   parameters_module: Screens.V2.ScreenData.MockParameters
+
+config :screens, Screens.V2.CandidateGenerator.DupNew, stop_module: Screens.Stops.MockStop
