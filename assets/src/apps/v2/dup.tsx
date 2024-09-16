@@ -35,6 +35,7 @@ import {
 } from "Components/v2/screen_container";
 import PageLoadNoData from "Components/v2/dup/page_load_no_data";
 import NoData from "Components/v2/dup/no_data";
+import DeparturesNoData from "Components/v2/dup/departures_no_data";
 import OvernightDepartures from "Components/v2/dup/overnight_departures";
 import { usePlayerName } from "Hooks/outfront";
 import { isDup } from "Util/outfront";
@@ -62,7 +63,7 @@ const TYPE_TO_COMPONENT = {
   takeover_alert: TakeoverAlert,
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
-  departures_no_data: NoData,
+  departures_no_data: DeparturesNoData,
   overnight_departures: OvernightDepartures,
 };
 
