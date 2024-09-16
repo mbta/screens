@@ -39,14 +39,14 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
       deps = struct!(deps, now: fn -> now end)
 
       expected_header = %NormalHeader{screen: config, icon: :logo, text: "Ruggles", time: now}
-      assert expected_header in Busway.candidate_instances(config, [], deps)
+      assert expected_header in Busway.candidate_instances(config, deps)
     end
 
     test "includes departures instances", %{config: config, deps: deps} do
       no_data = %DeparturesNoData{screen: config, show_alternatives?: true}
       deps = struct!(deps, departures_instances: fn ^config, _ -> [no_data] end)
 
-      assert no_data in Busway.candidate_instances(config, [], deps)
+      assert no_data in Busway.candidate_instances(config, deps)
     end
   end
 end

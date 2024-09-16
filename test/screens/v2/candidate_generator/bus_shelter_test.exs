@@ -72,7 +72,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
     end
   end
 
-  describe "candidate_instances/3" do
+  describe "candidate_instances/7" do
     test "returns expected header and footer", %{config: config} do
       departures_instances_fn = fn _, _ -> [] end
       alert_instances_fn = fn _ -> [] end
@@ -80,7 +80,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
       subway_status_instances_fn = fn _, _ -> [] end
-      opts = []
 
       expected_header = %NormalHeader{
         screen: config,
@@ -94,7 +93,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       actual_instances =
         BusShelter.candidate_instances(
           config,
-          opts,
           now,
           fetch_stop_fn,
           departures_instances_fn,
@@ -117,7 +115,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       now = ~U[2020-04-06T10:00:00Z]
       evergreen_content_instances_fn = fn _ -> [] end
       subway_status_instances_fn = fn _, _ -> [] end
-      opts = []
 
       expected_header = %NormalHeader{
         screen: config,
@@ -129,7 +126,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
       actual_instances =
         BusShelter.candidate_instances(
           config,
-          opts,
           now,
           fetch_stop_fn,
           departures_instances_fn,

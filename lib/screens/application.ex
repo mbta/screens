@@ -13,7 +13,6 @@ defmodule Screens.Application do
       Screens.Telemetry,
       {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
       {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
-      {Screens.Cache.Owner, engine_module: Screens.TriptychPlayer.Cache.Engine},
       :hackney_pool.child_spec(:ex_aws_pool, []),
       :hackney_pool.child_spec(:blue_bikes_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
@@ -27,8 +26,6 @@ defmodule Screens.Application do
       {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
       # ScreensByAlert self-refresh job runner
       {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
-      Screens.OlCrowding.DynamicSupervisor,
-      {Screens.OlCrowding.Agent, %{}},
       # Task supervisor for parallel running of candidate generator variants
       {Task.Supervisor, name: Screens.V2.ScreenData.ParallelRunSupervisor},
       {Screens.ScreenApiResponseCache, []},

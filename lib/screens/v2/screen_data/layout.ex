@@ -32,13 +32,12 @@ defmodule Screens.V2.ScreenData.Layout do
 
   @spec generate(Screen.t()) :: t()
   @spec generate(Screen.t(), String.t() | nil) :: t()
-  @spec generate(Screen.t(), String.t() | nil, keyword()) :: t()
-  def generate(config, variant \\ nil, candidate_generator_opts \\ []) do
+  def generate(config, variant \\ nil) do
     candidate_generator = @parameters.get_candidate_generator(config, variant)
     screen_template = candidate_generator.screen_template()
 
     config
-    |> candidate_generator.candidate_instances(candidate_generator_opts)
+    |> candidate_generator.candidate_instances()
     |> Enum.filter(&WidgetInstance.valid_candidate?/1)
     |> pick_instances(screen_template)
   end

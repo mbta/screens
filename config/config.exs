@@ -70,8 +70,6 @@ config :screens,
   audio_psa_s3_directory: "/screens/audio_assets/psa/",
   signs_ui_s3_path: "config.json",
   signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.S3,
-  triptych_player_s3_bucket: "mbta-ctd-config",
-  triptych_player_fetcher: Screens.TriptychPlayer.Fetch.S3,
   last_deploy_fetcher: Screens.Util.LastDeploy.S3Fetch,
   blue_bikes_api_client: Screens.BlueBikes.Client,
   blue_bikes_station_information_url:

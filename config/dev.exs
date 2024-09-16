@@ -16,13 +16,11 @@ config :screens, ScreensWeb.Endpoint,
 config :screens,
   config_fetcher: Screens.Config.Fetch.Local,
   pending_config_fetcher: Screens.PendingConfig.Fetch.Local,
-  triptych_player_fetcher: Screens.TriptychPlayer.Fetch.Local,
   last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:priv, "local.json"},
   local_pending_config_file_spec: {:priv, "local_pending.json"},
   local_signs_ui_config_file_spec: {:priv, "signs_ui_config.json"},
-  signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.Local,
-  local_triptych_player_file_spec: {:priv, "triptych_player_to_screen_id.json"}
+  signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.Local
 
 config :screens, ScreensWeb.AuthManager, secret_key: "secret key"
 

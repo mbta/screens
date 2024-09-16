@@ -14,7 +14,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   plug(:check_config)
 
-  plug Corsica, [origins: "*"] when action in [:show_dup, :show_triptych, :log_frontend_error]
+  plug Corsica, [origins: "*"] when action in [:show_dup, :log_frontend_error]
 
   defp check_config(conn, _) do
     if Cache.ok?() do
@@ -29,7 +29,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
     is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
     screen_side = params["screen_side"]
-    triptych_pane = params["pane"]
     variant = params["variant"]
     screen = Cache.screen(screen_id)
 
@@ -85,15 +84,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> screen_response(variant,
-            run_all_variants?: true,
-            update_visible_alerts?: true,
-            logging_options: %{
-              is_real_screen: is_screen,
-              screen_id: screen_id,
-              triptych_pane: triptych_pane
-            }
-          )
+          |> screen_response(variant, run_all_variants?: true, update_visible_alerts?: true)
           |> put_extra_fields(screen_id, screen)
 
         json(conn, response)
@@ -134,21 +125,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   def show_dup(conn, params), do: show(conn, params)
-
-  def show_triptych(conn, %{"player_name" => player_name} = params) do
-    case Screens.TriptychPlayer.fetch_screen_id_for_player(player_name) do
-      {:ok, screen_id} ->
-        show(conn, Map.put(params, "id", screen_id))
-
-      :error ->
-        LogScreenData.log_unrecognized_triptych_player(player_name)
-
-        # Reuse the logic + logging in show/2 for nonexistent IDs.
-        # This will log a data request for the nonexistent player name and
-        # return a 404 response.
-        show(conn, Map.put(params, "id", "triptych_player_name--#{player_name}"))
-    end
-  end
 
   def simulation(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
     variant = params["variant"]
@@ -197,16 +173,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         not_found_response(conn)
 
       config ->
-        screen_data =
-          ScreenData.get(
-            screen_id,
-            pending_config: config,
-            logging_options: %{
-              is_real_screen: false,
-              screen_id: screen_id,
-              triptych_pane: "UNKNOWN"
-            }
-          )
+        screen_data = ScreenData.get(screen_id, pending_config: config)
 
         json(conn, %{@base_response | data: screen_data})
     end

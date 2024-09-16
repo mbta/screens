@@ -16,9 +16,6 @@
   <%= if not is_nil(@rotation_index) do %>
     data-rotation-index="<%= @rotation_index %>"
   <% end %>
-  <%= if not is_nil(@triptych_pane) do %>
-    data-triptych-pane="<%= @triptych_pane %>"
-  <% end %>
   <%= if assigns[:screenplay_fullstory_org_id] do %>
     data-screenplay-fullstory-org-id="<%= assigns[:screenplay_fullstory_org_id] %>"
   <% end %>

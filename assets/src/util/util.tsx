@@ -3,7 +3,7 @@ import "moment-timezone";
 import { RefObject } from "react";
 
 import { getDatasetValue } from "Util/dataset";
-import { isOFM, isTriptych } from "Util/outfront";
+import { isDup } from "Util/outfront";
 
 export const classWithModifier = (baseClass, modifier) => {
   if (!modifier) {
@@ -33,16 +33,13 @@ export const hasOverflowX = (ref: RefObject<Element>): boolean =>
   !!ref.current && ref.current.scrollWidth > ref.current.clientWidth;
 
 export const imagePath = (fileName: string): string =>
-  isOFM() ? outfrontImagePath(fileName) : `/images/${fileName}`;
-
-export const outfrontImagePath = (fileName: string): string =>
-  isTriptych() ? `triptych_images/${fileName}` : `images/${fileName}`;
+  isDup() ? `images/${fileName}` : `/images/${fileName}`;
 
 export const pillPath = (fileName: string): string =>
-  isOFM() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
+  isDup() ? `images/pills/${fileName}` : `/images/pills/${fileName}`;
 
 export const isRealScreen = () =>
-  isOFM() || getDatasetValue("isRealScreen") === "true";
+  isDup() || getDatasetValue("isRealScreen") === "true";
 
 type ScreenSide = "left" | "right";
 const isScreenSide = (value: any): value is ScreenSide => {
