@@ -14,8 +14,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
             schedule: [%Schedule{}],
             now: nil,
             text_for_audio: nil,
-            audio_priority: nil,
-            show_identifiers: false
+            audio_priority: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
@@ -25,8 +24,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
           schedule: list(Schedule.t()) | RecurrentSchedule.t(),
           now: DateTime.t(),
           text_for_audio: String.t(),
-          audio_priority: WidgetInstance.priority(),
-          show_identifiers: boolean()
+          audio_priority: WidgetInstance.priority()
         }
 
   def priority(%__MODULE__{} = instance), do: instance.priority

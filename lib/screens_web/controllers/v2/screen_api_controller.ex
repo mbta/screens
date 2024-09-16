@@ -86,11 +86,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
           screen_id
           |> screen_response(variant,
             run_all_variants?: true,
-            update_visible_alerts?: true,
-            logging_options: %{
-              is_real_screen: is_screen,
-              screen_id: screen_id
-            }
+            update_visible_alerts?: true
           )
           |> put_extra_fields(screen_id, screen)
 
@@ -183,11 +179,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         screen_data =
           ScreenData.get(
             screen_id,
-            pending_config: config,
-            logging_options: %{
-              is_real_screen: false,
-              screen_id: screen_id
-            }
+            pending_config: config
           )
 
         json(conn, %{@base_response | data: screen_data})

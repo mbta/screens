@@ -83,14 +83,13 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     end
   end
 
-  describe "candidate_instances/4" do
+  describe "candidate_instances/6" do
     test "returns expected header", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
       fetch_stop_fn = fn "place-gover" -> "Government Center" end
       departures_instances_fn = fn _, _ -> [] end
       evergreen_content_instances_fn = fn _ -> [] end
       alerts_instances_fn = fn _, _ -> [] end
-      opts = []
 
       expected_headers =
         List.duplicate(
@@ -106,7 +105,6 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       actual_instances =
         Dup.candidate_instances(
           config,
-          opts,
           now,
           fetch_stop_fn,
           evergreen_content_instances_fn,

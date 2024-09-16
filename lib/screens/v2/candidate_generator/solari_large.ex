@@ -25,7 +25,6 @@ defmodule Screens.V2.CandidateGenerator.SolariLarge do
   # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
   def candidate_instances(
         config,
-        _opts,
         now \\ DateTime.utc_now(),
         departures_instances_fn \\ &Widgets.Departures.departures_instances/2
       ) do

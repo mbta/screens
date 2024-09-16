@@ -26,7 +26,6 @@ defmodule Screens.V2.ScreenData do
   @type variants(data) :: {data, %{String.t() => data}}
   @type screen_id :: String.t()
   @type options :: [
-          logging_options: %{atom() => term()},
           generator_variant: String.t(),
           pending_config: Screen.t(),
           run_all_variants?: boolean(),
@@ -69,13 +68,13 @@ defmodule Screens.V2.ScreenData do
       Enum.each(other_variants, fn variant ->
         {:ok, _pid} =
           Task.Supervisor.start_child(ParallelRunSupervisor, fn ->
-            config |> Layout.generate(variant, opts) |> then_fn.(config)
+            config |> Layout.generate(variant) |> then_fn.(config)
           end)
       end)
     end
 
     config
-    |> Layout.generate(selected_variant, opts)
+    |> Layout.generate(selected_variant)
     |> tap(&update_visible_alerts(&1, screen_id, config, opts))
     |> then_fn.(config)
   end
@@ -90,7 +89,7 @@ defmodule Screens.V2.ScreenData do
     |> Task.Supervisor.async_stream(
       [nil | @parameters.get_variants(config)],
       fn variant ->
-        {variant, config |> Layout.generate(variant, opts) |> then_fn.(config)}
+        {variant, config |> Layout.generate(variant) |> then_fn.(config)}
       end
     )
     |> Enum.map(fn {:ok, result} -> result end)

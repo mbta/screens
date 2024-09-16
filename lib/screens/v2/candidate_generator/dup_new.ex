@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew do
   defdelegate screen_template(), to: DupBase
 
   @impl CandidateGenerator
-  def candidate_instances(_config, _opts) do
+  def candidate_instances(_config) do
     List.duplicate(
       %Placeholder{
         color: :gray,

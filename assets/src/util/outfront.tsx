@@ -24,8 +24,6 @@ export const getRotationIndex = (): RotationIndex | null => {
 /**
  * Gets Outfront's unique name/ID for the media player we're running on.
  *
- * For DUPs, this is just a single ID.
- *
  * Returns null if we fail to determine the player name for any reason.
  */
 export const getPlayerName = (): string | null => {

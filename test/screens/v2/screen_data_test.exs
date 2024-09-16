@@ -12,7 +12,7 @@ defmodule Screens.V2.ScreenDataTest.Stub do
         def screen_template(), do: Builder.build_template({:screen, %{normal: [:main]}})
 
         @impl CandidateGenerator
-        def candidate_instances(config, _opts) do
+        def candidate_instances(config) do
           unquote(instances_fn).(config)
         end
 

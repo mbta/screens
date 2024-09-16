@@ -30,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.Busway do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(config, _opts, deps \\ %Deps{}) do
+  def candidate_instances(config, deps \\ %Deps{}) do
     now = deps.now.()
 
     [

@@ -44,7 +44,7 @@
     ```
     This sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
     The MRAID object gives our client info about which screen it's running on.
-  - replace the definition of `getOutfrontAbsolutePath` in assets/src/hooks/v2/use_api_response.tsx with `const getOutfrontAbsolutePath = () => isDup() ? "http://localhost:4000" : "";`.
+  - replace the definition of `OUTFRONT_BASE_URI` in `assets/src/hooks/v2/use_api_response.tsx` with `"http://localhost:4000"`.
 - `cd` to priv/static and run the following:
   ```sh
   for ROTATION_INDEX in {0..2}; do

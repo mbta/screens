@@ -30,11 +30,10 @@ defmodule Screens.V2.CandidateGenerator.SolariLargeTest do
     end
   end
 
-  describe "candidate_instances/2" do
+  describe "candidate_instances/3" do
     test "returns expected header", %{config: config} do
       departures_instances_fn = fn _, _ -> [] end
       now = ~U[2020-04-06T10:00:00Z]
-      opts = []
 
       expected_header = %NormalHeader{
         screen: config,
@@ -44,7 +43,7 @@ defmodule Screens.V2.CandidateGenerator.SolariLargeTest do
       }
 
       actual_instances =
-        SolariLarge.candidate_instances(config, opts, now, departures_instances_fn)
+        SolariLarge.candidate_instances(config, now, departures_instances_fn)
 
       assert expected_header in actual_instances
     end
