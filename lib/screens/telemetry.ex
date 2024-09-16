@@ -24,12 +24,18 @@ defmodule Screens.Telemetry do
         metadata: ~w[stop_id type_filters]a
       ),
       # DUP Candidate Generator
+      log_span(~w[screens v2 candidate_generator dup]a),
       log_span(~w[screens v2 candidate_generator dup departures_instances]a),
       log_span(~w[screens v2 candidate_generator dup departures get_section_data]a),
       log_span(~w[screens v2 candidate_generator dup departures get_sections_data]a),
       log_span(~w[screens v2 candidate_generator dup header_instances]a),
       log_span(~w[screens v2 candidate_generator dup alerts_instances]a),
       log_span(~w[screens v2 candidate_generator dup evergreen_content_instances]a),
+      # New DUP Candidate Generator
+      log_span(~w[screens v2 candidate_generator dup_new]a),
+      log_span(~w[screens v2 candidate_generator dup_new departures_instances]a),
+      log_span(~w[screens v2 candidate_generator dup_new evergreen_instances]a),
+      log_span(~w[screens v2 candidate_generator dup_new header_instances]a),
 
       # events
       log_event(~w[hackney_pool]a,
