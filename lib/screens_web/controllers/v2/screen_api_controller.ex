@@ -84,10 +84,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> screen_response(variant,
-            run_all_variants?: true,
-            update_visible_alerts?: true
-          )
+          |> screen_response(variant, run_all_variants?: true, update_visible_alerts?: true)
           |> put_extra_fields(screen_id, screen)
 
         json(conn, response)
@@ -176,11 +173,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
         not_found_response(conn)
 
       config ->
-        screen_data =
-          ScreenData.get(
-            screen_id,
-            pending_config: config
-          )
+        screen_data = ScreenData.get(screen_id, pending_config: config)
 
         json(conn, %{@base_response | data: screen_data})
     end
