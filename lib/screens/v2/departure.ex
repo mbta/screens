@@ -17,7 +17,7 @@ defmodule Screens.V2.Departure do
   defstruct prediction: nil, schedule: nil
 
   @type params :: %{
-          optional(:direction_id) => :both | 0 | 1,
+          optional(:direction_id) => Trip.direction() | :both,
           optional(:route_ids) => [Route.id()],
           optional(:route_type) => nil | :bus | :ferry | :light_rail | :rail | :subway,
           optional(:stop_ids) => [Stop.id()]

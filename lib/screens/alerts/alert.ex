@@ -5,6 +5,7 @@ defmodule Screens.Alerts.Alert do
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
+  alias Screens.Trips.Trip
   alias Screens.V3Api
 
   defstruct id: nil,
@@ -105,7 +106,7 @@ defmodule Screens.Alerts.Alert do
           stop: String.t() | nil,
           route: String.t() | nil,
           route_type: non_neg_integer() | nil,
-          direction_id: 0 | 1 | nil
+          direction_id: Trip.direction() | nil
         }
 
   @type t :: %__MODULE__{

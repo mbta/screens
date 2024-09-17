@@ -1,6 +1,8 @@
 defmodule Screens.Schedules.Schedule do
   @moduledoc false
+
   alias Screens.Departures.Departure
+  alias Screens.Trips.Trip
 
   defstruct id: nil,
             trip: nil,
@@ -22,7 +24,7 @@ defmodule Screens.Schedules.Schedule do
           departure_time: DateTime.t() | nil,
           stop_headsign: String.t() | nil,
           track_number: String.t() | nil,
-          direction_id: 0 | 1
+          direction_id: Trip.direction()
         }
 
   @spec fetch(Departure.query_params(), String.t() | nil) :: {:ok, list(t())} | :error

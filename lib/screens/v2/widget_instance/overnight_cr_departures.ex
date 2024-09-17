@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   @moduledoc false
 
   alias Screens.Schedules.Schedule
+  alias Screens.Trips.Trip
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance
 
@@ -19,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   @type t :: %__MODULE__{
           destination: String.t(),
           last_tomorrow_schedule: Schedule.t(),
-          direction_to_destination: 0 | 1,
+          direction_to_destination: Trip.direction(),
           priority: WidgetInstance.priority(),
           now: DateTime.t()
         }
