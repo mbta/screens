@@ -42,7 +42,10 @@ interface State {
  * normal render another try, even if an error was previously thrown.
  */
 class WidgetTreeErrorBoundary extends React.Component<Props, State> {
-  state = { hasError: false, prevLastFetch: this.props.lastFetch };
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false, prevLastFetch: this.props.lastFetch };
+  }
 
   // When an error is thrown during render, log it.
   // Repeat logs have a cooldown of 10 minutes, to avoid overloading quotas.
