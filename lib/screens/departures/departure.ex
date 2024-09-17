@@ -32,7 +32,7 @@ defmodule Screens.Departures.Departure do
           route: String.t(),
           route_id: String.t(),
           destination: String.t(),
-          direction_id: 0 | 1 | nil,
+          direction_id: Trip.direction(),
           vehicle_status: String.t(),
           alerts: list(:delay | :snow_route | :last_trip),
           stop_type: :first_stop | :last_stop | :mid_route_stop,
@@ -45,7 +45,7 @@ defmodule Screens.Departures.Departure do
   @type query_params :: %{
           optional(:stop_ids) => list(String.t()),
           optional(:route_ids) => list(String.t()),
-          optional(:direction_id) => 0 | 1 | :both,
+          optional(:direction_id) => Trip.direction() | :both,
           optional(:sort) => String.t(),
           optional(:include) => list(String.t()),
           optional(:date) => String.t(),

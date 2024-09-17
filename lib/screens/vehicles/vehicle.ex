@@ -1,6 +1,7 @@
 defmodule Screens.Vehicles.Vehicle do
   @moduledoc false
 
+  alias Screens.Trips.Trip
   alias Screens.Vehicles.Carriage
 
   defstruct id: nil,
@@ -25,7 +26,7 @@ defmodule Screens.Vehicles.Vehicle do
 
   @type t :: %__MODULE__{
           id: String.t(),
-          direction_id: 0 | 1,
+          direction_id: Trip.direction(),
           current_status: current_status,
           trip_id: Screens.Trips.Trip.id() | nil,
           stop_id: Screens.Stops.Stop.id() | nil,

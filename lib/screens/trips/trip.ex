@@ -10,10 +10,11 @@ defmodule Screens.Trips.Trip do
             stops: nil
 
   @type id :: String.t()
+  @type direction :: 0 | 1
 
   @type t :: %__MODULE__{
           id: id,
-          direction_id: 0 | 1 | nil,
+          direction_id: direction(),
           headsign: String.t() | nil,
           route_id: String.t() | nil,
           stops: list(Stop.id())
