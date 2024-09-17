@@ -67,7 +67,7 @@ module.exports = (env, argv) => {
               loader: "babel-loader",
               options: {
                 presets: [
-                  ["@babel/preset-env", { targets: "> 0.25%" }],
+                  ["@babel/preset-env"],
                   "@babel/preset-react",
                   "@babel/preset-typescript",
                 ],
