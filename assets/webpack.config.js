@@ -87,6 +87,7 @@ module.exports = (env, argv) => {
                     { loose: false },
                   ],
                   "@babel/plugin-proposal-do-expressions",
+                  "@babel/plugin-transform-numeric-separator",
                 ],
               },
             },
