@@ -55,6 +55,12 @@ updates:
           - "@svgr/webpack"
           - "@types/webpack-env"
           - "*-loader"
+          - "terser*"
+      polyfills:
+        patterns:
+          - "core-js*"
+          - "regenerator-runtime"
+          - "whatwg-fetch"
       moment:
         patterns:
           - "moment*"
