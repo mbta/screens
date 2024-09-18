@@ -12,6 +12,28 @@ defmodule Screens.V2.Departure.BuilderTest do
 
   describe "get_relevant_departures/1" do
     test "filters out departures with both arrival_time and departure_time nil" do
+      d1 = %Prediction{
+        id: "departure",
+        arrival_time: nil,
+        departure_time: ~U[2020-02-01T01:00:00Z]
+      }
+
+      d2 = %Prediction{
+        id: "both",
+        arrival_time: ~U[2020-02-01T01:00:00Z],
+        departure_time: ~U[2020-02-01T01:00:00Z]
+      }
+
+      d3 = %Prediction{id: "neither", arrival_time: nil, departure_time: nil}
+      departures = [d1, d2, d3]
+
+      now = ~U[2020-01-01T01:00:00Z]
+
+      assert MapSet.new([d1, d2]) ==
+               MapSet.new(Builder.get_relevant_departures(departures, now))
+    end
+
+    test "filters out departures with an arrival_time but no departure_time" do
       d1 = %Prediction{id: "arrival", arrival_time: ~U[2020-02-01T01:00:00Z], departure_time: nil}
 
       d2 = %Prediction{
@@ -26,12 +48,11 @@ defmodule Screens.V2.Departure.BuilderTest do
         departure_time: ~U[2020-02-01T01:00:00Z]
       }
 
-      d4 = %Prediction{id: "neither", arrival_time: nil, departure_time: nil}
-      departures = [d1, d2, d3, d4]
+      departures = [d1, d2, d3]
 
       now = ~U[2020-01-01T01:00:00Z]
 
-      assert MapSet.new([d1, d2, d3]) ==
+      assert MapSet.new([d2, d3]) ==
                MapSet.new(Builder.get_relevant_departures(departures, now))
     end
 

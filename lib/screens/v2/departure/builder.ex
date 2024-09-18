@@ -17,6 +17,7 @@ defmodule Screens.V2.Departure.Builder do
   def get_relevant_departures(predictions_or_schedules, now \\ DateTime.utc_now()) do
     predictions_or_schedules
     |> Stream.reject(&in_past_or_nil_time?(&1, now))
+    |> Stream.reject(&prediction_has_no_departure_time?/1)
     |> Stream.reject(&multi_route_duplicate?/1)
     |> Stream.reject(&vehicle_already_departed?/1)
     |> choose_earliest_arrival_per_trip()
@@ -57,6 +58,12 @@ defmodule Screens.V2.Departure.Builder do
   end
 
   defp vehicle_already_departed?(_), do: false
+
+  defp prediction_has_no_departure_time?(%Schedule{}), do: false
+
+  defp prediction_has_no_departure_time?(prediction) do
+    prediction.arrival_time != nil and prediction.departure_time == nil
+  end
 
   defp choose_earliest_arrival_per_trip(predictions_or_schedules) do
     {departures_without_trip, departures_with_trip} =
