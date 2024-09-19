@@ -483,6 +483,10 @@ config :screens, Screens.ScreenApiResponseCache,
   gc_interval: :timer.hours(1),
   allocated_memory: 250_000_000
 
+config :screens, Screens.LastTrip,
+  trip_updates_adapter: Screens.LastTrip.TripUpdates.GTFS,
+  vehicle_positions_adapter: Screens.LastTrip.VehiclePositions.GTFS
+
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"

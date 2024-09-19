@@ -1,0 +1,69 @@
+{
+  "entity": [
+    {
+      "id": "y3213",
+      "vehicle": {
+        "current_status": "STOPPED_AT",
+        "current_stop_sequence": 17,
+        "occupancy_percentage": 20,
+        "occupancy_status": "MANY_SEATS_AVAILABLE",
+        "position": {
+          "bearing": 0,
+          "latitude": 42.3454648,
+          "longitude": -71.1273508
+        },
+        "stop_id": "1304",
+        "timestamp": 1726675439,
+        "trip": {
+          "start_time": "11:43:00",
+          "schedule_relationship": "SCHEDULED",
+          "last_trip": false,
+          "trip_id": "last-trip-1",
+          "route_id": "66",
+          "direction_id": 1,
+          "start_date": "20240918",
+          "revenue": true
+        },
+        "vehicle": {
+          "id": "y3213",
+          "label": "3213"
+        }
+      }
+    },
+    {
+      "id": "y1913",
+      "vehicle": {
+        "current_status": "IN_TRANSIT_TO",
+        "current_stop_sequence": 13,
+        "occupancy_percentage": 40,
+        "occupancy_status": "MANY_SEATS_AVAILABLE",
+        "position": {
+          "bearing": 0,
+          "latitude": 42.32913652,
+          "longitude": -71.06879793
+        },
+        "stop_id": "30009",
+        "timestamp": 1726675436,
+        "trip": {
+          "start_time": "11:35:00",
+          "schedule_relationship": "SCHEDULED",
+          "last_trip": false,
+          "trip_id": "64464685",
+          "route_id": "10",
+          "direction_id": 0,
+          "start_date": "20240918",
+          "revenue": true
+        },
+        "vehicle": {
+          "id": "y1913",
+          "label": "1913"
+        }
+      }
+    }
+  ],
+  "header": {
+    "timestamp": 1726675447,
+    "gtfs_realtime_version": "2.0",
+    "incrementality": "FULL_DATASET"
+  }
+}
