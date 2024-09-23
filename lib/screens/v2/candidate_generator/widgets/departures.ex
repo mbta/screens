@@ -181,7 +181,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
       {:ok,
        departures
-       |> Enum.reject(&(Departure.route_type(&1) in disabled_route_types))
+       |> Enum.reject(&(Departure.route(&1).type in disabled_route_types))
        |> filter_departures(filters, now)
        |> make_bidirectional(is_bidirectional)}
     end
@@ -227,7 +227,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   end
 
   defp route_direction(d) do
-    %RouteDirection{route_id: Departure.route_id(d), direction_id: Departure.direction_id(d)}
+    %RouteDirection{route_id: Departure.route(d).id, direction_id: Departure.direction_id(d)}
   end
 
   # "Bidirectional" mode: take only the first departure, and the next departure in the opposite

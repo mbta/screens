@@ -150,7 +150,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        ) do
     routes_with_live_departures =
       departures
-      |> Enum.map(&{Departure.route_id(&1), Departure.direction_id(&1)})
+      |> Enum.map(&{Departure.route(&1).id, Departure.direction_id(&1)})
       |> Enum.uniq()
 
     # Check if there is any room for overnight rows before running the logic.

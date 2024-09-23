@@ -141,41 +141,9 @@ defmodule Screens.V2.Departure do
   def id(%__MODULE__{prediction: %Prediction{id: prediction_id}}), do: prediction_id
   def id(%__MODULE__{schedule: %Schedule{id: schedule_id}}), do: schedule_id
 
-  def route_id(%__MODULE__{prediction: %Prediction{route: %Route{id: route_id}}}) do
-    route_id
-  end
-
-  def route_id(%__MODULE__{prediction: nil, schedule: %Schedule{route: %Route{id: route_id}}}) do
-    route_id
-  end
-
-  def route_name(%__MODULE__{
-        prediction: %Prediction{
-          route: %Route{short_name: short_name, long_name: long_name, type: type}
-        }
-      }) do
-    do_route_name(type, short_name, long_name)
-  end
-
-  def route_name(%__MODULE__{
-        prediction: nil,
-        schedule: %Schedule{
-          route: %Route{short_name: short_name, long_name: long_name, type: type}
-        }
-      }) do
-    do_route_name(type, short_name, long_name)
-  end
-
-  def route_type(%__MODULE__{prediction: %Prediction{route: %Route{type: route_type}}}) do
-    route_type
-  end
-
-  def route_type(%__MODULE__{
-        prediction: nil,
-        schedule: %Schedule{route: %Route{type: route_type}}
-      }) do
-    route_type
-  end
+  @spec route(t()) :: Route.t()
+  def route(%__MODULE__{prediction: %Prediction{route: route}}), do: route
+  def route(%__MODULE__{prediction: nil, schedule: %Schedule{route: route}}), do: route
 
   def scheduled_time(%__MODULE__{schedule: s}) when not is_nil(s) do
     select_arrival_time(s)
@@ -183,13 +151,9 @@ defmodule Screens.V2.Departure do
 
   def scheduled_time(_), do: nil
 
-  def stop_id(%__MODULE__{prediction: %Prediction{stop: %Stop{id: stop_id}}}) do
-    stop_id
-  end
-
-  def stop_id(%__MODULE__{prediction: nil, schedule: %Schedule{stop: %Stop{id: stop_id}}}) do
-    stop_id
-  end
+  @spec stop(t()) :: Stop.t()
+  def stop(%__MODULE__{prediction: %Prediction{stop: stop}}), do: stop
+  def stop(%__MODULE__{prediction: nil, schedule: %Schedule{stop: stop}}), do: stop
 
   def stop_type(%__MODULE__{
         prediction: %Prediction{arrival_time: arrival_time, departure_time: departure_time}
@@ -231,13 +195,6 @@ defmodule Screens.V2.Departure do
   end
 
   def vehicle_status(_), do: nil
-
-  defp do_route_name(type, short_name, long_name) do
-    case type do
-      :bus -> short_name
-      _ -> long_name
-    end
-  end
 
   defp crowding_data_relevant?(%Trip{id: trip_trip_id, stops: [first_stop | _]}, %Vehicle{
          current_status: current_status,

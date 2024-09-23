@@ -189,4 +189,8 @@ defmodule Screens.Routes.Route do
   def icon(%{type: :ferry}), do: :ferry
   def icon(%{type: :rail}), do: :cr
   def icon(_), do: :bus
+
+  @spec name(t()) :: String.t()
+  def name(%__MODULE__{type: :bus, short_name: short_name}), do: short_name
+  def name(%__MODULE__{long_name: long_name}), do: long_name
 end
