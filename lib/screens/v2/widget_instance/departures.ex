@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
@@ -259,7 +260,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         make_ref()
 
       d ->
-        {Departure.route_id(d), Departure.headsign(d)}
+        {Departure.route(d), Departure.headsign(d)}
     end)
   end
 
@@ -281,7 +282,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     departures
     |> Util.group_by_with_order(fn
       %{text: %FreeTextLine{}} -> make_ref()
-      d -> {Departure.route_id(d), Departure.headsign(d)}
+      d -> {Departure.route(d), Departure.headsign(d)}
     end)
     |> Enum.map(fn
       {ref, [notice]} when is_reference(ref) ->
@@ -341,12 +342,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_route([first_departure | _], route_pill_serializer) do
-    route_id = Departure.route_id(first_departure)
-    route_name = Departure.route_name(first_departure)
-    route_type = Departure.route_type(first_departure)
+    route = Departure.route(first_departure)
+    %Route{id: route_id, type: route_type} = route
     track_number = Departure.track_number(first_departure)
 
-    route_pill_serializer.(route_id, route_name, route_type, track_number)
+    route_pill_serializer.(route_id, Route.name(route), route_type, track_number)
   end
 
   def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2}) do
@@ -383,7 +383,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp serialize_time_with_crowding(departure, screen, now) do
     serialized_time =
-      case Departure.route_type(departure) do
+      case Departure.route(departure).type do
         :rail -> serialize_time_with_schedule(departure, screen, now)
         _ -> serialize_time(departure, screen, now)
       end
@@ -441,12 +441,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
        do: %{time: %{type: :overnight}}
 
   defp serialize_time(departure, _screen, now) do
-    stop_id = Departure.stop_id(departure)
+    %Stop{id: stop_id} = Departure.stop(departure)
     departure_time = Departure.time(departure)
     vehicle_status = Departure.vehicle_status(departure)
     vehicle_stop_id = Prediction.stop_for_vehicle(departure.prediction)
     stop_type = Departure.stop_type(departure)
-    route_type = Departure.route_type(departure)
+    %Route{type: route_type} = Departure.route(departure)
 
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)

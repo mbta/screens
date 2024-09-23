@@ -177,54 +177,20 @@ defmodule Screens.V2.DepartureTest do
     end
   end
 
-  describe "route_id/1" do
-    test "returns prediction route_id when present" do
+  describe "route/1" do
+    test "returns prediction route when present" do
       prediction = %Prediction{route: %Route{id: "28"}}
       schedule = %Schedule{route: %Route{id: "1"}}
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert "28" == Departure.route_id(departure)
+      assert %Route{id: "28"} == Departure.route(departure)
     end
 
-    test "returns schedule route_id when no prediction is present" do
+    test "returns schedule route when no prediction is present" do
       schedule = %Schedule{route: %Route{id: "1"}}
       departure = %Departure{prediction: nil, schedule: schedule}
 
-      assert "1" == Departure.route_id(departure)
-    end
-  end
-
-  describe "route_name/1" do
-    test "returns prediction route short_name when present" do
-      prediction = %Prediction{route: %Route{id: "34E", type: :bus, short_name: "214/216"}}
-      schedule = %Schedule{route: %Route{id: "1", short_name: "1"}}
-      departure = %Departure{prediction: prediction, schedule: schedule}
-
-      assert "214/216" == Departure.route_name(departure)
-    end
-
-    test "returns schedule route short_name when no prediction is present" do
-      schedule = %Schedule{route: %Route{id: "34E", type: :bus, short_name: "214/216"}}
-      departure = %Departure{prediction: nil, schedule: schedule}
-
-      assert "214/216" == Departure.route_name(departure)
-    end
-  end
-
-  describe "route_type/1" do
-    test "returns prediction route_type when present" do
-      prediction = %Prediction{route: %Route{type: :rail}}
-      schedule = %Schedule{route: %Route{type: :subway}}
-      departure = %Departure{prediction: prediction, schedule: schedule}
-
-      assert :rail == Departure.route_type(departure)
-    end
-
-    test "returns schedule route_type when no prediction is present" do
-      schedule = %Schedule{route: %Route{type: :subway}}
-      departure = %Departure{prediction: nil, schedule: schedule}
-
-      assert :subway == Departure.route_type(departure)
+      assert %Route{id: "1"} == Departure.route(departure)
     end
   end
 
