@@ -4,24 +4,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
   alias Screens.RoutePatterns
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.Trips.Trip
   alias Screens.V3Api
-
-  defstruct id: nil,
-            direction_id: nil,
-            typicality: nil,
-            route_id: nil,
-            representative_trip_id: nil
-
-  @type id :: String.t()
-
-  @type t :: %__MODULE__{
-          id: id,
-          direction_id: 0 | 1,
-          typicality: 1 | 2 | 3 | 4,
-          route_id: Route.id(),
-          representative_trip_id: Trip.id()
-        }
 
   def stops_by_route_and_direction(route_id, direction_id) do
     with {:ok, route_patterns} <-
