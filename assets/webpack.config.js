@@ -8,6 +8,62 @@ const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 
+const common_export_body = {
+  resolve: {
+    extensions: [".ts", ".tsx", ".js", ".jsx"],
+    alias: {
+      // Please also update the "paths" list in tsconfig.json when you add aliases here!
+      Components: path.resolve(__dirname, "src/components"),
+      Hooks: path.resolve(__dirname, "src/hooks"),
+      Util: path.resolve(__dirname, "src/util"),
+      Constants: path.resolve(__dirname, "src/constants"),
+      Images: path.resolve(__dirname, "static/images"),
+    },
+  },
+  output: {
+    filename: "[name].js",
+    path: path.resolve(__dirname, "../priv/static/js"),
+  },
+  devtool: "source-map",
+  optimization: {
+    minimizer: [new TerserPlugin(), new OptimizeCSSAssetsPlugin()],
+  },
+};
+
+const common_rules = [
+  {
+    enforce: "pre",
+    test: /\.js$/,
+    loader: "source-map-loader",
+  },
+  {
+    test: /\.s?css$/,
+    use: [
+      MiniCssExtractPlugin.loader,
+      {
+        loader: "css-loader",
+      },
+      {
+        loader: "sass-loader",
+      },
+    ],
+  },
+  {
+    test: /\.svg$/i,
+    issuer: /\.[jt]sx?$/,
+    use: ["@svgr/webpack"],
+  },
+];
+
+const common_babel_loader_plugins = [
+  "@babel/plugin-proposal-export-default-from",
+  "@babel/plugin-proposal-logical-assignment-operators",
+  ["@babel/plugin-proposal-optional-chaining", { loose: false }],
+  ["@babel/plugin-proposal-pipeline-operator", { proposal: "minimal" }],
+  ["@babel/plugin-proposal-nullish-coalescing-operator", { loose: false }],
+  "@babel/plugin-proposal-do-expressions",
+];
+
 module.exports = (env, argv) => {
   // Upload source maps to Sentry for prod builds. Must be the last plugin.
   const appendPlugins =
@@ -23,25 +79,7 @@ module.exports = (env, argv) => {
 
   return [
     {
-      resolve: {
-        extensions: [".ts", ".tsx", ".js", ".jsx"],
-        alias: {
-          // Please also update the "paths" list in tsconfig.json when you add aliases here!
-          Components: path.resolve(__dirname, "src/components"),
-          Hooks: path.resolve(__dirname, "src/hooks"),
-          Util: path.resolve(__dirname, "src/util"),
-          Constants: path.resolve(__dirname, "src/constants"),
-          Images: path.resolve(__dirname, "static/images"),
-        },
-      },
-      output: {
-        filename: "[name].js",
-        path: path.resolve(__dirname, "../priv/static/js"),
-      },
-      devtool: "source-map",
-      optimization: {
-        minimizer: [new TerserPlugin(), new OptimizeCSSAssetsPlugin()],
-      },
+      ...common_export_body,
       entry: {
         polyfills: "./src/polyfills.js",
         bus_eink: "./src/apps/bus_eink.tsx",
@@ -71,48 +109,11 @@ module.exports = (env, argv) => {
                   "@babel/preset-react",
                   "@babel/preset-typescript",
                 ],
-                plugins: [
-                  "@babel/plugin-proposal-export-default-from",
-                  "@babel/plugin-proposal-logical-assignment-operators",
-                  [
-                    "@babel/plugin-proposal-optional-chaining",
-                    { loose: false },
-                  ],
-                  [
-                    "@babel/plugin-proposal-pipeline-operator",
-                    { proposal: "minimal" },
-                  ],
-                  [
-                    "@babel/plugin-proposal-nullish-coalescing-operator",
-                    { loose: false },
-                  ],
-                  "@babel/plugin-proposal-do-expressions",
-                ],
+                plugins: common_babel_loader_plugins,
               },
             },
           },
-          {
-            enforce: "pre",
-            test: /\.js$/,
-            loader: "source-map-loader",
-          },
-          {
-            test: /\.s?css$/,
-            use: [
-              MiniCssExtractPlugin.loader,
-              {
-                loader: "css-loader",
-              },
-              {
-                loader: "sass-loader",
-              },
-            ],
-          },
-          {
-            test: /\.svg$/i,
-            issuer: /\.[jt]sx?$/,
-            use: ["@svgr/webpack"],
-          },
+          ...common_rules,
           {
             test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
             use: [
@@ -144,6 +145,73 @@ module.exports = (env, argv) => {
       plugins: [
         new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
         new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "../" }] }),
+        ...appendPlugins,
+      ],
+    },
+    {
+      ...common_export_body,
+      entry: {
+        packaged_dup_polyfills: "./src/polyfills.js",
+        packaged_dup_v2: "./src/apps/v2/dup.tsx",
+      },
+      module: {
+        rules: [
+          {
+            test: /\.ts(x?)$/,
+            exclude: /node_modules/,
+            use: {
+              loader: "babel-loader",
+              options: {
+                presets: [
+                  // When no targets are specified: Babel will assume you are targeting the oldest browsers possible.
+                  [
+                    "@babel/preset-env",
+                    {
+                      corejs: { version: 3, proposals: true },
+                      useBuiltIns: "usage",
+                    },
+                  ],
+                  "@babel/preset-react",
+                  "@babel/preset-typescript",
+                ],
+                plugins: common_babel_loader_plugins,
+              },
+            },
+          },
+          ...common_rules,
+          {
+            test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+            use: [
+              {
+                loader: "file-loader",
+                options: {
+                  name: "[name].[ext]",
+                  outputPath: "fonts/",
+                  publicPath: "fonts/",
+                  useRelativePaths: true,
+                },
+              },
+            ],
+          },
+          {
+            test: /\.(png|jpe?g|gif|webp)$/i,
+            use: [
+              {
+                loader: "file-loader",
+                options: {
+                  name: "/[folder]/[name].[ext]",
+                  useRelativePaths: true,
+                },
+              },
+            ],
+          },
+        ],
+      },
+      plugins: [
+        new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
+        new CopyWebpackPlugin({
+          patterns: [{ from: "static/fonts", to: "../fonts" }],
+        }),
         ...appendPlugins,
       ],
     },
