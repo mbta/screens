@@ -13,7 +13,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     dup_v2: {
       CandidateGenerator.Dup,
       %{"new_departures" => CandidateGenerator.DupNew}
-    }
+    },
+    elevator_v2: CandidateGenerator.Elevator
   }
 
   @app_id_to_refresh_rate %{
@@ -23,7 +24,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     busway_v2: 15,
     solari_large_v2: 15,
     pre_fare_v2: 20,
-    dup_v2: 30
+    dup_v2: 30,
+    elevator_v2: 30
   }
 
   @app_id_to_audio_readout_interval %{
@@ -33,7 +35,8 @@ defmodule Screens.V2.ScreenData.Parameters do
     busway_v2: 0,
     solari_large_v2: 0,
     pre_fare_v2: 0,
-    dup_v2: 0
+    dup_v2: 0,
+    elevator_v2: 0
   }
 
   @callback get_candidate_generator(ScreensConfig.Screen.t()) :: module()
