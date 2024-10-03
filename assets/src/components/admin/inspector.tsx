@@ -27,6 +27,7 @@ const SCREEN_TYPES = new Set([
   "dup_v2",
   "gl_eink_v2",
   "pre_fare_v2",
+  "elevator_v2",
 ]);
 
 const AUDIO_SCREEN_TYPES = new Set([

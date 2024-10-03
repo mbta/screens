@@ -18,6 +18,7 @@ const fields = [
       "busway_v2",
       "dup",
       "dup_v2",
+      "elevator_v2",
       "gl_eink_double",
       "gl_eink_single",
       "gl_eink_v2",
@@ -88,6 +89,9 @@ const defaultAppParamsByAppId = {
     header: {
       stop_name: "",
     },
+  },
+  elevator_v2: {
+    elevator_id: "ELEVATOR_ID",
   },
 };
 

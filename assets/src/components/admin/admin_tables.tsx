@@ -468,6 +468,28 @@ const PreFareV2ScreensTable = (): JSX.Element => {
   );
 };
 
+const elevatorIdColumn = {
+  Header: "Elevator ID",
+  accessor: buildAppParamAccessor("elevator_id"),
+  mutator: buildAppParamMutator("elevator_id"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const ElevatorV2ScreensTable = (): JSX.Element => {
+  const dataFilter = ({ app_id }) => {
+    return app_id === "elevator_v2";
+  };
+
+  return (
+    <AdminTable
+      columns={[...v2Columns, elevatorIdColumn]}
+      dataFilter={dataFilter}
+    />
+  );
+};
+
 const BuswayV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "busway_v2";
@@ -515,6 +537,7 @@ export {
   BusShelterV2ScreensTable,
   BuswayV2ScreensTable,
   DupV2ScreensTable,
+  ElevatorV2ScreensTable,
   GLEinkV2ScreensTable,
   PreFareV2ScreensTable,
   SolariScreensTable,
