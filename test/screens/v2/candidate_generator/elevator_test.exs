@@ -11,7 +11,8 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
         elevator_id: "1"
       },
       device_id: "TEST",
-      name: "TEST"
+      name: "TEST",
+      vendor: :mimo
     }
 
     %{config: config}
