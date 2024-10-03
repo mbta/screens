@@ -38,6 +38,7 @@ const fields = [
       "c3ms",
       "outfront",
       "lg-mri",
+      "mimo",
     ]),
   },
   { key: "device_id", label: "Device ID", FormCell: FormTextCell },

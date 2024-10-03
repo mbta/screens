@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
 
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{Placeholder}
+  alias Screens.V2.WidgetInstance.Placeholder
 
   @behaviour CandidateGenerator
 
