@@ -472,9 +472,9 @@ const elevatorIdColumn = {
   Header: "Elevator ID",
   accessor: buildAppParamAccessor("elevator_id"),
   mutator: buildAppParamMutator("elevator_id"),
-  Cell: EditableTextarea,
+  Cell: EditableCell,
   disableFilters: true,
-  FormCell: EditableCell,
+  FormCell: FormTextCell,
 };
 
 const ElevatorV2ScreensTable = (): JSX.Element => {
@@ -485,6 +485,20 @@ const ElevatorV2ScreensTable = (): JSX.Element => {
   return (
     <AdminTable
       columns={[
+        {
+          Header: "Screen ID",
+          accessor: "id",
+          Cell: InspectorLink,
+          Filter: DefaultColumnFilter,
+          FormCell: FormStaticCell,
+        },
+        {
+          Header: "Name",
+          accessor: "name",
+          Cell: EditableCell,
+          Filter: DefaultColumnFilter,
+          FormCell: FormTextCell,
+        },
         {
           Header: "Evergreen Content",
           accessor: buildAppParamAccessor("evergreen_content"),

@@ -32,11 +32,11 @@ const routes: [string, string, ComponentType][][] = [
   [
     ["bus-eink-v2-screens", "Bus E-ink", BusEinkV2ScreensTable],
     ["bus-shelter-v2-screens", "Bus Shelter", BusShelterV2ScreensTable],
-    ["busway-v2-screens", "Sectional", BuswayV2ScreensTable],
     ["dup-v2-screens", "DUP", DupV2ScreensTable],
     ["elevator-v2-screens", "Elevator", ElevatorV2ScreensTable],
     ["gl-eink-v2-screens", "GL E-ink", GLEinkV2ScreensTable],
     ["pre-fare-v2-screens", "Pre-Fare", PreFareV2ScreensTable],
+    ["busway-v2-screens", "Sectional", BuswayV2ScreensTable],
   ],
   [["solari-screens", "Solari (v1)", SolariScreensTable]],
   [["screens-json-editor", "Config Editor", AdminScreenConfigForm]],
