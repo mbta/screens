@@ -18,9 +18,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   end
 
   def candidate_instances(_config) do
-    [fn -> placeholder_instances() end]
-    |> Task.async_stream(& &1.(), timeout: 15_000)
-    |> Enum.flat_map(fn {:ok, instances} -> instances end)
+    placeholder_instances()
   end
 
   def audio_only_instances(_widgets, _config), do: []
