@@ -30,30 +30,58 @@ const common_export_body = {
   },
 };
 
-const common_rules = [
-  {
-    enforce: "pre",
-    test: /\.js$/,
-    loader: "source-map-loader",
-  },
-  {
-    test: /\.s?css$/,
-    use: [
-      MiniCssExtractPlugin.loader,
-      {
-        loader: "css-loader",
-      },
-      {
-        loader: "sass-loader",
-      },
-    ],
-  },
-  {
-    test: /\.svg$/i,
-    issuer: /\.[jt]sx?$/,
-    use: ["@svgr/webpack"],
-  },
-];
+function getCommonRules(isOfmPackage) {
+  return [
+    {
+      enforce: "pre",
+      test: /\.js$/,
+      loader: "source-map-loader",
+    },
+    {
+      test: /\.s?css$/,
+      use: [
+        MiniCssExtractPlugin.loader,
+        {
+          loader: "css-loader",
+        },
+        {
+          loader: "sass-loader",
+        },
+      ],
+    },
+    {
+      test: /\.svg$/i,
+      issuer: /\.[jt]sx?$/,
+      use: ["@svgr/webpack"],
+    },
+    {
+      test: /\.(png|jpe?g|gif|webp)$/i,
+      use: [
+        {
+          loader: "file-loader",
+          options: {
+            name: "/[folder]/[name].[ext]",
+            useRelativePaths: true,
+          },
+        },
+      ],
+    },
+    {
+      test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
+      use: [
+        {
+          loader: "file-loader",
+          options: {
+            name: "[name].[ext]",
+            outputPath: "fonts/",
+            publicPath: isOfmPackage ? "fonts/" : "../fonts/",
+            useRelativePaths: true,
+          },
+        },
+      ],
+    },
+  ];
+}
 
 const common_babel_loader_plugins = [
   "@babel/plugin-proposal-export-default-from",
@@ -64,18 +92,24 @@ const common_babel_loader_plugins = [
   "@babel/plugin-proposal-do-expressions",
 ];
 
+const common_plugins = [
+  new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
+  new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "../" }] }),
+];
+
 module.exports = (env, argv) => {
   // Upload source maps to Sentry for prod builds. Must be the last plugin.
   const appendPlugins =
     argv.mode == "production"
       ? [
+          ...common_plugins,
           sentryWebpackPlugin({
             authToken: env.SENTRY_AUTH_TOKEN,
             org: env.SENTRY_ORG,
             project: env.SENTRY_PROJECT,
           }),
         ]
-      : [];
+      : common_plugins;
 
   return [
     {
@@ -113,40 +147,10 @@ module.exports = (env, argv) => {
               },
             },
           },
-          ...common_rules,
-          {
-            test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-            use: [
-              {
-                loader: "file-loader",
-                options: {
-                  name: "[name].[ext]",
-                  outputPath: "fonts/",
-                  publicPath: "../fonts/",
-                  useRelativePaths: true,
-                },
-              },
-            ],
-          },
-          {
-            test: /\.(png|jpe?g|gif|webp)$/i,
-            use: [
-              {
-                loader: "file-loader",
-                options: {
-                  name: "/[folder]/[name].[ext]",
-                  useRelativePaths: true,
-                },
-              },
-            ],
-          },
+          ...getCommonRules(false),
         ],
       },
-      plugins: [
-        new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
-        new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "../" }] }),
-        ...appendPlugins,
-      ],
+      plugins: appendPlugins,
     },
     {
       ...common_export_body,
@@ -178,42 +182,10 @@ module.exports = (env, argv) => {
               },
             },
           },
-          ...common_rules,
-          {
-            test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-            use: [
-              {
-                loader: "file-loader",
-                options: {
-                  name: "[name].[ext]",
-                  outputPath: "fonts/",
-                  publicPath: "fonts/",
-                  useRelativePaths: true,
-                },
-              },
-            ],
-          },
-          {
-            test: /\.(png|jpe?g|gif|webp)$/i,
-            use: [
-              {
-                loader: "file-loader",
-                options: {
-                  name: "/[folder]/[name].[ext]",
-                  useRelativePaths: true,
-                },
-              },
-            ],
-          },
+          ...getCommonRules(true),
         ],
       },
-      plugins: [
-        new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
-        new CopyWebpackPlugin({
-          patterns: [{ from: "static/fonts", to: "../fonts" }],
-        }),
-        ...appendPlugins,
-      ],
+      plugins: appendPlugins,
     },
   ];
 };
