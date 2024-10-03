@@ -98,11 +98,11 @@ const common_plugins = [
 ];
 
 module.exports = (env, argv) => {
-  // Upload source maps to Sentry for prod builds. Must be the last plugin.
-  const appendPlugins =
+  const plugins =
     argv.mode == "production"
       ? [
           ...common_plugins,
+          // Upload source maps to Sentry for prod builds. Must be the last plugin.
           sentryWebpackPlugin({
             authToken: env.SENTRY_AUTH_TOKEN,
             org: env.SENTRY_ORG,
@@ -150,7 +150,7 @@ module.exports = (env, argv) => {
           ...getCommonRules(false),
         ],
       },
-      plugins: appendPlugins,
+      plugins: plugins,
     },
     {
       ...common_export_body,
@@ -185,7 +185,7 @@ module.exports = (env, argv) => {
           ...getCommonRules(true),
         ],
       },
-      plugins: appendPlugins,
+      plugins: plugins,
     },
   ];
 };
