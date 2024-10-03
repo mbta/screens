@@ -2,35 +2,11 @@
 
 - Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the DUP-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/v2/screen_api_controller.ex#L9) in the API controller--if it is, you don't need to do anything for this step.
 - Double check that any behavior specific to the DUP screen environment happens inside of an `isDup()` check. This includes:
+
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
-- Create priv/static/dup-app.html if it doesn’t already exist. Copy paste the following contents in:
-
-  ```html
-  <!doctype html>
-  <html lang="en">
-    <head>
-      <meta charset="utf-8" />
-      <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Screens</title>
-      <link rel="stylesheet" href="dup_v2.css" />
-    </head>
-
-    <body>
-      <div
-        id="app"
-        data-last-refresh="2020-09-25T17:23:00Z"
-        data-environment-name="screens-prod"
-      ></div>
-      <script type="text/javascript" src="polyfills.js"></script>
-      <script type="text/javascript" src="dup_v2.js"></script>
-    </body>
-  </html>
-  ```
 
 - Set the version string in assets/src/components/v2/dup/version.tsx to `current_year.current_month.current_day.1`.
-- In assets/webpack.config.js, change `publicPath` in the font config to have value `'fonts/'`.
 - If you've renamed / removed image assets, you might want to delete the corresponding folder in `/priv/static`. The folder accumulates assets without clearing old ones out, and these will be included in the built bundle!
 - **Only if you are packaging for local testing**
   - add the following to the top of assets/src/apps/v2/dup.tsx, filling in the string values:
@@ -50,10 +26,10 @@
   for ROTATION_INDEX in {0..2}; do
     echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/v2/dup/rotation_index.tsx && \
     npm --prefix ../../assets run deploy && \
-    cp -r css/dup_v2.css js/polyfills.js js/dup_v2.js ../dup_preview.png . && \
+    cp -r css/packaged_dup_v2.css js/packaged_dup_polyfills.js js/packaged_dup_v2.js js/packaged_dup_v2.js.map ../dup_preview.png ../dup-app.html . && \
     cp ../dup_template.json ./template.json && \
     sed -i "" "s/DUP APP ./DUP APP ${ROTATION_INDEX}/" template.json && \
-    zip -r dup-app-${ROTATION_INDEX}.zip dup_v2.css polyfills.js dup_v2.js fonts images dup-app.html template.json dup_preview.png
+    zip -r dup-app-${ROTATION_INDEX}.zip packaged_dup_v2.css packaged_dup_polyfills.js packaged_dup_v2.js fonts images dup-app.html template.json dup_preview.png
   done
   ```
 - On completion, the packaged client apps will be saved at `priv/static/dup-app-(0|1|2).zip`.
