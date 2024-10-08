@@ -36,47 +36,48 @@ const fields = [
   { key: "device_id", label: "Device ID", FormCell: FormTextCell },
 ];
 
-const commonV2Params = {
-  header: { stop_id: "" },
-  evergreen_content: [],
-};
-
 const departuresWidgetParams = { sections: [] };
 const footerWidgetParams = { stop_id: "" };
 const alertsWidgetParams = { stop_id: "" };
 
 const defaultAppParamsByAppId = {
   bus_eink_v2: {
-    ...commonV2Params,
+    header: { stop_id: "" },
+    evergreen_content: [],
     departures: departuresWidgetParams,
     footer: footerWidgetParams,
     alerts: alertsWidgetParams,
   },
   gl_eink_v2: {
-    ...commonV2Params,
+    header: { stop_id: "" },
+    evergreen_content: [],
     departures: departuresWidgetParams,
     footer: footerWidgetParams,
     alerts: alertsWidgetParams,
   },
   solari: { station_name: "STATION_NAME" },
   dup_v2: {
-    ...commonV2Params,
+    header: { stop_id: "" },
+    evergreen_content: [],
     primary_departures: departuresWidgetParams,
     secondary_departures: departuresWidgetParams,
     alerts: alertsWidgetParams,
   },
   bus_shelter_v2: {
-    ...commonV2Params,
+    header: { stop_id: "" },
+    evergreen_content: [],
     departures: departuresWidgetParams,
     footer: footerWidgetParams,
     alerts: alertsWidgetParams,
   },
   busway_v2: {
-    ...commonV2Params,
+    header: { stop_name: "" },
+    evergreen_content: [],
     departures: departuresWidgetParams,
   },
   pre_fare_v2: {
-    ...commonV2Params,
+    header: { stop_id: "" },
+    evergreen_content: [],
   },
 };
 
