@@ -2705,7 +2705,7 @@
       "name": "",
       "refresh_if_loaded_before": null,
       "tags": [],
-      "vendor": "lg-mri"
+      "vendor": "lg_mri"
     }
   }
 }
