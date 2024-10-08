@@ -30,7 +30,7 @@ const fields = [
       "solari",
       "c3ms",
       "outfront",
-      "lg-mri",
+      "lg_mri",
     ]),
   },
   { key: "device_id", label: "Device ID", FormCell: FormTextCell },
