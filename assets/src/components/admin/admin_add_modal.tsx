@@ -12,19 +12,13 @@ const fields = [
     key: "app_id",
     label: "App ID",
     FormCell: buildFormSelect([
-      "bus_eink",
       "bus_eink_v2",
       "bus_shelter_v2",
       "busway_v2",
-      "dup",
       "dup_v2",
-      "gl_eink_double",
-      "gl_eink_single",
       "gl_eink_v2",
       "pre_fare_v2",
       "solari",
-      "solari_large",
-      "solari_large_v2",
     ]),
   },
   {
@@ -42,52 +36,47 @@ const fields = [
   { key: "device_id", label: "Device ID", FormCell: FormTextCell },
 ];
 
+const commonV2Params = {
+  header: { stop_id: "" },
+  evergreen_content: [],
+};
+
+const departuresWidgetParams = { sections: [] };
+const footerWidgetParams = { stop_id: "" };
+const alertsWidgetParams = { stop_id: "" };
+
 const defaultAppParamsByAppId = {
-  bus_eink: { stop_id: "STOP_ID" },
   bus_eink_v2: {
-    departures: {},
-    footer: {},
-    header: {},
-    alerts: {},
-  },
-  gl_eink_single: {
-    stop_id: "STOP_ID",
-    platform_id: "PLATFORM_ID",
-    route_id: "ROUTE_ID",
-    direction_id: -1,
-  },
-  gl_eink_double: {
-    stop_id: "STOP_ID",
-    platform_id: "PLATFORM_ID",
-    route_id: "ROUTE_ID",
-    direction_id: -1,
+    ...commonV2Params,
+    departures: departuresWidgetParams,
+    footer: footerWidgetParams,
+    alerts: alertsWidgetParams,
   },
   gl_eink_v2: {
-    departures: {},
-    footer: {},
-    header: {},
-    alerts: {},
+    ...commonV2Params,
+    departures: departuresWidgetParams,
+    footer: footerWidgetParams,
+    alerts: alertsWidgetParams,
   },
   solari: { station_name: "STATION_NAME" },
-  dup: { header: "STATION_NAME" },
+  dup_v2: {
+    ...commonV2Params,
+    primary_departures: departuresWidgetParams,
+    secondary_departures: departuresWidgetParams,
+    alerts: alertsWidgetParams,
+  },
   bus_shelter_v2: {
-    departures: {},
-    footer: {},
-    header: {},
-    alerts: {},
+    ...commonV2Params,
+    departures: departuresWidgetParams,
+    footer: footerWidgetParams,
+    alerts: alertsWidgetParams,
   },
   busway_v2: {
-    departures: {},
-    header: {},
-  },
-  solari_large_v2: {
-    departures: {},
-    header: {},
+    ...commonV2Params,
+    departures: departuresWidgetParams,
   },
   pre_fare_v2: {
-    header: {
-      stop_name: "",
-    },
+    ...commonV2Params,
   },
 };
 
