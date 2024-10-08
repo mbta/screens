@@ -80,17 +80,16 @@ const defaultAppParamsByAppId = {
   },
 };
 
-const initialFormValues = _.fromPairs(
-  fields.map(({ key }) => [key, undefined]),
-);
+const initialFormValues = _.fromPairs(fields.map(({ key }) => [key, ""]));
 
 const AddModal = ({ setData, closeModal }): JSX.Element => {
-  const [formValues, setFormValues] = useState(initialFormValues);
+  const [formValues, setFormValues] =
+    useState<_.Dictionary<string>>(initialFormValues);
 
   const addScreen = () => {
     const newRow = {
       app_id: formValues.app_id,
-      app_params: defaultAppParamsByAppId[formValues.app_id ?? 0],
+      app_params: defaultAppParamsByAppId[formValues.app_id],
       device_id: formValues.device_id,
       disabled: false,
       id: formValues.id,
