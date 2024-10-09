@@ -187,62 +187,6 @@ const SolariScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const DupV2ScreensTable = (): JSX.Element => {
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Cell: InspectorLink,
-      Filter: DefaultColumnFilter,
-    },
-    {
-      Header: "Header",
-      accessor: buildAppParamAccessor("header"),
-      mutator: buildAppParamMutator("header"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Primary Departures",
-      accessor: buildAppParamAccessor("primary_departures"),
-      mutator: buildAppParamMutator("primary_departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Secondary Departures",
-      accessor: buildAppParamAccessor("secondary_departures"),
-      mutator: buildAppParamMutator("secondary_departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Alerts",
-      accessor: buildAppParamAccessor("alerts"),
-      mutator: buildAppParamMutator("alerts"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Evergreen Content",
-      accessor: buildAppParamAccessor("evergreen_content"),
-      mutator: buildAppParamMutator("evergreen_content"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-  ];
-
-  const dataFilter = ({ app_id }) => {
-    return app_id === "dup_v2";
-  };
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
-};
-
 const v2Columns = [
   {
     Header: "Screen ID",
@@ -257,22 +201,6 @@ const v2Columns = [
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
     FormCell: FormTextCell,
-  },
-  {
-    Header: "Departures",
-    accessor: buildAppParamAccessor("departures"),
-    mutator: buildAppParamMutator("departures"),
-    Cell: EditableTextarea,
-    disableFilters: true,
-    FormCell: FormTextarea,
-  },
-  {
-    Header: "Footer",
-    accessor: buildAppParamAccessor("footer"),
-    mutator: buildAppParamMutator("footer"),
-    Cell: EditableTextarea,
-    disableFilters: true,
-    FormCell: FormTextarea,
   },
   {
     Header: "Header",
@@ -292,6 +220,24 @@ const v2Columns = [
   },
 ];
 
+const departuresColumn = {
+  Header: "Departures",
+  accessor: buildAppParamAccessor("departures"),
+  mutator: buildAppParamMutator("departures"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
+const footerColumn = {
+  Header: "Footer",
+  accessor: buildAppParamAccessor("footer"),
+  mutator: buildAppParamMutator("footer"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
+
 const alertsColumn = {
   Header: "Alerts",
   accessor: buildAppParamAccessor("alerts"),
@@ -299,65 +245,6 @@ const alertsColumn = {
   Cell: EditableTextarea,
   disableFilters: true,
   FormCell: FormTextarea,
-};
-
-const surveyColumn = {
-  Header: "Survey",
-  accessor: buildAppParamAccessor("survey"),
-  mutator: buildAppParamMutator("survey"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
-};
-
-const BusEinkV2ScreensTable = (): JSX.Element => {
-  const dataFilter = ({ app_id }) => {
-    return app_id === "bus_eink_v2";
-  };
-
-  return (
-    <AdminTable
-      columns={[...v2Columns, alertsColumn]}
-      dataFilter={dataFilter}
-    />
-  );
-};
-
-const GLEinkV2ScreensTable = (): JSX.Element => {
-  const lineMapColumn = {
-    Header: "Line Map",
-    accessor: buildAppParamAccessor("line_map"),
-    mutator: buildAppParamMutator("line_map"),
-    Cell: EditableTextarea,
-    disableFilters: true,
-    FormCell: FormTextarea,
-  };
-
-  const platformLocationColumn = {
-    Header: "Platform Location",
-    accessor: buildAppParamAccessor("platform_location"),
-    mutator: buildAppParamMutator("platform_location"),
-    Cell: EditableSelect,
-    disableFilters: true,
-    FormCell: buildFormSelect(["front", "back"], false),
-  };
-
-  const dataFilter = ({ app_id }) => {
-    return app_id === "gl_eink_v2";
-  };
-
-  return (
-    <AdminTable
-      columns={[
-        ...v2Columns,
-        alertsColumn,
-        lineMapColumn,
-        audioColumn,
-        platformLocationColumn,
-      ]}
-      dataFilter={dataFilter}
-    />
-  );
 };
 
 const audioColumn = {
@@ -369,80 +256,98 @@ const audioColumn = {
   FormCell: FormTextarea,
 };
 
+const DupV2ScreensTable = (): JSX.Element => {
+  const columns = [
+    ...v2Columns,
+    {
+      Header: "Primary Departures",
+      accessor: buildAppParamAccessor("primary_departures"),
+      mutator: buildAppParamMutator("primary_departures"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Secondary Departures",
+      accessor: buildAppParamAccessor("secondary_departures"),
+      mutator: buildAppParamMutator("secondary_departures"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    alertsColumn,
+  ];
+
+  const dataFilter = ({ app_id }) => {
+    return app_id === "dup_v2";
+  };
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+};
+
+const BusEinkV2ScreensTable = (): JSX.Element => {
+  const dataFilter = ({ app_id }) => {
+    return app_id === "bus_eink_v2";
+  };
+
+  const columns = [...v2Columns, departuresColumn, footerColumn, alertsColumn];
+
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+};
+
+const GLEinkV2ScreensTable = (): JSX.Element => {
+  const columns = [
+    ...v2Columns,
+    {
+      Header: "Line Map",
+      accessor: buildAppParamAccessor("line_map"),
+      mutator: buildAppParamMutator("line_map"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Platform Location",
+      accessor: buildAppParamAccessor("platform_location"),
+      mutator: buildAppParamMutator("platform_location"),
+      Cell: EditableSelect,
+      disableFilters: true,
+      FormCell: buildFormSelect(["front", "back"], false),
+    },
+    departuresColumn,
+    footerColumn,
+    alertsColumn,
+    audioColumn,
+  ];
+
+  const dataFilter = ({ app_id }) => {
+    return app_id === "gl_eink_v2";
+  };
+
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
+};
+
 const BusShelterV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "bus_shelter_v2";
   };
 
-  return (
-    <AdminTable
-      columns={[...v2Columns, alertsColumn, surveyColumn, audioColumn]}
-      dataFilter={dataFilter}
-    />
-  );
-};
+  const columns = [
+    ...v2Columns,
+    departuresColumn,
+    footerColumn,
+    alertsColumn,
+    audioColumn,
+    {
+      Header: "Survey",
+      accessor: buildAppParamAccessor("survey"),
+      mutator: buildAppParamMutator("survey"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+  ];
 
-const elevatorStatusColumn = {
-  Header: "Elevator Status",
-  accessor: buildAppParamAccessor("elevator_status"),
-  mutator: buildAppParamMutator("elevator_status"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
-};
-
-const reconstructedAlertWidgetColumn = {
-  Header: "Alert Widget",
-  accessor: buildAppParamAccessor("reconstructed_alert_widget"),
-  mutator: buildAppParamMutator("reconstructed_alert_widget"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
-};
-
-const lineMapColumn = {
-  Header: "Full Line Map",
-  accessor: buildAppParamAccessor("full_line_map"),
-  mutator: buildAppParamMutator("full_line_map"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
-};
-
-const contentSummaryColumn = {
-  Header: "Content Summary",
-  accessor: buildAppParamAccessor("content_summary"),
-  mutator: buildAppParamMutator("content_summary"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
-};
-
-const crDeparturesColumn = {
-  Header: "Commuter Rail",
-  accessor: buildAppParamAccessor("cr_departures"),
-  mutator: buildAppParamMutator("cr_departures"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
-};
-
-const blueBikesColumn = {
-  Header: "BlueBikes",
-  accessor: buildAppParamAccessor("blue_bikes"),
-  mutator: buildAppParamMutator("blue_bikes"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
-};
-
-const shuttleBusInfoColumn = {
-  Header: "Shuttle Bus Info",
-  accessor: buildAppParamAccessor("shuttle_bus_info"),
-  mutator: buildAppParamMutator("shuttle_bus_info"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
 const PreFareV2ScreensTable = (): JSX.Element => {
@@ -450,22 +355,68 @@ const PreFareV2ScreensTable = (): JSX.Element => {
     return app_id === "pre_fare_v2";
   };
 
-  return (
-    <AdminTable
-      columns={[
-        ...v2Columns,
-        lineMapColumn,
-        elevatorStatusColumn,
-        reconstructedAlertWidgetColumn,
-        contentSummaryColumn,
-        crDeparturesColumn,
-        blueBikesColumn,
-        shuttleBusInfoColumn,
-        audioColumn,
-      ]}
-      dataFilter={dataFilter}
-    />
-  );
+  const columns = [
+    ...v2Columns,
+    {
+      Header: "Elevator Status",
+      accessor: buildAppParamAccessor("elevator_status"),
+      mutator: buildAppParamMutator("elevator_status"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Alert Widget",
+      accessor: buildAppParamAccessor("reconstructed_alert_widget"),
+      mutator: buildAppParamMutator("reconstructed_alert_widget"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Full Line Map",
+      accessor: buildAppParamAccessor("full_line_map"),
+      mutator: buildAppParamMutator("full_line_map"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Content Summary",
+      accessor: buildAppParamAccessor("content_summary"),
+      mutator: buildAppParamMutator("content_summary"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Commuter Rail",
+      accessor: buildAppParamAccessor("cr_departures"),
+      mutator: buildAppParamMutator("cr_departures"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "BlueBikes",
+      accessor: buildAppParamAccessor("blue_bikes"),
+      mutator: buildAppParamMutator("blue_bikes"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    {
+      Header: "Shuttle Bus Info",
+      accessor: buildAppParamAccessor("shuttle_bus_info"),
+      mutator: buildAppParamMutator("shuttle_bus_info"),
+      Cell: EditableTextarea,
+      disableFilters: true,
+      FormCell: FormTextarea,
+    },
+    audioColumn,
+  ];
+
+  return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
 const elevatorIdColumn = {
@@ -519,38 +470,7 @@ const BuswayV2ScreensTable = (): JSX.Element => {
     return app_id === "busway_v2";
   };
 
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Cell: InspectorLink,
-      Filter: DefaultColumnFilter,
-      FormCell: FormStaticCell,
-    },
-    {
-      Header: "Name",
-      accessor: "name",
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Departures",
-      accessor: buildAppParamAccessor("departures"),
-      mutator: buildAppParamMutator("departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Header",
-      accessor: buildAppParamAccessor("header"),
-      mutator: buildAppParamMutator("header"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-  ];
+  const columns = [...v2Columns, departuresColumn];
 
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
