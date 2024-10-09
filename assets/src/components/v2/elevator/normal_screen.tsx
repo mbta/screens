@@ -9,7 +9,6 @@ interface Props {
 const NormalScreen: React.ComponentType<Props> = ({
   main_content: mainContent,
 }) => {
-  console.log(mainContent);
   return (
     <div className="screen-normal">
       <div className="screen-normal__body">
