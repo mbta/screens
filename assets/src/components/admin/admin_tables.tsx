@@ -419,6 +419,52 @@ const PreFareV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
+const elevatorIdColumn = {
+  Header: "Elevator ID",
+  accessor: buildAppParamAccessor("elevator_id"),
+  mutator: buildAppParamMutator("elevator_id"),
+  Cell: EditableCell,
+  disableFilters: true,
+  FormCell: FormTextCell,
+};
+
+const ElevatorV2ScreensTable = (): JSX.Element => {
+  const dataFilter = ({ app_id }) => {
+    return app_id === "elevator_v2";
+  };
+
+  return (
+    <AdminTable
+      columns={[
+        {
+          Header: "Screen ID",
+          accessor: "id",
+          Cell: InspectorLink,
+          Filter: DefaultColumnFilter,
+          FormCell: FormStaticCell,
+        },
+        {
+          Header: "Name",
+          accessor: "name",
+          Cell: EditableCell,
+          Filter: DefaultColumnFilter,
+          FormCell: FormTextCell,
+        },
+        {
+          Header: "Evergreen Content",
+          accessor: buildAppParamAccessor("evergreen_content"),
+          mutator: buildAppParamMutator("evergreen_content"),
+          Cell: EditableTextarea,
+          disableFilters: true,
+          FormCell: FormTextarea,
+        },
+        elevatorIdColumn,
+      ]}
+      dataFilter={dataFilter}
+    />
+  );
+};
+
 const BuswayV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "busway_v2";
@@ -435,6 +481,7 @@ export {
   BusShelterV2ScreensTable,
   BuswayV2ScreensTable,
   DupV2ScreensTable,
+  ElevatorV2ScreensTable,
   GLEinkV2ScreensTable,
   PreFareV2ScreensTable,
   SolariScreensTable,

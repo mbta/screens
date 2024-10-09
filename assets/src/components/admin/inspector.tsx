@@ -25,6 +25,7 @@ const SCREEN_TYPES = new Set([
   "bus_shelter_v2",
   "busway_v2",
   "dup_v2",
+  "elevator_v2",
   "gl_eink_v2",
   "pre_fare_v2",
 ]);

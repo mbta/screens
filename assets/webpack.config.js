@@ -129,6 +129,7 @@ module.exports = (env, argv) => {
         dup_v2: "./src/apps/v2/dup.tsx",
         bus_shelter_v2: "./src/apps/v2/bus_shelter.tsx",
         pre_fare_v2: "./src/apps/v2/pre_fare.tsx",
+        elevator_v2: "./src/apps/v2/elevator.tsx",
       },
       module: {
         rules: [
