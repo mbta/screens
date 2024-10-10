@@ -196,7 +196,7 @@ defmodule Screens.Alerts.Alert do
 
   If the query fails for any reason, an empty list is returned.
 
-  Currently used for DUPs V1 / V2
+  Currently used for DUPs
   """
   @spec fetch_or_empty_list(keyword()) :: list(t())
   def fetch_or_empty_list(opts \\ []) do

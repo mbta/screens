@@ -120,7 +120,6 @@ module.exports = (env, argv) => {
         gl_eink_single: "./src/apps/gl_eink_single.tsx",
         gl_eink_double: "./src/apps/gl_eink_double.tsx",
         solari: "./src/apps/solari.tsx",
-        dup: "./src/apps/dup.tsx",
         admin: "./src/apps/admin.tsx",
         bus_eink_v2: "./src/apps/v2/bus_eink.tsx",
         gl_eink_v2: "./src/apps/v2/gl_eink.tsx",

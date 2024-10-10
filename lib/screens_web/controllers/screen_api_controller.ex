@@ -4,7 +4,6 @@ defmodule ScreensWeb.ScreenApiController do
   alias Screens.Config.Cache
 
   plug(:check_config)
-  plug Corsica, [origins: "*"] when action == :show_dup
 
   defp check_config(conn, _) do
     if Cache.ok?() do
@@ -47,26 +46,6 @@ defmodule ScreensWeb.ScreenApiController do
           check_disabled: true,
           last_refresh: last_refresh
         )
-
-      json(conn, data)
-    end
-  end
-
-  def show_dup(conn, %{"id" => screen_id, "rotation_index" => rotation_index} = params) do
-    is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
-
-    _ =
-      Screens.LogScreenData.log_data_request(
-        screen_id,
-        nil,
-        is_screen,
-        params
-      )
-
-    if nonexistent_screen?(screen_id) do
-      not_found_response(conn)
-    else
-      data = Screens.DupScreenData.by_screen_id(screen_id, rotation_index)
 
       json(conn, data)
     end
