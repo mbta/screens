@@ -8,7 +8,6 @@ defmodule Screens.ScreenData do
 
   @modules_by_app_id %{
     gl_eink_single: Screens.GLScreenData,
-    gl_eink_double: Screens.GLScreenData,
     solari: Screens.SolariScreenData
   }
 

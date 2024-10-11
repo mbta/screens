@@ -12,18 +12,18 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
-import NormalScreen from "Components/v2/gl_eink_double/normal_screen";
+import NormalScreen from "Components/v2/gl_eink/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
-import NormalBody from "Components/v2/gl_eink_double/normal_body";
+import NormalBody from "Components/v2/gl_eink/normal_body";
 import TakeoverBody from "Components/v2/eink/takeover_body";
-import TopTakeoverBody from "Components/v2/gl_eink_double/top_takeover_body";
-import BottomTakeoverBody from "Components/v2/gl_eink_double/bottom_takeover_body";
+import TopTakeoverBody from "Components/v2/gl_eink/top_takeover_body";
+import BottomTakeoverBody from "Components/v2/gl_eink/bottom_takeover_body";
 import OneMedium from "Components/v2/eink/flex/one_medium";
 import Placeholder from "Components/v2/placeholder";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
 import NormalHeader from "Components/v2/eink/gl_normal_header";
 import Departures from "Components/v2/departures";
-import LineMap from "Components/v2/gl_eink_double/line_map";
+import LineMap from "Components/v2/gl_eink/line_map";
 import EvergreenContent from "Components/v2/evergreen_content";
 import NoData from "Components/v2/eink/no_data";
 import DeparturesNoData from "Components/v2/eink/departures_no_data";
@@ -44,7 +44,7 @@ import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import EinkSubwayStatus from "Components/v2/subway_status/eink_subway_status";
 import WidgetPage from "Components/v2/widget_page";
 import TopAndFlexTakeoverBody from "Components/v2/eink/top_and_flex_takeover";
-import FlexZoneTakeoverBody from "Components/v2/gl_eink_double/flex_zone_takeover";
+import FlexZoneTakeoverBody from "Components/v2/gl_eink/flex_zone_takeover";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,

@@ -577,31 +577,6 @@
       "tags": [],
       "vendor": "c3ms"
     },
-    "213": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 1,
-        "headway_mode": false,
-        "nearby_departures": ["1276", "1292"],
-        "platform_id": "70230",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-C",
-        "service_level": 1,
-        "stop_id": "place-bcnwa"
-      },
-      "device_id": "100102",
-      "disabled": false,
-      "name": "100102 Wash Sq EB GL06",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
     "102": {
       "app_id": "gl_eink_single",
       "app_params": {
@@ -626,81 +601,6 @@
       "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
       "tags": [],
       "vendor": "mercury"
-    },
-    "204": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "nearby_departures": ["1276", "1292"],
-        "platform_id": "70229",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-C",
-        "service_level": 1,
-        "stop_id": "place-bcnwa"
-      },
-      "device_id": "100097",
-      "disabled": false,
-      "name": "100097 Wash Sq WB GL08",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "203": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 1,
-        "headway_mode": false,
-        "nearby_departures": ["1276", "1292"],
-        "platform_id": "70230",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-C",
-        "service_level": 1,
-        "stop_id": "place-bcnwa"
-      },
-      "device_id": "100098",
-      "disabled": false,
-      "name": "100098 Wash Sq EB GL05",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "216": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "nearby_departures": ["51317", "71391"],
-        "platform_id": "70245",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-E",
-        "service_level": 1,
-        "stop_id": "place-mfa"
-      },
-      "device_id": "100101",
-      "disabled": false,
-      "name": "100101 MFA WB GL09",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
     },
     "310": {
       "app_id": "solari",
@@ -1660,31 +1560,6 @@
       "device_id": "002050",
       "disabled": false,
       "name": "002050 Wash Sq WB GL07",
-      "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
-      "tags": [],
-      "vendor": "mercury"
-    },
-    "206": {
-      "app_id": "gl_eink_double",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "nearby_departures": ["51317", "71391"],
-        "platform_id": "70245",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-E",
-        "service_level": 1,
-        "stop_id": "place-mfa"
-      },
-      "device_id": "002013",
-      "disabled": false,
-      "name": "002013 MFA WB GL10",
       "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
       "tags": [],
       "vendor": "mercury"
