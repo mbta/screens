@@ -1,6 +1,7 @@
 defmodule Screens.RoutePatterns.RoutePatternTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Lines.Line
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -8,7 +9,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
   describe "fetch/2" do
     test "fetches and parses route patterns" do
       get_json_fn =
-        fn "route_patterns", %{"include" => "route,representative_trip.stops"} ->
+        fn "route_patterns", %{"include" => "route.line,representative_trip.stops"} ->
           {
             :ok,
             %{
@@ -51,6 +52,18 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                     "long_name" => "Blue Line",
                     "short_name" => "",
                     "type" => 1
+                  },
+                  "relationships" => %{
+                    "line" => %{"data" => %{"id" => "line-Blue", "type" => "line"}}
+                  }
+                },
+                %{
+                  "id" => "line-Blue",
+                  "type" => "line",
+                  "attributes" => %{
+                    "long_name" => "Blue Line",
+                    "short_name" => "",
+                    "sort_order" => 0
                   }
                 },
                 %{
@@ -109,12 +122,20 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
           }
         end
 
+      blue_line = %Line{
+        id: "line-Blue",
+        short_name: "",
+        long_name: "Blue Line",
+        sort_order: 0
+      }
+
       blue_route = %Route{
         id: "Blue",
         short_name: "",
         long_name: "Blue Line",
         direction_destinations: ["Bowdoin", "Wonderland"],
-        type: :subway
+        type: :subway,
+        line: blue_line
       }
 
       bowdoin = %Stop{
@@ -162,7 +183,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
 
     test "filters by route type or typicality" do
       get_json_fn =
-        fn "route_patterns", %{"include" => "route,representative_trip.stops"} ->
+        fn "route_patterns", %{"include" => "route.line,representative_trip.stops"} ->
           {
             :ok,
             %{
@@ -205,6 +226,18 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                     "long_name" => "Blue Line",
                     "short_name" => "",
                     "type" => 1
+                  },
+                  "relationships" => %{
+                    "line" => %{"data" => %{"id" => "line-Blue", "type" => "line"}}
+                  }
+                },
+                %{
+                  "id" => "line-Blue",
+                  "type" => "line",
+                  "attributes" => %{
+                    "long_name" => "Blue Line",
+                    "short_name" => "",
+                    "sort_order" => 0
                   }
                 },
                 %{
@@ -215,6 +248,18 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                     "long_name" => "Harvard Square - Nubian Station",
                     "short_name" => "1",
                     "type" => 3
+                  },
+                  "relationships" => %{
+                    "line" => %{"data" => %{"id" => "line-1", "type" => "line"}}
+                  }
+                },
+                %{
+                  "id" => "line-1",
+                  "type" => "line",
+                  "attributes" => %{
+                    "long_name" => "Harvard - Nubian",
+                    "short_name" => "1",
+                    "sort_order" => 1
                   }
                 },
                 %{

@@ -19,10 +19,10 @@ defmodule Screens.Predictions.Prediction do
 
   @type t :: %__MODULE__{
           id: String.t(),
-          trip: Screens.Trips.Trip.t() | nil,
+          trip: Screens.Trips.Trip.t(),
           stop: Screens.Stops.Stop.t(),
           route: Screens.Routes.Route.t(),
-          vehicle: Screens.Vehicles.Vehicle.t(),
+          vehicle: Screens.Vehicles.Vehicle.t() | nil,
           alerts: list(Screens.Alerts.Alert.t()),
           arrival_time: DateTime.t() | nil,
           departure_time: DateTime.t() | nil,
@@ -38,7 +38,7 @@ defmodule Screens.Predictions.Prediction do
         query_params,
         "predictions",
         Screens.Predictions.Parser,
-        %{include: ~w[route stop trip trip.stops vehicle alerts]}
+        %{include: ~w[alerts route.line stop trip.stops vehicle]}
       )
 
     case predictions do

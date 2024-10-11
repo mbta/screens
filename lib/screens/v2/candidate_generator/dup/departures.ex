@@ -28,7 +28,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_departures_fn \\ &Departure.fetch/2,
         fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
         fetch_schedules_fn \\ &Screens.Schedules.Schedule.fetch/2,
-        fetch_routes_serving_stops_fn \\ &Screens.Routes.Route.serving_stops/1,
+        fetch_routes_fn \\ &Screens.Routes.Route.fetch/1,
         fetch_vehicles_fn \\ &Screens.Vehicles.Vehicle.by_route_and_direction/2
       ) do
     primary_departures_instances =
@@ -36,7 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> get_sections_data(
         fetch_departures_fn,
         fetch_alerts_fn,
-        fetch_routes_serving_stops_fn,
+        fetch_routes_fn,
         now
       )
       |> sections_data_to_departure_instances(
@@ -64,7 +64,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> get_sections_data(
         fetch_departures_fn,
         fetch_alerts_fn,
-        fetch_routes_serving_stops_fn,
+        fetch_routes_fn,
         now
       )
       |> sections_data_to_departure_instances(
@@ -209,7 +209,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          sections,
          fetch_departures_fn,
          fetch_alerts_fn,
-         fetch_routes_serving_stops_fn,
+         fetch_routes_fn,
          now
        ) do
     Screens.Telemetry.span(
@@ -223,7 +223,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
             &1,
             fetch_departures_fn,
             fetch_alerts_fn,
-            fetch_routes_serving_stops_fn,
+            fetch_routes_fn,
             now,
             ctx
           ),
@@ -250,7 +250,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
            section,
          fetch_departures_fn,
          fetch_alerts_fn,
-         fetch_routes_serving_stops_fn,
+         fetch_routes_fn,
          now,
          ctx
        ) do
@@ -258,7 +258,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       [:screens, :v2, :candidate_generator, :dup, :departures, :get_section_data],
       ctx,
       fn ->
-        routes = get_routes_serving_section(params, fetch_routes_serving_stops_fn)
+        routes = get_routes_serving_section(params, fetch_routes_fn)
         # DUP sections will always show no more than one mode.
         # For subway, each route will have its own section.
         # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
@@ -635,10 +635,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_routes_serving_section(
          %{route_ids: route_ids, stop_ids: stop_ids},
-         fetch_routes_serving_stops_fn
+         fetch_routes_fn
        ) do
     routes =
-      case fetch_routes_serving_stops_fn.(stop_ids) do
+      case fetch_routes_fn.(%{stop_ids: stop_ids}) do
         {:ok, routes} -> routes
         :error -> []
       end

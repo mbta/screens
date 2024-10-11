@@ -336,8 +336,7 @@ defmodule Screens.Departures.Departure do
   end
 
   def do_query_and_parse(%{} = query_params, api_endpoint, parser, extra_params \\ %{}) do
-    default_params = %{sort: "departure_time", include: ~w[route stop trip]}
-
+    default_params = %{sort: "departure_time"}
     all_params = [default_params, query_params, extra_params]
 
     api_query_params =
@@ -348,7 +347,7 @@ defmodule Screens.Departures.Departure do
       |> Enum.into(%{})
 
     case Screens.V3Api.get_json(api_endpoint, api_query_params) do
-      {:ok, result} -> {:ok, parser.parse_result(result)}
+      {:ok, result} -> {:ok, parser.parse(result)}
       _ -> :error
     end
   end

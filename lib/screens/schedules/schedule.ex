@@ -17,7 +17,7 @@ defmodule Screens.Schedules.Schedule do
 
   @type t :: %__MODULE__{
           id: String.t(),
-          trip: Screens.Trips.Trip.t() | nil,
+          trip: Screens.Trips.Trip.t(),
           stop: Screens.Stops.Stop.t(),
           route: Screens.Routes.Route.t(),
           arrival_time: DateTime.t() | nil,
@@ -36,7 +36,7 @@ defmodule Screens.Schedules.Schedule do
         query_params,
         "schedules",
         Screens.Schedules.Parser,
-        extra_params
+        Map.put(extra_params, :include, ~w[route.line stop trip.stops])
       )
 
     case schedules do
