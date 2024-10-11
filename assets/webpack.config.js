@@ -117,7 +117,6 @@ module.exports = (env, argv) => {
       entry: {
         polyfills: "./src/polyfills.js",
         gl_eink_single: "./src/apps/gl_eink_single.tsx",
-        gl_eink_double: "./src/apps/gl_eink_double.tsx",
         solari: "./src/apps/solari.tsx",
         admin: "./src/apps/admin.tsx",
         bus_eink_v2: "./src/apps/v2/bus_eink.tsx",
