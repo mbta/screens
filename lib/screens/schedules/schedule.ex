@@ -36,7 +36,11 @@ defmodule Screens.Schedules.Schedule do
         query_params,
         "schedules",
         Screens.Schedules.Parser,
-        Map.put(extra_params, :include, ~w[route.line stop trip.stops])
+        Map.put(
+          extra_params,
+          :include,
+          ~w[route.line stop trip.route_pattern.representative_trip trip.stops]
+        )
       )
 
     case schedules do

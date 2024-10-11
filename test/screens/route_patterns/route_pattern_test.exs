@@ -69,6 +69,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                 %{
                   "id" => "canonical-Blue-C1-0",
                   "type" => "trip",
+                  "attributes" => %{"headsign" => "Bowdoin"},
                   "relationships" => %{
                     "stops" => %{
                       "data" => [
@@ -81,6 +82,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                 %{
                   "id" => "65198154",
                   "type" => "trip",
+                  "attributes" => %{"headsign" => "Bowdoin"},
                   "relationships" => %{
                     "stops" => %{
                       "data" => [
@@ -166,6 +168,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
           direction_id: 0,
           typicality: 1,
           route: blue_route,
+          headsign: "Bowdoin",
           stops: [wonderland, bowdoin]
         },
         %RoutePattern{
@@ -174,6 +177,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
           direction_id: 0,
           typicality: 3,
           route: blue_route,
+          headsign: "Bowdoin",
           stops: [orient_heights, bowdoin]
         }
       ]
@@ -265,11 +269,13 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                 %{
                   "id" => "trip-blue",
                   "type" => "trip",
+                  "attributes" => %{"headsign" => "Bowdoin"},
                   "relationships" => %{"stops" => %{"data" => []}}
                 },
                 %{
                   "id" => "trip-bus-1",
                   "type" => "trip",
+                  "attributes" => %{"headsign" => "Nubian"},
                   "relationships" => %{"stops" => %{"data" => []}}
                 }
               ]
