@@ -8,7 +8,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
   alias Screens.Trips.Trip
   alias Screens.V3Api
 
-  defstruct ~w[id canonical? direction_id typicality route stops]a
+  defstruct ~w[id canonical? direction_id typicality route headsign stops]a
 
   @type id :: String.t()
   @type typicality :: 1 | 2 | 3 | 4 | 5
@@ -19,6 +19,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
           direction_id: Trip.direction(),
           typicality: typicality(),
           route: Route.t(),
+          headsign: String.t(),
           stops: [Stop.t()]
         }
 

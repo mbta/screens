@@ -1,23 +1,59 @@
 defmodule Screens.Trips.Parser do
   @moduledoc false
 
-  def parse_trip(%{"id" => id, "attributes" => attributes, "relationships" => relationships}) do
-    %{"headsign" => headsign, "direction_id" => direction_id} = attributes
-    %{"route" => %{"data" => %{"id" => route_id}}} = relationships
+  alias Screens.Trips.Trip
 
-    stops =
-      case Map.get(relationships, "stops") do
-        %{"data" => stop_list} ->
-          Enum.map(stop_list, fn %{"id" => stop_id, "type" => "stop"} -> stop_id end)
+  def parse(%{"data" => data} = response) do
+    included =
+      response
+      |> Map.get("included", [])
+      |> Map.new(fn %{"id" => id, "type" => type} = resource -> {{id, type}, resource} end)
+
+    Enum.map(data, &parse_trip(&1, included))
+  end
+
+  def parse_trip(
+        %{
+          "id" => id,
+          "attributes" => %{"headsign" => headsign, "direction_id" => direction_id},
+          "relationships" => %{"route" => %{"data" => %{"id" => route_id}}} = relationships
+        },
+        included
+      ) do
+    # We do not fully parse the trip => route_pattern => representative_trip chain, as this would
+    # recurse infinitely. Instead we hoist up only the attributes we're interested in.
+    pattern_headsign =
+      case Map.get(relationships, "route_pattern") do
+        %{
+          "data" => %{
+            "relationships" => %{
+              "representative_trip" => %{"data" => %{"id" => representative_trip_id}}
+            }
+          }
+        } ->
+          included
+          |> Map.fetch!({representative_trip_id, "trip"})
+          |> Map.fetch!("attributes")
+          |> Map.fetch!("headsign")
 
         _ ->
           nil
       end
 
-    %Screens.Trips.Trip{
+    stops =
+      case Map.get(relationships, "stops") do
+        %{"data" => stops_data} ->
+          Enum.map(stops_data, fn %{"id" => stop_id, "type" => "stop"} -> stop_id end)
+
+        _ ->
+          nil
+      end
+
+    %Trip{
       id: id,
       direction_id: direction_id,
       headsign: headsign,
+      pattern_headsign: pattern_headsign,
       route_id: route_id,
       stops: stops
     }

@@ -28,25 +28,24 @@ defmodule Screens.RoutePatterns.Parser do
          },
          included
        ) do
+    %{
+      "attributes" => %{"headsign" => headsign},
+      "relationships" => %{"stops" => %{"data" => stop_references}}
+    } = Map.fetch!(included, {representative_trip_id, "trip"})
+
+    stops =
+      Enum.map(stop_references, fn %{"id" => stop_id} ->
+        included |> Map.fetch!({stop_id, "stop"}) |> Stops.Parser.parse_stop()
+      end)
+
     %RoutePattern{
       id: id,
       canonical?: canonical?,
       direction_id: direction_id,
       typicality: typicality,
       route: included |> Map.fetch!({route_id, "route"}) |> Routes.Parser.parse_route(included),
-      stops:
-        included
-        |> Map.fetch!({representative_trip_id, "trip"})
-        |> parse_representative_stops(included)
+      headsign: headsign,
+      stops: stops
     }
-  end
-
-  defp parse_representative_stops(
-         %{"relationships" => %{"stops" => %{"data" => stop_references}}},
-         included
-       ) do
-    Enum.map(stop_references, fn %{"id" => stop_id} ->
-      included |> Map.fetch!({stop_id, "stop"}) |> Stops.Parser.parse_stop()
-    end)
   end
 end

@@ -141,6 +141,13 @@ defmodule Screens.V2.Departure do
   def id(%__MODULE__{prediction: %Prediction{id: prediction_id}}), do: prediction_id
   def id(%__MODULE__{schedule: %Schedule{id: schedule_id}}), do: schedule_id
 
+  @spec representative_headsign(t()) :: String.t() | nil
+  def representative_headsign(%__MODULE__{prediction: %Prediction{trip: trip}}),
+    do: Trip.representative_headsign(trip)
+
+  def representative_headsign(%__MODULE__{schedule: %Schedule{trip: trip}}),
+    do: Trip.representative_headsign(trip)
+
   @spec route(t()) :: Route.t()
   def route(%__MODULE__{prediction: %Prediction{route: route}}), do: route
   def route(%__MODULE__{prediction: nil, schedule: %Schedule{route: route}}), do: route

@@ -38,7 +38,10 @@ defmodule Screens.Predictions.Prediction do
         query_params,
         "predictions",
         Screens.Predictions.Parser,
-        %{include: ~w[alerts route.line stop trip.stops vehicle]}
+        %{
+          include:
+            ~w[alerts route.line stop trip.route_pattern.representative_trip trip.stops vehicle]
+        }
       )
 
     case predictions do

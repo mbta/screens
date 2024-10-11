@@ -30,7 +30,7 @@ defmodule Screens.Predictions.Parser do
         },
         included
       ) do
-    trip = included |> Map.fetch!({trip_id, "trip"}) |> Trips.Parser.parse_trip()
+    trip = included |> Map.fetch!({trip_id, "trip"}) |> Trips.Parser.parse_trip(included)
     stop = included |> Map.fetch!({stop_id, "stop"}) |> Stops.Parser.parse_stop()
     route = included |> Map.fetch!({route_id, "route"}) |> Routes.Parser.parse_route(included)
 
