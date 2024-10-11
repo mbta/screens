@@ -74,7 +74,6 @@ const AllScreensTable = (): JSX.Element => {
       Filter: SelectColumnFilter,
       filter: "includes",
       FormCell: buildFormSelect([
-        "bus_eink",
         "gl_eink_single",
         "gl_eink_double",
         "solari_eink",

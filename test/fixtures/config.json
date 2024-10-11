@@ -226,62 +226,6 @@
       "tags": [],
       "vendor": "solari"
     },
-    "10": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["8", "47", "CT3"],
-            "stop": "1790"
-          },
-          {
-            "routes_at_stop": ["SL4", "SL5", "8"],
-            "stop": "5"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "58"
-      },
-      "device_id": "100316",
-      "disabled": false,
-      "name": "100316 Mass Ave Harr B010",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "14": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["Orange Line"],
-            "stop": "place-rcmnl"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "1357"
-      },
-      "device_id": "100323",
-      "disabled": false,
-      "name": "100323 Tremont opp Rox B014",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
     "307": {
       "app_id": "solari",
       "app_params": {
@@ -445,36 +389,6 @@
       "tags": [],
       "vendor": "outfront"
     },
-    "12": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["Green Line"],
-            "stop": "place-coecl"
-          },
-          {
-            "routes_at_stop": ["9", "39", "55"],
-            "stop": "175"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "178"
-      },
-      "device_id": "100322",
-      "disabled": false,
-      "name": "100322 St James Dart B012",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
     "309": {
       "app_id": "solari",
       "app_params": {
@@ -566,126 +480,6 @@
       "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
       "tags": [],
       "vendor": "solari"
-    },
-    "16": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["44"],
-            "stop": "1346"
-          },
-          {
-            "routes_at_stop": ["45"],
-            "stop": "1583"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "407"
-      },
-      "device_id": "100306",
-      "disabled": false,
-      "name": "100306 Warren Towns B016",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "4": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["CR-Fitchburg"],
-            "stop": "place-FR-0074"
-          },
-          {
-            "routes_at_stop": ["74", "75"],
-            "stop": "2137"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "2134"
-      },
-      "device_id": "100105",
-      "disabled": false,
-      "name": "100105 Church Lex B004",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "8": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["33", "40/50", "50"],
-            "stop": "26531"
-          },
-          {
-            "routes_at_stop": ["CR-Franklin", "CR-Providence"],
-            "stop": "place-NEC-2203"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "36466"
-      },
-      "device_id": "100302",
-      "disabled": false,
-      "name": "100302 Hyde Park Oak B008",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "5": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["Red Line", "Bus"],
-            "stop": "place-harsq"
-          },
-          {
-            "routes_at_stop": ["1", "68", "69"],
-            "stop": "110"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "32549"
-      },
-      "device_id": "100313",
-      "disabled": false,
-      "name": "100313 Eliot Bennett B005",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
     },
     "314": {
       "app_id": "solari",
@@ -808,62 +602,6 @@
       "tags": [],
       "vendor": "gds"
     },
-    "3": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["99", "105", "106"],
-            "stop": "5403"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "5496"
-      },
-      "device_id": "100320",
-      "disabled": false,
-      "name": "100320 Broadway Nor B003",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "19": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["52", "57", "502", "504"],
-            "stop": "900"
-          },
-          {
-            "routes_at_stop": ["70"],
-            "stop": "8297"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "8178"
-      },
-      "device_id": "100310",
-      "disabled": false,
-      "name": "100310 Watertown Sq B019",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
     "102": {
       "app_id": "gl_eink_single",
       "app_params": {
@@ -889,36 +627,6 @@
       "tags": [],
       "vendor": "mercury"
     },
-    "9": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["14", "41"],
-            "stop": "1144"
-          },
-          {
-            "routes_at_stop": ["Orange Line"],
-            "stop": "place-rcmnl"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "11257"
-      },
-      "device_id": "100317",
-      "disabled": false,
-      "name": "100317 Malcolm X B009",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
     "204": {
       "app_id": "gl_eink_double",
       "app_params": {
@@ -940,36 +648,6 @@
       "device_id": "100097",
       "disabled": false,
       "name": "100097 Wash Sq WB GL08",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "7": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["SL3"],
-            "stop": "place-belsq"
-          },
-          {
-            "routes_at_stop": ["CR-Newburyport"],
-            "stop": "place-ER-0046"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "5615"
-      },
-      "device_id": "100319",
-      "disabled": false,
-      "name": "100319 Hawthorne B007",
       "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
       "tags": [],
       "vendor": "gds"
@@ -1120,126 +798,6 @@
       "tags": [],
       "vendor": "solari"
     },
-    "2": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["16"],
-            "stop": "2923"
-          },
-          {
-            "routes_at_stop": ["19"],
-            "stop": "568"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "383"
-      },
-      "device_id": "100303",
-      "disabled": false,
-      "name": "100303 Blue Hill Ave B002",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "11": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["Green Line • E"],
-            "stop": "place-rvrwy"
-          },
-          {
-            "routes_at_stop": ["66"],
-            "stop": "1314"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "21365"
-      },
-      "device_id": "100304",
-      "disabled": false,
-      "name": "100304 Huntington B011",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "15": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["44"],
-            "stop": "1332"
-          },
-          {
-            "routes_at_stop": ["45"],
-            "stop": "1569"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "390"
-      },
-      "device_id": "100305",
-      "disabled": false,
-      "name": "100305 Warren Quincy B015",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
-    "17": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["SL3"],
-            "stop": "place-belsq"
-          },
-          {
-            "routes_at_stop": ["CR-Newburyport"],
-            "stop": "place-ER-0046"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "5605"
-      },
-      "device_id": "100309",
-      "disabled": false,
-      "name": "100309 Wash Broad B017",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
     "405": {
       "app_id": "dup",
       "app_params": {
@@ -1264,36 +822,6 @@
       "refresh_if_loaded_before": null,
       "tags": [],
       "vendor": "outfront"
-    },
-    "18": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["14", "30"],
-            "stop": "6428"
-          },
-          {
-            "routes_at_stop": ["CR-Needham"],
-            "stop": "place-NB-0064"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "637"
-      },
-      "device_id": "100308",
-      "disabled": false,
-      "name": "100308 Wash Firth B018",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
     },
     "403": {
       "app_id": "dup",
@@ -1901,36 +1429,6 @@
       "tags": [],
       "vendor": "c3ms"
     },
-    "6": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["1", "66", "68", "69"],
-            "stop": "2168"
-          },
-          {
-            "routes_at_stop": ["Red Line", "Bus"],
-            "stop": "place-harsq"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "22549"
-      },
-      "device_id": "100326",
-      "disabled": false,
-      "name": "100326 Harvard Sq B006",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
-    },
     "404": {
       "app_id": "dup",
       "app_params": {
@@ -2311,36 +1809,6 @@
       "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
       "tags": [],
       "vendor": "mercury"
-    },
-    "1": {
-      "app_id": "bus_eink",
-      "app_params": {
-        "nearby_connections": [
-          {
-            "routes_at_stop": ["Mattapan", "Bus"],
-            "stop": "place-matt"
-          },
-          {
-            "routes_at_stop": ["CR-Fairmount"],
-            "stop": "place-DB-2222"
-          }
-        ],
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": "double"
-          },
-          "scheduled_overrides": []
-        },
-        "service_level": 1,
-        "stop_id": "1722"
-      },
-      "device_id": "100301",
-      "disabled": false,
-      "name": "100301 1624 Blue B001",
-      "refresh_if_loaded_before": "2020-10-13T16:54:42.832348Z",
-      "tags": [],
-      "vendor": "gds"
     },
     "305": {
       "app_id": "solari",

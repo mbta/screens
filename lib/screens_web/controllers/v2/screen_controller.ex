@@ -5,7 +5,7 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
 
-  @default_app_id :bus_eink
+  @default_app_id :bus_eink_v2
   @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 gl_eink_v2 solari_large_v2 pre_fare_v2 elevator_v2]a
   @app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 

@@ -2,7 +2,7 @@ defmodule ScreensWeb.PageControllerTest do
   use ScreensWeb.ConnCase
 
   test "GET /screen/<id>", %{conn: conn} do
-    conn = get(conn, "/screen/1")
+    conn = get(conn, "/screen/305")
     assert html_response(conn, 200)
   end
 

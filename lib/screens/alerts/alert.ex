@@ -461,18 +461,6 @@ defmodule Screens.Alerts.Alert do
 
   ###
 
-  # V1 only (bus_eink)
-  def by_stop_id(stop_id) do
-    {inline_alerts, global_alerts} =
-      [stop_id: stop_id]
-      |> fetch_or_empty_list()
-      |> Enum.split_with(&inline?/1)
-
-    global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
-
-    {inline_alerts, global_alert}
-  end
-
   # V1 only
   defp inline?(%{effect: :delay}) do
     true

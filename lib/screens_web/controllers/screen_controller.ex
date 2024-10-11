@@ -5,8 +5,8 @@ defmodule ScreensWeb.ScreenController do
   alias Screens.Config.Cache
   alias ScreensConfig.Screen
 
-  @default_app_id :bus_eink
-  @app_ids ~w[bus_eink gl_eink_single gl_eink_double solari]a
+  @default_app_id :solari
+  @app_ids ~w[gl_eink_single gl_eink_double solari]a
   @app_id_strings Enum.map(@app_ids, &Atom.to_string/1)
 
   plug(:body_class)
