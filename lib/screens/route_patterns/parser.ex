@@ -33,7 +33,7 @@ defmodule Screens.RoutePatterns.Parser do
       canonical?: canonical?,
       direction_id: direction_id,
       typicality: typicality,
-      route: included |> Map.fetch!({route_id, "route"}) |> Routes.Parser.parse_route(),
+      route: included |> Map.fetch!({route_id, "route"}) |> Routes.Parser.parse_route(included),
       stops:
         included
         |> Map.fetch!({representative_trip_id, "trip"})

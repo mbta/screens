@@ -1,73 +1,48 @@
 defmodule Screens.Schedules.Parser do
   @moduledoc false
 
-  def parse_result(%{"data" => data, "included" => included}) do
-    included_data = parse_included_data(included)
-    parse_data(data, included_data)
-  end
+  alias Screens.{Routes, Stops, Trips}
+  alias Screens.Schedules.Schedule
 
-  def parse_result(%{"data" => []}) do
-    []
-  end
+  def parse(%{"data" => data} = response) do
+    included =
+      response
+      |> Map.get("included", [])
+      |> Map.new(fn %{"id" => id, "type" => type} = resource -> {{id, type}, resource} end)
 
-  defp parse_included_data(data) do
-    data
-    |> Enum.map(fn item ->
-      {{Map.get(item, "type"), Map.get(item, "id")}, parse_included(item)}
-    end)
-    |> Enum.into(%{})
-  end
-
-  defp parse_included(%{"type" => "stop"} = item) do
-    Screens.Stops.Parser.parse_stop(item)
-  end
-
-  defp parse_included(%{"type" => "route"} = item) do
-    Screens.Routes.Parser.parse_route(item)
-  end
-
-  defp parse_included(%{"type" => "trip"} = item) do
-    Screens.Trips.Parser.parse_trip(item)
-  end
-
-  defp parse_data(data, included_data) do
-    Enum.map(data, &parse_schedule(&1, included_data))
+    Enum.map(data, &parse_schedule(&1, included))
   end
 
   defp parse_schedule(
-         %{"id" => id, "attributes" => attributes, "relationships" => relationships},
-         included_data
+         %{
+           "id" => id,
+           "attributes" => %{
+             "arrival_time" => arrival_time_string,
+             "departure_time" => departure_time_string,
+             "stop_headsign" => stop_headsign,
+             "direction_id" => direction_id
+           },
+           "relationships" => %{
+             "route" => %{"data" => %{"id" => route_id}},
+             "stop" => %{"data" => %{"id" => stop_id}},
+             "trip" => %{"data" => %{"id" => trip_id}}
+           }
+         },
+         included
        ) do
-    %{
-      "arrival_time" => arrival_time_string,
-      "departure_time" => departure_time_string,
-      "stop_headsign" => stop_headsign,
-      "direction_id" => direction_id
-    } = attributes
+    trip = included |> Map.fetch!({trip_id, "trip"}) |> Trips.Parser.parse_trip()
+    stop = included |> Map.fetch!({stop_id, "stop"}) |> Stops.Parser.parse_stop()
+    route = included |> Map.fetch!({route_id, "route"}) |> Routes.Parser.parse_route(included)
 
-    arrival_time = parse_time(arrival_time_string)
-    departure_time = parse_time(departure_time_string)
-
-    %{
-      "route" => %{"data" => %{"id" => route_id}},
-      "stop" => %{"data" => %{"id" => stop_id}},
-      "trip" => %{"data" => %{"id" => trip_id}}
-    } = relationships
-
-    trip = Map.get(included_data, {"trip", trip_id})
-    stop = Map.get(included_data, {"stop", stop_id})
-    route = Map.get(included_data, {"route", route_id})
-    track_number = Map.get(included_data, {"stop", stop_id}).platform_code
-
-    %Screens.Schedules.Schedule{
+    %Schedule{
       id: id,
       trip: trip,
       stop: stop,
       route: route,
-      arrival_time: arrival_time,
-      departure_time: departure_time,
+      arrival_time: parse_time(arrival_time_string),
+      departure_time: parse_time(departure_time_string),
       stop_headsign: stop_headsign,
-      track_number: track_number,
+      track_number: stop.platform_code,
       direction_id: direction_id
     }
   end

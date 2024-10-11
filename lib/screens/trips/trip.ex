@@ -17,6 +17,6 @@ defmodule Screens.Trips.Trip do
           direction_id: direction(),
           headsign: String.t() | nil,
           route_id: String.t() | nil,
-          stops: list(Stop.id())
+          stops: list(Stop.id()) | nil
         }
 end

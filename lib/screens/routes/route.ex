@@ -1,6 +1,7 @@
 defmodule Screens.Routes.Route do
   @moduledoc false
 
+  alias Screens.Lines.Line
   alias Screens.Routes.Parser
   alias Screens.RouteType
   alias Screens.Stops.Stop
@@ -12,7 +13,8 @@ defmodule Screens.Routes.Route do
             short_name: nil,
             long_name: nil,
             direction_destinations: nil,
-            type: nil
+            type: nil,
+            line: nil
 
   @type id :: String.t()
 
@@ -21,7 +23,8 @@ defmodule Screens.Routes.Route do
           short_name: String.t(),
           long_name: String.t(),
           direction_destinations: list(String.t()),
-          type: RouteType.t()
+          type: RouteType.t(),
+          line: Line.t()
         }
 
   @type params :: %{
@@ -38,42 +41,31 @@ defmodule Screens.Routes.Route do
   @type icon :: name_colors() | :bus | :cr | :ferry | :mattapan
 
   @spec by_id(id()) :: {:ok, t()} | :error
-  def by_id(route_id) do
-    case V3Api.get_json("routes/" <> route_id) do
-      {:ok, %{"data" => data}} -> {:ok, Parser.parse_route(data)}
+  def by_id(id) do
+    case fetch(%{ids: [id]}) do
+      {:ok, [route]} -> {:ok, route}
       _ -> :error
     end
   end
 
   @spec fetch() :: {:ok, [t()]} | :error
   @spec fetch(params()) :: {:ok, [t()]} | :error
-  def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
+  def fetch(opts \\ %{}, get_json_fn \\ &V3Api.get_json/2) do
     params =
       opts
       |> Enum.flat_map(&format_query_param/1)
-      |> Enum.into(%{})
+      |> Map.new()
+      |> Map.put("include", "line")
 
     case get_json_fn.("routes/", params) do
-      {:ok, %{"data" => data}} -> {:ok, Enum.map(data, &Parser.parse_route/1)}
+      {:ok, response} -> {:ok, Parser.parse(response)}
       _ -> :error
     end
   end
 
-  @doc "Fetches routes that serve the given stops."
-  @spec serving_stops([Stop.id()]) :: {:ok, [t()]} | :error
-  def serving_stops(stop_ids, get_json_fn \\ &V3Api.get_json/2) do
-    case get_json_fn.("routes", %{"filter[stop]" => Enum.join(stop_ids, ",")}) do
-      {:ok, %{"data" => data}} ->
-        {:ok, Enum.map(data, fn route -> Parser.parse_route(route) end)}
-
-      _ ->
-        :error
-    end
-  end
-
   @doc """
-  Similar to `serving_stops` but also determines whether each route has any scheduled service at
-  the given stop on the current day. Only route IDs and the `active?` flag are returned.
+  Fetches routes that serve the given stop, also determining whether each route has any scheduled
+  service at the stop on the current day. Only route IDs and the `active?` flag are returned.
   """
   @spec serving_stop_with_active(Stop.id()) ::
           {:ok, list(%{route_id: id(), active?: boolean()})} | :error

@@ -1,103 +1,70 @@
 defmodule Screens.Predictions.Parser do
   @moduledoc false
-  alias Screens.Predictions.ScheduleRelationship
 
-  def parse_result(%{"data" => data, "included" => included}) do
-    included_data = parse_included_data(included)
-    parse_data(data, included_data)
-  end
+  alias Screens.{Alerts, Routes, Stops, Trips, Vehicles}
+  alias Screens.Predictions.{Prediction, ScheduleRelationship}
 
-  def parse_result(%{"data" => []}) do
-    []
-  end
+  def parse(%{"data" => data} = response) do
+    included =
+      response
+      |> Map.get("included", [])
+      |> Map.new(fn %{"id" => id, "type" => type} = resource -> {{id, type}, resource} end)
 
-  defp parse_data(data, included_data) do
-    Enum.map(data, &parse_prediction(&1, included_data))
-  end
-
-  defp parse_included_data(data) do
-    data
-    |> Enum.map(fn item ->
-      {{Map.get(item, "type"), Map.get(item, "id")}, parse_included(item)}
-    end)
-    |> Enum.into(%{})
-  end
-
-  defp parse_included(%{"type" => "stop"} = item) do
-    Screens.Stops.Parser.parse_stop(item)
-  end
-
-  defp parse_included(%{"type" => "route"} = item) do
-    Screens.Routes.Parser.parse_route(item)
-  end
-
-  defp parse_included(%{"type" => "trip"} = item) do
-    Screens.Trips.Parser.parse_trip(item)
-  end
-
-  defp parse_included(%{"type" => "vehicle"} = item) do
-    Screens.Vehicles.Parser.parse_vehicle(item)
-  end
-
-  defp parse_included(%{"type" => "alert"} = item) do
-    Screens.Alerts.Parser.parse_alert(item)
+    Enum.map(data, &parse_prediction(&1, included))
   end
 
   def parse_prediction(
-        %{"id" => id, "attributes" => attributes, "relationships" => relationships},
-        included_data
+        %{
+          "id" => id,
+          "attributes" => %{
+            "arrival_time" => arrival_time_string,
+            "departure_time" => departure_time_string,
+            "schedule_relationship" => schedule_relationship
+          },
+          "relationships" =>
+            %{
+              "route" => %{"data" => %{"id" => route_id}},
+              "stop" => %{"data" => %{"id" => stop_id}},
+              "trip" => %{"data" => %{"id" => trip_id}}
+            } = relationships
+        },
+        included
       ) do
-    %{
-      "arrival_time" => arrival_time_string,
-      "departure_time" => departure_time_string,
-      "schedule_relationship" => schedule_relationship
-    } =
-      attributes
-
-    arrival_time = parse_time(arrival_time_string)
-    departure_time = parse_time(departure_time_string)
-
-    schedule_relationship = ScheduleRelationship.parse(schedule_relationship)
-
-    %{
-      "route" => %{"data" => %{"id" => route_id}},
-      "stop" => %{"data" => %{"id" => stop_id}},
-      "trip" => %{"data" => %{"id" => trip_id}}
-    } = relationships
-
-    trip = Map.get(included_data, {"trip", trip_id})
-    stop = Map.get(included_data, {"stop", stop_id})
-    route = Map.get(included_data, {"route", route_id})
-    track_number = Map.get(included_data, {"stop", stop_id}).platform_code
+    trip = included |> Map.fetch!({trip_id, "trip"}) |> Trips.Parser.parse_trip()
+    stop = included |> Map.fetch!({stop_id, "stop"}) |> Stops.Parser.parse_stop()
+    route = included |> Map.fetch!({route_id, "route"}) |> Routes.Parser.parse_route(included)
 
     vehicle =
-      case get_in(relationships, ["vehicle", "data", "id"]) do
-        nil -> nil
-        vehicle_id -> Map.get(included_data, {"vehicle", vehicle_id})
+      case get_in(relationships, ~w[vehicle data id]) do
+        nil ->
+          nil
+
+        vehicle_id ->
+          included |> Map.fetch!({vehicle_id, "vehicle"}) |> Vehicles.Parser.parse_vehicle()
       end
 
     alerts =
-      case get_in(relationships, ["alerts", "data"]) do
+      case get_in(relationships, ~w[alerts data]) do
         nil ->
           []
 
         alerts_data ->
           Enum.map(alerts_data, fn %{"id" => alert_id} ->
-            Map.get(included_data, {"alert", alert_id})
+            included |> Map.fetch!({alert_id, "alert"}) |> Alerts.Parser.parse_alert()
           end)
       end
 
-    %Screens.Predictions.Prediction{
+    %Prediction{
       id: id,
       trip: trip,
       stop: stop,
       route: route,
       vehicle: vehicle,
       alerts: alerts,
-      arrival_time: arrival_time,
-      departure_time: departure_time,
-      track_number: track_number,
-      schedule_relationship: schedule_relationship
+      arrival_time: parse_time(arrival_time_string),
+      departure_time: parse_time(departure_time_string),
+      track_number: stop.platform_code,
+      schedule_relationship: ScheduleRelationship.parse(schedule_relationship)
     }
   end
 
