@@ -5,6 +5,7 @@ defmodule Screens.Stops.Parser do
         "id" => id,
         "attributes" => %{
           "name" => name,
+          "location_type" => location_type,
           "platform_code" => platform_code,
           "platform_name" => platform_name
         }
@@ -12,6 +13,7 @@ defmodule Screens.Stops.Parser do
     %Screens.Stops.Stop{
       id: id,
       name: name,
+      location_type: location_type,
       platform_code: platform_code,
       platform_name: platform_name
     }

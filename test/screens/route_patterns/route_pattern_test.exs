@@ -97,6 +97,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                   "type" => "stop",
                   "attributes" => %{
                     "name" => "Wonderland",
+                    "location_type" => 0,
                     "platform_code" => "1",
                     "platform_name" => "Bowdoin"
                   }
@@ -106,6 +107,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                   "type" => "stop",
                   "attributes" => %{
                     "name" => "Orient Heights",
+                    "location_type" => 0,
                     "platform_code" => nil,
                     "platform_name" => "Bowdoin"
                   }
@@ -115,6 +117,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                   "type" => "stop",
                   "attributes" => %{
                     "name" => "Bowdoin",
+                    "location_type" => 0,
                     "platform_code" => nil,
                     "platform_name" => "Exit Only"
                   }
@@ -143,6 +146,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
       bowdoin = %Stop{
         id: "70838",
         name: "Bowdoin",
+        location_type: 0,
         platform_code: nil,
         platform_name: "Exit Only"
       }
@@ -150,6 +154,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
       orient_heights = %Stop{
         id: "70051",
         name: "Orient Heights",
+        location_type: 0,
         platform_code: nil,
         platform_name: "Bowdoin"
       }
@@ -157,6 +162,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
       wonderland = %Stop{
         id: "70059",
         name: "Wonderland",
+        location_type: 0,
         platform_code: "1",
         platform_name: "Bowdoin"
       }

@@ -165,6 +165,11 @@ config :screens, Screens.V2.ScreenData,
 
 config :screens, Screens.V2.CandidateGenerator.DupNew, stop_module: Screens.Stops.MockStop
 
+config :screens, Screens.V2.RDS,
+  departure_module: Screens.V2.MockDeparture,
+  route_pattern_module: Screens.RoutePatterns.MockRoutePattern,
+  stop_module: Screens.Stops.MockStop
+
 config :screens, Screens.LastTrip,
   trip_updates_adapter: Screens.LastTrip.TripUpdates.Noop,
   vehicle_positions_adapter: Screens.LastTrip.VehiclePositions.Noop

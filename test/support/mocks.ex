@@ -1,3 +1,5 @@
 Mox.defmock(Screens.Config.MockCache, for: Screens.Config.Cache)
+Mox.defmock(Screens.RoutePatterns.MockRoutePattern, for: Screens.RoutePatterns.RoutePattern)
 Mox.defmock(Screens.Stops.MockStop, for: Screens.Stops.Stop)
+Mox.defmock(Screens.V2.MockDeparture, for: Screens.V2.Departure)
 Mox.defmock(Screens.V2.ScreenData.MockParameters, for: Screens.V2.ScreenData.Parameters)
