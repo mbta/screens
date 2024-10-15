@@ -1,4 +1,4 @@
-defmodule Screens.RoutePatterns.Parser do
+defmodule Screens.RoutePatterns.RouteDirectionStops do
   @moduledoc false
 
   require Logger
