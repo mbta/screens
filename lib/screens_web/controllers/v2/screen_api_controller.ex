@@ -102,7 +102,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   # Add extra fields used by the Mercury E-ink client
-  defp put_extra_fields(response, screen_id, %Screen{app_id: :gl_eink_v2}) do
+  defp put_extra_fields(response, screen_id, %Screen{vendor: :mercury}) do
     response
     # Used to enable audio readout without additional network requests
     # https://app.asana.com/0/1176097567827729/1205748798471858/f

@@ -20,7 +20,6 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
       mercury_eink_instance: %WidgetInstance.NormalHeader{
         screen:
           struct(ScreensConfig.Screen, %{
-            app_id: :gl_eink_v2,
             vendor: :mercury,
             app_params: struct(GlEink, %{header: struct(Header.Destination)})
           }),
@@ -38,7 +37,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "serialize/1" do
-    test "does not return time if vendor is Mercury and app is GlEink", %{
+    test "does not return time if vendor is Mercury", %{
       mercury_eink_instance: instance
     } do
       assert %{
