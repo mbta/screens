@@ -19,16 +19,14 @@ defmodule Screens.Stops.Stop do
   alias Screens.V3Api
   alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
 
-  defstruct id: nil,
-            name: nil,
-            platform_code: nil,
-            platform_name: nil
+  defstruct ~w[id name location_type platform_code platform_name]a
 
   @type id :: String.t()
 
   @type t :: %__MODULE__{
           id: id,
           name: String.t(),
+          location_type: 0 | 1 | 2 | 3,
           platform_code: String.t() | nil,
           platform_name: String.t() | nil
         }
@@ -308,6 +306,50 @@ defmodule Screens.Stops.Stop do
           location_type == 0 and vehicle_type in [0, 1]
         end)
         |> Enum.map(&Stops.Parser.parse_stop/1)
+    end
+  end
+
+  @doc """
+  Returns a list of child stops for each given stop ID (in the same order). For stop IDs that are
+  already child stops, the list contains only the stop itself. For stop IDs that do not exist, the
+  list is empty.
+  """
+  @callback fetch_child_stops([id()]) :: {:ok, [[t()]]} | {:error, term()}
+  def fetch_child_stops(stop_ids, get_json_fn \\ &Screens.V3Api.get_json/2) do
+    case get_json_fn.("stops", %{
+           "filter[id]" => Enum.join(stop_ids, ","),
+           "include" => "child_stops"
+         }) do
+      {:ok, %{"data" => data} = response} ->
+        child_stops =
+          response
+          |> Map.get("included", [])
+          |> Enum.map(&Stops.Parser.parse_stop/1)
+          |> Map.new(&{&1.id, &1})
+
+        stops_with_children =
+          data
+          |> Enum.map(fn %{"relationships" => %{"child_stops" => %{"data" => children}}} = stop ->
+            {
+              Stops.Parser.parse_stop(stop),
+              children
+              |> Enum.map(fn %{"id" => id} -> Map.fetch!(child_stops, id) end)
+              |> Enum.filter(&(&1.location_type == 0))
+            }
+          end)
+          |> Map.new(&{elem(&1, 0).id, &1})
+
+        {:ok,
+         Enum.map(stop_ids, fn stop_id ->
+           case stops_with_children[stop_id] do
+             nil -> []
+             {stop, []} -> [stop]
+             {_stop, children} -> children
+           end
+         end)}
+
+      error ->
+        {:error, error}
     end
   end
 

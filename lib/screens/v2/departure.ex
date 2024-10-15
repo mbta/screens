@@ -32,7 +32,7 @@ defmodule Screens.V2.Departure do
 
   @type fetch :: (params(), opts() -> result())
 
-  @spec fetch(params(), opts()) :: result()
+  @callback fetch(params(), opts()) :: result()
   def fetch(params, opts \\ []) do
     # This is equivalent to an argument with a default value, so it's fine
     # credo:disable-for-next-line Screens.Checks.UntestableDateTime
