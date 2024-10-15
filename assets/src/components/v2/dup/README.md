@@ -39,8 +39,7 @@
 
 Once you've created the client app packages, you'll need to send them to Outfront to test and deploy.
 
-Ask a Screens team member for the email of our contact at Outfront.
-In your message, be sure to specify a player name (or "Liveboard name") that they should set on the test screen.
+For detailed instructions on this process, go to [this Notion doc](https://www.notion.so/mbta-downtown-crossing/Deploying-DUP-Package-Updates-120f5d8d11ea805fa219f214c1633293).
 
 ## Debugging
 
