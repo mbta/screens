@@ -20,13 +20,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   # Mercury adds their own time so we omit the time in the response.
   # https://app.asana.com/0/1185117109217413/1206070378353406/f
-  def serialize(
-        %__MODULE__{
-          screen: %Screen{vendor: :mercury, app_id: :gl_eink_v2},
-          icon: icon,
-          text: text
-        } = t
-      ) do
+  def serialize(%__MODULE__{screen: %Screen{vendor: :mercury}, icon: icon, text: text} = t) do
     %{icon: icon, text: text, show_to: showing_destination?(t)}
   end
 
