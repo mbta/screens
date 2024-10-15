@@ -1,11 +1,13 @@
 defmodule Screens.RoutePatterns.RoutePattern do
   @moduledoc false
 
-  alias Screens.RoutePatterns
+  alias Screens.RoutePatterns.RouteDirectionStops
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
+  alias Screens.Trips.Trip
   alias Screens.V3Api
 
+  @spec stops_by_route_and_direction(Route.id(), Trip.direction()) :: {:ok, [Stop.t()]} | :error
   def stops_by_route_and_direction(route_id, direction_id) do
     with {:ok, route_patterns} <-
            V3Api.get_json("route_patterns", %{
@@ -15,7 +17,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
              "include" => "representative_trip.stops"
            }),
          parsed_result when parsed_result != :error <-
-           RoutePatterns.Parser.parse_result(route_patterns, route_id) do
+           RouteDirectionStops.parse_result(route_patterns, route_id) do
       {:ok, parsed_result}
     else
       _ -> :error
