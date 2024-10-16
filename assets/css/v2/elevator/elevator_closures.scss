@@ -1,4 +1,7 @@
 .elevator-closures {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   position: relative;
   font-family: Inter, sans-serif;
   background-color: $warm-neutral-90;
@@ -27,10 +30,12 @@
 
   hr {
     height: 24px;
+    width: 100%;
     background-color: $cool-black-15;
   }
 
   .outside-alert-list {
+    height: 100%;
     background-color: $warm-neutral-90;
 
     .header {
@@ -40,5 +45,16 @@
       line-height: 150px;
       padding: 48px;
     }
+  }
+
+  .footer {
+    display: flex;
+    height: 184px;
+    background-color: $cool-black-30;
+    color: white;
+    font-size: 48px;
+    line-height: 62px;
+    align-items: center;
+    padding: 26px 48px;
   }
 }

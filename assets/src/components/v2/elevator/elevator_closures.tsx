@@ -55,6 +55,17 @@ const OutsideAlertList = (_props: OutsideAlertListProps) => {
   );
 };
 
+const Footer = () => {
+  return (
+    <div className="footer">
+      <span>
+        For more info and alternate paths: mbta.com/alerts/access or (617)
+        222-2828
+      </span>
+    </div>
+  );
+};
+
 interface Props {
   id: string;
   time: string;
@@ -73,6 +84,7 @@ const ElevatorClosures: React.ComponentType<Props> = ({
       <Header id={id} time={time} />
       <InStationSummary alerts={inStationAlerts} />
       <OutsideAlertList alerts={outsideAlerts} />
+      <Footer />
     </div>
   );
 };
