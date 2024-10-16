@@ -17,13 +17,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
     |> Builder.build_template()
   end
 
-  def candidate_instances(config) do
-    elevator_closures_instances(config)
+  def candidate_instances(config, now \\ DateTime.utc_now()) do
+    elevator_closures_instances(config, now)
   end
 
   def audio_only_instances(_widgets, _config), do: []
 
-  defp elevator_closures_instances(config) do
-    [%ElevatorClosures{screen: config, alerts: []}]
+  defp elevator_closures_instances(config, now) do
+    [%ElevatorClosures{screen: config, alerts: [], time: now}]
   end
 end
