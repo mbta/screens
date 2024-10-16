@@ -14,7 +14,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
         }
 
   def serialize(%__MODULE__{screen: %Screen{app_params: %Elevator{elevator_id: id}}, time: time}) do
-    %{id: id, alerts: [], time: DateTime.to_iso8601(time)}
+    %{id: id, in_station_alerts: [], outside_alerts: [], time: DateTime.to_iso8601(time)}
   end
 
   defimpl Screens.V2.WidgetInstance do

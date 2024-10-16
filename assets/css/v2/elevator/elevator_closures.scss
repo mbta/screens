@@ -1,8 +1,10 @@
 .elevator-closures {
+  position: relative;
   font-family: Inter, sans-serif;
+  background-color: $warm-neutral-90;
+
   .header {
     display: flex;
-    width: 100%;
     height: 104px;
     background-color: $cool-black-15;
     color: $warm-neutral-90;
@@ -11,5 +13,20 @@
     font-size: 48px;
     line-height: 62px;
     padding: 0 48px;
+  }
+
+  .in-station-summary {
+    display: flex;
+    padding: 24px 58px;
+    justify-content: space-between;
+    font-weight: 400;
+    font-size: 48px;
+    line-height: 64px;
+    color: $cool-black-30;
+  }
+
+  hr {
+    height: 24px;
+    background-color: $cool-black-15;
   }
 }
