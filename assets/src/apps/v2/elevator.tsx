@@ -10,15 +10,15 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NormalScreen from "Components/v2/elevator/normal_screen";
-import Placeholder from "Components/v2/placeholder";
 import EvergreenContent from "Components/v2/evergreen_content";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 import MultiScreenPage from "Components/v2/multi_screen_page";
+import ElevatorClosures from "Components/v2/elevator/elevator_closures";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
-  placeholder: Placeholder,
+  elevator_closures: ElevatorClosures,
   evergreen_content: EvergreenContent,
 };
 
