@@ -3,7 +3,7 @@
   font-family: Inter, sans-serif;
   background-color: $warm-neutral-90;
 
-  .header {
+  .screen-header {
     display: flex;
     height: 104px;
     background-color: $cool-black-15;
@@ -28,5 +28,17 @@
   hr {
     height: 24px;
     background-color: $cool-black-15;
+  }
+
+  .outside-alert-list {
+    background-color: $warm-neutral-90;
+
+    .header {
+      display: flex;
+      font-size: 150px;
+      font-weight: 700;
+      line-height: 150px;
+      padding: 48px;
+    }
   }
 }
