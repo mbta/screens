@@ -1,7 +1,9 @@
 defmodule Screens.V2.WidgetInstance.ElevatorClosures do
+  @moduledoc false
+
+  alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
-  alias Screens.Alerts.Alert
 
   defstruct screen: nil,
             alerts: nil,
