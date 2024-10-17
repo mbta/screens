@@ -1,6 +1,6 @@
 defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
-  require Logger
+
   alias Screens.Config.Cache
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
@@ -148,14 +148,10 @@ defmodule ScreensWeb.V2.ScreenController do
     # Phoenix does not automatically decode JSON received in query params.
     case Jason.decode(json_data) do
       {:ok, widget_data} ->
-        Logger.info(
-          "[screen_controller widget] rendering widget: app_id: #{app_id} data: #{json_data}"
-        )
-
         widget(conn, %{"app_id" => app_id, "widget" => widget_data})
 
       {:error, _} ->
-        Logger.error(
+        Sentry.capture_message(
           "[screen_controller widget] invalid widget JSON in query params for app_id: #{app_id}"
         )
 
@@ -181,7 +177,7 @@ defmodule ScreensWeb.V2.ScreenController do
   def widget(conn, %{"app_id" => app_id}) do
     app_id = String.to_existing_atom(app_id)
 
-    Logger.error(
+    Sentry.capture_message(
       "[screen_controller widget] missing widget JSON in request body for app_id: #{app_id}"
     )
 
