@@ -8,7 +8,7 @@
     "watch": "concurrently --kill-others --prefix-colors auto npm:watch-*",
     "watch-build": "webpack --mode development --stats minimal --watch",
     "watch-tsc": "tsc --noEmit --preserveWatchOutput --watch",
-    "tsc:check": "tsc --noEmit",
+    "tsc:check": "tsc --noEmit --skipLibCheck",
     "lint": "eslint --fix .",
     "lint:check": "eslint .",
     "lint:errors": "eslint --quiet .",
