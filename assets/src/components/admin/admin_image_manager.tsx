@@ -107,7 +107,8 @@ const ImageUpload = (): JSX.Element => {
   };
 
   const onDrop = useCallback(
-    ([acceptedFile]) => {
+    (acceptedFiles) => {
+      const [acceptedFile] = acceptedFiles;
       if (acceptedFile) {
         const fileWithPreview = Object.assign(acceptedFile, {
           preview: URL.createObjectURL(acceptedFile),
@@ -122,7 +123,11 @@ const ImageUpload = (): JSX.Element => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: ["image/png", "image/gif", "image/svg+xml"],
+    accept: {
+      "image/png": [".png"],
+      "image/gif": [".gif"],
+      "image/svg+xml": [".svg", ".xml"],
+    },
     multiple: false,
     maxSize: 20000000,
   });
