@@ -151,9 +151,10 @@ defmodule ScreensWeb.V2.ScreenController do
         widget(conn, %{"app_id" => app_id, "widget" => widget_data})
 
       {:error, _} ->
-        Sentry.capture_message(
-          "[screen_controller widget] invalid widget JSON in query params for app_id: #{app_id}"
-        )
+        _ =
+          Sentry.capture_message(
+            "[screen_controller widget] invalid widget JSON in query params for app_id: #{app_id}"
+          )
 
         conn
         |> put_status(:bad_request)
@@ -177,9 +178,10 @@ defmodule ScreensWeb.V2.ScreenController do
   def widget(conn, %{"app_id" => app_id}) do
     app_id = String.to_existing_atom(app_id)
 
-    Sentry.capture_message(
-      "[screen_controller widget] missing widget JSON in request body for app_id: #{app_id}"
-    )
+    _ =
+      Sentry.capture_message(
+        "[screen_controller widget] missing widget JSON in request body for app_id: #{app_id}"
+      )
 
     conn
     |> put_status(:bad_request)
