@@ -1,6 +1,6 @@
 defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
-  require Logger
+
   alias Screens.Config.Cache
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
@@ -142,15 +142,20 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   # Handles widget page GET requests with widget data as a query param.
-  # Phoenix does not automatically decode JSON received in query params.
   # Primarily used by Mercury so not all requests need to run through the framework.
   # https://app.asana.com/0/1185117109217413/1205234924224431/f
   def widget(conn, %{"app_id" => app_id, "widget" => json_data}) when is_binary(json_data) do
+    # Phoenix does not automatically decode JSON received in query params.
     case Jason.decode(json_data) do
       {:ok, widget_data} ->
         widget(conn, %{"app_id" => app_id, "widget" => widget_data})
 
       {:error, _} ->
+        _ =
+          Sentry.capture_message(
+            "[screen_controller widget] invalid widget JSON in query params for app_id: #{app_id}"
+          )
+
         conn
         |> put_status(:bad_request)
         |> text(
@@ -160,7 +165,6 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   # Handles widget page POST requests with widget data as a JSON request body.
-  # Phoenix automatically decodes JSON received in POST body.
   def widget(conn, %{"app_id" => app_id, "widget" => widget_data})
       when app_id in @app_id_strings do
     app_id = String.to_existing_atom(app_id)
@@ -173,6 +177,11 @@ defmodule ScreensWeb.V2.ScreenController do
 
   def widget(conn, %{"app_id" => app_id}) do
     app_id = String.to_existing_atom(app_id)
+
+    _ =
+      Sentry.capture_message(
+        "[screen_controller widget] missing widget JSON in request body for app_id: #{app_id}"
+      )
 
     conn
     |> put_status(:bad_request)
