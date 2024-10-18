@@ -5,10 +5,18 @@
   margin-left: auto;
 }
 
+.screen-normal__header {
+  width: 1080px;
+  height: 104px;
+}
+
 .screen-normal__body {
-  position: absolute;
-  top: 288px;
-  left: 0;
-  width: 1200px;
-  height: 2912px;
+  width: 1080px;
+  height: 1632px;
+}
+
+.screen-normal__footer {
+  position: relative;
+  width: 1080px;
+  height: 184px;
 }

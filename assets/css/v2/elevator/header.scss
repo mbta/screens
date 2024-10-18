@@ -1,0 +1,12 @@
+.normal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 100%;
+  padding: 0 48px;
+  font-family: Inter, sans-serif;
+  font-size: 48px;
+  line-height: 62px;
+  color: $warm-neutral-90;
+  background-color: $cool-black-15;
+}
