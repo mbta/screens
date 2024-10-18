@@ -1,21 +1,7 @@
 import React from "react";
-import { formatTimeString } from "Util/util";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 
-interface HeaderProps {
-  id: string;
-  time: string;
-}
-
-const Header = ({ id, time }: HeaderProps) => {
-  return (
-    <div className="screen-header">
-      <span className="header__id">Elevator {id}</span>
-      <span className="header__time">{formatTimeString(time)}</span>
-    </div>
-  );
-};
 interface InStationSummaryProps {
   alerts: string[];
 }
@@ -55,36 +41,20 @@ const OutsideAlertList = (_props: OutsideAlertListProps) => {
   );
 };
 
-const Footer = () => {
-  return (
-    <div className="footer">
-      <span>
-        For more info and alternate paths: mbta.com/alerts/access or (617)
-        222-2828
-      </span>
-    </div>
-  );
-};
-
 interface Props {
   id: string;
-  time: string;
   in_station_alerts: string[];
   outside_alerts: string[];
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({
-  id,
-  time,
   in_station_alerts: inStationAlerts,
   outside_alerts: outsideAlerts,
 }: Props) => {
   return (
     <div className="elevator-closures">
-      <Header id={id} time={time} />
       <InStationSummary alerts={inStationAlerts} />
       <OutsideAlertList alerts={outsideAlerts} />
-      <Footer />
     </div>
   );
 };

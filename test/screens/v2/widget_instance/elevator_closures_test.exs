@@ -10,7 +10,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
     %{
       instance: %ElevatorClosures{
         screen: struct(Screen, %{app_params: %Elevator{elevator_id: "111"}}),
-        time: ~U[2024-10-16T09:00:00Z],
         alerts: []
       }
     }
@@ -23,10 +22,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   end
 
   describe "serialize/1" do
-    test "returns map with id, alerts, and time", %{instance: instance} do
+    test "returns map with id and alerts", %{instance: instance} do
       assert %{
                id: "111",
-               time: DateTime.to_iso8601(~U[2024-10-16T09:00:00Z]),
                in_station_alerts: [],
                outside_alerts: []
              } == WidgetInstance.serialize(instance)

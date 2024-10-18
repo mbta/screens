@@ -16,11 +16,15 @@ import { MappingContext } from "Components/v2/widget";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import ElevatorClosures from "Components/v2/elevator/elevator_closures";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
+import Footer from "Components/v2/elevator/footer";
+import NormalHeader from "Components/v2/normal_header";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
   elevator_closures: ElevatorClosures,
   evergreen_content: EvergreenContent,
+  footer: Footer,
+  normal_header: NormalHeader,
 };
 
 const App = (): JSX.Element => {

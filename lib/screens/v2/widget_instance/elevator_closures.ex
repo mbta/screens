@@ -6,17 +6,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   alias ScreensConfig.V2.Elevator
 
   defstruct screen: nil,
-            alerts: nil,
-            time: nil
+            alerts: nil
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
-          alerts: list(Alert.t()),
-          time: DateTime.t()
+          alerts: list(Alert.t())
         }
 
-  def serialize(%__MODULE__{screen: %Screen{app_params: %Elevator{elevator_id: id}}, time: time}) do
-    %{id: id, in_station_alerts: [], outside_alerts: [], time: DateTime.to_iso8601(time)}
+  def serialize(%__MODULE__{screen: %Screen{app_params: %Elevator{elevator_id: id}}}) do
+    %{id: id, in_station_alerts: [], outside_alerts: []}
   end
 
   defimpl Screens.V2.WidgetInstance do

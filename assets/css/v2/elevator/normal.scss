@@ -5,7 +5,18 @@
   margin-left: auto;
 }
 
+.screen-normal__header {
+  width: 1080px;
+  height: 104px;
+}
+
 .screen-normal__body {
   width: 1080px;
-  height: 1920px;
+  height: 1632px;
+}
+
+.screen-normal__footer {
+  position: relative;
+  width: 1080px;
+  height: 184px;
 }
