@@ -164,6 +164,7 @@ const WrappedWithLastFetch: React.ComponentType<Omit<Props, "lastFetch">> = (
   return <WidgetTreeErrorBoundary {...props} lastFetch={lastFetch} />;
 };
 
+// https://reactrouter.com/en/main/start/faq#what-happened-to-withrouter-i-need-it
 function withRouter<ComponentProps>(
   Component: React.FunctionComponent<ComponentProps>,
 ) {
