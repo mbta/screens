@@ -1,4 +1,4 @@
-import React from "react";
+import React, { PropsWithChildren } from "react";
 
 interface State {
   hasError: boolean;
@@ -12,7 +12,7 @@ interface State {
  * Wraps children in an error boundary so that render failures in the children
  * don't cause the entire page to fail.
  */
-class DebugErrorBoundary extends React.Component {
+class DebugErrorBoundary extends React.Component<PropsWithChildren> {
   public static getDerivedStateFromError(_error: Error) {
     return { hasError: true };
   }
