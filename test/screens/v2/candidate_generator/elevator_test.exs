@@ -22,7 +22,7 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
     test "returns template" do
       assert {:screen,
               %{
-                normal: [:main_content]
+                normal: [:header, :main_content, :footer]
               }} == Elevator.screen_template()
     end
   end
