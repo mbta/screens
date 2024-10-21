@@ -33,7 +33,7 @@ defmodule Screens.V2.ScreenData.Layout do
   @spec generate(Screen.t()) :: t()
   @spec generate(Screen.t(), String.t() | nil) :: t()
   def generate(config, variant \\ nil) do
-    candidate_generator = @parameters.get_candidate_generator(config, variant)
+    candidate_generator = @parameters.candidate_generator(config, variant)
     screen_template = candidate_generator.screen_template()
 
     config

@@ -242,15 +242,6 @@ const alertsColumn = {
   FormCell: FormTextarea,
 };
 
-const audioColumn = {
-  Header: "Audio",
-  accessor: buildAppParamAccessor("audio"),
-  mutator: buildAppParamMutator("audio"),
-  Cell: EditableTextarea,
-  disableFilters: true,
-  FormCell: FormTextarea,
-};
-
 const DupV2ScreensTable = (): JSX.Element => {
   const columns = [
     ...v2Columns,
@@ -311,7 +302,6 @@ const GLEinkV2ScreensTable = (): JSX.Element => {
     departuresColumn,
     footerColumn,
     alertsColumn,
-    audioColumn,
   ];
 
   const dataFilter = ({ app_id }) => {
@@ -328,10 +318,21 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
 
   const columns = [
     ...v2Columns,
+    {
+      Header: "Audio Offset",
+      accessor: (row) => row.app_params.audio.interval_offset_seconds,
+      mutator: (row, value) => {
+        const newRow = structuredClone(row);
+        newRow.app_params.audio.interval_offset_seconds = value;
+        return newRow;
+      },
+      Cell: EditableCell,
+      disableFilters: true,
+      FormCell: FormTextCell,
+    },
     departuresColumn,
     footerColumn,
     alertsColumn,
-    audioColumn,
     {
       Header: "Survey",
       accessor: buildAppParamAccessor("survey"),
@@ -408,7 +409,6 @@ const PreFareV2ScreensTable = (): JSX.Element => {
       disableFilters: true,
       FormCell: FormTextarea,
     },
-    audioColumn,
   ];
 
   return <AdminTable columns={columns} dataFilter={dataFilter} />;

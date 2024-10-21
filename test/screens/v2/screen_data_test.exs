@@ -52,7 +52,7 @@ defmodule Screens.V2.ScreenDataTest do
 
   describe "get/2" do
     setup do
-      stub(MockParameters, :get_refresh_rate, fn _app_id -> 0 end)
+      stub(MockParameters, :refresh_rate, fn _app_id -> 0 end)
       :ok
     end
 
@@ -68,7 +68,7 @@ defmodule Screens.V2.ScreenDataTest do
 
       expect(
         MockParameters,
-        :get_candidate_generator,
+        :candidate_generator,
         fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
       )
 
@@ -81,7 +81,7 @@ defmodule Screens.V2.ScreenDataTest do
 
       expect(
         MockParameters,
-        :get_candidate_generator,
+        :candidate_generator,
         fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
       )
 
@@ -94,7 +94,7 @@ defmodule Screens.V2.ScreenDataTest do
 
       expect(
         MockParameters,
-        :get_candidate_generator,
+        :candidate_generator,
         fn %Screen{app_id: :test_app}, "test_variant" -> GrayGenerator end
       )
 
@@ -107,11 +107,11 @@ defmodule Screens.V2.ScreenDataTest do
         build_config(%{app_id: :test_app, app_params: %{test_pid: self()}})
       end)
 
-      expect(MockParameters, :get_variants, fn %Screen{app_id: :test_app} -> ["crash"] end)
+      expect(MockParameters, :variants, fn %Screen{app_id: :test_app} -> ["crash"] end)
 
       stub(
         MockParameters,
-        :get_candidate_generator,
+        :candidate_generator,
         fn
           %Screen{app_id: :test_app}, nil -> GrayGenerator
           %Screen{app_id: :test_app}, "crash" -> CrashGenerator
@@ -132,17 +132,17 @@ defmodule Screens.V2.ScreenDataTest do
 
   describe "variants/2" do
     setup do
-      stub(MockParameters, :get_refresh_rate, fn _app_id -> 0 end)
+      stub(MockParameters, :refresh_rate, fn _app_id -> 0 end)
       :ok
     end
 
     test "gets widget data for all variants" do
       expect(MockCache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
-      expect(MockParameters, :get_variants, fn %Screen{app_id: :test_app} -> ["green"] end)
+      expect(MockParameters, :variants, fn %Screen{app_id: :test_app} -> ["green"] end)
 
       stub(
         MockParameters,
-        :get_candidate_generator,
+        :candidate_generator,
         fn
           %Screen{app_id: :test_app}, nil -> GrayGenerator
           %Screen{app_id: :test_app}, "green" -> GreenGenerator

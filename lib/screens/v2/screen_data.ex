@@ -63,7 +63,7 @@ defmodule Screens.V2.ScreenData do
     selected_variant = Keyword.get(opts, :generator_variant)
 
     if Keyword.get(opts, :run_all_variants?, false) do
-      other_variants = List.delete([nil | @parameters.get_variants(config)], selected_variant)
+      other_variants = List.delete([nil | @parameters.variants(config)], selected_variant)
 
       Enum.each(other_variants, fn variant ->
         {:ok, _pid} =
@@ -87,7 +87,7 @@ defmodule Screens.V2.ScreenData do
 
     ParallelRunSupervisor
     |> Task.Supervisor.async_stream(
-      [nil | @parameters.get_variants(config)],
+      [nil | @parameters.variants(config)],
       fn variant ->
         {variant, config |> Layout.generate(variant) |> then_fn.(config)}
       end
@@ -114,7 +114,7 @@ defmodule Screens.V2.ScreenData do
   end
 
   defp resolve_paging(layout, config),
-    do: Layout.resolve_paging(layout, @parameters.get_refresh_rate(config))
+    do: Layout.resolve_paging(layout, @parameters.refresh_rate(config))
 
   @spec serialize(Layout.non_paged()) :: map() | nil
   def serialize({layout, instance_map, paging_metadata}) do
