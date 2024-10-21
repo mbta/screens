@@ -58,7 +58,7 @@ defmodule ScreensWeb.V2.ScreenController do
   def index(conn, %{"id" => app_id})
       when app_id in @app_id_strings do
     app_id = String.to_existing_atom(app_id)
-    refresh_rate = Parameters.get_refresh_rate(app_id)
+    refresh_rate = Parameters.refresh_rate(app_id)
 
     conn
     |> assign(:app_id, app_id)
@@ -123,13 +123,13 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   defp get_assigns(params, screen_id, %Screen{app_id: app_id} = config) do
-    refresh_rate = Parameters.get_refresh_rate(app_id)
+    refresh_rate = Parameters.refresh_rate(app_id)
 
     [
       app_id: app_id,
       refresh_rate: refresh_rate,
-      audio_readout_interval: Parameters.get_audio_readout_interval(app_id),
-      audio_interval_offset_seconds: Parameters.get_audio_interval_offset_seconds(config),
+      audio_readout_interval: Parameters.audio_interval_minutes(app_id),
+      audio_interval_offset_seconds: Parameters.audio_interval_offset_seconds(config),
       sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
       refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate),
       is_real_screen: match?(%{"is_real_screen" => "true"}, params),
