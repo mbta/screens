@@ -382,7 +382,9 @@ const DataControls: ComponentType<{
 };
 
 const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
-  const [isPlaying, setIsPlaying] = useState(false);
+  // To bypass browser caching, we add a meaningless query param to the URL of
+  // the <audio> element, based on the timestamp the Play button was clicked.
+  const [playingAt, setPlayingAt] = useState<Date | null>(null);
   const [ssml, setSSML] = useState<string | null>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
@@ -414,9 +416,13 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
               Show SSML
             </button>
 
-            <button onClick={() => setIsPlaying(!isPlaying)}>
-              {isPlaying ? "⏹️ Stop Audio" : "▶️ Play Audio"}
-            </button>
+            {playingAt ? (
+              <button onClick={() => setPlayingAt(null)}>⏹️ Stop Audio</button>
+            ) : (
+              <button onClick={() => setPlayingAt(new Date())}>
+                ▶️ Play Audio
+              </button>
+            )}
           </div>
 
           <dialog className="viewer__modal" ref={dialogRef}>
@@ -429,11 +435,11 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
             <div className="viewer__modal__ssml">{ssml}</div>
           </dialog>
 
-          {isPlaying && (
+          {playingAt && (
             <audio
               autoPlay={true}
-              onEnded={() => setIsPlaying(false)}
-              src={`${audioPath}/readout.mp3`}
+              onEnded={() => setPlayingAt(null)}
+              src={`${audioPath}/readout.mp3?at=${playingAt.getTime()}`}
             />
           )}
         </>
