@@ -164,6 +164,10 @@ const ScreenSelector: ComponentType<{
       return groups;
     }, {});
 
+  const selectEntries: [string, ScreenWithId[]][] = Object.entries(
+    screensByType,
+  ).sort(([typeA], [typeB]) => typeA.localeCompare(typeB));
+
   return (
     <fieldset>
       <legend>Screen</legend>
@@ -173,9 +177,9 @@ const ScreenSelector: ComponentType<{
         onChange={(event) => navigateToScreen(event.target.value)}
       >
         <option></option>
-        {Object.keys(screensByType).map((type) => (
+        {selectEntries.map(([type, screens]) => (
           <optgroup label={type} key={type}>
-            {screensByType[type].map(({ id, config: { name } }) => (
+            {screens.map(({ id, config: { name } }) => (
               <option value={id} key={id}>
                 {id}
                 {name ? ` · ${name}` : ""}
