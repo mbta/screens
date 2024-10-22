@@ -633,12 +633,12 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns true for gl_eink_v2", %{widget: widget} do
+    test "returns true for eink screen types", %{widget: widget} do
       assert AlertWidget.audio_valid_candidate?(widget)
     end
 
-    test "returns false for screen types != gl_eink_v2", %{widget: widget} do
-      widget = %{widget | screen: %Screen{widget.screen | app_id: :bus_eink_v2}}
+    test "returns false for non-eink screen types", %{widget: widget} do
+      widget = %{widget | screen: %Screen{widget.screen | app_id: :bus_shelter_v2}}
       refute AlertWidget.audio_valid_candidate?(widget)
     end
   end

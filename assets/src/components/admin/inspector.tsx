@@ -31,6 +31,7 @@ const SCREEN_TYPES = new Set([
 ]);
 
 const AUDIO_SCREEN_TYPES = new Set([
+  "bus_eink_v2",
   "bus_shelter_v2",
   "busway_v2",
   "gl_eink_v2",
