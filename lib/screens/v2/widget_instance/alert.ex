@@ -271,7 +271,10 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  def audio_valid_candidate?(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}}), do: true
+  def audio_valid_candidate?(%__MODULE__{screen: %Screen{app_id: app_id}})
+      when app_id in ~w[bus_eink_v2 gl_eink_v2]a,
+      do: true
+
   def audio_valid_candidate?(_instance), do: false
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertView

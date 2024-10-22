@@ -9,7 +9,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Footer, GlEink, PreFare}
+  alias ScreensConfig.V2.{BusEink, Footer, GlEink, PreFare}
 
   defmodule SubwayStatusAlert do
     @moduledoc false
@@ -135,7 +135,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     def audio_sort_key(_instance), do: [2]
 
     def audio_valid_candidate?(%{screen: %Screen{app_params: %app{}}})
-        when app in [PreFare, GlEink],
+        when app in [BusEink, GlEink, PreFare],
         do: true
 
     def audio_valid_candidate?(_instance), do: false

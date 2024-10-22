@@ -11,6 +11,7 @@ defmodule Screens.V2.ScreenData.Parameters do
 
   @static_params %{
     bus_eink_v2: %Static{
+      audio_active_time: @all_times,
       candidate_generator: CandidateGenerator.BusEink,
       refresh_rate: 30
     },
