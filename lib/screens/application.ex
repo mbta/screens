@@ -31,7 +31,8 @@ defmodule Screens.Application do
       {Screens.ScreenApiResponseCache, []},
       Screens.LastTrip,
       {Phoenix.PubSub, name: ScreensWeb.PubSub},
-      ScreensWeb.Endpoint
+      ScreensWeb.Endpoint,
+      Screens.Health
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
