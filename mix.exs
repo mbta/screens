@@ -91,7 +91,8 @@ defmodule Screens.MixProject do
       {:nebulex, "~> 2.6"},
       {:remote_ip, "~> 1.2"},
       {:hackney_telemetry, "~> 0.2.0"},
-      {:ex_cldr_messages, "~> 1.0"}
+      {:ex_cldr_messages, "~> 1.0"},
+      {:recon, "~> 2.5.6"}
     ]
   end
 end
