@@ -81,10 +81,19 @@ defmodule Screens.Health do
   defp process_metrics({pid, name, supervisor}) do
     metrics =
       pid
-      |> :recon.info(@process_metrics)
+      |> safe_recon_info(@process_metrics)
       |> Stream.map(fn {metric, value} -> "#{metric}=#{value}" end)
       |> Enum.intersperse(" ")
 
     {name, supervisor, metrics}
+  end
+
+  # work around https://github.com/ferd/recon/issues/95
+  @spec safe_recon_info(pid(), [atom()]) ::
+          [] | [{:recon.info_type(), [{:recon.info_key(), term()}]}]
+  defp safe_recon_info(pid, metrics) do
+    :recon.info(pid, metrics)
+  rescue
+    FunctionClauseError -> []
   end
 end
