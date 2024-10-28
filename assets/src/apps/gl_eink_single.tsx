@@ -4,8 +4,8 @@ initSentry("gl_eink_single");
 require("../../css/gl_eink_single.scss");
 
 import React from "react";
-import ReactDOM from "react-dom";
-import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
+import { createRoot } from "react-dom/client";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import ScreenContainer, {
   ScreenLayout,
@@ -20,19 +20,26 @@ import {
 const App = (): JSX.Element => {
   return (
     <Router>
-      <Switch>
-        <Route exact path="/screen/gl_eink_single">
-          <MultiScreenPage screenContainer={ScreenContainer} />
-        </Route>
-        <Route exact path="/audit/gl_eink_single">
-          <AuditScreenPage screenLayout={ScreenLayout} />
-        </Route>
-        <Route path="/screen/:id">
-          <ScreenPage screenContainer={ScreenContainer} />
-        </Route>
-      </Switch>
+      <Routes>
+        <Route
+          path="/screen/gl_eink_single"
+          element={<MultiScreenPage screenContainer={ScreenContainer} />}
+        />
+
+        <Route
+          path="/audit/gl_eink_single"
+          element={<AuditScreenPage screenLayout={ScreenLayout} />}
+        />
+
+        <Route
+          path="/screen/:id"
+          element={<ScreenPage screenContainer={ScreenContainer} />}
+        />
+      </Routes>
     </Router>
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("app"));
+const container = document.getElementById("app");
+const root = createRoot(container!);
+root.render(<App />);
