@@ -89,7 +89,6 @@ defmodule Screens.Health do
   end
 
   # work around https://github.com/ferd/recon/issues/95
-  # The issue is closed but is still very much an issue.
   @spec safe_recon_info(pid(), [atom()]) ::
           [] | [{:recon.info_type(), [{:recon.info_key(), term()}]}]
   defp safe_recon_info(pid, metrics) do
