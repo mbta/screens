@@ -21,7 +21,7 @@ export type Screen = {
 
 const gatherSelectOptions = (rows, columnId) => {
   const options = rows.map((row) => row.values[columnId]);
-  const uniqueOptions = new Set(options);
+  const uniqueOptions = new Set<string>(options);
   return Array.from(uniqueOptions);
 };
 
