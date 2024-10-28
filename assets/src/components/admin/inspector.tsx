@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 
 import AdminForm from "./admin_form";
 
@@ -145,13 +145,13 @@ const ScreenSelector: ComponentType<{
   isVariantEnabled,
   setIsVariantEnabled,
 }) => {
-  const navigate = useNavigate();
+  const history = useHistory();
   const { pathname, search } = useLocation();
 
   const navigateToScreen = (id) => {
     const params = new URLSearchParams(search);
     params.set("id", id);
-    navigate({ pathname, search: params.toString() });
+    history.push({ pathname, search: params.toString() });
   };
 
   const screensByType: Record<string, ScreenWithId[]> = Object.entries(

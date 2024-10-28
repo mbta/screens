@@ -4,8 +4,8 @@ initSentry("solari_large");
 require("../../../css/solari_large_v2.scss");
 
 import React from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 
@@ -27,25 +27,18 @@ const TYPE_TO_COMPONENT = {
 const App = (): JSX.Element => {
   return (
     <Router>
-      <Routes>
-        <Route
-          path="/v2/screen/solari_large_v2"
-          element={<MultiScreenPage components={TYPE_TO_COMPONENT} />}
-        />
-
-        <Route
-          path="/v2/screen/:id"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ScreenPage />
-            </MappingContext.Provider>
-          }
-        />
-      </Routes>
+      <Switch>
+        <Route exact path="/v2/screen/solari_large_v2">
+          <MultiScreenPage components={TYPE_TO_COMPONENT} />
+        </Route>
+        <Route path="/v2/screen/:id">
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ScreenPage />
+          </MappingContext.Provider>
+        </Route>
+      </Switch>
     </Router>
   );
 };
 
-const container = document.getElementById("app");
-const root = createRoot(container!);
-root.render(<App />);
+ReactDOM.render(<App />, document.getElementById("app"));

@@ -1,4 +1,4 @@
-import { QRCodeSVG } from "qrcode.react";
+import QRCode from "qrcode.react";
 import React from "react";
 
 import { imagePath } from "Util/util";
@@ -20,7 +20,7 @@ const DigitalBridge = ({ stopId }): JSX.Element => {
       </div>
       <div className="digital-bridge__qr-container">
         <div className="digital-bridge__qr-image-container">
-          <QRCodeSVG
+          <QRCode
             className="digital-bridge__qr-image"
             size={112}
             value={
