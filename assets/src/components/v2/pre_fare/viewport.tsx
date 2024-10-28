@@ -1,4 +1,4 @@
-import React, { PropsWithChildren } from "react";
+import React from "react";
 
 import { getScreenSide } from "Util/util";
 
@@ -8,7 +8,7 @@ import { getScreenSide } from "Util/util";
  * If the param is missing, this will show the full
  * screen content (2160px x 1920px).
  */
-const Viewport = ({ children }: PropsWithChildren) => {
+const Viewport: React.ComponentType = ({ children }) => {
   let viewportClassName = "pre-fare-screen-viewport";
   let shifterClassName = "pre-fare-shifter";
   switch (getScreenSide()) {

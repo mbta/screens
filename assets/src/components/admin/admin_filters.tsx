@@ -36,6 +36,7 @@ const SelectColumnFilter = ({
     >
       <option value="">All</option>
       {options.map((option, i) => (
+        // @ts-expect-error
         <option key={i} value={option}>
           {option}
         </option>

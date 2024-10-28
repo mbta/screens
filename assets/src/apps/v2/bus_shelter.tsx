@@ -7,8 +7,8 @@ initFullstory();
 require("../../../css/bus_shelter_v2.scss");
 
 import React from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
 import {
   ResponseMapper,
@@ -122,47 +122,40 @@ const getAudioConfig = (): AudioConfig | null => {
 const App = (): JSX.Element => {
   return (
     <Router>
-      <Routes>
+      <Switch>
+        <Route exact path="/v2/screen/bus_shelter_v2">
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
+        </Route>
+        <Route exact path={["/v2/screen/:id", "/v2/screen/pending/:id"]}>
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <BlinkConfigContext.Provider value={blinkConfig}>
+                <AudioConfigContext.Provider value={getAudioConfig()}>
+                  <ScreenPage />
+                </AudioConfigContext.Provider>
+              </BlinkConfigContext.Provider>
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
         <Route
-          path="/v2/screen/bus_shelter_v2"
-          element={
-            <MultiScreenPage
-              components={TYPE_TO_COMPONENT}
-              responseMapper={responseMapper}
-            />
-          }
-        />
-
-        <Route
-          path="/v2/screen/pending?/:id"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <BlinkConfigContext.Provider value={blinkConfig}>
-                  <AudioConfigContext.Provider value={getAudioConfig()}>
-                    <ScreenPage />
-                  </AudioConfigContext.Provider>
-                </BlinkConfigContext.Provider>
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          }
-        />
-
-        <Route
-          path="/v2/screen/pending?/:id/simulation"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <SimulationScreenPage />
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          }
-        />
-      </Routes>
+          exact
+          path={[
+            "/v2/screen/:id/simulation",
+            "/v2/screen/pending/:id/simulation",
+          ]}
+        >
+          <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage />
+            </ResponseMapperContext.Provider>
+          </MappingContext.Provider>
+        </Route>
+      </Switch>
     </Router>
   );
 };
 
-const container = document.getElementById("app");
-const root = createRoot(container!);
-root.render(<App />);
+ReactDOM.render(<App />, document.getElementById("app"));

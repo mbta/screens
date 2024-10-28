@@ -7,8 +7,8 @@ initFullstory();
 require("../../css/solari.scss");
 
 import React, { useEffect } from "react";
-import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import ReactDOM from "react-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 
 import ScreenContainer, {
   ScreenLayout,
@@ -25,22 +25,17 @@ const App = (): JSX.Element => {
 
   return (
     <Router>
-      <Routes>
-        <Route
-          path="/screen/solari"
-          element={<MultiScreenPage screenContainer={ScreenContainer} />}
-        />
-
-        <Route
-          path="/audit/solari"
-          element={<AuditScreenPage screenLayout={ScreenLayout} />}
-        />
-
-        <Route
-          path="/screen/:id"
-          element={<ScreenPage screenContainer={ScreenContainer} />}
-        />
-      </Routes>
+      <Switch>
+        <Route exact path="/screen/solari">
+          <MultiScreenPage screenContainer={ScreenContainer} />
+        </Route>
+        <Route exact path="/audit/solari">
+          <AuditScreenPage screenLayout={ScreenLayout} />
+        </Route>
+        <Route path="/screen/:id">
+          <ScreenPage screenContainer={ScreenContainer} />
+        </Route>
+      </Switch>
     </Router>
   );
 };
@@ -62,6 +57,4 @@ const handleWatchdogMessage = (ev: MessageEvent) => {
   }
 };
 
-const container = document.getElementById("app");
-const root = createRoot(container!);
-root.render(<App />);
+ReactDOM.render(<App />, document.getElementById("app"));
