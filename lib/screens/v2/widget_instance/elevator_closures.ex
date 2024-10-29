@@ -1,8 +1,8 @@
 defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   @moduledoc false
 
-  alias Screens.LocationContext
   alias Screens.Alerts.Alert
+  alias Screens.LocationContext
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 

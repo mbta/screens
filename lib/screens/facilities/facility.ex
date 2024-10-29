@@ -1,4 +1,8 @@
 defmodule Screens.Facilities.Facility do
+  @moduledoc """
+  Functions for fetching facility data from the V3 API.
+  """
+
   alias Screens.Stops
 
   @type id :: String.t()
