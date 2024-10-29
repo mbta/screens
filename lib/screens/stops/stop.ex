@@ -17,7 +17,7 @@ defmodule Screens.Stops.Stop do
   alias Screens.Stops
   alias Screens.Util
   alias Screens.V3Api
-  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
+  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, Elevator, GlEink, PreFare}
 
   defstruct ~w[id name location_type platform_code platform_name]a
 
@@ -493,6 +493,7 @@ defmodule Screens.Stops.Stop do
   # WTC is a special bus-only case
   def get_route_type_filter(Dup, "place-wtcst"), do: [:bus]
   def get_route_type_filter(Dup, _), do: [:light_rail, :subway]
+  def get_route_type_filter(Elevator, _), do: [:subway]
 
   @spec upstream_stop_id_set(String.t(), list(list(id()))) :: MapSet.t(id())
   def upstream_stop_id_set(stop_id, stop_sequences) do
@@ -530,7 +531,8 @@ defmodule Screens.Stops.Stop do
     RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids)
   end
 
-  defp fetch_tagged_stop_sequences_by_app(PreFare, stop_id, routes_at_stop) do
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
+       when app in [Elevator, PreFare] do
     route_ids = Route.route_ids(routes_at_stop)
 
     # We limit results to canonical route patterns only--no stop sequences for nonstandard patterns.
