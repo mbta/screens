@@ -301,79 +301,6 @@ defmodule Screens.Alerts.Alert do
 
   defp format_query_param(_), do: []
 
-  # V1 only
-  defp sort_key(alert, stop_id) do
-    {
-      specificity(alert, stop_id),
-      -high_severity(alert),
-      -new_service_in_next_two_weeks(alert),
-      -happening_now_key(alert),
-      -new_info_in_last_two_weeks(alert),
-      effect_index(alert.effect),
-      alert.id
-    }
-  end
-
-  # SPECIFICITY
-  # 0 if current stop
-  # 1 if whole route
-  # 2 if a different specific stop
-  # 3 if no stop or route IE
-  # V1 only
-  defp specificity(%{informed_entities: ies}, stop_id) do
-    ies
-    |> Enum.map(&ie_specificity(&1, stop_id))
-    |> Enum.min()
-  end
-
-  # V1 only
-  defp ie_specificity(ie, stop_id) do
-    case ie_target(ie) do
-      {:stop, target_stop_id} ->
-        if target_stop_id == stop_id, do: 0, else: 2
-
-      {:route, _route_id} ->
-        1
-
-      :other ->
-        3
-    end
-  end
-
-  # V1 only
-  defp ie_target(%{stop: stop_id}) do
-    {:stop, stop_id}
-  end
-
-  defp ie_target(%{route: route_id}) do
-    {:route, route_id}
-  end
-
-  defp ie_target(_) do
-    :other
-  end
-
-  # HIGH SEVERITY
-  # severity >= 7
-  # Note that we differentiate among severities which are at least 7 (same as dotcom)
-  # V1 only
-  def high_severity(%{severity: severity}) when severity >= 7 do
-    severity
-  end
-
-  def high_severity(_), do: 0
-
-  def high_severity?(alert) do
-    high_severity(alert) > 0
-  end
-
-  # HAPPENING NOW
-  # defined as: some active period contains the current time
-  # V1 only
-  defp happening_now_key(alert) do
-    if happening_now?(alert), do: 1, else: 0
-  end
-
   # V1 & V2
   def happening_now?(%{active_period: aps}, now \\ DateTime.utc_now()) do
     Enum.any?(aps, &in_active_period(&1, now))
@@ -462,15 +389,6 @@ defmodule Screens.Alerts.Alert do
   ###
 
   # V1 only
-  defp inline?(%{effect: :delay}) do
-    true
-  end
-
-  defp inline?(_) do
-    false
-  end
-
-  # V1 only
   def build_delay_map(alerts) do
     Enum.reduce(alerts, %{}, &delay_map_reducer/2)
   end
@@ -504,19 +422,6 @@ defmodule Screens.Alerts.Alert do
 
   defp bus_route_informed_entity(_) do
     []
-  end
-
-  ###
-  # V1 only (gl_eink)
-  def by_route_id(route_id, stop_id) do
-    {inline_alerts, global_alerts} =
-      [route_id: route_id]
-      |> fetch_or_empty_list()
-      |> Enum.split_with(&inline?/1)
-
-    global_alert = Enum.min_by(global_alerts, &sort_key(&1, stop_id), fn -> nil end)
-
-    {inline_alerts, global_alert}
   end
 
   @alert_cause_mapping %{

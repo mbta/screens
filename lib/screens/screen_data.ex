@@ -7,7 +7,6 @@ defmodule Screens.ScreenData do
   alias ScreensConfig.Screen
 
   @modules_by_app_id %{
-    gl_eink_single: Screens.GLScreenData,
     solari: Screens.SolariScreenData
   }
 

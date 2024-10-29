@@ -73,7 +73,7 @@ const AllScreensTable = (): JSX.Element => {
       Cell: EditableSelect,
       Filter: SelectColumnFilter,
       filter: "includes",
-      FormCell: buildFormSelect(["gl_eink_single", "solari_eink"]),
+      FormCell: FormStaticCell,
     },
     {
       Header: "Disabled",
