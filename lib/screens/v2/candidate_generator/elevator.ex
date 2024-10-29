@@ -2,8 +2,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Elevator.ElevatorClosures
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{ElevatorClosures, Footer, NormalHeader}
+  alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 
@@ -23,15 +24,16 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
     |> Builder.build_template()
   end
 
-  def candidate_instances(config, now \\ DateTime.utc_now()) do
-    [header_instance(config, now), elevator_closures_instance(config), footer_instance(config)]
+  def candidate_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        elevator_closure_instances_fn \\ &ElevatorClosures.elevator_status_instances/2
+      ) do
+    [header_instance(config, now), footer_instance(config)] ++
+      elevator_closure_instances_fn.(config, now)
   end
 
   def audio_only_instances(_widgets, _config), do: []
-
-  defp elevator_closures_instance(config) do
-    %ElevatorClosures{screen: config, alerts: []}
-  end
 
   defp header_instance(%Screen{app_params: %Elevator{elevator_id: elevator_id}} = config, now) do
     %NormalHeader{text: "Elevator #{elevator_id}", screen: config, time: now}
