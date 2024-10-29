@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Elevator.ElevatorClosures do
   @moduledoc false
 
+  require Logger
+
   alias Screens.Alerts.Alert
   alias Screens.Facilities.Facility
   alias Screens.Routes.Route
@@ -46,7 +48,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ElevatorClosures do
         }
       ]
     else
-      :error -> []
+      :error ->
+        []
+
+      {:error, error} ->
+        Logger.error("[elevator_status_instances] #{inspect(error)}")
+        []
     end
   end
 
