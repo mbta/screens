@@ -3,31 +3,6 @@
     "disabled_modes": ["ferry", "light_rail"]
   },
   "screens": {
-    "111": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 1,
-        "headway_mode": false,
-        "nearby_departures": ["941", "951"],
-        "platform_id": "70148",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": null
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-B",
-        "service_level": 1,
-        "stop_id": "place-bland"
-      },
-      "device_id": "002046",
-      "disabled": true,
-      "name": "002046 Blandford EB GL02",
-      "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
-      "tags": [],
-      "vendor": "mercury"
-    },
     "311": {
       "app_id": "solari",
       "app_params": {
@@ -576,31 +551,6 @@
       "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
       "tags": [],
       "vendor": "c3ms"
-    },
-    "102": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "nearby_departures": ["941", "951"],
-        "platform_id": "70149",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": null
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-B",
-        "service_level": 1,
-        "stop_id": "place-bland"
-      },
-      "device_id": "002051",
-      "disabled": false,
-      "name": "002051 Blandford WB GL04",
-      "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
-      "tags": [],
-      "vendor": "mercury"
     },
     "310": {
       "app_id": "solari",
@@ -1539,31 +1489,6 @@
       "tags": [],
       "vendor": "solari"
     },
-    "104": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "nearby_departures": ["1276", "1292"],
-        "platform_id": "70229",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": null
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-C",
-        "service_level": 1,
-        "stop_id": "place-bcnwa"
-      },
-      "device_id": "002050",
-      "disabled": false,
-      "name": "002050 Wash Sq WB GL07",
-      "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
-      "tags": [],
-      "vendor": "mercury"
-    },
     "312": {
       "app_id": "solari",
       "app_params": {
@@ -1660,31 +1585,6 @@
       "tags": [],
       "vendor": "solari"
     },
-    "101": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 1,
-        "headway_mode": false,
-        "nearby_departures": ["941", "951"],
-        "platform_id": "70148",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": null
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-B",
-        "service_level": 1,
-        "stop_id": "place-bland"
-      },
-      "device_id": "002047",
-      "disabled": false,
-      "name": "002047 Blandford EB GL01",
-      "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
-      "tags": [],
-      "vendor": "mercury"
-    },
     "305": {
       "app_id": "solari",
       "app_params": {
@@ -1780,31 +1680,6 @@
       "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
       "tags": [],
       "vendor": "solari"
-    },
-    "112": {
-      "app_id": "gl_eink_single",
-      "app_params": {
-        "direction_id": 0,
-        "headway_mode": false,
-        "nearby_departures": ["941", "951"],
-        "platform_id": "70149",
-        "psa_config": {
-          "default_list": {
-            "paths": [],
-            "type": null
-          },
-          "scheduled_overrides": []
-        },
-        "route_id": "Green-B",
-        "service_level": 1,
-        "stop_id": "place-bland"
-      },
-      "device_id": "002049",
-      "disabled": false,
-      "name": "002049 Blandford WB GL03",
-      "refresh_if_loaded_before": "2020-10-13T16:44:59.406651Z",
-      "tags": [],
-      "vendor": "mercury"
     },
     "402": {
       "app_id": "dup",
