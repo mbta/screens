@@ -18,6 +18,7 @@ defmodule Screens.Stops.Stop do
           platform_name: String.t() | nil
         }
 
+  @callback fetch_parent_station_name_map() :: {:ok, list(%{String.t() => String.t()})} | :error
   def fetch_parent_station_name_map(get_json_fn \\ &V3Api.get_json/2) do
     case get_json_fn.("stops", %{
            "filter[location_type]" => 1
