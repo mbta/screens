@@ -13,16 +13,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
             station_id_to_name: nil,
             station_id_to_routes: nil
 
-  @type icon ::
-          :red
-          | :blue
-          | :orange
-          | :green
-          | :silver
-          | :rail
-          | :bus
-          | :mattapan
-
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alerts: list(Alert.t()),
@@ -51,7 +41,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
 
   defp split_alerts_by_location(alerts, location_context) do
     Enum.split_with(alerts, fn %Alert{informed_entities: informed_entities} ->
-      location_context.home_stop in Enum.map(informed_entities, & &1["stop"])
+      location_context.home_stop in Enum.map(informed_entities, & &1.stop)
     end)
   end
 
