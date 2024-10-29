@@ -170,6 +170,12 @@ config :screens, Screens.V2.RDS,
   route_pattern_module: Screens.RoutePatterns.MockRoutePattern,
   stop_module: Screens.Stops.MockStop
 
+config :screens, Screens.V2.CandidateGenerator.Elevator.ElevatorClosures,
+  stop_module: Screens.Stops.MockStop,
+  facility_module: Screens.Facilities.MockFacility,
+  alert_module: Screens.Alerts.MockAlert,
+  route_module: Screens.Routes.MockRoute
+
 config :screens, Screens.LastTrip,
   trip_updates_adapter: Screens.LastTrip.TripUpdates.Noop,
   vehicle_positions_adapter: Screens.LastTrip.VehiclePositions.Noop

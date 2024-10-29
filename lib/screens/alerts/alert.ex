@@ -1,7 +1,7 @@
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
-  alias Screens.Alerts.InformedEntity
+  alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
@@ -204,6 +204,7 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
+  @callback fetch_elevator_alerts_with_facilities() :: {:ok, list(Alert.t())} | :error
   def fetch_elevator_alerts_with_facilities(get_json_fn \\ &V3Api.get_json/2) do
     query_opts = [activity: "USING_WHEELCHAIR", include: ~w[facilities]]
 
