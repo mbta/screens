@@ -466,21 +466,6 @@ defmodule Screens.Departures.Departure do
     DateTime.compare(departure_time, now) == :lt
   end
 
-  def associate_alerts_with_departures(departures, alerts) do
-    delay_map = Screens.Alerts.Alert.build_delay_map(alerts)
-    Enum.map(departures, &update_departure_with_delay_alert(delay_map, &1))
-  end
-
-  defp update_departure_with_delay_alert(delay_map, %{route_id: route_id} = departure) do
-    case delay_map do
-      %{^route_id => severity} ->
-        %{departure | inline_badges: [%{type: :delay, severity: severity}]}
-
-      _ ->
-        departure
-    end
-  end
-
   defp get_alerts_list(alerts) do
     [
       delay: Enum.any?(alerts, &(&1.effect == :delay)),

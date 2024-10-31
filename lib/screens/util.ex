@@ -2,11 +2,6 @@ defmodule Screens.Util do
   @moduledoc false
 
   alias Screens.Config.Cache
-  alias Screens.Vehicles.Carriage
-
-  def format_time(t) do
-    t |> DateTime.truncate(:second) |> DateTime.to_iso8601()
-  end
 
   @spec time_period(DateTime.t()) :: :peak | :off_peak | :saturday | :sunday
   def time_period(utc_time) do
@@ -62,25 +57,6 @@ defmodule Screens.Util do
       List.keystore(acc, key, 0, {key, [entry | group]})
     end)
     |> Enum.map(fn {key, group} -> {key, Enum.reverse(group)} end)
-  end
-
-  @doc """
-  Gets the keys of a struct given the module where the struct is defined.
-
-  Converts the keys to strings by default.
-  """
-  @spec struct_keys(module(), keyword()) :: list(atom()) | list(String.t())
-  def struct_keys(mod, opts \\ []) do
-    keys =
-      mod
-      |> Map.from_struct()
-      |> Map.keys()
-
-    if Keyword.get(opts, :as_strings, true) do
-      Enum.map(keys, &Atom.to_string/1)
-    else
-      keys
-    end
   end
 
   @doc """
@@ -228,26 +204,6 @@ defmodule Screens.Util do
   def get_service_date_tomorrow(now) do
     Date.add(get_service_date_today(now), 1)
   end
-
-  def translate_carriage_occupancy_status(%Carriage{occupancy_status: :no_data_available}),
-    do: :no_data
-
-  def translate_carriage_occupancy_status(%Carriage{occupancy_status: :not_accepting_passengers}),
-    do: :closed
-
-  def translate_carriage_occupancy_status(%Carriage{occupancy_percentage: occupancy_percentage})
-      when occupancy_percentage <= 12,
-      do: :not_crowded
-
-  def translate_carriage_occupancy_status(%Carriage{occupancy_percentage: occupancy_percentage})
-      when occupancy_percentage <= 40,
-      do: :some_crowding
-
-  def translate_carriage_occupancy_status(%Carriage{occupancy_percentage: occupancy_percentage})
-      when occupancy_percentage > 40,
-      do: :crowded
-
-  def translate_carriage_occupancy_status(_), do: nil
 
   @doc """
     Adds a timeout to a function. Mainly used for child processes of a Task.Supervisor

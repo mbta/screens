@@ -24,10 +24,8 @@ Check for any new credo complaints and address them as needed: `mix credo --stri
 Once everything looks good, start the server with `iex -S mix phx.server`. Thoroughly check that everything is looking as expected.
 
 Test loading the following:
-  - [ ] v1 screen (bus e-ink, GL e-ink single, GL e-ink double, solari, DUP)
-  - [ ] v1 audio (solari)
-  - [ ] v2 screen (bus e-ink, GL e-ink, bus shelter, pre-fare, others...?)
-  - [ ] v2 audio (bus shelter, others...?)
+  - [ ] screens (bus e-ink, GL e-ink, bus shelter, pre-fare, others...?)
+  - [ ] audio (bus shelter, others...?)
   - [ ] admin
 
 Create a PR with your changes and deploy to dev-green.

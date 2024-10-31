@@ -2,11 +2,9 @@
 
 @import "colors";
 
-// Don't import from solari... put in common place!
 @import "fonts";
-@import "solari/arrow";
-@import "solari/departure_time";
 
+@import "v2/arrow";
 @import "v2/clock_icon";
 
 @import "v2/pre_fare/viewport";
@@ -36,6 +34,7 @@
 @import "v2/pre_fare/evergreen/video";
 
 @import "v2/placeholder";
+@import "v2/pre_fare/departure_time";
 @import "v2/pre_fare/elevator_status";
 @import "v2/pre_fare/flex/paging_indicator";
 @import "v2/pre_fare/full_line_map";

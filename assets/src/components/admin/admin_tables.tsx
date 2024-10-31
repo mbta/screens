@@ -110,78 +110,6 @@ const AllScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const SolariScreensTable = (): JSX.Element => {
-  const columns = [
-    {
-      Header: "Screen ID",
-      accessor: "id",
-      Cell: InspectorLink,
-      Filter: DefaultColumnFilter,
-    },
-    {
-      Header: "Station Name",
-      accessor: buildAppParamAccessor("station_name"),
-      mutator: buildAppParamMutator("station_name"),
-      Cell: EditableCell,
-      Filter: DefaultColumnFilter,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Overhead",
-      accessor: buildAppParamAccessor("overhead"),
-      mutator: buildAppParamMutator("overhead"),
-      Cell: EditableCheckbox,
-      Filter: DefaultColumnFilter,
-      FormCell: FormBoolean,
-    },
-    {
-      Header: "Section Headers",
-      accessor: buildAppParamAccessor("section_headers"),
-      mutator: buildAppParamMutator("section_headers"),
-      Cell: EditableSelect,
-      Filter: SelectColumnFilter,
-      FormCell: buildFormSelect([null, "normal", "vertical"]),
-    },
-    {
-      Header: "Tags",
-      accessor: "tags",
-      Cell: EditableList,
-      Filter: DefaultColumnFilter,
-      filter: filterTags,
-      FormCell: FormTextCell,
-    },
-    {
-      Header: "Sections",
-      accessor: buildAppParamAccessor("sections"),
-      mutator: buildAppParamMutator("sections"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "Audio PSA",
-      accessor: buildAppParamAccessor("audio_psa"),
-      mutator: buildAppParamMutator("audio_psa"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
-      Header: "PSA Config",
-      accessor: buildAppParamAccessor("psa_config"),
-      mutator: buildAppParamMutator("psa_config"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-  ];
-
-  const dataFilter = ({ app_id }) => {
-    return app_id === "solari";
-  };
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
-};
-
 const v2Columns = [
   {
     Header: "Screen ID",
@@ -479,5 +407,4 @@ export {
   ElevatorV2ScreensTable,
   GLEinkV2ScreensTable,
   PreFareV2ScreensTable,
-  SolariScreensTable,
 };

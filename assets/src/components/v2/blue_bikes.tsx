@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import Arrow, { Direction } from "Components/solari/arrow";
+import Arrow, { Direction } from "Components/v2/arrow";
 import ClockIcon from "Components/v2/clock_icon";
 import { imagePath } from "Util/util";
 

@@ -17,8 +17,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     Busway,
     Departures,
     FreeTextLine,
-    GlEink,
-    SolariLarge
+    GlEink
   }
 
   @type options :: [
@@ -37,7 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   @spec departures_instances(Screen.t(), options()) :: [widget()]
   def departures_instances(%Screen{app_params: %app{}} = config, now, options \\ [])
-      when app in [BusEink, BusShelter, Busway, GlEink, SolariLarge] do
+      when app in [BusEink, BusShelter, Busway, GlEink] do
     disabled_modes =
       Keyword.get(options, :disabled_modes_fn, &Screens.Config.Cache.disabled_modes/0).()
 

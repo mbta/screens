@@ -49,15 +49,6 @@ defmodule Screens.Config.Cache do
     end
   end
 
-  def service_level(screen_id) do
-    with_table default: 1 do
-      case :ets.match(@table, {{:screen, screen_id}, %{app_params: %{service_level: :"$1"}}}) do
-        [[service_level]] -> service_level
-        [] -> 1
-      end
-    end
-  end
-
   def disabled?(screen_id) do
     with_table default: false do
       case :ets.match(@table, {{:screen, screen_id}, %{disabled: :"$1"}}) do
@@ -77,32 +68,12 @@ defmodule Screens.Config.Cache do
     end
   end
 
-  def app_params(screen_id) do
-    with_table default: nil do
-      case :ets.match(@table, {{:screen, screen_id}, %{app_params: :"$1"}}) do
-        [[app_params]] -> app_params
-        [] -> nil
-      end
-    end
-  end
-
   def devops do
     with_table default: nil do
       case :ets.match(@table, {:devops, :"$1"}) do
         [[devops]] -> devops
         [] -> nil
       end
-    end
-  end
-
-  @doc """
-  Returns a list of all screen IDs.
-  """
-  def screen_ids do
-    with_table default: [] do
-      @table
-      |> :ets.match({{:screen, :"$1"}, :_})
-      |> List.flatten()
     end
   end
 
