@@ -124,17 +124,6 @@ defmodule Screens.Alerts.Alert do
           description: String.t()
         }
 
-  # V1 only
-  def to_map(nil), do: nil
-
-  def to_map(alert) do
-    %{
-      effect: alert.effect,
-      header: alert.header,
-      updated_at: DateTime.to_iso8601(alert.updated_at)
-    }
-  end
-
   # Used by elevator status
   def ap_to_map({nil, end_t}) do
     %{"start" => nil, "end" => DateTime.to_iso8601(end_t)}
@@ -147,30 +136,6 @@ defmodule Screens.Alerts.Alert do
   def ap_to_map({start_t, end_t}) do
     %{"start" => DateTime.to_iso8601(start_t), "end" => DateTime.to_iso8601(end_t)}
   end
-
-  # V1 only
-  @effect_order [
-    :amber_alert,
-    :cancellation,
-    :delay,
-    :suspension,
-    :track_change,
-    :detour,
-    :shuttle,
-    :stop_closure,
-    :dock_closure,
-    :station_closure,
-    :stop_moved,
-    :extra_service,
-    :schedule_change,
-    :service_change,
-    :snow_route,
-    :stop_shoveling,
-    :station_issue,
-    :dock_issue,
-    :access_issue,
-    :policy_change
-  ]
 
   @spec fetch(keyword()) :: {:ok, list(t())} | :error
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
@@ -301,7 +266,6 @@ defmodule Screens.Alerts.Alert do
 
   defp format_query_param(_), do: []
 
-  # V1 & V2
   def happening_now?(%{active_period: aps}, now \\ DateTime.utc_now()) do
     Enum.any?(aps, &in_active_period(&1, now))
   end
@@ -316,112 +280,6 @@ defmodule Screens.Alerts.Alert do
 
   defp in_active_period({start_t, end_t}, t) do
     DateTime.compare(t, start_t) in [:gt, :eq] && DateTime.compare(t, end_t) in [:lt, :eq]
-  end
-
-  defp within_two_weeks(time_1, time_2) do
-    diff = DateTime.diff(time_1, time_2, :second)
-    diff <= 14 * 24 * 60 * 60 && diff >= -14 * 24 * 60 * 60
-  end
-
-  # NEW INFO
-  # defined as: created_at or updated_at is within the last two weeks
-  # V1 only
-  def new_info_in_last_two_weeks(
-        %{created_at: created_at, updated_at: updated_at},
-        now \\ DateTime.utc_now()
-      ) do
-    new_info = within_two_weeks(now, created_at) || within_two_weeks(now, updated_at)
-    if new_info, do: 1, else: 0
-  end
-
-  # NEW SERVICE
-  # defined as: next active_period start in the future is within two weeks of now
-  # V1 only
-  def new_service_in_next_two_weeks(%{active_period: active_period}, now \\ DateTime.utc_now()) do
-    next_t = first_future_active_period_start(active_period, now)
-
-    case next_t do
-      :infinity ->
-        0
-
-      _ ->
-        soon =
-          next_t
-          |> DateTime.from_unix!()
-          |> within_two_weeks(now)
-
-        if soon, do: 1, else: 0
-    end
-  end
-
-  # (from dotcom)
-  # atoms are greater than any integer
-  # V1 only
-  defp first_future_active_period_start([], _now), do: :infinity
-
-  defp first_future_active_period_start(periods, now) do
-    now_unix = DateTime.to_unix(now, :second)
-
-    future_periods =
-      for {start, _} <- periods,
-          start,
-          # wrap in a list to avoid an Erlang 19.3 issue
-          unix <- [DateTime.to_unix(start)],
-          unix > now_unix do
-        unix
-      end
-
-    if future_periods == [] do
-      :infinity
-    else
-      Enum.min(future_periods)
-    end
-  end
-
-  # V1 only
-  for {name, index} <- Enum.with_index(@effect_order) do
-    defp effect_index(unquote(name)), do: unquote(index)
-  end
-
-  # fallback
-  defp effect_index(_), do: unquote(length(@effect_order))
-
-  ###
-
-  # V1 only
-  def build_delay_map(alerts) do
-    Enum.reduce(alerts, %{}, &delay_map_reducer/2)
-  end
-
-  # V1 only
-  defp delay_map_reducer(%{informed_entities: ies, severity: severity}, delay_map) do
-    route_ids = bus_route_informed_entities(ies)
-    Enum.reduce(route_ids, delay_map, &delay_map_reducer_helper(&1, severity, &2))
-  end
-
-  # V1 only
-  defp delay_map_reducer_helper(route_id, severity, delay_map) do
-    case delay_map do
-      %{^route_id => current_severity} when current_severity >= severity ->
-        delay_map
-
-      _ ->
-        Map.put(delay_map, route_id, severity)
-    end
-  end
-
-  # V1 only
-  defp bus_route_informed_entities(informed_entities) do
-    Enum.flat_map(informed_entities, &bus_route_informed_entity/1)
-  end
-
-  # V1 only
-  defp bus_route_informed_entity(%{route: route_id, route_type: 3}) do
-    [route_id]
-  end
-
-  defp bus_route_informed_entity(_) do
-    []
   end
 
   @alert_cause_mapping %{

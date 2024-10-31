@@ -116,12 +116,10 @@ module.exports = (env, argv) => {
       ...common_export_body,
       entry: {
         polyfills: "./src/polyfills.js",
-        solari: "./src/apps/solari.tsx",
         admin: "./src/apps/admin.tsx",
         bus_eink_v2: "./src/apps/v2/bus_eink.tsx",
         gl_eink_v2: "./src/apps/v2/gl_eink.tsx",
         busway_v2: "./src/apps/v2/busway.tsx",
-        solari_large_v2: "./src/apps/v2/solari_large.tsx",
         dup_v2: "./src/apps/v2/dup.tsx",
         bus_shelter_v2: "./src/apps/v2/bus_shelter.tsx",
         pre_fare_v2: "./src/apps/v2/pre_fare.tsx",

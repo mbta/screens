@@ -12,7 +12,6 @@ import weakKey from "weak-key";
 
 import {
   AllScreensTable,
-  SolariScreensTable,
   BusEinkV2ScreensTable,
   GLEinkV2ScreensTable,
   BuswayV2ScreensTable,
@@ -38,7 +37,6 @@ const routes: [string, string, ComponentType][][] = [
     ["pre-fare-v2-screens", "Pre-Fare", PreFareV2ScreensTable],
     ["busway-v2-screens", "Sectional", BuswayV2ScreensTable],
   ],
-  [["solari-screens", "Solari (v1)", SolariScreensTable]],
   [["screens-json-editor", "Config Editor", AdminScreenConfigForm]],
   [["image-manager", "Image Manager", ImageManager]],
   [["devops", "Devops", Devops]],

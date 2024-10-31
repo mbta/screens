@@ -1,4 +1,3 @@
-import Arrow, { Direction as ArrowDirection } from "Components/solari/arrow";
 import React from "react";
 import { imagePath, classWithModifier } from "Util/util";
 import {
@@ -7,6 +6,7 @@ import {
   StationService,
 } from "Components/v2/cr_departures/cr_departures";
 import CRDepartureTime from "Components/v2/cr_departures/cr_departure_time";
+import Arrow, { Direction as ArrowDirection } from "Components/v2/arrow";
 
 interface Props {
   departures: Departure[];

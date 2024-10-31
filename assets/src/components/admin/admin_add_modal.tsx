@@ -19,7 +19,6 @@ const fields = [
       "elevator_v2",
       "gl_eink_v2",
       "pre_fare_v2",
-      "solari",
     ]),
   },
   {
@@ -57,7 +56,6 @@ const defaultAppParamsByAppId = {
     footer: footerWidgetParams,
     alerts: alertsWidgetParams,
   },
-  solari: { station_name: "STATION_NAME" },
   dup_v2: {
     header: { stop_id: "" },
     evergreen_content: [],

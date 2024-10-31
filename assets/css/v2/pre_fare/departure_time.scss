@@ -1,0 +1,26 @@
+@import "../../base/base_departure_time";
+
+.departure-time {
+  display: inline-block;
+  color: #171f26;
+  text-align: right;
+  vertical-align: middle;
+
+  &--animated {
+    animation: pulse 500ms cubic-bezier(0.65, 0, 0.35, 1) infinite;
+  }
+
+  @keyframes pulse {
+    0% {
+      opacity: 1;
+    }
+
+    50% {
+      opacity: 0.3;
+    }
+
+    100% {
+      opacity: 1;
+    }
+  }
+}

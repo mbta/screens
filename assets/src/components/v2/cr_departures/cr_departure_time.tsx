@@ -1,8 +1,32 @@
-import BaseDepartureTime from "Components/eink/base_departure_time";
 import moment from "moment";
 import React from "react";
 import { TimeRepresentation } from "Util/time_representation";
 import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
+
+const baseDepartureTime = (time: TimeRepresentation): JSX.Element | null => {
+  if (time.type === "TEXT") {
+    return (
+      <div className="base-departure-time">
+        <span className="base-departure-time__text">{time.text}</span>
+      </div>
+    );
+  } else if (time.type === "MINUTES") {
+    return (
+      <div className="base-departure-time">
+        <span className="base-departure-time__minutes">{time.minutes}</span>
+        <span className="base-departure-time__minutes-label">m</span>
+      </div>
+    );
+  } else if (time.type === "TIMESTAMP") {
+    return (
+      <div className="base-departure-time">
+        <span className="base-departure-time__timestamp">{time.timestamp}</span>
+      </div>
+    );
+  } else {
+    return null;
+  }
+};
 
 interface CRDepartureTimeProps {
   departureType: "schedule" | "prediction";
@@ -38,9 +62,7 @@ const CRDepartureTime = ({
         {formattedTime}
       </span>
     ) : (
-      <span style={{ display: "inline-block" }}>
-        <BaseDepartureTime time={time as TimeRepresentation} hideAmPm />
-      </span>
+      <span style={{ display: "inline-block" }}>{baseDepartureTime(time)}</span>
     );
 
   return (
