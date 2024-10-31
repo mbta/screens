@@ -12,11 +12,21 @@ defmodule Screens.SignsUiConfig.Parse do
     {sign_modes, time_ranges}
   end
 
-  defp parse_time_ranges(%{"off_peak" => off_peak, "peak" => peak}) do
-    %{off_peak: parse_time_range(off_peak), peak: parse_time_range(peak)}
+  defp parse_time_ranges(map) do
+    for {key, field} <- [
+          off_peak: "off_peak",
+          peak: "peak",
+          saturday: "saturday",
+          sunday: "sunday"
+        ],
+        range = parse_time_range(map[field]),
+        into: %{} do
+      {key, range}
+    end
   end
 
   defp parse_time_range(%{"range_low" => low, "range_high" => high}), do: {low, high}
+  defp parse_time_range(_), do: nil
 
   defp parse_sign_modes(signs) do
     signs

@@ -117,4 +117,12 @@ defmodule Screens.UtilTest do
       assert expected == get_service_date_today(now)
     end
   end
+
+  test "time_period" do
+    tz = "America/New_York"
+    assert DateTime.new!(~D[2020-03-20], ~T[18:00:00], tz) |> time_period() == :peak
+    assert DateTime.new!(~D[2020-03-21], ~T[02:00:00], tz) |> time_period() == :off_peak
+    assert DateTime.new!(~D[2020-03-21], ~T[08:00:00], tz) |> time_period() == :saturday
+    assert DateTime.new!(~D[2020-03-22], ~T[12:00:00], tz) |> time_period() == :sunday
+  end
 end
