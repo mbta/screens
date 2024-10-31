@@ -1,4 +1,5 @@
 import { useEffect } from "react";
+import { type AudioConfig } from "Components/v2/screen_container";
 
 /**
  * Defines a protocol the "Inspector" admin UI can use to communicate with
@@ -11,6 +12,7 @@ import { useEffect } from "react";
  */
 
 export type Message =
+  | { type: "audio_config"; config: AudioConfig | null }
   | { type: "data_refreshed"; timestamp: number }
   | { type: "refresh_data" }
   | { type: "set_data_variant"; variant: string | null }
@@ -44,6 +46,7 @@ const receiveHook = (handler: MessageHandler) => {
 };
 
 export {
+  isFramed,
   sendMessage,
   sendToInspector,
   useReceiveMessage,
