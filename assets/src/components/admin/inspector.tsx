@@ -10,6 +10,8 @@ import { useHistory, useLocation } from "react-router-dom";
 
 import AdminForm from "./admin_form";
 
+import { type AudioConfig } from "Components/v2/screen_container";
+
 import { doSubmit, type Config, type Screen } from "Util/admin";
 import {
   type Message,
@@ -383,6 +385,7 @@ const DataControls: ComponentType<{
 };
 
 const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
+  const [config, setConfig] = useState<AudioConfig | null | undefined>();
   // To bypass browser caching, we add a meaningless query param to the URL of
   // the <audio> element, based on the timestamp the Play button was clicked.
   const [playingAt, setPlayingAt] = useState<Date | null>(null);
@@ -393,6 +396,10 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
     () => (ssml ? dialogRef.current?.showModal() : dialogRef.current?.close()),
     [dialogRef, ssml],
   );
+
+  useReceiveMessage((message) => {
+    if (message.type == "audio_config") setConfig(message.config);
+  });
 
   const audioPath = AUDIO_SCREEN_TYPES.has(screen.config.app_id)
     ? `/v2/audio/${screen.id}`
@@ -442,6 +449,19 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
               onEnded={() => setPlayingAt(null)}
               src={`${audioPath}/readout.mp3?at=${playingAt.getTime()}`}
             />
+          )}
+
+          {config !== undefined && (
+            <div>
+              {config ? (
+                <span>
+                  🔈 Plays every <b>{config.readoutIntervalMinutes}</b> minutes
+                  (offset <b>{config.intervalOffsetSeconds}</b> seconds)
+                </span>
+              ) : (
+                "🔇 No periodic audio readout"
+              )}
+            </div>
           )}
         </>
       ) : (

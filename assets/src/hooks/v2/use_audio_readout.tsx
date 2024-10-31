@@ -1,6 +1,7 @@
 import { AudioConfig } from "Components/v2/screen_container";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import { fetchDatasetValue } from "Util/dataset";
+import { isFramed, sendToInspector } from "Util/inspector";
 
 const readoutPath = (id: string) => `/v2/audio/${id}/readout.mp3`;
 const volumePath = (id: string) => `/v2/audio/${id}/volume`;
@@ -32,6 +33,13 @@ interface UseAudioReadoutArgs {
 }
 
 const useAudioReadout = ({ id, config }: UseAudioReadoutArgs): void => {
+  if (isFramed()) {
+    // Don't read out periodic audio in the inspector, since there's otherwise
+    // no way to turn it off. Just report the config that would have been used.
+    sendToInspector({ type: "audio_config", config: config });
+    return;
+  }
+
   if (config == null || config.readoutIntervalMinutes === 0) {
     return;
   }
