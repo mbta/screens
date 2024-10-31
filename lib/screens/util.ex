@@ -13,7 +13,7 @@ defmodule Screens.Util do
     {:ok, dt} = DateTime.shift_zone(utc_time, "America/New_York")
 
     # Subtract 3 hours, since the service day ends at 3 AM
-    day_of_week = DateTime.add(dt, -3, :hour) |> Date.day_of_week()
+    day_of_week = dt |> DateTime.add(-3, :hour) |> Date.day_of_week()
 
     t = {dt.hour, dt.minute}
     am_rush? = t >= {7, 0} and t < {9, 0}
