@@ -9,7 +9,7 @@ defmodule Screens.SignsUiConfig.Cache do
 
   @type table_entry ::
           {{:sign_mode, sign_id :: String.t()}, atom()}
-          | {{:time_ranges, zone_id :: String.t()}, %{off_peak: time_range, peak: time_range}}
+          | {{:time_ranges, zone_id :: String.t()}, %{optional(atom()) => time_range}}
 
   @type time_range :: {low :: integer(), high :: integer()}
 
@@ -17,7 +17,7 @@ defmodule Screens.SignsUiConfig.Cache do
   # Table entries use 2-part tuples as keys, to distinguish sign mode entries from time range entries.
   # They look like:
   # - Sign mode entry: {{:sign_mode, sign_id}, mode}
-  # - Time ranges entry: {{:time_ranges, line_or_trunk}, %{off_peak: {low, high}, peak: {low, high}}}
+  # - Time ranges entry: {{:time_ranges, line_or_trunk}, %{off_peak: {low, high}, peak: {low, high}, saturday: {low, high}, sunday: {low, high}}}
   #
   # To look up the mode that a given sign is in for example, use:
   # [[mode]] = :ets.match(@table, {{:sign_mode, sign_id}, :"$1})
