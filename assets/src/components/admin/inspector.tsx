@@ -75,8 +75,8 @@ const Inspector: ComponentType = () => {
   useLayoutEffect(adjustFrame, [zoom]);
 
   return (
-    <div className="viewer">
-      <div className="viewer__controls">
+    <div className="inspector">
+      <div className="inspector__controls">
         <h1>Inspector</h1>
 
         {config && (
@@ -109,7 +109,7 @@ const Inspector: ComponentType = () => {
         )}
       </div>
 
-      <div className="viewer__screen">
+      <div className="inspector__screen">
         <iframe
           name={INSPECTOR_FRAME_NAME}
           onLoad={adjustFrame}
@@ -247,9 +247,9 @@ const ConfigControls: ComponentType<{ screen: ScreenWithId }> = ({
         </button>
       </div>
 
-      <dialog className="viewer__modal" ref={dialogRef}>
+      <dialog className="inspector__modal" ref={dialogRef}>
         <button
-          className="viewer__modal__close-button"
+          className="inspector__modal__close-button"
           onClick={() => {
             dialogRef.current?.close();
             setEditableConfig(null);
@@ -433,14 +433,14 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
             )}
           </div>
 
-          <dialog className="viewer__modal" ref={dialogRef}>
+          <dialog className="inspector__modal" ref={dialogRef}>
             <button
-              className="viewer__modal__close-button"
+              className="inspector__modal__close-button"
               onClick={() => setSSML(null)}
             >
               × Close
             </button>
-            <div className="viewer__modal__ssml">{ssml}</div>
+            <div className="inspector__modal__ssml">{ssml}</div>
           </dialog>
 
           {playingAt && (
@@ -478,11 +478,11 @@ const adjustScreenFrame = (
 ) => {
   if (ref.current?.contentWindow) {
     const doc = ref.current.contentWindow.document;
-    let style = doc.getElementById("viewer-injected-style");
+    let style = doc.getElementById("inspector-injected-style");
 
     if (!style) {
       style = doc.createElement("style");
-      style.id = "viewer-injected-style";
+      style.id = "inspector-injected-style";
       doc.head.appendChild(style);
     }
 
