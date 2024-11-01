@@ -5,50 +5,19 @@ defmodule Screens.SignsUiConfig.Cache do
 
   use Screens.Cache.Client, table: :signs_ui_config
 
-  @type table_contents :: list(table_entry)
+  @type entry :: {{:headways, headway_key()}, headway_values()}
 
-  @type table_entry ::
-          {{:sign_mode, sign_id :: String.t()}, atom()}
-          | {{:time_ranges, zone_id :: String.t()}, %{optional(atom()) => time_range}}
-
+  @type headway_key :: String.t()
+  @type headway_values :: %{optional(atom()) => time_range()}
   @type time_range :: {low :: integer(), high :: integer()}
 
-  # Implementation notes:
-  # Table entries use 2-part tuples as keys, to distinguish sign mode entries from time range entries.
-  # They look like:
-  # - Sign mode entry: {{:sign_mode, sign_id}, mode}
-  # - Time ranges entry: {{:time_ranges, line_or_trunk}, %{off_peak: {low, high}, peak: {low, high}, saturday: {low, high}, sunday: {low, high}}}
-  #
-  # To look up the mode that a given sign is in for example, use:
-  # [[mode]] = :ets.match(@table, {{:sign_mode, sign_id}, :"$1})
-
-  def all_signs_in_headway_mode?(sign_ids) do
-    all_signs_in_modes?(sign_ids, [:headway])
-  end
-
-  def all_signs_inactive?(sign_ids) do
-    all_signs_in_modes?(sign_ids, [:off, :static_text])
-  end
-
-  def time_ranges(line_or_trunk) do
-    with_table default: nil do
-      case :ets.match(@table, {{:time_ranges, line_or_trunk}, :"$1"}) do
-        [[ranges]] -> ranges
-        [] -> nil
+  @spec headways(headway_key()) :: headway_values()
+  def headways(key) do
+    with_table default: %{} do
+      case :ets.match(@table, {{:headways, key}, :"$1"}) do
+        [[headways]] -> headways
+        [] -> %{}
       end
-    end
-  end
-
-  defp all_signs_in_modes?([], _modes), do: false
-
-  defp all_signs_in_modes?(sign_ids, modes) do
-    with_table default: false do
-      Enum.all?(sign_ids, fn sign_id ->
-        case :ets.match(@table, {{:sign_mode, sign_id}, :"$1"}) do
-          [[mode]] -> mode in modes
-          [] -> false
-        end
-      end)
     end
   end
 end

@@ -363,10 +363,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
 
     if headway_mode? do
-      time_ranges = SignsUiConfig.Cache.time_ranges(headway_id)
+      headways = SignsUiConfig.Cache.headways(headway_id)
       current_time_period = Screens.Util.time_period(current_time)
 
-      case time_ranges do
+      case headways do
         %{^current_time_period => {lo, hi}} ->
           {:active, {lo, hi}, interpreted_alert.headsign}
 
