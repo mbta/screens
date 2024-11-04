@@ -12,12 +12,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   defmodule Alert do
     @moduledoc false
 
-    defstruct ~w[station_name routes alert_id elevator_name elevator_id description header_text]a
+    @derive Jason.Encoder
+
+    defstruct ~w[station_name routes id elevator_name elevator_id description header_text]a
 
     @type t :: %__MODULE__{
             station_name: String.t(),
             routes: list(String.t()),
-            alert_id: String.t(),
+            id: String.t(),
             elevator_name: String.t(),
             elevator_id: String.t(),
             description: String.t(),
@@ -25,7 +27,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
           }
   end
 
-  def serialize(t), do: t
+  def serialize(%__MODULE__{
+        id: id,
+        in_station_alerts: in_station_alerts,
+        outside_alerts: outside_alerts
+      }),
+      do: %{id: id, in_station_alerts: in_station_alerts, outside_alerts: outside_alerts}
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ElevatorClosures
