@@ -2,7 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.CandidateGenerator.Elevator.ElevatorClosures
+  alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
   alias ScreensConfig.Screen

@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   @moduledoc false
 
-  alias Screens.Alerts.Alert
+  alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.LocationContext
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
@@ -81,8 +81,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   defp get_parent_station_id_from_informed_entities(entities) do
     entities
     |> Enum.find_value(fn
-      %{stop: "place-" <> _ = parent_station_id} -> parent_station_id
-      _ -> false
+      ie -> if InformedEntity.parent_station?(ie), do: ie.stop
     end)
   end
 

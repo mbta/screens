@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Elevator.ElevatorClosures do
+defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @moduledoc false
 
   require Logger
@@ -22,6 +22,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ElevatorClosures do
   @alert Application.compile_env(:screens, [__MODULE__, :alert_module], Alert)
   @route Application.compile_env(:screens, [__MODULE__, :route_module], Route)
 
+  @spec elevator_status_instances(Screen.t()) :: list(ElevatorClosures.t())
+  @spec elevator_status_instances(Screen.t(), DateTime.t()) :: list(ElevatorClosures.t())
   def elevator_status_instances(
         %Screen{
           app_params: %Elevator{
