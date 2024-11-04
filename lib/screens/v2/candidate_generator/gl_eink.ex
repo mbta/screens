@@ -224,7 +224,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   defp format_headway(route_id, stop_id, direction_id, departures_to_concat \\ []) do
     destination = fetch_destination(route_id, direction_id)
 
-    case Screens.Headways.by_route_id(route_id, stop_id, direction_id, nil) do
+    case __MODULE__.Headways.by_route_id(route_id, stop_id, direction_id, nil) do
       nil ->
         :overnight
 
