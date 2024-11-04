@@ -26,7 +26,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       expect(MockStop, :fetch_parent_station_name_map, fn ->
-        {:ok, [%{"place-test" => "Place Test"}]}
+        {:ok, %{"place-test" => "Place Test"}}
       end)
 
       expect(MockRoute, :fetch, fn %{stop_id: "place-test"} ->
@@ -35,7 +35,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
-          struct(Alert, effect: :elevator_closure, informed_entities: [%{stop: "place-test"}]),
+          struct(Alert,
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
+            ]
+          ),
           struct(Alert, effect: :detour, informed_entities: [%{stop: "place-test"}])
         ]
 
@@ -44,22 +49,21 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
-          screen: %Screen{
-            app_id: :elevator_v2,
-            app_params: %Elevator{elevator_id: "111", evergreen_content: []}
-          },
-          alerts: [
-            %Alert{
-              effect: :elevator_closure,
-              informed_entities: [%{stop: "place-test"}]
-            }
+          id: "111",
+          in_station_alerts: [
+            [
+              %{
+                description: nil,
+                routes: ["Red"],
+                elevator_name: "Test",
+                elevator_id: "facility-test",
+                station_name: "Place Test",
+                alert_id: nil,
+                header_text: nil
+              }
+            ]
           ],
-          location_context: %LocationContext{
-            home_stop: "place-test"
-          },
-          now: ~U[2024-10-01 05:00:00Z],
-          station_id_to_name: [%{"place-test" => "Place Test"}],
-          station_id_to_routes: %{"place-test" => ["Red"]}
+          outside_alerts: []
         }
       ] =
         ElevatorClosures.elevator_status_instances(
@@ -80,7 +84,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       expect(MockStop, :fetch_parent_station_name_map, fn ->
-        {:ok, [%{"place-test" => "Place Test"}]}
+        {:ok, %{"place-test" => "Place Test"}}
       end)
 
       expect(MockRoute, :fetch, fn %{stop_id: "place-test"} ->
@@ -89,7 +93,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
-          struct(Alert, effect: :elevator_closure, informed_entities: [%{stop: "place-test"}])
+          struct(Alert,
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
+            ]
+          )
         ]
 
         {:ok, alerts}
@@ -97,22 +106,21 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
-          screen: %Screen{
-            app_id: :elevator_v2,
-            app_params: %Elevator{elevator_id: "111", evergreen_content: []}
-          },
-          alerts: [
-            %Alert{
-              effect: :elevator_closure,
-              informed_entities: [%{stop: "place-test"}]
-            }
+          id: "111",
+          in_station_alerts: [
+            [
+              %{
+                description: nil,
+                routes: [],
+                elevator_name: "Test",
+                elevator_id: "facility-test",
+                alert_id: nil,
+                header_text: nil,
+                station_name: "Place Test"
+              }
+            ]
           ],
-          location_context: %LocationContext{
-            home_stop: "place-test"
-          },
-          now: ~U[2024-10-01 05:00:00Z],
-          station_id_to_name: [%{"place-test" => "Place Test"}],
-          station_id_to_routes: %{"place-test" => []}
+          outside_alerts: []
         }
       ] =
         ElevatorClosures.elevator_status_instances(

@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   require Logger
 
-  alias Screens.Alerts.Alert
+  alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Facilities.Facility
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -23,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
           app_params: %Elevator{
             elevator_id: elevator_id
           }
-        } = config,
+        },
         now \\ DateTime.utc_now()
       ) do
     with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
@@ -33,14 +33,16 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       elevator_closures = relevant_alerts(alerts)
       routes_map = get_routes_map(elevator_closures, stop_id)
 
+      {in_station_alerts, outside_alerts} =
+        split_alerts_by_location(elevator_closures, location_context)
+
       [
         %ElevatorClosures{
-          alerts: elevator_closures,
-          location_context: location_context,
-          screen: config,
-          now: now,
-          station_id_to_name: parent_station_map,
-          station_id_to_routes: routes_map
+          id: elevator_id,
+          in_station_alerts:
+            alert_to_elevator_closure(in_station_alerts, parent_station_map, routes_map),
+          outside_alerts:
+            alert_to_elevator_closure(outside_alerts, parent_station_map, routes_map)
         }
       ]
     else
@@ -83,5 +85,51 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       # Show no route pills instead of crashing the screen
       :error -> []
     end
+  end
+
+  defp split_alerts_by_location(alerts, location_context) do
+    Enum.split_with(alerts, fn %Alert{informed_entities: informed_entities} ->
+      location_context.home_stop in Enum.map(informed_entities, & &1.stop)
+    end)
+  end
+
+  defp get_informed_facility(entities) do
+    entities
+    |> Enum.find_value(fn
+      %{facility: facility} -> facility
+      _ -> false
+    end)
+  end
+
+  defp alert_to_elevator_closure(alerts, station_id_to_name, station_id_to_routes) do
+    alerts
+    |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
+    |> Enum.map(fn {parent_station_id, alerts} ->
+      Enum.map(alerts, fn %Alert{
+                            id: id,
+                            informed_entities: entities,
+                            description: description,
+                            header: header
+                          } ->
+        facility = get_informed_facility(entities)
+
+        %{
+          station_name: Map.fetch!(station_id_to_name, parent_station_id),
+          routes: Map.fetch!(station_id_to_routes, parent_station_id),
+          alert_id: id,
+          elevator_name: facility.name,
+          elevator_id: facility.id,
+          description: description,
+          header_text: header
+        }
+      end)
+    end)
+  end
+
+  defp get_parent_station_id_from_informed_entities(entities) do
+    entities
+    |> Enum.find_value(fn
+      ie -> if InformedEntity.parent_station?(ie), do: ie.stop
+    end)
   end
 end
