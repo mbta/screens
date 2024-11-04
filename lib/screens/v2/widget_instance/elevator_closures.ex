@@ -10,6 +10,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
         }
 
   defmodule Alert do
+    @moduledoc false
+
     defstruct ~w[station_name routes alert_id elevator_name elevator_id description header_text]a
 
     @type t :: %__MODULE__{
