@@ -1,89 +1,29 @@
 defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   @moduledoc false
 
-  alias Screens.Alerts.{Alert, InformedEntity}
-  alias Screens.LocationContext
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Elevator
-
-  defstruct screen: nil,
-            alerts: nil,
-            location_context: nil,
-            now: nil,
-            station_id_to_name: nil,
-            station_id_to_routes: nil
+  defstruct ~w[id in_station_alerts outside_alerts]a
 
   @type t :: %__MODULE__{
-          screen: Screen.t(),
-          alerts: list(Alert.t()),
-          location_context: LocationContext.t(),
-          now: DateTime.t(),
-          station_id_to_name: %{String.t() => String.t()},
-          station_id_to_routes: %{String.t() => list(String.t())}
+          id: String.t(),
+          in_station_alerts: list(__MODULE__.Alert.t()),
+          outside_alerts: list(__MODULE__.Alert.t())
         }
 
-  def serialize(%__MODULE__{
-        screen: %Screen{app_params: %Elevator{elevator_id: id}},
-        alerts: alerts,
-        location_context: location_context,
-        station_id_to_name: station_id_to_name,
-        station_id_to_routes: station_id_to_routes
-      }) do
-    {in_station_alerts, outside_alerts} = split_alerts_by_location(alerts, location_context)
+  defmodule Alert do
+    defstruct ~w[station_name routes alert_id elevator_name elevator_id description header_text]a
 
-    %{
-      id: id,
-      in_station_alerts:
-        serialize_alerts(in_station_alerts, station_id_to_name, station_id_to_routes),
-      outside_alerts: serialize_alerts(outside_alerts, station_id_to_name, station_id_to_routes)
-    }
+    @type t :: %__MODULE__{
+            station_name: String.t(),
+            routes: list(String.t()),
+            alert_id: String.t(),
+            elevator_name: String.t(),
+            elevator_id: String.t(),
+            description: String.t(),
+            header_text: String.t()
+          }
   end
 
-  defp split_alerts_by_location(alerts, location_context) do
-    Enum.split_with(alerts, fn %Alert{informed_entities: informed_entities} ->
-      location_context.home_stop in Enum.map(informed_entities, & &1.stop)
-    end)
-  end
-
-  defp get_informed_facility(entities) do
-    entities
-    |> Enum.find_value(fn
-      %{facility: facility} -> facility
-      _ -> false
-    end)
-  end
-
-  defp serialize_alerts(alerts, station_id_to_name, station_id_to_routes) do
-    alerts
-    |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
-    |> Enum.map(fn {parent_station_id, alerts} ->
-      Enum.map(alerts, fn %Alert{
-                            id: id,
-                            informed_entities: entities,
-                            description: description,
-                            header: header
-                          } ->
-        facility = get_informed_facility(entities)
-
-        %{
-          station_name: Map.fetch!(station_id_to_name, parent_station_id),
-          routes: Map.fetch!(station_id_to_routes, parent_station_id),
-          alert_id: id,
-          elevator_name: facility.name,
-          elevator_id: facility.id,
-          description: description,
-          header_text: header
-        }
-      end)
-    end)
-  end
-
-  defp get_parent_station_id_from_informed_entities(entities) do
-    entities
-    |> Enum.find_value(fn
-      ie -> if InformedEntity.parent_station?(ie), do: ie.stop
-    end)
-  end
+  def serialize(t), do: t
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ElevatorClosures
