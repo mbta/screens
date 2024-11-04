@@ -110,7 +110,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   defp alert_to_elevator_closure(alerts, station_id_to_name, station_id_to_routes) do
     alerts
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
-    |> Enum.map(fn {parent_station_id, alerts} ->
+    |> Enum.flat_map(fn {parent_station_id, alerts} ->
       Enum.map(alerts, fn %Alert{
                             id: id,
                             informed_entities: entities,
@@ -122,7 +122,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         %{
           station_name: Map.fetch!(station_id_to_name, parent_station_id),
           routes: Map.fetch!(station_id_to_routes, parent_station_id),
-          alert_id: id,
+          id: id,
           elevator_name: facility.name,
           elevator_id: facility.id,
           description: description,
