@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Elevator.ElevatorClosuresTest do
+defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   use ExUnit.Case, async: true
 
   import Mox
@@ -9,7 +9,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ElevatorClosuresTest do
   alias Screens.LocationContext
   alias Screens.Routes.{MockRoute, Route}
   alias Screens.Stops.{MockStop, Stop}
-  alias Screens.V2.CandidateGenerator.Elevator.ElevatorClosures
+  alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 

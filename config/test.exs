@@ -170,7 +170,7 @@ config :screens, Screens.V2.RDS,
   route_pattern_module: Screens.RoutePatterns.MockRoutePattern,
   stop_module: Screens.Stops.MockStop
 
-config :screens, Screens.V2.CandidateGenerator.Elevator.ElevatorClosures,
+config :screens, Screens.V2.CandidateGenerator.Elevator.Closures,
   stop_module: Screens.Stops.MockStop,
   location_context_module: Screens.MockLocationContext,
   facility_module: Screens.Facilities.MockFacility,
