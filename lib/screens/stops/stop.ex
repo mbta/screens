@@ -282,17 +282,6 @@ defmodule Screens.Stops.Stop do
     end)
   end
 
-  def fetch_parent_stop_id(stop_id) do
-    case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "parent_station"}) do
-      {:ok, %{"included" => [included_data]}} ->
-        %{"id" => parent_station_id} = included_data
-        parent_station_id
-
-      _ ->
-        nil
-    end
-  end
-
   def fetch_subway_platforms_for_stop(stop_id) do
     case Screens.V3Api.get_json("stops/" <> stop_id, %{"include" => "child_stops"}) do
       {:ok, %{"included" => child_stop_data}} ->
