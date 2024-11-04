@@ -4,20 +4,20 @@ import { TimeRepresentation } from "Util/time_representation";
 import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
 
 const baseDepartureTime = (time: TimeRepresentation): JSX.Element | null => {
-  if (time.type === "TEXT") {
+  if (time.type === "text") {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__text">{time.text}</span>
       </div>
     );
-  } else if (time.type === "MINUTES") {
+  } else if (time.type === "minutes") {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__minutes">{time.minutes}</span>
         <span className="base-departure-time__minutes-label">m</span>
       </div>
     );
-  } else if (time.type === "TIMESTAMP") {
+  } else if (time.type === "timestamp") {
     return (
       <div className="base-departure-time">
         <span className="base-departure-time__timestamp">{time.timestamp}</span>
