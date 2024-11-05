@@ -29,7 +29,6 @@ const ClosureRow = ({ alert }: ClosureRowProps) => {
   console.log(routes);
   return (
     <div className="alert-row">
-      <hr />
       <div className="alert-row__name-and-pills">
         {routes.map((route) => (
           <RoutePill pill={route} key={routePillKey(route)} />
@@ -39,6 +38,7 @@ const ClosureRow = ({ alert }: ClosureRowProps) => {
       <div className="alert-row__elevator-name">
         {elevator_name} ({elevator_id})
       </div>
+      <hr />
     </div>
   );
 };
@@ -130,6 +130,7 @@ const OutsideAlertList = ({
           <AccessibilityAlert height={128} width={128} />
         </div>
       </div>
+      <hr />
       <div className="alert-list-container">
         <div className="alert-list" ref={ref}>
           {visibleAlerts.map((alert) => (
