@@ -30,12 +30,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       expect(MockRoute, :fetch, fn %{stop_id: "place-test"} ->
-        {:ok, [%Route{id: "Red"}]}
+        {:ok, [%Route{id: "Red", type: :subway}]}
       end)
 
       expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           struct(Alert,
+            id: "1",
             effect: :elevator_closure,
             informed_entities: [
               %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
@@ -51,17 +52,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         %Screens.V2.WidgetInstance.ElevatorClosures{
           id: "111",
           in_station_alerts: [
-            [
-              %{
-                description: nil,
-                routes: ["Red"],
-                elevator_name: "Test",
-                elevator_id: "facility-test",
-                station_name: "Place Test",
-                alert_id: nil,
-                header_text: nil
-              }
-            ]
+            %{
+              id: "1",
+              description: nil,
+              elevator_name: "Test",
+              elevator_id: "facility-test",
+              routes: [%{type: :text, text: "RL", color: :red}],
+              station_name: "Place Test",
+              header_text: nil
+            }
           ],
           outside_alerts: []
         }
@@ -94,6 +93,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           struct(Alert,
+            id: "1",
             effect: :elevator_closure,
             informed_entities: [
               %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
@@ -108,17 +108,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         %Screens.V2.WidgetInstance.ElevatorClosures{
           id: "111",
           in_station_alerts: [
-            [
-              %{
-                description: nil,
-                routes: [],
-                elevator_name: "Test",
-                elevator_id: "facility-test",
-                alert_id: nil,
-                header_text: nil,
-                station_name: "Place Test"
-              }
-            ]
+            %{
+              id: "1",
+              description: nil,
+              elevator_name: "Test",
+              elevator_id: "facility-test",
+              routes: [],
+              station_name: "Place Test",
+              header_text: nil
+            }
           ],
           outside_alerts: []
         }
