@@ -7,6 +7,8 @@ import React, {
 } from "react";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
+import PagingDotUnselected from "Images/svgr_bundled/paging_dot_unselected.svg";
+import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
 
@@ -143,7 +145,6 @@ const OutsideAlertList = ({
   }, [visibleAlerts]);
 
   const alertsToRender = doneGettingPages ? pages[pageIndex] : visibleAlerts;
-
   return (
     <div className="outside-alert-list">
       <div className="header">
@@ -164,7 +165,16 @@ const OutsideAlertList = ({
       </div>
       {pages.length && (
         <div className="paging-info-container">
-          +{alerts.length - pages[pageIndex].length} more elevators
+          <div>+{alerts.length - pages[pageIndex].length} more elevators</div>
+          <div className="paging-indicators">
+            {[...Array(pages.length)].map((_, i) => {
+              return pageIndex === i ? (
+                <PagingDotSelected key={i} />
+              ) : (
+                <PagingDotUnselected key={i} />
+              );
+            })}
+          </div>
         </div>
       )}
     </div>
