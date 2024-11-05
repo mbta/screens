@@ -27,13 +27,52 @@
   .outside-alert-list {
     height: 100%;
     background-color: $warm-neutral-90;
+    padding: 48px;
+    position: relative;
+    font-family: Inter;
 
     .header {
+      max-height: 432px;
       display: flex;
-      padding: 48px;
-      font-size: 150px;
+      font-size: 112px;
       font-weight: 700;
-      line-height: 150px;
+      line-height: 112px;
+      margin-bottom: 48px;
+
+      &__title {
+        word-spacing: 9999px;
+      }
+    }
+
+    .alert-list-container {
+      height: 904px;
+
+      .alert-list {
+        .alert-row {
+          margin-top: 24px;
+
+          &__station-name {
+            font-weight: 600;
+            font-size: 62px;
+            line-height: 80px;
+            color: $cool-black-15;
+          }
+
+          hr {
+            background-color: $true-grey-45;
+            height: 2px;
+            margin-bottom: 24px;
+          }
+        }
+      }
+    }
+
+    .paging-info-container,
+    .alert-row__elevator-name {
+      font-weight: 400;
+      font-size: 48px;
+      line-height: 64px;
+      color: $cool-black-30;
     }
   }
 }

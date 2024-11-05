@@ -1,9 +1,36 @@
-import React from "react";
+import React, { useLayoutEffect, useRef, useState } from "react";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 
+type ElevatorClosure = {
+  station_name: string;
+  routes: string[];
+  id: string;
+  elevator_name: string;
+  elevator_id: string;
+  description: string;
+  header_text: string;
+};
+
+interface ClosureRowProps {
+  alert: ElevatorClosure;
+}
+
+const ClosureRow = ({ alert }: ClosureRowProps) => {
+  const { station_name, elevator_name, elevator_id } = alert;
+  return (
+    <div className="alert-row">
+      <hr />
+      <div className="alert-row__station-name">{station_name}</div>
+      <div className="alert-row__elevator-name">
+        {elevator_name} ({elevator_id})
+      </div>
+    </div>
+  );
+};
+
 interface InStationSummaryProps {
-  alerts: string[];
+  alerts: ElevatorClosure[];
 }
 
 const InStationSummary = ({ alerts }: InStationSummaryProps) => {
@@ -25,17 +52,51 @@ const InStationSummary = ({ alerts }: InStationSummaryProps) => {
 };
 
 interface OutsideAlertListProps {
-  alerts: string[];
+  alerts: ElevatorClosure[];
 }
 
-const OutsideAlertList = (_props: OutsideAlertListProps) => {
+const OutsideAlertList = ({ alerts }: OutsideAlertListProps) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const maxHeight = 904;
+  const [keepChecking, setKeepChecking] = useState(true);
+  const [renderedAlerts, setRenderedAlerts] = useState<ElevatorClosure[]>([]);
+  const [overflowingAlerts, setOverflowingAlerts] =
+    useState<ElevatorClosure[]>(alerts);
+
+  useLayoutEffect(() => {
+    if (!ref.current || !keepChecking) return;
+
+    if (ref.current.clientHeight <= maxHeight && overflowingAlerts.length) {
+      setRenderedAlerts(renderedAlerts.concat(overflowingAlerts[0]));
+      setOverflowingAlerts(overflowingAlerts.slice(1));
+    }
+
+    if (ref.current.clientHeight > maxHeight) {
+      setRenderedAlerts(renderedAlerts.slice(0, -1));
+      setOverflowingAlerts(
+        renderedAlerts.slice(0, -1).concat(overflowingAlerts),
+      );
+      setKeepChecking(false);
+    }
+  });
+
   return (
     <div className="outside-alert-list">
       <div className="header">
-        <span>MBTA Elevator Closures</span>
-        <span>
+        <div className="header__title">MBTA Elevator Closures</div>
+        <div>
           <AccessibilityAlert height={128} width={128} />
-        </span>
+        </div>
+      </div>
+      <div className="alert-list-container">
+        <div className="alert-list" ref={ref}>
+          {renderedAlerts.map((alert) => (
+            <ClosureRow alert={alert} key={alert.id} />
+          ))}
+        </div>
+      </div>
+      <div className="paging-info-container">
+        +{overflowingAlerts.length} more elevators
       </div>
     </div>
   );
@@ -43,8 +104,8 @@ const OutsideAlertList = (_props: OutsideAlertListProps) => {
 
 interface Props {
   id: string;
-  in_station_alerts: string[];
-  outside_alerts: string[];
+  in_station_alerts: ElevatorClosure[];
+  outside_alerts: ElevatorClosure[];
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({
