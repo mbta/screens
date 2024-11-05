@@ -7,7 +7,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
-  alias Screens.Stops.Stop
+  alias Screens.Stops.{Stop, Subway}
   alias Screens.V2.AlertsWidget
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
@@ -2693,7 +2693,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       now = ~U[2022-06-24 12:00:00Z]
-      tagged_station_sequences = %{"Orange" => [Stop.get_route_stop_sequence("Orange")]}
+      tagged_station_sequences = %{"Orange" => [Subway.route_stop_sequence("Orange")]}
       station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
@@ -3110,7 +3110,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       now = ~U[2022-06-24 12:00:00Z]
-      tagged_station_sequences = %{"Green" => [Stop.get_route_stop_sequence("Green")]}
+      tagged_station_sequences = %{"Green" => [Subway.route_stop_sequence("Green")]}
       station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
