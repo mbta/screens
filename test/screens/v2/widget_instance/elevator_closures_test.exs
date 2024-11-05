@@ -15,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
             elevator_name: "Test Elevator",
             elevator_id: "111",
             station_name: "Test",
-            alert_id: "1",
+            id: "1",
             header_text: "Test Alert Header"
           }
         ],
@@ -26,7 +26,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
             elevator_name: "FH Elevator",
             elevator_id: "222",
             station_name: "Forest Hills",
-            alert_id: "2",
+            id: "2",
             header_text: "FH Alert Header"
           }
         ]
@@ -42,7 +42,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
 
   describe "serialize/1" do
     test "returns map with id and alerts", %{instance: instance} do
-      assert instance == WidgetInstance.serialize(instance)
+      assert Map.from_struct(instance) == WidgetInstance.serialize(instance)
     end
   end
 
