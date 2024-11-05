@@ -82,6 +82,18 @@
       }
     }
 
+    .paging-info-container {
+      display: flex;
+      justify-content: space-between;
+
+      .paging-indicators {
+        display: flex;
+        align-items: center;
+        gap: 27px;
+        margin-right: 66px;
+      }
+    }
+
     .paging-info-container,
     .alert-row__elevator-name {
       font-weight: 400;
