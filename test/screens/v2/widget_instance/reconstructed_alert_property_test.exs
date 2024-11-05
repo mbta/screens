@@ -15,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
   alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
-  alias Screens.Stops.{Stop, Subway}
+  alias Screens.Stops.Subway
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -1155,10 +1155,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
          %LocationContext{
            home_stop: stop_id,
            tagged_stop_sequences: tagged_station_sequences,
-           upstream_stops: Stop.upstream_stop_id_set(stop_id, station_sequences),
-           downstream_stops: Stop.downstream_stop_id_set(stop_id, station_sequences),
+           upstream_stops: LocationContext.upstream_stop_id_set(stop_id, station_sequences),
+           downstream_stops: LocationContext.downstream_stop_id_set(stop_id, station_sequences),
            routes: routes_at_stop,
-           alert_route_types: Stop.get_route_type_filter(PreFare, stop_id)
+           alert_route_types: LocationContext.route_type_filter(PreFare, stop_id)
          }}
       end
 

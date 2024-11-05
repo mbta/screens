@@ -16,7 +16,8 @@ defmodule Screens.Telemetry do
       log_span(~w[screens v3_api get_json]a, metadata: ~w[url cached]a),
       # Stops
       log_span(~w[screens stops stop fetch_stop_name]a, metadata: ~w[stop_id]),
-      log_span(~w[screens stops stop fetch_location_context]a, metadata: ~w[app stop_id]),
+      # Location Context
+      log_span(~w[screens location_context fetch]a, metadata: ~w[app stop_id]),
       # Alerts
       log_span(~w[screens alerts alert fetch]a),
       # Routes

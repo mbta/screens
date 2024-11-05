@@ -2,7 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.LocationContext, as: LC
+  alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
@@ -53,7 +53,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         now \\ DateTime.utc_now(),
         fetch_alerts_fn \\ &Alert.fetch/1,
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
-        fetch_location_context_fn \\ &Stop.fetch_location_context/3,
+        fetch_location_context_fn \\ &LocationContext.fetch/3,
         fetch_subway_platforms_for_stop_fn \\ &Stop.fetch_subway_platforms_for_stop/1
       ) do
     %PreFare{
@@ -65,7 +65,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          route_ids <- Route.route_ids(location_context.routes),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       relevant_alerts = relevant_alerts(alerts, location_context, now)
-      is_terminal_station = terminal?(stop_id, LC.stop_sequences(location_context))
+      is_terminal_station = terminal?(stop_id, LocationContext.stop_sequences(location_context))
 
       immediate_disruptions = get_immediate_disruptions(relevant_alerts, location_context)
       downstream_disruptions = get_downstream_disruptions(relevant_alerts, location_context)
@@ -95,7 +95,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
             find_closest_downstream_alerts(
               downstream_disruptions,
               stop_id,
-              LC.stop_sequences(location_context)
+              LocationContext.stop_sequences(location_context)
             )
 
           flex_zone_alerts = downstream_disruptions -- fullscreen_alerts
@@ -300,7 +300,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # If the current station's stop_id is the first or last entry in all stop_sequences,
   # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
   defp relevant_direction?(%{alert: alert, location_context: location_context}) do
-    stop_sequences = LC.stop_sequences(location_context)
+    stop_sequences = LocationContext.stop_sequences(location_context)
     informed_entities = Alert.informed_entities(alert)
 
     direction_id =
