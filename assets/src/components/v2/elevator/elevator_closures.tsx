@@ -1,6 +1,13 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, {
+  ComponentType,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
+import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 
 type ElevatorClosure = {
   station_name: string;
@@ -51,32 +58,60 @@ const InStationSummary = ({ alerts }: InStationSummaryProps) => {
   );
 };
 
-interface OutsideAlertListProps {
+interface OutsideAlertListProps extends WrappedComponentProps {
   alerts: ElevatorClosure[];
+  lastUpdate: number | null;
 }
 
-const OutsideAlertList = ({ alerts }: OutsideAlertListProps) => {
+const OutsideAlertList = ({
+  alerts,
+  lastUpdate,
+  onFinish,
+}: OutsideAlertListProps) => {
+  const [isResizing, setIsResizing] = useState(true);
+  const [visibleAlerts, setVisibleAlerts] = useState<ElevatorClosure[]>([]);
+  const [alertsQueue, setAlertsQueue] = useState<ElevatorClosure[]>(alerts);
+  const [isFirstRender, setIsFirstRender] = useState(true);
   const ref = useRef<HTMLDivElement>(null);
-  const maxHeight = 904;
-  const [keepChecking, setKeepChecking] = useState(true);
-  const [renderedAlerts, setRenderedAlerts] = useState<ElevatorClosure[]>([]);
-  const [overflowingAlerts, setOverflowingAlerts] =
-    useState<ElevatorClosure[]>(alerts);
 
-  useLayoutEffect(() => {
-    if (!ref.current || !keepChecking) return;
-
-    if (ref.current.clientHeight <= maxHeight && overflowingAlerts.length) {
-      setRenderedAlerts(renderedAlerts.concat(overflowingAlerts[0]));
-      setOverflowingAlerts(overflowingAlerts.slice(1));
+  useEffect(() => {
+    // Give the page a sec on first render
+    if (isFirstRender) {
+      setIsFirstRender(false);
+      return;
+    }
+    // If leftover alerts list is empty here, onFinish() was called in last render.
+    // Reset the list back to props to pick up any changes.
+    else if (alertsQueue.length === 0) {
+      setAlertsQueue(alerts);
     }
 
-    if (ref.current.clientHeight > maxHeight) {
-      setRenderedAlerts(renderedAlerts.slice(0, -1));
-      setOverflowingAlerts(
-        renderedAlerts.slice(0, -1).concat(overflowingAlerts),
-      );
-      setKeepChecking(false);
+    // If we are not already resizing the list, reset it so it will start resizing.
+    if (!isResizing) {
+      setVisibleAlerts([]);
+      setIsResizing(true);
+    }
+  }, [lastUpdate]);
+
+  useLayoutEffect(() => {
+    if (!ref.current || !isResizing || isFirstRender) return;
+
+    const maxHeight = 904;
+
+    // If we have leftover alerts and still have room in the list, add an alert to render.
+    if (ref.current.clientHeight < maxHeight && alertsQueue.length) {
+      setVisibleAlerts([...visibleAlerts, alertsQueue[0]]);
+      setAlertsQueue(alertsQueue.slice(1));
+    }
+    // If adding an alert made the list too big, remove the last alert, add it back to leftover, and stop resizing.
+    else if (ref.current.clientHeight > maxHeight) {
+      setVisibleAlerts(visibleAlerts.slice(0, -1));
+      setAlertsQueue(visibleAlerts.slice(-1).concat(alertsQueue));
+      setIsResizing(false);
+    }
+    // If we are done resizing and there are no more alerts to page through, trigger a prop update.
+    else if (alertsQueue.length === 0) {
+      onFinish();
     }
   });
 
@@ -90,19 +125,19 @@ const OutsideAlertList = ({ alerts }: OutsideAlertListProps) => {
       </div>
       <div className="alert-list-container">
         <div className="alert-list" ref={ref}>
-          {renderedAlerts.map((alert) => (
+          {visibleAlerts.map((alert) => (
             <ClosureRow alert={alert} key={alert.id} />
           ))}
         </div>
       </div>
       <div className="paging-info-container">
-        +{overflowingAlerts.length} more elevators
+        +{alerts.length - visibleAlerts.length} more elevators
       </div>
     </div>
   );
 };
 
-interface Props {
+interface Props extends WrappedComponentProps {
   id: string;
   in_station_alerts: ElevatorClosure[];
   outside_alerts: ElevatorClosure[];
@@ -111,13 +146,21 @@ interface Props {
 const ElevatorClosures: React.ComponentType<Props> = ({
   in_station_alerts: inStationAlerts,
   outside_alerts: outsideAlerts,
+  lastUpdate,
+  onFinish,
 }: Props) => {
   return (
     <div className="elevator-closures">
       <InStationSummary alerts={inStationAlerts} />
-      <OutsideAlertList alerts={outsideAlerts} />
+      <OutsideAlertList
+        alerts={outsideAlerts}
+        lastUpdate={lastUpdate}
+        onFinish={onFinish}
+      />
     </div>
   );
 };
 
-export default ElevatorClosures;
+export default makePersistent(
+  ElevatorClosures as ComponentType<WrappedComponentProps>,
+);
