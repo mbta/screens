@@ -26,27 +26,27 @@
   }
 
   .outside-alert-list {
-    height: 100%;
-    background-color: $warm-neutral-90;
-    padding: 48px;
     position: relative;
+    height: 100%;
+    padding: 48px;
     font-family: Inter;
+    background-color: $warm-neutral-90;
 
     hr {
-      background-color: $true-grey-45;
-      opacity: 50%;
       min-height: 2px;
       margin-top: 24px;
+      background-color: $true-grey-45;
       border: none;
+      opacity: 0.5;
     }
 
     .header {
-      max-height: 432px;
       display: flex;
+      max-height: 432px;
+      margin-bottom: 48px;
       font-size: 112px;
       font-weight: 700;
       line-height: 112px;
-      margin-bottom: 48px;
 
       &__title {
         word-spacing: 9999px;
@@ -61,16 +61,16 @@
           margin-top: 24px;
 
           &__station-name {
-            font-weight: 600;
             font-size: 62px;
+            font-weight: 600;
             line-height: 80px;
             color: $cool-black-15;
           }
 
           &__name-and-pills {
             display: flex;
-            align-items: center;
             gap: 24px;
+            align-items: center;
             margin-bottom: 14px;
 
             .route-pill {
@@ -88,16 +88,16 @@
 
       .paging-indicators {
         display: flex;
-        align-items: center;
         gap: 27px;
+        align-items: center;
         margin-right: 66px;
       }
     }
 
     .paging-info-container,
     .alert-row__elevator-name {
-      font-weight: 400;
       font-size: 48px;
+      font-weight: 400;
       line-height: 64px;
       color: $cool-black-30;
     }
