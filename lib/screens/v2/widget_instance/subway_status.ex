@@ -6,7 +6,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
-  alias Screens.Stops.Stop
+  alias Screens.Stops.Subway
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{BusEink, Footer, GlEink, PreFare}
@@ -334,15 +334,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   # credo:disable-for-next-line
   # TODO: get_endpoints is a common function; could be consolidated
   defp get_endpoints(informed_entities, route_id) do
-    case Stop.get_stop_sequence(informed_entities, route_id) do
+    case Subway.stop_sequence_containing_informed_entities(informed_entities, route_id) do
       nil ->
         nil
 
       stop_sequence ->
         {min_index, max_index} =
           informed_entities
-          |> Enum.filter(&Stop.stop_on_route?(&1.stop, stop_sequence))
-          |> Enum.map(&Stop.to_stop_index(&1, stop_sequence))
+          |> Enum.filter(&Subway.stop_on_route?(&1.stop, stop_sequence))
+          |> Enum.map(&Subway.stop_index_for_informed_entity(&1, stop_sequence))
           |> Enum.min_max()
 
         {_, {min_full_name, min_abbreviated_name}} = Enum.at(stop_sequence, min_index)
@@ -573,7 +573,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     if gl_alert_count == 0 do
       serialize_single_alert_row_for_route(grouped_alerts, "Green", total_alert_count)
     else
-      gl_stop_sets = Enum.map(Stop.get_gl_stop_sequences(), &MapSet.new/1)
+      gl_stop_sets = Enum.map(Subway.gl_stop_sequences(), &MapSet.new/1)
 
       {trunk_alerts, branch_alerts} =
         Enum.split_with(
@@ -720,9 +720,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end)
     |> Enum.flat_map(fn
       %{stop: stop_id, route: route_id} ->
-        stop_id_to_name = Stop.stop_id_to_name(route_id)
+        stop_names = Subway.route_stop_names(route_id)
 
-        case Map.get(stop_id_to_name, stop_id) do
+        case Map.get(stop_names, stop_id) do
           nil -> []
           name -> [name]
         end

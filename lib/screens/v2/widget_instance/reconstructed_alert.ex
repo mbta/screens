@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.Routes.Route
-  alias Screens.Stops.Stop
+  alias Screens.Stops.{Stop, Subway}
   alias Screens.Util
   alias Screens.V2.DisruptionDiagram
   alias Screens.V2.LocalizedAlert
@@ -189,10 +189,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        )
        when stop_id != nil and location in [:downstream, :boundary_downstream] do
     cond do
-      Stop.on_ashmont_branch?(stop_id) ->
+      Subway.ashmont_branch_stop?(stop_id) ->
         {0, "Red-Ashmont"}
 
-      Stop.on_braintree_branch?(stop_id) ->
+      Subway.braintree_branch_stop?(stop_id) ->
         {0, "Red-Braintree"}
 
       true ->
@@ -208,10 +208,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        )
        when stop_id != nil and location in [:upstream, :boundary_upstream] do
     cond do
-      Stop.on_ashmont_branch?(stop_id) ->
+      Subway.ashmont_branch_stop?(stop_id) ->
         {1, "Red-Ashmont"}
 
-      Stop.on_braintree_branch?(stop_id) ->
+      Subway.braintree_branch_stop?(stop_id) ->
         {1, "Red-Braintree"}
 
       true ->
@@ -1134,15 +1134,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def do_get_endpoints(informed_entities, route_id) do
-    case Stop.get_stop_sequence(informed_entities, route_id) do
+    case Subway.stop_sequence_containing_informed_entities(informed_entities, route_id) do
       nil ->
         nil
 
       stop_sequence ->
         {min_index, max_index} =
           informed_entities
-          |> Enum.filter(&Stop.stop_on_route?(&1.stop, stop_sequence))
-          |> Enum.map(&Stop.to_stop_index(&1, stop_sequence))
+          |> Enum.filter(&Subway.stop_on_route?(&1.stop, stop_sequence))
+          |> Enum.map(&Subway.stop_index_for_informed_entity(&1, stop_sequence))
           |> Enum.min_max()
 
         {_, min_station_name} = Enum.at(stop_sequence, min_index)
@@ -1189,9 +1189,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     # It's ok if the home stop is duplicated in this list due to also being informed by the alert.
     relevant_parent_stations = [home_stop | Enum.map(parent_station_ies, & &1.stop)]
 
-    includes_glx = Enum.any?(relevant_parent_stations, &Stop.on_glx?/1)
+    includes_glx = Enum.any?(relevant_parent_stations, &Subway.glx_stop?/1)
 
-    stops_west_of_copley = Stop.get_gl_stops_west_of_copley()
+    stops_west_of_copley = Subway.gl_stops_west_of_copley()
     includes_west_of_copley = Enum.any?(relevant_parent_stations, &(&1 in stops_west_of_copley))
 
     includes_glx and not includes_west_of_copley
