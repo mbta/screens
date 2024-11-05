@@ -26,7 +26,7 @@ interface ClosureRowProps {
 
 const ClosureRow = ({ alert }: ClosureRowProps) => {
   const { station_name, elevator_name, elevator_id, routes } = alert;
-  console.log(routes);
+
   return (
     <div className="alert-row">
       <div className="alert-row__name-and-pills">
@@ -75,33 +75,53 @@ const OutsideAlertList = ({
   lastUpdate,
   onFinish,
 }: OutsideAlertListProps) => {
-  const [isResizing, setIsResizing] = useState(true);
   const [visibleAlerts, setVisibleAlerts] = useState<ElevatorClosure[]>([]);
   const [alertsQueue, setAlertsQueue] = useState<ElevatorClosure[]>(alerts);
   const [isFirstRender, setIsFirstRender] = useState(true);
+  const [pages, setPages] = useState<ElevatorClosure[][]>([]);
+  const [pageIndex, setPageIndex] = useState(0);
+  // Value that tells hooks if useLayoutEffect is actively running
+  const [isResizing, setIsResizing] = useState(true);
+  // Value that forces a hook to add a page to state
+  const [addPage, setAddPage] = useState(true);
+  // Value that tells all hooks we are done until onFinish is called
+  const [doneGettingPages, setDoneGettingPages] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Give the page a sec on first render
-    if (isFirstRender) {
-      setIsFirstRender(false);
-      return;
-    }
-    // If leftover alerts list is empty here, onFinish() was called in last render.
-    // Reset the list back to props to pick up any changes.
-    else if (alertsQueue.length === 0) {
-      setAlertsQueue(alerts);
-    }
-
-    // If we are not already resizing the list, reset it so it will start resizing.
-    if (!isResizing) {
-      setVisibleAlerts([]);
-      setIsResizing(true);
+    if (lastUpdate != null) {
+      if (isFirstRender) {
+        setIsFirstRender(false);
+      } else {
+        setPageIndex((i) => i + 1);
+      }
     }
   }, [lastUpdate]);
 
+  useEffect(() => {
+    if (pageIndex === pages.length - 1) {
+      onFinish();
+    }
+  }, [pageIndex]);
+
+  useEffect(() => {
+    // Make sure we aren't actively calculating a page before adding to list
+    if (!isResizing) {
+      setPages([...pages, visibleAlerts]);
+      // If queue isn't empty, there are more pages to calculate
+      if (alertsQueue.length > 0) {
+        setVisibleAlerts([]);
+        setIsResizing(true);
+      }
+      // Done paging and safe to render content
+      else {
+        setDoneGettingPages(true);
+      }
+    }
+  }, [addPage]);
+
   useLayoutEffect(() => {
-    if (!ref.current || !isResizing || isFirstRender) return;
+    if (!ref.current || !isResizing) return;
 
     const maxHeight = 904;
 
@@ -115,12 +135,14 @@ const OutsideAlertList = ({
       setVisibleAlerts(visibleAlerts.slice(0, -1));
       setAlertsQueue(visibleAlerts.slice(-1).concat(alertsQueue));
       setIsResizing(false);
+      setAddPage(!addPage);
+    } else {
+      setIsResizing(false);
+      setAddPage(!addPage);
     }
-    // If we are done resizing and there are no more alerts to page through, trigger a prop update.
-    else if (alertsQueue.length === 0) {
-      onFinish();
-    }
-  });
+  }, [visibleAlerts]);
+
+  const alertsToRender = doneGettingPages ? pages[pageIndex] : visibleAlerts;
 
   return (
     <div className="outside-alert-list">
@@ -132,15 +154,19 @@ const OutsideAlertList = ({
       </div>
       <hr />
       <div className="alert-list-container">
-        <div className="alert-list" ref={ref}>
-          {visibleAlerts.map((alert) => (
-            <ClosureRow alert={alert} key={alert.id} />
-          ))}
+        {
+          <div className="alert-list" ref={ref}>
+            {alertsToRender.map((alert) => (
+              <ClosureRow alert={alert} key={alert.id} />
+            ))}
+          </div>
+        }
+      </div>
+      {pages.length && (
+        <div className="paging-info-container">
+          +{alerts.length - pages[pageIndex].length} more elevators
         </div>
-      </div>
-      <div className="paging-info-container">
-        +{alerts.length - visibleAlerts.length} more elevators
-      </div>
+      )}
     </div>
   );
 };
