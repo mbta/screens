@@ -63,6 +63,17 @@
             height: 2px;
             margin-bottom: 24px;
           }
+
+          &__name-and-pills {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+
+            .route-pill {
+              width: 132px;
+              height: 68.13px;
+            }
+          }
         }
       }
     }

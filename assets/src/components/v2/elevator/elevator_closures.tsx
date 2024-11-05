@@ -8,10 +8,11 @@ import React, {
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
+import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
 
 type ElevatorClosure = {
   station_name: string;
-  routes: string[];
+  routes: Pill[];
   id: string;
   elevator_name: string;
   elevator_id: string;
@@ -24,11 +25,17 @@ interface ClosureRowProps {
 }
 
 const ClosureRow = ({ alert }: ClosureRowProps) => {
-  const { station_name, elevator_name, elevator_id } = alert;
+  const { station_name, elevator_name, elevator_id, routes } = alert;
+  console.log(routes);
   return (
     <div className="alert-row">
       <hr />
-      <div className="alert-row__station-name">{station_name}</div>
+      <div className="alert-row__name-and-pills">
+        {routes.map((route) => (
+          <RoutePill pill={route} key={routePillKey(route)} />
+        ))}
+        <div className="alert-row__station-name">{station_name}</div>
+      </div>
       <div className="alert-row__elevator-name">
         {elevator_name} ({elevator_id})
       </div>

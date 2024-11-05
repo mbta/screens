@@ -9,6 +9,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Stops.Stop
   alias Screens.LocationContext
   alias Screens.V2.WidgetInstance.ElevatorClosures
+  alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 
@@ -71,7 +72,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     |> MapSet.new()
     |> MapSet.put(home_parent_station_id)
     |> Enum.map(fn station_id ->
-      {station_id, route_ids_serving_stop(station_id)}
+      {station_id, station_id |> route_ids_serving_stop() |> routes_to_labels()}
     end)
     |> Enum.into(%{})
   end
@@ -87,10 +88,23 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   defp route_ids_serving_stop(stop_id) do
     case @route.fetch(%{stop_id: stop_id}) do
-      {:ok, routes} -> Enum.map(routes, & &1.id)
+      {:ok, routes} -> routes
       # Show no route pills instead of crashing the screen
       :error -> []
     end
+  end
+
+  defp routes_to_labels(routes) do
+    routes
+    |> Enum.map(fn
+      %Route{type: :subway, id: id} -> id |> String.downcase() |> String.to_atom()
+      %Route{type: :light_rail, id: "Green-" <> _} -> :green
+      %Route{type: :light_rail, id: "Mattapan" <> _} -> :mattapan
+      %Route{type: :bus, short_name: "SL" <> _} -> :silver
+      %Route{type: :rail} -> :cr
+      %Route{type: type} -> type
+    end)
+    |> Enum.uniq()
   end
 
   defp split_alerts_by_location(alerts, location_context) do
@@ -119,9 +133,14 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
                           } ->
         facility = get_informed_facility(entities)
 
+        route_pills =
+          station_id_to_routes
+          |> Map.fetch!(parent_station_id)
+          |> Enum.map(&RoutePill.serialize_icon/1)
+
         %{
           station_name: Map.fetch!(station_id_to_name, parent_station_id),
-          routes: Map.fetch!(station_id_to_routes, parent_station_id),
+          routes: route_pills,
           id: id,
           elevator_name: facility.name,
           elevator_id: facility.id,
