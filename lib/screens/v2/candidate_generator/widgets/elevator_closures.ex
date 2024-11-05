@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorStatusWidget
@@ -15,7 +16,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
           }
         } = config,
         now \\ DateTime.utc_now(),
-        fetch_location_context_fn \\ &Stop.fetch_location_context/3,
+        fetch_location_context_fn \\ &LocationContext.fetch/3,
         fetch_elevator_alerts_with_facilities_fn \\ &Alert.fetch_elevator_alerts_with_facilities/0
       ) do
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, parent_station_id, now),

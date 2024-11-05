@@ -4,7 +4,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
   alias Screens.Routes.Route
-  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.Screen
@@ -21,7 +20,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
         %Screen{app_params: %app{alerts: %Alerts{stop_id: stop_id}}} = config,
         now \\ DateTime.utc_now(),
         fetch_alerts_by_stop_and_route_fn \\ &Alert.fetch_by_stop_and_route/2,
-        fetch_location_context_fn \\ &Stop.fetch_location_context/3
+        fetch_location_context_fn \\ &LocationContext.fetch/3
       )
       when app in @alert_supporting_screen_types do
     with {:ok, location_context} <- fetch_location_context_fn.(app, stop_id, now),
