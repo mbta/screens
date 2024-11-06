@@ -65,7 +65,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               header_text: nil
             }
           ],
-          stations_with_alerts: []
+          other_stations_with_alerts: []
         }
       ] =
         ElevatorClosures.elevator_status_instances(
@@ -119,7 +119,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               header_text: nil
             }
           ],
-          stations_with_alerts: []
+          other_stations_with_alerts: []
         }
       ] =
         ElevatorClosures.elevator_status_instances(

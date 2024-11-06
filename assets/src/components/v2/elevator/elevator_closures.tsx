@@ -186,11 +186,11 @@ const OutsideAlertList = ({
 interface Props extends WrappedComponentProps {
   id: string;
   in_station_alerts: ElevatorClosure[];
-  stations_with_alerts: StationWithAlert[];
+  other_stations_with_alerts: StationWithAlert[];
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({
-  stations_with_alerts: stationsWithAlerts,
+  other_stations_with_alerts: otherStationsWithAlerts,
   in_station_alerts: inStationAlerts,
   lastUpdate,
   onFinish,
@@ -199,7 +199,7 @@ const ElevatorClosures: React.ComponentType<Props> = ({
     <div className="elevator-closures">
       <InStationSummary alerts={inStationAlerts} />
       <OutsideAlertList
-        stations={stationsWithAlerts}
+        stations={otherStationsWithAlerts}
         lastUpdate={lastUpdate}
         onFinish={onFinish}
       />
