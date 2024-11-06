@@ -138,9 +138,9 @@ const OutsideAlertList = ({
     for (let i = 0; i < num; i++) {
       const indicator =
         pageIndex === i ? (
-          <PagingDotSelected key={i} />
+          <PagingDotSelected height={40} width={40} key={i} />
         ) : (
-          <PagingDotUnselected key={i} />
+          <PagingDotUnselected height={28} width={28} key={i} />
         );
       indicators.push(indicator);
     }
