@@ -28,7 +28,6 @@
   .outside-alert-list {
     position: relative;
     height: 100%;
-    padding: 48px;
     font-family: Inter;
     background-color: $warm-neutral-90;
 
@@ -43,7 +42,7 @@
     .header {
       display: flex;
       max-height: 432px;
-      margin-bottom: 48px;
+      margin: 48px;
       font-size: 112px;
       font-weight: 700;
       line-height: 112px;
@@ -54,11 +53,16 @@
     }
 
     .alert-list-container {
-      height: 904px;
+      overflow: hidden;
 
       .alert-list {
+        display: flex;
+        flex-flow: column wrap;
+        height: 904px;
+        transform: translateX(calc(-100% * var(--alert-list-offset)));
+
         .alert-row {
-          margin-top: 24px;
+          margin: 24px 48px 0;
 
           &__station-name {
             font-size: 62px;
@@ -85,6 +89,7 @@
     .paging-info-container {
       display: flex;
       justify-content: space-between;
+      margin: 0 48px;
 
       .paging-indicators {
         display: flex;
