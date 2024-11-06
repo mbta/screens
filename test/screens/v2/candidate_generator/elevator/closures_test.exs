@@ -74,6 +74,85 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         )
     end
 
+    test "Groups outside alerts by station" do
+      now = ~U[2024-10-01T05:00:00Z]
+
+      expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
+        {:ok, %Stop{id: "place-test"}}
+      end)
+
+      expect(MockStop, :fetch_location_context, fn Elevator, "place-test", ^now ->
+        {:ok, %LocationContext{home_stop: "place-test"}}
+      end)
+
+      expect(MockStop, :fetch_parent_station_name_map, fn ->
+        {:ok, %{"place-haecl" => "Haymarket"}}
+      end)
+
+      expect(MockRoute, :fetch, 2, fn
+        %{stop_id: "place-haecl"} ->
+          {:ok, [%Route{id: "Orange", type: :subway}]}
+
+        %{stop_id: "place-test"} ->
+          {:ok, [%Route{id: "Red", type: :subway}]}
+      end)
+
+      expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          struct(Alert,
+            id: "1",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-haecl", facility: %{name: "Test 1", id: "facility-test-1"}}
+            ]
+          ),
+          struct(Alert,
+            id: "2",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-2"}}
+            ]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      [
+        %Screens.V2.WidgetInstance.ElevatorClosures{
+          id: "111",
+          in_station_alerts: [],
+          other_stations_with_alerts: [
+            %{
+              id: "place-haecl",
+              name: "Haymarket",
+              routes: [%{type: :text, text: "OL", color: :orange}],
+              alerts: [
+                %{
+                  id: "1",
+                  description: nil,
+                  elevator_name: "Test 1",
+                  elevator_id: "facility-test-1",
+                  header_text: nil
+                },
+                %{
+                  id: "2",
+                  description: nil,
+                  elevator_name: "Test 2",
+                  elevator_id: "facility-test-2",
+                  header_text: nil
+                }
+              ]
+            }
+          ]
+        }
+      ] =
+        ElevatorClosures.elevator_status_instances(
+          struct(Screen, app_id: :elevator_v2, app_params: %Elevator{elevator_id: "111"}),
+          now
+        )
+    end
+
     test "Return empty routes on API error" do
       now = ~U[2024-10-01T05:00:00Z]
 
