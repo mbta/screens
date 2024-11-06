@@ -2,7 +2,6 @@ import React, {
   ComponentType,
   useEffect,
   useLayoutEffect,
-  useRef,
   useState,
 } from "react";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
@@ -77,18 +76,9 @@ const OutsideAlertList = ({
   lastUpdate,
   onFinish,
 }: OutsideAlertListProps) => {
-  const [visibleAlerts, setVisibleAlerts] = useState<ElevatorClosure[]>([]);
-  const [alertsQueue, setAlertsQueue] = useState<ElevatorClosure[]>(alerts);
   const [isFirstRender, setIsFirstRender] = useState(true);
-  const [pages, setPages] = useState<ElevatorClosure[][]>([]);
   const [pageIndex, setPageIndex] = useState(0);
-  // Value that tells hooks if useLayoutEffect is actively running
-  const [isResizing, setIsResizing] = useState(true);
-  // Value that forces a hook to add a page to state
-  const [addPage, setAddPage] = useState(true);
-  // Value that tells all hooks we are done until onFinish is called
-  const [doneGettingPages, setDoneGettingPages] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
+  const [numPages, setNumPages] = useState(0);
 
   useEffect(() => {
     if (lastUpdate != null) {
@@ -101,50 +91,20 @@ const OutsideAlertList = ({
   }, [lastUpdate]);
 
   useEffect(() => {
-    if (pageIndex === pages.length - 1) {
+    if (pageIndex === numPages - 1) {
       onFinish();
     }
   }, [pageIndex]);
 
-  useEffect(() => {
-    // Make sure we aren't actively calculating a page before adding to list
-    if (!isResizing) {
-      setPages([...pages, visibleAlerts]);
-      // If queue isn't empty, there are more pages to calculate
-      if (alertsQueue.length > 0) {
-        setVisibleAlerts([]);
-        setIsResizing(true);
-      }
-      // Done paging and safe to render content
-      else {
-        setDoneGettingPages(true);
-      }
-    }
-  }, [addPage]);
-
   useLayoutEffect(() => {
-    if (!ref.current || !isResizing) return;
+    const closureRows = document.getElementsByClassName("alert-row");
+    const uniqueOffsets = Array.from(closureRows)
+      .map((closure) => (closure as HTMLDivElement).offsetLeft)
+      .filter((val, i, self) => self.indexOf(val) === i);
 
-    const maxHeight = 904;
+    setNumPages(uniqueOffsets.length);
+  }, []);
 
-    // If we have leftover alerts and still have room in the list, add an alert to render.
-    if (ref.current.clientHeight < maxHeight && alertsQueue.length) {
-      setVisibleAlerts([...visibleAlerts, alertsQueue[0]]);
-      setAlertsQueue(alertsQueue.slice(1));
-    }
-    // If adding an alert made the list too big, remove the last alert, add it back to leftover, and stop resizing.
-    else if (ref.current.clientHeight > maxHeight) {
-      setVisibleAlerts(visibleAlerts.slice(0, -1));
-      setAlertsQueue(visibleAlerts.slice(-1).concat(alertsQueue));
-      setIsResizing(false);
-      setAddPage(!addPage);
-    } else {
-      setIsResizing(false);
-      setAddPage(!addPage);
-    }
-  }, [visibleAlerts]);
-
-  const alertsToRender = doneGettingPages ? pages[pageIndex] : visibleAlerts;
   return (
     <div className="outside-alert-list">
       <div className="header">
@@ -156,27 +116,32 @@ const OutsideAlertList = ({
       <hr />
       <div className="alert-list-container">
         {
-          <div className="alert-list" ref={ref}>
-            {alertsToRender.map((alert) => (
+          <div
+            className="alert-list"
+            style={
+              {
+                "--alert-list-offset": pageIndex,
+              } as React.CSSProperties
+            }
+          >
+            {alerts.map((alert) => (
               <ClosureRow alert={alert} key={alert.id} />
             ))}
           </div>
         }
       </div>
-      {pages.length && (
-        <div className="paging-info-container">
-          <div>+{alerts.length - pages[pageIndex].length} more elevators</div>
-          <div className="paging-indicators">
-            {[...Array(pages.length)].map((_, i) => {
-              return pageIndex === i ? (
-                <PagingDotSelected key={i} />
-              ) : (
-                <PagingDotUnselected key={i} />
-              );
-            })}
-          </div>
+      <div className="paging-info-container">
+        <div>+{alerts.length} more elevators</div>
+        <div className="paging-indicators">
+          {[...Array(numPages)].map((_, i) => {
+            return pageIndex === i ? (
+              <PagingDotSelected key={i} />
+            ) : (
+              <PagingDotUnselected key={i} />
+            );
+          })}
         </div>
-      )}
+      </div>
     </div>
   );
 };
