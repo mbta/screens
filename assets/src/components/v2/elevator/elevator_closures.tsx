@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
+import cx from "classnames";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import PagingDotUnselected from "Images/svgr_bundled/paging_dot_unselected.svg";
@@ -12,9 +13,14 @@ import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
 
-type ElevatorClosure = {
-  station_name: string;
+type StationWithAlert = {
+  id: string;
+  name: string;
   routes: Pill[];
+  alerts: ElevatorClosure[];
+};
+
+type ElevatorClosure = {
   id: string;
   elevator_name: string;
   elevator_id: string;
@@ -22,24 +28,31 @@ type ElevatorClosure = {
   header_text: string;
 };
 
-interface ClosureRowProps {
-  alert: ElevatorClosure;
+interface AlertRowProps {
+  station: StationWithAlert;
 }
 
-const ClosureRow = ({ alert }: ClosureRowProps) => {
-  const { station_name, elevator_name, elevator_id, routes } = alert;
+const AlertRow = ({ station }: AlertRowProps) => {
+  const { name, alerts, routes, id } = station;
 
   return (
     <div className="alert-row">
       <div className="alert-row__name-and-pills">
         {routes.map((route) => (
-          <RoutePill pill={route} key={routePillKey(route)} />
+          <RoutePill pill={route} key={`${routePillKey(route)}-${id}`} />
         ))}
-        <div className="alert-row__station-name">{station_name}</div>
+        <div className="alert-row__station-name">{name}</div>
       </div>
-      <div className="alert-row__elevator-name">
-        {elevator_name} ({elevator_id})
-      </div>
+      {alerts.map((alert) => (
+        <div
+          key={alert.id}
+          className={cx("alert-row__elevator-name", {
+            "list-item": alerts.length > 1,
+          })}
+        >
+          {alert.elevator_name} ({alert.elevator_id})
+        </div>
+      ))}
       <hr className="thin" />
     </div>
   );
@@ -68,12 +81,12 @@ const InStationSummary = ({ alerts }: InStationSummaryProps) => {
 };
 
 interface OutsideAlertListProps extends WrappedComponentProps {
-  alerts: ElevatorClosure[];
+  stations: StationWithAlert[];
   lastUpdate: number | null;
 }
 
 const OutsideAlertList = ({
-  alerts,
+  stations,
   lastUpdate,
   onFinish,
 }: OutsideAlertListProps) => {
@@ -108,17 +121,17 @@ const OutsideAlertList = ({
   }, [pageIndex]);
 
   useLayoutEffect(() => {
-    const closureRows = Array.from(
-      document.getElementsByClassName("alert-row"),
-    );
+    const alertRows = Array.from(document.getElementsByClassName("alert-row"));
+    const screenWidth = 1080;
+    const totalXMargins = 48;
 
-    const rowPageIndexes = closureRows.map((closure) => {
-      const val = (closure as HTMLDivElement).offsetLeft - 48;
-      return val / 1080;
+    const rowPageIndexes = alertRows.map((alert) => {
+      const val = (alert as HTMLDivElement).offsetLeft - totalXMargins;
+      return val / screenWidth;
     });
 
     setRowPageIndexes(rowPageIndexes);
-  }, []);
+  }, [stations]);
 
   const getPagingIndicators = (num: number) => {
     const indicators: JSX.Element[] = [];
@@ -131,6 +144,8 @@ const OutsideAlertList = ({
         );
       indicators.push(indicator);
     }
+
+    return indicators;
   };
 
   return (
@@ -139,7 +154,7 @@ const OutsideAlertList = ({
         <div className="header">
           <div className="header__title">MBTA Elevator Closures</div>
           <div>
-            <AccessibilityAlert height={128} width={128} />
+            <AccessibilityAlert height={128} width={155} />
           </div>
         </div>
         <hr className="thin" />
@@ -154,8 +169,8 @@ const OutsideAlertList = ({
               } as React.CSSProperties
             }
           >
-            {alerts.map((alert) => (
-              <ClosureRow alert={alert} key={alert.id} />
+            {stations.map((station) => (
+              <AlertRow station={station} key={station.id} />
             ))}
           </div>
         }
@@ -171,12 +186,12 @@ const OutsideAlertList = ({
 interface Props extends WrappedComponentProps {
   id: string;
   in_station_alerts: ElevatorClosure[];
-  outside_alerts: ElevatorClosure[];
+  stations_with_alerts: StationWithAlert[];
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({
+  stations_with_alerts: stationsWithAlerts,
   in_station_alerts: inStationAlerts,
-  outside_alerts: outsideAlerts,
   lastUpdate,
   onFinish,
 }: Props) => {
@@ -184,7 +199,7 @@ const ElevatorClosures: React.ComponentType<Props> = ({
     <div className="elevator-closures">
       <InStationSummary alerts={inStationAlerts} />
       <OutsideAlertList
-        alerts={outsideAlerts}
+        stations={stationsWithAlerts}
         lastUpdate={lastUpdate}
         onFinish={onFinish}
       />
