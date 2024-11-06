@@ -2,6 +2,7 @@ import React, {
   ComponentType,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useState,
 } from "react";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
@@ -78,7 +79,17 @@ const OutsideAlertList = ({
 }: OutsideAlertListProps) => {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [pageIndex, setPageIndex] = useState(0);
-  const [numPages, setNumPages] = useState(0);
+
+  // Each value represents the pageIndex the row is visible on
+  const [rowPageIndexes, setRowPageIndexes] = useState<number[]>([]);
+
+  const [numPages, numOffsetRows] = useMemo(
+    () => [
+      rowPageIndexes.filter((val, i, self) => self.indexOf(val) === i).length,
+      rowPageIndexes.filter((offset) => offset !== pageIndex).length,
+    ],
+    [rowPageIndexes],
+  );
 
   useEffect(() => {
     if (lastUpdate != null) {
@@ -97,13 +108,30 @@ const OutsideAlertList = ({
   }, [pageIndex]);
 
   useLayoutEffect(() => {
-    const closureRows = document.getElementsByClassName("alert-row");
-    const uniqueOffsets = Array.from(closureRows)
-      .map((closure) => (closure as HTMLDivElement).offsetLeft)
-      .filter((val, i, self) => self.indexOf(val) === i);
+    const closureRows = Array.from(
+      document.getElementsByClassName("alert-row"),
+    );
 
-    setNumPages(uniqueOffsets.length);
+    const rowPageIndexes = closureRows.map((closure) => {
+      const val = (closure as HTMLDivElement).offsetLeft - 48;
+      return val / 1080;
+    });
+
+    setRowPageIndexes(rowPageIndexes);
   }, []);
+
+  const getPagingIndicators = (num: number) => {
+    const indicators: JSX.Element[] = [];
+    for (let i = 0; i < num; i++) {
+      const indicator =
+        pageIndex === i ? (
+          <PagingDotSelected key={i} />
+        ) : (
+          <PagingDotUnselected key={i} />
+        );
+      indicators.push(indicator);
+    }
+  };
 
   return (
     <div className="outside-alert-list">
@@ -133,16 +161,8 @@ const OutsideAlertList = ({
         }
       </div>
       <div className="paging-info-container">
-        <div>+{alerts.length} more elevators</div>
-        <div className="paging-indicators">
-          {[...Array(numPages)].map((_, i) => {
-            return pageIndex === i ? (
-              <PagingDotSelected key={i} />
-            ) : (
-              <PagingDotUnselected key={i} />
-            );
-          })}
-        </div>
+        <div>+{numOffsetRows} more elevators</div>
+        <div className="paging-indicators">{getPagingIndicators(numPages)}</div>
       </div>
     </div>
   );
