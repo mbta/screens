@@ -11,23 +11,25 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
         in_station_alerts: [
           %ElevatorClosures.Alert{
             description: "Test Alert Description",
-            routes: ["Red"],
             elevator_name: "Test Elevator",
             elevator_id: "111",
-            station_name: "Test",
             id: "1",
             header_text: "Test Alert Header"
           }
         ],
-        outside_alerts: [
-          %ElevatorClosures.Alert{
-            description: "FH Alert Description",
+        stations_with_alerts: [
+          %ElevatorClosures.Station{
+            name: "Forest Hills",
             routes: ["Orange"],
-            elevator_name: "FH Elevator",
-            elevator_id: "222",
-            station_name: "Forest Hills",
-            id: "2",
-            header_text: "FH Alert Header"
+            alerts: [
+              %ElevatorClosures.Alert{
+                description: "FH Alert Description",
+                elevator_name: "FH Elevator",
+                elevator_id: "222",
+                id: "2",
+                header_text: "FH Alert Header"
+              }
+            ]
           }
         ]
       }

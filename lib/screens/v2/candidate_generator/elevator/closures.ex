@@ -46,10 +46,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       [
         %ElevatorClosures{
           id: elevator_id,
-          in_station_alerts:
-            alert_to_elevator_closure(in_station_alerts, parent_station_map, routes_map),
-          outside_alerts:
-            alert_to_elevator_closure(outside_alerts, parent_station_map, routes_map)
+          in_station_alerts: Enum.map(in_station_alerts, &alert_to_elevator_closure/1),
+          stations_with_alerts:
+            format_outside_alerts(outside_alerts, parent_station_map, routes_map)
         }
       ]
     else
@@ -121,33 +120,40 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     end)
   end
 
-  defp alert_to_elevator_closure(alerts, station_id_to_name, station_id_to_routes) do
+  defp alert_to_elevator_closure(%Alert{
+         id: id,
+         informed_entities: entities,
+         description: description,
+         header: header
+       }) do
+    facility = get_informed_facility(entities)
+
+    %{
+      id: id,
+      elevator_name: facility.name,
+      elevator_id: facility.id,
+      description: description,
+      header_text: header
+    }
+  end
+
+  defp format_outside_alerts(alerts, station_id_to_name, station_id_to_routes) do
     alerts
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
-    |> Enum.flat_map(fn {parent_station_id, alerts} ->
-      Enum.map(alerts, fn %Alert{
-                            id: id,
-                            informed_entities: entities,
-                            description: description,
-                            header: header
-                          } ->
-        facility = get_informed_facility(entities)
+    |> Enum.map(fn {parent_station_id, alerts} ->
+      alerts_at_station = Enum.map(alerts, &alert_to_elevator_closure/1)
 
-        route_pills =
-          station_id_to_routes
-          |> Map.fetch!(parent_station_id)
-          |> Enum.map(&RoutePill.serialize_icon/1)
+      route_pills =
+        station_id_to_routes
+        |> Map.fetch!(parent_station_id)
+        |> Enum.map(&RoutePill.serialize_icon/1)
 
-        %{
-          station_name: Map.fetch!(station_id_to_name, parent_station_id),
-          routes: route_pills,
-          id: id,
-          elevator_name: facility.name,
-          elevator_id: facility.id,
-          description: description,
-          header_text: header
-        }
-      end)
+      %{
+        id: parent_station_id,
+        name: Map.fetch!(station_id_to_name, parent_station_id),
+        routes: route_pills,
+        alerts: alerts_at_station
+      }
     end)
   end
 

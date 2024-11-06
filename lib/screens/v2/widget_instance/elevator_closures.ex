@@ -1,24 +1,41 @@
 defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   @moduledoc false
 
-  defstruct ~w[id in_station_alerts outside_alerts]a
+  alias Screens.Stops.Stop
+
+  defstruct ~w[id in_station_alerts stations_with_alerts]a
 
   @type t :: %__MODULE__{
           id: String.t(),
           in_station_alerts: list(__MODULE__.Alert.t()),
-          outside_alerts: list(__MODULE__.Alert.t())
+          stations_with_alerts: list(__MODULE__.Station.t())
         }
+
+  defmodule Station do
+    @moduledoc false
+
+    alias Screens.V2.WidgetInstance.ElevatorClosures.Alert
+
+    @derive Jason.Encoder
+
+    defstruct ~w[id name routes alerts]a
+
+    @type t :: %__MODULE__{
+            id: Stop.id(),
+            name: String.t(),
+            routes: list(String.t()),
+            alerts: list(Alert.t())
+          }
+  end
 
   defmodule Alert do
     @moduledoc false
 
     @derive Jason.Encoder
 
-    defstruct ~w[station_name routes id elevator_name elevator_id description header_text]a
+    defstruct ~w[id elevator_name elevator_id description header_text]a
 
     @type t :: %__MODULE__{
-            station_name: String.t(),
-            routes: list(String.t()),
             id: String.t(),
             elevator_name: String.t(),
             elevator_id: String.t(),
@@ -30,9 +47,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   def serialize(%__MODULE__{
         id: id,
         in_station_alerts: in_station_alerts,
-        outside_alerts: outside_alerts
+        stations_with_alerts: stations_with_alerts
       }),
-      do: %{id: id, in_station_alerts: in_station_alerts, outside_alerts: outside_alerts}
+      do: %{
+        id: id,
+        in_station_alerts: in_station_alerts,
+        stations_with_alerts: stations_with_alerts
+      }
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ElevatorClosures

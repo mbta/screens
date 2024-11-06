@@ -84,6 +84,12 @@
               height: 68.13px;
             }
           }
+
+          &__elevator-name.list-item {
+            display: list-item;
+            margin-bottom: 8px;
+            margin-left: 48px;
+          }
         }
       }
     }

@@ -42,7 +42,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
             ]
           ),
-          struct(Alert, effect: :detour, informed_entities: [%{stop: "place-test"}])
+          struct(Alert,
+            effect: :detour,
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test 2", id: "facility-test2"}}
+            ]
+          )
         ]
 
         {:ok, alerts}
@@ -57,12 +62,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               description: nil,
               elevator_name: "Test",
               elevator_id: "facility-test",
-              routes: [%{type: :text, text: "RL", color: :red}],
-              station_name: "Place Test",
               header_text: nil
             }
           ],
-          outside_alerts: []
+          stations_with_alerts: []
         }
       ] =
         ElevatorClosures.elevator_status_instances(
@@ -113,12 +116,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               description: nil,
               elevator_name: "Test",
               elevator_id: "facility-test",
-              routes: [],
-              station_name: "Place Test",
               header_text: nil
             }
           ],
-          outside_alerts: []
+          stations_with_alerts: []
         }
       ] =
         ElevatorClosures.elevator_status_instances(
