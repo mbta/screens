@@ -39,7 +39,7 @@ const ClosureRow = ({ alert }: ClosureRowProps) => {
       <div className="alert-row__elevator-name">
         {elevator_name} ({elevator_id})
       </div>
-      <hr />
+      <hr className="thin" />
     </div>
   );
 };
@@ -61,7 +61,7 @@ const InStationSummary = ({ alerts }: InStationSummaryProps) => {
           <NormalService height={72} width={72} fill="#145A06" />
         </span>
       </div>
-      <hr />
+      <hr className="thick" />
     </>
   );
 };
@@ -107,13 +107,15 @@ const OutsideAlertList = ({
 
   return (
     <div className="outside-alert-list">
-      <div className="header">
-        <div className="header__title">MBTA Elevator Closures</div>
-        <div>
-          <AccessibilityAlert height={128} width={128} />
+      <div className="header-container">
+        <div className="header">
+          <div className="header__title">MBTA Elevator Closures</div>
+          <div>
+            <AccessibilityAlert height={128} width={128} />
+          </div>
         </div>
+        <hr className="thin" />
       </div>
-      <hr />
       <div className="alert-list-container">
         {
           <div
