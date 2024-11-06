@@ -3,12 +3,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
 
   alias Screens.Stops.Stop
 
-  defstruct ~w[id in_station_alerts stations_with_alerts]a
+  defstruct ~w[id in_station_alerts other_stations_with_alerts]a
 
   @type t :: %__MODULE__{
           id: String.t(),
           in_station_alerts: list(__MODULE__.Alert.t()),
-          stations_with_alerts: list(__MODULE__.Station.t())
+          other_stations_with_alerts: list(__MODULE__.Station.t())
         }
 
   defmodule Station do
@@ -47,12 +47,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   def serialize(%__MODULE__{
         id: id,
         in_station_alerts: in_station_alerts,
-        stations_with_alerts: stations_with_alerts
+        other_stations_with_alerts: other_stations_with_alerts
       }),
       do: %{
         id: id,
         in_station_alerts: in_station_alerts,
-        stations_with_alerts: stations_with_alerts
+        other_stations_with_alerts: other_stations_with_alerts
       }
 
   defimpl Screens.V2.WidgetInstance do

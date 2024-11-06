@@ -47,7 +47,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         %ElevatorClosures{
           id: elevator_id,
           in_station_alerts: Enum.map(in_station_alerts, &alert_to_elevator_closure/1),
-          stations_with_alerts:
+          other_stations_with_alerts:
             format_outside_alerts(outside_alerts, parent_station_map, routes_map)
         }
       ]

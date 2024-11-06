@@ -17,7 +17,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
             header_text: "Test Alert Header"
           }
         ],
-        stations_with_alerts: [
+        other_stations_with_alerts: [
           %ElevatorClosures.Station{
             name: "Forest Hills",
             routes: ["Orange"],
