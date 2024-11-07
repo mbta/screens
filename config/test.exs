@@ -172,7 +172,6 @@ config :screens, Screens.V2.RDS,
 
 config :screens, Screens.V2.CandidateGenerator.Elevator.Closures,
   stop_module: Screens.Stops.MockStop,
-  location_context_module: Screens.MockLocationContext,
   facility_module: Screens.Facilities.MockFacility,
   alert_module: Screens.Alerts.MockAlert,
   route_module: Screens.Routes.MockRoute

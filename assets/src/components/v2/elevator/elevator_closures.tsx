@@ -2,7 +2,7 @@ import React, {
   ComponentType,
   useEffect,
   useLayoutEffect,
-  useMemo,
+  useRef,
   useState,
 } from "react";
 import cx from "classnames";
@@ -12,12 +12,13 @@ import PagingDotUnselected from "Images/svgr_bundled/paging_dot_unselected.svg";
 import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
+import _ from "lodash";
 
-type StationWithAlert = {
+type StationWithClosure = {
   id: string;
   name: string;
-  routes: Pill[];
-  alerts: ElevatorClosure[];
+  route_icons: Pill[];
+  closures: ElevatorClosure[];
 };
 
 type ElevatorClosure = {
@@ -28,29 +29,29 @@ type ElevatorClosure = {
   header_text: string;
 };
 
-interface AlertRowProps {
-  station: StationWithAlert;
+interface ClosureRowProps {
+  station: StationWithClosure;
 }
 
-const AlertRow = ({ station }: AlertRowProps) => {
-  const { name, alerts, routes, id } = station;
+const ClosureRow = ({ station }: ClosureRowProps) => {
+  const { name, closures, route_icons, id } = station;
 
   return (
-    <div className="alert-row">
-      <div className="alert-row__name-and-pills">
-        {routes.map((route) => (
+    <div className="closure-row">
+      <div className="closure-row__name-and-pills">
+        {route_icons.map((route) => (
           <RoutePill pill={route} key={`${routePillKey(route)}-${id}`} />
         ))}
-        <div className="alert-row__station-name">{name}</div>
+        <div className="closure-row__station-name">{name}</div>
       </div>
-      {alerts.map((alert) => (
+      {closures.map((closure) => (
         <div
-          key={alert.id}
-          className={cx("alert-row__elevator-name", {
-            "list-item": alerts.length > 1,
+          key={closure.id}
+          className={cx("closure-row__elevator-name", {
+            "list-item": closures.length > 1,
           })}
         >
-          {alert.elevator_name} ({alert.elevator_id})
+          {closure.elevator_name} ({closure.elevator_id})
         </div>
       ))}
       <hr className="thin" />
@@ -59,11 +60,11 @@ const AlertRow = ({ station }: AlertRowProps) => {
 };
 
 interface InStationSummaryProps {
-  alerts: ElevatorClosure[];
+  closures: ElevatorClosure[];
 }
 
-const InStationSummary = ({ alerts }: InStationSummaryProps) => {
-  const summaryText = alerts.length
+const InStationSummary = ({ closures }: InStationSummaryProps) => {
+  const summaryText = closures.length
     ? ""
     : "All elevators at this station are currently working";
 
@@ -80,55 +81,68 @@ const InStationSummary = ({ alerts }: InStationSummaryProps) => {
   );
 };
 
-interface OutsideAlertListProps extends WrappedComponentProps {
-  stations: StationWithAlert[];
+interface OutsideClosureListProps extends WrappedComponentProps {
+  stations: StationWithClosure[];
   lastUpdate: number | null;
 }
 
-const OutsideAlertList = ({
+const OutsideClosureList = ({
   stations,
   lastUpdate,
   onFinish,
-}: OutsideAlertListProps) => {
+}: OutsideClosureListProps) => {
   const [isFirstRender, setIsFirstRender] = useState(true);
   const [pageIndex, setPageIndex] = useState(0);
+  const ref = useRef<HTMLDivElement>(null);
 
   // Each value represents the pageIndex the row is visible on
-  const [rowPageIndexes, setRowPageIndexes] = useState<number[]>([]);
+  const [rowPageIndexes, setRowPageIndexes] = useState<{
+    [key: number]: number;
+  }>({});
 
-  const [numPages, numOffsetRows] = useMemo(
-    () => [
-      rowPageIndexes.filter((val, i, self) => self.indexOf(val) === i).length,
-      rowPageIndexes.filter((offset) => offset !== pageIndex).length,
-    ],
-    [rowPageIndexes],
-  );
+  const numOffsetRows = Object.keys(rowPageIndexes).reduce((acc, key) => {
+    if (parseInt(key) === pageIndex) {
+      return acc;
+    } else {
+      return acc + rowPageIndexes[key];
+    }
+  }, 0);
+
+  const numPages = Object.keys(rowPageIndexes).length;
 
   useEffect(() => {
     if (lastUpdate != null) {
       if (isFirstRender) {
         setIsFirstRender(false);
-      } else {
+      } else if (pageIndex < numPages - 1) {
         setPageIndex((i) => i + 1);
+      } else {
+        setPageIndex(0);
       }
     }
   }, [lastUpdate]);
 
   useEffect(() => {
-    if (pageIndex === numPages - 1) {
+    // numPages can be 0 before useLayoutEffect runs
+    if (numPages > 0 && pageIndex === numPages) {
       onFinish();
     }
   }, [pageIndex]);
 
   useLayoutEffect(() => {
-    const alertRows = Array.from(document.getElementsByClassName("alert-row"));
-    const screenWidth = 1080;
-    const totalXMargins = 48;
+    if (!ref.current) return;
 
-    const rowPageIndexes = alertRows.map((alert) => {
-      const val = (alert as HTMLDivElement).offsetLeft - totalXMargins;
-      return val / screenWidth;
+    const offsets = Array.from(ref.current.children).map((closure) => {
+      return (closure as HTMLDivElement).offsetLeft;
     });
+
+    const uniqOffsets = _.uniq(offsets);
+
+    const rowPageIndexes = _.chain(offsets)
+      .groupBy()
+      .mapKeys((value) => uniqOffsets.indexOf(value[0]))
+      .mapValues((value) => value.length)
+      .value();
 
     setRowPageIndexes(rowPageIndexes);
   }, [stations]);
@@ -149,7 +163,7 @@ const OutsideAlertList = ({
   };
 
   return (
-    <div className="outside-alert-list">
+    <div className="outside-closure-list">
       <div className="header-container">
         <div className="header">
           <div className="header__title">MBTA Elevator Closures</div>
@@ -159,47 +173,52 @@ const OutsideAlertList = ({
         </div>
         <hr className="thin" />
       </div>
-      <div className="alert-list-container">
+      <div className="closure-list-container">
         {
           <div
-            className="alert-list"
+            className="closure-list"
             style={
               {
-                "--alert-list-offset": pageIndex,
+                "--closure-list-offset": pageIndex,
               } as React.CSSProperties
             }
+            ref={ref}
           >
             {stations.map((station) => (
-              <AlertRow station={station} key={station.id} />
+              <ClosureRow station={station} key={station.id} />
             ))}
           </div>
         }
       </div>
-      <div className="paging-info-container">
-        <div>+{numOffsetRows} more elevators</div>
-        <div className="paging-indicators">{getPagingIndicators(numPages)}</div>
-      </div>
+      {numPages > 1 && (
+        <div className="paging-info-container">
+          <div>+{numOffsetRows} more elevators</div>
+          <div className="paging-indicators">
+            {getPagingIndicators(numPages)}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
 interface Props extends WrappedComponentProps {
   id: string;
-  in_station_alerts: ElevatorClosure[];
-  other_stations_with_alerts: StationWithAlert[];
+  in_station_closures: ElevatorClosure[];
+  other_stations_with_closures: StationWithClosure[];
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({
-  other_stations_with_alerts: otherStationsWithAlerts,
-  in_station_alerts: inStationAlerts,
+  other_stations_with_closures: otherStationsWithClosures,
+  in_station_closures: inStationClosures,
   lastUpdate,
   onFinish,
 }: Props) => {
   return (
     <div className="elevator-closures">
-      <InStationSummary alerts={inStationAlerts} />
-      <OutsideAlertList
-        stations={otherStationsWithAlerts}
+      <InStationSummary closures={inStationClosures} />
+      <OutsideClosureList
+        stations={otherStationsWithClosures}
         lastUpdate={lastUpdate}
         onFinish={onFinish}
       />

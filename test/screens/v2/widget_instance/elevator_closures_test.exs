@@ -8,8 +8,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
     %{
       instance: %ElevatorClosures{
         id: "111",
-        in_station_alerts: [
-          %ElevatorClosures.Alert{
+        in_station_closures: [
+          %ElevatorClosures.Closure{
             description: "Test Alert Description",
             elevator_name: "Test Elevator",
             elevator_id: "111",
@@ -17,12 +17,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
             header_text: "Test Alert Header"
           }
         ],
-        other_stations_with_alerts: [
+        other_stations_with_closures: [
           %ElevatorClosures.Station{
             name: "Forest Hills",
-            routes: ["Orange"],
-            alerts: [
-              %ElevatorClosures.Alert{
+            route_icons: ["Orange"],
+            closures: [
+              %ElevatorClosures.Closure{
                 description: "FH Alert Description",
                 elevator_name: "FH Elevator",
                 elevator_id: "222",
@@ -43,7 +43,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   end
 
   describe "serialize/1" do
-    test "returns map with id and alerts", %{instance: instance} do
+    test "returns map with id and closures", %{instance: instance} do
       assert Map.from_struct(instance) == WidgetInstance.serialize(instance)
     end
   end

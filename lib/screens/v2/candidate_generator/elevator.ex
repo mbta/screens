@@ -27,10 +27,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        elevator_closure_instances_fn \\ &ElevatorClosures.elevator_status_instances/2
+        elevator_closure_instances_fn \\ &ElevatorClosures.elevator_status_instances/1
       ) do
     [header_instance(config, now), footer_instance(config)] ++
-      elevator_closure_instances_fn.(config, now)
+      elevator_closure_instances_fn.(config)
   end
 
   def audio_only_instances(_widgets, _config), do: []
