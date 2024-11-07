@@ -30,7 +30,10 @@ defmodule Screens.V2.ScreenData.ParametersTest do
             alerts: %V2.Alerts{stop_id: "1"},
             departures: %V2.Departures{sections: []},
             footer: %V2.Footer{},
-            header: %V2.Header.CurrentStopId{stop_id: "1"}
+            header: %V2.Header.CurrentStopId{stop_id: "1"},
+            audio: %ScreensConfig.V2.Audio{
+              interval_enabled: true
+            }
           },
           app_params
         ),
