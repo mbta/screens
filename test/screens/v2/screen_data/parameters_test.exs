@@ -71,6 +71,11 @@ defmodule Screens.V2.ScreenData.ParametersTest do
       screen = build_screen()
       assert Parameters.audio_interval_minutes(screen, static_params) == 7
     end
+
+    test "is 0 for a screen type with audio interval disabled" do
+      screen = build_screen(%{audio: %V2.Audio{interval_enabled: false}})
+      assert Parameters.audio_interval_minutes(screen) == 0
+    end
   end
 
   describe "audio_interval_offset_seconds/1" do
