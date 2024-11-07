@@ -7,7 +7,6 @@ defmodule Screens.V2.LocalizedAlertTest do
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.RouteType
-  alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert, as: LocalizedAlert
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
@@ -35,7 +34,7 @@ defmodule Screens.V2.LocalizedAlertTest do
       widget
       | location_context: %{
           widget.location_context
-          | alert_route_types: Stop.get_route_type_filter(app_config_module, stop_id),
+          | alert_route_types: LocationContext.route_type_filter(app_config_module, stop_id),
             home_stop: stop_id
         }
     }
@@ -54,9 +53,9 @@ defmodule Screens.V2.LocalizedAlertTest do
           widget.location_context
           | tagged_stop_sequences: tagged_sequences,
             upstream_stops:
-              Stop.upstream_stop_id_set(widget.location_context.home_stop, sequences),
+              LocationContext.upstream_stop_id_set(widget.location_context.home_stop, sequences),
             downstream_stops:
-              Stop.downstream_stop_id_set(widget.location_context.home_stop, sequences)
+              LocationContext.downstream_stop_id_set(widget.location_context.home_stop, sequences)
         }
     }
   end

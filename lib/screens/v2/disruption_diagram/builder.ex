@@ -7,7 +7,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
   alias Aja.Vector
   alias Screens.Routes.Route
-  alias Screens.Stops.Stop
+  alias Screens.Stops.{Stop, Subway}
   alias Screens.V2.DisruptionDiagram, as: DD
   alias Screens.V2.DisruptionDiagram.Label
   alias Screens.V2.LocalizedAlert
@@ -116,12 +116,12 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
            get_builder_data(localized_alert, informed_stop_ids) do
       line = Route.color(route_id)
 
-      stop_id_to_name = Stop.stop_id_to_name(route_id)
+      stop_names = Subway.route_stop_names(route_id)
 
       slot_sequence =
         stop_sequence
         |> Vector.new(fn stop_id ->
-          {full, abbrev} = Map.fetch!(stop_id_to_name, stop_id)
+          {full, abbrev} = Map.fetch!(stop_names, stop_id)
 
           %StopSlot{
             id: stop_id,
@@ -331,7 +331,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     diagram_contains_glx =
       Aja.Enum.any?(builder.sequence, fn
-        %StopSlot{} = stop_data -> Stop.on_glx?(stop_data.id)
+        %StopSlot{} = stop_data -> Subway.glx_stop?(stop_data.id)
         _ -> false
       end)
 
@@ -425,16 +425,16 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
       true ->
         # Orange Line, probably at North Station, Haymarket, State, or Downtown Crossing
         # or Blue Line, probably at Government Center or State
-        {:ok, informed_route_id, Stop.get_route_stop_sequence(informed_route_id), :trunk}
+        {:ok, informed_route_id, Subway.route_stop_sequence(informed_route_id), :trunk}
     end
   end
 
   defp gl_trunk_stop_sequence do
-    Enum.map(Stop.gl_trunk_stops(), fn {stop_id, _labels} -> stop_id end)
+    Enum.map(Subway.gl_trunk_stops(), fn {stop_id, _labels} -> stop_id end)
   end
 
   defp rl_trunk_stop_sequence do
-    Enum.map(Stop.rl_trunk_stops(), fn {stop_id, _labels} -> stop_id end)
+    Enum.map(Subway.rl_trunk_stops(), fn {stop_id, _labels} -> stop_id end)
   end
 
   # Adjusts the left and right ends of the sequence before we split them off into `left_end` and `right_end`.

@@ -9,7 +9,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.Stops.Stop
+  alias Screens.Stops.Subway
 
   @doc """
   Creates a localized alert with the given effect, located at the given home station.
@@ -104,7 +104,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
   defp stop_range_to_list({first_station_id, last_station_id}) do
     endpoints_set = MapSet.new([first_station_id, last_station_id])
 
-    Stop.get_all_routes_stop_sequence()
+    Subway.all_stop_sequences()
     |> Enum.find_value(fn
       {_route_id, labeled_sequences} ->
         Enum.find_value(labeled_sequences, fn labeled_sequence ->
@@ -127,7 +127,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
   # Returns IDs of the subway/light rail route(s) that serve the given station,
   # using our hardcoded stop sequences rather than API calls.
   defp subway_routes_at_station(parent_station_id) do
-    Stop.get_all_routes_stop_sequence()
+    Subway.all_stop_sequences()
     |> Enum.filter(fn
       # Green isn't a real route ID, ignore it.
       {"Green", _} ->
@@ -146,7 +146,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
 
   # Returns a %{route => stop_sequences} map for all sequences that that contain the given subway/light rail station.
   defp tagged_stop_sequences_through_station(parent_station_id) do
-    Stop.get_all_routes_stop_sequence()
+    Subway.all_stop_sequences()
     |> Enum.flat_map(fn
       # Green isn't a real route ID, ignore it.
       {"Green", _} ->
@@ -166,7 +166,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
 
   # Returns IDs of the route(s) whose stop sequence(s) contain all of the given stops.
   defp routes_containing_all(parent_station_ids) do
-    Stop.get_all_routes_stop_sequence()
+    Subway.all_stop_sequences()
     |> Enum.filter(fn
       # Green isn't a real route ID, ignore it.
       {"Green", _} ->

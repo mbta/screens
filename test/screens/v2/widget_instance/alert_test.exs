@@ -6,7 +6,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   alias ScreensConfig.V2.{BusEink, BusShelter, GlEink}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
-  alias Screens.Stops.Stop
   alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
 
@@ -44,7 +43,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget
       | location_context: %{
           widget.location_context
-          | alert_route_types: Stop.get_route_type_filter(app_config_module, stop_id),
+          | alert_route_types: LocationContext.route_type_filter(app_config_module, stop_id),
             home_stop: stop_id
         }
     }
@@ -63,9 +62,9 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
           widget.location_context
           | tagged_stop_sequences: tagged_sequences,
             upstream_stops:
-              Stop.upstream_stop_id_set(widget.location_context.home_stop, sequences),
+              LocationContext.upstream_stop_id_set(widget.location_context.home_stop, sequences),
             downstream_stops:
-              Stop.downstream_stop_id_set(widget.location_context.home_stop, sequences)
+              LocationContext.downstream_stop_id_set(widget.location_context.home_stop, sequences)
         }
     }
   end

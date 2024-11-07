@@ -1,4 +1,4 @@
-defmodule Screens.Headways do
+defmodule Screens.V2.CandidateGenerator.GlEink.Headways do
   @moduledoc false
 
   alias Screens.Schedules.Schedule
