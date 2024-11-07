@@ -6,4 +6,3 @@ Mox.defmock(Screens.V2.ScreenData.MockParameters, for: Screens.V2.ScreenData.Par
 Mox.defmock(Screens.Facilities.MockFacility, for: Screens.Facilities.Facility)
 Mox.defmock(Screens.Alerts.MockAlert, for: Screens.Alerts.Alert)
 Mox.defmock(Screens.Routes.MockRoute, for: Screens.Routes.Route)
-Mox.defmock(Screens.MockLocationContext, for: Screens.LocationContext)

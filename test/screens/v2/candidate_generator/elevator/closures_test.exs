@@ -6,23 +6,16 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
   alias Screens.Alerts.{Alert, MockAlert}
   alias Screens.Facilities.MockFacility
-  alias Screens.LocationContext
   alias Screens.Routes.{MockRoute, Route}
   alias Screens.Stops.{MockStop, Stop}
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 
-  describe "elevator_status_instances/5" do
-    test "Only returns alerts with effect of :elevator_closure" do
-      now = ~U[2024-10-01T05:00:00Z]
-
+  describe "elevator_status_instances/1" do
+    test "Only returns closures with effect of :elevator_closure" do
       expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
         {:ok, %Stop{id: "place-test"}}
-      end)
-
-      expect(MockStop, :fetch_location_context, fn Elevator, "place-test", ^now ->
-        {:ok, %LocationContext{home_stop: "place-test"}}
       end)
 
       expect(MockStop, :fetch_parent_station_name_map, fn ->
@@ -56,7 +49,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
           id: "111",
-          in_station_alerts: [
+          in_station_closures: [
             %{
               id: "1",
               description: nil,
@@ -65,24 +58,17 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               header_text: nil
             }
           ],
-          other_stations_with_alerts: []
+          other_stations_with_closures: []
         }
       ] =
         ElevatorClosures.elevator_status_instances(
-          struct(Screen, app_id: :elevator_v2, app_params: %Elevator{elevator_id: "111"}),
-          now
+          struct(Screen, app_id: :elevator_v2, app_params: %Elevator{elevator_id: "111"})
         )
     end
 
-    test "Groups outside alerts by station" do
-      now = ~U[2024-10-01T05:00:00Z]
-
+    test "Groups outside closures by station" do
       expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
         {:ok, %Stop{id: "place-test"}}
-      end)
-
-      expect(MockStop, :fetch_location_context, fn Elevator, "place-test", ^now ->
-        {:ok, %LocationContext{home_stop: "place-test"}}
       end)
 
       expect(MockStop, :fetch_parent_station_name_map, fn ->
@@ -121,13 +107,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
           id: "111",
-          in_station_alerts: [],
-          other_stations_with_alerts: [
+          in_station_closures: [],
+          other_stations_with_closures: [
             %{
               id: "place-haecl",
               name: "Haymarket",
-              routes: [%{type: :text, text: "OL", color: :orange}],
-              alerts: [
+              route_icons: [%{type: :text, text: "OL", color: :orange}],
+              closures: [
                 %{
                   id: "1",
                   description: nil,
@@ -148,20 +134,58 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         }
       ] =
         ElevatorClosures.elevator_status_instances(
-          struct(Screen, app_id: :elevator_v2, app_params: %Elevator{elevator_id: "111"}),
-          now
+          struct(Screen, app_id: :elevator_v2, app_params: %Elevator{elevator_id: "111"})
         )
     end
 
-    test "Return empty routes on API error" do
-      now = ~U[2024-10-01T05:00:00Z]
-
+    test "Filters closures with no facilities or more than one facility" do
       expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
         {:ok, %Stop{id: "place-test"}}
       end)
 
-      expect(MockStop, :fetch_location_context, fn Elevator, "place-test", ^now ->
-        {:ok, %LocationContext{home_stop: "place-test"}}
+      expect(MockStop, :fetch_parent_station_name_map, fn ->
+        {:ok, %{"place-haecl" => "Haymarket"}}
+      end)
+
+      expect(MockRoute, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
+
+      expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          struct(Alert,
+            id: "1",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-haecl"}
+            ]
+          ),
+          struct(Alert,
+            id: "2",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-2"}},
+              %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-3"}}
+            ]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      [
+        %Screens.V2.WidgetInstance.ElevatorClosures{
+          id: "111",
+          in_station_closures: [],
+          other_stations_with_closures: []
+        }
+      ] =
+        ElevatorClosures.elevator_status_instances(
+          struct(Screen, app_id: :elevator_v2, app_params: %Elevator{elevator_id: "111"})
+        )
+    end
+
+    test "Return empty routes on API error" do
+      expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
+        {:ok, %Stop{id: "place-test"}}
       end)
 
       expect(MockStop, :fetch_parent_station_name_map, fn ->
@@ -189,7 +213,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
           id: "111",
-          in_station_alerts: [
+          in_station_closures: [
             %{
               id: "1",
               description: nil,
@@ -198,12 +222,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               header_text: nil
             }
           ],
-          other_stations_with_alerts: []
+          other_stations_with_closures: []
         }
       ] =
         ElevatorClosures.elevator_status_instances(
-          struct(Screen, app_id: :elevator_v2, app_params: %Elevator{elevator_id: "111"}),
-          now
+          struct(Screen, app_id: :elevator_v2, app_params: %Elevator{elevator_id: "111"})
         )
     end
   end

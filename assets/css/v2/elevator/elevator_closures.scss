@@ -3,7 +3,6 @@
   display: flex;
   flex-direction: column;
   height: 100%;
-  font-family: Inter, sans-serif;
   background-color: $warm-neutral-90;
 
   .in-station-summary {
@@ -32,10 +31,9 @@
     opacity: 0.5;
   }
 
-  .outside-alert-list {
+  .outside-closure-list {
     position: relative;
     height: 100%;
-    font-family: Inter;
     background-color: $warm-neutral-90;
 
     .header-container {
@@ -55,16 +53,16 @@
       }
     }
 
-    .alert-list-container {
+    .closure-list-container {
       overflow: hidden;
 
-      .alert-list {
+      .closure-list {
         display: flex;
         flex-flow: column wrap;
         height: 904px;
-        transform: translateX(calc(-100% * var(--alert-list-offset)));
+        transform: translateX(calc(-100% * var(--closure-list-offset)));
 
-        .alert-row {
+        .closure-row {
           margin: 24px 48px 0;
 
           &__station-name {
@@ -124,7 +122,7 @@
     }
 
     .paging-info-container,
-    .alert-row__elevator-name {
+    .closure-row__elevator-name {
       font-size: 48px;
       font-weight: 400;
       color: $cool-black-30;

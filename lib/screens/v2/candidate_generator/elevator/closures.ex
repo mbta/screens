@@ -7,48 +7,33 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Facilities.Facility
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.LocationContext
   alias Screens.V2.WidgetInstance.ElevatorClosures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 
   @stop Application.compile_env(:screens, [__MODULE__, :stop_module], Stop)
-  @location_context Application.compile_env(
-                      :screens,
-                      [__MODULE__, :location_context_module],
-                      LocationContext
-                    )
   @facility Application.compile_env(:screens, [__MODULE__, :facility_module], Facility)
   @alert Application.compile_env(:screens, [__MODULE__, :alert_module], Alert)
   @route Application.compile_env(:screens, [__MODULE__, :route_module], Route)
 
   @spec elevator_status_instances(Screen.t()) :: list(ElevatorClosures.t())
-  @spec elevator_status_instances(Screen.t(), DateTime.t()) :: list(ElevatorClosures.t())
-  def elevator_status_instances(
-        %Screen{
-          app_params: %Elevator{
-            elevator_id: elevator_id
-          }
-        },
-        now \\ DateTime.utc_now()
-      ) do
+  def elevator_status_instances(%Screen{app_params: %Elevator{elevator_id: elevator_id}}) do
     with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
-         {:ok, location_context} <- @location_context.fetch(Elevator, stop_id, now),
          {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
-         {:ok, alerts} <- @alert.fetch_elevator_alerts_with_facilities() do
-      elevator_closures = relevant_alerts(alerts)
+         {:ok, closures} <- @alert.fetch_elevator_alerts_with_facilities() do
+      elevator_closures = Enum.filter(closures, &relevant_closure?/1)
       routes_map = get_routes_map(elevator_closures, stop_id)
 
-      {in_station_alerts, outside_alerts} =
-        split_alerts_by_location(elevator_closures, location_context)
+      {in_station_closures, outside_closures} =
+        split_closures_by_location(elevator_closures, stop_id)
 
       [
         %ElevatorClosures{
           id: elevator_id,
-          in_station_alerts: Enum.map(in_station_alerts, &alert_to_elevator_closure/1),
-          other_stations_with_alerts:
-            format_outside_alerts(outside_alerts, parent_station_map, routes_map)
+          in_station_closures: Enum.map(in_station_closures, &alert_to_elevator_closure/1),
+          other_stations_with_closures:
+            format_outside_closures(outside_closures, parent_station_map, routes_map)
         }
       ]
     else
@@ -61,8 +46,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     end
   end
 
-  defp relevant_alerts(alerts) do
-    Enum.filter(alerts, &(&1.effect == :elevator_closure))
+  defp relevant_closure?(closure) do
+    relevant_effect?(closure) and informs_one_facility?(closure)
+  end
+
+  defp relevant_effect?(closure), do: closure.effect == :elevator_closure
+
+  defp informs_one_facility?(%Alert{informed_entities: informed_entities}) do
+    Enum.all?(informed_entities, &match?(%{facility: _}, &1)) and
+      informed_entities |> Enum.map(& &1.facility) |> Enum.uniq() |> Enum.count() == 1
   end
 
   defp get_routes_map(elevator_closures, home_parent_station_id) do
@@ -76,12 +68,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     |> Enum.into(%{})
   end
 
-  defp get_parent_station_ids_from_entities(alerts) do
-    alerts
+  defp get_parent_station_ids_from_entities(closures) do
+    closures
     |> Enum.flat_map(fn %Alert{informed_entities: informed_entities} ->
       informed_entities
+      |> Enum.filter(&InformedEntity.parent_station?/1)
       |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-      |> Enum.filter(&String.starts_with?(&1, "place-"))
     end)
   end
 
@@ -95,28 +87,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   defp routes_to_labels(routes) do
     routes
-    |> Enum.map(fn
-      %Route{type: :subway, id: id} -> id |> String.downcase() |> String.to_atom()
-      %Route{type: :light_rail, id: "Green-" <> _} -> :green
-      %Route{type: :light_rail, id: "Mattapan" <> _} -> :mattapan
-      %Route{type: :bus, short_name: "SL" <> _} -> :silver
-      %Route{type: :rail} -> :cr
-      %Route{type: type} -> type
-    end)
+    |> Enum.map(&Route.icon/1)
     |> Enum.uniq()
   end
 
-  defp split_alerts_by_location(alerts, location_context) do
-    Enum.split_with(alerts, fn %Alert{informed_entities: informed_entities} ->
-      location_context.home_stop in Enum.map(informed_entities, & &1.stop)
-    end)
-  end
-
-  defp get_informed_facility(entities) do
-    entities
-    |> Enum.find_value(fn
-      %{facility: facility} -> facility
-      _ -> false
+  defp split_closures_by_location(closures, home_stop_id) do
+    Enum.split_with(closures, fn %Alert{informed_entities: informed_entities} ->
+      home_stop_id in Enum.map(informed_entities, & &1.stop)
     end)
   end
 
@@ -126,7 +103,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
          description: description,
          header: header
        }) do
-    facility = get_informed_facility(entities)
+    facility = Enum.find_value(entities, fn %{facility: facility} -> facility end)
 
     %{
       id: id,
@@ -137,11 +114,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     }
   end
 
-  defp format_outside_alerts(alerts, station_id_to_name, station_id_to_routes) do
-    alerts
+  defp format_outside_closures(closures, station_id_to_name, station_id_to_routes) do
+    closures
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
-    |> Enum.map(fn {parent_station_id, alerts} ->
-      alerts_at_station = Enum.map(alerts, &alert_to_elevator_closure/1)
+    |> Enum.map(fn {parent_station_id, closures} ->
+      closures_at_station = Enum.map(closures, &alert_to_elevator_closure/1)
 
       route_pills =
         station_id_to_routes
@@ -151,8 +128,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       %{
         id: parent_station_id,
         name: Map.fetch!(station_id_to_name, parent_station_id),
-        routes: route_pills,
-        alerts: alerts_at_station
+        route_icons: route_pills,
+        closures: closures_at_station
       }
     end)
   end
