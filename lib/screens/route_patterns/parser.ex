@@ -35,7 +35,7 @@ defmodule Screens.RoutePatterns.Parser do
 
     stops =
       Enum.map(stop_references, fn %{"id" => stop_id} ->
-        included |> Map.fetch!({stop_id, "stop"}) |> Stops.Parser.parse_stop()
+        included |> Map.fetch!({stop_id, "stop"}) |> Stops.Parser.parse_stop(included)
       end)
 
     %RoutePattern{
