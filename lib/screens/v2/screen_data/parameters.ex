@@ -66,9 +66,24 @@ defmodule Screens.V2.ScreenData.Parameters do
     end
   end
 
-  @spec audio_interval_minutes(Screen.app_id()) :: pos_integer() | nil
-  @spec audio_interval_minutes(Screen.app_id(), static_params()) :: pos_integer() | nil
-  def audio_interval_minutes(app_id, static_params \\ @static_params) do
+  @spec audio_interval_minutes(Screen.t(), static_params()) :: pos_integer() | nil
+  def audio_interval_minutes(screen, static_params \\ @static_params)
+
+  def audio_interval_minutes(
+        %Screen{
+          app_id: app_id,
+          app_params: %{audio: %ScreensConfig.V2.Audio{interval_enabled: interval_enabled}}
+        },
+        static_params
+      ) do
+    if interval_enabled, do: fetch_interval_minutes(app_id, static_params), else: nil
+  end
+
+  def audio_interval_minutes(%Screen{app_id: app_id}, static_params) do
+    fetch_interval_minutes(app_id, static_params)
+  end
+
+  defp fetch_interval_minutes(app_id, static_params) do
     case Map.fetch!(static_params, app_id) do
       %Static{periodic_audio: nil} -> nil
       %Static{periodic_audio: %PeriodicAudio{interval_minutes: interval}} -> interval

@@ -128,7 +128,7 @@ defmodule ScreensWeb.V2.ScreenController do
     [
       app_id: app_id,
       refresh_rate: refresh_rate,
-      audio_readout_interval: Parameters.audio_interval_minutes(app_id),
+      audio_readout_interval: Parameters.audio_interval_minutes(config),
       audio_interval_offset_seconds: Parameters.audio_interval_offset_seconds(config),
       sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
       refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate),
