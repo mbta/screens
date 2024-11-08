@@ -59,11 +59,13 @@
       .closure-list {
         display: flex;
         flex-flow: column wrap;
+        column-gap: 96px;
         height: 904px;
+        padding: 0 48px;
         transform: translateX(calc(-100% * var(--closure-list-offset)));
 
         .closure-row {
-          margin: 24px 48px 0;
+          margin-top: 24px;
 
           &__station-name {
             font-size: 62px;
