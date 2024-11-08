@@ -76,7 +76,7 @@ defmodule Screens.V2.ScreenData.Parameters do
         },
         static_params
       ) do
-    if interval_enabled, do: fetch_interval_minutes(app_id, static_params), else: 0
+    if interval_enabled, do: fetch_interval_minutes(app_id, static_params), else: nil
   end
 
   def audio_interval_minutes(%Screen{app_id: app_id}, static_params) do

@@ -31,7 +31,7 @@ defmodule Screens.V2.ScreenData.ParametersTest do
             departures: %V2.Departures{sections: []},
             footer: %V2.Footer{},
             header: %V2.Header.CurrentStopId{stop_id: "1"},
-            audio: %ScreensConfig.V2.Audio{
+            audio: %V2.Audio{
               interval_enabled: true
             }
           },
@@ -75,9 +75,9 @@ defmodule Screens.V2.ScreenData.ParametersTest do
       assert Parameters.audio_interval_minutes(screen, static_params) == 7
     end
 
-    test "is 0 for a screen type with audio interval disabled" do
+    test "is nil for a screen with audio interval disabled" do
       screen = build_screen(%{audio: %V2.Audio{interval_enabled: false}})
-      assert Parameters.audio_interval_minutes(screen) == 0
+      assert Parameters.audio_interval_minutes(screen) == nil
     end
   end
 
