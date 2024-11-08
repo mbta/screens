@@ -1,5 +1,6 @@
-import React, { ComponentType, ReactNode, useEffect, useState } from "react";
+import React, { ComponentType, ReactNode } from "react";
 import makePersistent, { WrappedComponentProps } from "./persistent_wrapper";
+import useClientPaging from "Hooks/v2/use_client_paging";
 
 interface PageRendererProps<T> {
   page: T;
@@ -18,24 +19,11 @@ const Carousel = <T,>({
   onFinish,
   lastUpdate,
 }: Props<T>): ReactNode => {
-  const [isFirstRender, setIsFirstRender] = useState(true);
-  const [pageIndex, setPageIndex] = useState(0);
-
-  useEffect(() => {
-    if (lastUpdate != null) {
-      if (isFirstRender) {
-        setIsFirstRender(false);
-      } else {
-        setPageIndex((i) => i + 1);
-      }
-    }
-  }, [lastUpdate]);
-
-  useEffect(() => {
-    if (pageIndex === pages.length - 1) {
-      onFinish();
-    }
-  }, [pageIndex]);
+  const pageIndex = useClientPaging({
+    numPages: pages.length,
+    onFinish,
+    lastUpdate,
+  });
 
   return (
     <PageRenderer

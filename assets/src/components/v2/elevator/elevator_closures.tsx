@@ -1,10 +1,4 @@
-import React, {
-  ComponentType,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
 import cx from "classnames";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
@@ -13,6 +7,7 @@ import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
 import _ from "lodash";
+import useClientPaging from "Hooks/v2/use_client_paging";
 
 type StationWithClosure = {
   id: string;
@@ -91,14 +86,14 @@ const OutsideClosureList = ({
   lastUpdate,
   onFinish,
 }: OutsideClosureListProps) => {
-  const [isFirstRender, setIsFirstRender] = useState(true);
-  const [pageIndex, setPageIndex] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
   // Each value represents the pageIndex the row is visible on
   const [rowPageIndexes, setRowPageIndexes] = useState<{
     [key: number]: number;
   }>({});
+  const numPages = Object.keys(rowPageIndexes).length;
+  const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
 
   const numOffsetRows = Object.keys(rowPageIndexes).reduce((acc, key) => {
     if (parseInt(key) === pageIndex) {
@@ -107,27 +102,6 @@ const OutsideClosureList = ({
       return acc + rowPageIndexes[key];
     }
   }, 0);
-
-  const numPages = Object.keys(rowPageIndexes).length;
-
-  useEffect(() => {
-    if (lastUpdate != null) {
-      if (isFirstRender) {
-        setIsFirstRender(false);
-      } else if (pageIndex < numPages - 1) {
-        setPageIndex((i) => i + 1);
-      } else {
-        setPageIndex(0);
-      }
-    }
-  }, [lastUpdate]);
-
-  useEffect(() => {
-    // numPages can be 0 before useLayoutEffect runs
-    if (numPages > 0 && pageIndex === numPages) {
-      onFinish();
-    }
-  }, [pageIndex]);
 
   useLayoutEffect(() => {
     if (!ref.current) return;
