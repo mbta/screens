@@ -13,8 +13,10 @@ const useClientPaging = ({ numPages, onFinish, lastUpdate }: Args) => {
     if (lastUpdate != null) {
       if (isFirstRender) {
         setIsFirstRender(false);
-      } else {
+      } else if (numPages > 1) {
         setPageIndex((i) => i + 1);
+      } else {
+        onFinish();
       }
     }
   }, [lastUpdate]);

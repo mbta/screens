@@ -92,6 +92,7 @@ const OutsideClosureList = ({
   const [rowPageIndexes, setRowPageIndexes] = useState<{
     [key: number]: number;
   }>({});
+
   const numPages = Object.keys(rowPageIndexes).length;
   const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
 
