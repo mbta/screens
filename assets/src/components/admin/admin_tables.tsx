@@ -258,6 +258,18 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
       disableFilters: true,
       FormCell: FormTextCell,
     },
+    {
+      Header: "Audio Interval?",
+      accessor: (row) => row.app_params.audio.interval_enabled,
+      mutator: (row, value) => {
+        const newRow = structuredClone(row);
+        newRow.app_params.audio.interval_enabled = value;
+        return newRow;
+      },
+      Cell: EditableCheckbox,
+      disableFilters: true,
+      FormCell: FormBoolean,
+    },
     departuresColumn,
     footerColumn,
     alertsColumn,
