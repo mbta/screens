@@ -259,10 +259,9 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
       FormCell: FormTextCell,
     },
     {
-      Header: "Audio Interval Enabled",
+      Header: "Audio Interval?",
       accessor: (row) => row.app_params.audio.interval_enabled,
       mutator: (row, value) => {
-        console.log(value);
         const newRow = structuredClone(row);
         newRow.app_params.audio.interval_enabled = value;
         return newRow;
