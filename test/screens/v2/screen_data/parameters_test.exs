@@ -5,8 +5,6 @@ defmodule Screens.V2.ScreenData.ParametersTest do
   alias Screens.V2.ScreenData.{Parameters, Static}
   alias Screens.V2.ScreenData.Static.PeriodicAudio
 
-  @app_id :bus_shelter_v2
-
   defp build_params(static_fields) do
     %{bus_shelter_v2: struct!(%Static{candidate_generator: nil, refresh_rate: 0}, static_fields)}
   end
@@ -32,7 +30,10 @@ defmodule Screens.V2.ScreenData.ParametersTest do
             alerts: %V2.Alerts{stop_id: "1"},
             departures: %V2.Departures{sections: []},
             footer: %V2.Footer{},
-            header: %V2.Header.CurrentStopId{stop_id: "1"}
+            header: %V2.Header.CurrentStopId{stop_id: "1"},
+            audio: %V2.Audio{
+              interval_enabled: true
+            }
           },
           app_params
         ),
@@ -64,12 +65,19 @@ defmodule Screens.V2.ScreenData.ParametersTest do
   describe "audio_interval_minutes/1" do
     test "is nil for a screen type without periodic audio" do
       static_params = build_params(periodic_audio: nil)
-      assert Parameters.audio_interval_minutes(@app_id, static_params) == nil
+      screen = build_screen()
+      assert Parameters.audio_interval_minutes(screen, static_params) == nil
     end
 
     test "is the configured interval for a screen type with periodic audio" do
       static_params = build_params(periodic_audio: build_periodic_audio(interval_minutes: 7))
-      assert Parameters.audio_interval_minutes(@app_id, static_params) == 7
+      screen = build_screen()
+      assert Parameters.audio_interval_minutes(screen, static_params) == 7
+    end
+
+    test "is nil for a screen with audio interval disabled" do
+      screen = build_screen(%{audio: %V2.Audio{interval_enabled: false}})
+      assert Parameters.audio_interval_minutes(screen) == nil
     end
   end
 

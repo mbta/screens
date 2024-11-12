@@ -99,8 +99,10 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                     "name" => "Wonderland",
                     "location_type" => 0,
                     "platform_code" => "1",
-                    "platform_name" => "Bowdoin"
-                  }
+                    "platform_name" => "Bowdoin",
+                    "vehicle_type" => 1
+                  },
+                  "relationships" => %{}
                 },
                 %{
                   "id" => "70051",
@@ -109,8 +111,10 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                     "name" => "Orient Heights",
                     "location_type" => 0,
                     "platform_code" => nil,
-                    "platform_name" => "Bowdoin"
-                  }
+                    "platform_name" => "Bowdoin",
+                    "vehicle_type" => 1
+                  },
+                  "relationships" => %{}
                 },
                 %{
                   "id" => "70838",
@@ -119,8 +123,10 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                     "name" => "Bowdoin",
                     "location_type" => 0,
                     "platform_code" => nil,
-                    "platform_name" => "Exit Only"
-                  }
+                    "platform_name" => "Exit Only",
+                    "vehicle_type" => 1
+                  },
+                  "relationships" => %{}
                 }
               ]
             }
@@ -148,7 +154,9 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
         name: "Bowdoin",
         location_type: 0,
         platform_code: nil,
-        platform_name: "Exit Only"
+        platform_name: "Exit Only",
+        vehicle_type: :subway,
+        child_stops: []
       }
 
       orient_heights = %Stop{
@@ -156,7 +164,9 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
         name: "Orient Heights",
         location_type: 0,
         platform_code: nil,
-        platform_name: "Bowdoin"
+        platform_name: "Bowdoin",
+        vehicle_type: :subway,
+        child_stops: []
       }
 
       wonderland = %Stop{
@@ -164,7 +174,9 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
         name: "Wonderland",
         location_type: 0,
         platform_code: "1",
-        platform_name: "Bowdoin"
+        platform_name: "Bowdoin",
+        vehicle_type: :subway,
+        child_stops: []
       }
 
       expected = [
