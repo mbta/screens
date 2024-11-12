@@ -83,15 +83,6 @@ function getCommonRules(isOfmPackage) {
   ];
 }
 
-const common_babel_loader_plugins = [
-  "@babel/plugin-proposal-export-default-from",
-  "@babel/plugin-proposal-logical-assignment-operators",
-  ["@babel/plugin-proposal-optional-chaining", { loose: false }],
-  ["@babel/plugin-proposal-pipeline-operator", { proposal: "minimal" }],
-  ["@babel/plugin-proposal-nullish-coalescing-operator", { loose: false }],
-  "@babel/plugin-proposal-do-expressions",
-];
-
 const common_plugins = [
   new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
   new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "../" }] }),
@@ -130,17 +121,7 @@ module.exports = (env, argv) => {
           {
             test: /\.ts(x?)$/,
             exclude: /node_modules/,
-            use: {
-              loader: "babel-loader",
-              options: {
-                presets: [
-                  "@babel/preset-env",
-                  "@babel/preset-react",
-                  "@babel/preset-typescript",
-                ],
-                plugins: common_babel_loader_plugins,
-              },
-            },
+            use: { loader: "babel-loader" },
           },
           ...getCommonRules(false),
         ],
@@ -173,7 +154,6 @@ module.exports = (env, argv) => {
                   "@babel/preset-react",
                   "@babel/preset-typescript",
                 ],
-                plugins: common_babel_loader_plugins,
               },
             },
           },

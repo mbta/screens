@@ -49,5 +49,8 @@ export default [
       ],
     },
   },
-  compat.configs["flat/recommended"],
+  {
+    ...compat.configs["flat/recommended"],
+    files: ["**/*.{ts, tsx}"],
+  },
 ];
