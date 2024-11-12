@@ -9,7 +9,7 @@ defmodule Screens.LocationContext do
   alias Screens.Stops.Stop
   alias Screens.Util
 
-  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, Elevator, GlEink, PreFare}
+  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
 
   @enforce_keys [:home_stop]
   defstruct home_stop: "",
@@ -38,7 +38,7 @@ defmodule Screens.LocationContext do
   @doc """
   Fetches all the location context for a screen given its app type, stop id, and time
   """
-  @callback fetch(screen_type(), Stop.id(), DateTime.t()) :: {:ok, t()} | :error
+  @spec fetch(screen_type(), Stop.id(), DateTime.t()) :: {:ok, t()} | :error
   def fetch(app, stop_id, now) do
     Screens.Telemetry.span(
       ~w[screens location_context fetch]a,
@@ -86,7 +86,6 @@ defmodule Screens.LocationContext do
   # WTC is a special bus-only case
   def route_type_filter(Dup, "place-wtcst"), do: [:bus]
   def route_type_filter(Dup, _), do: [:light_rail, :subway]
-  def get_route_type_filter(Elevator, _), do: [:subway]
 
   @spec upstream_stop_id_set(String.t(), list(list(Stop.id()))) :: MapSet.t(Stop.id())
   def upstream_stop_id_set(stop_id, stop_sequences) do
@@ -130,8 +129,7 @@ defmodule Screens.LocationContext do
     RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids)
   end
 
-  defp fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop)
-       when app in [Elevator, PreFare] do
+  defp fetch_tagged_stop_sequences_by_app(PreFare, stop_id, routes_at_stop) do
     route_ids = Route.route_ids(routes_at_stop)
 
     # We limit results to canonical route patterns only--no stop sequences for nonstandard patterns.
