@@ -2,7 +2,6 @@
 
 export default {
   extends: ["stylelint-config-standard-scss", "stylelint-config-recess-order"],
-  plugins: ["stylelint-no-unsupported-browser-features"],
   reportDescriptionlessDisables: true,
   reportInvalidScopeDisables: true,
   reportNeedlessDisables: true,
@@ -39,9 +38,5 @@ export default {
     // Conflicts with Prettier, which breaks long lines involving operators by
     // putting operators at the ends of lines.
     "scss/operator-no-newline-after": null,
-    "plugin/no-unsupported-browser-features": [
-      true,
-      { ignore: ["intrinsic-width"] },
-    ],
   },
 };
