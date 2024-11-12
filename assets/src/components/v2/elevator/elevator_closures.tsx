@@ -111,13 +111,11 @@ const OutsideClosureList = ({
       return (closure as HTMLDivElement).offsetLeft;
     });
 
-    const uniqOffsets = _.uniq(offsets);
+    const rowPageIndexes: number[] = [];
 
-    const rowPageIndexes = _.chain(offsets)
-      .groupBy()
-      .mapKeys((value) => uniqOffsets.indexOf(value[0]))
-      .mapValues((value) => value.length)
-      .value();
+    _.uniq(offsets).forEach((uo) => {
+      rowPageIndexes.push(offsets.filter((o) => o === uo).length);
+    });
 
     setRowPageIndexes(rowPageIndexes);
   }, [stations]);
