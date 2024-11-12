@@ -9,7 +9,7 @@ import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
 import _ from "lodash";
 import useClientPaging from "Hooks/v2/use_client_paging";
 
-type StationWithClosure = {
+type StationWithClosures = {
   id: string;
   name: string;
   route_icons: Pill[];
@@ -25,7 +25,7 @@ type ElevatorClosure = {
 };
 
 interface ClosureRowProps {
-  station: StationWithClosure;
+  station: StationWithClosures;
 }
 
 const ClosureRow = ({ station }: ClosureRowProps) => {
@@ -77,7 +77,7 @@ const InStationSummary = ({ closures }: InStationSummaryProps) => {
 };
 
 interface OutsideClosureListProps extends WrappedComponentProps {
-  stations: StationWithClosure[];
+  stations: StationWithClosures[];
   lastUpdate: number | null;
 }
 
@@ -88,19 +88,18 @@ const OutsideClosureList = ({
 }: OutsideClosureListProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Each value represents the pageIndex the row is visible on
-  const [rowPageIndexes, setRowPageIndexes] = useState<{
-    [key: number]: number;
-  }>({});
+  // Each index represents a page number and each value represents the number of rows
+  // on the corresponding page index.
+  const [rowCounts, setRowCounts] = useState<number[]>([]);
 
-  const numPages = Object.keys(rowPageIndexes).length;
+  const numPages = Object.keys(rowCounts).length;
   const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
 
-  const numOffsetRows = Object.keys(rowPageIndexes).reduce((acc, key) => {
+  const numOffsetRows = Object.keys(rowCounts).reduce((acc, key) => {
     if (parseInt(key) === pageIndex) {
       return acc;
     } else {
-      return acc + rowPageIndexes[key];
+      return acc + rowCounts[key];
     }
   }, 0);
 
@@ -111,13 +110,13 @@ const OutsideClosureList = ({
       return (closure as HTMLDivElement).offsetLeft;
     });
 
-    const rowPageIndexes: number[] = [];
+    const rowCounts: number[] = [];
 
     _.uniq(offsets).forEach((uo) => {
-      rowPageIndexes.push(offsets.filter((o) => o === uo).length);
+      rowCounts.push(offsets.filter((o) => o === uo).length);
     });
 
-    setRowPageIndexes(rowPageIndexes);
+    setRowCounts(rowCounts);
   }, [stations]);
 
   const getPagingIndicators = (num: number) => {
@@ -178,7 +177,7 @@ const OutsideClosureList = ({
 interface Props extends WrappedComponentProps {
   id: string;
   in_station_closures: ElevatorClosure[];
-  other_stations_with_closures: StationWithClosure[];
+  other_stations_with_closures: StationWithClosures[];
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({

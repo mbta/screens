@@ -21,19 +21,19 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   def elevator_status_instances(%Screen{app_params: %Elevator{elevator_id: elevator_id}}) do
     with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
          {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
-         {:ok, closures} <- @alert.fetch_elevator_alerts_with_facilities() do
-      elevator_closures = Enum.filter(closures, &relevant_closure?/1)
-      routes_map = get_routes_map(elevator_closures, stop_id)
+         {:ok, alerts} <- @alert.fetch_elevator_alerts_with_facilities() do
+      elevator_alerts = Enum.filter(alerts, &relevant_alert?/1)
+      routes_map = get_routes_map(elevator_alerts, stop_id)
 
-      {in_station_closures, outside_closures} =
-        split_closures_by_location(elevator_closures, stop_id)
+      {in_station_alerts, outside_alerts} =
+        split_closures_by_location(elevator_alerts, stop_id)
 
       [
         %ElevatorClosures{
           id: elevator_id,
-          in_station_closures: Enum.map(in_station_closures, &alert_to_elevator_closure/1),
+          in_station_closures: Enum.map(in_station_alerts, &alert_to_elevator_closure/1),
           other_stations_with_closures:
-            format_outside_closures(outside_closures, parent_station_map, routes_map)
+            format_outside_closures(outside_alerts, parent_station_map, routes_map)
         }
       ]
     else
@@ -46,11 +46,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     end
   end
 
-  defp relevant_closure?(closure) do
-    relevant_effect?(closure) and informs_one_facility?(closure)
+  defp relevant_alert?(alert) do
+    relevant_effect?(alert) and informs_one_facility?(alert)
   end
 
-  defp relevant_effect?(closure), do: closure.effect == :elevator_closure
+  defp relevant_effect?(alert), do: alert.effect == :elevator_closure
 
   defp informs_one_facility?(%Alert{informed_entities: informed_entities}) do
     Enum.all?(informed_entities, &match?(%{facility: _}, &1)) and

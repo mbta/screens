@@ -13,7 +13,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   alias ScreensConfig.V2.Elevator
 
   describe "elevator_status_instances/1" do
-    test "Only returns closures with effect of :elevator_closure" do
+    test "Only returns alerts with effect of :elevator_closure" do
       expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
         {:ok, %Stop{id: "place-test"}}
       end)
@@ -138,7 +138,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         )
     end
 
-    test "Filters closures with no facilities or more than one facility" do
+    test "Filters alerts with no facilities or more than one facility" do
       expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
         {:ok, %Stop{id: "place-test"}}
       end)
