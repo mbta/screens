@@ -76,13 +76,13 @@
 
           &__name-and-pills {
             display: flex;
-            gap: 24px;
             align-items: center;
             margin-bottom: 14px;
 
             .route-pill {
               width: 132px;
               height: 68.13px;
+              margin-right: 24px;
 
               & > * {
                 height: 100%;
