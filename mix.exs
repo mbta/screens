@@ -8,6 +8,7 @@ defmodule Screens.MixProject do
       elixir: "~> 1.13",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
+      aliases: aliases(),
       deps: deps(),
       dialyzer: [
         plt_add_deps: :app_tree,
@@ -41,6 +42,12 @@ defmodule Screens.MixProject do
   # Specifies which paths to compile per environment.
   defp elixirc_paths(:test), do: ["lib", "test/support"]
   defp elixirc_paths(_), do: ["lib"]
+
+  defp aliases do
+    [
+      "credo.ci": "credo --strict --checks-without-tag formatter"
+    ]
+  end
 
   # Specifies your project dependencies.
   #
