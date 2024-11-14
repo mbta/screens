@@ -83,19 +83,9 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   end
 
   defp watched_screen_ids do
-    Screens.Config.Cache.screen_ids(fn {_screen_id, screen_config} ->
-      valid_for_self_refresh?(screen_config)
+    Screens.Config.Cache.screen_ids(fn {_id, %Screen{hidden_from_screenplay: hidden}} ->
+      not hidden
     end)
-  end
-
-  # A screen is valid for self-refresh if all of these are true:
-  # - It's a v2 screen (i.e., it shows widgets)
-  # - It's not hidden from Screenplay
-  defp valid_for_self_refresh?(screen_config) do
-    is_v2 = Screen.v2_screen?(screen_config)
-    is_visible_to_screenplay = not screen_config.hidden_from_screenplay
-
-    is_v2 and is_visible_to_screenplay
   end
 
   defp schedule_run do
