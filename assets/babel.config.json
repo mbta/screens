@@ -1,6 +1,5 @@
 {
   "presets": [
-    // When no targets are specified: Babel will assume you are targeting the oldest browsers possible.
     "@babel/preset-env",
     "@babel/preset-react",
     "@babel/preset-typescript"
