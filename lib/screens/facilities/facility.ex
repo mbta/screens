@@ -13,7 +13,7 @@ defmodule Screens.Facilities.Facility do
            "include" => "stop"
          }) do
       {:ok, %{"data" => _data, "included" => [stop_map]}} ->
-        {:ok, Stops.Parser.parse_stop(stop_map)}
+        {:ok, Stops.Parser.parse_stop(stop_map, [])}
 
       error ->
         {:error, error}
