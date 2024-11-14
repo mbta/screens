@@ -8,6 +8,14 @@
       "peak": {
         "range_high": 7,
         "range_low": 5
+      },
+      "saturday": {
+        "range_high": 14,
+        "range_low": 10
+      },
+      "sunday": {
+        "range_high": 16,
+        "range_low": 12
       }
     },
     "green_d": {

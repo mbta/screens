@@ -5,8 +5,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{Alerts, Departures, Header}
   alias ScreensConfig.V2.Departures.Header, as: SectionHeader
-  alias ScreensConfig.V2.Departures.{Headway, Layout, Query, Section}
+  alias ScreensConfig.V2.Departures.{Layout, Query, Section}
   alias ScreensConfig.V2.Dup, as: DupConfig
+  alias Screens.MockHeadways
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -17,6 +18,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.OvernightDepartures
+
+  import Mox
+  setup :verify_on_exit!
 
   defp put_primary_departures(widget, primary_departures_sections) do
     %{
@@ -950,10 +954,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     } do
       config =
         put_primary_departures(config, [
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
-            headway: %Headway{headway_id: "red_trunk"}
-          }
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
@@ -1146,13 +1147,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     } do
       config =
         put_primary_departures(config, [
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
-            headway: %Headway{headway_id: "red_trunk"}
-          }
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
+      expect(MockHeadways, :get_with_route, 2, fn "place-B", "test", ^now -> {12, 16} end)
 
       fetch_alerts_fn = fn
         [
@@ -1237,10 +1236,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     } do
       config =
         put_primary_departures(config, [
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-B"]}},
-            headway: %Headway{headway_id: "red_trunk"}
-          }
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
@@ -1452,10 +1448,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     } do
       config =
         put_primary_departures(config, [
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}},
-            headway: %Headway{headway_id: "green_trunk"}
-          }
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
@@ -1618,13 +1611,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     } do
       config =
         put_primary_departures(config, [
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}},
-            headway: %Headway{headway_id: "green_trunk"}
-          }
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
+      expect(MockHeadways, :get_with_route, 2, fn "place-kencl", "test", ^now -> {7, 13} end)
 
       fetch_alerts_fn = fn
         [
@@ -1739,10 +1730,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       config =
         config
         |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
-            headway: %Headway{headway_id: "ferry"}
-          },
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["Boat"]}}},
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}}
           }
@@ -1875,10 +1863,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           }
         ])
         |> put_secondary_departures_sections([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["Boat"]}},
-            headway: %Headway{headway_id: "ferry"}
-          },
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["Boat"]}}},
           %Section{
             query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}}
           }
@@ -2525,6 +2510,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
+      stub(MockHeadways, :get_with_route, fn "place-overnight", "Red", ^now -> {5, 8} end)
 
       fetch_schedules_fn = fn
         _, nil ->

@@ -165,6 +165,9 @@ config :screens, Screens.V2.ScreenData,
 
 config :screens, Screens.V2.CandidateGenerator.DupNew, stop_module: Screens.Stops.MockStop
 
+config :screens, Screens.V2.CandidateGenerator.Dup.Departures,
+  headways_module: Screens.MockHeadways
+
 config :screens, Screens.V2.RDS,
   departure_module: Screens.V2.MockDeparture,
   route_pattern_module: Screens.RoutePatterns.MockRoutePattern,

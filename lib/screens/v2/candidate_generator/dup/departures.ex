@@ -5,7 +5,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   alias Screens.Alerts.Alert
   alias Screens.Routes.Route
-  alias Screens.SignsUiConfig
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Departure
@@ -13,9 +12,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures
-  alias ScreensConfig.V2.Departures.{Header, Headway, Layout, Query, Section}
+  alias ScreensConfig.V2.Departures.{Header, Layout, Query, Section}
   alias ScreensConfig.V2.Departures.Query.Params
   alias ScreensConfig.V2.Dup
+
+  @headways Application.compile_env(:screens, [__MODULE__, :headways_module], Screens.Headways)
 
   def departures_instances(
         %Screen{
@@ -138,7 +139,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          %{
            departures: departures,
            alert_informed_entities: alert_informed_entities,
-           headway: headway,
            stop_ids: stop_ids,
            routes: routes,
            params: params
@@ -169,7 +169,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         )
       end
 
-    headway_mode = get_headway_mode(stop_ids, headway, alert_informed_entities, now)
+    headway_mode = get_headway_mode(stop_ids, routes, alert_informed_entities, now)
 
     cond do
       # All routes in section are overnight
@@ -246,8 +246,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_section_data(
-         %Section{query: %Query{params: %Params{stop_ids: stop_ids} = params}, headway: headway} =
-           section,
+         %Section{query: %Query{params: %Params{stop_ids: stop_ids} = params}} = section,
          fetch_departures_fn,
          fetch_alerts_fn,
          fetch_routes_fn,
@@ -287,7 +286,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           %{
             departures: section_departures,
             alert_informed_entities: alert_informed_entities,
-            headway: headway,
             stop_ids: stop_ids,
             routes: routes,
             params: params
@@ -346,12 +344,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_headway_mode(_, _, [], _), do: :inactive
 
-  defp get_headway_mode(
-         stop_ids,
-         %Headway{headway_id: headway_id},
-         informed_entities,
-         current_time
-       ) do
+  defp get_headway_mode(stop_ids, routes, informed_entities, current_time) do
     # Use all informed_entities from relevant alerts to decide whether there's
     # any reason to go into headway mode.
     # For example, a NB suspension and SB shuttle from Aquarium shouldn't use headway mode
@@ -363,15 +356,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
 
     if headway_mode? do
-      headways = SignsUiConfig.Cache.headways(headway_id)
-      current_time_period = Screens.Util.time_period(current_time)
+      all_headways =
+        for stop_id <- stop_ids, %{id: route_id} <- routes do
+          @headways.get_with_route(stop_id, route_id, current_time)
+        end
 
-      case headways do
-        %{^current_time_period => {lo, hi}} ->
-          {:active, {lo, hi}, interpreted_alert.headsign}
-
-        _ ->
-          :inactive
+      case Enum.uniq(all_headways) do
+        [{lo, hi}] -> {:active, {lo, hi}, interpreted_alert.headsign}
+        _ -> :inactive
       end
     else
       :inactive
