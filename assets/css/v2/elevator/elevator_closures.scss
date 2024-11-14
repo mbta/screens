@@ -7,13 +7,16 @@
 
   .in-station-summary {
     display: flex;
-    gap: 82px;
     justify-content: space-between;
     padding: 24px 48px;
     font-size: 48px;
     font-weight: 400;
     line-height: 64px;
     color: $cool-black-30;
+
+    & > *:first-child {
+      margin-right: 82px;
+    }
   }
 
   hr.thick {
@@ -117,9 +120,14 @@
 
       .paging-indicators {
         display: flex;
-        gap: 27px;
         align-items: center;
         margin-right: 66px;
+
+        & > * {
+          &:first-child:not(:only-child) {
+            margin-right: 27px;
+          }
+        }
       }
     }
 
