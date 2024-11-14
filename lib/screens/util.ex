@@ -3,26 +3,6 @@ defmodule Screens.Util do
 
   alias Screens.Config.Cache
 
-  @spec time_period(DateTime.t()) :: :peak | :off_peak | :saturday | :sunday
-  def time_period(utc_time) do
-    {:ok, dt} = DateTime.shift_zone(utc_time, "America/New_York")
-
-    # Subtract 3 hours, since the service day ends at 3 AM
-    day_of_week = dt |> DateTime.add(-3, :hour) |> Date.day_of_week()
-
-    t = {dt.hour, dt.minute}
-    am_rush? = t >= {7, 0} and t < {9, 0}
-    pm_rush? = t >= {16, 0} and t <= {18, 30}
-    rush_hour? = am_rush? or pm_rush?
-
-    case {day_of_week, rush_hour?} do
-      {6, _} -> :saturday
-      {7, _} -> :sunday
-      {_, true} -> :peak
-      {_, false} -> :off_peak
-    end
-  end
-
   @doc """
   Similar to Enum.group_by, except it returns a list of {key, value} tuples instead of a map to maintain order.
   Order of the groups is determined by the position of the first occurrence of a member of that group.
