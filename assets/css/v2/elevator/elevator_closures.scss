@@ -14,7 +14,7 @@
     line-height: 64px;
     color: $cool-black-30;
 
-    & > *:first-child {
+    .text {
       margin-right: 82px;
     }
   }
@@ -123,10 +123,8 @@
         align-items: center;
         margin-right: 66px;
 
-        & > * {
-          &:first-child:not(:only-child) {
-            margin-right: 27px;
-          }
+        .paging-indicator:first-child:not(:only-child) {
+          margin-right: 27px;
         }
       }
     }
