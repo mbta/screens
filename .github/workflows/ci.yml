@@ -30,7 +30,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      - run: mix credo --strict
+      - run: mix credo.ci
 
   ex-dialyzer:
     name: Elixir Dialyze
