@@ -38,7 +38,7 @@ defmodule Screens.V2.ScreenData.Parameters do
     },
     elevator_v2: %Static{
       candidate_generator: CandidateGenerator.Elevator,
-      refresh_rate: 30
+      refresh_rate: 8
     },
     gl_eink_v2: %Static{
       audio_active_time: @all_times,

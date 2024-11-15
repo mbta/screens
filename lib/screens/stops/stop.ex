@@ -90,7 +90,7 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  @spec fetch_parent_station_name_map() :: {:ok, %{id() => String.t()}} | :error
+  @callback fetch_parent_station_name_map() :: {:ok, %{id() => String.t()}} | :error
   def fetch_parent_station_name_map do
     case fetch(%{location_types: [1]}) do
       {:ok, stops} -> {:ok, Map.new(stops, fn %__MODULE__{id: id, name: name} -> {id, name} end)}

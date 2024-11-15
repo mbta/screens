@@ -3,14 +3,35 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
 
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ElevatorClosures
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Elevator
 
   setup do
     %{
       instance: %ElevatorClosures{
-        screen: struct(Screen, %{app_params: %Elevator{elevator_id: "111"}}),
-        alerts: []
+        id: "111",
+        in_station_closures: [
+          %ElevatorClosures.Closure{
+            description: "Test Alert Description",
+            elevator_name: "Test Elevator",
+            elevator_id: "111",
+            id: "1",
+            header_text: "Test Alert Header"
+          }
+        ],
+        other_stations_with_closures: [
+          %ElevatorClosures.Station{
+            name: "Forest Hills",
+            route_icons: ["Orange"],
+            closures: [
+              %ElevatorClosures.Closure{
+                description: "FH Alert Description",
+                elevator_name: "FH Elevator",
+                elevator_id: "222",
+                id: "2",
+                header_text: "FH Alert Header"
+              }
+            ]
+          }
+        ]
       }
     }
   end
@@ -22,12 +43,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   end
 
   describe "serialize/1" do
-    test "returns map with id and alerts", %{instance: instance} do
-      assert %{
-               id: "111",
-               in_station_alerts: [],
-               outside_alerts: []
-             } == WidgetInstance.serialize(instance)
+    test "returns map with id and closures", %{instance: instance} do
+      assert Map.from_struct(instance) == WidgetInstance.serialize(instance)
     end
   end
 

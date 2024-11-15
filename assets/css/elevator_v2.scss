@@ -1,14 +1,17 @@
 @import "https://rsms.me/inter/inter.css";
 @import "colors";
+@import "v2/lcd_common/screen_container";
 @import "v2/elevator/elevator_closures";
 @import "v2/elevator/normal";
 @import "v2/simulation_common";
 @import "v2/lcd_common/simulation";
 @import "v2/elevator/header";
 @import "v2/elevator/footer";
+@import "v2/lcd_common/route_pill";
 
 body {
   margin: 0;
+  font-family: Inter;
 }
 
 .multi-screen-page {

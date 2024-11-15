@@ -48,8 +48,8 @@ defmodule Screens.Routes.Route do
     end
   end
 
-  @spec fetch() :: {:ok, [t()]} | :error
-  @spec fetch(params()) :: {:ok, [t()]} | :error
+  @callback fetch() :: {:ok, [t()]} | :error
+  @callback fetch(params()) :: {:ok, [t()]} | :error
   def fetch(opts \\ %{}, get_json_fn \\ &V3Api.get_json/2) do
     params =
       opts

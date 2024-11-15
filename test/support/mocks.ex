@@ -4,3 +4,6 @@ Mox.defmock(Screens.RoutePatterns.MockRoutePattern, for: Screens.RoutePatterns.R
 Mox.defmock(Screens.Stops.MockStop, for: Screens.Stops.Stop)
 Mox.defmock(Screens.V2.MockDeparture, for: Screens.V2.Departure)
 Mox.defmock(Screens.V2.ScreenData.MockParameters, for: Screens.V2.ScreenData.Parameters)
+Mox.defmock(Screens.Facilities.MockFacility, for: Screens.Facilities.Facility)
+Mox.defmock(Screens.Alerts.MockAlert, for: Screens.Alerts.Alert)
+Mox.defmock(Screens.Routes.MockRoute, for: Screens.Routes.Route)
