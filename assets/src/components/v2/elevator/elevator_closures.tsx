@@ -174,7 +174,9 @@ const OutsideClosureList = ({
       </div>
       {numPages > 1 && (
         <div className="paging-info-container">
-          <div>+{numOffsetRows} more elevators</div>
+          <div className="more-elevators-text">
+            +{numOffsetRows} more elevators
+          </div>
           <div className="paging-indicators">
             {getPagingIndicators(numPages)}
           </div>
