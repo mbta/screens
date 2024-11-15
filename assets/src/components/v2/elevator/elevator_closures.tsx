@@ -124,9 +124,19 @@ const OutsideClosureList = ({
     for (let i = 0; i < num; i++) {
       const indicator =
         pageIndex === i ? (
-          <PagingDotSelected height={40} width={40} key={i} />
+          <PagingDotSelected
+            className="paging-indicator"
+            height={40}
+            width={40}
+            key={i}
+          />
         ) : (
-          <PagingDotUnselected height={28} width={28} key={i} />
+          <PagingDotUnselected
+            className="paging-indicator"
+            height={28}
+            width={28}
+            key={i}
+          />
         );
       indicators.push(indicator);
     }
