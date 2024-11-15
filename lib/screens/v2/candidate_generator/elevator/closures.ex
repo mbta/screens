@@ -105,7 +105,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
        }) do
     facility = Enum.find_value(entities, fn %{facility: facility} -> facility end)
 
-    %{
+    %ElevatorClosures.Closure{
       id: id,
       elevator_name: facility.name,
       elevator_id: facility.id,
@@ -125,7 +125,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         |> Map.fetch!(parent_station_id)
         |> Enum.map(&RoutePill.serialize_icon/1)
 
-      %{
+      %ElevatorClosures.Station{
         id: parent_station_id,
         name: Map.fetch!(station_id_to_name, parent_station_id),
         route_icons: route_pills,
