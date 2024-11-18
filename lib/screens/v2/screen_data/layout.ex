@@ -10,13 +10,10 @@ defmodule Screens.V2.ScreenData.Layout do
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
 
+  import Screens.Inject
   import Template.Guards, only: [is_paged: 1, is_paged_slot_id: 1, is_non_paged_slot_id: 1]
 
-  @parameters Application.compile_env(
-                :screens,
-                [Screens.V2.ScreenData, :parameters_module],
-                Screens.V2.ScreenData.Parameters
-              )
+  @parameters injected(Screens.V2.ScreenData.Parameters)
 
   @type t :: {Template.layout(), %{Template.slot_id() => WidgetInstance.t()}}
   @type non_paged ::

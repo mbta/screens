@@ -8,18 +8,11 @@ defmodule Screens.V2.ScreenData do
   alias ScreensConfig.Screen
   alias __MODULE__.{ParallelRunSupervisor, Layout}
 
+  import Screens.Inject
   import Screens.V2.Template.Guards, only: [is_slot_id: 1, is_paged_slot_id: 1]
 
-  @config_cache Application.compile_env(
-                  :screens,
-                  [__MODULE__, :config_cache_module],
-                  Screens.Config.Cache
-                )
-  @parameters Application.compile_env(
-                :screens,
-                [__MODULE__, :parameters_module],
-                Screens.V2.ScreenData.Parameters
-              )
+  @config_cache injected(Screens.Config.Cache)
+  @parameters injected(Screens.V2.ScreenData.Parameters)
 
   @type t :: %{type: atom()}
   @type simulation_data :: %{full_page: t(), flex_zone: [t()]}

@@ -3,24 +3,29 @@ defmodule Screens.V2.RDSTest do
 
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
-  alias Screens.RoutePatterns.{MockRoutePattern, RoutePattern}
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
-  alias Screens.Stops.{MockStop, Stop}
+  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
-  alias Screens.V2.{Departure, MockDeparture}
+  alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias ScreensConfig.V2.Departures
   alias ScreensConfig.V2.Departures.{Query, Section}
 
+  import Screens.Inject
   import Mox
   setup :verify_on_exit!
 
+  @departure injected(Departure)
+  @route_pattern injected(RoutePattern)
+  @stop injected(Stop)
+
   describe "get/1" do
     setup do
-      stub(MockDeparture, :fetch, fn _, _ -> {:ok, []} end)
-      stub(MockRoutePattern, :fetch, fn _ -> {:ok, []} end)
-      stub(MockStop, :fetch_child_stops, fn ids -> {:ok, Enum.map(ids, &[%Stop{id: &1}])} end)
+      stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
+      stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
+      stub(@stop, :fetch_child_stops, fn ids -> {:ok, Enum.map(ids, &[%Stop{id: &1}])} end)
       :ok
     end
 
@@ -36,11 +41,11 @@ defmodule Screens.V2.RDSTest do
     test "creates destinations from typical route patterns" do
       stop_ids = ~w[s0 s1]
 
-      expect(MockStop, :fetch_child_stops, fn ^stop_ids ->
+      expect(@stop, :fetch_child_stops, fn ^stop_ids ->
         {:ok, [[%Stop{id: "sA"}, %Stop{id: "sB"}], [%Stop{id: "sC"}]]}
       end)
 
-      expect(MockRoutePattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
         {:ok,
          [
            %RoutePattern{
@@ -82,7 +87,7 @@ defmodule Screens.V2.RDSTest do
     test "creates destinations from upcoming predicted and scheduled departures" do
       now = ~U[2024-10-11 12:00:00Z]
 
-      expect(MockDeparture, :fetch, fn
+      expect(@departure, :fetch, fn
         %{direction_id: 0, route_type: :bus, stop_ids: ["s0"]},
         [include_schedules: true, now: ^now] ->
           {

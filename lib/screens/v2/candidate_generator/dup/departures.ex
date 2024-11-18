@@ -16,7 +16,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias ScreensConfig.V2.Departures.Query.Params
   alias ScreensConfig.V2.Dup
 
-  @headways Application.compile_env(:screens, [__MODULE__, :headways_module], Screens.Headways)
+  import Screens.Inject
+
+  @headways injected(Screens.Headways)
 
   def departures_instances(
         %Screen{

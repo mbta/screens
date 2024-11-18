@@ -1,32 +1,35 @@
 defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   use ExUnit.Case, async: true
 
-  import Mox
-  setup :verify_on_exit!
-
-  alias Screens.Alerts.{Alert, MockAlert}
-  alias Screens.Facilities.MockFacility
-  alias Screens.Routes.{MockRoute, Route}
-  alias Screens.Stops.{MockStop, Stop}
+  alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
+  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 
+  import Screens.Inject
+  import Mox
+  setup :verify_on_exit!
+
+  @alert injected(Alert)
+  @facility injected(Screens.Facilities.Facility)
+  @route injected(Route)
+  @stop injected(Stop)
+
   describe "elevator_status_instances/1" do
     test "Only returns alerts with effect of :elevator_closure" do
-      expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
-        {:ok, %Stop{id: "place-test"}}
-      end)
+      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
 
-      expect(MockStop, :fetch_parent_station_name_map, fn ->
+      expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-test" => "Place Test"}}
       end)
 
-      expect(MockRoute, :fetch, fn %{stop_id: "place-test"} ->
+      expect(@route, :fetch, fn %{stop_id: "place-test"} ->
         {:ok, [%Route{id: "Red", type: :subway}]}
       end)
 
-      expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           struct(Alert,
             id: "1",
@@ -67,15 +70,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     end
 
     test "Groups outside closures by station" do
-      expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
-        {:ok, %Stop{id: "place-test"}}
-      end)
+      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
 
-      expect(MockStop, :fetch_parent_station_name_map, fn ->
+      expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-haecl" => "Haymarket"}}
       end)
 
-      expect(MockRoute, :fetch, 2, fn
+      expect(@route, :fetch, 2, fn
         %{stop_id: "place-haecl"} ->
           {:ok, [%Route{id: "Orange", type: :subway}]}
 
@@ -83,7 +84,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
           {:ok, [%Route{id: "Red", type: :subway}]}
       end)
 
-      expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           struct(Alert,
             id: "1",
@@ -139,17 +140,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     end
 
     test "Filters alerts with no facilities or more than one facility" do
-      expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
-        {:ok, %Stop{id: "place-test"}}
-      end)
+      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
 
-      expect(MockStop, :fetch_parent_station_name_map, fn ->
+      expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-haecl" => "Haymarket"}}
       end)
 
-      expect(MockRoute, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
+      expect(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
 
-      expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           struct(Alert,
             id: "1",
@@ -184,19 +183,17 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     end
 
     test "Return empty routes on API error" do
-      expect(MockFacility, :fetch_stop_for_facility, fn "111" ->
-        {:ok, %Stop{id: "place-test"}}
-      end)
+      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
 
-      expect(MockStop, :fetch_parent_station_name_map, fn ->
+      expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-test" => "Place Test"}}
       end)
 
-      expect(MockRoute, :fetch, fn %{stop_id: "place-test"} ->
+      expect(@route, :fetch, fn %{stop_id: "place-test"} ->
         :error
       end)
 
-      expect(MockAlert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           struct(Alert,
             id: "1",

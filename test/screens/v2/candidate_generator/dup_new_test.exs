@@ -4,13 +4,15 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{Alerts, Departures, EvergreenContentItem, Header, Schedule}
   alias ScreensConfig.V2.Dup, as: DupConfig
-  alias Screens.Stops.MockStop
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator.DupNew
   alias Screens.V2.WidgetInstance.{DeparturesNoData, EvergreenContent, NormalHeader}
 
+  import Screens.Inject
   import Mox
   setup :verify_on_exit!
+
+  @stop injected(Screens.Stops.Stop)
 
   describe "candidate_instances/2" do
     @config %Screen{
@@ -38,7 +40,7 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
 
     test "returns header with stop name determined from stop ID" do
       config = put_in(@config.app_params.header, %Header.CurrentStopId{stop_id: "test_id"})
-      expect(MockStop, :fetch_stop_name, fn "test_id" -> "Test Name" end)
+      expect(@stop, :fetch_stop_name, fn "test_id" -> "Test Name" end)
 
       instances = DupNew.candidate_instances(config, @now)
 

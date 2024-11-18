@@ -4,7 +4,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   require Logger
 
   alias Screens.Alerts.{Alert, InformedEntity}
-  alias Screens.Facilities.Facility
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ElevatorClosures
@@ -12,10 +11,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 
-  @stop Application.compile_env(:screens, [__MODULE__, :stop_module], Stop)
-  @facility Application.compile_env(:screens, [__MODULE__, :facility_module], Facility)
-  @alert Application.compile_env(:screens, [__MODULE__, :alert_module], Alert)
-  @route Application.compile_env(:screens, [__MODULE__, :route_module], Route)
+  import Screens.Inject
+
+  @alert injected(Alert)
+  @facility injected(Screens.Facilities.Facility)
+  @route injected(Route)
+  @stop injected(Stop)
 
   @spec elevator_status_instances(Screen.t()) :: list(ElevatorClosures.t())
   def elevator_status_instances(%Screen{app_params: %Elevator{elevator_id: elevator_id}}) do
