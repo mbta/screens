@@ -9,6 +9,8 @@ defmodule Screens.V2.RDS do
   into widgets by screen-specific code.
   """
 
+  import Screens.Inject
+
   alias Screens.Lines.Line
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
@@ -40,15 +42,9 @@ defmodule Screens.V2.RDS do
     defstruct []
   end
 
-  @departure Application.compile_env(:screens, [__MODULE__, :departure_module], Departure)
-
-  @route_pattern Application.compile_env(
-                   :screens,
-                   [__MODULE__, :route_pattern_module],
-                   RoutePattern
-                 )
-
-  @stop Application.compile_env(:screens, [__MODULE__, :stop_module], Stop)
+  @departure injected(Departure)
+  @route_pattern injected(RoutePattern)
+  @stop injected(Stop)
 
   @max_departure_minutes 90
 

@@ -7,7 +7,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias ScreensConfig.V2.Departures.Header, as: SectionHeader
   alias ScreensConfig.V2.Departures.{Layout, Query, Section}
   alias ScreensConfig.V2.Dup, as: DupConfig
-  alias Screens.MockHeadways
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -19,8 +18,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.OvernightDepartures
 
+  import Screens.Inject
   import Mox
   setup :verify_on_exit!
+
+  @headways injected(Screens.Headways)
 
   defp put_primary_departures(widget, primary_departures_sections) do
     %{
@@ -1151,7 +1153,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
-      expect(MockHeadways, :get_with_route, 2, fn "place-B", "test", ^now -> {12, 16} end)
+      expect(@headways, :get_with_route, 2, fn "place-B", "test", ^now -> {12, 16} end)
 
       fetch_alerts_fn = fn
         [
@@ -1615,7 +1617,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
-      expect(MockHeadways, :get_with_route, 2, fn "place-kencl", "test", ^now -> {7, 13} end)
+      expect(@headways, :get_with_route, 2, fn "place-kencl", "test", ^now -> {7, 13} end)
 
       fetch_alerts_fn = fn
         [
@@ -2510,7 +2512,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
-      stub(MockHeadways, :get_with_route, fn "place-overnight", "Red", ^now -> {5, 8} end)
+      stub(@headways, :get_with_route, fn "place-overnight", "Red", ^now -> {5, 8} end)
 
       fetch_schedules_fn = fn
         _, nil ->

@@ -159,26 +159,6 @@ config :screens, :screens_by_alert,
   screens_last_updated_ttl_seconds: 2,
   screens_ttl_seconds: 1
 
-config :screens, Screens.V2.ScreenData,
-  config_cache_module: Screens.Config.MockCache,
-  parameters_module: Screens.V2.ScreenData.MockParameters
-
-config :screens, Screens.V2.CandidateGenerator.DupNew, stop_module: Screens.Stops.MockStop
-
-config :screens, Screens.V2.CandidateGenerator.Dup.Departures,
-  headways_module: Screens.MockHeadways
-
-config :screens, Screens.V2.RDS,
-  departure_module: Screens.V2.MockDeparture,
-  route_pattern_module: Screens.RoutePatterns.MockRoutePattern,
-  stop_module: Screens.Stops.MockStop
-
-config :screens, Screens.V2.CandidateGenerator.Elevator.Closures,
-  stop_module: Screens.Stops.MockStop,
-  facility_module: Screens.Facilities.MockFacility,
-  alert_module: Screens.Alerts.MockAlert,
-  route_module: Screens.Routes.MockRoute
-
 config :screens, Screens.LastTrip,
   trip_updates_adapter: Screens.LastTrip.TripUpdates.Noop,
   vehicle_positions_adapter: Screens.LastTrip.VehiclePositions.Noop

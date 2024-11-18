@@ -29,16 +29,18 @@ defmodule Screens.V2.ScreenDataTest do
   use ExUnit.Case, async: true
 
   alias ScreensConfig.Screen
-  alias Screens.Config.MockCache
   alias Screens.V2.ScreenData
-  alias Screens.V2.ScreenData.MockParameters
   alias Screens.V2.WidgetInstance.MockWidget
   alias Screens.V2.WidgetInstance.Placeholder
   alias Screens.V2.ScreenDataTest.Stub
 
   import ExUnit.CaptureLog
+  import Screens.Inject
   import Mox
   setup :verify_on_exit!
+
+  @config_cache injected(Screens.Config.Cache)
+  @parameters injected(Screens.V2.ScreenData.Parameters)
 
   require Stub
 
@@ -52,7 +54,7 @@ defmodule Screens.V2.ScreenDataTest do
 
   describe "get/2" do
     setup do
-      stub(MockParameters, :refresh_rate, fn _app_id -> 0 end)
+      stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
       :ok
     end
 
@@ -64,10 +66,10 @@ defmodule Screens.V2.ScreenDataTest do
     end
 
     test "gets widget data for a screen ID" do
-      expect(MockCache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+      expect(@config_cache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
 
       expect(
-        MockParameters,
+        @parameters,
         :candidate_generator,
         fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
       )
@@ -77,10 +79,10 @@ defmodule Screens.V2.ScreenDataTest do
     end
 
     test "generates widget data from a pending config" do
-      deny(MockCache, :screen, 1)
+      deny(@config_cache, :screen, 1)
 
       expect(
-        MockParameters,
+        @parameters,
         :candidate_generator,
         fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
       )
@@ -90,10 +92,10 @@ defmodule Screens.V2.ScreenDataTest do
     end
 
     test "selects a variant candidate generator" do
-      expect(MockCache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+      expect(@config_cache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
 
       expect(
-        MockParameters,
+        @parameters,
         :candidate_generator,
         fn %Screen{app_id: :test_app}, "test_variant" -> GrayGenerator end
       )
@@ -103,14 +105,14 @@ defmodule Screens.V2.ScreenDataTest do
     end
 
     test "runs all variant generators in the background" do
-      expect(MockCache, :screen, fn "test_id" ->
+      expect(@config_cache, :screen, fn "test_id" ->
         build_config(%{app_id: :test_app, app_params: %{test_pid: self()}})
       end)
 
-      expect(MockParameters, :variants, fn %Screen{app_id: :test_app} -> ["crash"] end)
+      expect(@parameters, :variants, fn %Screen{app_id: :test_app} -> ["crash"] end)
 
       stub(
-        MockParameters,
+        @parameters,
         :candidate_generator,
         fn
           %Screen{app_id: :test_app}, nil -> GrayGenerator
@@ -132,16 +134,16 @@ defmodule Screens.V2.ScreenDataTest do
 
   describe "variants/2" do
     setup do
-      stub(MockParameters, :refresh_rate, fn _app_id -> 0 end)
+      stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
       :ok
     end
 
     test "gets widget data for all variants" do
-      expect(MockCache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
-      expect(MockParameters, :variants, fn %Screen{app_id: :test_app} -> ["green"] end)
+      expect(@config_cache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+      expect(@parameters, :variants, fn %Screen{app_id: :test_app} -> ["green"] end)
 
       stub(
-        MockParameters,
+        @parameters,
         :candidate_generator,
         fn
           %Screen{app_id: :test_app}, nil -> GrayGenerator

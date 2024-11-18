@@ -6,11 +6,9 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Header do
   alias ScreensConfig.V2.Dup
   alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
 
-  @stop Application.compile_env(
-          :screens,
-          [Screens.V2.CandidateGenerator.DupNew, :stop_module],
-          Screens.Stops.Stop
-        )
+  import Screens.Inject
+
+  @stop injected(Screens.Stops.Stop)
 
   @spec instances(Screen.t(), DateTime.t()) :: [NormalHeader.t()]
   def instances(%Screen{app_params: %Dup{header: header_config}} = config, now) do

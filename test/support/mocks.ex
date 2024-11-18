@@ -1,9 +1,15 @@
-Mox.defmock(Screens.Config.MockCache, for: Screens.Config.Cache)
-Mox.defmock(Screens.MockHeadways, for: Screens.Headways)
-Mox.defmock(Screens.RoutePatterns.MockRoutePattern, for: Screens.RoutePatterns.RoutePattern)
-Mox.defmock(Screens.Stops.MockStop, for: Screens.Stops.Stop)
-Mox.defmock(Screens.V2.MockDeparture, for: Screens.V2.Departure)
-Mox.defmock(Screens.V2.ScreenData.MockParameters, for: Screens.V2.ScreenData.Parameters)
-Mox.defmock(Screens.Facilities.MockFacility, for: Screens.Facilities.Facility)
-Mox.defmock(Screens.Alerts.MockAlert, for: Screens.Alerts.Alert)
-Mox.defmock(Screens.Routes.MockRoute, for: Screens.Routes.Route)
+injected_modules = [
+  Screens.Alerts.Alert,
+  Screens.Config.Cache,
+  Screens.Facilities.Facility,
+  Screens.Headways,
+  Screens.RoutePatterns.RoutePattern,
+  Screens.Routes.Route,
+  Screens.Stops.Stop,
+  Screens.V2.Departure,
+  Screens.V2.ScreenData.Parameters
+]
+
+for module <- injected_modules do
+  module |> Module.concat("Mock") |> Mox.defmock(for: module)
+end
