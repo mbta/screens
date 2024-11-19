@@ -81,7 +81,7 @@
           &__name-and-pills {
             display: flex;
             align-items: center;
-            margin-bottom: 14px;
+            margin: 0 48px 14px;
 
             .route-pill {
               width: 132px;
@@ -104,13 +104,14 @@
           }
 
           &__elevator-name {
+            margin: 0 48px;
             line-height: 64px;
           }
 
           &__elevator-name.list-item {
             display: list-item;
             margin-bottom: 8px;
-            margin-left: 48px;
+            margin-left: 96px;
           }
         }
       }
