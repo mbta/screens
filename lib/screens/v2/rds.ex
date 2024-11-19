@@ -69,11 +69,11 @@ defmodule Screens.V2.RDS do
        )
        when stop_ids != [] do
     {:ok, child_stops} = @stop.fetch_child_stops(stop_ids)
-    {:ok, typical_patterns} = params |> Map.put(:typicality, 1) |> @route_pattern.fetch()
+    {:ok, canonical_patterns} = params |> Map.put(:canonical?, true) |> @route_pattern.fetch()
     {:ok, departures} = @departure.fetch(params, include_schedules: true, now: now)
 
     (tuples_from_departures(departures, now) ++
-       tuples_from_patterns(typical_patterns, child_stops))
+       tuples_from_patterns(canonical_patterns, child_stops))
     |> Enum.uniq()
     |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
       %__MODULE__{

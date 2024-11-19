@@ -41,14 +41,14 @@ defmodule Screens.V2.RDSTest do
       }
     end
 
-    test "creates destinations from typical route patterns" do
+    test "creates destinations from canonical route patterns" do
       stop_ids = ~w[s0 s1]
 
       expect(@stop, :fetch_child_stops, fn ^stop_ids ->
         {:ok, [[%Stop{id: "sA"}, %Stop{id: "sB"}], [%Stop{id: "sC"}]]}
       end)
 
-      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, canonical?: true} ->
         {:ok,
          [
            %RoutePattern{
