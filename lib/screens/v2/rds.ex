@@ -11,6 +11,7 @@ defmodule Screens.V2.RDS do
 
   import Screens.Inject
 
+  alias Screens.Headways
   alias Screens.Lines.Line
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
@@ -38,11 +39,12 @@ defmodule Screens.V2.RDS do
     mode, or B) there simply aren't any upcoming departures we want to display, and as far as we
     can tell this is "normal"/expected.
     """
-    @type t :: %__MODULE__{}
-    defstruct []
+    @type t :: %__MODULE__{headways: Headways.range() | nil}
+    defstruct ~w[headways]a
   end
 
   @departure injected(Departure)
+  @headways injected(Headways)
   @route_pattern injected(RoutePattern)
   @stop injected(Stop)
 
@@ -73,8 +75,13 @@ defmodule Screens.V2.RDS do
     (tuples_from_departures(departures, now) ++
        tuples_from_patterns(typical_patterns, child_stops))
     |> Enum.uniq()
-    |> Enum.map(fn {stop, line, headsign} ->
-      %__MODULE__{stop: stop, line: line, headsign: headsign, state: %NoDepartures{}}
+    |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
+      %__MODULE__{
+        stop: stop,
+        line: line,
+        headsign: headsign,
+        state: %NoDepartures{headways: @headways.get(stop_id, now)}
+      }
     end)
   end
 
