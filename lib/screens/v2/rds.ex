@@ -68,7 +68,7 @@ defmodule Screens.V2.RDS do
          now
        )
        when stop_ids != [] do
-    {:ok, child_stops} = @stop.fetch_child_stops(stop_ids)
+    child_stops = fetch_child_stops(stop_ids)
     {:ok, canonical_patterns} = params |> Map.put(:canonical?, true) |> @route_pattern.fetch()
     {:ok, departures} = @departure.fetch(params, include_schedules: true, now: now)
 
@@ -82,6 +82,20 @@ defmodule Screens.V2.RDS do
         headsign: headsign,
         state: %NoDepartures{headways: @headways.get(stop_id, now)}
       }
+    end)
+  end
+
+  defp fetch_child_stops(stop_ids) do
+    {:ok, stops} = @stop.fetch(%{ids: stop_ids}, _include_related? = true)
+    stops_by_id = Map.new(stops, fn %Stop{id: id} = stop -> {id, stop} end)
+
+    stop_ids
+    |> Enum.map(&stops_by_id[&1])
+    |> Enum.flat_map(fn
+      %Stop{location_type: 0} = stop -> [stop]
+      %Stop{child_stops: stops} when is_list(stops) -> stops
+      # stop ID in screen configuration does not exist; drop it
+      nil -> []
     end)
   end
 
