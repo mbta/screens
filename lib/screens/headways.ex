@@ -139,10 +139,10 @@ defmodule Screens.Headways do
 
   @doc """
   Gets headway values for a stop. The stop should be a stopping location (`location_type == 0`).
-  Returns `nil` otherwise, or if no headways are configured for the stop.
+  Returns `nil` otherwise, or if no headways are configured for the stop or time period.
   """
-  @spec get(Stop.id()) :: range() | nil
-  @spec get(Stop.id(), DateTime.t()) :: range() | nil
+  @callback get(Stop.id()) :: range() | nil
+  @callback get(Stop.id(), DateTime.t()) :: range() | nil
   def get(stop_id, at \\ DateTime.utc_now()) do
     case headway_key(stop_id) do
       nil -> nil

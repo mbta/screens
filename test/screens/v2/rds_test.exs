@@ -1,6 +1,7 @@
 defmodule Screens.V2.RDSTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Headways
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.RoutePatterns.RoutePattern
@@ -18,23 +19,25 @@ defmodule Screens.V2.RDSTest do
   setup :verify_on_exit!
 
   @departure injected(Departure)
+  @headways injected(Headways)
   @route_pattern injected(RoutePattern)
   @stop injected(Stop)
 
   describe "get/1" do
     setup do
       stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
+      stub(@headways, :get, fn _, _ -> nil end)
       stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
       stub(@stop, :fetch_child_stops, fn ids -> {:ok, Enum.map(ids, &[%Stop{id: &1}])} end)
       :ok
     end
 
-    defp no_departures(stop_id, line_id, headsign) do
+    defp no_departures(stop_id, line_id, headsign, headways \\ nil) do
       %RDS{
         stop: %Stop{id: stop_id},
         line: %Line{id: line_id},
         headsign: headsign,
-        state: %RDS.NoDepartures{}
+        state: %RDS.NoDepartures{headways: headways}
       }
     end
 
@@ -142,6 +145,29 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                [no_departures("s1", "l1", "h1"), no_departures("s2", "l2", "h2")]
              ]
+    end
+
+    test "NoDepartures includes a headway range for stops that have one" do
+      now = ~U[2024-10-11 12:00:00Z]
+      expect(@headways, :get, fn "s1", ^now -> {5, 10} end)
+
+      expect(@route_pattern, :fetch, fn %{stop_ids: ~w[s1]} ->
+        {:ok,
+         [
+           %RoutePattern{
+             id: "p1",
+             headsign: "h1",
+             route: %Route{id: "r1", line: %Line{id: "l1"}},
+             stops: [%Stop{id: "s1"}]
+           }
+         ]}
+      end)
+
+      departures = %Departures{
+        sections: [%Section{query: %Query{params: %Query.Params{stop_ids: ~w[s1]}}}]
+      }
+
+      assert RDS.get(departures, now) == [[no_departures("s1", "l1", "h1", {5, 10})]]
     end
   end
 end
