@@ -38,8 +38,8 @@ defmodule Screens.Stops.Stop do
           optional(:route_types) => [RouteType.t()]
         }
 
-  @spec fetch(params()) :: {:ok, [t()]} | :error
-  @spec fetch(params(), boolean()) :: {:ok, [t()]} | :error
+  @callback fetch(params()) :: {:ok, [t()]} | :error
+  @callback fetch(params(), boolean()) :: {:ok, [t()]} | :error
   def fetch(params, include_related? \\ false, get_json_fn \\ &V3Api.get_json/2) do
     encoded_params =
       params
@@ -62,33 +62,6 @@ defmodule Screens.Stops.Stop do
   defp encode_param({:ids, ids}), do: [{"filter[id]", Enum.join(ids, ",")}]
   defp encode_param({:location_types, lts}), do: [{"filter[location_type]", Enum.join(lts, ",")}]
   defp encode_param({:route_types, rts}), do: [{"filter[route_type]", Enum.join(rts, ",")}]
-
-  @doc """
-  Returns a list of child stops for each given stop ID (in the same order). For stop IDs that are
-  already child stops, the list contains only the stop itself. For stop IDs that do not exist, the
-  list is empty.
-  """
-  @callback fetch_child_stops([id()]) :: {:ok, [[t()]]} | :error
-  def fetch_child_stops(stop_ids) do
-    case fetch(%{ids: stop_ids}, true) do
-      {:ok, stops} ->
-        stops_by_id = Map.new(stops, fn %__MODULE__{id: id} = stop -> {id, stop} end)
-
-        child_stops =
-          stop_ids
-          |> Enum.map(&stops_by_id[&1])
-          |> Enum.map(fn
-            nil -> []
-            %__MODULE__{location_type: 0} = stop -> [stop]
-            %__MODULE__{child_stops: stops} when is_list(stops) -> stops
-          end)
-
-        {:ok, child_stops}
-
-      :error ->
-        :error
-    end
-  end
 
   @callback fetch_parent_station_name_map() :: {:ok, %{id() => String.t()}} | :error
   def fetch_parent_station_name_map do

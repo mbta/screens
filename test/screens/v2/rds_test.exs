@@ -28,7 +28,7 @@ defmodule Screens.V2.RDSTest do
       stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
       stub(@headways, :get, fn _, _ -> nil end)
       stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
-      stub(@stop, :fetch_child_stops, fn ids -> {:ok, Enum.map(ids, &[%Stop{id: &1}])} end)
+      stub(@stop, :fetch, fn %{ids: ids}, true -> {:ok, Enum.map(ids, &stop/1)} end)
       :ok
     end
 
@@ -41,11 +41,17 @@ defmodule Screens.V2.RDSTest do
       }
     end
 
+    defp station(id, child_stop_ids) do
+      %Stop{id: id, child_stops: Enum.map(child_stop_ids, &stop/1)}
+    end
+
+    defp stop(id), do: %Stop{id: id, location_type: 0}
+
     test "creates destinations from canonical route patterns" do
       stop_ids = ~w[s0 s1]
 
-      expect(@stop, :fetch_child_stops, fn ^stop_ids ->
-        {:ok, [[%Stop{id: "sA"}, %Stop{id: "sB"}], [%Stop{id: "sC"}]]}
+      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
+        {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
       end)
 
       expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, canonical?: true} ->
