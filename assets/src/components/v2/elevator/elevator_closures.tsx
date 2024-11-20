@@ -54,19 +54,13 @@ const ClosureRow = ({ station }: ClosureRowProps) => {
   );
 };
 
-interface InStationSummaryProps {
-  closures: ElevatorClosure[];
-}
-
-const InStationSummary = ({ closures }: InStationSummaryProps) => {
-  const summaryText = closures.length
-    ? ""
-    : "All elevators at this station are currently working";
-
+const InStationSummary = () => {
   return (
     <>
       <div className="in-station-summary">
-        <span className="text">{summaryText}</span>
+        <span className="text">
+          All elevators at this station are currently working
+        </span>
         <span>
           <NormalService height={72} width={72} fill="#145A06" />
         </span>
@@ -78,7 +72,6 @@ const InStationSummary = ({ closures }: InStationSummaryProps) => {
 
 interface OutsideClosureListProps extends WrappedComponentProps {
   stations: StationWithClosures[];
-  lastUpdate: number | null;
 }
 
 const OutsideClosureList = ({
@@ -186,6 +179,25 @@ const OutsideClosureList = ({
   );
 };
 
+interface NoInStationClosuresViewProps extends OutsideClosureListProps {}
+
+const NoInStationClosuresView = ({
+  stations,
+  lastUpdate,
+  onFinish,
+}: NoInStationClosuresViewProps) => {
+  return (
+    <>
+      <InStationSummary />
+      <OutsideClosureList
+        stations={stations}
+        lastUpdate={lastUpdate}
+        onFinish={onFinish}
+      />
+    </>
+  );
+};
+
 interface Props extends WrappedComponentProps {
   id: string;
   in_station_closures: ElevatorClosure[];
@@ -200,12 +212,15 @@ const ElevatorClosures: React.ComponentType<Props> = ({
 }: Props) => {
   return (
     <div className="elevator-closures">
-      <InStationSummary closures={inStationClosures} />
-      <OutsideClosureList
-        stations={otherStationsWithClosures}
-        lastUpdate={lastUpdate}
-        onFinish={onFinish}
-      />
+      {inStationClosures.length === 0 ? (
+        <NoInStationClosuresView
+          stations={otherStationsWithClosures}
+          lastUpdate={lastUpdate}
+          onFinish={onFinish}
+        />
+      ) : (
+        <></>
+      )}
     </div>
   );
 };
