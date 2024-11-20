@@ -2,13 +2,24 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   @moduledoc false
 
   alias Screens.Stops.Stop
+  alias ScreensConfig.V2.Elevator
 
-  defstruct ~w[id in_station_closures other_stations_with_closures]a
+  defstruct ~w[
+                id
+                in_station_closures
+                other_stations_with_closures
+                alternate_direction_text
+                accessible_path_direction_arrow
+                accessible_path_image_url
+              ]a
 
   @type t :: %__MODULE__{
           id: String.t(),
           in_station_closures: list(__MODULE__.Closure.t()),
-          other_stations_with_closures: list(__MODULE__.Station.t())
+          other_stations_with_closures: list(__MODULE__.Station.t()),
+          alternate_direction_text: String.t(),
+          accessible_path_direction_arrow: Elevator.arrow_direction(),
+          accessible_path_image_url: String.t()
         }
 
   defmodule Station do
@@ -48,12 +59,18 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   def serialize(%__MODULE__{
         id: id,
         in_station_closures: in_station_closures,
-        other_stations_with_closures: other_stations_with_closures
+        other_stations_with_closures: other_stations_with_closures,
+        alternate_direction_text: alternate_direction_text,
+        accessible_path_direction_arrow: accessible_path_direction_arrow,
+        accessible_path_image_url: accessible_path_image_url
       }),
       do: %{
         id: id,
         in_station_closures: in_station_closures,
-        other_stations_with_closures: other_stations_with_closures
+        other_stations_with_closures: other_stations_with_closures,
+        alternate_direction_text: alternate_direction_text,
+        accessible_path_direction_arrow: accessible_path_direction_arrow,
+        accessible_path_image_url: accessible_path_image_url
       }
 
   defimpl Screens.V2.WidgetInstance do

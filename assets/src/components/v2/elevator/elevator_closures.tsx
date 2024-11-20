@@ -1,12 +1,16 @@
 import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
 import cx from "classnames";
+import _ from "lodash";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import PagingDotUnselected from "Images/svgr_bundled/paging_dot_unselected.svg";
 import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
+import NoService from "Images/svgr_bundled/no-service-black.svg";
+import ElevatorWayfinding from "Images/svgr_bundled/elevator-wayfinding.svg";
+import Arrow from "Images/svgr_bundled/arrow-90.svg";
+import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
-import _ from "lodash";
 import useClientPaging from "Hooks/v2/use_client_paging";
 
 type StationWithClosures = {
@@ -22,6 +26,38 @@ type ElevatorClosure = {
   elevator_id: string;
   description: string;
   header_text: string;
+};
+
+type ArrowDirection = "n" | "e" | "s" | "w";
+
+interface PagingIndicatorsProps {
+  numPages: number;
+  pageIndex: number;
+}
+
+const PagingIndicators = ({ numPages, pageIndex }: PagingIndicatorsProps) => {
+  const indicators: JSX.Element[] = [];
+  for (let i = 0; i < numPages; i++) {
+    const indicator =
+      pageIndex === i ? (
+        <PagingDotSelected
+          className="paging-indicator"
+          height={40}
+          width={40}
+          key={i}
+        />
+      ) : (
+        <PagingDotUnselected
+          className="paging-indicator"
+          height={28}
+          width={28}
+          key={i}
+        />
+      );
+    indicators.push(indicator);
+  }
+
+  return <div className="paging-indicators">{indicators}</div>;
 };
 
 interface ClosureRowProps {
@@ -112,31 +148,6 @@ const OutsideClosureList = ({
     setRowCounts(rowCounts);
   }, [stations]);
 
-  const getPagingIndicators = (num: number) => {
-    const indicators: JSX.Element[] = [];
-    for (let i = 0; i < num; i++) {
-      const indicator =
-        pageIndex === i ? (
-          <PagingDotSelected
-            className="paging-indicator"
-            height={40}
-            width={40}
-            key={i}
-          />
-        ) : (
-          <PagingDotUnselected
-            className="paging-indicator"
-            height={28}
-            width={28}
-            key={i}
-          />
-        );
-      indicators.push(indicator);
-    }
-
-    return indicators;
-  };
-
   return (
     <div className="outside-closure-list">
       <div className="header-container">
@@ -146,8 +157,8 @@ const OutsideClosureList = ({
             <AccessibilityAlert height={128} width={155} />
           </div>
         </div>
+        <hr className="thin" />
       </div>
-      <hr className="thin" />
       <div className="closure-list-container">
         {
           <div
@@ -170,31 +181,77 @@ const OutsideClosureList = ({
           <div className="more-elevators-text">
             +{numOffsetRows} more elevators
           </div>
-          <div className="paging-indicators">
-            {getPagingIndicators(numPages)}
-          </div>
+          <PagingIndicators numPages={numPages} pageIndex={pageIndex} />
         </div>
       )}
     </div>
   );
 };
 
-interface NoInStationClosuresViewProps extends OutsideClosureListProps {}
+interface OutsideClosuresViewProps extends OutsideClosureListProps {}
 
-const NoInStationClosuresView = ({
+const OutsideClosuresView = ({
   stations,
   lastUpdate,
   onFinish,
-}: NoInStationClosuresViewProps) => {
+}: OutsideClosuresViewProps) => {
   return (
-    <>
+    <div className="outside-closures-view">
       <InStationSummary />
       <OutsideClosureList
         stations={stations}
         lastUpdate={lastUpdate}
         onFinish={onFinish}
       />
-    </>
+    </div>
+  );
+};
+
+interface CurrentElevatorClosedViewProps {
+  closure: ElevatorClosure;
+  alternateDirectionText: string;
+  accessiblePathDirectionArrow: ArrowDirection;
+  accessiblePathImageUrl: string;
+}
+
+const CurrentElevatorClosedView = ({
+  alternateDirectionText,
+  accessiblePathDirectionArrow,
+}: CurrentElevatorClosedViewProps) => {
+  return (
+    <div className="current-elevator-closed-view">
+      <div className="shape"></div>
+      <div className="header">
+        <div className="icons">
+          <NoService className="no-service-icon" height={126} width={126} />
+          <ElevatorWayfinding />
+        </div>
+        <div className="closed-text">Closed</div>
+        <div className="subheading">Until further notice</div>
+      </div>
+      <hr className="thin" />
+      <div className="accessible-path-container">
+        <div className="subheading-container">
+          <div className="subheading">Accessible Path</div>
+          <div>
+            <IsaNegative width={100} height={100} />
+            <Arrow
+              width={100}
+              height={100}
+              className={cx("arrow", accessiblePathDirectionArrow)}
+            />
+          </div>
+        </div>
+        <div className="alternate-direction-text">{alternateDirectionText}</div>
+        <div className="feedback-text">
+          <span className="italic">
+            Are these directions unclear? Leave feedback here:
+          </span>{" "}
+          <span className="bold">www.feedback.com</span>
+        </div>
+      </div>
+      <PagingIndicators numPages={2} pageIndex={0} />
+    </div>
   );
 };
 
@@ -202,24 +259,40 @@ interface Props extends WrappedComponentProps {
   id: string;
   in_station_closures: ElevatorClosure[];
   other_stations_with_closures: StationWithClosures[];
+  alternate_direction_text: string;
+  accessible_path_direction_arrow: ArrowDirection;
+  accessible_path_image_url: string;
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({
+  id,
   other_stations_with_closures: otherStationsWithClosures,
   in_station_closures: inStationClosures,
+  alternate_direction_text: alternateDirectionText,
+  accessible_path_direction_arrow: accessiblePathDirectionArrow,
+  accessible_path_image_url: accessiblePathImageUrl,
   lastUpdate,
   onFinish,
 }: Props) => {
+  const currentElevatorClosure = inStationClosures.find(
+    (c) => c.elevator_id === id,
+  );
+
   return (
     <div className="elevator-closures">
-      {inStationClosures.length === 0 ? (
-        <NoInStationClosuresView
+      {currentElevatorClosure ? (
+        <CurrentElevatorClosedView
+          closure={currentElevatorClosure}
+          alternateDirectionText={alternateDirectionText}
+          accessiblePathDirectionArrow={accessiblePathDirectionArrow}
+          accessiblePathImageUrl={accessiblePathImageUrl}
+        />
+      ) : (
+        <OutsideClosuresView
           stations={otherStationsWithClosures}
           lastUpdate={lastUpdate}
           onFinish={onFinish}
         />
-      ) : (
-        <></>
       )}
     </div>
   );
