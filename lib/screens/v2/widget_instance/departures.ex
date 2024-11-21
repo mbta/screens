@@ -1,7 +1,6 @@
 defmodule Screens.V2.WidgetInstance.Departures do
   @moduledoc false
 
-  alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -329,8 +328,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :departure_row,
       route: serialize_route(departures, route_pill_serializer),
       headsign: serialize_headsign(departures, screen),
-      times_with_crowding: serialize_times_with_crowding(departures, screen, now),
-      inline_alerts: serialize_inline_alerts(departures)
+      times_with_crowding: serialize_times_with_crowding(departures, screen, now)
     }
   end
 
@@ -506,28 +504,5 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp serialize_crowding(departure) do
     Departure.crowding_level(departure)
-  end
-
-  def serialize_inline_alerts([first_departure | _]) do
-    first_departure
-    |> Departure.alerts()
-    |> Enum.filter(&inline_alert?/1)
-    |> Enum.map(&serialize_inline_alert/1)
-  end
-
-  defp inline_alert?(%{effect: :delay}), do: false
-  defp inline_alert?(_), do: false
-
-  defp serialize_inline_alert(%{id: id, effect: :delay, severity: severity}) do
-    {delay_description, delay_minutes} = Alert.interpret_severity(severity)
-
-    delay_description_text =
-      case delay_description do
-        :up_to -> "Delays up to"
-        :more_than -> "Delays more than"
-      end
-
-    delay_text = [delay_description_text, %{format: :bold, text: "#{delay_minutes}m"}]
-    %{id: id, icon: :clock, text: delay_text, color: :black}
   end
 end

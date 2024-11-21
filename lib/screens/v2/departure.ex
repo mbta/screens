@@ -82,12 +82,6 @@ defmodule Screens.V2.Departure do
   end
 
   ### Accessor functions
-  def alerts(%__MODULE__{prediction: p}) when not is_nil(p) do
-    %Prediction{alerts: alerts} = p
-    alerts
-  end
-
-  def alerts(%__MODULE__{prediction: nil, schedule: _}), do: []
 
   def crowding_level(%__MODULE__{prediction: p}) when not is_nil(p) do
     case p do

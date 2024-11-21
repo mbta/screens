@@ -9,23 +9,6 @@ defmodule Screens.V2.DepartureTest do
   alias Screens.V2.Departure
   alias Screens.Vehicles.Vehicle
 
-  describe "alerts/1" do
-    test "returns alerts from prediction when present" do
-      prediction = %Prediction{id: "prediction", alerts: [%Alert{id: "1"}, %Alert{id: "2"}]}
-      schedule = %Schedule{id: "schedule"}
-      departure = %Departure{prediction: prediction, schedule: schedule}
-
-      assert [%Alert{id: "1"}, %Alert{id: "2"}] = Departure.alerts(departure)
-    end
-
-    test "returns empty list when no prediction is present" do
-      schedule = %Schedule{id: "schedule"}
-      departure = %Departure{schedule: schedule}
-
-      assert [] == Departure.alerts(departure)
-    end
-  end
-
   describe "crowding_level/1" do
     test "returns relevant crowding levels" do
       trip = %Trip{id: "trip-1", stops: ["1", "2", "3"]}

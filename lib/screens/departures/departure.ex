@@ -251,13 +251,7 @@ defmodule Screens.Departures.Departure do
           %{}
       end
 
-    alert_data =
-      case Map.get(data, :alerts) do
-        nil -> %{}
-        alerts -> %{alerts: get_alerts_list(alerts)}
-      end
-
-    departure = Enum.reduce([base_data, trip_data, vehicle_data, alert_data], &Map.merge/2)
+    departure = Enum.reduce([base_data, trip_data, vehicle_data], &Map.merge/2)
 
     struct(__MODULE__, departure)
   end
@@ -464,15 +458,5 @@ defmodule Screens.Departures.Departure do
 
   def departure_in_past(%{departure_time: departure_time}, now \\ DateTime.utc_now()) do
     DateTime.compare(departure_time, now) == :lt
-  end
-
-  defp get_alerts_list(alerts) do
-    [
-      delay: Enum.any?(alerts, &(&1.effect == :delay)),
-      snow_route: false,
-      last_trip: false
-    ]
-    |> Enum.filter(fn {_alert_type, active?} -> active? end)
-    |> Enum.map(fn {alert_type, _active?} -> alert_type end)
   end
 end

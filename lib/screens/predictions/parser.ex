@@ -1,7 +1,7 @@
 defmodule Screens.Predictions.Parser do
   @moduledoc false
 
-  alias Screens.{Alerts, Routes, Stops, Trips, Vehicles}
+  alias Screens.{Routes, Stops, Trips, Vehicles}
   alias Screens.Predictions.{Prediction, ScheduleRelationship}
 
   def parse(%{"data" => data} = response) do
@@ -43,24 +43,12 @@ defmodule Screens.Predictions.Parser do
           included |> Map.fetch!({vehicle_id, "vehicle"}) |> Vehicles.Parser.parse_vehicle()
       end
 
-    alerts =
-      case get_in(relationships, ~w[alerts data]) do
-        nil ->
-          []
-
-        alerts_data ->
-          Enum.map(alerts_data, fn %{"id" => alert_id} ->
-            included |> Map.fetch!({alert_id, "alert"}) |> Alerts.Parser.parse_alert()
-          end)
-      end
-
     %Prediction{
       id: id,
       trip: trip,
       stop: stop,
       route: route,
       vehicle: vehicle,
-      alerts: alerts,
       arrival_time: parse_time(arrival_time_string),
       departure_time: parse_time(departure_time_string),
       track_number: stop.platform_code,

@@ -71,8 +71,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                   track_number: nil,
                   route_text: "Green Line B"
                 },
-                headsign: %{headsign: "Boston College", variation: nil},
-                inline_alerts: []
+                headsign: %{headsign: "Boston College", variation: nil}
               },
               normal: %{
                 type: :departure_row,
@@ -94,8 +93,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                   track_number: nil,
                   route_text: "Red Line"
                 },
-                headsign: %{headsign: "Alewife", variation: nil},
-                inline_alerts: []
+                headsign: %{headsign: "Alewife", variation: nil}
               }
             ]
           }
@@ -132,8 +130,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                   }
                 ],
                 route: %{id: "73", vehicle_type: :bus, track_number: "E", route_text: "73"},
-                headsign: %{headsign: "Waverley", variation: nil},
-                inline_alerts: []
+                headsign: %{headsign: "Waverley", variation: nil}
               },
               normal: %{
                 type: :departure_row,
@@ -156,8 +153,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                   track_number: "5",
                   route_text: "Needham Line"
                 },
-                headsign: %{headsign: "South Station", variation: nil},
-                inline_alerts: []
+                headsign: %{headsign: "South Station", variation: nil}
               }
             ]
           }
