@@ -99,7 +99,7 @@ defmodule Screens.MixProject do
       {:remote_ip, "~> 1.2"},
       {:hackney_telemetry, "~> 0.2.0"},
       {:ex_cldr_messages, "~> 1.0"},
-      {:recon, "~> 2.5.6"}
+      {:recon, github: "ferd/recon", ref: "e3e7289ff18c4dc3f692bc332f27007f1ffabaeb"}
     ]
   end
 end

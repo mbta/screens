@@ -79,21 +79,18 @@ defmodule Screens.Health do
 
   @spec process_metrics({pid(), term() | nil, term() | nil}) :: {term(), term(), iodata()}
   defp process_metrics({pid, name, supervisor}) do
-    metrics =
-      pid
-      |> safe_recon_info(@process_metrics)
-      |> Stream.map(fn {metric, value} -> "#{metric}=#{value}" end)
-      |> Enum.intersperse(" ")
+    log_data =
+      case :recon.info(pid, @process_metrics) do
+        # Can occur if the process died between discovering it and getting its metrics
+        :undefined ->
+          []
 
-    {name, supervisor, metrics}
-  end
+        metrics ->
+          metrics
+          |> Stream.map(fn {metric, value} -> "#{metric}=#{value}" end)
+          |> Enum.intersperse(" ")
+      end
 
-  # work around https://github.com/ferd/recon/issues/95
-  @spec safe_recon_info(pid(), [atom()]) ::
-          [] | [{:recon.info_type(), [{:recon.info_key(), term()}]}]
-  defp safe_recon_info(pid, metrics) do
-    :recon.info(pid, metrics)
-  rescue
-    FunctionClauseError -> []
+    {name, supervisor, log_data}
   end
 end
