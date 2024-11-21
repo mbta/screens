@@ -153,8 +153,8 @@ const OutsideClosureList = ({
             <AccessibilityAlert height={128} width={155} />
           </div>
         </div>
+        <hr className="thin" />
       </div>
-      <hr className="thin" />
       <div className="closure-list-container">
         {
           <div
