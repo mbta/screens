@@ -328,7 +328,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :departure_row,
       route: serialize_route(departures, route_pill_serializer),
       headsign: serialize_headsign(departures, screen),
-      times_with_crowding: serialize_times_with_crowding(departures, screen, now)
+      times_with_crowding: serialize_times_with_crowding(departures, screen, now),
+      # Temporarily retained for compatibility with deployed clients that expect this field
+      inline_alerts: []
     }
   end
 

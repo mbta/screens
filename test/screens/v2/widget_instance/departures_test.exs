@@ -1,7 +1,6 @@
 defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Alerts.Alert
   alias ScreensConfig.V2.Departures.Header
   alias ScreensConfig.V2.Departures.Layout
   alias ScreensConfig.V2.FreeTextLine
