@@ -12,6 +12,7 @@ import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
 import useClientPaging from "Hooks/v2/use_client_paging";
+import useTextResizer from "Hooks/v2/use_text_resizer";
 
 type StationWithClosures = {
   id: string;
@@ -207,7 +208,7 @@ const OutsideClosuresView = ({
   );
 };
 
-interface CurrentElevatorClosedViewProps {
+interface CurrentElevatorClosedViewProps extends WrappedComponentProps {
   closure: ElevatorClosure;
   alternateDirectionText: string;
   accessiblePathDirectionArrow: ArrowDirection;
@@ -217,7 +218,16 @@ interface CurrentElevatorClosedViewProps {
 const CurrentElevatorClosedView = ({
   alternateDirectionText,
   accessiblePathDirectionArrow,
+  onFinish,
+  lastUpdate,
 }: CurrentElevatorClosedViewProps) => {
+  const pageIndex = useClientPaging({ numPages: 2, onFinish, lastUpdate });
+  const { ref, size } = useTextResizer({
+    sizes: ["small", "medium", "large"],
+    maxHeight: 746,
+    resetDependencies: [alternateDirectionText],
+  });
+
   return (
     <div className="current-elevator-closed-view">
       <div className="shape"></div>
@@ -242,15 +252,11 @@ const CurrentElevatorClosedView = ({
             />
           </div>
         </div>
-        <div className="alternate-direction-text">{alternateDirectionText}</div>
-        <div className="feedback-text">
-          <span className="italic">
-            Are these directions unclear? Leave feedback here:
-          </span>{" "}
-          <span className="bold">www.feedback.com</span>
+        <div ref={ref} className={cx("alternate-direction-text", size)}>
+          {alternateDirectionText}
         </div>
       </div>
-      <PagingIndicators numPages={2} pageIndex={0} />
+      <PagingIndicators numPages={2} pageIndex={pageIndex} />
     </div>
   );
 };
@@ -286,6 +292,8 @@ const ElevatorClosures: React.ComponentType<Props> = ({
           alternateDirectionText={alternateDirectionText}
           accessiblePathDirectionArrow={accessiblePathDirectionArrow}
           accessiblePathImageUrl={accessiblePathImageUrl}
+          onFinish={onFinish}
+          lastUpdate={lastUpdate}
         />
       ) : (
         <OutsideClosuresView
