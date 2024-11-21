@@ -126,6 +126,10 @@
   }
 
   .outside-closures-view {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
     .in-station-summary {
       display: flex;
       justify-content: space-between;
@@ -141,7 +145,6 @@
     }
 
     .outside-closure-list {
-      position: relative;
       height: 100%;
       background-color: $warm-neutral-90;
 
