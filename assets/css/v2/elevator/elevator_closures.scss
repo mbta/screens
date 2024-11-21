@@ -28,7 +28,7 @@
 
   hr.thin {
     min-height: 2px;
-    margin: 24px 0 0;
+    margin: 24px 0;
     background-color: $true-grey-45;
     border: none;
     opacity: 0.5;
@@ -46,6 +46,7 @@
       .header {
         display: flex;
         max-height: 432px;
+        margin-bottom: 48px;
         font-size: 112px;
         font-weight: 700;
         line-height: 112px;
@@ -66,9 +67,9 @@
         transform: translateX(calc(-100% * var(--closure-list-offset)));
 
         .closure-row {
-          max-width: 1080px;
+          box-sizing: border-box;
+          width: 1080px;
           padding: 0 48px;
-          margin-top: 24px;
 
           &__station-name {
             font-size: 62px;
