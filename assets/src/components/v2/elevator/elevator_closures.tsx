@@ -7,12 +7,12 @@ import PagingDotUnselected from "Images/svgr_bundled/paging_dot_unselected.svg";
 import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
 import NoService from "Images/svgr_bundled/no-service-black.svg";
 import ElevatorWayfinding from "Images/svgr_bundled/elevator-wayfinding.svg";
-import Arrow from "Images/svgr_bundled/arrow-90.svg";
 import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
 import useClientPaging from "Hooks/v2/use_client_paging";
 import useTextResizer from "Hooks/v2/use_text_resizer";
+import Arrow, { Direction } from "../arrow";
 
 type StationWithClosures = {
   id: string;
@@ -28,8 +28,6 @@ type ElevatorClosure = {
   description: string;
   header_text: string;
 };
-
-type ArrowDirection = "n" | "e" | "s" | "w";
 
 interface PagingIndicatorsProps {
   numPages: number;
@@ -211,7 +209,7 @@ const OutsideClosuresView = ({
 interface CurrentElevatorClosedViewProps extends WrappedComponentProps {
   closure: ElevatorClosure;
   alternateDirectionText: string;
-  accessiblePathDirectionArrow: ArrowDirection;
+  accessiblePathDirectionArrow: Direction;
   accessiblePathImageUrl: string;
 }
 
@@ -246,11 +244,7 @@ const CurrentElevatorClosedView = ({
           <div className="subheading">Accessible Path</div>
           <div>
             <IsaNegative width={100} height={100} />
-            <Arrow
-              width={100}
-              height={100}
-              className={cx("arrow", accessiblePathDirectionArrow)}
-            />
+            <Arrow direction={accessiblePathDirectionArrow} className="arrow" />
           </div>
         </div>
         {pageIndex === 0 ? (
@@ -271,7 +265,7 @@ interface Props extends WrappedComponentProps {
   in_station_closures: ElevatorClosure[];
   other_stations_with_closures: StationWithClosures[];
   alternate_direction_text: string;
-  accessible_path_direction_arrow: ArrowDirection;
+  accessible_path_direction_arrow: Direction;
   accessible_path_image_url: string;
 }
 

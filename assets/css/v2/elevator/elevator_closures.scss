@@ -80,16 +80,9 @@
           align-self: center;
         }
 
-        .arrow.e {
-          rotate: 90deg;
-        }
-
-        .arrow.s {
-          rotate: 180deg;
-        }
-
-        .arrow.w {
-          rotate: -90deg;
+        .arrow {
+          width: 100px;
+          height: 100px;
         }
       }
 
