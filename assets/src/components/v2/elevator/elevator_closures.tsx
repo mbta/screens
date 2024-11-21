@@ -218,6 +218,7 @@ interface CurrentElevatorClosedViewProps extends WrappedComponentProps {
 const CurrentElevatorClosedView = ({
   alternateDirectionText,
   accessiblePathDirectionArrow,
+  accessiblePathImageUrl,
   onFinish,
   lastUpdate,
 }: CurrentElevatorClosedViewProps) => {
@@ -252,9 +253,13 @@ const CurrentElevatorClosedView = ({
             />
           </div>
         </div>
-        <div ref={ref} className={cx("alternate-direction-text", size)}>
-          {alternateDirectionText}
-        </div>
+        {pageIndex === 0 ? (
+          <div ref={ref} className={cx("alternate-direction-text", size)}>
+            {alternateDirectionText}
+          </div>
+        ) : (
+          <img className="map" src={accessiblePathImageUrl} />
+        )}
       </div>
       <PagingIndicators numPages={2} pageIndex={pageIndex} />
     </div>

@@ -112,18 +112,10 @@
         line-height: 96px;
       }
 
-      .feedback-text {
-        font-size: 48px;
-        line-height: 64px;
-        color: $cool-black-30;
-
-        .italic {
-          font-style: italic;
-        }
-
-        .bold {
-          font-weight: 700;
-        }
+      .map {
+        width: 1080px;
+        margin-top: 26px;
+        margin-left: -48px;
       }
     }
 
