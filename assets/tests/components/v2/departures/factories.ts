@@ -17,7 +17,6 @@ export const departureRow = Factory.define<Row>(({ sequence }) => ({
   route: { type: "text", color: "yellow", text: sequence.toString() },
   headsign: { headsign: `Destination ${sequence}` },
   times_with_crowding: timeWithCrowding.buildList(1),
-  inline_alerts: [],
 }));
 
 export const timeWithCrowding = Factory.define<TimeWithCrowding>(

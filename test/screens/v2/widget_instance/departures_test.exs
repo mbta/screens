@@ -135,7 +135,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                    headsign: %{headsign: "Oak Grove"},
                    # MD5 hash when the schedule ID is nil. Won't change unless ID does.
                    id: "1B2M2Y8AsgTpgAmY7PhCfg==",
-                   inline_alerts: [],
                    route: %{color: :orange, text: "OL", type: :text},
                    times_with_crowding: [%{id: nil, crowding: nil, time: %{type: :overnight}}],
                    type: :departure_row
@@ -904,20 +903,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
-  describe "serialize_inline_alerts/1" do
-    test "filters all alerts" do
-      a1 = %Alert{id: "1", effect: :delay, severity: 4}
-      a2 = %Alert{id: "2", effect: :shuttle, severity: 7}
-      a3 = %Alert{id: "3", effect: :suspension, severity: 7}
-      alerts = [a1, a2, a3]
-      departure = %Departure{prediction: %Prediction{alerts: alerts}}
-
-      expected = []
-
-      assert expected == Departures.serialize_inline_alerts([departure])
-    end
-  end
-
   describe "slot_names/1" do
     test "returns main_content" do
       instance = %Departures{section_data: []}
@@ -1021,8 +1006,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                     route: %{track_number: nil, vehicle_type: :train, route_text: nil},
                     times_with_crowding: [
                       %{id: nil, time: %{type: :minutes, minutes: 5}, crowding: nil}
-                    ],
-                    inline_alerts: []
+                    ]
                   }}
                ],
                header: "Section Header"
@@ -1069,8 +1053,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                     times_with_crowding: [
                       %{id: nil, time: %{type: :minutes, minutes: 1}, crowding: nil},
                       %{id: nil, time: %{type: :minutes, minutes: 2}, crowding: nil}
-                    ],
-                    inline_alerts: []
+                    ]
                   }}
                ],
                header: "Section Header"
@@ -1124,8 +1107,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                     times_with_crowding: [
                       %{id: nil, time: %{type: :minutes, minutes: 5}, crowding: nil},
                       %{id: nil, time: %{type: :minutes, minutes: 6}, crowding: nil}
-                    ],
-                    inline_alerts: []
+                    ]
                   }}
                ],
                header: "Section Header"
@@ -1144,8 +1126,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                     times_with_crowding: [
                       %{id: nil, time: %{type: :minutes, minutes: 5}, crowding: nil},
                       %{id: nil, time: %{type: :minutes, minutes: 6}, crowding: nil}
-                    ],
-                    inline_alerts: []
+                    ]
                   }}
                ],
                header: "Section Header"
