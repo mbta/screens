@@ -4,6 +4,9 @@ defmodule Screens.LastTrip.VehiclePositions.Noop do
 
   @impl true
   def get do
-    {:ok, %HTTPoison.Response{status_code: 200, body: %{"entity" => []}}}
+    case Jason.decode("{\"entity\":[]}") do
+      {:ok, decoded} -> {:ok, %HTTPoison.Response{status_code: 200, body: decoded}}
+      error -> error
+    end
   end
 end

@@ -2,6 +2,7 @@ defmodule Screens.LastTrip.Poller do
   @moduledoc """
   GenServer that polls predictions to calculate the last trip of the day
   """
+  require Logger
   alias Screens.LastTrip.Cache
   alias Screens.LastTrip.Parser
   alias Screens.LastTrip.TripUpdates
@@ -32,14 +33,20 @@ defmodule Screens.LastTrip.Poller do
         :ok = Cache.reset()
         %{state | next_reset: next_reset()}
       else
-        {:ok,
-         %{
-           trip_updates: trip_updates,
-           vehicle_positions: vehicle_positions
-         }} = fetch_trip_updates_and_vehicle_positions()
+        case fetch_trip_updates_and_vehicle_positions() do
+          {:ok,
+           %{
+             trip_updates: trip_updates,
+             vehicle_positions: vehicle_positions
+           }} ->
+            update_last_trips(trip_updates)
+            update_recent_departures(trip_updates, vehicle_positions)
 
-        update_last_trips(trip_updates)
-        update_recent_departures(trip_updates, vehicle_positions)
+          {:error, error} ->
+            Logger.warning(
+              "[last_trip_poller] failed while polling for new data: #{inspect(error)}"
+            )
+        end
 
         state
       end
