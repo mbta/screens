@@ -5,7 +5,10 @@ defmodule Screens.LastTrip.TripUpdates.GTFS do
   """
   @behaviour Screens.LastTrip.TripUpdates
 
+  use Retry.Annotation
+
   @impl true
+  @retry with: Stream.take(constant_backoff(500), 5)
   def get do
     trip_updates_url = Application.fetch_env!(:screens, :trip_updates_url)
 

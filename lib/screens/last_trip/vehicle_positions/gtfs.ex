@@ -5,7 +5,10 @@ defmodule Screens.LastTrip.VehiclePositions.GTFS do
   """
   @behaviour Screens.LastTrip.VehiclePositions
 
+  use Retry.Annotation
+
   @impl true
+  @retry with: Stream.take(constant_backoff(500), 5)
   def get do
     vehicle_positions_url = Application.fetch_env!(:screens, :vehicle_positions_url)
 
