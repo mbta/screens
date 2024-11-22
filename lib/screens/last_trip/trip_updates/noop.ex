@@ -4,9 +4,6 @@ defmodule Screens.LastTrip.TripUpdates.Noop do
 
   @impl true
   def get do
-    case Jason.decode("{\"entity\":[]}") do
-      {:ok, decoded} -> {:ok, %{status_code: 200, body: decoded}}
-      error -> error
-    end
+    {:ok, %{status_code: 200, body: %{"entity" => []}}}
   end
 end
