@@ -6,7 +6,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.Util.Assets
   alias Screens.V2.WidgetInstance.ElevatorClosures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
@@ -20,14 +19,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @stop injected(Stop)
 
   @spec elevator_status_instances(Screen.t()) :: list(ElevatorClosures.t())
-  def elevator_status_instances(%Screen{
-        app_params: %Elevator{
-          elevator_id: elevator_id,
-          alternate_direction_text: alternate_direction_text,
-          accessible_path_direction_arrow: accessible_path_direction_arrow,
-          accessible_path_image_url: accessible_path_image_url
-        }
-      }) do
+  def elevator_status_instances(%Screen{app_params: %Elevator{elevator_id: elevator_id} = config}) do
     with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
          {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
          {:ok, alerts} <- @alert.fetch_elevator_alerts_with_facilities() do
@@ -39,13 +31,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
       [
         %ElevatorClosures{
-          id: elevator_id,
           in_station_closures: Enum.map(in_station_alerts, &alert_to_elevator_closure/1),
           other_stations_with_closures:
             format_outside_closures(outside_alerts, parent_station_map, routes_map),
-          alternate_direction_text: alternate_direction_text,
-          accessible_path_direction_arrow: accessible_path_direction_arrow,
-          accessible_path_image_url: Assets.s3_asset_url(accessible_path_image_url)
+          elevator_config: config
         }
       ]
     else

@@ -2,24 +2,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   @moduledoc false
 
   alias Screens.Stops.Stop
+  alias Screens.Util.Assets
   alias ScreensConfig.V2.Elevator
 
-  defstruct ~w[
-                id
-                in_station_closures
-                other_stations_with_closures
-                alternate_direction_text
-                accessible_path_direction_arrow
-                accessible_path_image_url
-              ]a
+  defstruct ~w[elevator_config in_station_closures other_stations_with_closures]a
 
   @type t :: %__MODULE__{
-          id: String.t(),
+          elevator_config: Elevator.t(),
           in_station_closures: list(__MODULE__.Closure.t()),
-          other_stations_with_closures: list(__MODULE__.Station.t()),
-          alternate_direction_text: String.t(),
-          accessible_path_direction_arrow: Elevator.arrow_direction(),
-          accessible_path_image_url: String.t()
+          other_stations_with_closures: list(__MODULE__.Station.t())
         }
 
   defmodule Station do
@@ -57,12 +48,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   end
 
   def serialize(%__MODULE__{
-        id: id,
+        elevator_config: %Elevator{
+          elevator_id: id,
+          alternate_direction_text: alternate_direction_text,
+          accessible_path_direction_arrow: accessible_path_direction_arrow,
+          accessible_path_image_url: accessible_path_image_url,
+          accessible_path_image_here_coordinates: accessible_path_image_here_coordinates
+        },
         in_station_closures: in_station_closures,
-        other_stations_with_closures: other_stations_with_closures,
-        alternate_direction_text: alternate_direction_text,
-        accessible_path_direction_arrow: accessible_path_direction_arrow,
-        accessible_path_image_url: accessible_path_image_url
+        other_stations_with_closures: other_stations_with_closures
       }),
       do: %{
         id: id,
@@ -70,7 +64,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
         other_stations_with_closures: other_stations_with_closures,
         alternate_direction_text: alternate_direction_text,
         accessible_path_direction_arrow: accessible_path_direction_arrow,
-        accessible_path_image_url: accessible_path_image_url
+        accessible_path_image_url: Assets.s3_asset_url(accessible_path_image_url),
+        accessible_path_image_here_coordinates: accessible_path_image_here_coordinates
       }
 
   defimpl Screens.V2.WidgetInstance do

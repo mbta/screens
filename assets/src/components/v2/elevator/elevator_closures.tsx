@@ -8,6 +8,8 @@ import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
 import NoService from "Images/svgr_bundled/no-service-black.svg";
 import ElevatorWayfinding from "Images/svgr_bundled/elevator-wayfinding.svg";
 import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
+import CurrentLocationMarker from "Images/svgr_bundled/current-location-marker.svg";
+import CurrentLocationBackground from "Images/svgr_bundled/current-location-background.svg";
 import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
 import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
 import useClientPaging from "Hooks/v2/use_client_paging";
@@ -27,6 +29,20 @@ type ElevatorClosure = {
   elevator_id: string;
   description: string;
   header_text: string;
+};
+
+type Coordinates = {
+  x: number;
+  y: number;
+};
+
+const PulsatingDot = ({ x, y }: Coordinates) => {
+  return (
+    <div className="marker-container" style={{ top: x, left: y }}>
+      <CurrentLocationBackground className="marker-background" />
+      <CurrentLocationMarker className="marker" />
+    </div>
+  );
 };
 
 interface PagingIndicatorsProps {
@@ -211,12 +227,14 @@ interface CurrentElevatorClosedViewProps extends WrappedComponentProps {
   alternateDirectionText: string;
   accessiblePathDirectionArrow: Direction;
   accessiblePathImageUrl: string;
+  accessiblePathImageHereCoordinates: Coordinates;
 }
 
 const CurrentElevatorClosedView = ({
   alternateDirectionText,
   accessiblePathDirectionArrow,
   accessiblePathImageUrl,
+  accessiblePathImageHereCoordinates,
   onFinish,
   lastUpdate,
 }: CurrentElevatorClosedViewProps) => {
@@ -247,12 +265,18 @@ const CurrentElevatorClosedView = ({
             <Arrow direction={accessiblePathDirectionArrow} className="arrow" />
           </div>
         </div>
-        {pageIndex === 0 ? (
+        {pageIndex === 123 ? (
           <div ref={ref} className={cx("alternate-direction-text", size)}>
             {alternateDirectionText}
           </div>
         ) : (
-          <img className="map" src={accessiblePathImageUrl} />
+          <div className="map-container">
+            <PulsatingDot
+              x={accessiblePathImageHereCoordinates.x}
+              y={accessiblePathImageHereCoordinates.y}
+            />
+            <img className="map" src={accessiblePathImageUrl} />
+          </div>
         )}
       </div>
       <PagingIndicators numPages={2} pageIndex={pageIndex} />
@@ -267,6 +291,7 @@ interface Props extends WrappedComponentProps {
   alternate_direction_text: string;
   accessible_path_direction_arrow: Direction;
   accessible_path_image_url: string;
+  accessible_path_image_here_coordinates: Coordinates;
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({
@@ -276,6 +301,7 @@ const ElevatorClosures: React.ComponentType<Props> = ({
   alternate_direction_text: alternateDirectionText,
   accessible_path_direction_arrow: accessiblePathDirectionArrow,
   accessible_path_image_url: accessiblePathImageUrl,
+  accessible_path_image_here_coordinates: accessiblePathImageHereCoordinates,
   lastUpdate,
   onFinish,
 }: Props) => {
@@ -291,6 +317,9 @@ const ElevatorClosures: React.ComponentType<Props> = ({
           alternateDirectionText={alternateDirectionText}
           accessiblePathDirectionArrow={accessiblePathDirectionArrow}
           accessiblePathImageUrl={accessiblePathImageUrl}
+          accessiblePathImageHereCoordinates={
+            accessiblePathImageHereCoordinates
+          }
           onFinish={onFinish}
           lastUpdate={lastUpdate}
         />

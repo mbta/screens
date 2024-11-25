@@ -1,3 +1,43 @@
+.screen-normal:has(.current-elevator-closed-view) {
+  .normal-header,
+  .footer {
+    color: white;
+    background-color: $accessibility-blue;
+  }
+}
+
+.marker-container {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 116px;
+  height: 116px;
+
+  .marker-background,
+  .marker {
+    position: absolute;
+  }
+
+  .marker-background {
+    animation: pulse-ring 1.5s infinite;
+  }
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(0.5);
+  }
+
+  60% {
+    opacity: 0.25;
+  }
+
+  100% {
+    opacity: 0;
+  }
+}
+
 .elevator-closures {
   position: relative;
   display: flex;
@@ -105,10 +145,14 @@
         line-height: 96px;
       }
 
-      .map {
-        width: 1080px;
+      .map-container {
+        position: relative;
         margin-top: 26px;
         margin-left: -48px;
+
+        .map {
+          width: 1080px;
+        }
       }
     }
 
