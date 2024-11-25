@@ -1,11 +1,14 @@
 .footer {
-  display: flex;
-  align-items: center;
+  box-sizing: border-box;
   height: 100%;
-  padding: 0 48px;
-  font-family: Inter, sans-serif;
+  padding: 26px 48px;
   font-size: 48px;
+  font-weight: 500;
   line-height: 62px;
   color: white;
   background-color: $cool-black-30;
+
+  b {
+    letter-spacing: -0.2px;
+  }
 }
