@@ -226,7 +226,7 @@ interface CurrentElevatorClosedViewProps extends WrappedComponentProps {
   closure: ElevatorClosure;
   alternateDirectionText: string;
   accessiblePathDirectionArrow: Direction;
-  accessiblePathImageUrl: string;
+  accessiblePathImageUrl: string | null;
   accessiblePathImageHereCoordinates: Coordinates;
 }
 
@@ -238,7 +238,8 @@ const CurrentElevatorClosedView = ({
   onFinish,
   lastUpdate,
 }: CurrentElevatorClosedViewProps) => {
-  const pageIndex = useClientPaging({ numPages: 2, onFinish, lastUpdate });
+  const numPages = accessiblePathImageUrl ? 2 : 1;
+  const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
   const { ref, size } = useTextResizer({
     sizes: ["small", "medium", "large"],
     maxHeight: 746,
@@ -265,7 +266,7 @@ const CurrentElevatorClosedView = ({
             <Arrow direction={accessiblePathDirectionArrow} className="arrow" />
           </div>
         </div>
-        {pageIndex === 123 ? (
+        {pageIndex === 0 ? (
           <div ref={ref} className={cx("alternate-direction-text", size)}>
             {alternateDirectionText}
           </div>
@@ -275,11 +276,13 @@ const CurrentElevatorClosedView = ({
               x={accessiblePathImageHereCoordinates.x}
               y={accessiblePathImageHereCoordinates.y}
             />
-            <img className="map" src={accessiblePathImageUrl} />
+            <img className="map" src={accessiblePathImageUrl!} />
           </div>
         )}
       </div>
-      <PagingIndicators numPages={2} pageIndex={pageIndex} />
+      {numPages === 2 && (
+        <PagingIndicators numPages={numPages} pageIndex={pageIndex} />
+      )}
     </div>
   );
 };
@@ -290,7 +293,7 @@ interface Props extends WrappedComponentProps {
   other_stations_with_closures: StationWithClosures[];
   alternate_direction_text: string;
   accessible_path_direction_arrow: Direction;
-  accessible_path_image_url: string;
+  accessible_path_image_url: string | null;
   accessible_path_image_here_coordinates: Coordinates;
 }
 

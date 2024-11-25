@@ -64,7 +64,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
         other_stations_with_closures: other_stations_with_closures,
         alternate_direction_text: alternate_direction_text,
         accessible_path_direction_arrow: accessible_path_direction_arrow,
-        accessible_path_image_url: Assets.s3_asset_url(accessible_path_image_url),
+        accessible_path_image_url:
+          if(is_nil(accessible_path_image_url),
+            do: nil,
+            else: Assets.s3_asset_url(accessible_path_image_url)
+          ),
         accessible_path_image_here_coordinates: accessible_path_image_here_coordinates
       }
 
