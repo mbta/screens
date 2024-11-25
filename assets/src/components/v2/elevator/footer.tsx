@@ -3,8 +3,9 @@ import React from "react";
 const Footer = () => {
   return (
     <div className="footer">
-      For more info and alternate paths: mbta.com/alerts/access or (617)
-      222-2828
+      For more info and alternate paths:{" "}
+      <span className="bold">mbta.com/alerts/access</span> or{" "}
+      <span className="bold">617-222-2828</span>
     </div>
   );
 };
