@@ -4,8 +4,7 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
   """
   alias Screens.BlueBikes
   alias Screens.BlueBikes.StationStatus
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.BlueBikes.Station
+  alias ScreensConfig.{Arrow, Screen}
   alias ScreensConfig.V2.PreFare
 
   @type t :: %__MODULE__{
@@ -24,7 +23,7 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
   @type normal_station :: %{
           status: :normal,
           id: String.t(),
-          arrow: Station.arrow(),
+          arrow: Arrow.t(),
           walk_distance_minutes: non_neg_integer(),
           walk_distance_feet: non_neg_integer(),
           name: String.t(),
@@ -35,7 +34,7 @@ defmodule Screens.V2.WidgetInstance.BlueBikes do
   @type special_station :: %{
           status: :valet | :out_of_service,
           id: String.t(),
-          arrow: Station.arrow(),
+          arrow: Arrow.t(),
           walk_distance_minutes: non_neg_integer(),
           walk_distance_feet: non_neg_integer(),
           name: String.t()
