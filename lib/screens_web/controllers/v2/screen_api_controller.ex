@@ -8,7 +8,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias Screens.V2.{ScreenAudioData, ScreenData}
   alias ScreensConfig.Screen
 
-  @base_response %{data: nil, disabled: false, force_reload: false}
+  @base_response %{data: nil, disabled: false, force_reload: false, flex_zone: nil}
   @disabled_response %{@base_response | disabled: true}
   @outdated_response %{@base_response | force_reload: true}
 
@@ -84,19 +84,29 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> screen_response(variant, run_all_variants?: true, update_visible_alerts?: true)
+          |> screen_response(variant, screen,
+            run_all_variants?: true,
+            update_visible_alerts?: true
+          )
           |> put_extra_fields(screen_id, screen)
 
         json(conn, response)
     end
   end
 
-  defp screen_response(screen_id, "all", opts) do
+  defp screen_response(screen_id, "all", _, opts) do
     {default, variants} = ScreenData.variants(screen_id, opts)
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
-  defp screen_response(screen_id, variant, opts) do
+  defp screen_response(screen_id, variant, %Screen{vendor: :mercury}, opts) do
+    {data, flex_zone} =
+      ScreenData.get_with_flex_zone(screen_id, Keyword.put(opts, :generator_variant, variant))
+
+    %{@base_response | data: data, flex_zone: flex_zone}
+  end
+
+  defp screen_response(screen_id, variant, _, opts) do
     data = ScreenData.get(screen_id, Keyword.put(opts, :generator_variant, variant))
     %{@base_response | data: data}
   end
