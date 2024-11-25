@@ -3,11 +3,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
 
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ElevatorClosures
+  alias ScreensConfig.V2.Elevator
 
   setup do
     %{
       instance: %ElevatorClosures{
-        id: "111",
+        elevator_config:
+          struct(Elevator,
+            elevator_id: "1",
+            alternate_direction_text: "Test",
+            accessible_path_direction_arrow: :n
+          ),
         in_station_closures: [
           %ElevatorClosures.Closure{
             description: "Test Alert Description",
@@ -44,7 +50,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
 
   describe "serialize/1" do
     test "returns map with id and closures", %{instance: instance} do
-      assert Map.from_struct(instance) == WidgetInstance.serialize(instance)
+      assert %{
+               in_station_closures: instance.in_station_closures,
+               other_stations_with_closures: instance.other_stations_with_closures,
+               accessible_path_direction_arrow:
+                 instance.elevator_config.accessible_path_direction_arrow,
+               accessible_path_image_here_coordinates:
+                 instance.elevator_config.accessible_path_image_here_coordinates,
+               accessible_path_image_url: instance.elevator_config.accessible_path_image_url,
+               alternate_direction_text: instance.elevator_config.alternate_direction_text,
+               id: instance.elevator_config.elevator_id
+             } == WidgetInstance.serialize(instance)
     end
   end
 

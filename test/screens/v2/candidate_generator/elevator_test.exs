@@ -9,7 +9,9 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
     config = %Screen{
       app_id: :elevator_v2,
       app_params: %V2.Elevator{
-        elevator_id: "1"
+        elevator_id: "1",
+        alternate_direction_text: "Test",
+        accessible_path_direction_arrow: :n
       },
       device_id: "TEST",
       name: "TEST",
