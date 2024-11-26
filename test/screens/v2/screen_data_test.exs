@@ -132,33 +132,6 @@ defmodule Screens.V2.ScreenDataTest do
     end
   end
 
-  describe "get_with_flex_zone/2" do
-    setup do
-      stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
-      :ok
-    end
-
-    defp build_config(attrs) do
-      struct!(
-        %Screen{app_id: :test_app, app_params: %{}, device_id: "", name: "", vendor: :mercury},
-        attrs
-      )
-    end
-
-    test "gets widget data and all flex_zone pages for a screen ID" do
-      expect(@config_cache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
-
-      expect(
-        @parameters,
-        :candidate_generator,
-        fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
-      )
-
-      assert ScreenData.get_with_flex_zone("test_id") ==
-               {%{type: :normal, main: %{type: :placeholder, color: :gray}}, []}
-    end
-  end
-
   describe "variants/2" do
     setup do
       stub(@parameters, :refresh_rate, fn _app_id -> 0 end)

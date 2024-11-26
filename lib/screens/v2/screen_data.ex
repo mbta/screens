@@ -16,7 +16,6 @@ defmodule Screens.V2.ScreenData do
 
   @type t :: %{type: atom()}
   @type simulation_data :: %{full_page: t(), flex_zone: [t()]}
-  @type data_with_flex_zone :: {t(), [t()]}
   @type variants(data) :: {data, %{String.t() => data}}
   @type screen_id :: String.t()
   @type options :: [
@@ -30,12 +29,6 @@ defmodule Screens.V2.ScreenData do
   @spec get(screen_id(), options()) :: t()
   def get(screen_id, opts \\ []) do
     select_variant(screen_id, opts, &layout_to_data/2)
-  end
-
-  @spec get_with_flex_zone(screen_id()) :: data_with_flex_zone()
-  @spec get_with_flex_zone(screen_id(), options()) :: data_with_flex_zone()
-  def get_with_flex_zone(screen_id, opts \\ []) do
-    select_variant(screen_id, opts, &layout_to_data_with_flex_zone/2)
   end
 
   @spec simulation(screen_id()) :: simulation_data()
@@ -57,7 +50,7 @@ defmodule Screens.V2.ScreenData do
   end
 
   @spec select_variant(screen_id(), options(), (Layout.t(), Screen.t() -> data)) :: data
-        when data: t() | simulation_data() | data_with_flex_zone()
+        when data: t() | simulation_data()
   defp select_variant(screen_id, opts, then_fn) do
     config = get_config(screen_id, opts)
     selected_variant = Keyword.get(opts, :generator_variant)
@@ -103,12 +96,6 @@ defmodule Screens.V2.ScreenData do
   @spec layout_to_data(Layout.t(), Screen.t()) :: t()
   defp layout_to_data(layout, config) do
     layout |> resolve_paging(config) |> serialize()
-  end
-
-  @spec layout_to_data(Layout.t(), Screen.t()) :: data_with_flex_zone()
-  defp layout_to_data_with_flex_zone(layout, config) do
-    {layout |> resolve_paging(config) |> serialize(),
-     serialize_paged_slots(layout, config.app_id)}
   end
 
   @spec layout_to_simulation_data(Layout.t(), Screen.t()) :: simulation_data()
