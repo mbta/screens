@@ -5,6 +5,7 @@ import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
 import pluginReactHooks from "eslint-plugin-react-hooks";
 import eslintConfigPrettier from "eslint-config-prettier";
 import jestPlugin from "eslint-plugin-jest";
+import compat from "eslint-plugin-compat";
 
 export default [
   { languageOptions: { globals: globals.browser } },
@@ -47,5 +48,9 @@ export default [
         },
       ],
     },
+  },
+  {
+    ...compat.configs["flat/recommended"],
+    files: ["**/*.{ts, tsx}"],
   },
 ];
