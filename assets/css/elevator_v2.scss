@@ -9,6 +9,12 @@
 @import "v2/elevator/footer";
 @import "v2/lcd_common/route_pill";
 
+.evergreen-content-image__container,
+.evergreen-content-image__image {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   margin: 0;
   font-family: Inter;
