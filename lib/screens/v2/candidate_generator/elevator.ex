@@ -32,8 +32,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
         evergreen_content_instances_fn \\ &Evergreen.evergreen_content_instances/2
       ) do
     Enum.concat([
-      header_instance(config, now),
-      footer_instance(config),
+      [header_instance(config, now)],
+      [footer_instance(config)],
       elevator_closure_instances_fn.(config),
       evergreen_content_instances_fn.(config, now)
     ])
