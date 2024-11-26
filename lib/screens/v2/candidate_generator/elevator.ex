@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
 
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
+  alias Screens.V2.CandidateGenerator.Widgets.Evergreen
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
   alias ScreensConfig.Screen
@@ -27,10 +28,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        elevator_closure_instances_fn \\ &ElevatorClosures.elevator_status_instances/1
+        elevator_closure_instances_fn \\ &ElevatorClosures.elevator_status_instances/1,
+        evergreen_content_instances_fn \\ &Evergreen.evergreen_content_instances/2
       ) do
-    [header_instance(config, now), footer_instance(config)] ++
-      elevator_closure_instances_fn.(config)
+    Enum.concat([
+      header_instance(config, now),
+      footer_instance(config),
+      elevator_closure_instances_fn.(config),
+      evergreen_content_instances_fn.(config, now)
+    ])
   end
 
   def audio_only_instances(_widgets, _config), do: []
