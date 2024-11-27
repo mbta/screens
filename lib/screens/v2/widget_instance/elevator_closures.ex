@@ -5,12 +5,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   alias Screens.Util.Assets
   alias ScreensConfig.V2.Elevator
 
-  defstruct ~w[app_params in_station_closures other_stations_with_closures]a
+  defstruct ~w[app_params in_station_closures other_stations_with_closures now]a
 
   @type t :: %__MODULE__{
           app_params: Elevator.t(),
           in_station_closures: list(__MODULE__.Closure.t()),
-          other_stations_with_closures: list(__MODULE__.Station.t())
+          other_stations_with_closures: list(__MODULE__.Station.t()),
+          now: DateTime.t()
         }
 
   defmodule Station do
@@ -56,7 +57,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
           accessible_path_image_here_coordinates: accessible_path_image_here_coordinates
         },
         in_station_closures: in_station_closures,
-        other_stations_with_closures: other_stations_with_closures
+        other_stations_with_closures: other_stations_with_closures,
+        now: now
       }),
       do: %{
         id: id,
@@ -69,13 +71,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
             do: nil,
             else: Assets.s3_asset_url(accessible_path_image_url)
           ),
-        accessible_path_image_here_coordinates: accessible_path_image_here_coordinates
+        accessible_path_image_here_coordinates: accessible_path_image_here_coordinates,
+        time: DateTime.to_iso8601(now)
       }
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ElevatorClosures
 
-    def priority(_instance), do: [1]
+    def priority(_instance), do: [0]
     def serialize(instance), do: ElevatorClosures.serialize(instance)
     def slot_names(_instance), do: [:main_content]
     def widget_type(_instance), do: :elevator_closures

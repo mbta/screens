@@ -1,16 +1,8 @@
-.screen-normal:has(.current-elevator-closed-view) {
-  .normal-header,
-  .footer {
-    color: white;
-    background-color: $accessibility-blue;
-  }
-}
-
 .elevator-closures {
   position: relative;
   display: flex;
   flex-direction: column;
-  height: 100%;
+  height: 1632px;
   color: $cool-black-15;
   background-color: $warm-neutral-90;
 

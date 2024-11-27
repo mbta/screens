@@ -37,14 +37,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
               }
             ]
           }
-        ]
+        ],
+        now: ~U[2024-11-27T05:00:00Z]
       }
     }
   end
 
   describe "priority/1" do
-    test "returns 1", %{instance: instance} do
-      assert [1] == WidgetInstance.priority(instance)
+    test "returns 0", %{instance: instance} do
+      assert [0] == WidgetInstance.priority(instance)
     end
   end
 
@@ -59,7 +60,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
                  instance.app_params.accessible_path_image_here_coordinates,
                accessible_path_image_url: instance.app_params.accessible_path_image_url,
                alternate_direction_text: instance.app_params.alternate_direction_text,
-               id: instance.app_params.elevator_id
+               id: instance.app_params.elevator_id,
+               time: "2024-11-27T05:00:00Z"
              } == WidgetInstance.serialize(instance)
     end
   end
