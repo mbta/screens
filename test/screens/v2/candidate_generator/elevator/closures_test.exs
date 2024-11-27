@@ -61,7 +61,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
-          elevator_config: ^config,
+          app_params: ^config,
           in_station_closures: [
             %{
               id: "1",
@@ -117,7 +117,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
-          elevator_config: ^config,
+          app_params: ^config,
           in_station_closures: [],
           other_stations_with_closures: [
             %{
@@ -182,7 +182,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
-          elevator_config: ^config,
+          app_params: ^config,
           in_station_closures: [],
           other_stations_with_closures: []
         }
@@ -219,7 +219,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         %Screens.V2.WidgetInstance.ElevatorClosures{
-          elevator_config: ^config,
+          app_params: ^config,
           in_station_closures: [
             %{
               id: "1",

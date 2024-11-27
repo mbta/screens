@@ -28,3 +28,9 @@ body {
 .multi-screen-page {
   grid-auto-rows: 1920px;
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}

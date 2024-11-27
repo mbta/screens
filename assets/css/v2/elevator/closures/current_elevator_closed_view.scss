@@ -2,7 +2,7 @@
   position: relative;
   height: 100%;
 
-  .shape {
+  .notch {
     position: absolute;
     top: 0;
     right: 0;
@@ -12,9 +12,11 @@
   }
 
   .header {
-    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     height: 528px;
-    padding: 53px 68px 51px 48px;
+    padding-left: 48px;
     font-weight: 700;
 
     .icons {
@@ -37,7 +39,6 @@
   }
 
   .accessible-path-container {
-    box-sizing: border-box;
     height: 984px;
     padding: 48px;
 

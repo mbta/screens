@@ -34,7 +34,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
           in_station_closures: Enum.map(in_station_alerts, &alert_to_elevator_closure/1),
           other_stations_with_closures:
             format_outside_closures(outside_alerts, parent_station_map, routes_map),
-          elevator_config: config
+          app_params: config
         }
       ]
     else

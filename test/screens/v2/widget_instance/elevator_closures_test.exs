@@ -8,7 +8,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   setup do
     %{
       instance: %ElevatorClosures{
-        elevator_config:
+        app_params:
           struct(Elevator,
             elevator_id: "1",
             alternate_direction_text: "Test",
@@ -54,12 +54,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
                in_station_closures: instance.in_station_closures,
                other_stations_with_closures: instance.other_stations_with_closures,
                accessible_path_direction_arrow:
-                 instance.elevator_config.accessible_path_direction_arrow,
+                 instance.app_params.accessible_path_direction_arrow,
                accessible_path_image_here_coordinates:
-                 instance.elevator_config.accessible_path_image_here_coordinates,
-               accessible_path_image_url: instance.elevator_config.accessible_path_image_url,
-               alternate_direction_text: instance.elevator_config.alternate_direction_text,
-               id: instance.elevator_config.elevator_id
+                 instance.app_params.accessible_path_image_here_coordinates,
+               accessible_path_image_url: instance.app_params.accessible_path_image_url,
+               alternate_direction_text: instance.app_params.alternate_direction_text,
+               id: instance.app_params.elevator_id
              } == WidgetInstance.serialize(instance)
     end
   end

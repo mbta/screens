@@ -52,7 +52,7 @@ const CurrentElevatorClosedView = ({
 
   return (
     <div className="current-elevator-closed-view">
-      <div className="shape"></div>
+      <div className="notch"></div>
       <div className="header">
         <div className="icons">
           <NoService className="no-service-icon" height={126} width={126} />

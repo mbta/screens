@@ -5,10 +5,10 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   alias Screens.Util.Assets
   alias ScreensConfig.V2.Elevator
 
-  defstruct ~w[elevator_config in_station_closures other_stations_with_closures]a
+  defstruct ~w[app_params in_station_closures other_stations_with_closures]a
 
   @type t :: %__MODULE__{
-          elevator_config: Elevator.t(),
+          app_params: Elevator.t(),
           in_station_closures: list(__MODULE__.Closure.t()),
           other_stations_with_closures: list(__MODULE__.Station.t())
         }
@@ -48,7 +48,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   end
 
   def serialize(%__MODULE__{
-        elevator_config: %Elevator{
+        app_params: %Elevator{
           elevator_id: id,
           alternate_direction_text: alternate_direction_text,
           accessible_path_direction_arrow: accessible_path_direction_arrow,
