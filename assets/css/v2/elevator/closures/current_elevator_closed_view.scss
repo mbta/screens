@@ -89,7 +89,8 @@
   }
 
   .paging-indicators {
-    justify-content: end;
+    position: absolute;
+    right: 0;
     height: 120px;
   }
 }
