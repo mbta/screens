@@ -84,19 +84,29 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> screen_response(variant, run_all_variants?: true, update_visible_alerts?: true)
+          |> screen_response(screen, variant,
+            run_all_variants?: true,
+            update_visible_alerts?: true
+          )
           |> put_extra_fields(screen_id, screen)
 
         json(conn, response)
     end
   end
 
-  defp screen_response(screen_id, "all", opts) do
+  defp screen_response(screen_id, _, "all", opts) do
     {default, variants} = ScreenData.variants(screen_id, opts)
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
-  defp screen_response(screen_id, variant, opts) do
+  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, opts) do
+    %{full_page: data, flex_zone: flex_zone} =
+      ScreenData.simulation(screen_id, Keyword.put(opts, :generator_variant, variant))
+
+    Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
+  end
+
+  defp screen_response(screen_id, _, variant, opts) do
     data = ScreenData.get(screen_id, Keyword.put(opts, :generator_variant, variant))
     %{@base_response | data: data}
   end
