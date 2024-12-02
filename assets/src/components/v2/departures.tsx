@@ -8,7 +8,6 @@ import React, {
 import weakKey from "weak-key";
 
 import NormalSection from "./departures/normal_section";
-import NoticeSection from "./departures/notice_section";
 import { Section, trimSections, toFoldedSection } from "./departures/section";
 
 import { warn } from "Util/sentry";
@@ -45,13 +44,7 @@ const Departures: ComponentType<Departures> = ({ sections }) => {
   return (
     <div className="departures-container" ref={ref}>
       {foldedSections.map((section) => {
-        const key = weakKey(section);
-
-        if (section.type === "folded_section") {
-          return <NormalSection {...section} key={key} />;
-        } else {
-          return <NoticeSection {...section} key={key} />;
-        }
+        return <NormalSection {...section} key={weakKey(section)} />;
       })}
     </div>
   );

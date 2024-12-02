@@ -65,13 +65,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
              } = Departures.serialize_section(section, bus_shelter_screen, now)
     end
 
-    test "returns serialized notice_section", %{bus_shelter_screen: bus_shelter_screen, now: now} do
-      section = %{type: :notice_section, text: %{icon: :warning, text: []}}
-
-      assert %{type: :notice_section, text: %{icon: :warning, text: []}} ==
-               Departures.serialize_section(section, bus_shelter_screen, now)
-    end
-
     test "returns serialized normal_section with notice", %{
       bus_shelter_screen: bus_shelter_screen,
       now: now

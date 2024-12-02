@@ -5,15 +5,10 @@ import type {
   NormalSection,
   FoldedNormalSection,
 } from "./normal_section";
-import NoticeSection from "./notice_section";
 
-export type Section =
-  | (NormalSection & { type: "normal_section" })
-  | (NoticeSection & { type: "notice_section" });
+export type Section = NormalSection & { type: "normal_section" };
 
-export type FoldedSection =
-  | (FoldedNormalSection & { type: "folded_section" })
-  | (NoticeSection & { type: "notice_section" });
+export type FoldedSection = FoldedNormalSection & { type: "folded_section" };
 
 export const toFoldedSection = (section: Section): FoldedSection => {
   switch (section.type) {
@@ -36,9 +31,6 @@ export const toFoldedSection = (section: Section): FoldedSection => {
 
       return foldedSection;
     }
-
-    case "notice_section":
-      return section;
   }
 };
 
