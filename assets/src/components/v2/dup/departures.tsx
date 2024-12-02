@@ -2,7 +2,6 @@ import React, { ComponentType } from "react";
 
 import { type Section as SectionBase } from "Components/v2/departures/section";
 import NormalSection from "./departures/normal_section";
-import NoticeSection from "Components/v2/departures/notice_section";
 import HeadwaySection from "./departures/headway_section";
 import NoDataSection from "./departures/no_data_section";
 import OvernightSection from "./departures/overnight_section";
@@ -25,8 +24,6 @@ const Departures: ComponentType<Props> = ({ sections }) => {
           switch (section.type) {
             case "normal_section":
               return <NormalSection {...section} key={i} />;
-            case "notice_section":
-              return <NoticeSection {...section} key={i} />;
             case "headway_section":
               return <HeadwaySection {...section} key={i} />;
             case "no_data_section":

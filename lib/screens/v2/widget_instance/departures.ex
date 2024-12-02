@@ -24,11 +24,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
           header: Header.t()
         }
 
-  @type notice_section :: %{
-          type: :notice_section,
-          text: FreeTextLine.t()
-        }
-
   @type headway_section :: %{
           type: :headway_section,
           route: :red | :orange | :green | :blue,
@@ -55,7 +50,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
           section_data:
             list(
               normal_section()
-              | notice_section()
               | headway_section()
               | overnight_section()
               | no_data_section()
@@ -102,10 +96,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(section, screen, now, is_only_section \\ false)
-
-  def serialize_section(%{type: :notice_section, text: text}, _screen, _now, _) do
-    %{type: :notice_section, text: text}
-  end
 
   def serialize_section(%{type: :no_data_section, route: route}, _screen, _now, _) do
     text = %FreeTextLine{
@@ -198,10 +188,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
 
     %{type: :overnight_section, text: FreeTextLine.to_json(text)}
-  end
-
-  def audio_serialize_section(%{type: :notice_section, text: text}, _screen, _now) do
-    %{type: :notice_section, text: FreeTextLine.to_plaintext(text)}
   end
 
   def audio_serialize_section(

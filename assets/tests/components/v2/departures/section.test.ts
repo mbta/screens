@@ -5,7 +5,6 @@ import _ from "lodash/fp";
 import {
   toFoldedSection,
   trimSections,
-  type FoldedSection,
 } from "Components/v2/departures/section";
 
 import { departureRow, normalSection, timeWithCrowding } from "./factories";
@@ -30,17 +29,6 @@ describe("toFoldedSection", () => {
 describe("trimSections", () => {
   const buildFoldedSection = (attrs) =>
     toFoldedSection(normalSection.build(attrs));
-
-  test("does nothing with notice sections", () => {
-    const sections: FoldedSection[] = [
-      {
-        type: "notice_section",
-        text: { text: [{ text: "text" }] },
-      },
-    ];
-
-    expect(trimSections(sections)).toBe(sections);
-  });
 
   test("trims one departure from the largest section above its `base`", () => {
     const rowsB = departureRow.buildList(5);
