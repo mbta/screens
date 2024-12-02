@@ -1,16 +1,11 @@
 .footer {
-  height: 184px;
+  height: 100%;
   padding: 26px 48px;
   font-size: 48px;
   font-weight: 500;
   line-height: 62px;
   color: white;
   background-color: $cool-black-30;
-
-  &--blue {
-    color: white;
-    background-color: $accessibility-blue;
-  }
 
   b {
     letter-spacing: -0.2px;

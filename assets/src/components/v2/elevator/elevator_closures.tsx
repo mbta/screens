@@ -9,8 +9,6 @@ import OutsideClosuresView from "Components/v2/elevator/closures/outside_closure
 import CurrentElevatorClosedView, {
   type Coordinates,
 } from "Components/v2/elevator/closures/current_elevator_closed_view";
-import Footer from "Components/v2/elevator/footer";
-import NormalHeader from "Components/v2/normal_header";
 
 export type StationWithClosures = {
   id: string;
@@ -35,7 +33,6 @@ interface Props extends WrappedComponentProps {
   accessible_path_direction_arrow: Direction;
   accessible_path_image_url: string | null;
   accessible_path_image_here_coordinates: Coordinates;
-  time: string;
 }
 
 const ElevatorClosures: React.ComponentType<Props> = ({
@@ -46,7 +43,6 @@ const ElevatorClosures: React.ComponentType<Props> = ({
   accessible_path_direction_arrow: accessiblePathDirectionArrow,
   accessible_path_image_url: accessiblePathImageUrl,
   accessible_path_image_here_coordinates: accessiblePathImageHereCoordinates,
-  time,
   lastUpdate,
   onFinish,
 }: Props) => {
@@ -55,36 +51,27 @@ const ElevatorClosures: React.ComponentType<Props> = ({
   );
 
   return (
-    <>
-      <NormalHeader
-        text={`Elevator ${id}`}
-        time={time}
-        maxHeight={104}
-        classModifiers={currentElevatorClosure ? "blue" : ""}
-      />
-      <div className="elevator-closures">
-        {currentElevatorClosure ? (
-          <CurrentElevatorClosedView
-            closure={currentElevatorClosure}
-            alternateDirectionText={alternateDirectionText}
-            accessiblePathDirectionArrow={accessiblePathDirectionArrow}
-            accessiblePathImageUrl={accessiblePathImageUrl}
-            accessiblePathImageHereCoordinates={
-              accessiblePathImageHereCoordinates
-            }
-            onFinish={onFinish}
-            lastUpdate={lastUpdate}
-          />
-        ) : (
-          <OutsideClosuresView
-            stations={otherStationsWithClosures}
-            lastUpdate={lastUpdate}
-            onFinish={onFinish}
-          />
-        )}
-      </div>
-      <Footer variant={currentElevatorClosure ? "blue" : ""} />
-    </>
+    <div className="elevator-closures">
+      {currentElevatorClosure ? (
+        <CurrentElevatorClosedView
+          closure={currentElevatorClosure}
+          alternateDirectionText={alternateDirectionText}
+          accessiblePathDirectionArrow={accessiblePathDirectionArrow}
+          accessiblePathImageUrl={accessiblePathImageUrl}
+          accessiblePathImageHereCoordinates={
+            accessiblePathImageHereCoordinates
+          }
+          onFinish={onFinish}
+          lastUpdate={lastUpdate}
+        />
+      ) : (
+        <OutsideClosuresView
+          stations={otherStationsWithClosures}
+          lastUpdate={lastUpdate}
+          onFinish={onFinish}
+        />
+      )}
+    </div>
   );
 };
 

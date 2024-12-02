@@ -34,3 +34,11 @@ body {
 *::after {
   box-sizing: border-box;
 }
+
+.normal-header,
+.footer {
+  &--closed {
+    color: white;
+    background-color: $accessibility-blue;
+  }
+}

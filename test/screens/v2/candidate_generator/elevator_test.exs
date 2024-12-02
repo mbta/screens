@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
 
   alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Elevator
-  alias Screens.V2.WidgetInstance.ElevatorClosures
+  alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
 
   setup do
     config = %Screen{
@@ -25,25 +25,36 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
     test "returns template" do
       assert {:screen,
               %{
-                normal: [:main_content]
+                normal: [:header, :main_content, :footer]
               }} == Elevator.screen_template()
     end
   end
 
   describe "candidate_instances/4" do
-    test "returns expected content", %{config: config} do
+    test "returns expected header and footer", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
-      elevator_instances = [struct(ElevatorClosures)]
-      elevator_closure_instances_fn = fn _, _ -> elevator_instances end
+
+      expected_header = %NormalHeader{
+        screen: config,
+        icon: nil,
+        text: "Elevator 1",
+        time: now
+      }
+
+      expected_footer = %Footer{screen: config}
+      elevator_closure_instances_fn = fn _, _, _ -> [expected_header, expected_footer] end
       evergreen_content_instances_fn = fn _, _ -> [] end
 
-      assert elevator_instances ==
-               Elevator.candidate_instances(
-                 config,
-                 now,
-                 elevator_closure_instances_fn,
-                 evergreen_content_instances_fn
-               )
+      actual_instances =
+        Elevator.candidate_instances(
+          config,
+          now,
+          elevator_closure_instances_fn,
+          evergreen_content_instances_fn
+        )
+
+      assert expected_header in actual_instances
+      assert expected_footer in actual_instances
     end
   end
 end

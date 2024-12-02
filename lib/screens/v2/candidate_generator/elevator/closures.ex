@@ -6,7 +6,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.V2.WidgetInstance.ElevatorClosures
+  alias Screens.V2.WidgetInstance.{ElevatorClosures, Footer, NormalHeader}
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
@@ -18,10 +18,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @route injected(Route)
   @stop injected(Stop)
 
-  @spec elevator_status_instances(Screen.t()) :: list(ElevatorClosures.t())
+  @spec elevator_status_instances(Screen.t(), NormalHeader.t(), Footer.t()) ::
+          list(ElevatorClosures.t())
   def elevator_status_instances(
         %Screen{app_params: %Elevator{elevator_id: elevator_id} = config},
-        now \\ DateTime.utc_now()
+        header_instance,
+        footer_instance
       ) do
     with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
          {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
@@ -32,14 +34,24 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       {in_station_alerts, outside_alerts} =
         split_closures_by_location(elevator_alerts, stop_id)
 
+      in_station_closures =
+        Enum.map(in_station_alerts, &alert_to_elevator_closure/1)
+
+      header_footer_variant =
+        if(Enum.any?(in_station_closures, &(&1.elevator_id == elevator_id)),
+          do: :closed,
+          else: nil
+        )
+
       [
+        %NormalHeader{header_instance | variant: header_footer_variant},
         %ElevatorClosures{
-          in_station_closures: Enum.map(in_station_alerts, &alert_to_elevator_closure/1),
+          in_station_closures: in_station_closures,
           other_stations_with_closures:
             format_outside_closures(outside_alerts, parent_station_map, routes_map),
-          app_params: config,
-          now: now
-        }
+          app_params: config
+        },
+        %Footer{footer_instance | variant: header_footer_variant}
       ]
     else
       :error ->

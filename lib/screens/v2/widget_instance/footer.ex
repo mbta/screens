@@ -3,16 +3,23 @@ defmodule Screens.V2.WidgetInstance.Footer do
 
   alias ScreensConfig.Screen
 
-  defstruct screen: nil
+  defstruct screen: nil, variant: nil
 
   @type t :: %__MODULE__{
-          screen: Screen.t()
+          screen: Screen.t(),
+          variant: atom() | nil
         }
 
+  def serialize(%__MODULE__{variant: variant}) do
+    %{variant: variant}
+  end
+
   defimpl Screens.V2.WidgetInstance do
+    alias Screens.V2.WidgetInstance.Footer
+
     def priority(_instance), do: [1]
 
-    def serialize(_instance), do: %{}
+    def serialize(instance), do: Footer.serialize(instance)
 
     def slot_names(_instance), do: [:footer]
 

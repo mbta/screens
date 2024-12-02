@@ -8,14 +8,16 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
   defstruct screen: nil,
             icon: nil,
             text: nil,
-            time: nil
+            time: nil,
+            variant: nil
 
   @type icon :: :logo | :green_b | :green_c | :green_d | :green_e
   @type t :: %__MODULE__{
           screen: ScreensConfig.Screen.t(),
           icon: icon | nil,
           text: String.t(),
-          time: DateTime.t()
+          time: DateTime.t(),
+          variant: atom() | nil
         }
 
   # Mercury adds their own time so we omit the time in the response.
@@ -24,8 +26,14 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
     %{icon: icon, text: text, show_to: showing_destination?(t)}
   end
 
-  def serialize(%__MODULE__{icon: icon, text: text, time: time} = t) do
-    %{icon: icon, text: text, time: DateTime.to_iso8601(time), show_to: showing_destination?(t)}
+  def serialize(%__MODULE__{icon: icon, text: text, time: time, variant: variant} = t) do
+    %{
+      icon: icon,
+      text: text,
+      time: DateTime.to_iso8601(time),
+      show_to: showing_destination?(t),
+      variant: variant
+    }
   end
 
   def slot_names(%__MODULE__{screen: %Screen{app_id: :dup_v2}}) do

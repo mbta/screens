@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
+  alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 
@@ -17,18 +18,31 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   @route injected(Route)
   @stop injected(Stop)
 
-  describe "elevator_status_instances/1" do
+  describe "elevator_status_instances/3" do
     setup do
+      config = %Elevator{
+        elevator_id: "111",
+        accessible_path_direction_arrow: :n,
+        alternate_direction_text: "Test"
+      }
+
       %{
-        config: %Elevator{
-          elevator_id: "111",
-          accessible_path_direction_arrow: :n,
-          alternate_direction_text: "Test"
-        }
+        config: config,
+        header_instance: %NormalHeader{
+          screen: config,
+          icon: nil,
+          text: "Elevator 1",
+          time: ~U[2020-04-06T10:00:00Z]
+        },
+        footer_instance: %Footer{screen: config}
       }
     end
 
-    test "Only returns alerts with effect of :elevator_closure", %{config: config} do
+    test "Only returns alerts with effect of :elevator_closure", %{
+      config: config,
+      header_instance: header_instance,
+      footer_instance: footer_instance
+    } do
       expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
 
       expect(@stop, :fetch_parent_station_name_map, fn ->
@@ -60,6 +74,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       [
+        ^header_instance,
         %Screens.V2.WidgetInstance.ElevatorClosures{
           app_params: ^config,
           in_station_closures: [
@@ -72,14 +87,21 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
             }
           ],
           other_stations_with_closures: []
-        }
+        },
+        ^footer_instance
       ] =
         ElevatorClosures.elevator_status_instances(
-          struct(Screen, app_id: :elevator_v2, app_params: config)
+          struct(Screen, app_id: :elevator_v2, app_params: config),
+          header_instance,
+          footer_instance
         )
     end
 
-    test "Groups outside closures by station", %{config: config} do
+    test "Groups outside closures by station", %{
+      config: config,
+      header_instance: header_instance,
+      footer_instance: footer_instance
+    } do
       expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
 
       expect(@stop, :fetch_parent_station_name_map, fn ->
@@ -116,6 +138,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       [
+        ^header_instance,
         %Screens.V2.WidgetInstance.ElevatorClosures{
           app_params: ^config,
           in_station_closures: [],
@@ -142,14 +165,21 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               ]
             }
           ]
-        }
+        },
+        ^footer_instance
       ] =
         ElevatorClosures.elevator_status_instances(
-          struct(Screen, app_id: :elevator_v2, app_params: config)
+          struct(Screen, app_id: :elevator_v2, app_params: config),
+          header_instance,
+          footer_instance
         )
     end
 
-    test "Filters alerts with no facilities or more than one facility", %{config: config} do
+    test "Filters alerts with no facilities or more than one facility", %{
+      config: config,
+      header_instance: header_instance,
+      footer_instance: footer_instance
+    } do
       expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
 
       expect(@stop, :fetch_parent_station_name_map, fn ->
@@ -181,18 +211,26 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       [
+        ^header_instance,
         %Screens.V2.WidgetInstance.ElevatorClosures{
           app_params: ^config,
           in_station_closures: [],
           other_stations_with_closures: []
-        }
+        },
+        ^footer_instance
       ] =
         ElevatorClosures.elevator_status_instances(
-          struct(Screen, app_id: :elevator_v2, app_params: config)
+          struct(Screen, app_id: :elevator_v2, app_params: config),
+          header_instance,
+          footer_instance
         )
     end
 
-    test "Return empty routes on API error", %{config: config} do
+    test "Return empty routes on API error", %{
+      config: config,
+      header_instance: header_instance,
+      footer_instance: footer_instance
+    } do
       expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
 
       expect(@stop, :fetch_parent_station_name_map, fn ->
@@ -218,6 +256,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       [
+        ^header_instance,
         %Screens.V2.WidgetInstance.ElevatorClosures{
           app_params: ^config,
           in_station_closures: [
@@ -230,10 +269,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
             }
           ],
           other_stations_with_closures: []
-        }
+        },
+        ^footer_instance
       ] =
         ElevatorClosures.elevator_status_instances(
-          struct(Screen, app_id: :elevator_v2, app_params: config)
+          struct(Screen, app_id: :elevator_v2, app_params: config),
+          header_instance,
+          footer_instance
         )
     end
   end
