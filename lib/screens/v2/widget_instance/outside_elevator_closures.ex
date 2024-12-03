@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.OutsideElevatorClosures do
   @moduledoc false
 
   alias Screens.Stops.Stop
-  alias Screens.V2.WidgetInstance.CurrentElevatorClosed.Closure
+  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias ScreensConfig.V2.Elevator
 
   defstruct ~w[app_params in_station_closures other_stations_with_closures]a
@@ -17,7 +17,7 @@ defmodule Screens.V2.WidgetInstance.OutsideElevatorClosures do
     @moduledoc false
 
     alias Screens.Routes.Route
-    alias Screens.V2.WidgetInstance.CurrentElevatorClosed.Closure
+    alias Screens.V2.WidgetInstance.Elevator.Closure
 
     @derive Jason.Encoder
 

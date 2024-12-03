@@ -2,30 +2,15 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosed do
   @moduledoc false
 
   alias Screens.Util.Assets
+  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias ScreensConfig.V2.Elevator
 
   defstruct ~w[app_params closure]a
 
   @type t :: %__MODULE__{
           app_params: Elevator.t(),
-          closure: __MODULE__.Closure.t()
+          closure: Closure.t()
         }
-
-  defmodule Closure do
-    @moduledoc false
-
-    @derive Jason.Encoder
-
-    defstruct ~w[id elevator_name elevator_id description header_text]a
-
-    @type t :: %__MODULE__{
-            id: String.t(),
-            elevator_name: String.t(),
-            elevator_id: String.t(),
-            description: String.t(),
-            header_text: String.t()
-          }
-  end
 
   def serialize(%__MODULE__{
         app_params: %Elevator{

@@ -1,7 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.WidgetInstance.CurrentElevatorClosed.Closure
+  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias Screens.Alerts.Alert
   alias Screens.Routes.Route
   alias Screens.Stops.Stop

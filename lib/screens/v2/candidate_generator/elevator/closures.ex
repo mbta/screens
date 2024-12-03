@@ -6,7 +6,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-
   alias Screens.V2.WidgetInstance
 
   alias Screens.V2.WidgetInstance.{
@@ -16,6 +15,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     OutsideElevatorClosures
   }
 
+  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
@@ -134,7 +134,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
        }) do
     facility = Enum.find_value(entities, fn %{facility: facility} -> facility end)
 
-    %CurrentElevatorClosed.Closure{
+    %Closure{
       id: id,
       elevator_name: facility.name,
       elevator_id: facility.id,

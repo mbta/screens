@@ -2,7 +2,8 @@ defmodule Screens.V2.WidgetInstance.OutsideElevatorClosuresTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.{CurrentElevatorClosed, OutsideElevatorClosures}
+  alias Screens.V2.WidgetInstance.Elevator.Closure
+  alias Screens.V2.WidgetInstance.OutsideElevatorClosures
   alias ScreensConfig.V2.Elevator
 
   setup do
@@ -15,7 +16,7 @@ defmodule Screens.V2.WidgetInstance.OutsideElevatorClosuresTest do
             accessible_path_direction_arrow: :n
           ),
         in_station_closures: [
-          %CurrentElevatorClosed.Closure{
+          %Closure{
             description: "Test Alert Description",
             elevator_name: "Test Elevator",
             elevator_id: "111",
@@ -28,7 +29,7 @@ defmodule Screens.V2.WidgetInstance.OutsideElevatorClosuresTest do
             name: "Forest Hills",
             route_icons: ["Orange"],
             closures: [
-              %CurrentElevatorClosed.Closure{
+              %Closure{
                 description: "FH Alert Description",
                 elevator_name: "FH Elevator",
                 elevator_id: "222",

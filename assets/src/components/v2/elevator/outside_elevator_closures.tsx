@@ -6,8 +6,10 @@ import makePersistent, {
   WrappedComponentProps,
 } from "Components/v2/persistent_wrapper";
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
-import { type StationWithClosures } from "Components/v2/elevator/models/station";
-import { type Closure } from "Components/v2/elevator/models/closure";
+import {
+  type StationWithClosures,
+  type Closure,
+} from "Components/v2/elevator/types";
 import useClientPaging from "Hooks/v2/use_client_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";

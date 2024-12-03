@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
 
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.CurrentElevatorClosed
+  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias ScreensConfig.V2.Elevator
 
   setup do
@@ -14,7 +15,7 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
             alternate_direction_text: "Test",
             accessible_path_direction_arrow: :n
           ),
-        closure: %CurrentElevatorClosed.Closure{
+        closure: %Closure{
           description: "Test Alert Description",
           elevator_name: "Test Elevator",
           elevator_id: "111",
