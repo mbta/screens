@@ -28,13 +28,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        elevator_closure_instances_fn \\ &ElevatorClosures.elevator_status_instances/1,
+        elevator_closure_instances_fn \\ &ElevatorClosures.elevator_status_instances/3,
         evergreen_content_instances_fn \\ &Evergreen.evergreen_content_instances/2
       ) do
     Enum.concat([
-      [header_instance(config, now)],
-      [footer_instance(config)],
-      elevator_closure_instances_fn.(config),
+      elevator_closure_instances_fn.(
+        config,
+        header_instance(config, now),
+        footer_instance(config)
+      ),
       evergreen_content_instances_fn.(config, now)
     ])
   end

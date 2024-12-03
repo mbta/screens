@@ -1,13 +1,15 @@
-defmodule Screens.V2.WidgetInstance.ElevatorClosures do
+defmodule Screens.V2.WidgetInstance.OutsideElevatorClosures do
   @moduledoc false
 
   alias Screens.Stops.Stop
+  alias Screens.V2.WidgetInstance.Elevator.Closure
+  alias ScreensConfig.V2.Elevator
 
-  defstruct ~w[id in_station_closures other_stations_with_closures]a
+  defstruct ~w[app_params in_station_closures other_stations_with_closures]a
 
   @type t :: %__MODULE__{
-          id: String.t(),
-          in_station_closures: list(__MODULE__.Closure.t()),
+          app_params: Elevator.t(),
+          in_station_closures: list(Closure.t()),
           other_stations_with_closures: list(__MODULE__.Station.t())
         }
 
@@ -15,7 +17,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
     @moduledoc false
 
     alias Screens.Routes.Route
-    alias Screens.V2.WidgetInstance.ElevatorClosures.Closure
+    alias Screens.V2.WidgetInstance.Elevator.Closure
 
     @derive Jason.Encoder
 
@@ -29,24 +31,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
           }
   end
 
-  defmodule Closure do
-    @moduledoc false
-
-    @derive Jason.Encoder
-
-    defstruct ~w[id elevator_name elevator_id description header_text]a
-
-    @type t :: %__MODULE__{
-            id: String.t(),
-            elevator_name: String.t(),
-            elevator_id: String.t(),
-            description: String.t(),
-            header_text: String.t()
-          }
-  end
-
   def serialize(%__MODULE__{
-        id: id,
+        app_params: %Elevator{elevator_id: id},
         in_station_closures: in_station_closures,
         other_stations_with_closures: other_stations_with_closures
       }),
@@ -57,16 +43,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
       }
 
   defimpl Screens.V2.WidgetInstance do
-    alias Screens.V2.WidgetInstance.ElevatorClosures
+    alias Screens.V2.WidgetInstance.OutsideElevatorClosures
 
     def priority(_instance), do: [1]
-    def serialize(instance), do: ElevatorClosures.serialize(instance)
+    def serialize(instance), do: OutsideElevatorClosures.serialize(instance)
     def slot_names(_instance), do: [:main_content]
-    def widget_type(_instance), do: :elevator_closures
+    def widget_type(_instance), do: :outside_elevator_closures
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}
     def audio_sort_key(_instance), do: [0]
     def audio_valid_candidate?(_instance), do: false
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorClosuresView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.OutsideElevatorClosuresView
   end
 end

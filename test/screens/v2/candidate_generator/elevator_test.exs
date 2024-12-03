@@ -9,7 +9,9 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
     config = %Screen{
       app_id: :elevator_v2,
       app_params: %V2.Elevator{
-        elevator_id: "1"
+        elevator_id: "1",
+        alternate_direction_text: "Test",
+        accessible_path_direction_arrow: :n
       },
       device_id: "TEST",
       name: "TEST",
@@ -31,8 +33,6 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
   describe "candidate_instances/4" do
     test "returns expected header and footer", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
-      elevator_closure_instances_fn = fn _ -> [] end
-      evergreen_content_instances_fn = fn _, _ -> [] end
 
       expected_header = %NormalHeader{
         screen: config,
@@ -42,6 +42,8 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
       }
 
       expected_footer = %Footer{screen: config}
+      elevator_closure_instances_fn = fn _, _, _ -> [expected_header, expected_footer] end
+      evergreen_content_instances_fn = fn _, _ -> [] end
 
       actual_instances =
         Elevator.candidate_instances(

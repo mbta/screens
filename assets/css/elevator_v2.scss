@@ -1,13 +1,17 @@
+// Our Mimo elevator screens run Webview 83.
+// When writing styles for widgets on these screens,
+// verify browser compatibility in the MDN web docs.
+
 @import "https://rsms.me/inter/inter.css";
 @import "colors";
 @import "v2/lcd_common/screen_container";
-@import "v2/elevator/elevator_closures";
 @import "v2/elevator/normal";
 @import "v2/simulation_common";
 @import "v2/lcd_common/simulation";
 @import "v2/elevator/header";
 @import "v2/elevator/footer";
 @import "v2/lcd_common/route_pill";
+@import "v2/arrow";
 
 .evergreen-content-image__container,
 .evergreen-content-image__image {
@@ -23,3 +27,61 @@ body {
 .multi-screen-page {
   grid-auto-rows: 1920px;
 }
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.normal-header,
+.footer {
+  &--closed {
+    color: white;
+    background-color: $accessibility-blue;
+  }
+}
+
+.outside-elevator-closures,
+.current-elevator-closed {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: $cool-black-15;
+  background-color: $warm-neutral-90;
+
+  hr.thick {
+    min-height: 24px;
+    margin: 0;
+    background-color: $cool-black-15;
+    border: none;
+  }
+
+  hr.thin {
+    min-height: 2px;
+    margin: 24px 0;
+    background-color: $true-grey-45;
+    border: none;
+    opacity: 0.5;
+  }
+
+  .subheading {
+    font-size: 80px;
+    font-weight: 700;
+    line-height: 80px;
+  }
+}
+
+.paging-indicators {
+  display: flex;
+  align-items: center;
+  margin-right: 66px;
+
+  .paging-indicator:first-child:not(:only-child) {
+    margin-right: 27px;
+  }
+}
+
+@import "v2/elevator/current_elevator_closed";
+@import "v2/elevator/outside_elevator_closures";

@@ -1,28 +1,18 @@
 import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
 import cx from "classnames";
+import _ from "lodash";
+import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
+import makePersistent, {
+  WrappedComponentProps,
+} from "Components/v2/persistent_wrapper";
+import PagingIndicators from "Components/v2/elevator/paging_indicators";
+import {
+  type StationWithClosures,
+  type Closure,
+} from "Components/v2/elevator/types";
+import useClientPaging from "Hooks/v2/use_client_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
-import PagingDotUnselected from "Images/svgr_bundled/paging_dot_unselected.svg";
-import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
-import makePersistent, { WrappedComponentProps } from "../persistent_wrapper";
-import RoutePill, { routePillKey, type Pill } from "../departures/route_pill";
-import _ from "lodash";
-import useClientPaging from "Hooks/v2/use_client_paging";
-
-type StationWithClosures = {
-  id: string;
-  name: string;
-  route_icons: Pill[];
-  closures: ElevatorClosure[];
-};
-
-type ElevatorClosure = {
-  id: string;
-  elevator_name: string;
-  elevator_id: string;
-  description: string;
-  header_text: string;
-};
 
 interface ClosureRowProps {
   station: StationWithClosures;
@@ -54,19 +44,13 @@ const ClosureRow = ({ station }: ClosureRowProps) => {
   );
 };
 
-interface InStationSummaryProps {
-  closures: ElevatorClosure[];
-}
-
-const InStationSummary = ({ closures }: InStationSummaryProps) => {
-  const summaryText = closures.length
-    ? ""
-    : "All elevators at this station are currently working";
-
+const InStationSummary = () => {
   return (
     <>
       <div className="in-station-summary">
-        <span className="text">{summaryText}</span>
+        <span className="text">
+          All elevators at this station are currently working
+        </span>
         <span>
           <NormalService height={72} width={72} fill="#145A06" />
         </span>
@@ -78,7 +62,6 @@ const InStationSummary = ({ closures }: InStationSummaryProps) => {
 
 interface OutsideClosureListProps extends WrappedComponentProps {
   stations: StationWithClosures[];
-  lastUpdate: number | null;
 }
 
 const OutsideClosureList = ({
@@ -119,31 +102,6 @@ const OutsideClosureList = ({
     setRowCounts(rowCounts);
   }, [stations]);
 
-  const getPagingIndicators = (num: number) => {
-    const indicators: JSX.Element[] = [];
-    for (let i = 0; i < num; i++) {
-      const indicator =
-        pageIndex === i ? (
-          <PagingDotSelected
-            className="paging-indicator"
-            height={40}
-            width={40}
-            key={i}
-          />
-        ) : (
-          <PagingDotUnselected
-            className="paging-indicator"
-            height={28}
-            width={28}
-            key={i}
-          />
-        );
-      indicators.push(indicator);
-    }
-
-    return indicators;
-  };
-
   return (
     <div className="outside-closure-list">
       <div className="header-container">
@@ -177,9 +135,7 @@ const OutsideClosureList = ({
           <div className="more-elevators-text">
             +{numOffsetRows} more elevators
           </div>
-          <div className="paging-indicators">
-            {getPagingIndicators(numPages)}
-          </div>
+          <PagingIndicators numPages={numPages} pageIndex={pageIndex} />
         </div>
       )}
     </div>
@@ -188,21 +144,20 @@ const OutsideClosureList = ({
 
 interface Props extends WrappedComponentProps {
   id: string;
-  in_station_closures: ElevatorClosure[];
+  in_station_closures: Closure[];
   other_stations_with_closures: StationWithClosures[];
 }
 
-const ElevatorClosures: React.ComponentType<Props> = ({
-  other_stations_with_closures: otherStationsWithClosures,
-  in_station_closures: inStationClosures,
+const OutsideElevatorClosures = ({
+  other_stations_with_closures: stations,
   lastUpdate,
   onFinish,
 }: Props) => {
   return (
-    <div className="elevator-closures">
-      <InStationSummary closures={inStationClosures} />
+    <div className="outside-elevator-closures">
+      <InStationSummary />
       <OutsideClosureList
-        stations={otherStationsWithClosures}
+        stations={stations}
         lastUpdate={lastUpdate}
         onFinish={onFinish}
       />
@@ -211,5 +166,5 @@ const ElevatorClosures: React.ComponentType<Props> = ({
 };
 
 export default makePersistent(
-  ElevatorClosures as ComponentType<WrappedComponentProps>,
+  OutsideElevatorClosures as ComponentType<WrappedComponentProps>,
 );

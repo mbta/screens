@@ -1,15 +1,9 @@
-import useTextResizer from "Hooks/v2/use_text_resizer";
 import React, { forwardRef, ComponentType } from "react";
-import { getDatasetValue } from "Util/dataset";
 
 import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
-
-import {
-  classWithModifier,
-  classWithModifiers,
-  formatTimeString,
-  imagePath,
-} from "Util/util";
+import { getDatasetValue } from "Util/dataset";
+import { classWithModifiers, formatTimeString, imagePath } from "Util/util";
+import useTextResizer from "Hooks/v2/use_text_resizer";
 
 enum Icon {
   green_b = "green_b",
@@ -154,6 +148,7 @@ interface Props {
   fullName?: boolean;
   classModifiers?: string;
   accentPattern?: string;
+  variant?: string | null;
 }
 
 const NormalHeader: ComponentType<Props> = ({
@@ -167,6 +162,7 @@ const NormalHeader: ComponentType<Props> = ({
   fullName = false,
   classModifiers,
   accentPattern,
+  variant,
 }) => {
   const { ref: headerRef, size: headerSize } = useTextResizer({
     sizes: Object.keys(TitleSize),
@@ -174,7 +170,9 @@ const NormalHeader: ComponentType<Props> = ({
     resetDependencies: [text],
   });
   return (
-    <div className={classWithModifier("normal-header", classModifiers)}>
+    <div
+      className={classWithModifiers("normal-header", [classModifiers, variant])}
+    >
       <NormalHeaderTitle
         icon={icon}
         text={text}

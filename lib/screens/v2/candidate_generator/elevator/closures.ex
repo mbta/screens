@@ -6,7 +6,16 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.V2.WidgetInstance.ElevatorClosures
+  alias Screens.V2.WidgetInstance
+
+  alias Screens.V2.WidgetInstance.{
+    CurrentElevatorClosed,
+    Footer,
+    NormalHeader,
+    OutsideElevatorClosures
+  }
+
+  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
@@ -18,8 +27,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @route injected(Route)
   @stop injected(Stop)
 
-  @spec elevator_status_instances(Screen.t()) :: list(ElevatorClosures.t())
-  def elevator_status_instances(%Screen{app_params: %Elevator{elevator_id: elevator_id}}) do
+  @spec elevator_status_instances(Screen.t(), NormalHeader.t(), Footer.t()) ::
+          list(WidgetInstance.t())
+  def elevator_status_instances(
+        %Screen{app_params: %Elevator{elevator_id: elevator_id} = config},
+        header_instance,
+        footer_instance
+      ) do
     with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
          {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
          {:ok, alerts} <- @alert.fetch_elevator_alerts_with_facilities() do
@@ -29,13 +43,27 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       {in_station_alerts, outside_alerts} =
         split_closures_by_location(elevator_alerts, stop_id)
 
+      in_station_closures =
+        Enum.map(in_station_alerts, &alert_to_elevator_closure/1)
+
+      current_elevator_closure = Enum.find(in_station_closures, &(&1.elevator_id == elevator_id))
+
+      {elevator_widget_instance, header_footer_variant} =
+        if is_nil(current_elevator_closure) do
+          {%OutsideElevatorClosures{
+             in_station_closures: in_station_closures,
+             other_stations_with_closures:
+               format_outside_closures(outside_alerts, parent_station_map, routes_map),
+             app_params: config
+           }, nil}
+        else
+          {%CurrentElevatorClosed{closure: current_elevator_closure, app_params: config}, :closed}
+        end
+
       [
-        %ElevatorClosures{
-          id: elevator_id,
-          in_station_closures: Enum.map(in_station_alerts, &alert_to_elevator_closure/1),
-          other_stations_with_closures:
-            format_outside_closures(outside_alerts, parent_station_map, routes_map)
-        }
+        %NormalHeader{header_instance | variant: header_footer_variant},
+        elevator_widget_instance,
+        %Footer{footer_instance | variant: header_footer_variant}
       ]
     else
       :error ->
@@ -106,7 +134,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
        }) do
     facility = Enum.find_value(entities, fn %{facility: facility} -> facility end)
 
-    %ElevatorClosures.Closure{
+    %Closure{
       id: id,
       elevator_name: facility.name,
       elevator_id: facility.id,
@@ -126,7 +154,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         |> Map.fetch!(parent_station_id)
         |> Enum.map(&RoutePill.serialize_icon/1)
 
-      %ElevatorClosures.Station{
+      %OutsideElevatorClosures.Station{
         id: parent_station_id,
         name: Map.fetch!(station_id_to_name, parent_station_id),
         route_icons: route_pills,

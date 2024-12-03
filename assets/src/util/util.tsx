@@ -1,6 +1,7 @@
 import moment from "moment";
 import "moment-timezone";
 import { RefObject } from "react";
+import cx from "classnames";
 
 import { getDatasetValue } from "Util/dataset";
 import { isDup } from "Util/outfront";
@@ -17,8 +18,9 @@ export const classWithModifiers = (baseClass, modifiers) => {
   if (modifiers.length === 0) {
     return baseClass;
   } else {
-    return (
-      `${baseClass} ` + modifiers.map((m) => `${baseClass}--${m}`).join(" ")
+    return cx(
+      baseClass,
+      ...modifiers.filter((m) => m).map((m) => `${baseClass}--${m}`),
     );
   }
 };

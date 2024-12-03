@@ -1,9 +1,7 @@
-.elevator-closures {
-  position: relative;
+.outside-elevator-closures {
   display: flex;
+  flex: 1;
   flex-direction: column;
-  height: 100%;
-  background-color: $warm-neutral-90;
 
   .in-station-summary {
     display: flex;
@@ -19,23 +17,7 @@
     }
   }
 
-  hr.thick {
-    min-height: 24px;
-    margin: 0;
-    background-color: $cool-black-15;
-    border: none;
-  }
-
-  hr.thin {
-    min-height: 2px;
-    margin: 24px 0;
-    background-color: $true-grey-45;
-    border: none;
-    opacity: 0.5;
-  }
-
   .outside-closure-list {
-    position: relative;
     height: 100%;
     background-color: $warm-neutral-90;
 
@@ -67,7 +49,6 @@
         transform: translateX(calc(-100% * var(--closure-list-offset)));
 
         .closure-row {
-          box-sizing: border-box;
           width: 1080px;
           padding: 0 48px;
 
@@ -128,16 +109,6 @@
       .more-elevators-text {
         align-self: center;
         padding: 0 48px 20px;
-      }
-
-      .paging-indicators {
-        display: flex;
-        align-items: center;
-        margin-right: 66px;
-
-        .paging-indicator:first-child:not(:only-child) {
-          margin-right: 27px;
-        }
       }
     }
 
