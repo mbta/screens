@@ -144,7 +144,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   end
 
   defp format_outside_closures(closures, station_id_to_name, station_id_to_routes) do
+    redundancy_data = fetch_elevator_redundancy_data()
+
     closures
+    |> Enum.reject(&has_nearby_redundancy?(&1, redundancy_data))
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
     |> Enum.map(fn {parent_station_id, closures} ->
       closures_at_station = Enum.map(closures, &alert_to_elevator_closure/1)
@@ -168,5 +171,20 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     |> Enum.find_value(fn
       ie -> if InformedEntity.parent_station?(ie), do: ie.stop
     end)
+  end
+
+  defp has_nearby_redundancy?(
+         %Alert{informed_entities: [%{facility: %{id: informed_facility_id}} | _]},
+         redundancy_data
+       ) do
+    Enum.find(redundancy_data, &(&1.id == informed_facility_id))[:nearby_redundancy?]
+  end
+
+  defp fetch_elevator_redundancy_data do
+    :screens
+    |> :code.priv_dir()
+    |> Path.join("elevators/elevator_redundancy_data.json")
+    |> File.read!()
+    |> Jason.decode!(keys: :atoms)
   end
 end
