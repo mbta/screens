@@ -1,4 +1,4 @@
-.current-elevator-closed-view {
+.current-elevator-closed {
   position: relative;
   height: 100%;
 
@@ -91,6 +91,7 @@
   .paging-indicators {
     position: absolute;
     right: 0;
+    bottom: 0;
     height: 120px;
   }
 }

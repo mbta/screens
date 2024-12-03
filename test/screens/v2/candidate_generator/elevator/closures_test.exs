@@ -1,11 +1,19 @@
 defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   use ExUnit.Case, async: true
 
+  alias Screens.V2.WidgetInstance.CurrentElevatorClosed.Closure
   alias Screens.Alerts.Alert
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
-  alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
+
+  alias Screens.V2.WidgetInstance.{
+    CurrentElevatorClosed,
+    Footer,
+    NormalHeader,
+    OutsideElevatorClosures
+  }
+
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator
 
@@ -75,7 +83,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %Screens.V2.WidgetInstance.ElevatorClosures{
+        %OutsideElevatorClosures{
           app_params: ^config,
           in_station_closures: [
             %{
@@ -139,7 +147,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %Screens.V2.WidgetInstance.ElevatorClosures{
+        %OutsideElevatorClosures{
           app_params: ^config,
           in_station_closures: [],
           other_stations_with_closures: [
@@ -212,12 +220,71 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %Screens.V2.WidgetInstance.ElevatorClosures{
+        %OutsideElevatorClosures{
           app_params: ^config,
           in_station_closures: [],
           other_stations_with_closures: []
         },
         ^footer_instance
+      ] =
+        ElevatorClosures.elevator_status_instances(
+          struct(Screen, app_id: :elevator_v2, app_params: config),
+          header_instance,
+          footer_instance
+        )
+    end
+
+    test "Returns CurrentElevatorClosed if configured elevator is closed", %{
+      config: config,
+      header_instance: header_instance,
+      footer_instance: footer_instance
+    } do
+      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
+
+      expect(@stop, :fetch_parent_station_name_map, fn ->
+        {:ok, %{"place-test" => "Place Test"}}
+      end)
+
+      expect(@route, :fetch, fn %{stop_id: "place-test"} ->
+        {:ok, [%Route{id: "Red", type: :subway}]}
+      end)
+
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          struct(Alert,
+            id: "1",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test", id: "111"}}
+            ]
+          ),
+          struct(Alert,
+            effect: :detour,
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test 2", id: "facility-test2"}}
+            ]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      closed_header_instance = %{header_instance | variant: :closed}
+      closed_footer_instance = %{footer_instance | variant: :closed}
+
+      [
+        ^closed_header_instance,
+        %CurrentElevatorClosed{
+          app_params: ^config,
+          closure: %Closure{
+            id: "1",
+            elevator_name: "Test",
+            elevator_id: "111",
+            description: nil,
+            header_text: nil
+          }
+        },
+        ^closed_footer_instance
       ] =
         ElevatorClosures.elevator_status_instances(
           struct(Screen, app_id: :elevator_v2, app_params: config),
@@ -257,7 +324,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %Screens.V2.WidgetInstance.ElevatorClosures{
+        %OutsideElevatorClosures{
           app_params: ^config,
           in_station_closures: [
             %{

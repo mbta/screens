@@ -1,35 +1,15 @@
-defmodule Screens.V2.WidgetInstance.ElevatorClosures do
+defmodule Screens.V2.WidgetInstance.CurrentElevatorClosed do
   @moduledoc false
 
-  alias Screens.Stops.Stop
   alias Screens.Util.Assets
   alias ScreensConfig.V2.Elevator
 
-  defstruct ~w[app_params in_station_closures other_stations_with_closures]a
+  defstruct ~w[app_params closure]a
 
   @type t :: %__MODULE__{
           app_params: Elevator.t(),
-          in_station_closures: list(__MODULE__.Closure.t()),
-          other_stations_with_closures: list(__MODULE__.Station.t())
+          closure: __MODULE__.Closure.t()
         }
-
-  defmodule Station do
-    @moduledoc false
-
-    alias Screens.Routes.Route
-    alias Screens.V2.WidgetInstance.ElevatorClosures.Closure
-
-    @derive Jason.Encoder
-
-    defstruct ~w[id name route_icons closures]a
-
-    @type t :: %__MODULE__{
-            id: Stop.id(),
-            name: String.t(),
-            route_icons: list(Route.icon()),
-            closures: list(Closure.t())
-          }
-  end
 
   defmodule Closure do
     @moduledoc false
@@ -55,13 +35,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
           accessible_path_image_url: accessible_path_image_url,
           accessible_path_image_here_coordinates: accessible_path_image_here_coordinates
         },
-        in_station_closures: in_station_closures,
-        other_stations_with_closures: other_stations_with_closures
+        closure: closure
       }),
       do: %{
         id: id,
-        in_station_closures: in_station_closures,
-        other_stations_with_closures: other_stations_with_closures,
+        closure: closure,
         alternate_direction_text: alternate_direction_text,
         accessible_path_direction_arrow: accessible_path_direction_arrow,
         accessible_path_image_url:
@@ -73,16 +51,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
       }
 
   defimpl Screens.V2.WidgetInstance do
-    alias Screens.V2.WidgetInstance.ElevatorClosures
+    alias Screens.V2.WidgetInstance.CurrentElevatorClosed
 
     def priority(_instance), do: [1]
-    def serialize(instance), do: ElevatorClosures.serialize(instance)
+    def serialize(instance), do: CurrentElevatorClosed.serialize(instance)
     def slot_names(_instance), do: [:main_content]
-    def widget_type(_instance), do: :elevator_closures
+    def widget_type(_instance), do: :current_elevator_closed
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}
     def audio_sort_key(_instance), do: [0]
     def audio_valid_candidate?(_instance), do: false
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorClosuresView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.CurrentElevatorClosedView
   end
 end

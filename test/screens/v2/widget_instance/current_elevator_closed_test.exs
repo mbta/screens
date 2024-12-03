@@ -1,43 +1,26 @@
-defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
+defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.ElevatorClosures
+  alias Screens.V2.WidgetInstance.CurrentElevatorClosed
   alias ScreensConfig.V2.Elevator
 
   setup do
     %{
-      instance: %ElevatorClosures{
+      instance: %CurrentElevatorClosed{
         app_params:
           struct(Elevator,
-            elevator_id: "1",
+            elevator_id: "111",
             alternate_direction_text: "Test",
             accessible_path_direction_arrow: :n
           ),
-        in_station_closures: [
-          %ElevatorClosures.Closure{
-            description: "Test Alert Description",
-            elevator_name: "Test Elevator",
-            elevator_id: "111",
-            id: "1",
-            header_text: "Test Alert Header"
-          }
-        ],
-        other_stations_with_closures: [
-          %ElevatorClosures.Station{
-            name: "Forest Hills",
-            route_icons: ["Orange"],
-            closures: [
-              %ElevatorClosures.Closure{
-                description: "FH Alert Description",
-                elevator_name: "FH Elevator",
-                elevator_id: "222",
-                id: "2",
-                header_text: "FH Alert Header"
-              }
-            ]
-          }
-        ]
+        closure: %CurrentElevatorClosed.Closure{
+          description: "Test Alert Description",
+          elevator_name: "Test Elevator",
+          elevator_id: "111",
+          id: "1",
+          header_text: "Test Alert Header"
+        }
       }
     }
   end
@@ -49,10 +32,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   end
 
   describe "serialize/1" do
-    test "returns map with id and closures", %{instance: instance} do
+    test "returns map with id, closure, and alternate direction info", %{instance: instance} do
       assert %{
-               in_station_closures: instance.in_station_closures,
-               other_stations_with_closures: instance.other_stations_with_closures,
+               closure: instance.closure,
                accessible_path_direction_arrow:
                  instance.app_params.accessible_path_direction_arrow,
                accessible_path_image_here_coordinates:
@@ -71,8 +53,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   end
 
   describe "widget_type/1" do
-    test "returns elevator_closures", %{instance: instance} do
-      assert :elevator_closures == WidgetInstance.widget_type(instance)
+    test "returns current_elevator_closed", %{instance: instance} do
+      assert :current_elevator_closed == WidgetInstance.widget_type(instance)
     end
   end
 
@@ -95,8 +77,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   end
 
   describe "audio_view/1" do
-    test "returns ElevatorClosuresView", %{instance: instance} do
-      assert ScreensWeb.V2.Audio.ElevatorClosuresView == WidgetInstance.audio_view(instance)
+    test "returns CurrentElevatorClosedView", %{instance: instance} do
+      assert ScreensWeb.V2.Audio.CurrentElevatorClosedView == WidgetInstance.audio_view(instance)
     end
   end
 end

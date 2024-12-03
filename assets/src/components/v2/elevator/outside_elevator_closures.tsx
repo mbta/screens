@@ -1,10 +1,13 @@
-import React, { useLayoutEffect, useRef, useState } from "react";
+import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
 import cx from "classnames";
 import _ from "lodash";
-import { type StationWithClosures } from "Components/v2/elevator/elevator_closures";
 import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
-import { WrappedComponentProps } from "Components/v2/persistent_wrapper";
-import PagingIndicators from "Components/v2/elevator/closures/paging_indicators";
+import makePersistent, {
+  WrappedComponentProps,
+} from "Components/v2/persistent_wrapper";
+import PagingIndicators from "Components/v2/elevator/paging_indicators";
+import { type StationWithClosures } from "Components/v2/elevator/models/station";
+import { type Closure } from "Components/v2/elevator/models/closure";
 import useClientPaging from "Hooks/v2/use_client_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
@@ -137,15 +140,19 @@ const OutsideClosureList = ({
   );
 };
 
-interface OutsideClosuresViewProps extends OutsideClosureListProps {}
+interface Props extends WrappedComponentProps {
+  id: string;
+  in_station_closures: Closure[];
+  other_stations_with_closures: StationWithClosures[];
+}
 
-const OutsideClosuresView = ({
-  stations,
+const OutsideElevatorClosures = ({
+  other_stations_with_closures: stations,
   lastUpdate,
   onFinish,
-}: OutsideClosuresViewProps) => {
+}: Props) => {
   return (
-    <div className="outside-closures-view">
+    <div className="outside-elevator-closures">
       <InStationSummary />
       <OutsideClosureList
         stations={stations}
@@ -156,4 +163,6 @@ const OutsideClosuresView = ({
   );
 };
 
-export default OutsideClosuresView;
+export default makePersistent(
+  OutsideElevatorClosures as ComponentType<WrappedComponentProps>,
+);

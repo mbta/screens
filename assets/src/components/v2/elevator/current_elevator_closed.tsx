@@ -1,9 +1,11 @@
-import React from "react";
+import React, { ComponentType } from "react";
 import cx from "classnames";
 import Arrow, { Direction } from "Components/v2/arrow";
-import { WrappedComponentProps } from "Components/v2/persistent_wrapper";
-import PagingIndicators from "Components/v2/elevator/closures/paging_indicators";
-import { type ElevatorClosure } from "Components/v2/elevator/elevator_closures";
+import makePersistent, {
+  WrappedComponentProps,
+} from "Components/v2/persistent_wrapper";
+import PagingIndicators from "Components/v2/elevator/paging_indicators";
+import { type Closure } from "Components/v2/elevator/models/closure";
 import useClientPaging from "Hooks/v2/use_client_paging";
 import useTextResizer from "Hooks/v2/use_text_resizer";
 import CurrentLocationMarker from "Images/svgr_bundled/current-location-marker.svg";
@@ -12,7 +14,7 @@ import NoService from "Images/svgr_bundled/no-service-black.svg";
 import ElevatorWayfinding from "Images/svgr_bundled/elevator-wayfinding.svg";
 import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
 
-export type Coordinates = {
+type Coordinates = {
   x: number;
   y: number;
 };
@@ -26,22 +28,22 @@ const PulsatingDot = ({ x, y }: Coordinates) => {
   );
 };
 
-interface CurrentElevatorClosedViewProps extends WrappedComponentProps {
-  closure: ElevatorClosure;
-  alternateDirectionText: string;
-  accessiblePathDirectionArrow: Direction;
-  accessiblePathImageUrl: string | null;
-  accessiblePathImageHereCoordinates: Coordinates;
+interface Props extends WrappedComponentProps {
+  closure: Closure;
+  alternate_direction_text: string;
+  accessible_path_direction_arrow: Direction;
+  accessible_path_image_url: string | null;
+  accessible_path_image_here_coordinates: Coordinates;
 }
 
-const CurrentElevatorClosedView = ({
-  alternateDirectionText,
-  accessiblePathDirectionArrow,
-  accessiblePathImageUrl,
-  accessiblePathImageHereCoordinates,
+const CurrentElevatorClosed = ({
+  alternate_direction_text: alternateDirectionText,
+  accessible_path_direction_arrow: accessiblePathDirectionArrow,
+  accessible_path_image_url: accessiblePathImageUrl,
+  accessible_path_image_here_coordinates: accessiblePathImageHereCoordinates,
   onFinish,
   lastUpdate,
-}: CurrentElevatorClosedViewProps) => {
+}: Props) => {
   const numPages = accessiblePathImageUrl ? 2 : 1;
   const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
   const { ref, size } = useTextResizer({
@@ -51,7 +53,7 @@ const CurrentElevatorClosedView = ({
   });
 
   return (
-    <div className="current-elevator-closed-view">
+    <div className="current-elevator-closed">
       <div className="notch"></div>
       <div className="header">
         <div className="icons">
@@ -91,4 +93,6 @@ const CurrentElevatorClosedView = ({
   );
 };
 
-export default CurrentElevatorClosedView;
+export default makePersistent(
+  CurrentElevatorClosed as ComponentType<WrappedComponentProps>,
+);
