@@ -17,6 +17,7 @@ defmodule Screens.V2.WidgetInstance.BottomScreenFiller do
 
   @type t :: %__MODULE__{screen: Screen.t()}
 
+  def priority(%__MODULE__{screen: %Screen{vendor: :mercury}}), do: [0]
   def priority(_instance), do: [10]
   def serialize(_instance), do: %{}
   def slot_names(_instance), do: [:full_body_bottom_screen]
