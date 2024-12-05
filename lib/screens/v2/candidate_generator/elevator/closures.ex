@@ -50,11 +50,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       elevator_alerts = Enum.filter(alerts, &relevant_alert?(&1, stop_id))
       routes_map = get_routes_map(elevator_alerts, stop_id)
 
-      {in_station_alerts, outside_alerts} =
-        split_closures_by_location(elevator_alerts, stop_id)
-
       in_station_closures =
-        Enum.map(in_station_alerts, &alert_to_elevator_closure/1)
+        elevator_alerts
+        |> get_in_station_alerts(stop_id)
+        |> Enum.map(&alert_to_elevator_closure/1)
 
       current_elevator_closure = Enum.find(in_station_closures, &(&1.elevator_id == elevator_id))
 
@@ -63,8 +62,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
           {%OutsideElevatorClosures{
              in_station_closures: in_station_closures,
              other_stations_with_closures:
-               format_outside_closures(outside_alerts, parent_station_map, routes_map),
-             app_params: config
+               format_outside_closures(
+                 elevator_alerts,
+                 parent_station_map,
+                 routes_map
+               ),
+             app_params: config,
+             station_id: stop_id
            }, nil}
         else
           {%CurrentElevatorClosed{closure: current_elevator_closure, app_params: config}, :closed}
@@ -133,8 +137,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     |> Enum.uniq()
   end
 
-  defp split_closures_by_location(closures, home_stop_id) do
-    Enum.split_with(closures, fn %Alert{informed_entities: informed_entities} ->
+  defp get_in_station_alerts(alerts, home_stop_id) do
+    Enum.filter(alerts, fn %Alert{informed_entities: informed_entities} ->
       home_stop_id in Enum.map(informed_entities, & &1.stop)
     end)
   end
