@@ -1,846 +1,635 @@
-[
-  {
-    "id": "50",
+{
+  "918": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "51",
+  "925": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "52",
+  "804": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "53",
+  "958": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "6476",
+  "780": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "701",
+  "986": {
+    "nearby_redundancy?": false
+  },
+  "921": {
+    "nearby_redundancy?": false
+  },
+  "725": {
+    "nearby_redundancy?": false
+  },
+  "816": {
+    "nearby_redundancy?": false
+  },
+  "866": {
+    "nearby_redundancy?": false
+  },
+  "996": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "702",
+  "744": {
+    "nearby_redundancy?": false
+  },
+  "710": {
+    "nearby_redundancy?": false
+  },
+  "842": {
+    "nearby_redundancy?": false
+  },
+  "899": {
+    "nearby_redundancy?": false
+  },
+  "856": {
+    "nearby_redundancy?": false
+  },
+  "879": {
+    "nearby_redundancy?": false
+  },
+  "901": {
+    "nearby_redundancy?": false
+  },
+  "922": {
+    "nearby_redundancy?": false
+  },
+  "945": {
+    "nearby_redundancy?": false
+  },
+  "701": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "703",
+  "771": {
+    "nearby_redundancy?": false
+  },
+  "734": {
+    "nearby_redundancy?": false
+  },
+  "979": {
+    "nearby_redundancy?": false
+  },
+  "936": {
+    "nearby_redundancy?": false
+  },
+  "957": {
+    "nearby_redundancy?": false
+  },
+  "998": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "708",
+  "971": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "709",
+  "913": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "710",
+  "855": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "711",
+  "731": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "712",
+  "892": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "713",
+  "854": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "714",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "715",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "716",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "717",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "718",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "719",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "720",
+  "815": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "721",
+  "712": {
+    "nearby_redundancy?": false
+  },
+  "938": {
+    "nearby_redundancy?": false
+  },
+  "896": {
+    "nearby_redundancy?": false
+  },
+  "886": {
+    "nearby_redundancy?": false
+  },
+  "994": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "722",
+  "713": {
+    "nearby_redundancy?": false
+  },
+  "933": {
+    "nearby_redundancy?": false
+  },
+  "897": {
+    "nearby_redundancy?": false
+  },
+  "769": {
+    "nearby_redundancy?": false
+  },
+  "869": {
+    "nearby_redundancy?": false
+  },
+  "908": {
+    "nearby_redundancy?": false
+  },
+  "910": {
+    "nearby_redundancy?": false
+  },
+  "813": {
+    "nearby_redundancy?": false
+  },
+  "891": {
+    "nearby_redundancy?": false
+  },
+  "947": {
+    "nearby_redundancy?": false
+  },
+  "724": {
+    "nearby_redundancy?": false
+  },
+  "711": {
+    "nearby_redundancy?": false
+  },
+  "782": {
+    "nearby_redundancy?": false
+  },
+  "972": {
+    "nearby_redundancy?": false
+  },
+  "803": {
+    "nearby_redundancy?": false
+  },
+  "978": {
+    "nearby_redundancy?": false
+  },
+  "992": {
+    "nearby_redundancy?": false
+  },
+  "859": {
+    "nearby_redundancy?": false
+  },
+  "702": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "723",
+  "757": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "724",
+  "965": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "725",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "726",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "727",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "728",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "731",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "732",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "733",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "734",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "735",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "736",
+  "722": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "743",
+  "898": {
+    "nearby_redundancy?": false
+  },
+  "717": {
+    "nearby_redundancy?": false
+  },
+  "915": {
+    "nearby_redundancy?": false
+  },
+  "807": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "744",
+  "852": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "745",
+  "858": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "746",
+  "944": {
+    "nearby_redundancy?": false
+  },
+  "850": {
+    "nearby_redundancy?": false
+  },
+  "967": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "756",
+  "768": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "757",
+  "909": {
+    "nearby_redundancy?": false
+  },
+  "970": {
+    "nearby_redundancy?": false
+  },
+  "868": {
+    "nearby_redundancy?": false
+  },
+  "52": {
+    "nearby_redundancy?": false
+  },
+  "920": {
+    "nearby_redundancy?": false
+  },
+  "949": {
+    "nearby_redundancy?": false
+  },
+  "746": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "762",
+  "805": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "763",
+  "930": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "764",
+  "719": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "765",
+  "937": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "766",
+  "966": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "767",
+  "946": {
+    "nearby_redundancy?": false
+  },
+  "814": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "768",
+  "709": {
+    "nearby_redundancy?": false
+  },
+  "721": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "769",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "770",
+  "762": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "771",
+  "846": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "772",
+  "802": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "780",
+  "880": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "781",
+  "781": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "782",
+  "876": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "800",
+  "715": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "801",
+  "864": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "802",
+  "969": {
+    "nearby_redundancy?": false
+  },
+  "890": {
+    "nearby_redundancy?": false
+  },
+  "927": {
+    "nearby_redundancy?": false
+  },
+  "889": {
+    "nearby_redundancy?": false
+  },
+  "973": {
+    "nearby_redundancy?": false
+  },
+  "904": {
+    "nearby_redundancy?": false
+  },
+  "870": {
+    "nearby_redundancy?": false
+  },
+  "975": {
+    "nearby_redundancy?": false
+  },
+  "964": {
+    "nearby_redundancy?": false
+  },
+  "982": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "803",
+  "847": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "804",
+  "923": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "805",
+  "857": {
+    "nearby_redundancy?": false
+  },
+  "808": {
+    "nearby_redundancy?": false
+  },
+  "732": {
+    "nearby_redundancy?": false
+  },
+  "851": {
+    "nearby_redundancy?": false
+  },
+  "905": {
+    "nearby_redundancy?": false
+  },
+  "806": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "806",
+  "849": {
+    "nearby_redundancy?": false
+  },
+  "885": {
+    "nearby_redundancy?": false
+  },
+  "912": {
+    "nearby_redundancy?": false
+  },
+  "845": {
+    "nearby_redundancy?": false
+  },
+  "811": {
+    "nearby_redundancy?": false
+  },
+  "900": {
+    "nearby_redundancy?": false
+  },
+  "763": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "807",
+  "735": {
+    "nearby_redundancy?": false
+  },
+  "823": {
+    "nearby_redundancy?": false
+  },
+  "841": {
+    "nearby_redundancy?": false
+  },
+  "999": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "808",
+  "906": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "810",
+  "954": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "811",
+  "953": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "812",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "813",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "814",
+  "772": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "815",
+  "861": {
+    "nearby_redundancy?": false
+  },
+  "952": {
+    "nearby_redundancy?": false
+  },
+  "843": {
+    "nearby_redundancy?": false
+  },
+  "962": {
+    "nearby_redundancy?": false
+  },
+  "884": {
+    "nearby_redundancy?": false
+  },
+  "831": {
+    "nearby_redundancy?": false
+  },
+  "723": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "816",
+  "50": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "817",
+  "935": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "821",
+  "728": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "823",
+  "745": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "830",
+  "765": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "831",
+  "919": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "840",
+  "963": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "841",
+  "991": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "842",
+  "985": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "843",
+  "53": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "844",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "845",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "846",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "847",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "848",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "849",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "850",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "851",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "852",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "853",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "854",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "855",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "856",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "857",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "858",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "859",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "860",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "861",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "864",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "865",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "866",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "867",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "868",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "869",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "870",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "872",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "876",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "879",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "880",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "881",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "884",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "885",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "886",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "887",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "889",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "890",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "891",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "892",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "896",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "897",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "898",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "899",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "900",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "901",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "903",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "904",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "905",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "906",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "907",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "908",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "909",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "910",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "911",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "912",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "913",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "914",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "915",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "917",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "918",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "919",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "920",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "921",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "922",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "923",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "924",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "925",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "926",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "927",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "928",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "929",
+  "736": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "930",
+  "867": {
+    "nearby_redundancy?": false
+  },
+  "756": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "931",
+  "903": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "932",
+  "940": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "933",
+  "800": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "934",
+  "726": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "935",
+  "764": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "936",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "937",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "938",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "939",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "940",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "944",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "945",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "946",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "947",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "948",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "949",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "951",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "952",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "953",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "954",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "955",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "956",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "957",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "958",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "961",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "962",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "963",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "964",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "965",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "966",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "967",
+  "703": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "968",
+  "887": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "969",
+  "872": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "970",
+  "733": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "971",
+  "830": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "972",
+  "817": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "973",
+  "853": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "974",
+  "955": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "975",
+  "968": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "976",
+  "821": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "977",
+  "928": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "978",
+  "931": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "979",
+  "766": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "980",
+  "961": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "981",
+  "993": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "982",
+  "997": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "983",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "985",
+  "812": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "986",
+  "990": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "987",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "990",
+  "926": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "991",
+  "956": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "992",
+  "976": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "993",
+  "727": {
     "nearby_redundancy?": false
   },
-  {
-    "id": "994",
+  "848": {
+    "nearby_redundancy?": false
+  },
+  "983": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "995",
+  "743": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "996",
+  "810": {
+    "nearby_redundancy?": false
+  },
+  "924": {
+    "nearby_redundancy?": false
+  },
+  "987": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "997",
+  "720": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "998",
+  "718": {
+    "nearby_redundancy?": false
+  },
+  "865": {
+    "nearby_redundancy?": false
+  },
+  "911": {
+    "nearby_redundancy?": false
+  },
+  "981": {
+    "nearby_redundancy?": false
+  },
+  "932": {
+    "nearby_redundancy?": false
+  },
+  "716": {
+    "nearby_redundancy?": false
+  },
+  "980": {
+    "nearby_redundancy?": false
+  },
+  "948": {
+    "nearby_redundancy?": false
+  },
+  "929": {
     "nearby_redundancy?": true
   },
-  {
-    "id": "999",
+  "840": {
+    "nearby_redundancy?": false
+  },
+  "907": {
+    "nearby_redundancy?": false
+  },
+  "844": {
+    "nearby_redundancy?": false
+  },
+  "714": {
+    "nearby_redundancy?": false
+  },
+  "974": {
+    "nearby_redundancy?": false
+  },
+  "917": {
+    "nearby_redundancy?": false
+  },
+  "770": {
+    "nearby_redundancy?": true
+  },
+  "860": {
+    "nearby_redundancy?": false
+  },
+  "951": {
+    "nearby_redundancy?": false
+  },
+  "939": {
+    "nearby_redundancy?": false
+  },
+  "934": {
+    "nearby_redundancy?": false
+  },
+  "51": {
+    "nearby_redundancy?": false
+  },
+  "708": {
+    "nearby_redundancy?": false
+  },
+  "881": {
+    "nearby_redundancy?": false
+  },
+  "977": {
+    "nearby_redundancy?": false
+  },
+  "6476": {
+    "nearby_redundancy?": false
+  },
+  "801": {
+    "nearby_redundancy?": false
+  },
+  "767": {
+    "nearby_redundancy?": true
+  },
+  "914": {
+    "nearby_redundancy?": false
+  },
+  "995": {
     "nearby_redundancy?": true
   }
-]
+}

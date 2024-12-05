@@ -31,7 +31,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
                             |> :code.priv_dir()
                             |> Path.join("elevators/elevator_redundancy_data.json")
                             |> File.read!()
-                            |> Jason.decode!(keys: :atoms)
+                            |> Jason.decode!()
 
   @spec elevator_status_instances(Screen.t(), NormalHeader.t(), Footer.t()) ::
           list(WidgetInstance.t())
@@ -180,6 +180,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   defp has_nearby_redundancy?(%Alert{
          informed_entities: [%{facility: %{id: informed_facility_id}} | _]
        }) do
-    Enum.find(@elevator_redundancy_data, &(&1.id == informed_facility_id))[:nearby_redundancy?]
+    if data = @elevator_redundancy_data[informed_facility_id] do
+      data["nearby_redundancy?"]
+    else
+      Logger.error("Elevator #{informed_facility_id} does not exist in redundancy data")
+      false
+    end
   end
 end
