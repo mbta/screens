@@ -21,7 +21,7 @@ type Coordinates = {
 
 const PulsatingDot = ({ x, y }: Coordinates) => {
   return (
-    <div className="marker-container" style={{ top: x, left: y }}>
+    <div className="marker-container" style={{ left: x, top: y }}>
       <CurrentLocationBackground className="marker-background" />
       <CurrentLocationMarker className="marker" />
     </div>
