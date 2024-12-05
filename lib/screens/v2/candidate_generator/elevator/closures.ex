@@ -183,7 +183,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     if data = @elevator_redundancy_data[informed_facility_id] do
       data["nearby_redundancy?"]
     else
-      Logger.error("Elevator #{informed_facility_id} does not exist in redundancy data")
+      _ =
+        Sentry.capture_message(
+          "Elevator #{informed_facility_id} does not exist in redundancy data"
+        )
+
       false
     end
   end
