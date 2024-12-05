@@ -51,21 +51,6 @@ body {
   color: $cool-black-15;
   background-color: $warm-neutral-90;
 
-  hr.thick {
-    min-height: 24px;
-    margin: 0;
-    background-color: $cool-black-15;
-    border: none;
-  }
-
-  hr.thin {
-    min-height: 2px;
-    margin: 24px 0;
-    background-color: $true-grey-45;
-    border: none;
-    opacity: 0.5;
-  }
-
   .subheading {
     font-size: 80px;
     font-weight: 700;

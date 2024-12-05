@@ -39,7 +39,6 @@ const ClosureRow = ({ station }: ClosureRowProps) => {
           {closure.elevator_name} ({closure.elevator_id})
         </div>
       ))}
-      <hr className="thin" />
     </div>
   );
 };
@@ -55,7 +54,6 @@ const InStationSummary = () => {
           <NormalService height={72} width={72} fill="#145A06" />
         </span>
       </div>
-      <hr className="thick" />
     </>
   );
 };
@@ -111,7 +109,6 @@ const OutsideClosureList = ({
             <AccessibilityAlert height={128} width={155} />
           </div>
         </div>
-        <hr className="thin" />
       </div>
       <div className="closure-list-container">
         {
