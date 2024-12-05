@@ -21,16 +21,11 @@ formatted_data =
     {:ok, %{"elevator_id" => ""}} ->
       nil
 
-    {:ok,
-     %{
-       "elevator_id" => id,
-       "Exiting System Categorization" => category,
-       "parent_station" => station_id
-     }} ->
-      %{id: id, station_id: station_id, nearby_redundancy?: category == "1 - Nearby"}
+    {:ok, %{"elevator_id" => id, "Exiting System Categorization" => category}} ->
+      %{id: id, nearby_redundancy?: category == "1 - Nearby"}
   end)
   |> Enum.reject(&is_nil/1)
-  |> Enum.sort_by(&{&1.station_id, &1.id})
+  |> Enum.sort_by(& &1.id)
 
 File.write(
   "priv/elevators/elevator_redundancy_data.json",

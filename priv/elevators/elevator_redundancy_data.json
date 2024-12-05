@@ -1,1057 +1,846 @@
 [
   {
-    "id": "928",
-    "station_id": "place-ER-0115",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "929",
-    "station_id": "place-ER-0115",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "930",
-    "station_id": "place-ER-0115",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "996",
-    "station_id": "place-ER-0168",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "997",
-    "station_id": "place-ER-0168",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "994",
-    "station_id": "place-ER-0183",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "995",
-    "station_id": "place-ER-0183",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "52",
-    "station_id": "place-NEC-2173",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "53",
-    "station_id": "place-NEC-2173",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "990",
-    "station_id": "place-WML-0025",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "991",
-    "station_id": "place-WML-0025",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "992",
-    "station_id": "place-WML-0025",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "993",
-    "station_id": "place-WML-0025",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "725",
-    "station_id": "place-WML-0035",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "726",
-    "station_id": "place-WML-0035",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "727",
-    "station_id": "place-WML-0035",
-    "nearby_redundancy?": false
-  },
-  {
     "id": "50",
-    "station_id": "place-WML-0214",
     "nearby_redundancy?": false
   },
   {
     "id": "51",
-    "station_id": "place-WML-0214",
     "nearby_redundancy?": false
   },
   {
-    "id": "780",
-    "station_id": "place-WML-0442",
+    "id": "52",
     "nearby_redundancy?": false
   },
   {
-    "id": "781",
-    "station_id": "place-WML-0442",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "782",
-    "station_id": "place-WML-0442",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "813",
-    "station_id": "place-alfcl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "814",
-    "station_id": "place-alfcl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "815",
-    "station_id": "place-alfcl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "961",
-    "station_id": "place-alfcl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "872",
-    "station_id": "place-andrw",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "879",
-    "station_id": "place-andrw",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "880",
-    "station_id": "place-andrw",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "931",
-    "station_id": "place-aport",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "932",
-    "station_id": "place-aport",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "955",
-    "station_id": "place-aport",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "956",
-    "station_id": "place-aport",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "913",
-    "station_id": "place-aqucl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "914",
-    "station_id": "place-aqucl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "915",
-    "station_id": "place-aqucl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "923",
-    "station_id": "place-aqucl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "924",
-    "station_id": "place-aqucl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "925",
-    "station_id": "place-aqucl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "962",
-    "station_id": "place-armnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "963",
-    "station_id": "place-armnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "964",
-    "station_id": "place-armnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "968",
-    "station_id": "place-asmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "969",
-    "station_id": "place-asmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "970",
-    "station_id": "place-asmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "716",
-    "station_id": "place-astao",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "717",
-    "station_id": "place-astao",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "718",
-    "station_id": "place-astao",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "719",
-    "station_id": "place-astao",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "769",
-    "station_id": "place-balsq",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "853",
-    "station_id": "place-bbsta",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "854",
-    "station_id": "place-bbsta",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "855",
-    "station_id": "place-bbsta",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "856",
-    "station_id": "place-bbsta",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "886",
-    "station_id": "place-bmmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "887",
-    "station_id": "place-bmmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "867",
-    "station_id": "place-brdwy",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "868",
-    "station_id": "place-brdwy",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "811",
-    "station_id": "place-brntn",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "933",
-    "station_id": "place-ccmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "951",
-    "station_id": "place-chmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "952",
-    "station_id": "place-chmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "876",
-    "station_id": "place-chncl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "922",
-    "station_id": "place-chncl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "860",
-    "station_id": "place-cntsq",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "861",
-    "station_id": "place-cntsq",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "976",
-    "station_id": "place-coecl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "977",
-    "station_id": "place-coecl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "937",
-    "station_id": "place-crtst",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "938",
-    "station_id": "place-crtst",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "939",
-    "station_id": "place-crtst",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "940",
-    "station_id": "place-crtst",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "816",
-    "station_id": "place-davis",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "817",
-    "station_id": "place-davis",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "869",
-    "station_id": "place-dwnxg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "870",
-    "station_id": "place-dwnxg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "891",
-    "station_id": "place-dwnxg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "892",
-    "station_id": "place-dwnxg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "998",
-    "station_id": "place-dwnxg",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "999",
-    "station_id": "place-dwnxg",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "957",
-    "station_id": "place-fldcr",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "958",
-    "station_id": "place-fldcr",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "724",
-    "station_id": "place-forhl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "841",
-    "station_id": "place-forhl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "842",
-    "station_id": "place-forhl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "843",
-    "station_id": "place-forhl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "765",
-    "station_id": "place-gilmn",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "766",
-    "station_id": "place-gilmn",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "720",
-    "station_id": "place-gover",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "721",
-    "station_id": "place-gover",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "722",
-    "station_id": "place-gover",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "723",
-    "station_id": "place-gover",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "844",
-    "station_id": "place-grnst",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "903",
-    "station_id": "place-haecl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "904",
-    "station_id": "place-haecl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "905",
-    "station_id": "place-haecl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "906",
-    "station_id": "place-haecl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "907",
-    "station_id": "place-haecl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "908",
-    "station_id": "place-haecl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "821",
-    "station_id": "place-harsq",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "973",
-    "station_id": "place-harsq",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "846",
-    "station_id": "place-jaksn",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "830",
-    "station_id": "place-jfk",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "831",
-    "station_id": "place-jfk",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "948",
-    "station_id": "place-kencl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "971",
-    "station_id": "place-kencl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "972",
-    "station_id": "place-kencl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "756",
-    "station_id": "place-knncl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "757",
-    "station_id": "place-knncl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "866",
-    "station_id": "place-knncl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "762",
-    "station_id": "place-lech",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "763",
-    "station_id": "place-lech",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "764",
-    "station_id": "place-lech",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "852",
-    "station_id": "place-masta",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "770",
-    "station_id": "place-mdftf",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "772",
-    "station_id": "place-mdftf",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "767",
-    "station_id": "place-mgngl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "768",
-    "station_id": "place-mgngl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "944",
-    "station_id": "place-mlmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "945",
-    "station_id": "place-mlmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "965",
-    "station_id": "place-mvbcl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "966",
-    "station_id": "place-mvbcl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "731",
-    "station_id": "place-north",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "732",
-    "station_id": "place-north",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "909",
-    "station_id": "place-north",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "910",
-    "station_id": "place-north",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "911",
-    "station_id": "place-north",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "912",
-    "station_id": "place-north",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "897",
-    "station_id": "place-nqncy",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "898",
-    "station_id": "place-nqncy",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "899",
-    "station_id": "place-nqncy",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "900",
-    "station_id": "place-nqncy",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "743",
-    "station_id": "place-ogmnl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "744",
-    "station_id": "place-ogmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "745",
-    "station_id": "place-ogmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "746",
-    "station_id": "place-ogmnl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "800",
-    "station_id": "place-ogmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "801",
-    "station_id": "place-ogmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "712",
-    "station_id": "place-orhte",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "713",
-    "station_id": "place-orhte",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "714",
-    "station_id": "place-orhte",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "715",
-    "station_id": "place-orhte",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "804",
-    "station_id": "place-pktrm",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "808",
-    "station_id": "place-pktrm",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "812",
-    "station_id": "place-pktrm",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "823",
-    "station_id": "place-pktrm",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "978",
-    "station_id": "place-pktrm",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "979",
-    "station_id": "place-pktrm",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "982",
-    "station_id": "place-portr",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "983",
-    "station_id": "place-portr",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "985",
-    "station_id": "place-portr",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "986",
-    "station_id": "place-portr",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "987",
-    "station_id": "place-portr",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "917",
-    "station_id": "place-prmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "920",
-    "station_id": "place-prmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "921",
-    "station_id": "place-prmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "736",
-    "station_id": "place-qamnl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "805",
-    "station_id": "place-qamnl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "806",
-    "station_id": "place-qamnl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "807",
-    "station_id": "place-qamnl",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "810",
-    "station_id": "place-qnctr",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "896",
-    "station_id": "place-qnctr",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "884",
-    "station_id": "place-rbmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "885",
-    "station_id": "place-rbmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "847",
-    "station_id": "place-rcmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "728",
-    "station_id": "place-rugg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "848",
-    "station_id": "place-rugg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "849",
-    "station_id": "place-rugg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "850",
-    "station_id": "place-rugg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "851",
-    "station_id": "place-rugg",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "845",
-    "station_id": "place-sbmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "946",
-    "station_id": "place-shmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "947",
-    "station_id": "place-shmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "953",
-    "station_id": "place-smmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "954",
-    "station_id": "place-smmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "980",
-    "station_id": "place-spmnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "981",
-    "station_id": "place-spmnl",
+    "id": "53",
     "nearby_redundancy?": false
   },
   {
     "id": "6476",
-    "station_id": "place-sstat",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "901",
-    "station_id": "place-sstat",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "918",
-    "station_id": "place-sstat",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "919",
-    "station_id": "place-sstat",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "926",
-    "station_id": "place-sstat",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "927",
-    "station_id": "place-sstat",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "949",
-    "station_id": "place-sstat",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "802",
-    "station_id": "place-state",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "803",
-    "station_id": "place-state",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "967",
-    "station_id": "place-state",
-    "nearby_redundancy?": true
-  },
-  {
-    "id": "974",
-    "station_id": "place-state",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "975",
-    "station_id": "place-state",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "840",
-    "station_id": "place-sull",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "881",
-    "station_id": "place-sull",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "857",
-    "station_id": "place-tumnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "858",
-    "station_id": "place-tumnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "859",
-    "station_id": "place-tumnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "771",
-    "station_id": "place-unsqu",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "864",
-    "station_id": "place-welln",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "865",
-    "station_id": "place-welln",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "889",
-    "station_id": "place-wimnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "890",
-    "station_id": "place-wimnl",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "733",
-    "station_id": "place-wlsta",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "734",
-    "station_id": "place-wlsta",
-    "nearby_redundancy?": false
-  },
-  {
-    "id": "735",
-    "station_id": "place-wlsta",
     "nearby_redundancy?": false
   },
   {
     "id": "701",
-    "station_id": "place-wondl",
     "nearby_redundancy?": true
   },
   {
     "id": "702",
-    "station_id": "place-wondl",
     "nearby_redundancy?": true
   },
   {
     "id": "703",
-    "station_id": "place-wondl",
     "nearby_redundancy?": true
   },
   {
     "id": "708",
-    "station_id": "place-wondl",
     "nearby_redundancy?": false
   },
   {
     "id": "709",
-    "station_id": "place-wondl",
     "nearby_redundancy?": false
   },
   {
     "id": "710",
-    "station_id": "place-wondl",
     "nearby_redundancy?": false
   },
   {
     "id": "711",
-    "station_id": "place-wondl",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "712",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "713",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "714",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "715",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "716",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "717",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "718",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "719",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "720",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "721",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "722",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "723",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "724",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "725",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "726",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "727",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "728",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "731",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "732",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "733",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "734",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "735",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "736",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "743",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "744",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "745",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "746",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "756",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "757",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "762",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "763",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "764",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "765",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "766",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "767",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "768",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "769",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "770",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "771",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "772",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "780",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "781",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "782",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "800",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "801",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "802",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "803",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "804",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "805",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "806",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "807",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "808",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "810",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "811",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "812",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "813",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "814",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "815",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "816",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "817",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "821",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "823",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "830",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "831",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "840",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "841",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "842",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "843",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "844",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "845",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "846",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "847",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "848",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "849",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "850",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "851",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "852",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "853",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "854",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "855",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "856",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "857",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "858",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "859",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "860",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "861",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "864",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "865",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "866",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "867",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "868",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "869",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "870",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "872",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "876",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "879",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "880",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "881",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "884",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "885",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "886",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "887",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "889",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "890",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "891",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "892",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "896",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "897",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "898",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "899",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "900",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "901",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "903",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "904",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "905",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "906",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "907",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "908",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "909",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "910",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "911",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "912",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "913",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "914",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "915",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "917",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "918",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "919",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "920",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "921",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "922",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "923",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "924",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "925",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "926",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "927",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "928",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "929",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "930",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "931",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "932",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "933",
     "nearby_redundancy?": false
   },
   {
     "id": "934",
-    "station_id": "place-wtcst",
     "nearby_redundancy?": false
   },
   {
     "id": "935",
-    "station_id": "place-wtcst",
     "nearby_redundancy?": false
   },
   {
     "id": "936",
-    "station_id": "place-wtcst",
     "nearby_redundancy?": false
+  },
+  {
+    "id": "937",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "938",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "939",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "940",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "944",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "945",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "946",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "947",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "948",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "949",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "951",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "952",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "953",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "954",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "955",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "956",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "957",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "958",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "961",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "962",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "963",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "964",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "965",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "966",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "967",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "968",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "969",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "970",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "971",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "972",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "973",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "974",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "975",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "976",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "977",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "978",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "979",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "980",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "981",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "982",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "983",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "985",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "986",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "987",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "990",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "991",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "992",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "993",
+    "nearby_redundancy?": false
+  },
+  {
+    "id": "994",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "995",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "996",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "997",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "998",
+    "nearby_redundancy?": true
+  },
+  {
+    "id": "999",
+    "nearby_redundancy?": true
   }
 ]
