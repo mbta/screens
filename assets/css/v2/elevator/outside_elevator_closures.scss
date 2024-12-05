@@ -64,24 +64,30 @@
           width: 1080px;
           padding: 26px 48px 24px;
 
-          &::after,
-          &:first-child::before {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            margin: 0 24px;
-            content: "";
-            background: $true-grey-45;
-            opacity: 0.5;
+          &:not(&--current-station) {
+            &::after,
+            &:first-child::before {
+              position: absolute;
+              left: 0;
+              width: 100%;
+              height: 2px;
+              margin: 0 24px;
+              content: "";
+              background: $true-grey-45;
+              opacity: 0.5;
+            }
+
+            &::after {
+              top: 100%;
+            }
+
+            &::before {
+              top: 0;
+            }
           }
 
-          &::after {
-            top: 100%;
-          }
-
-          &::before {
-            top: 0;
+          &--current-station {
+            background-color: $warm-neutral-85;
           }
 
           &__station-name {
