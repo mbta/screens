@@ -28,8 +28,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @stop injected(Stop)
 
   @elevator_redundancy_data :screens
-                            |> :code.priv_dir()
-                            |> Path.join("elevators/elevator_redundancy_data.json")
+                            |> Application.compile_env(
+                              :elevator_redundancy_data_path,
+                              :screens
+                              |> :code.priv_dir()
+                              |> Path.join("elevators/elevator_redundancy_data.json")
+                            )
                             |> File.read!()
                             |> Jason.decode!()
 
