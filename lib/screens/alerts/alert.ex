@@ -374,4 +374,9 @@ defmodule Screens.Alerts.Alert do
   end
 
   def partial_station_closure?(_, _), do: false
+
+  @spec informs_stop_id?(Alert.t(), Stop.id()) :: boolean()
+  def informs_stop_id?(%__MODULE__{informed_entities: informed_entities}, stop_id) do
+    Enum.any?(informed_entities, &(&1.stop == stop_id))
+  end
 end

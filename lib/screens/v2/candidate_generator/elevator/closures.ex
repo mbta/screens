@@ -27,6 +27,16 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @route injected(Route)
   @stop injected(Stop)
 
+  @elevator_redundancy_data :screens
+                            |> Application.compile_env(
+                              :elevator_redundancy_data_path,
+                              :screens
+                              |> :code.priv_dir()
+                              |> Path.join("elevators/elevator_redundancy_data.json")
+                            )
+                            |> File.read!()
+                            |> Jason.decode!()
+
   @spec elevator_status_instances(Screen.t(), NormalHeader.t(), Footer.t()) ::
           list(WidgetInstance.t())
   def elevator_status_instances(
@@ -37,7 +47,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
          {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
          {:ok, alerts} <- @alert.fetch_elevator_alerts_with_facilities() do
-      elevator_alerts = Enum.filter(alerts, &relevant_alert?/1)
+      elevator_alerts = Enum.filter(alerts, &relevant_alert?(&1, stop_id))
       routes_map = get_routes_map(elevator_alerts, stop_id)
 
       {in_station_alerts, outside_alerts} =
@@ -75,8 +85,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     end
   end
 
-  defp relevant_alert?(alert) do
-    relevant_effect?(alert) and informs_one_facility?(alert)
+  # All alerts at home station are relevant but only elevators without redundancies are
+  # relevant at other stations.
+  defp relevant_alert?(alert, home_stop_id) do
+    relevant_effect?(alert) and informs_one_facility?(alert) and
+      (Alert.informs_stop_id?(alert, home_stop_id) or not has_nearby_redundancy?(alert))
   end
 
   defp relevant_effect?(alert), do: alert.effect == :elevator_closure
@@ -168,5 +181,20 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     |> Enum.find_value(fn
       ie -> if InformedEntity.parent_station?(ie), do: ie.stop
     end)
+  end
+
+  defp has_nearby_redundancy?(%Alert{
+         informed_entities: [%{facility: %{id: informed_facility_id}} | _]
+       }) do
+    if data = @elevator_redundancy_data[informed_facility_id] do
+      data["nearby_redundancy?"]
+    else
+      _ =
+        Sentry.capture_message(
+          "Elevator #{informed_facility_id} does not exist in redundancy data"
+        )
+
+      false
+    end
   end
 end
