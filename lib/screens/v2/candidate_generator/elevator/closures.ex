@@ -43,7 +43,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
          {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
          {:ok, alerts} <- @alert.fetch_elevator_alerts_with_facilities() do
-      elevator_alerts = Enum.filter(alerts, &relevant_alert?/1)
+      elevator_alerts = Enum.filter(alerts, &relevant_alert?(&1, stop_id))
       routes_map = get_routes_map(elevator_alerts, stop_id)
 
       {in_station_alerts, outside_alerts} =
@@ -81,8 +81,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     end
   end
 
-  defp relevant_alert?(alert) do
-    relevant_effect?(alert) and informs_one_facility?(alert)
+  # All alerts at home station are relevant but only elevators without redundancies are
+  # relevant at other stations.
+  defp relevant_alert?(alert, home_stop_id) do
+    relevant_effect?(alert) and informs_one_facility?(alert) and
+      (Alert.informs_stop_id?(alert, home_stop_id) or not has_nearby_redundancy?(alert))
   end
 
   defp relevant_effect?(alert), do: alert.effect == :elevator_closure
@@ -151,7 +154,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   defp format_outside_closures(closures, station_id_to_name, station_id_to_routes) do
     closures
-    |> Enum.reject(&has_nearby_redundancy?/1)
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
     |> Enum.map(fn {parent_station_id, closures} ->
       closures_at_station = Enum.map(closures, &alert_to_elevator_closure/1)
