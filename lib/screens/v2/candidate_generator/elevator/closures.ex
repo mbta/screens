@@ -60,9 +60,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       {elevator_widget_instance, header_footer_variant} =
         if is_nil(current_elevator_closure) do
           {%ElevatorClosuresList{
-             in_station_closures: in_station_closures,
-             other_stations_with_closures:
-               format_outside_closures(
+             stations_with_closures:
+               build_stations_with_closures(
                  elevator_alerts,
                  parent_station_map,
                  routes_map
@@ -160,7 +159,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     }
   end
 
-  defp format_outside_closures(alerts, station_id_to_name, station_id_to_routes) do
+  defp build_stations_with_closures(alerts, station_id_to_name, station_id_to_routes) do
     alerts
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
     |> Enum.map(fn {parent_station_id, alerts} ->

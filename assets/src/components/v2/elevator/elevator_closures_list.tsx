@@ -198,21 +198,23 @@ const OutsideClosureList = ({
 
 interface Props extends WrappedComponentProps {
   id: string;
-  in_station_closures: Closure[];
-  other_stations_with_closures: StationWithClosures[];
+  stations_with_closures: StationWithClosures[];
   station_id: string;
 }
 
 const ElevatorClosuresList = ({
-  other_stations_with_closures: stations,
-  in_station_closures: inStationClosures,
+  stations_with_closures: stations,
   station_id: stationId,
   lastUpdate,
   onFinish,
 }: Props) => {
   return (
     <div className="elevator-closures-list">
-      <InStationSummary closures={inStationClosures} />
+      <InStationSummary
+        closures={stations
+          .filter((s) => s.id === stationId)
+          .flatMap((s) => s.closures)}
+      />
       <OutsideClosureList
         stations={stations}
         stationId={stationId}

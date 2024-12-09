@@ -5,12 +5,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresList do
   alias Screens.V2.WidgetInstance.Elevator.Closure
   alias ScreensConfig.V2.Elevator
 
-  defstruct ~w[app_params in_station_closures other_stations_with_closures station_id]a
+  defstruct ~w[app_params stations_with_closures station_id]a
 
   @type t :: %__MODULE__{
           app_params: Elevator.t(),
-          in_station_closures: list(Closure.t()),
-          other_stations_with_closures: list(__MODULE__.Station.t()),
+          stations_with_closures: list(__MODULE__.Station.t()),
           station_id: String.t()
         }
 
@@ -34,14 +33,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresList do
 
   def serialize(%__MODULE__{
         app_params: %Elevator{elevator_id: id},
-        in_station_closures: in_station_closures,
-        other_stations_with_closures: other_stations_with_closures,
+        stations_with_closures: stations_with_closures,
         station_id: station_id
       }),
       do: %{
         id: id,
-        in_station_closures: in_station_closures,
-        other_stations_with_closures: other_stations_with_closures,
+        stations_with_closures: stations_with_closures,
         station_id: station_id
       }
 
