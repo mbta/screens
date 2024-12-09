@@ -1,7 +1,6 @@
 import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
 import cx from "classnames";
 import _ from "lodash";
-import numberToWords from "number-to-words";
 import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
 import makePersistent, {
   WrappedComponentProps,
@@ -85,9 +84,8 @@ const InStationSummary = ({ closures }: InStationSummaryProps) => {
   } else {
     text = (
       <>
-        <b>This elevator is working.</b>{" "}
-        {_.capitalize(numberToWords.toWords(closures.length))} other elevators
-        at this station are down.
+        <b>This elevator is working.</b> {closures.length} other elevators at
+        this station are down.
       </>
     );
   }
