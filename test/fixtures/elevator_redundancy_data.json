@@ -1,0 +1,11 @@
+{
+  "112": {
+    "nearby_redundancy?": true
+  },
+  "222": {
+    "nearby_redundancy?": true
+  },
+  "333": {
+    "nearby_redundancy?": false
+  }
+}

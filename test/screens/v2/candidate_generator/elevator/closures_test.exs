@@ -234,6 +234,104 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         )
     end
 
+    test "Filters out alerts at other stations with nearby redundancy", %{
+      config: config,
+      header_instance: header_instance,
+      footer_instance: footer_instance
+    } do
+      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
+
+      expect(@stop, :fetch_parent_station_name_map, fn ->
+        {:ok,
+         %{
+           "place-test" => "This Station",
+           "place-test-redundancy" => "Other With Redundancy",
+           "place-test-no-redundancy" => "Other No Redundancy"
+         }}
+      end)
+
+      expect(@route, :fetch, 2, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
+
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          struct(Alert,
+            id: "1",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "In Station Elevator", id: "112"}}
+            ]
+          ),
+          struct(Alert,
+            id: "2",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{
+                stop: "place-test-redundancy",
+                facility: %{name: "Other With Redundancy", id: "222"}
+              }
+            ]
+          ),
+          struct(Alert,
+            id: "3",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{
+                stop: "place-test-no-redundancy",
+                facility: %{name: "Other Without Redundancy", id: "333"}
+              }
+            ]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      [
+        ^header_instance,
+        %Screens.V2.WidgetInstance.OutsideElevatorClosures{
+          app_params: %ScreensConfig.V2.Elevator{
+            elevator_id: "111",
+            alternate_direction_text: "Test",
+            accessible_path_direction_arrow: :n,
+            evergreen_content: [],
+            accessible_path_image_url: nil,
+            accessible_path_image_here_coordinates: %{y: 0, x: 0}
+          },
+          in_station_closures: [
+            %Screens.V2.WidgetInstance.Elevator.Closure{
+              id: "1",
+              elevator_name: "In Station Elevator",
+              elevator_id: "112",
+              description: nil,
+              header_text: nil
+            }
+          ],
+          other_stations_with_closures: [
+            %Screens.V2.WidgetInstance.OutsideElevatorClosures.Station{
+              id: "place-test-no-redundancy",
+              name: "Other No Redundancy",
+              route_icons: [%{type: :text, text: "RL", color: :red}],
+              closures: [
+                %Screens.V2.WidgetInstance.Elevator.Closure{
+                  id: "3",
+                  elevator_name: "Other Without Redundancy",
+                  elevator_id: "333",
+                  description: nil,
+                  header_text: nil
+                }
+              ]
+            }
+          ]
+        },
+        ^footer_instance
+      ] =
+        ElevatorClosures.elevator_status_instances(
+          struct(Screen, app_id: :elevator_v2, app_params: config),
+          header_instance,
+          footer_instance
+        )
+    end
+
     test "Returns CurrentElevatorClosed if configured elevator is closed", %{
       config: config,
       header_instance: header_instance,
