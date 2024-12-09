@@ -14,7 +14,7 @@ import EvergreenContent from "Components/v2/evergreen_content";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 import MultiScreenPage from "Components/v2/multi_screen_page";
-import OutsideElevatorClosures from "Components/v2/elevator/outside_elevator_closures";
+import ElevatorClosuresList from "Components/v2/elevator/elevator_closures_list";
 import CurrentElevatorClosed from "Components/v2/elevator/current_elevator_closed";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import Footer from "Components/v2/elevator/footer";
@@ -22,7 +22,7 @@ import NormalHeader from "Components/v2/normal_header";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
-  outside_elevator_closures: OutsideElevatorClosures,
+  elevator_closures_list: ElevatorClosuresList,
   current_elevator_closed: CurrentElevatorClosed,
   evergreen_content: EvergreenContent,
   footer: Footer,

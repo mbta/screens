@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     CurrentElevatorClosed,
     Footer,
     NormalHeader,
-    OutsideElevatorClosures
+    ElevatorClosuresList
   }
 
   alias ScreensConfig.Screen
@@ -83,7 +83,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %OutsideElevatorClosures{
+        %ElevatorClosuresList{
           app_params: ^config,
           in_station_closures: [
             %{
@@ -147,7 +147,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %OutsideElevatorClosures{
+        %ElevatorClosuresList{
           app_params: ^config,
           in_station_closures: [],
           other_stations_with_closures: [
@@ -220,7 +220,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %OutsideElevatorClosures{
+        %ElevatorClosuresList{
           app_params: ^config,
           in_station_closures: [],
           other_stations_with_closures: []
@@ -288,7 +288,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %Screens.V2.WidgetInstance.OutsideElevatorClosures{
+        %ElevatorClosuresList{
           app_params: %ScreensConfig.V2.Elevator{
             elevator_id: "111",
             alternate_direction_text: "Test",
@@ -307,7 +307,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
             }
           ],
           other_stations_with_closures: [
-            %Screens.V2.WidgetInstance.OutsideElevatorClosures.Station{
+            %ElevatorClosuresList.Station{
               id: "place-test-no-redundancy",
               name: "Other No Redundancy",
               route_icons: [%{type: :text, text: "RL", color: :red}],
@@ -422,7 +422,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       [
         ^header_instance,
-        %OutsideElevatorClosures{
+        %ElevatorClosuresList{
           app_params: ^config,
           in_station_closures: [
             %{

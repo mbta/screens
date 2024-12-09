@@ -1,4 +1,4 @@
-.outside-elevator-closures {
+.elevator-closures-list {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -28,7 +28,7 @@
     }
   }
 
-  .outside-closure-list {
+  .closures-list {
     height: 100%;
     background-color: $warm-neutral-90;
 

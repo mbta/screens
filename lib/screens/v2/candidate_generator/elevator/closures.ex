@@ -10,9 +10,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   alias Screens.V2.WidgetInstance.{
     CurrentElevatorClosed,
+    ElevatorClosuresList,
     Footer,
-    NormalHeader,
-    OutsideElevatorClosures
+    NormalHeader
   }
 
   alias Screens.V2.WidgetInstance.Elevator.Closure
@@ -59,7 +59,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
       {elevator_widget_instance, header_footer_variant} =
         if is_nil(current_elevator_closure) do
-          {%OutsideElevatorClosures{
+          {%ElevatorClosuresList{
              in_station_closures: in_station_closures,
              other_stations_with_closures:
                format_outside_closures(
@@ -160,18 +160,18 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     }
   end
 
-  defp format_outside_closures(closures, station_id_to_name, station_id_to_routes) do
-    closures
+  defp format_outside_closures(alerts, station_id_to_name, station_id_to_routes) do
+    alerts
     |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
-    |> Enum.map(fn {parent_station_id, closures} ->
-      closures_at_station = Enum.map(closures, &alert_to_elevator_closure/1)
+    |> Enum.map(fn {parent_station_id, alerts} ->
+      closures_at_station = Enum.map(alerts, &alert_to_elevator_closure/1)
 
       route_pills =
         station_id_to_routes
         |> Map.fetch!(parent_station_id)
         |> Enum.map(&RoutePill.serialize_icon/1)
 
-      %OutsideElevatorClosures.Station{
+      %ElevatorClosuresList.Station{
         id: parent_station_id,
         name: Map.fetch!(station_id_to_name, parent_station_id),
         route_icons: route_pills,

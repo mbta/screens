@@ -42,7 +42,7 @@ body {
   }
 }
 
-.outside-elevator-closures,
+.elevator-closures-list,
 .current-elevator-closed {
   position: relative;
   display: flex;
@@ -69,4 +69,4 @@ body {
 }
 
 @import "v2/elevator/current_elevator_closed";
-@import "v2/elevator/outside_elevator_closures";
+@import "v2/elevator/elevator_closures_list";

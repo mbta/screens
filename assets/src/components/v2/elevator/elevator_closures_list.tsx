@@ -149,7 +149,7 @@ const OutsideClosureList = ({
   }, [stations]);
 
   return (
-    <div className="outside-closure-list">
+    <div className="closures-list">
       <div className="header-container">
         <div className="header">
           <div className="header__title">MBTA Elevator Closures</div>
@@ -203,7 +203,7 @@ interface Props extends WrappedComponentProps {
   station_id: string;
 }
 
-const OutsideElevatorClosures = ({
+const ElevatorClosuresList = ({
   other_stations_with_closures: stations,
   in_station_closures: inStationClosures,
   station_id: stationId,
@@ -211,7 +211,7 @@ const OutsideElevatorClosures = ({
   onFinish,
 }: Props) => {
   return (
-    <div className="outside-elevator-closures">
+    <div className="elevator-closures-list">
       <InStationSummary closures={inStationClosures} />
       <OutsideClosureList
         stations={stations}
@@ -224,5 +224,5 @@ const OutsideElevatorClosures = ({
 };
 
 export default makePersistent(
-  OutsideElevatorClosures as ComponentType<WrappedComponentProps>,
+  ElevatorClosuresList as ComponentType<WrappedComponentProps>,
 );
