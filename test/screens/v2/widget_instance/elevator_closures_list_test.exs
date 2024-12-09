@@ -15,16 +15,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresListTest do
             alternate_direction_text: "Test",
             accessible_path_direction_arrow: :n
           ),
-        in_station_closures: [
-          %Closure{
-            description: "Test Alert Description",
-            elevator_name: "Test Elevator",
-            elevator_id: "111",
-            id: "1",
-            header_text: "Test Alert Header"
-          }
-        ],
-        other_stations_with_closures: [
+        stations_with_closures: [
           %ElevatorClosuresList.Station{
             name: "Forest Hills",
             route_icons: ["Orange"],
@@ -52,9 +43,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresListTest do
   describe "serialize/1" do
     test "returns map with id and closures", %{instance: instance} do
       assert %{
-               in_station_closures: instance.in_station_closures,
-               other_stations_with_closures: instance.other_stations_with_closures,
-               id: instance.app_params.elevator_id
+               stations_with_closures: instance.stations_with_closures,
+               id: instance.app_params.elevator_id,
+               station_id: nil
              } == WidgetInstance.serialize(instance)
     end
   end

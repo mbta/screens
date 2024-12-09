@@ -85,16 +85,21 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         ^header_instance,
         %ElevatorClosuresList{
           app_params: ^config,
-          in_station_closures: [
-            %{
-              id: "1",
-              description: nil,
-              elevator_name: "Test",
-              elevator_id: "facility-test",
-              header_text: nil
+          stations_with_closures: [
+            %ElevatorClosuresList.Station{
+              id: "place-test",
+              name: "Place Test",
+              route_icons: [%{type: :text, text: "RL", color: :red}],
+              closures: [
+                %Closure{
+                  id: "1",
+                  elevator_name: "Test",
+                  elevator_id: "facility-test"
+                }
+              ]
             }
           ],
-          other_stations_with_closures: []
+          station_id: "place-test"
         },
         ^footer_instance
       ] =
@@ -149,8 +154,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         ^header_instance,
         %ElevatorClosuresList{
           app_params: ^config,
-          in_station_closures: [],
-          other_stations_with_closures: [
+          stations_with_closures: [
             %{
               id: "place-haecl",
               name: "Haymarket",
@@ -222,8 +226,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         ^header_instance,
         %ElevatorClosuresList{
           app_params: ^config,
-          in_station_closures: [],
-          other_stations_with_closures: []
+          stations_with_closures: []
         },
         ^footer_instance
       ] =
@@ -297,22 +300,25 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
             accessible_path_image_url: nil,
             accessible_path_image_here_coordinates: %{y: 0, x: 0}
           },
-          in_station_closures: [
-            %Screens.V2.WidgetInstance.Elevator.Closure{
-              id: "1",
-              elevator_name: "In Station Elevator",
-              elevator_id: "112",
-              description: nil,
-              header_text: nil
-            }
-          ],
-          other_stations_with_closures: [
+          stations_with_closures: [
+            %ElevatorClosuresList.Station{
+              id: "place-test",
+              name: "This Station",
+              route_icons: [%{type: :text, text: "RL", color: :red}],
+              closures: [
+                %Closure{
+                  id: "1",
+                  elevator_name: "In Station Elevator",
+                  elevator_id: "112"
+                }
+              ]
+            },
             %ElevatorClosuresList.Station{
               id: "place-test-no-redundancy",
               name: "Other No Redundancy",
               route_icons: [%{type: :text, text: "RL", color: :red}],
               closures: [
-                %Screens.V2.WidgetInstance.Elevator.Closure{
+                %Closure{
                   id: "3",
                   elevator_name: "Other Without Redundancy",
                   elevator_id: "333",
@@ -321,7 +327,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                 }
               ]
             }
-          ]
+          ],
+          station_id: "place-test"
         },
         ^footer_instance
       ] =
@@ -424,16 +431,20 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         ^header_instance,
         %ElevatorClosuresList{
           app_params: ^config,
-          in_station_closures: [
-            %{
-              id: "1",
-              description: nil,
-              elevator_name: "Test",
-              elevator_id: "facility-test",
-              header_text: nil
+          stations_with_closures: [
+            %ElevatorClosuresList.Station{
+              id: "place-test",
+              name: "Place Test",
+              closures: [
+                %Closure{
+                  id: "1",
+                  elevator_name: "Test",
+                  elevator_id: "facility-test"
+                }
+              ]
             }
           ],
-          other_stations_with_closures: []
+          station_id: "place-test"
         },
         ^footer_instance
       ] =
