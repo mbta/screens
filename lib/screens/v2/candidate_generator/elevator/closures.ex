@@ -50,12 +50,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       elevator_alerts = Enum.filter(alerts, &relevant_alert?(&1, stop_id))
       routes_map = get_routes_map(elevator_alerts, stop_id)
 
-      in_station_closures =
+      current_elevator_closure =
         elevator_alerts
         |> get_in_station_alerts(stop_id)
         |> Enum.map(&alert_to_elevator_closure/1)
-
-      current_elevator_closure = Enum.find(in_station_closures, &(&1.elevator_id == elevator_id))
+        |> Enum.find(&(&1.elevator_id == elevator_id))
 
       {elevator_widget_instance, header_footer_variant} =
         if is_nil(current_elevator_closure) do
