@@ -13,10 +13,33 @@ import {
 import useClientPaging from "Hooks/v2/use_client_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
+import { classWithModifier } from "Util/util";
 
 interface ClosureRowProps {
   station: StationWithClosures;
 }
+
+const CurrentStationClosureRow = ({ station }: ClosureRowProps) => {
+  const { closures } = station;
+
+  return (
+    <div className={classWithModifier("closure-row", "current-station")}>
+      <div className="closure-row__name-and-pills">
+        <div className="closure-row__station-name">At this station</div>
+      </div>
+      {closures.map((closure) => (
+        <div
+          key={closure.id}
+          className={cx("closure-row__elevator-name", {
+            "list-item": closures.length > 1,
+          })}
+        >
+          {closure.elevator_name} ({closure.elevator_id})
+        </div>
+      ))}
+    </div>
+  );
+};
 
 const ClosureRow = ({ station }: ClosureRowProps) => {
   const { name, closures, route_icons, id } = station;
@@ -39,33 +62,54 @@ const ClosureRow = ({ station }: ClosureRowProps) => {
           {closure.elevator_name} ({closure.elevator_id})
         </div>
       ))}
-      <hr className="thin" />
     </div>
   );
 };
 
-const InStationSummary = () => {
+interface InStationSummaryProps {
+  closures: Closure[];
+}
+
+const InStationSummary = ({ closures }: InStationSummaryProps) => {
+  let text;
+  if (closures.length === 0) {
+    text = "All elevators at this station are currently working";
+  } else if (closures.length === 1) {
+    text = (
+      <>
+        <b>This elevator is working.</b> Another elevator at this station is
+        down.
+      </>
+    );
+  } else {
+    text = (
+      <>
+        <b>This elevator is working.</b> {closures.length} other elevators at
+        this station are down.
+      </>
+    );
+  }
+
   return (
     <>
       <div className="in-station-summary">
-        <span className="text">
-          All elevators at this station are currently working
-        </span>
+        <span className="text">{text}</span>
         <span>
           <NormalService height={72} width={72} fill="#145A06" />
         </span>
       </div>
-      <hr className="thick" />
     </>
   );
 };
 
 interface OutsideClosureListProps extends WrappedComponentProps {
   stations: StationWithClosures[];
+  stationId: string;
 }
 
 const OutsideClosureList = ({
   stations,
+  stationId,
   lastUpdate,
   onFinish,
 }: OutsideClosureListProps) => {
@@ -103,7 +147,7 @@ const OutsideClosureList = ({
   }, [stations]);
 
   return (
-    <div className="outside-closure-list">
+    <div className="closures-list">
       <div className="header-container">
         <div className="header">
           <div className="header__title">MBTA Elevator Closures</div>
@@ -111,7 +155,6 @@ const OutsideClosureList = ({
             <AccessibilityAlert height={128} width={155} />
           </div>
         </div>
-        <hr className="thin" />
       </div>
       <div className="closure-list-container">
         {
@@ -124,9 +167,18 @@ const OutsideClosureList = ({
             }
             ref={ref}
           >
-            {stations.map((station) => (
-              <ClosureRow station={station} key={station.id} />
-            ))}
+            {stations
+              .sort((a, _b) => (a.id === stationId ? 0 : 1))
+              .map((station) =>
+                station.id === stationId ? (
+                  <CurrentStationClosureRow
+                    station={station}
+                    key={station.id}
+                  />
+                ) : (
+                  <ClosureRow station={station} key={station.id} />
+                ),
+              )}
           </div>
         }
       </div>
@@ -144,20 +196,26 @@ const OutsideClosureList = ({
 
 interface Props extends WrappedComponentProps {
   id: string;
-  in_station_closures: Closure[];
-  other_stations_with_closures: StationWithClosures[];
+  stations_with_closures: StationWithClosures[];
+  station_id: string;
 }
 
-const OutsideElevatorClosures = ({
-  other_stations_with_closures: stations,
+const ElevatorClosuresList = ({
+  stations_with_closures: stations,
+  station_id: stationId,
   lastUpdate,
   onFinish,
 }: Props) => {
   return (
-    <div className="outside-elevator-closures">
-      <InStationSummary />
+    <div className="elevator-closures-list">
+      <InStationSummary
+        closures={stations
+          .filter((s) => s.id === stationId)
+          .flatMap((s) => s.closures)}
+      />
       <OutsideClosureList
         stations={stations}
+        stationId={stationId}
         lastUpdate={lastUpdate}
         onFinish={onFinish}
       />
@@ -166,5 +224,5 @@ const OutsideElevatorClosures = ({
 };
 
 export default makePersistent(
-  OutsideElevatorClosures as ComponentType<WrappedComponentProps>,
+  ElevatorClosuresList as ComponentType<WrappedComponentProps>,
 );

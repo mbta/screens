@@ -42,7 +42,7 @@ body {
   }
 }
 
-.outside-elevator-closures,
+.elevator-closures-list,
 .current-elevator-closed {
   position: relative;
   display: flex;
@@ -50,21 +50,6 @@ body {
   height: 100%;
   color: $cool-black-15;
   background-color: $warm-neutral-90;
-
-  hr.thick {
-    min-height: 24px;
-    margin: 0;
-    background-color: $cool-black-15;
-    border: none;
-  }
-
-  hr.thin {
-    min-height: 2px;
-    margin: 24px 0;
-    background-color: $true-grey-45;
-    border: none;
-    opacity: 0.5;
-  }
 
   .subheading {
     font-size: 80px;
@@ -84,4 +69,4 @@ body {
 }
 
 @import "v2/elevator/current_elevator_closed";
-@import "v2/elevator/outside_elevator_closures";
+@import "v2/elevator/elevator_closures_list";

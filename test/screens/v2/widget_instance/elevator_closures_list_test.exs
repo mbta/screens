@@ -1,31 +1,22 @@
-defmodule Screens.V2.WidgetInstance.OutsideElevatorClosuresTest do
+defmodule Screens.V2.WidgetInstance.ElevatorClosuresListTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Elevator.Closure
-  alias Screens.V2.WidgetInstance.OutsideElevatorClosures
+  alias Screens.V2.WidgetInstance.ElevatorClosuresList
   alias ScreensConfig.V2.Elevator
 
   setup do
     %{
-      instance: %OutsideElevatorClosures{
+      instance: %ElevatorClosuresList{
         app_params:
           struct(Elevator,
             elevator_id: "1",
             alternate_direction_text: "Test",
             accessible_path_direction_arrow: :n
           ),
-        in_station_closures: [
-          %Closure{
-            description: "Test Alert Description",
-            elevator_name: "Test Elevator",
-            elevator_id: "111",
-            id: "1",
-            header_text: "Test Alert Header"
-          }
-        ],
-        other_stations_with_closures: [
-          %OutsideElevatorClosures.Station{
+        stations_with_closures: [
+          %ElevatorClosuresList.Station{
             name: "Forest Hills",
             route_icons: ["Orange"],
             closures: [
@@ -52,9 +43,9 @@ defmodule Screens.V2.WidgetInstance.OutsideElevatorClosuresTest do
   describe "serialize/1" do
     test "returns map with id and closures", %{instance: instance} do
       assert %{
-               in_station_closures: instance.in_station_closures,
-               other_stations_with_closures: instance.other_stations_with_closures,
-               id: instance.app_params.elevator_id
+               stations_with_closures: instance.stations_with_closures,
+               id: instance.app_params.elevator_id,
+               station_id: nil
              } == WidgetInstance.serialize(instance)
     end
   end
@@ -66,8 +57,8 @@ defmodule Screens.V2.WidgetInstance.OutsideElevatorClosuresTest do
   end
 
   describe "widget_type/1" do
-    test "returns outside_elevator_closures", %{instance: instance} do
-      assert :outside_elevator_closures == WidgetInstance.widget_type(instance)
+    test "returns elevator_closures_list", %{instance: instance} do
+      assert :elevator_closures_list == WidgetInstance.widget_type(instance)
     end
   end
 
@@ -90,8 +81,8 @@ defmodule Screens.V2.WidgetInstance.OutsideElevatorClosuresTest do
   end
 
   describe "audio_view/1" do
-    test "returns OutsideElevatorClosuresView", %{instance: instance} do
-      assert ScreensWeb.V2.Audio.OutsideElevatorClosuresView ==
+    test "returns ElevatorClosuresListView", %{instance: instance} do
+      assert ScreensWeb.V2.Audio.ElevatorClosuresListView ==
                WidgetInstance.audio_view(instance)
     end
   end
