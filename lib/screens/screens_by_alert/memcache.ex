@@ -26,10 +26,10 @@ defmodule Screens.ScreensByAlert.Memcache do
   }
   ```
   """
+
+  alias Screens.Log
   alias Screens.ScreensByAlert.Memcache.TaskSupervisor
   alias Screens.Util
-
-  require Logger
 
   @behaviour Screens.ScreensByAlert.Behaviour
 
@@ -83,7 +83,7 @@ defmodule Screens.ScreensByAlert.Memcache do
         Map.merge(default_map, found_items)
 
       {:error, message} ->
-        Logger.warning("[get_screens_by_alert memcache error] message=\"#{message}\"")
+        log_warning(message, :get_screens_by_alert)
         # Should we return an error tuple instead of the default map?
         default_map
     end
@@ -100,26 +100,20 @@ defmodule Screens.ScreensByAlert.Memcache do
         Map.merge(default_map, found_items)
 
       {:error, message} ->
-        Logger.warning("[get_screens_last_updated memcache error] message=\"#{message}\"")
+        log_warning(message, :get_screens_last_updated)
         # Should we return an error tuple instead of the default map?
         default_map
     end
   end
 
   defp update_screens_last_updated_key(screen_id, now) do
-    set_result =
-      Memcache.set(@server, last_updated_key(screen_id), now, ttl: @screens_last_updated_ttl)
+    case Memcache.set(@server, last_updated_key(screen_id), now, ttl: @screens_last_updated_ttl) do
+      {:error, message} ->
+        log_warning(message, :update_screens_last_updated_key, screen_id: screen_id)
 
-    _ =
-      case set_result do
-        {:error, message} ->
-          Logger.warning(
-            "[put_data screens_last_updated memcache error] screen_id=#{screen_id} message=#{message}"
-          )
-
-        _ ->
-          :ok
-      end
+      _ ->
+        :ok
+    end
   end
 
   # Creates or updates the cache item for the given alert ID with the given screen ID, retrying until success.
@@ -141,9 +135,7 @@ defmodule Screens.ScreensByAlert.Memcache do
 
     case cas_result do
       {:error, message} ->
-        Logger.warning(
-          "[put_data screens_by_alert memcache error] alert_id=#{alert_id} screen_id=#{screen_id} message=#{message}"
-        )
+        log_warning(message, :update_alert_key, alert_id: alert_id, screen_id: screen_id)
 
       _ ->
         :ok
@@ -185,4 +177,8 @@ defmodule Screens.ScreensByAlert.Memcache do
 
   defp key_to_id(@screens_by_alert_key_prefix <> alert_id), do: alert_id
   defp key_to_id(@screens_last_updated_key_prefix <> screen_id), do: screen_id
+
+  defp log_warning(message, source, extra \\ []) do
+    Log.warning("memcache_error", [message: message, source: source] ++ extra)
+  end
 end

@@ -1,9 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @moduledoc false
 
-  require Logger
-
   alias Screens.Alerts.{Alert, InformedEntity}
+  alias Screens.Log
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance
@@ -82,7 +81,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         []
 
       {:error, error} ->
-        Logger.error("[elevator_status_instances] #{inspect(error)}")
+        Log.error("elevator_closures_error", error: error)
         []
     end
   end
@@ -191,11 +190,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     if data = @elevator_redundancy_data[informed_facility_id] do
       data["nearby_redundancy?"]
     else
-      _ =
-        Sentry.capture_message(
-          "Elevator #{informed_facility_id} does not exist in redundancy data"
-        )
-
+      Log.warning("elevator_redundancy_not_found", facility_id: informed_facility_id)
       false
     end
   end

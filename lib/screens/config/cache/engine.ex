@@ -37,9 +37,6 @@ defmodule Screens.Config.Cache.Engine do
   @impl true
   def update_interval_ms, do: 5_000
 
-  @impl true
-  def update_failure_error_log_threshold_minutes, do: 2
-
   @spec config_to_table_entries(Config.t(), DateTime.t() | nil) :: Cache.table_contents()
   defp config_to_table_entries(config, last_deploy_timestamp) do
     screen_entries =

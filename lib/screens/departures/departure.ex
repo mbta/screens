@@ -1,8 +1,7 @@
 defmodule Screens.Departures.Departure do
   @moduledoc false
 
-  require Logger
-
+  alias Screens.Log
   alias Screens.Predictions.Prediction
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
@@ -410,8 +409,10 @@ defmodule Screens.Departures.Departure do
       expected_route_ids = ["64", "120"]
 
       if length(route_ids) > 1 and !Enum.member?(expected_route_ids, route_id) do
-        Logger.warning(
-          "log_unexpected_groups found #{length(route_ids)} predictions on trip #{trip_id} for route #{Enum.at(route_ids, 0)}"
+        Log.warning("log_unexpected_groups",
+          predictions: length(route_ids),
+          route: Enum.at(route_ids, 0),
+          trip: trip_id
         )
       end
     end)

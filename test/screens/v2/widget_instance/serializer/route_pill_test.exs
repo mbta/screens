@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                    serialize_for_departure("CR-Foobar", "", :rail, nil)
         end)
 
-      assert logs =~ "missing route pill abbreviation for CR-Foobar"
+      assert logs =~ ~s(missing_route_pill_abbreviation line="Foobar")
     end
 
     test "Returns boat icon if route type is :ferry" do
