@@ -21,13 +21,24 @@ formatted_data =
     {:ok, %{"elevator_id" => ""}} ->
       nil
 
-    {:ok, %{"elevator_id" => id, "Exiting System Categorization" => category}} ->
-      {id, %{nearby_redundancy?: category == "1 - Nearby"}}
+    {:ok,
+     %{
+       "elevator_id" => id,
+       "Exiting System Categorization" => category,
+       "Short Text" => summary
+     }} ->
+      redundancy =
+        case category do
+          "1" <> _ -> 1
+          "2" <> _ -> 2
+          "3" <> _ -> 3
+          "4" <> _ -> 4
+          _ -> nil
+        end
+
+      {id, %{redundancy: redundancy, summary: summary}}
   end)
   |> Enum.reject(&is_nil/1)
   |> Map.new()
 
-File.write(
-  "priv/elevators/elevator_redundancy_data.json",
-  Jason.encode!(formatted_data, pretty: true)
-)
+File.write("priv/elevators.json", Jason.encode!(formatted_data, pretty: true))
