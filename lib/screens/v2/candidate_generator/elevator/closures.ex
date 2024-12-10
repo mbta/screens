@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @moduledoc false
 
   alias Screens.Alerts.{Alert, InformedEntity}
+  alias Screens.Elevator
   alias Screens.Log
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -17,29 +18,20 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.V2.WidgetInstance.Elevator.Closure
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Elevator
+  alias ScreensConfig.V2.Elevator, as: ElevatorConfig
 
   import Screens.Inject
 
   @alert injected(Alert)
+  @elevator injected(Elevator)
   @facility injected(Screens.Facilities.Facility)
   @route injected(Route)
   @stop injected(Stop)
 
-  @elevator_redundancy_data :screens
-                            |> Application.compile_env(
-                              :elevator_redundancy_data_path,
-                              :screens
-                              |> :code.priv_dir()
-                              |> Path.join("elevators/elevator_redundancy_data.json")
-                            )
-                            |> File.read!()
-                            |> Jason.decode!()
-
   @spec elevator_status_instances(Screen.t(), NormalHeader.t(), Footer.t()) ::
           list(WidgetInstance.t())
   def elevator_status_instances(
-        %Screen{app_params: %Elevator{elevator_id: elevator_id} = config},
+        %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id} = config},
         header_instance,
         footer_instance
       ) do
@@ -187,11 +179,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   defp has_nearby_redundancy?(%Alert{
          informed_entities: [%{facility: %{id: informed_facility_id}} | _]
        }) do
-    if data = @elevator_redundancy_data[informed_facility_id] do
-      data["nearby_redundancy?"]
-    else
-      Log.warning("elevator_redundancy_not_found", facility_id: informed_facility_id)
-      false
+    case @elevator.get(informed_facility_id) do
+      %Elevator{redundancy: :nearby} -> true
+      _ -> false
     end
   end
 end

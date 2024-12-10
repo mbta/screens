@@ -1,0 +1,846 @@
+{
+  "918": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "925": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "804": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "958": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "780": {
+    "summary": "",
+    "redundancy": null
+  },
+  "986": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "921": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "725": {
+    "summary": "",
+    "redundancy": null
+  },
+  "816": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "866": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "996": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "744": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "710": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "842": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "899": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "856": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "879": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "901": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "922": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "945": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "701": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "771": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "734": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "979": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "936": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "957": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "998": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "971": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "913": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "855": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "731": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "892": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "854": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "815": {
+    "summary": "N/A",
+    "redundancy": 1
+  },
+  "712": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "938": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "896": {
+    "summary": "",
+    "redundancy": 4
+  },
+  "886": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "994": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "713": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "933": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "897": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "769": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "869": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "908": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "910": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "813": {
+    "summary": "Accessible route available",
+    "redundancy": 2
+  },
+  "891": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "947": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "724": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "711": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "782": {
+    "summary": "",
+    "redundancy": null
+  },
+  "972": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "803": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "978": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "992": {
+    "summary": "",
+    "redundancy": null
+  },
+  "859": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "702": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "757": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "965": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "722": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "898": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "717": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "915": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "807": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "852": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "858": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "944": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "850": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "967": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "768": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "909": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "970": {
+    "summary": "",
+    "redundancy": 4
+  },
+  "868": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "52": {
+    "summary": "",
+    "redundancy": 4
+  },
+  "920": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "949": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "746": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "805": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "930": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "719": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "937": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "966": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "946": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "814": {
+    "summary": "N/A",
+    "redundancy": 1
+  },
+  "709": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "721": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "762": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "846": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "802": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "880": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "781": {
+    "summary": "",
+    "redundancy": null
+  },
+  "876": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "715": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "864": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "969": {
+    "summary": "",
+    "redundancy": null
+  },
+  "890": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "927": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "889": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "973": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "904": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "870": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "975": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "964": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "982": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "847": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "923": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "857": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "808": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "732": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "851": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "905": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "806": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "849": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "885": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "912": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "845": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "811": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "900": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "763": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "735": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "823": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "841": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "999": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "906": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "954": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "953": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "772": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "861": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "952": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "843": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "962": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "884": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "831": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "723": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "50": {
+    "summary": "",
+    "redundancy": null
+  },
+  "935": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "728": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "745": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "765": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "919": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "963": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "991": {
+    "summary": "",
+    "redundancy": null
+  },
+  "985": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "53": {
+    "summary": "",
+    "redundancy": 4
+  },
+  "736": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "867": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "756": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "903": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "940": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "800": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "726": {
+    "summary": "",
+    "redundancy": null
+  },
+  "764": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "703": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "887": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "872": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "733": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "830": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "817": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "853": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "955": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "968": {
+    "summary": "",
+    "redundancy": null
+  },
+  "821": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "928": {
+    "summary": "",
+    "redundancy": 4
+  },
+  "931": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "766": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "961": {
+    "summary": "Accessible route available",
+    "redundancy": 2
+  },
+  "993": {
+    "summary": "",
+    "redundancy": null
+  },
+  "997": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "812": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "990": {
+    "summary": "",
+    "redundancy": null
+  },
+  "926": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "956": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "976": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "727": {
+    "summary": "",
+    "redundancy": null
+  },
+  "848": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "983": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "743": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "810": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "924": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "987": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "720": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "718": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "865": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "911": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "981": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "932": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "716": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "980": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "948": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "929": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "840": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "907": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "844": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "714": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "974": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "917": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "770": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "860": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "951": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "939": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "934": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "51": {
+    "summary": "",
+    "redundancy": null
+  },
+  "708": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "881": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "977": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "6476": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "801": {
+    "summary": "",
+    "redundancy": 3
+  },
+  "767": {
+    "summary": "",
+    "redundancy": 1
+  },
+  "914": {
+    "summary": "",
+    "redundancy": 2
+  },
+  "995": {
+    "summary": "",
+    "redundancy": 1
+  }
+}
