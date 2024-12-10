@@ -5,11 +5,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
+  alias Screens.Log
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
   alias ScreensConfig.Screen
-
-  require Logger
 
   @enforce_keys [
     :screen,
@@ -139,7 +138,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
                                [effect, location, layout_zero] =
                                  Enum.map(
                                    [effect, location, layout_zero],
-                                   &String.to_existing_atom/1
+                                   &String.to_atom/1
                                  )
 
                                [affected_line_count, primary_section_count] =
@@ -226,7 +225,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # we generate DUP alert widgets for, but in case one slips through, we
   # should know about it!
   defp log_layout_mismatch(t, delay_severity) do
-    log_fields =
+    Log.warning(
+      "dup_alert_no_matching_layout",
       t
       |> get_layout_parameters()
       |> Map.merge(%{
@@ -235,10 +235,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
         alert_id: t.alert.id,
         stop_id: t.screen.app_params.alerts.stop_id
       })
-
-    Logger.warning(
-      "[DUP alert no matching layout] " <>
-        Enum.map_join(log_fields, " ", fn {label, value} -> "#{label}=#{value}" end)
     )
   end
 

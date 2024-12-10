@@ -51,10 +51,4 @@ defmodule Screens.Cache.Engine do
   Returns the number of milliseconds to wait between each `update_table` call.
   """
   @callback update_interval_ms() :: non_neg_integer
-
-  @doc """
-  Returns the number of minutes to wait before changing the log level
-  for failed `update_table` calls from warning to error.
-  """
-  @callback update_failure_error_log_threshold_minutes() :: non_neg_integer
 end

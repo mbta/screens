@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   require Logger
 
   alias Screens.Alerts.Alert
+  alias Screens.Log
   alias Screens.Routes.Route
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
@@ -534,11 +535,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          _first_schedule_tomorrow,
          route_id,
          direction_id,
-         now
+         _now
        )
        when is_nil(first_schedule_today) or is_nil(last_schedule_today) do
-    Logger.info(
-      "[get_overnight_schedules_for_section] No schedules for today found. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
+    Log.warning("dup_overnight_no_first_last_schedule",
+      route_id: route_id,
+      direction_id: direction_id
     )
 
     nil
@@ -577,8 +579,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        ) do
     cond do
       DateTime.compare(now, first_schedule_tomorrow.departure_time) == :gt ->
-        Logger.warning(
-          "[get_overnight_schedules_for_section] now is after first_schedule_tomorrow. route_id=#{route_id} direction_id=#{direction_id} now=#{now}"
+        Log.warning("dup_overnight_after_first_schedule",
+          route_id: route_id,
+          direction_id: direction_id
         )
 
         nil

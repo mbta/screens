@@ -9,7 +9,7 @@ defmodule Screens.Cache.Owner do
   or what kinds of queries will be made against it.
   """
   alias Screens.Cache.Engine
-  require Logger
+  alias Screens.Log
 
   use GenServer
 
@@ -18,7 +18,6 @@ defmodule Screens.Cache.Owner do
           name: any(),
           update_table: (Engine.table_version() -> Engine.update_result()),
           update_interval_ms: non_neg_integer,
-          update_failure_error_log_threshold_minutes: non_neg_integer,
 
           ### Cache state
           table_version: Engine.table_version(),
@@ -27,12 +26,7 @@ defmodule Screens.Cache.Owner do
           status: :ok | :error
         }
 
-  @enforce_keys [
-    :name,
-    :update_table,
-    :update_interval_ms,
-    :update_failure_error_log_threshold_minutes
-  ]
+  @enforce_keys [:name, :update_table, :update_interval_ms]
   defstruct @enforce_keys ++ [table_version: nil, retry_count: 0, status: :error]
 
   ### Client
@@ -47,9 +41,7 @@ defmodule Screens.Cache.Owner do
     cache_opts = %{
       name: engine.name(),
       update_table: &engine.update_table/1,
-      update_interval_ms: engine.update_interval_ms(),
-      update_failure_error_log_threshold_minutes:
-        engine.update_failure_error_log_threshold_minutes()
+      update_interval_ms: engine.update_interval_ms()
     }
 
     GenServer.start_link(__MODULE__, cache_opts, gen_server_opts)
@@ -73,9 +65,7 @@ defmodule Screens.Cache.Owner do
     init_state = %__MODULE__{
       update_table: cache_opts.update_table,
       name: cache_opts.name,
-      update_interval_ms: cache_opts.update_interval_ms,
-      update_failure_error_log_threshold_minutes:
-        cache_opts.update_failure_error_log_threshold_minutes
+      update_interval_ms: cache_opts.update_interval_ms
     }
 
     state = do_update(init_state)
@@ -169,26 +159,12 @@ defmodule Screens.Cache.Owner do
   end
 
   defp error_state(%{status: :error} = state) do
-    _ = Logger.error("cache_init_error table_name=#{state.name}")
-
+    Log.error("cache_init_error", table_name: state.name)
     %{state | retry_count: state.retry_count + 1}
   end
 
   defp error_state(state) do
-    log_message = "cache_update_error table_name=#{state.name} retry_count=#{state.retry_count}"
-
-    if log_as_error?(state) do
-      Logger.error(log_message)
-    else
-      Logger.warning(log_message)
-    end
-
+    Log.error("cache_update_error", table_name: state.name, retry_count: state.retry_count)
     %{state | retry_count: state.retry_count + 1}
-  end
-
-  defp log_as_error?(state) do
-    threshold_ms = state.update_failure_error_log_threshold_minutes * 60_000
-
-    state.retry_count * state.update_interval_ms >= threshold_ms
   end
 end

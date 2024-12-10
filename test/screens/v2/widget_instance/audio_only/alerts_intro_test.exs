@@ -106,11 +106,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntroTest do
       {result, log} = with_log(fn -> AlertsIntro.audio_sort_key(widget, audio_sort_key_fn) end)
 
       assert [0] == result
-
-      assert String.contains?(
-               log,
-               "Failed to find a service alert widget in the audio readout queue"
-             )
+      assert log =~ "alerts_intro_widget_not_found"
     end
 
     test "logs a warning and returns [0] if service alert widget is first in the readout queue",
@@ -118,11 +114,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntroTest do
       {result, log} = with_log(fn -> AlertsIntro.audio_sort_key(widget, audio_sort_key_fn) end)
 
       assert [0] == result
-
-      assert String.contains?(
-               log,
-               "Unexpectedly found a service alert widget at the start of the audio readout queue"
-             )
+      assert log =~ "alerts_intro_widget_at_queue_start"
     end
   end
 

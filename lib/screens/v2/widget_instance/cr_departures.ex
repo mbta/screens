@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
-  require Logger
+  alias Screens.Log
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
   alias Screens.V2.Departure
@@ -135,10 +135,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
        ) do
     {:ok, scheduled_departure_time} =
       if is_nil(schedule) do
-        Logger.error(
-          "[cr_departures serialize_time] Could not get schedule time: #{inspect(departure)}"
-        )
-
+        Log.error("cr_departures_no_scheduled_time", departure: departure)
         {:ok, nil}
       else
         %Departure{schedule: schedule}
