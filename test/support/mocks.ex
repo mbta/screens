@@ -1,6 +1,7 @@
 injected_modules = [
   Screens.Alerts.Alert,
   Screens.Config.Cache,
+  Screens.Elevator,
   Screens.Facilities.Facility,
   Screens.Headways,
   Screens.RoutePatterns.RoutePattern,
