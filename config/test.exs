@@ -131,9 +131,7 @@ config :screens,
         headway_headsign: "Test"
       }
     ]
-  },
-  elevator_redundancy_data_path:
-    Path.join(~w[#{File.cwd!()} test fixtures elevator_redundancy_data.json])
+  }
 
 config :screens, ScreensWeb.AuthManager, secret_key: "test key"
 
