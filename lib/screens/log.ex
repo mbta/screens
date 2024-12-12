@@ -6,7 +6,7 @@ defmodule Screens.Log do
   def error(tag, data \\ []), do: log(:error, tag, data)
   def warning(tag, data \\ []), do: log(:warning, tag, data)
 
-  @spec log(:error | :warning, String.t(), Enumerable.t({term(), term()})) :: :ok
+  @spec log(:error | :warning, String.t(), Enumerable.t({String.Chars.t(), term()})) :: :ok
   defp log(level, tag, data) do
     Logger.log(
       level,
