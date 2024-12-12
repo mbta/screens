@@ -115,8 +115,23 @@ const OutsideClosureList = ({
 }: OutsideClosureListProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
-  // Each index represents a page number and each value represents the number of rows
-  // on the corresponding page index.
+  const sortedStations = [...stations].sort((a, b) => {
+    const aInStation = a.id === stationId;
+    const bInStation = b.id === stationId;
+
+    // Sort all in-station closures above other closures. Within each of those
+    // groups, sort by station name.
+    if (aInStation && !bInStation) {
+      return -1;
+    } else if (!aInStation && bInStation) {
+      return 1;
+    } else {
+      return a.name.localeCompare(b.name);
+    }
+  });
+
+  // Each index represents a page number and each value represents the number of
+  // rows on the corresponding page index.
   const [rowCounts, setRowCounts] = useState<number[]>([]);
 
   const numPages = Object.keys(rowCounts).length;
@@ -167,18 +182,13 @@ const OutsideClosureList = ({
             }
             ref={ref}
           >
-            {stations
-              .sort((a, _b) => (a.id === stationId ? 0 : 1))
-              .map((station) =>
-                station.id === stationId ? (
-                  <CurrentStationClosureRow
-                    station={station}
-                    key={station.id}
-                  />
-                ) : (
-                  <ClosureRow station={station} key={station.id} />
-                ),
-              )}
+            {sortedStations.map((station) =>
+              station.id === stationId ? (
+                <CurrentStationClosureRow station={station} key={station.id} />
+              ) : (
+                <ClosureRow station={station} key={station.id} />
+              ),
+            )}
           </div>
         }
       </div>
