@@ -127,7 +127,7 @@ defmodule Screens.V2.WidgetInstance.CRDeparturesTest do
           )
         end)
 
-      assert log =~ "Could not get schedule time"
+      assert log =~ "cr_departures_no_scheduled_time"
       assert %{prediction_or_schedule_id: "prediction-1"} = result
     end
   end

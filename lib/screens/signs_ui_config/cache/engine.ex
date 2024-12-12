@@ -23,7 +23,4 @@ defmodule Screens.SignsUiConfig.Cache.Engine do
 
   @impl true
   def update_interval_ms, do: 60_000
-
-  @impl true
-  def update_failure_error_log_threshold_minutes, do: 2
 end

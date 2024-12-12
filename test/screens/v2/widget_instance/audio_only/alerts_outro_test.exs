@@ -92,11 +92,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutroTest do
       {result, log} = with_log(fn -> AlertsOutro.audio_sort_key(widget, audio_sort_key_fn) end)
 
       assert [100] == result
-
-      assert String.contains?(
-               log,
-               "Failed to find an alert widget in the audio readout queue"
-             )
+      assert log =~ "alerts_outro_widget_not_found"
     end
   end
 

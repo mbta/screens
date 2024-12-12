@@ -107,7 +107,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       {result, log} = with_log(fn -> WidgetInstance.audio_sort_key(widget) end)
 
       assert [0] == result
-      assert String.contains?(log, "Failed to find a header widget in the audio readout queue")
+      assert log =~ "content_summary_header_not_found"
     end
   end
 

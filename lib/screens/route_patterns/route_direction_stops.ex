@@ -1,16 +1,11 @@
 defmodule Screens.RoutePatterns.RouteDirectionStops do
   @moduledoc false
 
-  require Logger
+  alias Screens.Log
 
-  def parse_result(%{"data" => data, "included" => included}, route_id) do
-    included_data = parse_included_data(included)
+  def parse_result(%{"data" => data} = response, route_id) do
+    included_data = response |> Map.get("included", []) |> parse_included_data()
     parse_data(data, included_data, route_id)
-  end
-
-  def parse_result(_, _) do
-    Logger.warning("Unrecognized format of route_pattern data.")
-    :error
   end
 
   defp parse_included_data(data) do
@@ -62,17 +57,16 @@ defmodule Screens.RoutePatterns.RouteDirectionStops do
          },
          included_data
        ) do
-    # The only way this function output an empty array is if the trip data has an empty stop list
-    # This happens occasionally in dev-green
     parsed =
       included_data
       |> Map.get({"trip", trip_id})
       |> Enum.map(fn stop_id -> Map.get(included_data, {"stop", stop_id}) end)
 
     case parsed do
-      # If `trip` is present, but the stop array is empty, there's a problem with the trip in the API
       [] ->
-        Logger.warning("Trip data doesn't contain stop ids. trip_id: #{trip_id}")
+        # Happens sometimes in API dev (only?). If a trip has no stops, there is something wrong
+        # with the data.
+        Log.warning("route_pattern_empty_stops", trip_id: trip_id)
         :error
 
       _ ->

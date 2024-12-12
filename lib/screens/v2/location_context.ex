@@ -1,8 +1,7 @@
 defmodule Screens.LocationContext do
   @moduledoc false
 
-  require Logger
-
+  alias Screens.Log
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.RouteType
@@ -66,10 +65,7 @@ defmodule Screens.LocationContext do
           }
         else
           :error ->
-            Logger.error(
-              "[location_context fetch error] Failed to get location context for an alert: stop_id=#{stop_id}"
-            )
-
+            Log.error("location_context_fetch_error", stop_id: stop_id)
             :error
         end
       end
