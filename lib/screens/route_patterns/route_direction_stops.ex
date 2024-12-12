@@ -3,8 +3,8 @@ defmodule Screens.RoutePatterns.RouteDirectionStops do
 
   alias Screens.Log
 
-  def parse_result(%{"data" => data, "included" => included}, route_id) do
-    included_data = parse_included_data(included)
+  def parse_result(%{"data" => data} = response, route_id) do
+    included_data = response |> Map.get("included", []) |> parse_included_data()
     parse_data(data, included_data, route_id)
   end
 
