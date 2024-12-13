@@ -80,7 +80,10 @@ const defaultAppParamsByAppId = {
     evergreen_content: [],
   },
   elevator_v2: {
-    elevator_id: "ELEVATOR_ID",
+    elevator_id: "",
+    alternate_direction_text: "",
+    accessible_path_image_here_coordinates: { x: 0, y: 0 },
+    evergreen_content: [],
   },
 };
 

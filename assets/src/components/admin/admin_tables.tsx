@@ -354,15 +354,6 @@ const PreFareV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const elevatorIdColumn = {
-  Header: "Elevator ID",
-  accessor: buildAppParamAccessor("elevator_id"),
-  mutator: buildAppParamMutator("elevator_id"),
-  Cell: EditableCell,
-  disableFilters: true,
-  FormCell: FormTextCell,
-};
-
 const ElevatorV2ScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "elevator_v2";
@@ -386,6 +377,64 @@ const ElevatorV2ScreensTable = (): JSX.Element => {
           FormCell: FormTextCell,
         },
         {
+          Header: "Elevator ID",
+          accessor: buildAppParamAccessor("elevator_id"),
+          mutator: buildAppParamMutator("elevator_id"),
+          Cell: EditableCell,
+          disableFilters: true,
+          FormCell: FormTextCell,
+        },
+        {
+          Header: "Accessible Path Arrow",
+          accessor: buildAppParamAccessor("accessible_path_direction_arrow"),
+          mutator: buildAppParamMutator("accessible_path_direction_arrow"),
+          Cell: EditableCell,
+          disableFilters: true,
+          FormCell: FormTextCell,
+        },
+        {
+          Header: "Accessible Path Text",
+          accessor: buildAppParamAccessor("alternate_direction_text"),
+          mutator: buildAppParamMutator("alternate_direction_text"),
+          Cell: EditableCell,
+          disableFilters: true,
+          FormCell: FormTextCell,
+        },
+        {
+          Header: "Accessible Path Image",
+          accessor: buildAppParamAccessor("accessible_path_image_url"),
+          mutator: buildAppParamMutator("accessible_path_image_url"),
+          Cell: EditableCell,
+          disableFilters: true,
+          FormCell: FormTextCell,
+        },
+        {
+          Header: "Dot X",
+          accessor: (row) =>
+            row.app_params.accessible_path_image_here_coordinates.x,
+          mutator: (row, value) => {
+            const newRow = structuredClone(row);
+            newRow.app_params.accessible_path_image_here_coordinates.x = value;
+            return newRow;
+          },
+          Cell: EditableCell,
+          disableFilters: true,
+          FormCell: FormTextCell,
+        },
+        {
+          Header: "Dot Y",
+          accessor: (row) =>
+            row.app_params.accessible_path_image_here_coordinates.y,
+          mutator: (row, value) => {
+            const newRow = structuredClone(row);
+            newRow.app_params.accessible_path_image_here_coordinates.y = value;
+            return newRow;
+          },
+          Cell: EditableCell,
+          disableFilters: true,
+          FormCell: FormTextCell,
+        },
+        {
           Header: "Evergreen Content",
           accessor: buildAppParamAccessor("evergreen_content"),
           mutator: buildAppParamMutator("evergreen_content"),
@@ -393,7 +442,6 @@ const ElevatorV2ScreensTable = (): JSX.Element => {
           disableFilters: true,
           FormCell: FormTextarea,
         },
-        elevatorIdColumn,
       ]}
       dataFilter={dataFilter}
     />
