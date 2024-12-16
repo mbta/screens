@@ -12,11 +12,7 @@ defmodule Screens.Elevator do
 
   @type t :: %__MODULE__{id: Facility.id(), redundancy: redundancy()}
 
-  @type redundancy ::
-          :nearby
-          | :in_station
-          | {:different_station, summary :: String.t()}
-          | {:contact, summary :: String.t()}
+  @type redundancy :: :nearby | :in_station | {:other, summary :: String.t()}
 
   @data :screens
         |> :code.priv_dir()
@@ -33,11 +29,8 @@ defmodule Screens.Elevator do
       %{"redundancy" => 2} ->
         %__MODULE__{id: id, redundancy: :in_station}
 
-      %{"redundancy" => 3, "summary" => summary} ->
-        %__MODULE__{id: id, redundancy: {:different_station, summary}}
-
-      %{"redundancy" => 4, "summary" => summary} ->
-        %__MODULE__{id: id, redundancy: {:contact, summary}}
+      %{"summary" => summary} ->
+        %__MODULE__{id: id, redundancy: {:other, summary}}
 
       _other ->
         Log.warning("elevator_redundancy_not_found", id: id)
