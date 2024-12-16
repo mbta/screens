@@ -95,7 +95,7 @@ defmodule Screens.Image do
   end
 
   defp psa_images_prefix do
-    Application.get_env(:screens, :environment_name, "dev") <> "/images/psa/"
+    Application.get_env(:screens, :environment_name, "screens-dev") <> "/images/psa/"
   end
 
   defp get_s3_path(filename), do: psa_images_prefix() <> filename
