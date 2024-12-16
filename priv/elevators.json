@@ -1,134 +1,134 @@
 {
   "918": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "925": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "804": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "958": {
-    "summary": "",
+    "summary": "Exit at Shawmut. Take an Alewife train back to Fields Corner.",
     "redundancy": 3
   },
   "780": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "986": {
-    "summary": "",
+    "summary": "Visit mbta.com/alerts for more info.",
     "redundancy": 3
   },
   "921": {
-    "summary": "",
+    "summary": "Exit at Copley. Take a Heath St train back to Prudential.",
     "redundancy": 3
   },
   "725": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "816": {
-    "summary": "",
+    "summary": "Exit at Harvard. Request shuttle bus back to Davis.",
     "redundancy": 3
   },
   "866": {
-    "summary": "",
+    "summary": "Exit at Harvard. Take an Ashmont/Braintree train back to Kendall/MIT.",
     "redundancy": 3
   },
   "996": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "744": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "710": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "842": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "899": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "856": {
-    "summary": "",
+    "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
     "redundancy": 3
   },
   "879": {
-    "summary": "",
+    "summary": "Exit at JFK/UMass. Take an Alewife train back to Andrew.",
     "redundancy": 3
   },
   "901": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "922": {
-    "summary": "",
+    "summary": "Exit at Tufts Medical Center. Take an Oak Grove train back to Chinatown.",
     "redundancy": 3
   },
   "945": {
-    "summary": "",
+    "summary": "Exit at Oak Grove. Request shuttle bus back to Malden Center.",
     "redundancy": 3
   },
   "701": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "771": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "734": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "979": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "936": {
-    "summary": "",
+    "summary": "Exit at Silver Line Way. Take an inbound SL bus back to World Trade Center.",
     "redundancy": 3
   },
   "957": {
-    "summary": "",
+    "summary": "Exit at Savin Hill. Take an Ashmont train back to Fields Corner.",
     "redundancy": 3
   },
   "998": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "971": {
-    "summary": "",
+    "summary": "Visit mbta.com/alerts for more info.",
     "redundancy": 3
   },
   "913": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "855": {
-    "summary": "",
+    "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
     "redundancy": 3
   },
   "731": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "892": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "854": {
-    "summary": "",
+    "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
     "redundancy": 3
   },
   "815": {
@@ -136,203 +136,203 @@
     "redundancy": 1
   },
   "712": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "938": {
-    "summary": "",
+    "summary": "Exit at World Trade Center. Take an inbound SL bus to Courthouse.",
     "redundancy": 3
   },
   "896": {
-    "summary": "",
-    "redundancy": 4
+    "summary": "Visit mbta.com/alerts for more info.",
+    "redundancy": 5
   },
   "886": {
-    "summary": "",
+    "summary": "Exit at Suffolk Downs. Take a Wonderland train back to Beachmont.",
     "redundancy": 3
   },
   "994": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "713": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "933": {
-    "summary": "",
+    "summary": "Exit at Sullivan. Request shuttle bus back to Community College.",
     "redundancy": 3
   },
   "897": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "769": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "869": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "908": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "910": {
-    "summary": "",
-    "redundancy": 3
+    "summary": "Visit mbta.com/alerts for more info.",
+    "redundancy": 5
   },
   "813": {
     "summary": "Accessible route available",
     "redundancy": 2
   },
   "891": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "947": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "724": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "711": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "782": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "972": {
-    "summary": "",
+    "summary": "Exit at Copley. Take a Kenmore & West train back to Kenmore.",
     "redundancy": 3
   },
   "803": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "978": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "992": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "859": {
-    "summary": "",
+    "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
     "redundancy": 3
   },
   "702": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "757": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "965": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "722": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "898": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "717": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "915": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "807": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "852": {
-    "summary": "",
+    "summary": "Exit at Back Bay. Request shuttle bus back to Mass Ave.",
     "redundancy": 3
   },
   "858": {
-    "summary": "",
+    "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
     "redundancy": 3
   },
   "944": {
-    "summary": "",
-    "redundancy": 3
+    "summary": "Visit mbta.com/alerts for more info.",
+    "redundancy": 5
   },
   "850": {
-    "summary": "",
+    "summary": "Exit at Jackson Sq. Request shuttle bus back to Ruggles.",
     "redundancy": 3
   },
   "967": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "768": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "909": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "970": {
-    "summary": "",
+    "summary": "Request assistance to exit.",
     "redundancy": 4
   },
   "868": {
-    "summary": "",
+    "summary": "Exit at Andrew. Request shuttle bus back to Broadway.",
     "redundancy": 3
   },
   "52": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": 4
   },
   "920": {
-    "summary": "",
+    "summary": "Exit at Northeastern. Take a Medford/Tufts train back to Prudential.",
     "redundancy": 3
   },
   "949": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "746": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "805": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "930": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "719": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "937": {
-    "summary": "",
+    "summary": "Exit at South Station. Take an outbound SL bus to Courthouse.",
     "redundancy": 3
   },
   "966": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "946": {
-    "summary": "",
+    "summary": "Exit at JFK/UMass. Request shuttle bus back to Savin Hill.",
     "redundancy": 3
   },
   "814": {
@@ -340,327 +340,327 @@
     "redundancy": 1
   },
   "709": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "721": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "762": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "846": {
-    "summary": "",
+    "summary": "Exit at Stony Brook. Request shuttle bus back to Jackson Sq.",
     "redundancy": 3
   },
   "802": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "880": {
-    "summary": "",
+    "summary": "Exit at Broadway. Take an Ashmont/Braintree train back to Andrew.",
     "redundancy": 3
   },
   "781": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "876": {
-    "summary": "",
+    "summary": "Exit at Tufts Medical Center. Take an SL4 or SL5 bus to Chinatown.",
     "redundancy": 3
   },
   "715": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "864": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "969": {
-    "summary": "",
-    "redundancy": null
+    "summary": "Accessible route available",
+    "redundancy": 2
   },
   "890": {
-    "summary": "",
+    "summary": "Exit at Orient Heights. Take a Bowdoin train back to Wood Island.",
     "redundancy": 3
   },
   "927": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "889": {
-    "summary": "",
+    "summary": "Exit at Airport. Take a Wonderland train back to Wood Island.",
     "redundancy": 3
   },
   "973": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "904": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "870": {
-    "summary": "",
+    "summary": "Exit at Park St. ",
     "redundancy": 3
   },
   "975": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "964": {
-    "summary": "",
+    "summary": "Exit at Copley. Request shuttle bus back to Arlington.",
     "redundancy": 3
   },
   "982": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "847": {
-    "summary": "",
+    "summary": "Exit at Ruggles. Request shuttle bus back to Roxbury Crossing.",
     "redundancy": 3
   },
   "923": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "857": {
-    "summary": "",
+    "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
     "redundancy": 3
   },
   "808": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "732": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "851": {
-    "summary": "",
+    "summary": "Exit at Ruggles. Request shuttle bus back to Ruggles.",
     "redundancy": 3
   },
   "905": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "806": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "849": {
-    "summary": "",
+    "summary": "Exit at Back Bay. Take the Orange Line to Ruggles. ",
     "redundancy": 3
   },
   "885": {
-    "summary": "",
+    "summary": "Exit at Wonderland. Take a Bowdoin train back to Revere Beach.",
     "redundancy": 3
   },
   "912": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "845": {
-    "summary": "",
+    "summary": "Exit at Jackson Sq. Request shuttle bus back to Stony Brook.",
     "redundancy": 3
   },
   "811": {
-    "summary": "",
+    "summary": "Exit at Quincy Adams. Request shuttle bus back to Braintree.",
     "redundancy": 3
   },
   "900": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "763": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "735": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "823": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "841": {
-    "summary": "",
+    "summary": "Exit at Ruggles or Back Bay. Take the Orange Line to Forest Hills.",
     "redundancy": 3
   },
   "999": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "906": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "954": {
-    "summary": "",
+    "summary": "Exit at Ashmont. Take an Alewife train back to Shawmut.",
     "redundancy": 3
   },
   "953": {
-    "summary": "",
+    "summary": "Exit at Fields Corner. Take an Ashmont train back to Shawmut.",
     "redundancy": 3
   },
   "772": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "861": {
-    "summary": "",
+    "summary": "Exit at Harvard. Take a Route 1 bus to Central. ",
     "redundancy": 3
   },
   "952": {
-    "summary": "",
+    "summary": "Exit at Kendall/MIT. Take an Ashmont/Braintree train back to Charles/MGH.",
     "redundancy": 3
   },
   "843": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "962": {
-    "summary": "",
+    "summary": "Exit at Copley. Take a Park St & North train back to Arlington.",
     "redundancy": 3
   },
   "884": {
-    "summary": "",
+    "summary": "Exit at Beachmont. Take a Wonderland train back to Revere Beach.",
     "redundancy": 3
   },
   "831": {
-    "summary": "",
+    "summary": "Visit mbta.com/alerts for more info.",
     "redundancy": 3
   },
   "723": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "50": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "935": {
-    "summary": "",
+    "summary": "Exit at Courthouse. Take an outbound SL bus to World Trade Center.",
     "redundancy": 3
   },
   "728": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "745": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "765": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "919": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "963": {
-    "summary": "",
+    "summary": "Exit at Park St. Take a westbound train back to Arlington.",
     "redundancy": 3
   },
   "991": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "985": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "53": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": 4
   },
   "736": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "867": {
-    "summary": "",
+    "summary": "Exit at Andrew. Request shuttle bus back to Broadway.",
     "redundancy": 3
   },
   "756": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "903": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "940": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "800": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "726": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "764": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "703": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "887": {
-    "summary": "",
+    "summary": "Exit at Revere Beach. Take a Bowdoin train back to Beachmont.",
     "redundancy": 3
   },
   "872": {
-    "summary": "",
+    "summary": "Exit at Broadway. Request shuttle bus back to Andrew.",
     "redundancy": 3
   },
   "733": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "830": {
-    "summary": "",
+    "summary": "Visit mbta.com/alerts for more info.",
     "redundancy": 3
   },
   "817": {
-    "summary": "",
+    "summary": "Exit at Harvard. Request shuttle bus back to Davis.",
     "redundancy": 3
   },
   "853": {
-    "summary": "",
+    "summary": "Exit at Mass Ave. Request shuttle bus back to Back Bay.",
     "redundancy": 3
   },
   "955": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "968": {
-    "summary": "",
-    "redundancy": null
+    "summary": "Accessible route available",
+    "redundancy": 2
   },
   "821": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "928": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": 4
   },
   "931": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "766": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "961": {
@@ -668,179 +668,179 @@
     "redundancy": 2
   },
   "993": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "997": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "812": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "990": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "926": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "956": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "976": {
-    "summary": "",
+    "summary": "Exit at Arlington. Take a westbound train back to Copley.",
     "redundancy": 3
   },
   "727": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "848": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "983": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "743": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "810": {
-    "summary": "",
+    "summary": "Exit at Quincy Adams. Request shuttle bus back to Quincy Center.",
     "redundancy": 3
   },
   "924": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "987": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "720": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "718": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "865": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "911": {
-    "summary": "",
+    "summary": "Exit at Community College. Take Forest Hills train back to North Station.",
     "redundancy": 3
   },
   "981": {
-    "summary": "",
+    "summary": "Exit at Lechmere. Take a Copley & West  train back to Science Park/West End.",
     "redundancy": 3
   },
   "932": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "716": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "980": {
-    "summary": "",
+    "summary": "Exit at North Station. Take a Lechmere & North train back to Science Park/West End.",
     "redundancy": 3
   },
   "948": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "929": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "840": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "907": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "844": {
-    "summary": "",
+    "summary": "Exit at Forest Hills. Request shuttle bus back to Green Street.",
     "redundancy": 3
   },
   "714": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "974": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "917": {
-    "summary": "",
+    "summary": "Exit at Northeastern. Take a Route 39 bus to Prudential. ",
     "redundancy": 3
   },
   "770": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "860": {
-    "summary": "",
+    "summary": "Exit at Harvard. Take an Ashmont/Braintree train back to Central.",
     "redundancy": 3
   },
   "951": {
-    "summary": "",
+    "summary": "Exit at Park St. Take an Alewife train back to Charles/MGH.",
     "redundancy": 3
   },
   "939": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "934": {
-    "summary": "",
-    "redundancy": 3
+    "summary": "Visit mbta.com/alerts for more info.",
+    "redundancy": null
   },
   "51": {
-    "summary": "",
+    "summary": "Request assistance from conductor.",
     "redundancy": null
   },
   "708": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "881": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "977": {
-    "summary": "",
+    "summary": "Visit mbta.com/alerts for more info.",
     "redundancy": 3
   },
   "6476": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "801": {
-    "summary": "",
+    "summary": "Exit at Malden Center. Request shuttle bus back to Oak Grove.",
     "redundancy": 3
   },
   "767": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   },
   "914": {
-    "summary": "",
+    "summary": "Accessible route available",
     "redundancy": 2
   },
   "995": {
-    "summary": "",
+    "summary": "N/A",
     "redundancy": 1
   }
 }

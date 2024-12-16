@@ -28,12 +28,9 @@ formatted_data =
        "Short Text" => summary
      }} ->
       redundancy =
-        case category do
-          "1" <> _ -> 1
-          "2" <> _ -> 2
-          "3" <> _ -> 3
-          "4" <> _ -> 4
-          _ -> nil
+        case Integer.parse(category) do
+          {integer, _rest} -> integer
+          :error -> nil
         end
 
       {id, %{redundancy: redundancy, summary: summary}}
