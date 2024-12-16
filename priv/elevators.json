@@ -1,846 +1,1719 @@
 {
   "918": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "901",
+      "927",
+      "919"
+    ],
     "redundancy": 2
   },
   "925": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "913",
+      "914",
+      "915"
+    ],
     "redundancy": 2
   },
   "804": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "892",
+      "979",
+      "978",
+      "812",
+      "823"
+    ],
     "redundancy": 2
   },
   "958": {
     "summary": "Exit at Shawmut. Take an Alewife train back to Fields Corner.",
+    "alternate_ids": [
+      "953",
+      "964",
+      "957"
+    ],
     "redundancy": 3
   },
   "780": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "986": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "896"
+    ],
     "redundancy": 3
   },
   "921": {
     "summary": "Exit at Copley. Take a Heath St train back to Prudential.",
+    "alternate_ids": [
+      "920",
+      "917",
+      "977",
+      "976"
+    ],
     "redundancy": 3
   },
   "725": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [
+      "727"
+    ],
     "redundancy": null
   },
   "816": {
     "summary": "Exit at Harvard. Request shuttle bus back to Davis.",
+    "alternate_ids": [
+      "821",
+      "973"
+    ],
     "redundancy": 3
   },
   "866": {
     "summary": "Exit at Harvard. Take an Ashmont/Braintree train back to Kendall/MIT.",
+    "alternate_ids": [
+      "863",
+      "821",
+      "973",
+      "951",
+      "952"
+    ],
     "redundancy": 3
   },
   "996": {
     "summary": "N/A",
+    "alternate_ids": [
+      "997"
+    ],
     "redundancy": 1
   },
   "744": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "800",
+      "945"
+    ],
     "redundancy": 2
   },
   "710": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "701",
+      "702",
+      "703"
+    ],
     "redundancy": 2
   },
   "842": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "724"
+    ],
     "redundancy": 2
   },
   "899": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "900"
+    ],
     "redundancy": 2
   },
   "856": {
     "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
+    "alternate_ids": [
+      "849",
+      "850",
+      "841",
+      "842"
+    ],
     "redundancy": 3
   },
   "879": {
     "summary": "Exit at JFK/UMass. Take an Alewife train back to Andrew.",
+    "alternate_ids": [
+      "880",
+      "872"
+    ],
     "redundancy": 3
   },
   "901": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "918",
+      "927",
+      "919"
+    ],
     "redundancy": 2
   },
   "922": {
     "summary": "Exit at Tufts Medical Center. Take an Oak Grove train back to Chinatown.",
+    "alternate_ids": [
+      "876",
+      "857",
+      "858",
+      "859"
+    ],
     "redundancy": 3
   },
   "945": {
     "summary": "Exit at Oak Grove. Request shuttle bus back to Malden Center.",
+    "alternate_ids": [
+      "800",
+      "801"
+    ],
     "redundancy": 3
   },
   "701": {
     "summary": "N/A",
+    "alternate_ids": [
+      "702",
+      "703"
+    ],
     "redundancy": 1
   },
   "771": {
     "summary": "Accessible route available",
+    "alternate_ids": [],
     "redundancy": 2
   },
   "734": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "733",
+      "735"
+    ],
     "redundancy": 2
   },
   "979": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "808",
+      "804"
+    ],
     "redundancy": 2
   },
   "936": {
     "summary": "Exit at Silver Line Way. Take an inbound SL bus back to World Trade Center.",
+    "alternate_ids": [
+      "935",
+      "937",
+      "938"
+    ],
     "redundancy": 3
   },
   "957": {
     "summary": "Exit at Savin Hill. Take an Ashmont train back to Fields Corner.",
+    "alternate_ids": [
+      "958",
+      "953",
+      "954"
+    ],
     "redundancy": 3
   },
   "998": {
     "summary": "N/A",
+    "alternate_ids": [
+      "999",
+      "869"
+    ],
     "redundancy": 1
   },
   "971": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "972",
+      "948",
+      "976",
+      "977"
+    ],
     "redundancy": 3
   },
   "913": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "924",
+      "925"
+    ],
     "redundancy": 2
   },
   "855": {
     "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
+    "alternate_ids": [
+      "849",
+      "850",
+      "841",
+      "842"
+    ],
     "redundancy": 3
   },
   "731": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "912",
+      "732"
+    ],
     "redundancy": 2
   },
   "892": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "804"
+    ],
     "redundancy": 2
   },
   "854": {
     "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
+    "alternate_ids": [
+      "849",
+      "850",
+      "841",
+      "842"
+    ],
     "redundancy": 3
   },
   "815": {
     "summary": "N/A",
+    "alternate_ids": [
+      "814"
+    ],
     "redundancy": 1
   },
   "712": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "713",
+      "715"
+    ],
     "redundancy": 2
   },
   "938": {
     "summary": "Exit at World Trade Center. Take an inbound SL bus to Courthouse.",
+    "alternate_ids": [
+      "937",
+      "935",
+      "936",
+      "901",
+      "918",
+      "919",
+      "927"
+    ],
     "redundancy": 3
   },
   "896": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "810",
+      "805",
+      "830",
+      "831"
+    ],
     "redundancy": 5
   },
   "886": {
     "summary": "Exit at Suffolk Downs. Take a Wonderland train back to Beachmont.",
+    "alternate_ids": [
+      "887",
+      "884",
+      "885"
+    ],
     "redundancy": 3
   },
   "994": {
     "summary": "N/A",
+    "alternate_ids": [
+      "995"
+    ],
     "redundancy": 1
   },
   "713": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "712",
+      "714"
+    ],
     "redundancy": 2
   },
   "933": {
     "summary": "Exit at Sullivan. Request shuttle bus back to Community College.",
+    "alternate_ids": [
+      "840",
+      "881"
+    ],
     "redundancy": 3
   },
   "897": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "900"
+    ],
     "redundancy": 2
   },
   "769": {
     "summary": "Accessible route available",
+    "alternate_ids": [],
     "redundancy": 2
   },
   "869": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "998",
+      "999"
+    ],
     "redundancy": 2
   },
   "908": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "904",
+      "905",
+      "906",
+      "907",
+      "903"
+    ],
     "redundancy": 2
   },
   "910": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "911",
+      "905",
+      "906",
+      "907"
+    ],
     "redundancy": 5
   },
   "813": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "961"
+    ],
     "redundancy": 2
   },
   "891": {
     "summary": "Accessible route available",
+    "alternate_ids": [],
     "redundancy": 2
   },
   "947": {
     "summary": "Accessible route available",
+    "alternate_ids": [],
     "redundancy": 2
   },
   "724": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "842"
+    ],
     "redundancy": 2
   },
   "711": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "710"
+    ],
     "redundancy": 2
   },
   "782": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "972": {
     "summary": "Exit at Copley. Take a Kenmore & West train back to Kenmore.",
+    "alternate_ids": [
+      "971",
+      "948",
+      "977",
+      "976"
+    ],
     "redundancy": 3
   },
   "803": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "975",
+      "892",
+      "891"
+    ],
     "redundancy": 2
   },
   "978": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "804",
+      "808",
+      "979",
+      "812",
+      "823",
+      "979"
+    ],
     "redundancy": 2
   },
   "992": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "859": {
     "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
+    "alternate_ids": [
+      "853",
+      "858"
+    ],
     "redundancy": 3
   },
   "702": {
     "summary": "N/A",
+    "alternate_ids": [
+      "701",
+      "703"
+    ],
     "redundancy": 1
   },
   "757": {
     "summary": "N/A",
+    "alternate_ids": [
+      "756",
+      "866",
+      "821",
+      "973",
+      "951",
+      "952"
+    ],
     "redundancy": 1
   },
   "965": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "966"
+    ],
     "redundancy": 2
   },
   "722": {
     "summary": "N/A",
+    "alternate_ids": [
+      "723"
+    ],
     "redundancy": 1
   },
   "898": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "900"
+    ],
     "redundancy": 2
   },
   "717": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "718",
+      "719"
+    ],
     "redundancy": 2
   },
   "915": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "923",
+      "924",
+      "925"
+    ],
     "redundancy": 2
   },
   "807": {
     "summary": "N/A",
+    "alternate_ids": [
+      "806"
+    ],
     "redundancy": 1
   },
   "852": {
     "summary": "Exit at Back Bay. Request shuttle bus back to Mass Ave.",
+    "alternate_ids": [
+      "853"
+    ],
     "redundancy": 3
   },
   "858": {
     "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
+    "alternate_ids": [
+      "853",
+      "859"
+    ],
     "redundancy": 3
   },
   "944": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "945",
+      "911",
+      "731",
+      "732"
+    ],
     "redundancy": 5
   },
   "850": {
     "summary": "Exit at Jackson Sq. Request shuttle bus back to Ruggles.",
+    "alternate_ids": [
+      "846",
+      "847"
+    ],
     "redundancy": 3
   },
   "967": {
     "summary": "N/A",
+    "alternate_ids": [
+      "974",
+      "975",
+      "802"
+    ],
     "redundancy": 1
   },
   "768": {
     "summary": "N/A",
+    "alternate_ids": [
+      "767"
+    ],
     "redundancy": 1
   },
   "909": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "912",
+      "731"
+    ],
     "redundancy": 2
   },
   "970": {
     "summary": "Request assistance to exit.",
+    "alternate_ids": [],
     "redundancy": 4
   },
   "868": {
     "summary": "Exit at Andrew. Request shuttle bus back to Broadway.",
+    "alternate_ids": [
+      "872",
+      "879",
+      "880"
+    ],
     "redundancy": 3
   },
   "52": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": 4
   },
   "920": {
     "summary": "Exit at Northeastern. Take a Medford/Tufts train back to Prudential.",
+    "alternate_ids": [
+      "921",
+      "917",
+      "977",
+      "976"
+    ],
     "redundancy": 3
   },
   "949": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "926",
+      "6476"
+    ],
     "redundancy": 2
   },
   "746": {
     "summary": "N/A",
+    "alternate_ids": [
+      "743"
+    ],
     "redundancy": 1
   },
   "805": {
     "summary": "N/A",
+    "alternate_ids": [
+      "736",
+      "810"
+    ],
     "redundancy": 1
   },
   "930": {
     "summary": "N/A",
+    "alternate_ids": [
+      "929"
+    ],
     "redundancy": 1
   },
   "719": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "716",
+      "717"
+    ],
     "redundancy": 2
   },
   "937": {
     "summary": "Exit at South Station. Take an outbound SL bus to Courthouse.",
+    "alternate_ids": [
+      "938",
+      "935",
+      "936",
+      "901",
+      "918",
+      "919",
+      "927"
+    ],
     "redundancy": 3
   },
   "966": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "965"
+    ],
     "redundancy": 2
   },
   "946": {
     "summary": "Exit at JFK/UMass. Request shuttle bus back to Savin Hill.",
+    "alternate_ids": [
+      "831",
+      "830"
+    ],
     "redundancy": 3
   },
   "814": {
     "summary": "N/A",
+    "alternate_ids": [
+      "815"
+    ],
     "redundancy": 1
   },
   "709": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "701",
+      "702",
+      "703"
+    ],
     "redundancy": 2
   },
   "721": {
     "summary": "N/A",
+    "alternate_ids": [
+      "720"
+    ],
     "redundancy": 1
   },
   "762": {
     "summary": "N/A",
+    "alternate_ids": [
+      "763",
+      "764"
+    ],
     "redundancy": 1
   },
   "846": {
     "summary": "Exit at Stony Brook. Request shuttle bus back to Jackson Sq.",
+    "alternate_ids": [
+      "845",
+      "847"
+    ],
     "redundancy": 3
   },
   "802": {
     "summary": "N/A",
+    "alternate_ids": [
+      "967",
+      "974",
+      "975"
+    ],
     "redundancy": 1
   },
   "880": {
     "summary": "Exit at Broadway. Take an Ashmont/Braintree train back to Andrew.",
+    "alternate_ids": [
+      "879",
+      "872"
+    ],
     "redundancy": 3
   },
   "781": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "876": {
     "summary": "Exit at Tufts Medical Center. Take an SL4 or SL5 bus to Chinatown.",
+    "alternate_ids": [
+      "922",
+      "857",
+      "858",
+      "859"
+    ],
     "redundancy": 3
   },
   "715": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "714",
+      "712"
+    ],
     "redundancy": 2
   },
   "864": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "865"
+    ],
     "redundancy": 2
   },
   "969": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "968"
+    ],
     "redundancy": 2
   },
   "890": {
     "summary": "Exit at Orient Heights. Take a Bowdoin train back to Wood Island.",
+    "alternate_ids": [
+      "712",
+      "714",
+      "931",
+      "932"
+    ],
     "redundancy": 3
   },
   "927": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "919",
+      "918"
+    ],
     "redundancy": 2
   },
   "889": {
     "summary": "Exit at Airport. Take a Wonderland train back to Wood Island.",
+    "alternate_ids": [
+      "712",
+      "714",
+      "931",
+      "932"
+    ],
     "redundancy": 3
   },
   "973": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "821"
+    ],
     "redundancy": 2
   },
   "904": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "903",
+      "905",
+      "906",
+      "907",
+      "908"
+    ],
     "redundancy": 2
   },
   "870": {
     "summary": "Exit at Park St. ",
+    "alternate_ids": [
+      "979",
+      "978"
+    ],
     "redundancy": 3
   },
   "975": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "974",
+      "967",
+      "802"
+    ],
     "redundancy": 2
   },
   "964": {
     "summary": "Exit at Copley. Request shuttle bus back to Arlington.",
+    "alternate_ids": [
+      "976",
+      "977"
+    ],
     "redundancy": 3
   },
   "982": {
     "summary": "N/A",
+    "alternate_ids": [
+      "985"
+    ],
     "redundancy": 1
   },
   "847": {
     "summary": "Exit at Ruggles. Request shuttle bus back to Roxbury Crossing.",
+    "alternate_ids": [
+      "846",
+      "850"
+    ],
     "redundancy": 3
   },
   "923": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "914",
+      "915"
+    ],
     "redundancy": 2
   },
   "857": {
     "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
+    "alternate_ids": [
+      "853",
+      "876",
+      "922"
+    ],
     "redundancy": 3
   },
   "808": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "978",
+      "979"
+    ],
     "redundancy": 2
   },
   "732": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "731",
+      "912"
+    ],
     "redundancy": 2
   },
   "851": {
     "summary": "Exit at Ruggles. Request shuttle bus back to Ruggles.",
+    "alternate_ids": [
+      "N/A"
+    ],
     "redundancy": 3
   },
   "905": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "904",
+      "903",
+      "906",
+      "907",
+      "908"
+    ],
     "redundancy": 2
   },
   "806": {
     "summary": "N/A",
+    "alternate_ids": [
+      "807"
+    ],
     "redundancy": 1
   },
   "849": {
     "summary": "Exit at Back Bay. Take the Orange Line to Ruggles. ",
+    "alternate_ids": [
+      "850",
+      "853",
+      "854",
+      "855",
+      "856"
+    ],
     "redundancy": 3
   },
   "885": {
     "summary": "Exit at Wonderland. Take a Bowdoin train back to Revere Beach.",
+    "alternate_ids": [
+      "884",
+      "709",
+      "710"
+    ],
     "redundancy": 3
   },
   "912": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "731",
+      "732",
+      "909",
+      ""
+    ],
     "redundancy": 2
   },
   "845": {
     "summary": "Exit at Jackson Sq. Request shuttle bus back to Stony Brook.",
+    "alternate_ids": [
+      "846"
+    ],
     "redundancy": 3
   },
   "811": {
     "summary": "Exit at Quincy Adams. Request shuttle bus back to Braintree.",
+    "alternate_ids": [
+      "805",
+      "810"
+    ],
     "redundancy": 3
   },
   "900": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "897",
+      "898",
+      "899"
+    ],
     "redundancy": 2
   },
   "763": {
     "summary": "N/A",
+    "alternate_ids": [
+      "762",
+      "764"
+    ],
     "redundancy": 1
   },
   "735": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "734"
+    ],
     "redundancy": 2
   },
   "823": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "808",
+      "978",
+      "804",
+      "979"
+    ],
     "redundancy": 2
   },
   "841": {
     "summary": "Exit at Ruggles or Back Bay. Take the Orange Line to Forest Hills.",
+    "alternate_ids": [
+      "850",
+      "849",
+      "853",
+      "854",
+      "855",
+      "856",
+      "724"
+    ],
     "redundancy": 3
   },
   "999": {
     "summary": "N/A",
+    "alternate_ids": [
+      "998",
+      "869"
+    ],
     "redundancy": 1
   },
   "906": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "903",
+      "904",
+      "905",
+      "907",
+      "908"
+    ],
     "redundancy": 2
   },
   "954": {
     "summary": "Exit at Ashmont. Take an Alewife train back to Shawmut.",
+    "alternate_ids": [
+      "953",
+      "957",
+      "958",
+      "968",
+      "969",
+      "970"
+    ],
     "redundancy": 3
   },
   "953": {
     "summary": "Exit at Fields Corner. Take an Ashmont train back to Shawmut.",
+    "alternate_ids": [
+      "954",
+      "957",
+      "958",
+      "968",
+      "969",
+      "970"
+    ],
     "redundancy": 3
   },
   "772": {
     "summary": "N/A",
+    "alternate_ids": [
+      "770"
+    ],
     "redundancy": 1
   },
   "861": {
     "summary": "Exit at Harvard. Take a Route 1 bus to Central. ",
+    "alternate_ids": [
+      "860",
+      "821",
+      "973",
+      "863",
+      "866"
+    ],
     "redundancy": 3
   },
   "952": {
     "summary": "Exit at Kendall/MIT. Take an Ashmont/Braintree train back to Charles/MGH.",
+    "alternate_ids": [
+      "951",
+      "866",
+      "863"
+    ],
     "redundancy": 3
   },
   "843": {
     "summary": "Accessible route available",
+    "alternate_ids": [],
     "redundancy": 2
   },
   "962": {
     "summary": "Exit at Copley. Take a Park St & North train back to Arlington.",
+    "alternate_ids": [
+      "963",
+      "812",
+      "823",
+      "976",
+      "977"
+    ],
     "redundancy": 3
   },
   "884": {
     "summary": "Exit at Beachmont. Take a Wonderland train back to Revere Beach.",
+    "alternate_ids": [
+      "885",
+      "709",
+      "710"
+    ],
     "redundancy": 3
   },
   "831": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "830",
+      "880",
+      "879"
+    ],
     "redundancy": 3
   },
   "723": {
     "summary": "N/A",
+    "alternate_ids": [
+      "722"
+    ],
     "redundancy": 1
   },
   "50": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "935": {
     "summary": "Exit at Courthouse. Take an outbound SL bus to World Trade Center.",
+    "alternate_ids": [
+      "936",
+      "937",
+      "938"
+    ],
     "redundancy": 3
   },
   "728": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "848"
+    ],
     "redundancy": 2
   },
   "745": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "744",
+      "945",
+      "800"
+    ],
     "redundancy": 2
   },
   "765": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "766"
+    ],
     "redundancy": 2
   },
   "919": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "927",
+      "901"
+    ],
     "redundancy": 2
   },
   "963": {
     "summary": "Exit at Park St. Take a westbound train back to Arlington.",
+    "alternate_ids": [
+      "962",
+      "812",
+      "823",
+      "976",
+      "977"
+    ],
     "redundancy": 3
   },
   "991": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "985": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "982"
+    ],
     "redundancy": 2
   },
   "53": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": 4
   },
   "736": {
     "summary": "N/A",
+    "alternate_ids": [
+      "805",
+      "810"
+    ],
     "redundancy": 1
   },
   "867": {
     "summary": "Exit at Andrew. Request shuttle bus back to Broadway.",
+    "alternate_ids": [
+      "872",
+      "879",
+      "880"
+    ],
     "redundancy": 3
   },
   "756": {
     "summary": "N/A",
+    "alternate_ids": [
+      "757",
+      "866",
+      "821",
+      "973",
+      "951",
+      "952"
+    ],
     "redundancy": 1
   },
   "903": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "904",
+      "905",
+      "906",
+      "907",
+      "908"
+    ],
     "redundancy": 2
   },
   "940": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "939"
+    ],
     "redundancy": 2
   },
   "800": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "744",
+      "945",
+      "745"
+    ],
     "redundancy": 2
   },
   "726": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [
+      "727"
+    ],
     "redundancy": null
   },
   "764": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "762",
+      "763"
+    ],
     "redundancy": 2
   },
   "703": {
     "summary": "N/A",
+    "alternate_ids": [
+      "701",
+      "702"
+    ],
     "redundancy": 1
   },
   "887": {
     "summary": "Exit at Revere Beach. Take a Bowdoin train back to Beachmont.",
+    "alternate_ids": [
+      "886",
+      "884",
+      "885"
+    ],
     "redundancy": 3
   },
   "872": {
     "summary": "Exit at Broadway. Request shuttle bus back to Andrew.",
+    "alternate_ids": [
+      "868",
+      "867"
+    ],
     "redundancy": 3
   },
   "733": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "734"
+    ],
     "redundancy": 2
   },
   "830": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "831",
+      "880",
+      "879"
+    ],
     "redundancy": 3
   },
   "817": {
     "summary": "Exit at Harvard. Request shuttle bus back to Davis.",
+    "alternate_ids": [
+      "821",
+      "973"
+    ],
     "redundancy": 3
   },
   "853": {
     "summary": "Exit at Mass Ave. Request shuttle bus back to Back Bay.",
+    "alternate_ids": [
+      "852"
+    ],
     "redundancy": 3
   },
   "955": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "932",
+      "931"
+    ],
     "redundancy": 2
   },
   "968": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "969"
+    ],
     "redundancy": 2
   },
   "821": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "973"
+    ],
     "redundancy": 2
   },
   "928": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": 4
   },
   "931": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "956",
+      "955"
+    ],
     "redundancy": 2
   },
   "766": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "765"
+    ],
     "redundancy": 2
   },
   "961": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "813"
+    ],
     "redundancy": 2
   },
   "993": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "997": {
     "summary": "N/A",
+    "alternate_ids": [
+      "996"
+    ],
     "redundancy": 1
   },
   "812": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "808",
+      "978",
+      "804",
+      "979"
+    ],
     "redundancy": 2
   },
   "990": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "926": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "949",
+      "6476"
+    ],
     "redundancy": 2
   },
   "956": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "931",
+      "932"
+    ],
     "redundancy": 2
   },
   "976": {
     "summary": "Exit at Arlington. Take a westbound train back to Copley.",
+    "alternate_ids": [
+      "977",
+      "962",
+      "963",
+      "972",
+      "971"
+    ],
     "redundancy": 3
   },
   "727": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [
+      "725",
+      "726"
+    ],
     "redundancy": null
   },
   "848": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "728"
+    ],
     "redundancy": 2
   },
   "983": {
     "summary": "N/A",
+    "alternate_ids": [
+      "987"
+    ],
     "redundancy": 1
   },
   "743": {
     "summary": "N/A",
+    "alternate_ids": [
+      "746"
+    ],
     "redundancy": 1
   },
   "810": {
     "summary": "Exit at Quincy Adams. Request shuttle bus back to Quincy Center.",
+    "alternate_ids": [
+      "805",
+      "806"
+    ],
     "redundancy": 3
   },
   "924": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "913",
+      "915"
+    ],
     "redundancy": 2
   },
   "987": {
     "summary": "N/A",
+    "alternate_ids": [
+      "983"
+    ],
     "redundancy": 1
   },
   "720": {
     "summary": "N/A",
+    "alternate_ids": [
+      "721"
+    ],
     "redundancy": 1
   },
   "718": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "716",
+      "717"
+    ],
     "redundancy": 2
   },
   "865": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "864"
+    ],
     "redundancy": 2
   },
   "911": {
     "summary": "Exit at Community College. Take Forest Hills train back to North Station.",
+    "alternate_ids": [
+      "910",
+      "905",
+      "906",
+      "907"
+    ],
     "redundancy": 3
   },
   "981": {
     "summary": "Exit at Lechmere. Take a Copley & West  train back to Science Park/West End.",
+    "alternate_ids": [
+      "980"
+    ],
     "redundancy": 3
   },
   "932": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "955",
+      "956"
+    ],
     "redundancy": 2
   },
   "716": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "718",
+      "719"
+    ],
     "redundancy": 2
   },
   "980": {
     "summary": "Exit at North Station. Take a Lechmere & North train back to Science Park/West End.",
+    "alternate_ids": [
+      "981"
+    ],
     "redundancy": 3
   },
   "948": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "972"
+    ],
     "redundancy": 2
   },
   "929": {
     "summary": "N/A",
+    "alternate_ids": [
+      "930"
+    ],
     "redundancy": 1
   },
   "840": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "881"
+    ],
     "redundancy": 2
   },
   "907": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "903",
+      "904",
+      "905",
+      "906",
+      "908"
+    ],
     "redundancy": 2
   },
   "844": {
     "summary": "Exit at Forest Hills. Request shuttle bus back to Green Street.",
+    "alternate_ids": [
+      "842"
+    ],
     "redundancy": 3
   },
   "714": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "715",
+      "713"
+    ],
     "redundancy": 2
   },
   "974": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "975",
+      "967",
+      "802"
+    ],
     "redundancy": 2
   },
   "917": {
     "summary": "Exit at Northeastern. Take a Route 39 bus to Prudential. ",
+    "alternate_ids": [],
     "redundancy": 3
   },
   "770": {
     "summary": "N/A",
+    "alternate_ids": [
+      "772"
+    ],
     "redundancy": 1
   },
   "860": {
     "summary": "Exit at Harvard. Take an Ashmont/Braintree train back to Central.",
+    "alternate_ids": [
+      "861",
+      "821",
+      "973"
+    ],
     "redundancy": 3
   },
   "951": {
     "summary": "Exit at Park St. Take an Alewife train back to Charles/MGH.",
+    "alternate_ids": [
+      "952",
+      "866",
+      "863"
+    ],
     "redundancy": 3
   },
   "939": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "940"
+    ],
     "redundancy": 2
   },
   "934": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "935",
+      "901",
+      "927"
+    ],
     "redundancy": null
   },
   "51": {
     "summary": "Request assistance from conductor.",
+    "alternate_ids": [],
     "redundancy": null
   },
   "708": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "701",
+      "702",
+      "703"
+    ],
     "redundancy": 2
   },
   "881": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "840"
+    ],
     "redundancy": 2
   },
   "977": {
     "summary": "Visit mbta.com/alerts for more info.",
+    "alternate_ids": [
+      "976",
+      "962",
+      "963",
+      "920",
+      "921",
+      "972",
+      "971"
+    ],
     "redundancy": 3
   },
   "6476": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "926",
+      "949"
+    ],
     "redundancy": 2
   },
   "801": {
     "summary": "Exit at Malden Center. Request shuttle bus back to Oak Grove.",
+    "alternate_ids": [
+      "744",
+      "800",
+      "945"
+    ],
     "redundancy": 3
   },
   "767": {
     "summary": "N/A",
+    "alternate_ids": [
+      "768"
+    ],
     "redundancy": 1
   },
   "914": {
     "summary": "Accessible route available",
+    "alternate_ids": [
+      "923",
+      "925"
+    ],
     "redundancy": 2
   },
   "995": {
     "summary": "N/A",
+    "alternate_ids": [
+      "994"
+    ],
     "redundancy": 1
   }
 }

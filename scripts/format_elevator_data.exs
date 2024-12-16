@@ -24,16 +24,23 @@ formatted_data =
     {:ok,
      %{
        "elevator_id" => id,
+       "alternate_elevator_ids" => alternate,
        "Exiting System Categorization" => category,
        "Short Text" => summary
      }} ->
+      alternate_ids =
+        case String.split(alternate, ~r/(\s|,)+/) do
+          [""] -> []
+          ids -> ids
+        end
+
       redundancy =
         case Integer.parse(category) do
           {integer, _rest} -> integer
           :error -> nil
         end
 
-      {id, %{redundancy: redundancy, summary: summary}}
+      {id, %{alternate_ids: alternate_ids, redundancy: redundancy, summary: summary}}
   end)
   |> Enum.reject(&is_nil/1)
   |> Map.new()

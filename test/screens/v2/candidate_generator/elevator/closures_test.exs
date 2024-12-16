@@ -29,7 +29,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   @stop injected(Stop)
 
   setup do
-    stub(@elevator, :get, fn id -> %Elevator{id: id, redundancy: :in_station} end)
+    stub(@elevator, :get, fn id ->
+      %Elevator{id: id, alternate_ids: [], redundancy: :in_station}
+    end)
+
     :ok
   end
 
@@ -263,9 +266,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       stub(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
 
       stub(@elevator, :get, fn
-        "112" -> %Elevator{id: "112", redundancy: :nearby}
-        "222" -> %Elevator{id: "222", redundancy: :nearby}
-        "333" -> %Elevator{id: "333", redundancy: :in_station}
+        "112" -> %Elevator{id: "112", alternate_ids: [], redundancy: :nearby}
+        "222" -> %Elevator{id: "222", alternate_ids: [], redundancy: :nearby}
+        "333" -> %Elevator{id: "333", alternate_ids: [], redundancy: :in_station}
       end)
 
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
