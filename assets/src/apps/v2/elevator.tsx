@@ -10,6 +10,7 @@ import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NormalScreen from "Components/v2/elevator/normal_screen";
+import TakeoverScreen from "Components/v2/takeover_screen";
 import EvergreenContent from "Components/v2/evergreen_content";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
@@ -22,6 +23,7 @@ import NormalHeader from "Components/v2/normal_header";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
+  takeover: TakeoverScreen,
   elevator_closures_list: ElevatorClosuresList,
   current_elevator_closed: CurrentElevatorClosed,
   evergreen_content: EvergreenContent,
