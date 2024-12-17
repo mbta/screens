@@ -64,7 +64,7 @@
           width: 1080px;
           padding: 26px 48px 24px;
 
-          &:not(&--current-station) {
+          &:not(.current-station) {
             &::after,
             &:first-child::before {
               position: absolute;
@@ -86,7 +86,7 @@
             }
           }
 
-          &--current-station {
+          &.current-station {
             background-color: $warm-neutral-85;
           }
 
