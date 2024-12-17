@@ -19,7 +19,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
           :header,
           :main_content,
           :footer
-        ]
+        ],
+        takeover: [:full_screen]
       }
     }
     |> Builder.build_template()
