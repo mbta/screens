@@ -20,7 +20,7 @@ interface ClosureRowProps {
 }
 
 const ClosureRow = ({
-  station: { id, name, closures, route_icons },
+  station: { id, name, closures, route_icons, summary },
   isCurrentStation,
 }: ClosureRowProps) => {
   return (
@@ -45,9 +45,13 @@ const ClosureRow = ({
             "list-item": closures.length > 1,
           })}
         >
-          {closure.elevator_name} ({closure.elevator_id})
+          {closure.name} ({closure.id})
         </div>
       ))}
+
+      <div className={cx("closure-row__summary", { important: summary })}>
+        {summary ?? "Accessible route available"}
+      </div>
     </div>
   );
 };

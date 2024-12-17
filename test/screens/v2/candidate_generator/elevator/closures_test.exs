@@ -1,12 +1,12 @@
 defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias Screens.Alerts.Alert
   alias Screens.Elevator
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
+  alias Screens.V2.WidgetInstance.Elevator.Closure
 
   alias Screens.V2.WidgetInstance.{
     CurrentElevatorClosed,
@@ -18,6 +18,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator, as: ElevatorConfig
 
+  import ExUnit.CaptureLog
   import Screens.Inject
   import Mox
   setup :verify_on_exit!
@@ -31,6 +32,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   setup do
     stub(@elevator, :get, fn id ->
       %Elevator{id: id, alternate_ids: [], redundancy: :in_station}
+    end)
+
+    stub(@facility, :fetch_stop_for_facility, fn _facility_id ->
+      {:ok, %Stop{id: "place-test"}}
     end)
 
     :ok
@@ -61,8 +66,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       header_instance: header_instance,
       footer_instance: footer_instance
     } do
-      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
-
       expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-test" => "Place Test"}}
       end)
@@ -100,13 +103,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                      id: "place-test",
                      name: "Place Test",
                      route_icons: [%{type: :text, text: "RL", color: :red}],
-                     closures: [
-                       %Closure{
-                         id: "1",
-                         elevator_name: "Test",
-                         elevator_id: "facility-test"
-                       }
-                     ]
+                     closures: [%Closure{id: "facility-test", name: "Test"}],
+                     summary: nil
                    }
                  ],
                  station_id: "place-test"
@@ -120,13 +118,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                )
     end
 
-    test "Groups outside closures by station", %{
+    test "Groups multiple outside closures by station", %{
       config: config,
       header_instance: header_instance,
       footer_instance: footer_instance
     } do
-      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
-
       expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-haecl" => "Haymarket"}}
       end)
@@ -170,21 +166,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                      name: "Haymarket",
                      route_icons: [%{type: :text, text: "OL", color: :orange}],
                      closures: [
-                       %{
-                         id: "1",
-                         description: nil,
-                         elevator_name: "Test 1",
-                         elevator_id: "facility-test-1",
-                         header_text: nil
-                       },
-                       %{
-                         id: "2",
-                         description: nil,
-                         elevator_name: "Test 2",
-                         elevator_id: "facility-test-2",
-                         header_text: nil
-                       }
-                     ]
+                       %Closure{id: "facility-test-1", name: "Test 1"},
+                       %Closure{id: "facility-test-2", name: "Test 2"}
+                     ],
+                     summary: "Visit mbta.com/alerts for more info"
                    }
                  ]
                },
@@ -202,8 +187,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       header_instance: header_instance,
       footer_instance: footer_instance
     } do
-      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
-
       expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-haecl" => "Haymarket"}}
       end)
@@ -215,9 +198,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
           struct(Alert,
             id: "1",
             effect: :elevator_closure,
-            informed_entities: [
-              %{stop: "place-haecl"}
-            ]
+            informed_entities: [%{stop: "place-haecl", facility: nil}]
           ),
           struct(Alert,
             id: "2",
@@ -232,19 +213,24 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         {:ok, alerts}
       end)
 
-      assert [
-               ^header_instance,
-               %ElevatorClosuresList{
-                 app_params: ^config,
-                 stations_with_closures: []
-               },
-               ^footer_instance
-             ] =
-               ElevatorClosures.elevator_status_instances(
-                 struct(Screen, app_id: :elevator_v2, app_params: config),
-                 header_instance,
-                 footer_instance
-               )
+      logs =
+        capture_log([level: :warning], fn ->
+          assert [
+                   ^header_instance,
+                   %ElevatorClosuresList{
+                     app_params: ^config,
+                     stations_with_closures: []
+                   },
+                   ^footer_instance
+                 ] =
+                   ElevatorClosures.elevator_status_instances(
+                     struct(Screen, app_id: :elevator_v2, app_params: config),
+                     header_instance,
+                     footer_instance
+                   )
+        end)
+
+      assert logs =~ "elevator_closure_affects_multiple"
     end
 
     test "Filters out alerts at other stations with nearby redundancy", %{
@@ -252,8 +238,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       header_instance: header_instance,
       footer_instance: footer_instance
     } do
-      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
-
       expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok,
          %{
@@ -321,30 +305,109 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                      id: "place-test",
                      name: "This Station",
                      route_icons: [%{type: :text, text: "RL", color: :red}],
-                     closures: [
-                       %Closure{
-                         id: "1",
-                         elevator_name: "In Station Elevator",
-                         elevator_id: "112"
-                       }
-                     ]
+                     closures: [%Closure{id: "112", name: "In Station Elevator"}]
                    },
                    %ElevatorClosuresList.Station{
                      id: "place-test-no-redundancy",
                      name: "Other No Redundancy",
                      route_icons: [%{type: :text, text: "RL", color: :red}],
-                     closures: [
-                       %Closure{
-                         id: "3",
-                         elevator_name: "Other Without Redundancy",
-                         elevator_id: "333",
-                         description: nil,
-                         header_text: nil
-                       }
-                     ]
+                     closures: [%Closure{id: "333", name: "Other Without Redundancy"}]
                    }
                  ],
                  station_id: "place-test"
+               },
+               ^footer_instance
+             ] =
+               ElevatorClosures.elevator_status_instances(
+                 struct(Screen, app_id: :elevator_v2, app_params: config),
+                 header_instance,
+                 footer_instance
+               )
+    end
+
+    test "Generates appropriate backup route summaries", %{
+      config: config,
+      header_instance: header_instance,
+      footer_instance: footer_instance
+    } do
+      stub(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
+
+      stub(@elevator, :get, fn
+        "1" -> %Elevator{id: "1", alternate_ids: [], redundancy: :in_station}
+        "2" -> %Elevator{id: "2", alternate_ids: [], redundancy: {:other, "some summary"}}
+        "3" -> %Elevator{id: "3", alternate_ids: ["alt"], redundancy: :nearby}
+        "alt" -> %Elevator{id: "alt", alternate_ids: [], redundancy: :nearby}
+      end)
+
+      expect(@stop, :fetch_parent_station_name_map, fn ->
+        {:ok,
+         %{
+           "place-1" => "one",
+           "place-2" => "two",
+           "place-3" => "three",
+           "place-4" => "four"
+         }}
+      end)
+
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          struct(Alert,
+            id: "1",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-1", facility: %{name: "backup in station", id: "1"}}
+            ]
+          ),
+          struct(Alert,
+            id: "2",
+            effect: :elevator_closure,
+            informed_entities: [
+              %{stop: "place-2", facility: %{name: "custom backup summary", id: "2"}}
+            ]
+          ),
+          struct(Alert,
+            id: "3",
+            effect: :elevator_closure,
+            informed_entities: [
+              # despite having "nearby" redundancy, should not be filtered out, because its
+              # alternate elevator is also down
+              %{stop: "place-3", facility: %{name: "alternate elevator down", id: "3"}}
+            ]
+          ),
+          struct(Alert,
+            id: "alt",
+            effect: :elevator_closure,
+            informed_entities: [
+              # somewhat unrealistically, place elevator 3's "nearby" alternate at a different
+              # station, so they aren't combined
+              %{stop: "place-4", facility: %{name: "alternate", id: "alt"}}
+            ]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      assert [
+               ^header_instance,
+               %ElevatorClosuresList{
+                 stations_with_closures: [
+                   %ElevatorClosuresList.Station{
+                     id: "place-1",
+                     closures: [%Closure{id: "1"}],
+                     summary: nil
+                   },
+                   %ElevatorClosuresList.Station{
+                     id: "place-2",
+                     closures: [%Closure{id: "2"}],
+                     summary: "some summary"
+                   },
+                   %ElevatorClosuresList.Station{
+                     id: "place-3",
+                     closures: [%Closure{id: "3"}],
+                     summary: "Visit mbta.com/alerts for more info"
+                   }
+                 ]
                },
                ^footer_instance
              ] =
@@ -360,16 +423,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       header_instance: header_instance,
       footer_instance: footer_instance
     } do
-      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
-
-      expect(@stop, :fetch_parent_station_name_map, fn ->
-        {:ok, %{"place-test" => "Place Test"}}
-      end)
-
-      expect(@route, :fetch, fn %{stop_id: "place-test"} ->
-        {:ok, [%Route{id: "Red", type: :subway}]}
-      end)
-
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           struct(Alert,
@@ -395,16 +448,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       assert [
                ^closed_header_instance,
-               %CurrentElevatorClosed{
-                 app_params: ^config,
-                 closure: %Closure{
-                   id: "1",
-                   elevator_name: "Test",
-                   elevator_id: "111",
-                   description: nil,
-                   header_text: nil
-                 }
-               },
+               %CurrentElevatorClosed{app_params: ^config},
                ^closed_footer_instance
              ] =
                ElevatorClosures.elevator_status_instances(
@@ -419,8 +463,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       header_instance: header_instance,
       footer_instance: footer_instance
     } do
-      expect(@facility, :fetch_stop_for_facility, fn "111" -> {:ok, %Stop{id: "place-test"}} end)
-
       expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-test" => "Place Test"}}
       end)
@@ -451,13 +493,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                    %ElevatorClosuresList.Station{
                      id: "place-test",
                      name: "Place Test",
-                     closures: [
-                       %Closure{
-                         id: "1",
-                         elevator_name: "Test",
-                         elevator_id: "facility-test"
-                       }
-                     ]
+                     closures: [%Closure{id: "facility-test", name: "Test"}]
                    }
                  ],
                  station_id: "place-test"
