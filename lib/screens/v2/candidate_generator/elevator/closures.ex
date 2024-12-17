@@ -1,8 +1,32 @@
 defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
-  @moduledoc false
+  @moduledoc """
+  Generates the standard widgets for elevator screens: `CurrentElevatorClosed` when the screen's
+  elevator is closed, otherwise `ElevatorClosuresList`. Includes the header and footer, as these
+  have different variants depending on the "main" widget.
+  """
+
+  defmodule Closure do
+    @moduledoc false
+    # Internal struct used while generating widgets. Represents a single elevator which is closed.
+
+    alias Screens.Elevator
+    alias Screens.Facilities.Facility
+    alias Screens.Stops.Stop
+
+    @type t :: %__MODULE__{
+            id: Facility.id(),
+            name: String.t(),
+            station_id: Stop.id(),
+            elevator: Elevator.t() | nil
+          }
+
+    @enforce_keys ~w[id name station_id elevator]a
+    defstruct @enforce_keys
+  end
 
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Elevator
+  alias Screens.Facilities.Facility
   alias Screens.Log
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -15,7 +39,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     NormalHeader
   }
 
-  alias Screens.V2.WidgetInstance.Elevator.Closure
+  alias Screens.V2.WidgetInstance.Elevator.Closure, as: WidgetClosure
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator, as: ElevatorConfig
@@ -24,164 +48,145 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   @alert injected(Alert)
   @elevator injected(Elevator)
-  @facility injected(Screens.Facilities.Facility)
+  @facility injected(Facility)
   @route injected(Route)
   @stop injected(Stop)
+
+  @fallback_summary "Visit mbta.com/alerts for more info"
 
   @spec elevator_status_instances(Screen.t(), NormalHeader.t(), Footer.t()) ::
           list(WidgetInstance.t())
   def elevator_status_instances(
-        %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id} = config},
+        %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id} = app_params},
         header_instance,
         footer_instance
       ) do
-    with {:ok, %Stop{id: stop_id}} <- @facility.fetch_stop_for_facility(elevator_id),
-         {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
-         {:ok, alerts} <- @alert.fetch_elevator_alerts_with_facilities() do
-      elevator_alerts = Enum.filter(alerts, &relevant_alert?(&1, stop_id))
-      routes_map = get_routes_map(elevator_alerts, stop_id)
+    {:ok, alerts} = @alert.fetch_elevator_alerts_with_facilities()
+    closures = Enum.flat_map(alerts, &elevator_closure/1)
 
-      current_elevator_closure =
-        elevator_alerts
-        |> get_in_station_alerts(stop_id)
-        |> Enum.map(&alert_to_elevator_closure/1)
-        |> Enum.find(&(&1.elevator_id == elevator_id))
+    case Enum.find(closures, fn %Closure{id: id} -> id == elevator_id end) do
+      nil ->
+        [header_instance, elevator_closures_list(closures, app_params), footer_instance]
 
-      {elevator_widget_instance, header_footer_variant} =
-        if is_nil(current_elevator_closure) do
-          {%ElevatorClosuresList{
-             stations_with_closures:
-               build_stations_with_closures(
-                 elevator_alerts,
-                 parent_station_map,
-                 routes_map
-               ),
-             app_params: config,
-             station_id: stop_id
-           }, nil}
-        else
-          {%CurrentElevatorClosed{closure: current_elevator_closure, app_params: config}, :closed}
-        end
+      _closure ->
+        [
+          %NormalHeader{header_instance | variant: :closed},
+          %CurrentElevatorClosed{app_params: app_params},
+          %Footer{footer_instance | variant: :closed}
+        ]
+    end
+  end
 
-      [
-        %NormalHeader{header_instance | variant: header_footer_variant},
-        elevator_widget_instance,
-        %Footer{footer_instance | variant: header_footer_variant}
-      ]
-    else
-      :error ->
+  defp elevator_closure(%Alert{id: id, effect: :elevator_closure, informed_entities: entities}) do
+    # We expect there is a 1:1 relationship between `elevator_closure` alerts and individual
+    # out-of-service elevators. Log a warning if our assumptions don't hold.
+    stations_and_facilities =
+      entities
+      |> Enum.filter(&(InformedEntity.parent_station?(&1) and not is_nil(&1.facility)))
+      |> Enum.map(fn %{facility: facility, stop: station_id} -> {station_id, facility} end)
+      |> Enum.uniq()
+
+    case stations_and_facilities do
+      [] ->
         []
 
-      {:error, error} ->
-        Log.error("elevator_closures_error", error: error)
+      [{station_id, %{id: id, name: name}}] ->
+        [%Closure{id: id, name: name, station_id: station_id, elevator: @elevator.get(id)}]
+
+      _multiple ->
+        Log.warning("elevator_closure_affects_multiple", alert_id: id)
         []
     end
   end
 
-  # All alerts at home station are relevant but only elevators without redundancies are
-  # relevant at other stations.
-  defp relevant_alert?(alert, home_stop_id) do
-    relevant_effect?(alert) and informs_one_facility?(alert) and
-      (Alert.informs_stop_id?(alert, home_stop_id) or not has_nearby_redundancy?(alert))
+  defp elevator_closure(_alert), do: []
+
+  defp elevator_closures_list(
+         closures,
+         %ElevatorConfig{elevator_id: elevator_id} = app_params
+       ) do
+    {:ok, %Stop{id: stop_id}} = @facility.fetch_stop_for_facility(elevator_id)
+    {:ok, station_names} = @stop.fetch_parent_station_name_map()
+    station_route_pills = fetch_station_route_pills(closures, stop_id)
+
+    %ElevatorClosuresList{
+      app_params: app_params,
+      station_id: stop_id,
+      stations_with_closures:
+        build_stations_with_closures(closures, stop_id, station_names, station_route_pills)
+    }
   end
 
-  defp relevant_effect?(alert), do: alert.effect == :elevator_closure
-
-  defp informs_one_facility?(%Alert{informed_entities: informed_entities}) do
-    Enum.all?(informed_entities, &match?(%{facility: _}, &1)) and
-      informed_entities |> Enum.map(& &1.facility) |> Enum.uniq() |> Enum.count() == 1
-  end
-
-  defp get_routes_map(elevator_closures, home_parent_station_id) do
-    elevator_closures
-    |> get_parent_station_ids_from_entities()
-    |> MapSet.new()
-    |> MapSet.put(home_parent_station_id)
-    |> Enum.map(fn station_id ->
-      {station_id, station_id |> route_ids_serving_stop() |> routes_to_labels()}
-    end)
-    |> Enum.into(%{})
-  end
-
-  defp get_parent_station_ids_from_entities(closures) do
+  defp fetch_station_route_pills(closures, home_station_id) do
     closures
-    |> Enum.flat_map(fn %Alert{informed_entities: informed_entities} ->
-      informed_entities
-      |> Enum.filter(&InformedEntity.parent_station?/1)
-      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-    end)
+    |> Enum.map(& &1.station_id)
+    |> MapSet.new()
+    |> MapSet.put(home_station_id)
+    |> Map.new(fn station_id -> {station_id, fetch_route_pills(station_id)} end)
   end
 
-  defp route_ids_serving_stop(stop_id) do
+  defp fetch_route_pills(stop_id) do
     case @route.fetch(%{stop_id: stop_id}) do
-      {:ok, routes} -> routes
+      {:ok, routes} -> routes |> Enum.map(&Route.icon/1) |> Enum.uniq()
       # Show no route pills instead of crashing the screen
       :error -> []
     end
   end
 
-  defp routes_to_labels(routes) do
-    routes
-    |> Enum.map(&Route.icon/1)
-    |> Enum.uniq()
-  end
-
-  defp get_in_station_alerts(alerts, home_stop_id) do
-    Enum.filter(alerts, fn %Alert{informed_entities: informed_entities} ->
-      home_stop_id in Enum.map(informed_entities, & &1.stop)
-    end)
-  end
-
-  defp alert_to_elevator_closure(%Alert{
-         id: id,
-         informed_entities: entities,
-         description: description,
-         header: header
-       }) do
-    facility = Enum.find_value(entities, fn %{facility: facility} -> facility end)
-
-    %Closure{
-      id: id,
-      elevator_name: facility.name,
-      elevator_id: facility.id,
-      description: description,
-      header_text: header
-    }
-  end
-
-  defp build_stations_with_closures(alerts, station_id_to_name, station_id_to_routes) do
-    alerts
-    |> Enum.group_by(&get_parent_station_id_from_informed_entities(&1.informed_entities))
-    |> Enum.map(fn {parent_station_id, alerts} ->
-      closures_at_station = Enum.map(alerts, &alert_to_elevator_closure/1)
-
-      route_pills =
-        station_id_to_routes
-        |> Map.fetch!(parent_station_id)
-        |> Enum.map(&RoutePill.serialize_icon/1)
-
+  defp build_stations_with_closures(closures, home_station_id, station_names, station_route_pills) do
+    closures
+    |> Enum.filter(&relevant_closure?(&1, home_station_id, closures))
+    |> Enum.group_by(& &1.station_id)
+    |> Enum.map(fn {station_id, station_closures} ->
       %ElevatorClosuresList.Station{
-        id: parent_station_id,
-        name: Map.fetch!(station_id_to_name, parent_station_id),
-        route_icons: route_pills,
-        closures: closures_at_station
+        id: station_id,
+        name: Map.fetch!(station_names, station_id),
+        route_icons:
+          station_route_pills
+          |> Map.fetch!(station_id)
+          |> Enum.map(&RoutePill.serialize_icon/1),
+        closures:
+          Enum.map(
+            station_closures,
+            fn %Closure{id: id, name: name} -> %WidgetClosure{id: id, name: name} end
+          ),
+        summary: backup_route_summary(station_closures, closures)
       }
     end)
   end
 
-  defp get_parent_station_id_from_informed_entities(entities) do
-    entities
-    |> Enum.find_value(fn
-      ie -> if InformedEntity.parent_station?(ie), do: ie.stop
-    end)
+  # If we couldn't find alternate/redundancy data for an elevator, assume it's relevant.
+  defp relevant_closure?(%Closure{elevator: nil}, _home_station_id, _closures), do: true
+
+  # Elevators at the home station ID are always relevant.
+  defp relevant_closure?(%Closure{station_id: station_id}, station_id, _closures), do: true
+
+  # If any of a closed elevator's alternates are also closed, it's always relevant.
+  defp relevant_closure?(
+         %Closure{elevator: %Elevator{alternate_ids: alternate_ids, redundancy: redundancy}},
+         _home_station_id,
+         closures
+       ) do
+    Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) or redundancy != :nearby
   end
 
-  defp has_nearby_redundancy?(%Alert{
-         informed_entities: [%{facility: %{id: informed_facility_id}} | _]
-       }) do
-    case @elevator.get(informed_facility_id) do
-      %Elevator{redundancy: :nearby} -> true
-      _ -> false
+  defp backup_route_summary(
+         [%Closure{elevator: %Elevator{alternate_ids: alternate_ids, redundancy: redundancy}}],
+         closures
+       ) do
+    # If any of a closed elevator's alternates are also closed, the normal summary may not be
+    # applicable.
+    if Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) do
+      @fallback_summary
+    else
+      case redundancy do
+        type when type in ~w[nearby in_station]a -> nil
+        {:other, summary} -> summary
+      end
     end
   end
+
+  # Use the fallback when there are multiple closures at the same station or we have no redundancy
+  # data for an elevator.
+  defp backup_route_summary(_other, _all_closures), do: @fallback_summary
 end

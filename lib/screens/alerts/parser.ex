@@ -72,11 +72,14 @@ defmodule Screens.Alerts.Parser do
       stop: get_in(ie, ["stop"]),
       route: get_in(ie, ["route"]),
       route_type: get_in(ie, ["route_type"]),
-      direction_id: get_in(ie, ["direction_id"])
+      direction_id: get_in(ie, ["direction_id"]),
+      facility: nil
     }
   end
 
   defp parse_informed_entity_with_facilities(ie, facilities) do
+    parsed = parse_informed_entity(ie)
+
     facility_id = get_in(ie, ["facility"])
 
     facility_name =
@@ -85,9 +88,11 @@ defmodule Screens.Alerts.Parser do
         :error -> nil
       end
 
-    ie
-    |> parse_informed_entity()
-    |> Map.put(:facility, %{id: facility_id, name: facility_name})
+    if not is_nil(facility_id) and not is_nil(facility_name) do
+      Map.put(parsed, :facility, %{id: facility_id, name: facility_name})
+    else
+      parsed
+    end
   end
 
   defp parse_and_sort_active_periods(periods) do

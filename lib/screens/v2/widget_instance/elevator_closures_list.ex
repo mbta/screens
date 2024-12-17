@@ -21,13 +21,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresList do
 
     @derive Jason.Encoder
 
-    defstruct ~w[id name route_icons closures]a
+    defstruct ~w[id name route_icons closures summary]a
 
     @type t :: %__MODULE__{
             id: Stop.id(),
             name: String.t(),
             route_icons: list(Route.icon()),
-            closures: list(Closure.t())
+            closures: list(Closure.t()),
+            summary: String.t() | nil
           }
   end
 
