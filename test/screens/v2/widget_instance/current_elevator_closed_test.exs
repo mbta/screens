@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
 
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.CurrentElevatorClosed
-  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias ScreensConfig.V2.Elevator
 
   setup do
@@ -14,14 +13,7 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
             elevator_id: "111",
             alternate_direction_text: "Test",
             accessible_path_direction_arrow: :n
-          ),
-        closure: %Closure{
-          description: "Test Alert Description",
-          elevator_name: "Test Elevator",
-          elevator_id: "111",
-          id: "1",
-          header_text: "Test Alert Header"
-        }
+          )
       }
     }
   end
@@ -33,16 +25,14 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
   end
 
   describe "serialize/1" do
-    test "returns map with id, closure, and alternate direction info", %{instance: instance} do
+    test "returns map with alternate direction info", %{instance: instance} do
       assert %{
-               closure: instance.closure,
                accessible_path_direction_arrow:
                  instance.app_params.accessible_path_direction_arrow,
                accessible_path_image_here_coordinates:
                  instance.app_params.accessible_path_image_here_coordinates,
                accessible_path_image_url: instance.app_params.accessible_path_image_url,
-               alternate_direction_text: instance.app_params.alternate_direction_text,
-               id: instance.app_params.elevator_id
+               alternate_direction_text: instance.app_params.alternate_direction_text
              } == WidgetInstance.serialize(instance)
     end
   end

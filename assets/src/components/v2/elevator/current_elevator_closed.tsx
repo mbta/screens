@@ -5,7 +5,6 @@ import makePersistent, {
   WrappedComponentProps,
 } from "Components/v2/persistent_wrapper";
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
-import { type Closure } from "Components/v2/elevator/types";
 import useClientPaging from "Hooks/v2/use_client_paging";
 import useTextResizer from "Hooks/v2/use_text_resizer";
 import CurrentLocationMarker from "Images/svgr_bundled/current-location-marker.svg";
@@ -29,7 +28,6 @@ const PulsatingDot = ({ x, y }: Coordinates) => {
 };
 
 interface Props extends WrappedComponentProps {
-  closure: Closure;
   alternate_direction_text: string;
   accessible_path_direction_arrow: Direction;
   accessible_path_image_url: string | null;

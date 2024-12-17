@@ -2,29 +2,21 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosed do
   @moduledoc false
 
   alias Screens.Util.Assets
-  alias Screens.V2.WidgetInstance.Elevator.Closure
   alias ScreensConfig.V2.Elevator
 
-  defstruct ~w[app_params closure]a
+  defstruct ~w[app_params]a
 
-  @type t :: %__MODULE__{
-          app_params: Elevator.t(),
-          closure: Closure.t()
-        }
+  @type t :: %__MODULE__{app_params: Elevator.t()}
 
   def serialize(%__MODULE__{
         app_params: %Elevator{
-          elevator_id: id,
           alternate_direction_text: alternate_direction_text,
           accessible_path_direction_arrow: accessible_path_direction_arrow,
           accessible_path_image_url: accessible_path_image_url,
           accessible_path_image_here_coordinates: accessible_path_image_here_coordinates
-        },
-        closure: closure
+        }
       }),
       do: %{
-        id: id,
-        closure: closure,
         alternate_direction_text: alternate_direction_text,
         accessible_path_direction_arrow: accessible_path_direction_arrow,
         accessible_path_image_url:
