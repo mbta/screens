@@ -25,7 +25,8 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
     test "returns template" do
       assert {:screen,
               %{
-                normal: [:header, :main_content, :footer]
+                normal: [:header, :main_content, :footer],
+                takeover: [:full_screen]
               }} == Elevator.screen_template()
     end
   end
