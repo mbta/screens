@@ -5,12 +5,10 @@ export type StationWithClosures = {
   name: string;
   route_icons: Pill[];
   closures: Closure[];
+  summary: string | null;
 };
 
 export type Closure = {
   id: string;
-  elevator_name: string;
-  elevator_id: string;
-  description: string;
-  header_text: string;
+  name: string;
 };
