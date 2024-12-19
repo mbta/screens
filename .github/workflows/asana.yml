@@ -1,0 +1,22 @@
+name: Asana integration
+on: 
+  pull_request:
+    types:
+      - closed
+      - converted_to_draft
+      - opened
+      - ready_for_review
+      - reopened
+
+jobs:
+  asana:
+    uses: mbta/workflows/.github/workflows/asana.yml@v3
+    with:
+      development-section: In Progress
+      review-section: In Review
+      merged-section: Ready to Deploy
+      attach-pr: true
+      trigger-phrase: "\\*\\*Asana task\\*\\*:"
+    secrets:
+      asana-token: ${{ secrets.ASANA_SECRET_FOR_INSURIFY_ACTION }}
+      github-secret: ${{ secrets.ASANA_GITHUB_INTEGRATION_SECRET }}
