@@ -19,15 +19,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresListTest do
           %ElevatorClosuresList.Station{
             name: "Forest Hills",
             route_icons: ["Orange"],
-            closures: [
-              %Closure{
-                description: "FH Alert Description",
-                elevator_name: "FH Elevator",
-                elevator_id: "222",
-                id: "2",
-                header_text: "FH Alert Header"
-              }
-            ]
+            closures: [%Closure{id: "222", name: "FH Elevator"}]
           }
         ]
       }
