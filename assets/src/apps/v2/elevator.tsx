@@ -29,6 +29,7 @@ const TYPE_TO_COMPONENT = {
   footer: Footer,
   normal_header: NormalHeader,
   no_data: NoData,
+  page_load_no_data: NoData,
 };
 
 const App = (): JSX.Element => {
