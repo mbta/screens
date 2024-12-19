@@ -19,6 +19,7 @@ import CurrentElevatorClosed from "Components/v2/elevator/current_elevator_close
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import Footer from "Components/v2/elevator/footer";
 import NormalHeader from "Components/v2/normal_header";
+import NoData from "Components/v2/elevator/no_data";
 
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
@@ -27,6 +28,8 @@ const TYPE_TO_COMPONENT = {
   evergreen_content: EvergreenContent,
   footer: Footer,
   normal_header: NormalHeader,
+  no_data: NoData,
+  page_load_no_data: NoData,
 };
 
 const App = (): JSX.Element => {
