@@ -83,14 +83,7 @@ function getCommonRules(isOfmPackage) {
   ];
 }
 
-const common_babel_loader_plugins = [
-  "@babel/plugin-proposal-export-default-from",
-  "@babel/plugin-proposal-logical-assignment-operators",
-  ["@babel/plugin-proposal-optional-chaining", { loose: false }],
-  ["@babel/plugin-proposal-pipeline-operator", { proposal: "minimal" }],
-  ["@babel/plugin-proposal-nullish-coalescing-operator", { loose: false }],
-  "@babel/plugin-proposal-do-expressions",
-];
+const common_babel_loader_plugins = ["@babel/plugin-proposal-do-expressions"];
 
 const common_plugins = [
   new MiniCssExtractPlugin({ filename: "../css/[name].css" }),
@@ -166,7 +159,7 @@ module.exports = (env, argv) => {
                   [
                     "@babel/preset-env",
                     {
-                      corejs: { version: 3, proposals: true },
+                      corejs: { version: "3.20", proposals: true },
                       useBuiltIns: "usage",
                     },
                   ],
