@@ -13,20 +13,31 @@ import {
 import useClientPaging from "Hooks/v2/use_client_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
-import { classWithModifier } from "Util/util";
 
 interface ClosureRowProps {
   station: StationWithClosures;
+  isCurrentStation: boolean;
 }
 
-const CurrentStationClosureRow = ({ station }: ClosureRowProps) => {
-  const { closures } = station;
-
+const ClosureRow = ({
+  station: { id, name, closures, route_icons, summary },
+  isCurrentStation,
+}: ClosureRowProps) => {
   return (
-    <div className={classWithModifier("closure-row", "current-station")}>
+    <div className={cx("closure-row", { "current-station": isCurrentStation })}>
       <div className="closure-row__name-and-pills">
-        <div className="closure-row__station-name">At this station</div>
+        {isCurrentStation ? (
+          <div className="closure-row__station-name">At this station</div>
+        ) : (
+          <>
+            {route_icons.map((route) => (
+              <RoutePill pill={route} key={`${routePillKey(route)}-${id}`} />
+            ))}
+            <div className="closure-row__station-name">{name}</div>
+          </>
+        )}
       </div>
+
       {closures.map((closure) => (
         <div
           key={closure.id}
@@ -34,34 +45,13 @@ const CurrentStationClosureRow = ({ station }: ClosureRowProps) => {
             "list-item": closures.length > 1,
           })}
         >
-          {closure.elevator_name} ({closure.elevator_id})
+          {closure.name} ({closure.id})
         </div>
       ))}
-    </div>
-  );
-};
 
-const ClosureRow = ({ station }: ClosureRowProps) => {
-  const { name, closures, route_icons, id } = station;
-
-  return (
-    <div className="closure-row">
-      <div className="closure-row__name-and-pills">
-        {route_icons.map((route) => (
-          <RoutePill pill={route} key={`${routePillKey(route)}-${id}`} />
-        ))}
-        <div className="closure-row__station-name">{name}</div>
+      <div className={cx("closure-row__summary", { important: summary })}>
+        {summary ?? "Accessible route available"}
       </div>
-      {closures.map((closure) => (
-        <div
-          key={closure.id}
-          className={cx("closure-row__elevator-name", {
-            "list-item": closures.length > 1,
-          })}
-        >
-          {closure.elevator_name} ({closure.elevator_id})
-        </div>
-      ))}
     </div>
   );
 };
@@ -171,6 +161,7 @@ const OutsideClosureList = ({
           </div>
         </div>
       </div>
+
       <div className="closure-list-container">
         {
           <div
@@ -182,16 +173,17 @@ const OutsideClosureList = ({
             }
             ref={ref}
           >
-            {sortedStations.map((station) =>
-              station.id === stationId ? (
-                <CurrentStationClosureRow station={station} key={station.id} />
-              ) : (
-                <ClosureRow station={station} key={station.id} />
-              ),
-            )}
+            {sortedStations.map((station) => (
+              <ClosureRow
+                station={station}
+                isCurrentStation={station.id == stationId}
+                key={station.id}
+              />
+            ))}
           </div>
         }
       </div>
+
       {numPages > 1 && (
         <div className="paging-info-container">
           <div className="more-elevators-text">

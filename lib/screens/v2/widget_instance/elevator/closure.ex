@@ -5,13 +5,7 @@ defmodule Screens.V2.WidgetInstance.Elevator.Closure do
 
   @derive Jason.Encoder
 
-  defstruct ~w[id elevator_name elevator_id description header_text]a
+  defstruct ~w[id name]a
 
-  @type t :: %__MODULE__{
-          id: String.t(),
-          elevator_name: String.t(),
-          elevator_id: String.t(),
-          description: String.t(),
-          header_text: String.t()
-        }
+  @type t :: %__MODULE__{id: String.t(), name: String.t()}
 end
