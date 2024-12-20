@@ -4,7 +4,7 @@ initSentry("pre_fare");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
-require("../../../css/pre_fare_v2.scss");
+import "../../../css/pre_fare_v2.scss";
 
 import React from "react";
 import ReactDOM from "react-dom";

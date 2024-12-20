@@ -1,4 +1,4 @@
-require("../../css/admin.scss");
+import "../../css/admin.scss";
 
 import React, { ComponentType } from "react";
 import ReactDOM from "react-dom";

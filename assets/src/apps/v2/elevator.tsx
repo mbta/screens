@@ -4,7 +4,7 @@ initSentry("elevator");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
-require("../../../css/elevator_v2.scss");
+import "../../../css/elevator_v2.scss";
 
 import React from "react";
 import ReactDOM from "react-dom";

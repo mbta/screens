@@ -4,7 +4,7 @@ initSentry("gl_eink_v2");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
-require("../../../css/gl_eink_v2.scss");
+import "../../../css/gl_eink_v2.scss";
 
 import React from "react";
 import ReactDOM from "react-dom";

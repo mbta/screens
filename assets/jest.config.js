@@ -1,6 +1,6 @@
 // https://jestjs.io/docs/configuration
 
-/* eslint-disable @typescript-eslint/no-var-requires */
+/* eslint-disable @typescript-eslint/no-require-imports */
 /* global require, module */
 
 const requireJSON5 = require("require-json5");
