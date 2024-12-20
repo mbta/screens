@@ -4,7 +4,7 @@ initSentry("bus_shelter");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
-require("../../../css/bus_shelter_v2.scss");
+import "../../../css/bus_shelter_v2.scss";
 
 import React from "react";
 import ReactDOM from "react-dom";

@@ -67,7 +67,7 @@ const Inspector: ComponentType = () => {
 
   const sendToFrame = (message: Message) => {
     const frameWindow = frameRef.current?.contentWindow;
-    frameWindow && sendMessage(frameWindow, message);
+    if (frameWindow) sendMessage(frameWindow, message);
   };
 
   const [zoom, setZoom] = useState(1.0);

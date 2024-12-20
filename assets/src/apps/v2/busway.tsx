@@ -4,7 +4,7 @@ initSentry("busway_v2");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
-require("../../../css/busway_v2.scss");
+import "../../../css/busway_v2.scss";
 
 import React from "react";
 import ReactDOM from "react-dom";

@@ -2,9 +2,7 @@ import moment from "moment";
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/util";
 
-interface Props {}
-
-const OvernightDepartures: ComponentType<Props> = () => {
+const OvernightDepartures: ComponentType = () => {
   const currentTime = moment().tz("America/New_York").format("h:mm");
 
   return (
