@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.AlertTest do
   use ExUnit.Case, async: true
 
+  alias ScreensConfig.V2.Audio
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{BusEink, BusShelter, GlEink}
@@ -81,6 +82,18 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   defp put_app_id(widget, app_id) do
     %{widget | screen: %{widget.screen | app_id: app_id}}
+  end
+
+  defp put_bus_shelter_params(widget, params) do
+    %{
+      widget
+      | screen: %{
+          widget.screen
+          | app_id: :bus_shelter_v2,
+            app_params:
+              struct!(%BusShelter{header: nil, footer: nil, alerts: nil, departures: nil}, params)
+        }
+    }
   end
 
   defp put_effect(widget, effect) do
@@ -632,13 +645,18 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns true for eink screen types", %{widget: widget} do
+    test "returns false for bus shelter screens with periodic audio", %{widget: widget} do
+      widget = put_bus_shelter_params(widget, audio: %Audio{interval_enabled: true})
+      refute AlertWidget.audio_valid_candidate?(widget)
+    end
+
+    test "returns true for bus shelter screens without periodic audio", %{widget: widget} do
+      widget = put_bus_shelter_params(widget, audio: %Audio{interval_enabled: false})
       assert AlertWidget.audio_valid_candidate?(widget)
     end
 
-    test "returns false for non-eink screen types", %{widget: widget} do
-      widget = %{widget | screen: %Screen{widget.screen | app_id: :bus_shelter_v2}}
-      refute AlertWidget.audio_valid_candidate?(widget)
+    test "returns true for other screen types", %{widget: widget} do
+      assert AlertWidget.audio_valid_candidate?(widget)
     end
   end
 

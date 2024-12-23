@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
+  alias ScreensConfig.V2.{Audio, BusShelter}
 
   defstruct screen: nil,
             alert: nil,
@@ -271,11 +272,12 @@ defmodule Screens.V2.WidgetInstance.Alert do
     end
   end
 
-  def audio_valid_candidate?(%__MODULE__{screen: %Screen{app_id: app_id}})
-      when app_id in ~w[bus_eink_v2 gl_eink_v2]a,
-      do: true
+  def audio_valid_candidate?(%__MODULE__{
+        screen: %Screen{app_params: %BusShelter{audio: %Audio{interval_enabled: true}}}
+      }),
+      do: false
 
-  def audio_valid_candidate?(_instance), do: false
+  def audio_valid_candidate?(_instance), do: true
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertView
 

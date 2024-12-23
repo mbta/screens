@@ -9,7 +9,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   alias Screens.Stops.Subway
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{BusEink, Footer, GlEink, PreFare}
+  alias ScreensConfig.V2.{Footer, GlEink}
 
   defmodule SubwayStatusAlert do
     @moduledoc false
@@ -87,6 +87,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   defimpl Screens.V2.WidgetInstance do
+    alias ScreensConfig.V2.{Audio, BusShelter}
+
     def priority(_instance), do: [2, 1]
 
     @spec serialize(SubwayStatus.t()) :: SubwayStatus.serialized_response()
@@ -134,11 +136,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     def audio_sort_key(_instance), do: [2]
 
-    def audio_valid_candidate?(%{screen: %Screen{app_params: %app{}}})
-        when app in [BusEink, GlEink, PreFare],
-        do: true
+    def audio_valid_candidate?(%SubwayStatus{
+          screen: %Screen{app_params: %BusShelter{audio: %Audio{interval_enabled: true}}}
+        }),
+        do: false
 
-    def audio_valid_candidate?(_instance), do: false
+    def audio_valid_candidate?(_instance), do: true
 
     def audio_view(_instance), do: ScreensWeb.V2.Audio.SubwayStatusView
   end
