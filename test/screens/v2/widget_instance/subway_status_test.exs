@@ -1,9 +1,10 @@
 defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   use ExUnit.Case, async: true
 
+  alias ScreensConfig.V2.Audio
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{BusShelter, Departures, PreFare}
+  alias ScreensConfig.V2.BusShelter
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.SubwayStatus
 
@@ -1732,39 +1733,34 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   end
 
   describe "audio_valid_candidate?/1" do
-    test "returns true for PreFare" do
+    test "returns false for bus shelter screens with periodic audio" do
       instance = %SubwayStatus{
-        screen: %Screen{
-          app_params: struct(PreFare),
-          vendor: nil,
-          device_id: nil,
-          name: nil,
-          app_id: nil
-        }
+        screen:
+          struct(Screen,
+            app_id: :bus_shelter_v2,
+            app_params: struct(BusShelter, audio: %Audio{interval_enabled: true})
+          )
+      }
+
+      refute WidgetInstance.audio_valid_candidate?(instance)
+    end
+
+    test "returns true for bus shelter screens without periodic audio" do
+      instance = %SubwayStatus{
+        screen:
+          struct(Screen,
+            app_id: :bus_shelter_v2,
+            app_params: struct(BusShelter, audio: %Audio{interval_enabled: false})
+          )
       }
 
       assert WidgetInstance.audio_valid_candidate?(instance)
     end
 
-    test "returns false for BusShelter" do
-      instance = %SubwayStatus{
-        screen: %Screen{
-          app_params: %BusShelter{
-            departures: %Departures{
-              sections: []
-            },
-            header: nil,
-            footer: nil,
-            alerts: nil
-          },
-          vendor: nil,
-          device_id: nil,
-          name: nil,
-          app_id: nil
-        }
-      }
+    test "returns true for other screen types" do
+      instance = %SubwayStatus{screen: struct(Screen, app_id: :pre_fare_v2)}
 
-      refute WidgetInstance.audio_valid_candidate?(instance)
+      assert WidgetInstance.audio_valid_candidate?(instance)
     end
   end
 
