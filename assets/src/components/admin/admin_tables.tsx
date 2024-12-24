@@ -13,6 +13,7 @@ import {
   EditableList,
   EditableSelect,
   EditableCheckbox,
+  EditableNumberInput,
   EditableTextarea,
   InspectorLink,
 } from "Components/admin/admin_cells";
@@ -417,7 +418,7 @@ const ElevatorV2ScreensTable = (): JSX.Element => {
             newRow.app_params.accessible_path_image_here_coordinates.x = value;
             return newRow;
           },
-          Cell: EditableCell,
+          Cell: EditableNumberInput,
           disableFilters: true,
           FormCell: FormTextCell,
         },
@@ -430,7 +431,7 @@ const ElevatorV2ScreensTable = (): JSX.Element => {
             newRow.app_params.accessible_path_image_here_coordinates.y = value;
             return newRow;
           },
-          Cell: EditableCell,
+          Cell: EditableNumberInput,
           disableFilters: true,
           FormCell: FormTextCell,
         },

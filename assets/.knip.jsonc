@@ -1,0 +1,5 @@
+{
+  "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
+  // Used only by the Phoenix `watchers` configuration, not detectable by Knip
+  "ignoreDependencies": ["exit_on_eof"],
+}

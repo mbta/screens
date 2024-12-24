@@ -16,7 +16,6 @@ const common_export_body = {
       Components: path.resolve(__dirname, "src/components"),
       Hooks: path.resolve(__dirname, "src/hooks"),
       Util: path.resolve(__dirname, "src/util"),
-      Constants: path.resolve(__dirname, "src/constants"),
       Images: path.resolve(__dirname, "static/images"),
     },
   },

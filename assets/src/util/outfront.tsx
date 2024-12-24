@@ -101,8 +101,9 @@ export const getMRAID = (): MRAID | false => {
 };
 
 /**
- * For use in test DUP packages only! Sets a fake MRAID object on `window` so that we can test OFM client packages
- * as if they are running on real OFM screens.
+ * For use in test DUP packages only! Sets a fake MRAID object on `window` so
+ * we can test OFM client packages as if they are running on real OFM screens.
+ * @knipignore
  */
 export const __TEST_setFakeMRAID__ = (options: {
   playerName: string;

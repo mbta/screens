@@ -231,4 +231,3 @@ const FreeText = ({ lines }: FreeTextProps) => {
 };
 
 export default FreeText;
-export { srcForIcon };

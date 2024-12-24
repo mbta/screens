@@ -8,7 +8,7 @@ import type {
 
 export type Section = NormalSection & { type: "normal_section" };
 
-export type FoldedSection = FoldedNormalSection & { type: "folded_section" };
+type FoldedSection = FoldedNormalSection & { type: "folded_section" };
 
 export const toFoldedSection = (section: Section): FoldedSection => {
   switch (section.type) {
