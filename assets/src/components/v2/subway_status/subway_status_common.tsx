@@ -3,7 +3,7 @@
 ///////////////////////
 
 import useTextResizer from "Hooks/v2/use_text_resizer";
-import { firstWord } from "Util/util";
+import { firstWord } from "Util/utils";
 
 export interface SubwayStatusData {
   blue: Section;

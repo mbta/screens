@@ -1,5 +1,5 @@
 import React from "react";
-import { imagePath } from "Util/util";
+import { imagePath } from "Util/utils";
 
 /*
 - arrow.svg points North

@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier } from "Util/utils";
 import FreeText, { FreeTextType } from "Components/v2/free_text";
 
 interface PartialAlertProps {

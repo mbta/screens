@@ -1,6 +1,6 @@
 import React from "react";
 
-import { getScreenSide } from "Util/util";
+import { getScreenSide } from "Util/utils";
 
 /**
  * Shifts either the left or right side of the screen content into

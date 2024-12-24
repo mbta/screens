@@ -1,5 +1,5 @@
 import React, { ComponentType, forwardRef } from "react";
-import { classWithModifier, classWithModifiers, firstWord } from "Util/util";
+import { classWithModifier, classWithModifiers, firstWord } from "Util/utils";
 import { STRING_TO_SVG, getHexColor } from "Util/svg_utils";
 import {
   Alert,

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isRealScreen } from "Util/util";
+import { isRealScreen } from "Util/utils";
 import useInterval from "Hooks/use_interval";
 import { getDatasetValue } from "Util/dataset";
 import * as SentryLogger from "Util/sentry";

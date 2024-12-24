@@ -1,6 +1,6 @@
 import React from "react";
 
-import { imagePath } from "Util/util";
+import { imagePath } from "Util/utils";
 
 const LinkFooter = ({ text, url, logoPath }) => {
   return (

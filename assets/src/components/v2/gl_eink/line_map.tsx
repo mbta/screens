@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier } from "Util/utils";
 
 const WIDTH = 374;
 const HEIGHT = 1312;

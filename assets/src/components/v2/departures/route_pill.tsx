@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 
-import { imagePath, classWithModifiers } from "Util/util";
+import { imagePath, classWithModifiers } from "Util/utils";
 
 type Pill =
   | (TextPill & { type: "text" })

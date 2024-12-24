@@ -1,5 +1,5 @@
 import React from "react";
-import { classWithModifier } from "Util/util";
+import { classWithModifier } from "Util/utils";
 
 const Footer = ({ variant }: { variant: string | null }) => {
   return (

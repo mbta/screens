@@ -2,7 +2,7 @@ import React, { ErrorInfo, useContext } from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import getCsrfToken from "Util/csrf";
 import { getDataset } from "Util/dataset";
-import { isRealScreen } from "Util/util";
+import { isRealScreen } from "Util/utils";
 import {
   ResponseMapperContext,
   LastFetchContext,
