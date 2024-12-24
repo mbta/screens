@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier } from "Util/utils";
 
 export type CrowdingLevel = 1 | 2 | 3;
 

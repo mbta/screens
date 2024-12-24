@@ -1,6 +1,6 @@
 import { getDatasetValue } from "Util/dataset";
 import * as FullStory from "@fullstory/browser";
-import { isRealScreen } from "./util";
+import { isRealScreen } from "./utils";
 
 /**
  * Initializes Fullstory if the org ID is defined

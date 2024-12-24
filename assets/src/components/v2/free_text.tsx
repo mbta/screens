@@ -1,7 +1,7 @@
 import React from "react";
 import _ from "lodash";
 
-import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 
 const textPills = [
   "red",

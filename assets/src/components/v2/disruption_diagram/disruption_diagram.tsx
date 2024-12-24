@@ -7,7 +7,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { classWithModifier, classWithModifiers } from "Util/util";
+import { classWithModifier, classWithModifiers } from "Util/utils";
 
 import LargeXOctagonBordered from "Images/svgr_bundled/disruption_diagram/large-x-octagon-bordered.svg";
 import SmallXOctagon from "Images/svgr_bundled/disruption_diagram/small-x-octagon.svg";

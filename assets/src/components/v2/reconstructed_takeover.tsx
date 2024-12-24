@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifiers, imagePath } from "Util/util";
+import { classWithModifiers, imagePath } from "Util/utils";
 import DisruptionDiagram, {
   DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";

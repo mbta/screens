@@ -1,5 +1,5 @@
 import React from "react";
-import { imagePath, classWithModifier } from "Util/util";
+import { imagePath, classWithModifier } from "Util/utils";
 import {
   Departure,
   Direction,

@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier } from "Util/utils";
 
 interface Props {
   pageIndex: number;

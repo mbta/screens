@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { getDatasetValue } from "Util/dataset";
 import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
 import { isDup } from "Util/outfront";
-import { getScreenSide, isRealScreen } from "Util/util";
+import { getScreenSide, isRealScreen } from "Util/utils";
 import * as SentryLogger from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 import { DUP_VERSION } from "Components/v2/dup/version";

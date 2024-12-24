@@ -2,7 +2,7 @@ import React, { forwardRef, ComponentType } from "react";
 
 import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
 import { getDatasetValue } from "Util/dataset";
-import { classWithModifiers, formatTimeString, imagePath } from "Util/util";
+import { classWithModifiers, formatTimeString, imagePath } from "Util/utils";
 import useTextResizer from "Hooks/v2/use_text_resizer";
 
 enum Icon {
