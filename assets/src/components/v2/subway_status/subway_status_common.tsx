@@ -31,6 +31,13 @@ export interface Alert {
   station_count?: number;
 }
 
+type AlertLocation = string | AlertLocationMap | null;
+
+interface AlertLocationMap {
+  full: string;
+  abbrev: string;
+}
+
 export interface SubwayStatusPill {
   color: LineColor;
   branches?: GLBranch[];
@@ -41,13 +48,6 @@ export interface GLMultiPill extends SubwayStatusPill {
   branches: GLBranch[];
 }
 
-export type AlertLocation = string | AlertLocationMap | null;
-
-export interface AlertLocationMap {
-  full: string;
-  abbrev: string;
-}
-
 export enum LineColor {
   Blue = "blue",
   Orange = "orange",
@@ -55,7 +55,7 @@ export enum LineColor {
   Green = "green",
 }
 
-export enum GLBranch {
+enum GLBranch {
   B = "b",
   C = "c",
   D = "d",

@@ -42,4 +42,5 @@ const initSentry = (appString: string) => {
 };
 
 export default initSentry;
+/** @knipignore */
 export { info, warn, error, captureException };

@@ -90,9 +90,7 @@ interface NormalHeaderTimeProps {
   time: string;
 }
 
-export const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({
-  time,
-}) => {
+const NormalHeaderTime: ComponentType<NormalHeaderTimeProps> = ({ time }) => {
   const currentTime = formatTimeString(time);
   return <div className="normal-header-time">{currentTime}</div>;
 };

@@ -109,3 +109,12 @@ jobs:
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run tsc:check
+
+  js-unused:
+    name: Frontend Unused
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+      - working-directory: ./assets
+        run: npm run unused
