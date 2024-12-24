@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 import FreeText, { FreeTextType } from "Components/v2/free_text";
-import { classWithModifier } from "Util/util";
+import { classWithModifier } from "Util/utils";
 
 interface HeadwaySection {
   layout: string;

@@ -3,7 +3,7 @@ import DeparturesTable from "Components/v2/cr_departures/cr_departures_table";
 import CRDeparturesHeader from "Components/v2/cr_departures/cr_departures_header_normal";
 import OvernightMoon from "Images/svgr_bundled/overnight.svg";
 import moment from "moment";
-import { imagePath } from "Util/util";
+import { imagePath } from "Util/utils";
 import { Direction } from "./cr_departures";
 
 interface Props {

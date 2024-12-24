@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import { classWithModifier, classWithModifiers, imagePath } from "Util/util";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 
 import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
 import { ReconAlertProps } from "./reconstructed_takeover";

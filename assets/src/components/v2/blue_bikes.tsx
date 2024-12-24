@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import Arrow, { Direction } from "Components/v2/arrow";
 import ClockIcon from "Components/v2/clock_icon";
-import { imagePath } from "Util/util";
+import { imagePath } from "Util/utils";
 
 interface Props {
   destination: string;

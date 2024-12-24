@@ -1,6 +1,6 @@
 import React from "react";
 
-import { classWithModifier } from "Util/util";
+import { classWithModifier } from "Util/utils";
 
 const FlexZonePageIndicator = ({ pageIndex, numPages }) => {
   return (

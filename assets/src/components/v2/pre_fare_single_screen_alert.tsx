@@ -4,7 +4,7 @@ import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import DisruptionDiagram, {
   DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";
-import { classWithModifier, classWithModifiers, formatCause } from "Util/util";
+import { classWithModifier, classWithModifiers, formatCause } from "Util/utils";
 
 import ClockIcon from "Images/svgr_bundled/clock-negative.svg";
 import NoServiceIcon from "Images/svgr_bundled/no-service.svg";

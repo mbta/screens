@@ -8,7 +8,7 @@ import React, {
 import _ from "lodash";
 import cx from "classnames";
 
-import { hasOverflowX } from "Util/util";
+import { hasOverflowX } from "Util/utils";
 import useRefreshRate from "Hooks/v2/use_refresh_rate";
 
 import DepartureRow from "./departure_row";
