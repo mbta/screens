@@ -65,7 +65,7 @@
 
           &:not(.current-station) {
             &::after,
-            &:first-child::before {
+            &.first-row-on-page::before {
               position: absolute;
               left: 0;
               width: calc(100% - 48px);
