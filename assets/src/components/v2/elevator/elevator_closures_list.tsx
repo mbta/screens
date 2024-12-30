@@ -22,10 +22,16 @@ interface ClosureRowProps {
 
 const ClosureRow = ({
   station: { id, name, closures, route_icons, summary },
-  isCurrentStation, isFirstRowOnPage
+  isCurrentStation,
+  isFirstRowOnPage,
 }: ClosureRowProps) => {
   return (
-    <div className={cx("closure-row", { "current-station": isCurrentStation, "first-row-on-page": isFirstRowOnPage })}>
+    <div
+      className={cx("closure-row", {
+        "current-station": isCurrentStation,
+        "first-row-on-page": isFirstRowOnPage,
+      })}
+    >
       <div className="closure-row__name-and-pills">
         {isCurrentStation ? (
           <div className="closure-row__station-name">At this station</div>
@@ -153,9 +159,9 @@ const OutsideClosureList = ({
   }, [stations]);
 
   // Track which closure row will be at the top of each page to apply special styling
-  let firstRowsOnPages = [0]
+  const firstRowsOnPages = [0];
   for (let i = 0; i < rowCountsPerPage.length - 1; i++) {
-    firstRowsOnPages.push(firstRowsOnPages[i] + rowCountsPerPage[i])
+    firstRowsOnPages.push(firstRowsOnPages[i] + rowCountsPerPage[i]);
   }
 
   return (
