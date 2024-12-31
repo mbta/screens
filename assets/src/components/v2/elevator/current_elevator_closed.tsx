@@ -67,7 +67,9 @@ const CurrentElevatorClosed = ({
           <div className="subheading">Accessible Path</div>
           <div>
             <IsaNegative width={100} height={100} />
+            {accessiblePathDirectionArrow} ? (
             <Arrow direction={accessiblePathDirectionArrow} className="arrow" />
+            ) : ()
           </div>
         </div>
         {pageIndex === 0 ? (
