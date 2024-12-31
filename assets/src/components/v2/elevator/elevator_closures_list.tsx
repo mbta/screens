@@ -17,14 +17,21 @@ import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 interface ClosureRowProps {
   station: StationWithClosures;
   isCurrentStation: boolean;
+  isFirstRowOnPage: boolean;
 }
 
 const ClosureRow = ({
   station: { id, name, closures, route_icons, summary },
   isCurrentStation,
+  isFirstRowOnPage,
 }: ClosureRowProps) => {
   return (
-    <div className={cx("closure-row", { "current-station": isCurrentStation })}>
+    <div
+      className={cx("closure-row", {
+        "current-station": isCurrentStation,
+        "first-row-on-page": isFirstRowOnPage,
+      })}
+    >
       <div className="closure-row__name-and-pills">
         {isCurrentStation ? (
           <div className="closure-row__station-name">At this station</div>
@@ -122,16 +129,16 @@ const OutsideClosureList = ({
 
   // Each index represents a page number and each value represents the number of
   // rows on the corresponding page index.
-  const [rowCounts, setRowCounts] = useState<number[]>([]);
+  const [rowCountsPerPage, setRowCountsPerPage] = useState<number[]>([]);
 
-  const numPages = Object.keys(rowCounts).length;
+  const numPages = Object.keys(rowCountsPerPage).length;
   const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
 
-  const numOffsetRows = Object.keys(rowCounts).reduce((acc, key) => {
+  const numOffsetRows = Object.keys(rowCountsPerPage).reduce((acc, key) => {
     if (parseInt(key) === pageIndex) {
       return acc;
     } else {
-      return acc + rowCounts[key];
+      return acc + rowCountsPerPage[key];
     }
   }, 0);
 
@@ -148,8 +155,14 @@ const OutsideClosureList = ({
       rowCounts.push(offsets.filter((o) => o === uo).length);
     });
 
-    setRowCounts(rowCounts);
+    setRowCountsPerPage(rowCounts);
   }, [stations]);
+
+  // Track which closure row will be at the top of each page to apply special styling
+  const firstRowsOnPages = [0];
+  for (let i = 0; i < rowCountsPerPage.length - 1; i++) {
+    firstRowsOnPages.push(firstRowsOnPages[i] + rowCountsPerPage[i]);
+  }
 
   return (
     <div className="closures-list">
@@ -173,11 +186,12 @@ const OutsideClosureList = ({
             }
             ref={ref}
           >
-            {sortedStations.map((station) => (
+            {sortedStations.map((station, index) => (
               <ClosureRow
                 station={station}
                 isCurrentStation={station.id == stationId}
                 key={station.id}
+                isFirstRowOnPage={firstRowsOnPages.includes(index)}
               />
             ))}
           </div>

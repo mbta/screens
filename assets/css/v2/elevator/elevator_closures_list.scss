@@ -65,10 +65,10 @@
 
           &:not(.current-station) {
             &::after,
-            &:first-child::before {
+            &.first-row-on-page::before {
               position: absolute;
               left: 0;
-              width: 100%;
+              width: calc(100% - 48px);
               height: 2px;
               margin: 0 24px;
               content: "";
