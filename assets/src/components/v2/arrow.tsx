@@ -15,6 +15,7 @@ enum Direction {
   SW = "sw",
   W = "w",
   NW = "nw",
+  UTURN = "uturn",
 }
 
 interface ArrowDescriptor {
@@ -30,6 +31,9 @@ const directionToArrow = (direction: Direction): ArrowDescriptor => {
     case Direction.S:
     case Direction.W:
       imageName = "arrow.svg";
+      break;
+    case Direction.UTURN:
+      imageName = "turn-around-arrow.svg";
       break;
     default:
       imageName = "arrow-45.svg";
