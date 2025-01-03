@@ -14,11 +14,12 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Vehicles.Vehicle
   alias Screens.V2.{Departure, WidgetInstance}
   alias Screens.V2.WidgetInstance.Departures
+  alias Screens.V2.WidgetInstance.Departures.{HeadwaySection, NoDataSection, NormalSection}
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   describe "priority/1" do
     test "returns 2" do
-      instance = %Departures{section_data: []}
+      instance = %Departures{sections: []}
       assert [2] == WidgetInstance.priority(instance)
     end
   end
@@ -38,7 +39,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "returns serialized normal_section", %{bus_shelter_screen: bus_shelter_screen, now: now} do
-      section = %{type: :normal_section, rows: [], layout: %Layout{}, header: %Header{}}
+      section = %NormalSection{rows: [], layout: %Layout{}, header: %Header{}}
 
       assert %{type: :normal_section, rows: []} =
                Departures.serialize_section(section, bus_shelter_screen, now)
@@ -48,8 +49,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       bus_shelter_screen: bus_shelter_screen,
       now: now
     } do
-      section = %{
-        type: :normal_section,
+      section = %NormalSection{
         rows: [],
         layout: %Layout{},
         header: %Header{
@@ -69,9 +69,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       bus_shelter_screen: bus_shelter_screen,
       now: now
     } do
-      section = %{
-        type: :normal_section,
-        rows: [%{text: %FreeTextLine{icon: nil, text: []}}],
+      section = %NormalSection{
+        rows: [%FreeTextLine{icon: nil, text: []}],
         layout: %Layout{},
         header: %Header{}
       }
@@ -99,8 +98,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %{
-        type: :normal_section,
+      section = %NormalSection{
         layout: %Layout{},
         header: %Header{},
         rows: [
@@ -141,7 +139,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %{type: :headway_section, route: "Red", time_range: {1, 2}, headsign: "Test"}
+      section = %HeadwaySection{route: "Red", time_range: {1, 2}, headsign: "Test"}
 
       expected_text = %{
         icon: "subway-negative-black",
@@ -163,12 +161,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
            dup_screen: dup_screen,
            now: now
          } do
-      section = %{
-        type: :headway_section,
-        route: "Red",
-        time_range: {1, 2},
-        headsign: "Ashmont/Braintree"
-      }
+      section = %HeadwaySection{route: "Red", time_range: {1, 2}, headsign: "Ashmont/Braintree"}
 
       expected_text = %{
         icon: "subway-negative-black",
@@ -188,7 +181,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %{type: :headway_section, route: "Red", time_range: {1, 2}, headsign: "Test"}
+      section = %HeadwaySection{route: "Red", time_range: {1, 2}, headsign: "Test"}
 
       expected_text = %{
         icon: :red,
@@ -203,7 +196,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %{type: :no_data_section, route: %{id: "Orange", type: :subway}}
+      section = %NoDataSection{route: %{id: "Orange", type: :subway}}
 
       expected_text = %{
         icon: :orange,
@@ -213,7 +206,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{type: :no_data_section, text: expected_text} ==
                Departures.serialize_section(section, dup_screen, now, true)
 
-      section = %{type: :no_data_section, route: %{id: "Green", type: :light_rail}}
+      section = %NoDataSection{route: %{id: "Green", type: :light_rail}}
 
       expected_text = %{
         icon: :green,
@@ -228,7 +221,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %{type: :no_data_section, route: %{id: "555", type: :bus}}
+      section = %NoDataSection{route: %{id: "555", type: :bus}}
 
       expected_text = %{
         icon: :bus,
@@ -243,7 +236,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %{type: :no_data_section, route: %{short_name: "SL1", type: :bus}}
+      section = %NoDataSection{route: %{short_name: "SL1", type: :bus}}
 
       expected_text = %{
         icon: :silver,
@@ -258,7 +251,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %{type: :no_data_section, route: %{id: "CR-Test", type: :rail}}
+      section = %NoDataSection{route: %{id: "CR-Test", type: :rail}}
 
       expected_text = %{
         icon: :cr,
@@ -345,7 +338,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         schedule: %Schedule{route: %Route{id: "22"}, trip: %Trip{headsign: "Ruggles"}}
       }
 
-      n1 = %{text: %FreeTextLine{icon: nil, text: []}}
+      n1 = %FreeTextLine{icon: nil, text: []}
 
       departures = [d1, d2, d3, n1]
       expected = [[d1, d2], [d3], [n1]]
@@ -897,14 +890,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
   describe "slot_names/1" do
     test "returns main_content" do
-      instance = %Departures{section_data: []}
+      instance = %Departures{sections: []}
       assert [:main_content] == WidgetInstance.slot_names(instance)
     end
   end
 
   describe "widget_type/1" do
     test "returns departures" do
-      instance = %Departures{section_data: []}
+      instance = %Departures{sections: []}
       assert :departures == WidgetInstance.widget_type(instance)
     end
   end
@@ -919,8 +912,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
   describe "audio_serialize_section/3" do
     test "can serialize a :normal_section" do
-      section = %{
-        type: :normal_section,
+      section = %NormalSection{
         rows: [],
         header: %Header{title: "Section Header"}
       }
@@ -937,8 +929,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "uses the `read_as` header property if available" do
-      section = %{
-        type: :normal_section,
+      section = %NormalSection{
         rows: [],
         header: %Header{title: "Section Header", read_as: "A special audio-only value"}
       }
@@ -962,8 +953,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "busway_v2 return 1 departure time if first departure is > 2 minutes away" do
       now = ~U[2020-01-01T00:00:00Z]
 
-      section = %{
-        type: :normal_section,
+      section = %NormalSection{
         rows: [
           %Departure{
             prediction: %Prediction{
@@ -1008,8 +998,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "busway_v2 return 2 departure times if first departure is <= 2 minutes away" do
       now = ~U[2020-01-01T00:00:00Z]
 
-      section = %{
-        type: :normal_section,
+      section = %NormalSection{
         rows: [
           %Departure{
             prediction: %Prediction{
@@ -1055,8 +1044,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "gl_eink_v2 and bus_shelter_v2 always return a max of 2 departures" do
       now = ~U[2020-01-01T00:00:00Z]
 
-      section = %{
-        type: :normal_section,
+      section = %NormalSection{
         rows: [
           %Departure{
             prediction: %Prediction{
