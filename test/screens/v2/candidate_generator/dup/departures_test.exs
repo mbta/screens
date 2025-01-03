@@ -16,6 +16,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.Departures.{HeadwaySection, NoDataSection, NormalSection}
   alias Screens.V2.WidgetInstance.OvernightDepartures
 
   import Screens.Inject
@@ -307,9 +308,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -325,8 +325,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -358,9 +357,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -376,8 +374,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -409,9 +406,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -427,8 +423,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -483,9 +478,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -501,8 +495,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -534,9 +527,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -552,8 +544,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -585,9 +576,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -603,8 +593,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -672,9 +661,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -700,8 +688,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -723,9 +710,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -751,8 +737,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -774,9 +759,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -802,8 +786,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :normal_section,
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -860,9 +843,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -884,9 +866,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -908,9 +889,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -964,9 +944,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1018,9 +997,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1072,9 +1050,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1176,9 +1153,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :headway_section,
+          sections: [
+            %HeadwaySection{
               route: "Red",
               time_range: {12, 16},
               headsign: "Test A"
@@ -1189,9 +1165,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :headway_section,
+          sections: [
+            %HeadwaySection{
               route: "Red",
               time_range: {12, 16},
               headsign: "Test A"
@@ -1202,9 +1177,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :headway_section,
+          sections: [
+            %HeadwaySection{
               route: "Red",
               time_range: {12, 16},
               headsign: "Test A"
@@ -1265,9 +1239,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1319,9 +1292,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1373,9 +1345,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1518,9 +1489,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1542,9 +1512,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1566,9 +1535,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1668,9 +1636,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :headway_section,
+          sections: [
+            %HeadwaySection{
               route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
@@ -1681,9 +1648,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :headway_section,
+          sections: [
+            %HeadwaySection{
               route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
@@ -1694,9 +1660,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :headway_section,
+          sections: [
+            %HeadwaySection{
               route: "Green-C",
               time_range: {7, 13},
               headsign: "Westbound"
@@ -1751,13 +1716,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :no_data_section,
-              route: %{id: "Ferry", type: :ferry}
-            },
-            %{
-              type: :normal_section,
+          sections: [
+            %NoDataSection{route: %{id: "Ferry", type: :ferry}},
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1779,13 +1740,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :no_data_section,
-              route: %{id: "Ferry", type: :ferry}
-            },
-            %{
-              type: :normal_section,
+          sections: [
+            %NoDataSection{route: %{id: "Ferry", type: :ferry}},
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1807,9 +1764,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1825,10 +1781,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 }
               ]
             },
-            %{
-              type: :no_data_section,
-              route: %{id: "Green", type: :light_rail}
-            }
+            %NoDataSection{route: %{id: "Green", type: :light_rail}}
           ],
           slot_names: [:main_content_two],
           now: now
@@ -1939,9 +1892,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1963,9 +1915,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -1987,9 +1938,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -2075,9 +2025,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -2099,9 +2048,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -2123,9 +2071,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -2214,25 +2161,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
-          ],
+          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
           slot_names: [:main_content_zero],
           now: now
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
-          ],
+          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
           slot_names: [:main_content_one],
           now: now
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
-          ],
+          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
           slot_names: [:main_content_two],
           now: now
         }
@@ -2288,25 +2229,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
-          ],
+          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
           slot_names: [:main_content_zero],
           now: now
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
-          ],
+          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
           slot_names: [:main_content_one],
           now: now
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{layout: %Layout{}, header: %SectionHeader{}, rows: [], type: :normal_section}
-          ],
+          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
           slot_names: [:main_content_two],
           now: now
         }
@@ -2374,9 +2309,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_departures = [
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
@@ -2398,9 +2332,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         },
         %DeparturesWidget{
           screen: config,
-          section_data: [
-            %{
-              type: :normal_section,
+          sections: [
+            %NormalSection{
               layout: %Layout{},
               header: %SectionHeader{},
               rows: [
