@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.RouteType
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Departures.Filters.RouteDirections
@@ -95,15 +96,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           sections =
             Enum.map(sections_data, fn
               %{section: %Section{header: header, layout: layout}, result: result} ->
-                %{
-                  type: :normal_section,
+                %NormalSection{
                   rows: normal_section_rows(result),
                   layout: layout,
                   header: header
                 }
             end)
 
-          %DeparturesWidget{screen: config, section_data: sections, now: now}
+          %DeparturesWidget{screen: config, sections: sections, now: now}
       end
 
     [departures_instance]
@@ -149,11 +149,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   defp normal_section_rows({:no_data, route?}) do
     [
-      %{
-        text: %FreeTextLine{
-          icon: if(route?, do: Route.icon(route?), else: nil),
-          text: ["No departures currently available"]
-        }
+      %FreeTextLine{
+        icon: if(route?, do: Route.icon(route?), else: nil),
+        text: ["No departures currently available"]
       }
     ]
   end

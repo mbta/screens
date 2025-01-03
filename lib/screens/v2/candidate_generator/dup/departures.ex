@@ -17,6 +17,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias ScreensConfig.V2.Departures.Query.Params
   alias ScreensConfig.V2.Dup
 
+  alias Screens.V2.WidgetInstance.Departures.{
+    HeadwaySection,
+    NoDataSection,
+    NormalSection,
+    OvernightSection
+  }
+
   import Screens.Inject
 
   @headways injected(Screens.Headways)
@@ -83,7 +90,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     # If every rotation is showing OvernightDepartures, we don't need to render any route pills.
     if Enum.all?(widget_instances, &is_struct(&1, OvernightDepartures)) do
-      Enum.map(widget_instances, &%{&1 | routes: []})
+      Enum.map(widget_instances, &%OvernightDepartures{&1 | routes: []})
     else
       widget_instances
     end
@@ -111,13 +118,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     Enum.map(slot_ids, fn slot_id ->
       cond do
-        Enum.all?(sections, &(&1.type == :no_data_section)) ->
+        Enum.all?(sections, &is_struct(&1, NoDataSection)) ->
           %DeparturesNoData{
             screen: config,
             slot_name: slot_id
           }
 
-        Enum.all?(sections, &(&1.type == :overnight_section)) ->
+        Enum.all?(sections, &is_struct(&1, OvernightSection)) ->
           %OvernightDepartures{
             screen: config,
             slot_names: [slot_id],
@@ -127,7 +134,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         true ->
           %DeparturesWidget{
             screen: config,
-            section_data: sections,
+            sections: sections,
             slot_names: [slot_id],
             now: now
           }
@@ -135,8 +142,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     end)
   end
 
-  defp get_departure_instance_for_section(%{type: :no_data_section} = section, _, _, _, _),
-    do: section
+  defp get_departure_instance_for_section(
+         %{type: :no_data_section, route: route},
+         _is_only_section,
+         _now,
+         _fetch_schedules_fn,
+         _fetch_vehicles_fn
+       ),
+       do: %NoDataSection{route: route}
 
   defp get_departure_instance_for_section(
          %{
@@ -177,7 +190,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     cond do
       # All routes in section are overnight
       overnight_schedules_for_section != [] and departures == [] ->
-        %{type: :overnight_section, routes: routes}
+        %OvernightSection{routes: routes}
 
       # There are still predictions to show
       headway_mode == :inactive ->
@@ -193,14 +206,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           end
 
         # DUPs don't support Layout or Header for now
-        %{type: :normal_section, rows: visible_departures, layout: %Layout{}, header: %Header{}}
+        %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
 
       # Headway mode
       true ->
         {:active, time_range, headsign} = headway_mode
 
-        %{
-          type: :headway_section,
+        %HeadwaySection{
           route: get_section_route_from_entities(stop_ids, alert_informed_entities),
           time_range: time_range,
           headsign: headsign
@@ -649,7 +661,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp get_route_pills_for_rotation(sections) do
     sections
-    |> Enum.flat_map(fn %{routes: routes} -> Enum.map(routes, &Route.icon/1) end)
+    |> Enum.flat_map(fn %OvernightSection{routes: routes} -> Enum.map(routes, &Route.icon/1) end)
     |> Enum.uniq()
   end
 

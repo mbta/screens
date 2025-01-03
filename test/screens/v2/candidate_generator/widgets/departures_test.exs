@@ -11,6 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias Screens.V2.CandidateGenerator.Widgets.Departures
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -82,9 +83,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       assert [
                %DeparturesWidget{
                  screen: ^config,
-                 section_data: [
-                   %{type: :normal_section, rows: ^departures_a},
-                   %{type: :normal_section, rows: ^departures_b}
+                 sections: [
+                   %NormalSection{rows: ^departures_a},
+                   %NormalSection{rows: ^departures_b}
                  ]
                }
              ] = departures_instances(config, departure_fetch_fn: fetch_fn)
@@ -101,7 +102,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         ])
 
       assert [
-               %DeparturesWidget{screen: ^config, section_data: [%{layout: ^layout}]}
+               %DeparturesWidget{screen: ^config, sections: [%{layout: ^layout}]}
              ] = departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
@@ -115,7 +116,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
           %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, header: header}
         ])
 
-      assert [%DeparturesWidget{section_data: [%{header: ^header}]}] =
+      assert [%DeparturesWidget{sections: [%{header: ^header}]}] =
                departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
@@ -127,19 +128,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       assert [
                %DeparturesWidget{
-                 section_data: [
-                   %{
-                     type: :normal_section,
+                 sections: [
+                   %NormalSection{
                      rows: [
-                       %{
-                         text: %FreeTextLine{
-                           icon: :bus,
-                           text: ["No departures currently available"]
-                         }
+                       %FreeTextLine{
+                         icon: :bus,
+                         text: ["No departures currently available"]
                        }
                      ]
                    },
-                   %{type: :normal_section, rows: [^departure_b]}
+                   %NormalSection{rows: [^departure_b]}
                  ]
                }
              ] =
@@ -157,19 +155,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       assert [
                %DeparturesWidget{
-                 section_data: [
-                   %{
-                     type: :normal_section,
+                 sections: [
+                   %NormalSection{
                      rows: [
-                       %{
-                         text: %FreeTextLine{
-                           icon: nil,
-                           text: ["No departures currently available"]
-                         }
+                       %FreeTextLine{
+                         icon: nil,
+                         text: ["No departures currently available"]
                        }
                      ]
                    },
-                   %{type: :normal_section, rows: [^departure_b]}
+                   %NormalSection{rows: [^departure_b]}
                  ]
                }
              ] =
@@ -192,19 +187,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       assert [
                %DeparturesWidget{
-                 section_data: [
-                   %{
-                     type: :normal_section,
+                 sections: [
+                   %NormalSection{
                      rows: [
-                       %{
-                         text: %FreeTextLine{
-                           icon: :bus,
-                           text: ["No departures currently available"]
-                         }
+                       %FreeTextLine{
+                         icon: :bus,
+                         text: ["No departures currently available"]
                        }
                      ]
                    },
-                   %{type: :normal_section, rows: [^departure_b]}
+                   %NormalSection{rows: [^departure_b]}
                  ]
                }
              ] =
@@ -279,9 +271,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       assert [
                %DeparturesWidget{
                  screen: ^config,
-                 section_data: [
-                   %{type: :normal_section, rows: ["notice"]},
-                   %{type: :normal_section, rows: [^departure_b, "notice"]}
+                 sections: [
+                   %NormalSection{rows: ["notice"]},
+                   %NormalSection{rows: [^departure_b, "notice"]}
                  ]
                }
              ] =
@@ -396,7 +388,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       assert [
                %DeparturesWidget{
                  screen: ^config,
-                 section_data: [
+                 sections: [
                    %{rows: [^departure_a_0, ^departure_a_1]},
                    %{rows: [^departure_b_0, ^departure_b_0]}
                  ]
