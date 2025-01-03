@@ -29,7 +29,7 @@ const PulsatingDot = ({ x, y }: Coordinates) => {
 
 interface Props extends WrappedComponentProps {
   alternate_direction_text: string;
-  accessible_path_direction_arrow: Direction;
+  accessible_path_direction_arrow: Direction | null;
   accessible_path_image_url: string | null;
   accessible_path_image_here_coordinates: Coordinates;
 }
@@ -68,7 +68,10 @@ const CurrentElevatorClosed = ({
           <div>
             <IsaNegative width={100} height={100} />
             {accessiblePathDirectionArrow} ? (
-            <Arrow direction={accessiblePathDirectionArrow} className="arrow" />
+            <Arrow
+              direction={accessiblePathDirectionArrow!}
+              className="arrow"
+            />
             ) : ()
           </div>
         </div>
