@@ -37,15 +37,10 @@
 
       .header {
         display: flex;
-        max-height: 432px;
         margin-bottom: 48px;
-        font-size: 112px;
+        font-size: 96px;
         font-weight: 700;
-        line-height: 112px;
-
-        &__title {
-          word-spacing: 9999px;
-        }
+        line-height: 96px;
       }
     }
 
@@ -65,10 +60,10 @@
 
           &:not(.current-station) {
             &::after,
-            &:first-child::before {
+            &.first-row-on-page::before {
               position: absolute;
               left: 0;
-              width: 100%;
+              width: calc(100% - 48px);
               height: 2px;
               margin: 0 24px;
               content: "";
