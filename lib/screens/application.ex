@@ -14,10 +14,7 @@ defmodule Screens.Application do
       {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
       {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
       :hackney_pool.child_spec(:ex_aws_pool, []),
-      :hackney_pool.child_spec(:blue_bikes_pool, []),
       :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
-      # Turning this off because it's not in use, and the process is failing
-      # {Screens.BlueBikes.State, name: Screens.BlueBikes.State},
       # Task supervisor for ScreensByAlert async updates
       {Task.Supervisor, name: Screens.ScreensByAlert.Memcache.TaskSupervisor},
       # ScreensByAlert server process

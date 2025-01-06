@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
 
   alias Screens.Log
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.{BlueBikes, NormalHeader, ShuttleBusInfo}
+  alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Header.CurrentStopId
   alias ScreensConfig.V2.PreFare
@@ -82,10 +82,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
   end
 
   defp has_surge_widgets?(widgets) do
-    Enum.any?(widgets, fn
-      %widget{} when widget in [ShuttleBusInfo, BlueBikes] -> true
-      _ -> false
-    end)
+    Enum.any?(widgets, &match?(%ShuttleBusInfo{}, &1))
   end
 
   defimpl Screens.V2.WidgetInstance do

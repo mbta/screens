@@ -48,7 +48,6 @@ import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/pre_fare/simulation_screen_page";
 import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
 import ShuttleBusInfo from "Components/v2/shuttle_bus_info";
-import BlueBikes from "Components/v2/blue_bikes";
 import PreFareSingleScreenAlert from "Components/v2/pre_fare_single_screen_alert";
 
 const TYPE_TO_COMPONENT = {
@@ -81,7 +80,6 @@ const TYPE_TO_COMPONENT = {
   cr_departures: CRDepartures,
   overnight_cr_departures: OvernightCRDepartures,
   shuttle_bus_info: ShuttleBusInfo,
-  blue_bikes: BlueBikes,
 };
 
 const DISABLED_LAYOUT = {
