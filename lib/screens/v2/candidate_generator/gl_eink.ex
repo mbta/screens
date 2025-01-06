@@ -229,20 +229,20 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         :overnight
 
       headway ->
-        {:ok,
-         departures_to_concat ++
-           [
-             %{
-               text: %FreeTextLine{
-                 icon: nil,
-                 text: [
-                   "Trains to #{destination} every",
-                   %{format: :bold, text: "#{headway - 2}-#{headway + 2}"},
-                   "minutes"
-                 ]
-               }
-             }
-           ]}
+        {
+          :ok,
+          departures_to_concat ++
+            [
+              %FreeTextLine{
+                icon: nil,
+                text: [
+                  "Trains to #{destination} every",
+                  %{format: :bold, text: "#{headway - 2}-#{headway + 2}"},
+                  "minutes"
+                ]
+              }
+            ]
+        }
     end
   end
 end
