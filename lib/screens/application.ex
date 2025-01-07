@@ -10,10 +10,9 @@ defmodule Screens.Application do
 
     # List all child processes to be supervised
     children = [
-      Screens.Telemetry,
       {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
       {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
-      :hackney_pool.child_spec(:api_v3_pool, max_connections: 100),
+      :hackney_pool.child_spec(:api_v3_pool, max_connections: 50),
       # Task supervisor for ScreensByAlert async updates
       {Task.Supervisor, name: Screens.ScreensByAlert.Memcache.TaskSupervisor},
       # ScreensByAlert server process
@@ -24,8 +23,10 @@ defmodule Screens.Application do
       {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
       # Task supervisor for parallel running of candidate generator variants
       {Task.Supervisor, name: Screens.V2.ScreenData.ParallelRunSupervisor},
-      {Screens.ScreenApiResponseCache, []},
+      Screens.V3Api.Cache.Realtime,
+      Screens.V3Api.Cache.Static,
       Screens.LastTrip,
+      Screens.Telemetry,
       {Phoenix.PubSub, name: ScreensWeb.PubSub},
       ScreensWeb.Endpoint,
       Screens.Health

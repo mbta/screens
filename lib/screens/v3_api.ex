@@ -5,7 +5,7 @@ defmodule Screens.V3Api do
 
   require Logger
 
-  alias Screens.ScreenApiResponseCache
+  alias __MODULE__.Cache
 
   @default_opts [
     timeout: 5000,
@@ -13,109 +13,74 @@ defmodule Screens.V3Api do
     hackney: [pool: :api_v3_pool, checkout_timeout: 4000]
   ]
 
-  @retry with: Stream.take(constant_backoff(500), 3), atoms: [:bad_response_code]
-  def get_json(
-        route,
-        params \\ %{},
-        opts \\ []
-      ) do
-    headers = api_key_headers(Application.get_env(:screens, :api_v3_key))
-    url = build_url(route, params)
-
+  def get_json(path, params \\ %{}, opts \\ []) do
     ctx = Screens.Telemetry.context()
-
-    meta =
-      Map.merge(ctx, %{url: url})
+    meta = Map.merge(ctx, %{path: path, query: URI.encode_query(params)})
 
     Screens.Telemetry.span_with_stop_meta([:screens, :v3_api, :get_json], meta, fn ->
-      cached_response = ScreenApiResponseCache.get(url)
+      case Cache.get({path, params}) do
+        {:fresh, {_last_modified, response}} ->
+          {{:ok, response}, %{cache: "local"}}
 
-      headers =
-        if is_nil(cached_response),
-          do: headers,
-          else: headers ++ [{"if-modified-since", elem(cached_response, 1)}]
+        {:stale, {last_modified, response}} ->
+          fetch_json_with_meta(path, params, opts, last_modified, response)
 
-      with {:http_request, {:ok, response}} <-
-             {:http_request,
-              HTTPoison.get(
-                url,
-                headers,
-                Keyword.merge(@default_opts, opts)
-              )},
-           {:response_success, %{status_code: 200, body: body, headers: headers}} <-
-             {:response_success, response},
-           {:parse, {:ok, parsed}} <- {:parse, Jason.decode(body)} do
-        update_response_cache(url, parsed, headers)
-
-        {{:ok, parsed}, %{cached: false}}
-      else
-        {:http_request, e} ->
-          {:error, httpoison_error} = e
-
-          error =
-            log_api_error({:http_fetch_error, e}, url,
-              message: Exception.message(httpoison_error)
-            )
-
-          {error, %{cached: false}}
-
-        {:response_success, %{status_code: 304}} ->
-          {{:ok, elem(cached_response, 0)}, %{cached: true}}
-
-        {:response_success, %{status_code: status_code}} = response ->
-          _ = log_api_error({:bad_response_code, response}, url, status_code: status_code)
-
-          {:bad_response_code, %{cached: false}}
-
-        {:parse, {:error, e}} ->
-          error = log_api_error({:parse_error, e}, url)
-          {error, %{cached: false}}
-
-        e ->
-          error = log_api_error({:error, e}, url)
-          {error, %{cached: false}}
+        nil ->
+          fetch_json_with_meta(path, params, opts)
       end
     end)
   end
 
-  defp update_response_cache(url, response, headers) do
-    date =
-      headers
-      |> Enum.into(%{})
-      |> Map.get("last-modified")
+  @retry with: Stream.take(constant_backoff(500), 3), atoms: [:bad_response_code]
+  defp fetch_json_with_meta(path, params, opts, last_modified \\ nil, cached_response \\ nil) do
+    url = build_url(path, params)
+    api_key = Application.get_env(:screens, :api_v3_key)
+    headers = api_key_headers(api_key) ++ cache_headers(last_modified)
 
-    ScreenApiResponseCache.put(url, {response, date})
+    case HTTPoison.get(url, headers, Keyword.merge(@default_opts, opts)) do
+      {:ok, %{status_code: 200, body: body, headers: headers}} ->
+        response = Jason.decode!(body)
+        last_modified = headers |> Map.new() |> Map.fetch!("last-modified")
+        Cache.put({path, params}, {last_modified, response})
+        {{:ok, response}, %{cache: "none"}}
+
+      {:ok, %{status_code: 304}} ->
+        # Refresh unconditional TTL on the cache entry
+        Cache.put({path, params}, {last_modified, cached_response})
+        {{:ok, cached_response}, %{cache: "http"}}
+
+      {:ok, %{status_code: status_code}} ->
+        log_api_error(:bad_response_code, url, status_code: status_code)
+        {:bad_response_code, %{}}
+
+      {:error, error} ->
+        log_api_error(:http_fetch_error, url, message: Exception.message(error))
+        {{:http_fetch_error, error}, %{}}
+    end
   end
 
-  defp log_api_error({error_type, _error_data} = error, url, extra_fields \\ []) do
+  defp log_api_error(error_type, url, extra_fields) do
     extra_fields
     |> Enum.map_join(" ", fn {label, value} -> "#{label}=\"#{value}\"" end)
     |> then(fn fields ->
-      Logger.info("[api_v3_get_json_error] url=\"#{url}\" error_type=#{error_type} " <> fields)
+      Logger.error("api_v3_get_json_error url=\"#{url}\" error_type=#{error_type} " <> fields)
     end)
-
-    error
   end
 
-  defp build_url(route, params) when map_size(params) == 0 do
-    base_url()
+  defp build_url(path, params) do
+    :screens
+    |> Application.get_env(:api_v3_url)
     |> URI.parse()
-    |> URI.merge(route)
+    |> URI.merge(path)
     |> URI.to_string()
-  end
-
-  defp build_url(route, params) do
-    base_url()
-    |> URI.parse()
-    |> URI.merge(route)
-    |> URI.to_string()
-    |> then(&"#{&1}?#{URI.encode_query(params)}")
-  end
-
-  defp base_url do
-    Application.get_env(:screens, :api_v3_url)
+    |> then(fn uri ->
+      if map_size(params) == 0, do: uri, else: "#{uri}?#{URI.encode_query(params)}"
+    end)
   end
 
   defp api_key_headers(nil), do: []
   defp api_key_headers(key), do: [{"x-api-key", key}]
+
+  defp cache_headers(nil), do: []
+  defp cache_headers(last_modified), do: [{"if-modified-since", last_modified}]
 end
