@@ -10,7 +10,7 @@ import {
   type StationWithClosures,
   type Closure,
 } from "Components/v2/elevator/types";
-import useClientPaging from "Hooks/v2/use_client_paging";
+import useCustomPaging from "Hooks/v2/use_custom_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 
@@ -132,7 +132,7 @@ const OutsideClosureList = ({
   const [rowCountsPerPage, setRowCountsPerPage] = useState<number[]>([]);
 
   const numPages = Object.keys(rowCountsPerPage).length;
-  const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
+  const pageIndex = useCustomPaging({ numPages, onFinish, lastUpdate});
 
   const numOffsetRows = Object.keys(rowCountsPerPage).reduce((acc, key) => {
     if (parseInt(key) === pageIndex) {
