@@ -51,26 +51,6 @@ defmodule Screens.Image do
     end
   end
 
-  @spec fetch_image(String.t()) :: {:ok, binary(), String.t()} | :error
-  def fetch_image(filename) do
-    s3_path = get_s3_path(filename)
-
-    get_operation = S3.get_object(@bucket, s3_path)
-
-    case ExAws.request(get_operation) do
-      {:ok, %{status_code: 200, body: body, headers: headers}} ->
-        content_type =
-          headers
-          |> List.keyfind("Content-Type", 0)
-          |> elem(1)
-
-        {:ok, body, content_type}
-
-      _ ->
-        :error
-    end
-  end
-
   @spec delete_image(String.t()) :: :ok | :error
   def delete_image(filename) do
     s3_path = psa_images_prefix() <> filename
