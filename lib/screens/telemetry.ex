@@ -1,19 +1,18 @@
 defmodule Screens.Telemetry do
-  @moduledoc """
-  `:telemetry` based span logging
-  """
-  use GenServer
+  @moduledoc "Telemetry logging and polling."
+
+  use Supervisor
   require Logger
 
   def start_link(opts) do
-    GenServer.start_link(__MODULE__, [], opts)
+    Supervisor.start_link(__MODULE__, [], opts)
   end
 
-  @impl GenServer
+  @impl Supervisor
   def init(_) do
     handlers = [
       # V3 API
-      log_span(~w[screens v3_api get_json]a, metadata: ~w[url cached]a),
+      log_span(~w[screens v3_api get_json]a, metadata: ~w[path query cache]a),
       # Stops
       log_span(~w[screens stops stop fetch_stop_name]a, metadata: ~w[stop_id]),
       # Location Context
@@ -42,6 +41,10 @@ defmodule Screens.Telemetry do
       log_event(~w[hackney_pool]a,
         metadata: ~w[pool]a,
         measurements: ~w[free_count in_use_count no_socket queue_count take_rate]a
+      ),
+      log_event(~w[screens v3_api cache stats]a,
+        metadata: ~w[cache]a,
+        measurements: ~w[hits misses writes updates evictions expirations]a
       )
     ]
 
@@ -50,7 +53,17 @@ defmodule Screens.Telemetry do
       :ok = :telemetry.attach_many(name, event_names, &Screens.Telemetry.handle_event/4, config)
     end
 
-    :ignore
+    children = [
+      {
+        :telemetry_poller,
+        measurements: [
+          {Screens.V3Api.Cache.Realtime, :dispatch_stats, []},
+          {Screens.V3Api.Cache.Static, :dispatch_stats, []}
+        ]
+      }
+    ]
+
+    Supervisor.init(children, strategy: :one_for_one)
   end
 
   @doc """
