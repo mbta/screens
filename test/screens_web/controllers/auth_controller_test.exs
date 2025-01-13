@@ -10,8 +10,11 @@ defmodule ScreensWeb.Controllers.AuthControllerTest do
         credentials: %Ueberauth.Auth.Credentials{
           expires_at: current_time + 1_000
         },
-        extra: %{
-          raw_info: %{
+        extra: %Ueberauth.Auth.Extra{
+          raw_info: %UeberauthOidcc.RawInfo{
+            claims: %{
+              "iat" => System.system_time(:second)
+            },
             userinfo: %{
               "resource_access" => %{
                 "test-client" => %{"roles" => ["screens-admin"]}

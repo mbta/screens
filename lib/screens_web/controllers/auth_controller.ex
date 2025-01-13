@@ -11,8 +11,13 @@ defmodule ScreensWeb.AuthController do
 
   def callback(%{assigns: %{ueberauth_auth: auth}} = conn, _params) do
     username = auth.uid
-    expiration = auth.credentials.expires_at
-    current_time = System.system_time(:second)
+
+    auth_time =
+      Map.get(
+        auth.extra.raw_info.claims,
+        "auth_time",
+        auth.extra.raw_info.claims["iat"]
+      )
 
     keycloak_client_id =
       get_in(Application.get_env(:ueberauth_oidcc, :providers), [:keycloak, :client_id])
@@ -23,12 +28,12 @@ defmodule ScreensWeb.AuthController do
     redirect_to = Plug.Conn.get_session(conn, :previous_path, ~p"/admin")
 
     conn
-    |> Plug.Conn.delete_session(:previous_path)
+    |> configure_session(drop: true)
     |> Guardian.Plug.sign_in(
       ScreensWeb.AuthManager,
       username,
-      %{roles: roles},
-      ttl: {expiration - current_time, :seconds}
+      %{auth_time: auth_time, roles: roles},
+      ttl: {30, :minutes}
     )
     |> redirect(to: redirect_to)
   end

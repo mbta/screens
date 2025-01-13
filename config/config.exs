@@ -44,12 +44,25 @@ config :screens,
   redirect_http?: true,
   keycloak_role: "screens-admin"
 
-config :screens, ScreensWeb.AuthManager, issuer: "screens"
+max_session_time = 12 * 60 * 60
+
+config :screens, ScreensWeb.AuthManager,
+  idle_time: 30 * 60,
+  issuer: "screens",
+  max_session_time: max_session_time
 
 # Placeholder for Keycloak authentication, defined for real in environment configs
 config :ueberauth, Ueberauth,
   providers: [
-    keycloak: nil
+    keycloak: {
+      Ueberauth.Strategy.Oidcc,
+      authorization_params: %{max_age: "#{max_session_time}"},
+      authorization_params_passthrough: ~w(prompt login_hint),
+      issuer: :keycloak_issuer,
+      scopes: ~w(openid email),
+      uid_field: "email",
+      userinfo: true
+    }
   ]
 
 config :ex_cldr,
