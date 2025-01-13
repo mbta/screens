@@ -3,7 +3,7 @@ import { LastFetchContext } from "Components/v2/screen_container";
 
 interface WrappedComponentProps {
   onFinish: () => void;
-  lastUpdate: number | null;
+  lastUpdate?: number | null;
 }
 
 interface Props {
@@ -37,7 +37,7 @@ const PersistentWrapper: ComponentType<Props> = ({
       {...visibleData}
       onFinish={handleFinished}
       key={renderKey}
-      lastUpdate={lastFetch}
+      lastUpdate={lastFetch} // make this optional - either determined by lastFetch Context or by other interval
     />
   );
 };

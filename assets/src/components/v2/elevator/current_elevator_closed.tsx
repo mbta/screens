@@ -1,17 +1,17 @@
-import React, { ComponentType } from "react";
+import React, { ComponentType, useContext } from "react";
 import cx from "classnames";
 import Arrow, { Direction } from "Components/v2/arrow";
 import makePersistent, {
   WrappedComponentProps,
 } from "Components/v2/persistent_wrapper";
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
-import useClientPaging from "Hooks/v2/use_client_paging";
 import useTextResizer from "Hooks/v2/use_text_resizer";
 import CurrentLocationMarker from "Images/svgr_bundled/current-location-marker.svg";
 import CurrentLocationBackground from "Images/svgr_bundled/current-location-background.svg";
 import NoService from "Images/svgr_bundled/no-service-black.svg";
 import ElevatorWayfinding from "Images/svgr_bundled/elevator-wayfinding.svg";
 import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
+import usePageAdvancer from "Hooks/v2/use_page_advancer";
 
 type Coordinates = {
   x: number;
@@ -40,10 +40,15 @@ const CurrentElevatorClosed = ({
   accessible_path_image_url: accessiblePathImageUrl,
   accessible_path_image_here_coordinates: accessiblePathImageHereCoordinates,
   onFinish,
-  lastUpdate,
 }: Props) => {
   const numPages = accessiblePathImageUrl ? 2 : 1;
-  const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
+  const { pageIndex } = usePageAdvancer({
+    numPages,
+    cycleInterval: 12000, // 12 seconds
+    advanceOnDataRefresh: false,
+    onFinish,
+  });
+
   const { ref, size } = useTextResizer({
     sizes: ["small", "medium", "large"],
     maxHeight: 746,

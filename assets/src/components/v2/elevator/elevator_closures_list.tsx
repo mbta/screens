@@ -1,4 +1,10 @@
-import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
+import React, {
+  ComponentType,
+  useContext,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import cx from "classnames";
 import _ from "lodash";
 import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
@@ -10,9 +16,10 @@ import {
   type StationWithClosures,
   type Closure,
 } from "Components/v2/elevator/types";
-import useCustomPaging from "Hooks/v2/use_custom_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
+import usePageAdvancer from "Hooks/v2/use_page_advancer";
+import { LastFetchContext } from "../screen_container";
 
 interface ClosureRowProps {
   station: StationWithClosures;
@@ -130,9 +137,17 @@ const OutsideClosureList = ({
   // Each index represents a page number and each value represents the number of
   // rows on the corresponding page index.
   const [rowCountsPerPage, setRowCountsPerPage] = useState<number[]>([]);
+  const lastFetch = useContext(LastFetchContext);
 
   const numPages = Object.keys(rowCountsPerPage).length;
-  const pageIndex = useCustomPaging({ numPages, onFinish, lastUpdate});
+
+  const { pageIndex, advance } = usePageAdvancer({
+    numPages,
+    cycleInterval: 3000, // 12 seconds
+    advanceOnDataRefresh: false,
+    lastUpdate: lastFetch,
+    onFinish: () => console.log("Data refreshed!"), // TODO: For testing
+  });
 
   const numOffsetRows = Object.keys(rowCountsPerPage).reduce((acc, key) => {
     if (parseInt(key) === pageIndex) {
