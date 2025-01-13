@@ -80,7 +80,7 @@ defmodule Screens.MixProject do
       {:hackney, "== 1.20.1"},
       {:guardian, "~> 2.3.1"},
       {:ueberauth, "~> 0.10"},
-      {:ueberauth_oidcc, "~> 0.3"},
+      {:ueberauth_oidcc, "~> 0.4"},
       {:corsica, "~> 2.1"},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:sentry, "~> 10.4"},

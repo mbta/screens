@@ -12,7 +12,7 @@ import AdminForm from "./admin_form";
 
 import { type AudioConfig } from "Components/v2/screen_container";
 
-import { doSubmit, type Config, type Screen } from "Util/admin";
+import { fetch, type Config, type Screen } from "Util/admin";
 import {
   type Message,
   INSPECTOR_FRAME_NAME,
@@ -46,11 +46,10 @@ const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
 
   useEffect(() => {
-    fetch("/api/admin")
-      .then((result) => result.json())
-      .then((json) => JSON.parse(json.config))
-      .then((config) => setConfig(config))
-      .catch(() => alert("Failed to load config!"));
+    fetch
+      .get("/api/admin")
+      .then((response) => JSON.parse(response.config))
+      .then((config) => setConfig(config));
   }, []);
 
   const { search } = useLocation();
@@ -238,7 +237,8 @@ const ConfigControls: ComponentType<{ screen: ScreenWithId }> = ({
           disabled={isRequestingReload}
           onClick={() => {
             setIsRequestingReload(true);
-            doSubmit("/api/admin/refresh", { screen_ids: [screen.id] })
+            fetch
+              .post("/api/admin/refresh", { screen_ids: [screen.id] })
               .then(() => alert("Scheduled a reload for this screen."))
               .finally(() => setIsRequestingReload(false));
           }}
@@ -415,10 +415,7 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
             <button
               onClick={() => {
                 setSSML("Loading...");
-                fetch(`${audioPath}/debug`)
-                  .then((result) => result.text())
-                  .then((text) => setSSML(text))
-                  .catch(() => alert("Failed to fetch SSML!"));
+                fetch.text(`${audioPath}/debug`).then((text) => setSSML(text));
               }}
             >
               Show SSML
