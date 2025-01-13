@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from "react";
 
-import { doSubmit } from "Util/admin";
+import { fetch } from "Util/admin";
 
 const DEVOPS_PATH = "/api/admin/devops";
 
 const updateDisabledModes = async (disabledModes) => {
-  const result = await doSubmit(DEVOPS_PATH, { disabled_modes: disabledModes });
+  const result = await fetch.post(DEVOPS_PATH, {
+    disabled_modes: disabledModes,
+  });
   if (result.success !== true) {
     alert("Config update failed");
   }
@@ -27,9 +29,9 @@ const Devops = () => {
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
-    fetch("/api/admin/")
-      .then((result) => result.json())
-      .then((json) => JSON.parse(json.config))
+    fetch
+      .get("/api/admin")
+      .then((response) => JSON.parse(response.config))
       .then((config) => config.devops.disabled_modes)
       .then(setDisabledModes)
       .then((_) => setLoaded(true))

@@ -45,12 +45,6 @@ if config_env() == :prod do
       coder: Screens.ScreensByAlert.Memcache.SafeErlangCoder
     ]
 
-  keycloak_opts = [
-    issuer: :keycloak_issuer,
-    client_id: System.fetch_env!("KEYCLOAK_CLIENT_ID"),
-    client_secret: System.fetch_env!("KEYCLOAK_CLIENT_SECRET")
-  ]
-
   config :ueberauth_oidcc,
     issuers: [
       %{
@@ -59,7 +53,10 @@ if config_env() == :prod do
       }
     ],
     providers: [
-      keycloak: keycloak_opts
+      keycloak: [
+        client_id: System.fetch_env!("KEYCLOAK_CLIENT_ID"),
+        client_secret: System.fetch_env!("KEYCLOAK_CLIENT_SECRET")
+      ]
     ]
 end
 

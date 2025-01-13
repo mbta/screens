@@ -25,23 +25,43 @@ const gatherSelectOptions = (rows, columnId) => {
   return Array.from(uniqueOptions);
 };
 
-const doSubmit = async (path, data) => {
-  try {
-    const result = await fetch(path, {
-      method: "POST",
+const fetch = {
+  get: (path) => doFetch(path, {}),
+
+  post: (path, data) => {
+    return doFetch(path, {
+      body: JSON.stringify(data),
       headers: {
         "content-type": "application/json",
         "x-csrf-token": getCsrfToken(),
       },
-      credentials: "include",
-      body: JSON.stringify(data),
+      method: "POST",
     });
-    const json = await result.json();
-    return json;
-  } catch (err) {
-    alert("An error occurred.");
-    throw err;
+  },
+
+  delete: (path) => doFetch(path, { method: "DELETE" }),
+
+  text: (path) => doFetch(path, {}, (response) => response.text()),
+};
+
+const doFetch = async (
+  path,
+  opts,
+  handleResponse = (response) => response.json(),
+) => {
+  try {
+    const response = await window.fetch(path, opts);
+
+    if (response.status === 401) {
+      alert("Your session has expired; refresh the page to continue.");
+      throw new Error("unauthenticated");
+    } else {
+      return handleResponse(response);
+    }
+  } catch (error) {
+    alert(`An error occurred: ${error}`);
+    throw error;
   }
 };
 
-export { gatherSelectOptions, doSubmit };
+export { fetch, gatherSelectOptions };

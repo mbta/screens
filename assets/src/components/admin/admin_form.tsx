@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { doSubmit } from "Util/admin";
+import { fetch } from "Util/admin";
 
 const validateJson = (json) => {
   try {
@@ -30,7 +30,7 @@ const AdminValidateControls = ({
     const config = configRef.current.value;
     if (validateJson(config)) {
       const dataToSubmit = { config };
-      doSubmit(validatePath, dataToSubmit).then(validateCallback);
+      fetch.post(validatePath, dataToSubmit).then(validateCallback);
     } else {
       alert("JSON is invalid!");
     }
@@ -65,7 +65,7 @@ const AdminConfirmControls = ({
   const confirmFn = () => {
     const config = configRef.current.value;
     const dataToSubmit = { config };
-    doSubmit(confirmPath, dataToSubmit).then(confirmCallback);
+    fetch.post(confirmPath, dataToSubmit).then(confirmCallback);
   };
 
   return (

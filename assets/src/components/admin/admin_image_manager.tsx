@@ -1,23 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import _ from "lodash";
-import getCsrfToken from "Util/csrf";
+
+import { fetch } from "Util/admin";
 
 interface FileWithPreview extends File {
   preview: string;
 }
 
-const fetchWithCsrf = (resource: RequestInfo, init: RequestInit = {}) => {
-  return fetch(resource, {
-    ...init,
-    headers: { ...(init?.headers || {}), "x-csrf-token": getCsrfToken() },
-    credentials: "include",
-  });
-};
-
 const fetchImageFilenames = async () => {
-  const response = await fetchWithCsrf("/api/admin/image_filenames");
-  const { image_filenames: imageFilenames } = await response.json();
+  const { image_filenames: imageFilenames } = await fetch.get(
+    "/api/admin/image_filenames",
+  );
   return _.sortBy(imageFilenames);
 };
 
@@ -88,12 +82,8 @@ const ImageUpload = (): JSX.Element => {
     formData.append("image", stagedImageUpload, stagedImageUpload.name);
 
     try {
-      const response = await fetchWithCsrf("/api/admin/image", {
-        method: "POST",
-        body: formData,
-      });
+      const result = await fetch.post("/api/admin/image", formData);
 
-      const result = await response.json();
       if (result.success) {
         alert(`Success. Image has been uploaded as "${result.uploaded_name}".`);
         location.reload();
@@ -166,12 +156,10 @@ const ImageManager = ({ imageFilenames }): JSX.Element => {
       setIsDeleting(true);
 
       try {
-        const response = await fetchWithCsrf(
+        const result = await fetch.delete(
           `/api/admin/image/${selectedFilename}`,
-          { method: "DELETE" },
         );
 
-        const result = await response.json();
         if (result.success) {
           alert(`Success. "${selectedFilename}" has been deleted.`);
           location.reload();
