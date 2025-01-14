@@ -35,10 +35,6 @@ config :phoenix, :format_encoders,
 # Use Jason for JSON parsing in ExAws
 config :ex_aws, json_codec: Jason
 
-config :ex_aws, :hackney_opts,
-  recv_timeout: 30_000,
-  pool: :ex_aws_pool
-
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 
 config :hackney, mod_metrics: :hackney_telemetry
@@ -71,10 +67,6 @@ config :screens,
   signs_ui_s3_path: "config.json",
   signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.S3,
   last_deploy_fetcher: Screens.Util.LastDeploy.S3Fetch,
-  blue_bikes_api_client: Screens.BlueBikes.Client,
-  blue_bikes_station_information_url:
-    "https://gbfs.bluebikes.com/gbfs/en/station_information.json",
-  blue_bikes_station_status_url: "https://gbfs.bluebikes.com/gbfs/en/station_status.json",
   record_sentry: false
 
 config :screens,
@@ -479,13 +471,26 @@ config :screens, :screens_by_alert,
   screens_last_updated_ttl_seconds: 3600,
   screens_ttl_seconds: 40
 
-config :screens, Screens.ScreenApiResponseCache,
-  gc_interval: :timer.hours(1),
-  allocated_memory: 250_000_000
-
 config :screens, Screens.LastTrip,
   trip_updates_adapter: Screens.LastTrip.TripUpdates.GTFS,
   vehicle_positions_adapter: Screens.LastTrip.VehiclePositions.GTFS
+
+# Memory limits for V3 API response caches are based on ETS table memory usage measurements in a
+# deployed environment. To avoid thrashing and overloading the HTTP connection pool, these can and
+# should be tweaked as the V3 API usage patterns and requirements of the app change over time.
+
+config :screens, Screens.V3Api.Cache.Realtime,
+  allocated_memory: 50 * 1024 * 1024,
+  gc_cleanup_min_timeout: :timer.seconds(5),
+  gc_interval: :timer.seconds(30),
+  stats: true,
+  telemetry_prefix: ~w[screens v3_api cache]a
+
+config :screens, Screens.V3Api.Cache.Static,
+  allocated_memory: 150 * 1024 * 1024,
+  gc_interval: :timer.hours(1),
+  stats: true,
+  telemetry_prefix: ~w[screens v3_api cache]a
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

@@ -21,9 +21,6 @@ config :screens,
   # To write testable functions: pass request-firing functions as arguments. Default value can be the "normal" fetch function,
   # and then during tests, we can pass a stubbed version
   api_v3_url: [:no_api_requests_allowed_during_testing],
-  blue_bikes_station_information_url: [:no_api_requests_allowed_during_testing],
-  blue_bikes_station_status_url: [:no_api_requests_allowed_during_testing],
-  blue_bikes_api_client: Screens.BlueBikes.FakeClient,
   dup_headsign_replacements: %{
     "Test 1" => "T1"
   },

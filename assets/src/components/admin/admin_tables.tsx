@@ -335,14 +335,6 @@ const PreFareV2ScreensTable = (): JSX.Element => {
       FormCell: FormTextarea,
     },
     {
-      Header: "BlueBikes",
-      accessor: buildAppParamAccessor("blue_bikes"),
-      mutator: buildAppParamMutator("blue_bikes"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
-    {
       Header: "Shuttle Bus Info",
       accessor: buildAppParamAccessor("shuttle_bus_info"),
       mutator: buildAppParamMutator("shuttle_bus_info"),
