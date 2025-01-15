@@ -72,7 +72,7 @@ function usePageAdvancer({
     }
   }, [lastUpdate]);
 
-  return  pageIndex;
+  return pageIndex;
 }
 
 export default usePageAdvancer;

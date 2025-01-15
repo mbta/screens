@@ -1,9 +1,4 @@
-import React, {
-  ComponentType,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
 import cx from "classnames";
 import _ from "lodash";
 import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
@@ -142,7 +137,7 @@ const OutsideClosureList = ({
     numPages,
     cycleIntervalMs: 8000, // 8 seconds
     advanceOnDataRefresh: false,
-    onFinish
+    onFinish,
   });
 
   const numOffsetRows = Object.keys(rowCountsPerPage).reduce((acc, key) => {
