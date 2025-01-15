@@ -1,16 +1,22 @@
 import { useState, useEffect, useCallback } from "react";
 
+/**
+ * This hook acts as a way for components with multiple pages to advance through their pages
+ * in one of two ways.
+ * 1. Interval based advancement (advances page every __ ms)
+ * 2. Refresh based advancement (advances page with every data refresh)
+ */
 interface UsePageAdvancerProps {
   numPages: number; // Total number of pages to cycle through
   advanceOnDataRefresh: boolean; // Whether to advance when data is refreshed
-  cycleInterval?: number; // Time interval for cycling pages (only used if advanceOnDataRefresh is false)
+  cycleIntervalMs?: number; // In milliseconds, the interval for cycling pages (only used if advanceOnDataRefresh is false)
   lastUpdate?: number | null;
   onFinish: () => void; // Callback
 }
 
 function usePageAdvancer({
   numPages,
-  cycleInterval,
+  cycleIntervalMs,
   advanceOnDataRefresh = false,
   lastUpdate,
   onFinish,
@@ -33,10 +39,10 @@ function usePageAdvancer({
 
   // Function for time-interval-based advancement
   const advanceByTime = useCallback(() => {
-    const intervalId = setInterval(advancePage, cycleInterval);
+    const intervalId = setInterval(advancePage, cycleIntervalMs);
 
     return () => clearInterval(intervalId); // Cleanup
-  }, [advancePage, cycleInterval]);
+  }, [advancePage, cycleIntervalMs]);
 
   // Function for data-refresh-based advancement
   const advanceOnRefresh = useCallback(() => {
@@ -48,12 +54,12 @@ function usePageAdvancer({
 
   // Start the appropriate page advancement type
   useEffect(() => {
-    if (!advanceOnDataRefresh && cycleInterval) {
+    if (!advanceOnDataRefresh && cycleIntervalMs) {
       return advanceByTime();
     } else {
       return advanceOnRefresh();
     }
-  }, [lastUpdate, cycleInterval]);
+  }, [lastUpdate, cycleIntervalMs]);
 
   // TODO: I should maybe remove the advance function since it isn't needed anymore after refactoring
   return { pageIndex, advance };
