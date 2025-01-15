@@ -1,6 +1,5 @@
 import React, {
   ComponentType,
-  useContext,
   useLayoutEffect,
   useRef,
   useState,
@@ -19,7 +18,6 @@ import {
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import usePageAdvancer from "Hooks/v2/use_page_advancer";
-import { LastFetchContext } from "../screen_container";
 
 interface ClosureRowProps {
   station: StationWithClosures;
@@ -137,16 +135,14 @@ const OutsideClosureList = ({
   // Each index represents a page number and each value represents the number of
   // rows on the corresponding page index.
   const [rowCountsPerPage, setRowCountsPerPage] = useState<number[]>([]);
-  const lastFetch = useContext(LastFetchContext);
 
   const numPages = Object.keys(rowCountsPerPage).length;
 
-  const { pageIndex, advance } = usePageAdvancer({
+  const pageIndex = usePageAdvancer({
     numPages,
-    cycleInterval: 3000, // 12 seconds
+    cycleIntervalMs: 8000, // 8 seconds
     advanceOnDataRefresh: false,
-    lastUpdate: lastFetch,
-    onFinish: () => console.log("Data refreshed!"), // TODO: For testing
+    onFinish
   });
 
   const numOffsetRows = Object.keys(rowCountsPerPage).reduce((acc, key) => {

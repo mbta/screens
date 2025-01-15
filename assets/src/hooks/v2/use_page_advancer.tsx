@@ -1,19 +1,19 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
-/**
- * This hook acts as a way for components with multiple pages to advance through their pages
- * in one of two ways.
- * 1. Interval based advancement (advances page every __ ms)
- * 2. Refresh based advancement (advances page with every data refresh)
- */
 interface UsePageAdvancerProps {
   numPages: number; // Total number of pages to cycle through
   advanceOnDataRefresh: boolean; // Whether to advance when data is refreshed
   cycleIntervalMs?: number; // In milliseconds, the interval for cycling pages (only used if advanceOnDataRefresh is false)
   lastUpdate?: number | null;
-  onFinish: () => void; // Callback
+  onFinish: () => void; // Callback when cycling completes
 }
 
+/**
+ * This hook acts as a way for components with multiple pages to advance
+ * through their pages in one of two ways:
+ *   1. Interval-based advancement (advances page every __ ms)
+ *   2. Refresh-based advancement (advances page with every data refresh)
+ */
 function usePageAdvancer({
   numPages,
   cycleIntervalMs,
@@ -22,47 +22,57 @@ function usePageAdvancer({
   onFinish,
 }: UsePageAdvancerProps) {
   const [pageIndex, setPageIndex] = useState(0);
-  const [isFirstRender, setIsFirstRender] = useState(true);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Function for page advancement
+  // Use refs to keep stable references to numPages and onFinish
+  const numPagesRef = useRef(numPages);
+  const onFinishRef = useRef(onFinish);
+
+  useEffect(() => {
+    numPagesRef.current = numPages;
+  }, [numPages]);
+
+  useEffect(() => {
+    onFinishRef.current = onFinish;
+  }, [onFinish]);
+
+  // Callback that handles changing the state of pageIndex
   const advancePage = useCallback(() => {
-    if (lastUpdate !== null) {
-      if (isFirstRender) {
-        setIsFirstRender(false);
-      } else if (numPages > 1) {
-        setPageIndex((i) => (i + 1) % numPages);
-      } else {
-        onFinish();
-      }
+    setPageIndex((prevIndex) => {
+      const nextIndex = (prevIndex + 1) % numPagesRef.current;
+      if (nextIndex === 0) onFinishRef.current(); // Call onFinish when cycling completes
+      return nextIndex;
+    });
+  }, []);
+
+  // Start the interval for time-based advancement
+  const startTimer = useCallback(() => {
+    if (intervalRef.current) clearInterval(intervalRef.current); // Clear any existing timer
+    if (cycleIntervalMs) {
+      intervalRef.current = setInterval(() => {
+        advancePage();
+      }, cycleIntervalMs);
     }
-  }, [numPages, lastUpdate]);
+  }, [cycleIntervalMs, advancePage]);
 
-  // Function for time-interval-based advancement
-  const advanceByTime = useCallback(() => {
-    const intervalId = setInterval(advancePage, cycleIntervalMs);
-
-    return () => clearInterval(intervalId); // Cleanup
-  }, [advancePage, cycleIntervalMs]);
-
-  // Function for data-refresh-based advancement
-  const advanceOnRefresh = useCallback(() => {
-    advancePage();
-  }, [lastUpdate]);
-
-  // Choose the appropriate function to return
-  const advance = advanceOnDataRefresh ? advanceOnRefresh : advanceByTime;
-
-  // Start the appropriate page advancement type
+  // Cleanup the timer interval when the component unmounts or dependencies change
   useEffect(() => {
     if (!advanceOnDataRefresh && cycleIntervalMs) {
-      return advanceByTime();
-    } else {
-      return advanceOnRefresh();
+      startTimer();
+      return () => {
+        if (intervalRef.current) clearInterval(intervalRef.current);
+      };
     }
-  }, [lastUpdate, cycleIntervalMs]);
+  }, [advanceOnDataRefresh, cycleIntervalMs, startTimer]);
 
-  // TODO: I should maybe remove the advance function since it isn't needed anymore after refactoring
-  return { pageIndex, advance };
+  // Handle refresh-based advancement
+  useEffect(() => {
+    if (advanceOnDataRefresh && lastUpdate !== null) {
+      advancePage();
+    }
+  }, [lastUpdate]);
+
+  return  pageIndex;
 }
 
 export default usePageAdvancer;

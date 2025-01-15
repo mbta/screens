@@ -42,9 +42,9 @@ const CurrentElevatorClosed = ({
   onFinish,
 }: Props) => {
   const numPages = accessiblePathImageUrl ? 2 : 1;
-  const { pageIndex } = usePageAdvancer({
+  const pageIndex = usePageAdvancer({
     numPages,
-    cycleInterval: 12000, // 12 seconds
+    cycleIntervalMs: 12000, // 12 seconds
     advanceOnDataRefresh: false,
     onFinish,
   });
