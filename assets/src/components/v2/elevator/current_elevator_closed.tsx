@@ -5,13 +5,13 @@ import makePersistent, {
   WrappedComponentProps,
 } from "Components/v2/persistent_wrapper";
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
+import usePageAdvancer from "Hooks/v2/use_page_advancer";
 import useTextResizer from "Hooks/v2/use_text_resizer";
 import CurrentLocationMarker from "Images/svgr_bundled/current-location-marker.svg";
 import CurrentLocationBackground from "Images/svgr_bundled/current-location-background.svg";
 import NoService from "Images/svgr_bundled/no-service-black.svg";
 import ElevatorWayfinding from "Images/svgr_bundled/elevator-wayfinding.svg";
 import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
-import usePageAdvancer from "Hooks/v2/use_page_advancer";
 
 type Coordinates = {
   x: number;

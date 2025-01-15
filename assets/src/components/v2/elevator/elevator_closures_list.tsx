@@ -10,9 +10,9 @@ import {
   type StationWithClosures,
   type Closure,
 } from "Components/v2/elevator/types";
+import usePageAdvancer from "Hooks/v2/use_page_advancer";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
-import usePageAdvancer from "Hooks/v2/use_page_advancer";
 
 interface ClosureRowProps {
   station: StationWithClosures;
