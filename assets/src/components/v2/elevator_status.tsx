@@ -84,7 +84,7 @@ const ElevatorStatus: ComponentType<Props> = ({
         <div className="elevator-status__footer">
           <div className="elevator-status__footer-text">
             For more elevator alerts and directions to alternate accessible
-            paths, visit mbta.com/alerts/access or call 617-222-2828
+            paths, visit mbta.com/elevators or call 617-222-2828
           </div>
         </div>
       </div>
