@@ -22,28 +22,16 @@ function usePageAdvancer({
   onFinish,
 }: UsePageAdvancerProps) {
   const [pageIndex, setPageIndex] = useState(0);
+    // Use refs to keep stable references to numPages and interval without triggering re-renders
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  // Use refs to keep stable references to numPages and onFinish
   const numPagesRef = useRef(numPages);
-  const onFinishRef = useRef(onFinish);
 
   useEffect(() => {
     numPagesRef.current = numPages;
   }, [numPages]);
 
-  useEffect(() => {
-    onFinishRef.current = onFinish;
-  }, [onFinish]);
-
   // Callback that handles changing the state of pageIndex
-  const advancePage = useCallback(() => {
-    setPageIndex((prevIndex) => {
-      const nextIndex = (prevIndex + 1) % numPagesRef.current;
-      if (nextIndex === 0) onFinishRef.current(); // Call onFinish when cycling completes
-      return nextIndex;
-    });
-  }, []);
+  const advancePage = useCallback(, []);
 
   // Start the interval for time-based advancement
   const startTimer = useCallback(() => {
@@ -74,6 +62,11 @@ function usePageAdvancer({
       advancePage();
     }
   }, [lastUpdate]);
+
+  useEffect(() => {
+      // Call onFinish when cycling completes
+    if (pageIndex === 0) onFinish();
+  }, [pageIndex]);
 
   return pageIndex;
 }
