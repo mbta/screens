@@ -63,6 +63,9 @@ function usePageAdvancer({
         if (intervalRef.current) clearInterval(intervalRef.current);
       };
     }
+    // Hooks must return void or a cleanup function,
+    // so we explicitly return undefined when no cleanup is necessary.
+    return undefined;
   }, [advanceOnDataRefresh, cycleIntervalMs, startTimer]);
 
   // Handle refresh-based advancement
