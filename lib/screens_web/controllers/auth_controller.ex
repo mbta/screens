@@ -4,6 +4,8 @@ defmodule ScreensWeb.AuthController do
   use ScreensWeb, :controller
   plug Ueberauth
 
+  require Logger
+
   # Respond with 404 instead of crashing when the path doesn't match a supported provider
   def request(conn, %{"provider" => provider}) when provider != "keycloak" do
     send_resp(conn, 404, "Not Found")
@@ -18,6 +20,8 @@ defmodule ScreensWeb.AuthController do
         "auth_time",
         auth.extra.raw_info.claims["iat"]
       )
+
+    Logger.info("auth_debug callback_claims #{inspect(auth.extra.raw_info.claims)}")
 
     keycloak_client_id =
       get_in(Application.get_env(:ueberauth_oidcc, :providers), [:keycloak, :client_id])

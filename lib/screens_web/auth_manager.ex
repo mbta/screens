@@ -3,6 +3,8 @@ defmodule ScreensWeb.AuthManager do
 
   use Guardian, otp_app: :screens
 
+  require Logger
+
   @idle_time Application.compile_env!(:screens, [__MODULE__, :idle_time])
   @max_session_time Application.compile_env!(:screens, [__MODULE__, :max_session_time])
 
@@ -24,10 +26,16 @@ defmodule ScreensWeb.AuthManager do
     token_expires_at = token_issued_at + @idle_time
 
     # is either expiration time in the past?
-    if min(auth_expires_at, token_expires_at) < System.system_time(:second) do
+    if auth_expires_at < System.system_time(:second) do
+      Logger.info("auth_debug user_auth_expired")
       {:error, {:auth_expired, claims["sub"]}}
     else
-      {:ok, claims}
+      if token_expires_at < System.system_time(:second) do
+        Logger.info("auth_debug token_expired")
+        {:error, {:auth_expired, claims["sub"]}}
+      else
+        {:ok, claims}
+      end
     end
   end
 end

@@ -3,8 +3,11 @@ defmodule ScreensWeb.AuthManager.ErrorHandler do
 
   @behaviour Guardian.Plug.ErrorHandler
 
+  require Logger
+
   @impl true
   def auth_error(conn, error, _opts) do
+    Logger.info("auth_debug error_handler #{inspect(error)}")
     Phoenix.Controller.redirect(conn,
       to: ScreensWeb.Router.Helpers.auth_path(conn, :request, "keycloak", auth_params(error))
     )
