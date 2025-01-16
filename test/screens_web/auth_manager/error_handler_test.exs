@@ -8,7 +8,7 @@ defmodule ScreensWeb.AuthManager.ErrorHandlerTest do
         |> init_test_session(%{})
         |> ScreensWeb.AuthManager.ErrorHandler.auth_error({:some_type, :reason}, [])
 
-      assert html_response(conn, 302) =~ "\"/auth/keycloak\""
+      assert redirected_to(conn) =~ "/auth/keycloak?prompt=login"
     end
   end
 end
