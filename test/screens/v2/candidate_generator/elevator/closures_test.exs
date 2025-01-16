@@ -41,6 +41,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     :ok
   end
 
+  defp build_alert(fields) do
+    struct!(%Alert{active_period: [{DateTime.utc_now(), nil}], effect: :elevator_closure}, fields)
+  end
+
   describe "elevator_status_instances/3" do
     setup do
       config = %ElevatorConfig{
@@ -61,7 +65,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       }
     end
 
-    test "Only returns alerts with effect of :elevator_closure", %{
+    test "Only returns currently-active alerts with effect of :elevator_closure", %{
       config: config,
       header_instance: header_instance,
       footer_instance: footer_instance
@@ -75,18 +79,28 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        now = DateTime.utc_now()
+        active_period = {DateTime.add(now, -1, :day), DateTime.add(now, 1, :day)}
+        upcoming_period = {DateTime.add(now, 1, :day), DateTime.add(now, 3, :day)}
+
         alerts = [
-          struct(Alert,
-            id: "1",
-            effect: :elevator_closure,
+          build_alert(
+            active_period: [active_period],
             informed_entities: [
               %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
             ]
           ),
-          struct(Alert,
-            effect: :detour,
+          build_alert(
+            active_period: [upcoming_period],
             informed_entities: [
               %{stop: "place-test", facility: %{name: "Test 2", id: "facility-test2"}}
+            ]
+          ),
+          build_alert(
+            effect: :detour,
+            active_period: [active_period],
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test 3", id: "facility-test3"}}
             ]
           )
         ]
@@ -137,16 +151,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
-          struct(Alert,
-            id: "1",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               %{stop: "place-haecl", facility: %{name: "Test 1", id: "facility-test-1"}}
             ]
           ),
-          struct(Alert,
-            id: "2",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-2"}}
             ]
@@ -195,14 +205,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
-          struct(Alert,
-            id: "1",
-            effect: :elevator_closure,
-            informed_entities: [%{stop: "place-haecl", facility: nil}]
-          ),
-          struct(Alert,
-            id: "2",
-            effect: :elevator_closure,
+          build_alert(informed_entities: [%{stop: "place-haecl", facility: nil}]),
+          build_alert(
             informed_entities: [
               %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-2"}},
               %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-3"}}
@@ -257,16 +261,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
-          struct(Alert,
-            id: "1",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               %{stop: "place-test", facility: %{name: "In Station Elevator", id: "112"}}
             ]
           ),
-          struct(Alert,
-            id: "2",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               %{
                 stop: "place-test-redundancy",
@@ -274,9 +274,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
               }
             ]
           ),
-          struct(Alert,
-            id: "3",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               %{
                 stop: "place-test-no-redundancy",
@@ -351,32 +349,24 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
-          struct(Alert,
-            id: "1",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               %{stop: "place-1", facility: %{name: "backup in station", id: "1"}}
             ]
           ),
-          struct(Alert,
-            id: "2",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               %{stop: "place-2", facility: %{name: "custom backup summary", id: "2"}}
             ]
           ),
-          struct(Alert,
-            id: "3",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               # despite having "nearby" redundancy, should not be filtered out, because its
               # alternate elevator is also down
               %{stop: "place-3", facility: %{name: "alternate elevator down", id: "3"}}
             ]
           ),
-          struct(Alert,
-            id: "alt",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               # somewhat unrealistically, place elevator 3's "nearby" alternate at a different
               # station, so they aren't combined
@@ -425,18 +415,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     } do
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
-          struct(Alert,
-            id: "1",
-            effect: :elevator_closure,
-            informed_entities: [
-              %{stop: "place-test", facility: %{name: "Test", id: "111"}}
-            ]
-          ),
-          struct(Alert,
-            effect: :detour,
-            informed_entities: [
-              %{stop: "place-test", facility: %{name: "Test 2", id: "facility-test2"}}
-            ]
+          build_alert(
+            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
           )
         ]
 
@@ -473,9 +453,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
-          struct(Alert,
-            id: "1",
-            effect: :elevator_closure,
+          build_alert(
             informed_entities: [
               %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
             ]
