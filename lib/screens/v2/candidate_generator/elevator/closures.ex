@@ -62,7 +62,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         footer_instance
       ) do
     {:ok, alerts} = @alert.fetch_elevator_alerts_with_facilities()
-    closures = Enum.flat_map(alerts, &elevator_closure/1)
+
+    closures =
+      alerts |> Enum.filter(&Alert.happening_now?/1) |> Enum.flat_map(&elevator_closure/1)
 
     case Enum.find(closures, fn %Closure{id: id} -> id == elevator_id end) do
       nil ->
