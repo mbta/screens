@@ -52,7 +52,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @route injected(Route)
   @stop injected(Stop)
 
-  @fallback_summary "Visit mbta.com/alerts for more info"
+  @fallback_summary "Visit mbta.com/elevators for more info"
 
   @spec elevator_status_instances(Screen.t(), NormalHeader.t(), Footer.t()) ::
           list(WidgetInstance.t())
