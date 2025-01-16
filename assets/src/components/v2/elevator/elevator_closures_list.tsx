@@ -107,7 +107,6 @@ interface OutsideClosureListProps extends WrappedComponentProps {
 const OutsideClosureList = ({
   stations,
   stationId,
-  lastUpdate,
   onFinish,
 }: OutsideClosureListProps) => {
   const ref = useRef<HTMLDivElement>(null);

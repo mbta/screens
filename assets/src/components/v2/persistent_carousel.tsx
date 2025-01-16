@@ -19,7 +19,7 @@ const Carousel = <T,>({
   onFinish,
   lastUpdate,
 }: Props<T>): ReactNode => {
-  const { pageIndex, advance } = usePageAdvancer({
+  const pageIndex = usePageAdvancer({
     numPages: pages.length,
     advanceOnDataRefresh: true,
     onFinish,
