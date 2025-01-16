@@ -179,7 +179,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                        %Closure{id: "facility-test-1", name: "Test 1"},
                        %Closure{id: "facility-test-2", name: "Test 2"}
                      ],
-                     summary: "Visit mbta.com/alerts for more info"
+                     summary: "Visit mbta.com/elevators for more info"
                    }
                  ]
                },
@@ -395,7 +395,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                    %ElevatorClosuresList.Station{
                      id: "place-3",
                      closures: [%Closure{id: "3"}],
-                     summary: "Visit mbta.com/alerts for more info"
+                     summary: "Visit mbta.com/elevators for more info"
                    }
                  ]
                },

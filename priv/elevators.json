@@ -43,7 +43,7 @@
     "redundancy": null
   },
   "986": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "896"
     ],
@@ -224,7 +224,7 @@
     "redundancy": 1
   },
   "971": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "972",
       "948",
@@ -305,7 +305,7 @@
     "redundancy": 3
   },
   "896": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "810",
       "805",
@@ -378,7 +378,7 @@
     "redundancy": 2
   },
   "910": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "911",
       "905",
@@ -548,7 +548,7 @@
     "redundancy": 3
   },
   "944": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "945",
       "911",
@@ -1109,7 +1109,7 @@
     "redundancy": 3
   },
   "831": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "830",
       "880",
@@ -1301,7 +1301,7 @@
     "redundancy": 2
   },
   "830": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "831",
       "880",
@@ -1635,7 +1635,7 @@
     "redundancy": 2
   },
   "934": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "935",
       "901",
@@ -1665,7 +1665,7 @@
     "redundancy": 2
   },
   "977": {
-    "summary": "Visit mbta.com/alerts for more info.",
+    "summary": "Visit mbta.com/elevators for more info.",
     "alternate_ids": [
       "976",
       "962",
