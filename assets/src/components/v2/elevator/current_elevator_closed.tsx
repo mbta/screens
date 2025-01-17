@@ -69,7 +69,7 @@ const CurrentElevatorClosed = ({
             <IsaNegative width={100} height={100} />
             {accessiblePathDirectionArrow ? (
               <Arrow
-                direction={Direction.NE}
+                direction={accessiblePathDirectionArrow}
                 className="arrow"
                 screenType={ScreenType.ELEVATOR}
               />
