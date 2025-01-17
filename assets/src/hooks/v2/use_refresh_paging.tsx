@@ -1,11 +1,18 @@
 import { WrappedComponentProps } from "Components/v2/persistent_wrapper";
 import { useEffect, useState } from "react";
 
-interface Args extends WrappedComponentProps {
+interface UseRefreshPagingProps extends WrappedComponentProps {
   numPages: number;
 }
 
-const useClientPaging = ({ numPages, onFinish, lastUpdate }: Args) => {
+/**
+ * Enables pagination on data refreshes for components that are wrapped in Persistent Wrapper.
+ */
+const useRefreshPaging = ({
+  numPages,
+  onFinish,
+  lastUpdate,
+}: UseRefreshPagingProps) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [isFirstRender, setIsFirstRender] = useState(true);
 
@@ -30,4 +37,4 @@ const useClientPaging = ({ numPages, onFinish, lastUpdate }: Args) => {
   return pageIndex;
 };
 
-export default useClientPaging;
+export default useRefreshPaging;
