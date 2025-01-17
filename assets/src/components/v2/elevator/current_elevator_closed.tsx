@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 import cx from "classnames";
-import Arrow, { Direction } from "Components/v2/arrow";
+import Arrow, { Direction, ScreenType } from "Components/v2/arrow";
 import makePersistent, {
   WrappedComponentProps,
 } from "Components/v2/persistent_wrapper";
@@ -69,8 +69,9 @@ const CurrentElevatorClosed = ({
             <IsaNegative width={100} height={100} />
             {accessiblePathDirectionArrow ? (
               <Arrow
-                direction={accessiblePathDirectionArrow}
+                direction={Direction.NE}
                 className="arrow"
+                screenType={ScreenType.ELEVATOR}
               />
             ) : null}
           </div>

@@ -18,25 +18,42 @@ enum Direction {
   UTURN = "uturn",
 }
 
+enum ScreenType {
+  ELEVATOR = "elevator",
+}
+
 interface ArrowDescriptor {
   imageName: string;
   className: string;
 }
 
-const directionToArrow = (direction: Direction): ArrowDescriptor => {
+/**
+ * Returns an ArrowDescriptor containing an arrow SVG and CSS class that determines arrow rotation
+ * Can return different arrows for different screen types, but only does this for elevator screens now.
+ */
+const directionToArrow = (
+  direction: Direction,
+  screen_type?: ScreenType,
+): ArrowDescriptor => {
   let imageName: string;
   switch (direction) {
     case Direction.N:
     case Direction.E:
     case Direction.S:
     case Direction.W:
-      imageName = "arrow.svg";
+      imageName =
+        screen_type === ScreenType.ELEVATOR
+          ? "arrow-elevator.svg"
+          : "arrow.svg";
       break;
     case Direction.UTURN:
       imageName = "turn-around-arrow.svg";
       break;
     default:
-      imageName = "arrow-45.svg";
+      imageName =
+        screen_type === ScreenType.ELEVATOR
+          ? "arrow-elevator-45.svg"
+          : "arrow-45.svg";
   }
 
   let className: string = "arrow__icon-image";
@@ -63,11 +80,16 @@ const directionToArrow = (direction: Direction): ArrowDescriptor => {
 const Arrow = ({
   direction,
   className,
+  screenType,
 }: {
   direction: Direction;
   className: string;
+  screenType?: ScreenType;
 }): JSX.Element => {
-  const { imageName, className: baseClassName } = directionToArrow(direction);
+  const { imageName, className: baseClassName } = directionToArrow(
+    direction,
+    screenType,
+  );
   return (
     <img
       className={`${baseClassName} ${className}`}
@@ -77,4 +99,4 @@ const Arrow = ({
 };
 
 export default Arrow;
-export { Direction };
+export { Direction, ScreenType };
