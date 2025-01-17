@@ -18,8 +18,9 @@ enum Direction {
   UTURN = "uturn",
 }
 
-enum ScreenType {
-  ELEVATOR = "elevator",
+enum LineWeight {
+  THICK = "thick",
+  THIN = "thin",
 }
 
 interface ArrowDescriptor {
@@ -29,11 +30,11 @@ interface ArrowDescriptor {
 
 /**
  * Returns an ArrowDescriptor containing an arrow SVG and CSS class that determines arrow rotation
- * Can return different arrows for different screen types, but only does this for elevator screens now.
+ * Defaults to a thickset arrow if no arrow type is specified
  */
 const directionToArrow = (
   direction: Direction,
-  screen_type?: ScreenType,
+  lineWeight: LineWeight = LineWeight.THICK,
 ): ArrowDescriptor => {
   let imageName: string;
   switch (direction) {
@@ -42,18 +43,14 @@ const directionToArrow = (
     case Direction.S:
     case Direction.W:
       imageName =
-        screen_type === ScreenType.ELEVATOR
-          ? "arrow-elevator.svg"
-          : "arrow.svg";
+        lineWeight === LineWeight.THIN ? "arrow-thin.svg" : "arrow.svg";
       break;
     case Direction.UTURN:
       imageName = "turn-around-arrow.svg";
       break;
     default:
       imageName =
-        screen_type === ScreenType.ELEVATOR
-          ? "arrow-elevator-45.svg"
-          : "arrow-45.svg";
+        lineWeight === LineWeight.THIN ? "arrow-thin-45.svg" : "arrow-45.svg";
   }
 
   let className: string = "arrow__icon-image";
@@ -80,15 +77,15 @@ const directionToArrow = (
 const Arrow = ({
   direction,
   className,
-  screenType,
+  lineWeight,
 }: {
   direction: Direction;
   className: string;
-  screenType?: ScreenType;
+  lineWeight?: LineWeight;
 }): JSX.Element => {
   const { imageName, className: baseClassName } = directionToArrow(
     direction,
-    screenType,
+    lineWeight,
   );
   return (
     <img
@@ -99,4 +96,4 @@ const Arrow = ({
 };
 
 export default Arrow;
-export { Direction, ScreenType };
+export { Direction, LineWeight };

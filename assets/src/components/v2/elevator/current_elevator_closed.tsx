@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 import cx from "classnames";
-import Arrow, { Direction, ScreenType } from "Components/v2/arrow";
+import Arrow, { Direction, LineWeight } from "Components/v2/arrow";
 import makePersistent, {
   WrappedComponentProps,
 } from "Components/v2/persistent_wrapper";
@@ -71,7 +71,7 @@ const CurrentElevatorClosed = ({
               <Arrow
                 direction={accessiblePathDirectionArrow}
                 className="arrow"
-                screenType={ScreenType.ELEVATOR}
+                lineWeight={LineWeight.THIN}
               />
             ) : null}
           </div>
