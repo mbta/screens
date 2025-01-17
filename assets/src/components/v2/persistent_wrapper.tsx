@@ -3,7 +3,7 @@ import { LastFetchContext } from "Components/v2/screen_container";
 
 interface WrappedComponentProps {
   onFinish: () => void;
-  lastUpdate?: number | null;
+  lastUpdate: number | null;
 }
 
 interface Props {
@@ -27,7 +27,7 @@ const PersistentWrapper: ComponentType<Props> = ({
   useEffect(() => {
     if (isFinished) {
       setVisibleData(data);
-      setRenderKey((n) => n + 1);
+      setRenderKey((n) => n + 1); // TODO: This should be disabled only for interval based advancing
       setIsFinished(false);
     }
   }, [lastFetch]);
@@ -37,7 +37,7 @@ const PersistentWrapper: ComponentType<Props> = ({
       {...visibleData}
       onFinish={handleFinished}
       key={renderKey}
-      lastUpdate={lastFetch} // make this optional - either determined by lastFetch Context or by other interval
+      lastUpdate={lastFetch}
     />
   );
 };

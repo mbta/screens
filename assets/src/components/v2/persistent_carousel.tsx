@@ -1,6 +1,6 @@
 import React, { ComponentType, ReactNode } from "react";
 import makePersistent, { WrappedComponentProps } from "./persistent_wrapper";
-import usePageAdvancer from "Hooks/v2/use_page_advancer";
+import useRefreshPaging from "Hooks/v2/use_refresh_paging";
 
 interface PageRendererProps<T> {
   page: T;
@@ -19,9 +19,8 @@ const Carousel = <T,>({
   onFinish,
   lastUpdate,
 }: Props<T>): ReactNode => {
-  const pageIndex = usePageAdvancer({
+  const pageIndex = useRefreshPaging({
     numPages: pages.length,
-    advanceOnDataRefresh: true,
     onFinish,
     lastUpdate,
   });

@@ -10,9 +10,10 @@ import {
   type StationWithClosures,
   type Closure,
 } from "Components/v2/elevator/types";
-import usePageAdvancer from "Hooks/v2/use_page_advancer";
+import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
+import { CLOSURE_LIST_PAGING_INTERVAL_MS } from "./elevator_constants";
 
 interface ClosureRowProps {
   station: StationWithClosures;
@@ -132,10 +133,9 @@ const OutsideClosureList = ({
 
   const numPages = Object.keys(rowCountsPerPage).length;
 
-  const pageIndex = usePageAdvancer({
+  const pageIndex = useIntervalPaging({
     numPages,
-    cycleIntervalMs: 8000, // 8 seconds
-    advanceOnDataRefresh: false,
+    cycleIntervalMs: CLOSURE_LIST_PAGING_INTERVAL_MS,
     onFinish,
   });
 
