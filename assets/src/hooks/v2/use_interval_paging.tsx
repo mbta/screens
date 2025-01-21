@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 interface UseIntervalPagingProps {
   numPages: number; // Total number of pages to cycle through
-  cycleIntervalMs: number; // In milliseconds, the interval for cycling pages (only used if advanceOnDataRefresh is false)
+  cycleIntervalMs: number; // In milliseconds, the interval for cycling pagesß
   onFinish: () => void; // Callback when cycling completes
 }
 
@@ -25,7 +25,9 @@ function useIntervalPaging({
     intervalRef.current = setInterval(() => {
       setPageIndex((prevPage) => {
         const nextPage = (prevPage + 1) % numPages;
+
         if (nextPage === 0) {
+          // Updates the state of the data being displayed in case of any refreshes before cycling the page to index 0.
           setIsFinished(true);
         }
 
@@ -41,7 +43,8 @@ function useIntervalPaging({
     };
   }, [cycleIntervalMs, numPages]);
 
-  // Handles calling the onFinish function in persistentWrapper
+  // Handles calling the onFinish function in persistentWrapper.
+  // This needs to be done in a separate hook outside of the setInterval callback.
   useEffect(() => {
     if (pageIndex === 0 && isFinished === true) {
       onFinish();
