@@ -28,7 +28,7 @@ const PersistentWrapper: ComponentType<Props> = ({
       setVisibleData(data);
       setIsFinished(false);
     }
-  }, [lastFetch]);
+  }, [isFinished]);
 
   return (
     <WrappedComponent
