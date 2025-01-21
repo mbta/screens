@@ -18,7 +18,6 @@ const PersistentWrapper: ComponentType<Props> = ({
 
   const [visibleData, setVisibleData] = useState(data);
   const [isFinished, setIsFinished] = useState(false);
-  const [renderKey, setRenderKey] = useState(0);
 
   const handleFinished = () => {
     setIsFinished(true);
@@ -27,7 +26,6 @@ const PersistentWrapper: ComponentType<Props> = ({
   useEffect(() => {
     if (isFinished) {
       setVisibleData(data);
-      setRenderKey((n) => n + 1); // TODO: This should be disabled only for interval based advancing
       setIsFinished(false);
     }
   }, [lastFetch]);
@@ -36,7 +34,6 @@ const PersistentWrapper: ComponentType<Props> = ({
     <WrappedComponent
       {...visibleData}
       onFinish={handleFinished}
-      key={renderKey}
       lastUpdate={lastFetch}
     />
   );

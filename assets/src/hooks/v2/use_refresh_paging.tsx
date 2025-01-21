@@ -21,7 +21,7 @@ const useRefreshPaging = ({
       if (isFirstRender) {
         setIsFirstRender(false);
       } else if (numPages > 1) {
-        setPageIndex((i) => i + 1);
+        setPageIndex((i) => (i + 1) % numPages);
       } else {
         onFinish();
       }

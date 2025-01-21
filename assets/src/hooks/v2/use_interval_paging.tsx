@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 
 interface UseIntervalPagingProps {
   numPages: number; // Total number of pages to cycle through
-  cycleIntervalMs?: number; // In milliseconds, the interval for cycling pages (only used if advanceOnDataRefresh is false)
+  cycleIntervalMs: number; // In milliseconds, the interval for cycling pages (only used if advanceOnDataRefresh is false)
   onFinish: () => void; // Callback when cycling completes
 }
 
@@ -16,48 +16,38 @@ function useIntervalPaging({
   onFinish,
 }: UseIntervalPagingProps) {
   const [pageIndex, setPageIndex] = useState(0);
-  // Use refs to keep stable references to numPages and interval without triggering re-renders
+  const [isFinished, setIsFinished] = useState(false);
+
+  // Use ref to keep stable references to timer interval without triggering re-renders
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-  const numPagesRef = useRef(numPages);
 
   useEffect(() => {
-    numPagesRef.current = numPages;
-  }, [numPages]);
+    intervalRef.current = setInterval(() => {
+      setPageIndex((prevPage) => {
+        const nextPage = (prevPage + 1) % numPages;
+        if (nextPage === 0) {
+          setIsFinished(true);
+        }
 
-  // Callback that handles changing the state of pageIndex
-  const advancePage = useCallback(() => {
-    setPageIndex((prevIndex) => {
-      return (prevIndex + 1) % numPagesRef.current;
-    });
-  }, []);
+        return nextPage;
+      });
+    }, cycleIntervalMs);
 
-  // Start the interval for time-based advancement
-  const startTimer = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current); // Clear any existing timer
-    if (cycleIntervalMs) {
-      intervalRef.current = setInterval(() => {
-        advancePage();
-      }, cycleIntervalMs);
+    // Cleanup interval on unmount
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+      }
+    };
+  }, [cycleIntervalMs, numPages]);
+
+  // Handles calling the onFinish function in persistentWrapper
+  useEffect(() => {
+    if (pageIndex === 0 && isFinished === true) {
+      onFinish();
+      setIsFinished(false);
     }
-  }, [cycleIntervalMs, advancePage]);
-
-  // Cleanup the timer interval when the component unmounts or dependencies change
-  useEffect(() => {
-    if (cycleIntervalMs) {
-      startTimer();
-      return () => {
-        if (intervalRef.current) clearInterval(intervalRef.current);
-      };
-    }
-    // Hooks must return void or a cleanup function,
-    // so we explicitly return undefined when no cleanup is necessary.
-    return undefined;
-  }, [cycleIntervalMs, startTimer]);
-
-  useEffect(() => {
-    if (pageIndex === 0) onFinish();
-  }, [pageIndex]);
-
+  }, [isFinished]);
   return pageIndex;
 }
 
