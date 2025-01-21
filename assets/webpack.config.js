@@ -116,6 +116,7 @@ module.exports = (env, argv) => {
         bus_shelter_v2: "./src/apps/v2/bus_shelter.tsx",
         pre_fare_v2: "./src/apps/v2/pre_fare.tsx",
         elevator_v2: "./src/apps/v2/elevator.tsx",
+        on_bus: "./src/apps/v2/on_bus.tsx",
       },
       module: {
         rules: [
