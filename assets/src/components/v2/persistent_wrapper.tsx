@@ -1,8 +1,8 @@
-import React, { ComponentType, useContext, useEffect, useState } from "react";
+import React, { ComponentType, useContext, useState } from "react";
 import { LastFetchContext } from "Components/v2/screen_container";
 
 interface WrappedComponentProps {
-  onFinish: () => void;
+  updateVisibleData: () => void;
   lastUpdate: number | null;
 }
 
@@ -17,23 +17,11 @@ const PersistentWrapper: ComponentType<Props> = ({
   const lastFetch = useContext(LastFetchContext);
 
   const [visibleData, setVisibleData] = useState(data);
-  const [isFinished, setIsFinished] = useState(false);
-
-  const handleFinished = () => {
-    setIsFinished(true);
-  };
-
-  useEffect(() => {
-    if (isFinished) {
-      setVisibleData(data);
-      setIsFinished(false);
-    }
-  }, [isFinished]);
 
   return (
     <WrappedComponent
       {...visibleData}
-      onFinish={handleFinished}
+      updateVisibleData={() => setVisibleData(data)}
       lastUpdate={lastFetch}
     />
   );
@@ -47,7 +35,7 @@ const PersistentWrapper: ComponentType<Props> = ({
  * defining your `WrappedComponent`'s prop types.
  *
  * `WrappedComponent` must expect the following props:
- * - `onFinish`: A callback that `WrappedComponent` can call to indicate that it is ready to receive
+ * - `updateVisibleData`: A callback that `WrappedComponent` can call to indicate that it is ready to receive
  *   fresh data on the next refresh.
  * - `lastUpdate`: a **nullable** timestamp of the last successful data refresh, which `WrappedComponent` should use to
  *   sync its re-renders with the rest of the page.

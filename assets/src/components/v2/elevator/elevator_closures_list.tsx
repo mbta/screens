@@ -108,7 +108,8 @@ interface OutsideClosureListProps extends WrappedComponentProps {
 const OutsideClosureList = ({
   stations,
   stationId,
-  onFinish,
+  lastUpdate,
+  updateVisibleData,
 }: OutsideClosureListProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -136,7 +137,7 @@ const OutsideClosureList = ({
   const pageIndex = useIntervalPaging({
     numPages,
     cycleIntervalMs: CLOSURE_LIST_PAGING_INTERVAL_MS,
-    onFinish,
+    updateVisibleData,
   });
 
   const numOffsetRows = Object.keys(rowCountsPerPage).reduce((acc, key) => {
@@ -225,7 +226,7 @@ const ElevatorClosuresList = ({
   stations_with_closures: stations,
   station_id: stationId,
   lastUpdate,
-  onFinish,
+  updateVisibleData,
 }: Props) => {
   return (
     <div className="elevator-closures-list">
@@ -238,7 +239,7 @@ const ElevatorClosuresList = ({
         stations={stations}
         stationId={stationId}
         lastUpdate={lastUpdate}
-        onFinish={onFinish}
+        updateVisibleData={updateVisibleData}
       />
     </div>
   );

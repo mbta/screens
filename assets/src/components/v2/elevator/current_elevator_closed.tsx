@@ -40,13 +40,13 @@ const CurrentElevatorClosed = ({
   accessible_path_direction_arrow: accessiblePathDirectionArrow,
   accessible_path_image_url: accessiblePathImageUrl,
   accessible_path_image_here_coordinates: accessiblePathImageHereCoordinates,
-  onFinish,
+  updateVisibleData,
 }: Props) => {
   const numPages = accessiblePathImageUrl ? 2 : 1;
   const pageIndex = useIntervalPaging({
     numPages,
     cycleIntervalMs: CURRENT_CLOSED_PAGING_INTERVAL_MS, // 12 seconds
-    onFinish,
+    updateVisibleData,
   });
 
   const { ref, size } = useTextResizer({

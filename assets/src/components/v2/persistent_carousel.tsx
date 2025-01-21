@@ -16,13 +16,13 @@ interface Props<T> extends WrappedComponentProps {
 const Carousel = <T,>({
   PageRenderer,
   pages,
-  onFinish,
+  updateVisibleData,
   lastUpdate,
 }: Props<T>): ReactNode => {
   const pageIndex = useRefreshPaging({
     numPages: pages.length,
-    onFinish,
     lastUpdate,
+    updateVisibleData,
   });
 
   return (

@@ -10,8 +10,8 @@ interface UseRefreshPagingProps extends WrappedComponentProps {
  */
 const useRefreshPaging = ({
   numPages,
-  onFinish,
   lastUpdate,
+  updateVisibleData,
 }: UseRefreshPagingProps) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [isFirstRender, setIsFirstRender] = useState(true);
@@ -21,18 +21,16 @@ const useRefreshPaging = ({
       if (isFirstRender) {
         setIsFirstRender(false);
       } else if (numPages > 1) {
-        setPageIndex((i) => (i + 1) % numPages);
+        const newPageIndex = (pageIndex + 1) % numPages;
+        if (newPageIndex === 0) {
+          updateVisibleData();
+        }
+        setPageIndex(newPageIndex);
       } else {
-        onFinish();
+        updateVisibleData();
       }
     }
   }, [lastUpdate]);
-
-  useEffect(() => {
-    if (pageIndex === numPages - 1) {
-      onFinish();
-    }
-  }, [pageIndex]);
 
   return pageIndex;
 };
