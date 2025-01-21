@@ -18,25 +18,39 @@ enum Direction {
   UTURN = "uturn",
 }
 
+enum LineWeight {
+  THICK = "thick",
+  THIN = "thin",
+}
+
 interface ArrowDescriptor {
   imageName: string;
   className: string;
 }
 
-const directionToArrow = (direction: Direction): ArrowDescriptor => {
+/**
+ * Returns an ArrowDescriptor containing an arrow SVG and CSS class that determines arrow rotation
+ * Defaults to a thickset arrow if no arrow type is specified
+ */
+const directionToArrow = (
+  direction: Direction,
+  lineWeight: LineWeight = LineWeight.THICK,
+): ArrowDescriptor => {
   let imageName: string;
   switch (direction) {
     case Direction.N:
     case Direction.E:
     case Direction.S:
     case Direction.W:
-      imageName = "arrow.svg";
+      imageName =
+        lineWeight === LineWeight.THIN ? "arrow-thin.svg" : "arrow.svg";
       break;
     case Direction.UTURN:
       imageName = "turn-around-arrow.svg";
       break;
     default:
-      imageName = "arrow-45.svg";
+      imageName =
+        lineWeight === LineWeight.THIN ? "arrow-thin-45.svg" : "arrow-45.svg";
   }
 
   let className: string = "arrow__icon-image";
@@ -63,11 +77,16 @@ const directionToArrow = (direction: Direction): ArrowDescriptor => {
 const Arrow = ({
   direction,
   className,
+  lineWeight,
 }: {
   direction: Direction;
   className: string;
+  lineWeight?: LineWeight;
 }): JSX.Element => {
-  const { imageName, className: baseClassName } = directionToArrow(direction);
+  const { imageName, className: baseClassName } = directionToArrow(
+    direction,
+    lineWeight,
+  );
   return (
     <img
       className={`${baseClassName} ${className}`}
@@ -77,4 +96,4 @@ const Arrow = ({
 };
 
 export default Arrow;
-export { Direction };
+export { Direction, LineWeight };
