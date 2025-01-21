@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 
 interface UseIntervalPagingProps {
   numPages: number; // Total number of pages to cycle through
