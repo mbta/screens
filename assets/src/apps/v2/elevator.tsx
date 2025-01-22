@@ -38,7 +38,7 @@ const App = (): JSX.Element => {
   return (
     <Router>
       <Switch>
-        <Route exact path="/v2/screen/elevator_v2">
+        <Route exact path="/v2/screen/on_bus">
           <MultiScreenPage components={TYPE_TO_COMPONENT} />
         </Route>
         <Route exact path="/v2/screen/:id">
