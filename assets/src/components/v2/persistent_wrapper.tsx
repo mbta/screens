@@ -32,8 +32,6 @@ const PersistentWrapper: ComponentType<Props> = ({
  * `WrappedComponent` must expect the following props:
  * - `updateVisibleData`: A callback that `WrappedComponent` can call to refresh the data displayed by the child component
  *   with the most recently received data.
- * - `lastUpdate`: a **nullable** timestamp of the last successful data refresh, which `WrappedComponent` should use to
- *   sync its re-renders with the rest of the page. Used by components that use data refreshes to handle pagination.
  *
  * Any other props (e.g. data to be rendered) are passed through to `WrappedComponent` unchanged.
  */
