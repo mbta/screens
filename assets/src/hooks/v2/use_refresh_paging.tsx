@@ -1,5 +1,6 @@
 import { WrappedComponentProps } from "Components/v2/persistent_wrapper";
-import { useEffect, useState } from "react";
+import { LastFetchContext } from "Components/v2/screen_container";
+import { useContext, useEffect, useState } from "react";
 
 interface UseRefreshPagingProps extends WrappedComponentProps {
   numPages: number;
@@ -10,9 +11,10 @@ interface UseRefreshPagingProps extends WrappedComponentProps {
  */
 const useRefreshPaging = ({
   numPages,
-  lastUpdate,
   updateVisibleData,
 }: UseRefreshPagingProps) => {
+  const lastUpdate = useContext(LastFetchContext);
+
   const [pageIndex, setPageIndex] = useState(0);
   const [isFirstRender, setIsFirstRender] = useState(true);
 

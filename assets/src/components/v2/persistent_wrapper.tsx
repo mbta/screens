@@ -1,9 +1,7 @@
-import React, { ComponentType, useContext, useState } from "react";
-import { LastFetchContext } from "Components/v2/screen_container";
+import React, { ComponentType, useState } from "react";
 
 interface WrappedComponentProps {
   updateVisibleData: () => void;
-  lastUpdate: number | null;
 }
 
 interface Props {
@@ -14,15 +12,12 @@ const PersistentWrapper: ComponentType<Props> = ({
   WrappedComponent,
   ...data
 }) => {
-  const lastFetch = useContext(LastFetchContext);
-
   const [visibleData, setVisibleData] = useState(data);
 
   return (
     <WrappedComponent
       {...visibleData}
       updateVisibleData={() => setVisibleData(data)}
-      lastUpdate={lastFetch}
     />
   );
 };

@@ -224,7 +224,6 @@ interface Props extends WrappedComponentProps {
 const ElevatorClosuresList = ({
   stations_with_closures: stations,
   station_id: stationId,
-  lastUpdate,
   updateVisibleData,
 }: Props) => {
   return (
@@ -237,7 +236,6 @@ const ElevatorClosuresList = ({
       <OutsideClosureList
         stations={stations}
         stationId={stationId}
-        lastUpdate={lastUpdate}
         updateVisibleData={updateVisibleData}
       />
     </div>

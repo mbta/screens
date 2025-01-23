@@ -17,11 +17,9 @@ const Carousel = <T,>({
   PageRenderer,
   pages,
   updateVisibleData,
-  lastUpdate,
 }: Props<T>): ReactNode => {
   const pageIndex = useRefreshPaging({
     numPages: pages.length,
-    lastUpdate,
     updateVisibleData,
   });
 
