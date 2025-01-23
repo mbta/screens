@@ -19,10 +19,10 @@ function useIntervalPaging({
   const [isCycleFinished, setIsCycleFinished] = useState(false);
 
   // Use ref to keep stable references to timer interval without triggering re-renders
-  const intervalRef = useRef<NodeJS.Timeout>();
+  const intervalRef = useRef<number>();
 
   useEffect(() => {
-    intervalRef.current = setInterval(() => {
+    intervalRef.current = window.setInterval(() => {
       setPageIndex((prevPage) => {
         const nextPage = (prevPage + 1) % numPages;
 
