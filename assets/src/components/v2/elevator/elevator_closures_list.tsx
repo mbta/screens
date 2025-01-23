@@ -135,7 +135,7 @@ const OutsideClosureList = ({
 
   const pageIndex = useIntervalPaging({
     numPages,
-    cycleIntervalMs: CLOSURE_LIST_PAGING_INTERVAL_MS,
+    intervalMs: CLOSURE_LIST_PAGING_INTERVAL_MS,
     updateVisibleData,
   });
 

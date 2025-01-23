@@ -45,7 +45,7 @@ const CurrentElevatorClosed = ({
   const numPages = accessiblePathImageUrl ? 2 : 1;
   const pageIndex = useIntervalPaging({
     numPages,
-    cycleIntervalMs: CURRENT_CLOSED_PAGING_INTERVAL_MS, // 12 seconds
+    intervalMs: CURRENT_CLOSED_PAGING_INTERVAL_MS,
     updateVisibleData,
   });
 
