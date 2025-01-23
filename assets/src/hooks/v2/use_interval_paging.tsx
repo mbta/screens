@@ -38,7 +38,7 @@ function useIntervalPaging({
     // Cleanup interval on unmount
     return () => {
       if (intervalRef.current) {
-        clearInterval(intervalRef.current);
+        window.clearInterval(intervalRef.current);
       }
     };
   }, [cycleIntervalMs, numPages]);
