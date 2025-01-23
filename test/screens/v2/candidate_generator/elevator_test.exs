@@ -3,7 +3,6 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
 
   alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Elevator
-  alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
 
   setup do
     config = %Screen{
@@ -31,31 +30,16 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
     end
   end
 
-  describe "candidate_instances/4" do
-    test "returns expected header and footer", %{config: config} do
+  describe "candidate_instances/3" do
+    test "calls instance generator functions and combines the results", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
 
-      expected_header = %NormalHeader{
-        screen: config,
-        icon: nil,
-        text: "Elevator 1",
-        time: now
-      }
+      instance_fns = [
+        fn ^config, ^now -> ~w[one two]a end,
+        fn ^config, ^now -> ~w[three]a end
+      ]
 
-      expected_footer = %Footer{screen: config}
-      elevator_closure_instances_fn = fn _, _, _ -> [expected_header, expected_footer] end
-      evergreen_content_instances_fn = fn _, _ -> [] end
-
-      actual_instances =
-        Elevator.candidate_instances(
-          config,
-          now,
-          elevator_closure_instances_fn,
-          evergreen_content_instances_fn
-        )
-
-      assert expected_header in actual_instances
-      assert expected_footer in actual_instances
+      assert Elevator.candidate_instances(config, now, instance_fns) == ~w[one two three]a
     end
   end
 end
