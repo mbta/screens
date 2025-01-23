@@ -16,7 +16,7 @@ function useIntervalPaging({
   updateVisibleData,
 }: UseIntervalPagingProps) {
   const [pageIndex, setPageIndex] = useState(0);
-  const [isFinished, setIsFinished] = useState(false);
+  const [isCycleFinished, setIsCycleFinished] = useState(false);
 
   // Use ref to keep stable references to timer interval without triggering re-renders
   const intervalRef = useRef<NodeJS.Timeout>();
@@ -28,7 +28,7 @@ function useIntervalPaging({
 
         if (nextPage === 0) {
           // Updates the state of the data being displayed in case of any refreshes before cycling the page to index 0.
-          setIsFinished(true);
+          setIsCycleFinished(true);
         }
 
         return nextPage;
@@ -44,13 +44,15 @@ function useIntervalPaging({
   }, [cycleIntervalMs, numPages]);
 
   // Handles calling the updateVisibleData function in persistentWrapper.
-  // This needs to be done in a separate hook outside of the setInterval callback.
+  // This needs to be done in a separate hook outside of the setInterval callback,
+  // b/c you cannot change state in a different component within a callback function. 
+  // So we trigger this hook within the callback function of setInterval with a boolean flag.
   useEffect(() => {
-    if (pageIndex === 0 && isFinished === true) {
+    if (isCycleFinished === true) {
       updateVisibleData();
-      setIsFinished(false);
+      setIsCycleFinished(false);
     }
-  }, [isFinished]);
+  }, [isCycleFinished]);
   return pageIndex;
 }
 
