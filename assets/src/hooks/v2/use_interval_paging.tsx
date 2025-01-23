@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from "react";
 
 interface UseIntervalPagingProps {
   numPages: number; // Total number of pages to cycle through
-  cycleIntervalMs: number; // In milliseconds, the interval for cycling pagesß
+  cycleIntervalMs: number; // In milliseconds, the interval for cycling pages
   updateVisibleData: () => void; // Callback when cycling completes
 }
 
@@ -19,7 +19,7 @@ function useIntervalPaging({
   const [isFinished, setIsFinished] = useState(false);
 
   // Use ref to keep stable references to timer interval without triggering re-renders
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     intervalRef.current = setInterval(() => {
