@@ -45,7 +45,7 @@ function useIntervalPaging({
 
   // Handles calling the updateVisibleData function in persistentWrapper.
   // This needs to be done in a separate hook outside of the setInterval callback,
-  // b/c you cannot change state in a different component within a callback function. 
+  // b/c you cannot change state in a different component within a callback function.
   // So we trigger this hook within the callback function of setInterval with a boolean flag.
   useEffect(() => {
     if (isCycleFinished === true) {
