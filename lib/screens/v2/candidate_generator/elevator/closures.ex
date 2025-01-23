@@ -31,6 +31,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
 
   alias Screens.V2.WidgetInstance.{
     CurrentElevatorClosed,
@@ -54,12 +55,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   @fallback_summary "Visit mbta.com/elevators for more info"
 
-  @spec elevator_status_instances(Screen.t(), NormalHeader.t(), Footer.t()) ::
-          list(WidgetInstance.t())
+  @spec elevator_status_instances(Screen.t(), DateTime.t()) :: list(WidgetInstance.t())
   def elevator_status_instances(
-        %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id} = app_params},
-        header_instance,
-        footer_instance
+        %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id} = app_params} = config,
+        now
       ) do
     {:ok, alerts} = @alert.fetch_elevator_alerts_with_facilities()
 
@@ -68,15 +67,25 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
     case Enum.find(closures, fn %Closure{id: id} -> id == elevator_id end) do
       nil ->
-        [header_instance, elevator_closures_list(closures, app_params), footer_instance]
+        [elevator_closures_list(closures, app_params) | header_footer_instances(config, now)]
 
       _closure ->
         [
-          %NormalHeader{header_instance | variant: :closed},
-          %CurrentElevatorClosed{app_params: app_params},
-          %Footer{footer_instance | variant: :closed}
+          %CurrentElevatorClosed{app_params: app_params}
+          | header_footer_instances(config, now, :closed)
         ]
     end
+  end
+
+  defp header_footer_instances(
+         %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id}} = config,
+         now,
+         variant \\ nil
+       ) do
+    [
+      %NormalHeader{text: "Elevator #{elevator_id}", screen: config, time: now, variant: variant},
+      %Footer{screen: config, variant: variant}
+    ]
   end
 
   defp elevator_closure(%Alert{id: id, effect: :elevator_closure, informed_entities: entities}) do
