@@ -10,9 +10,10 @@ import {
   type StationWithClosures,
   type Closure,
 } from "Components/v2/elevator/types";
-import useClientPaging from "Hooks/v2/use_client_paging";
+import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
+import { CLOSURE_LIST_PAGING_INTERVAL_MS } from "./elevator_constants";
 
 interface ClosureRowProps {
   station: StationWithClosures;
@@ -107,8 +108,7 @@ interface OutsideClosureListProps extends WrappedComponentProps {
 const OutsideClosureList = ({
   stations,
   stationId,
-  lastUpdate,
-  onFinish,
+  updateVisibleData,
 }: OutsideClosureListProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -132,7 +132,12 @@ const OutsideClosureList = ({
   const [rowCountsPerPage, setRowCountsPerPage] = useState<number[]>([]);
 
   const numPages = Object.keys(rowCountsPerPage).length;
-  const pageIndex = useClientPaging({ numPages, onFinish, lastUpdate });
+
+  const pageIndex = useIntervalPaging({
+    numPages,
+    intervalMs: CLOSURE_LIST_PAGING_INTERVAL_MS,
+    updateVisibleData,
+  });
 
   const numOffsetRows = Object.keys(rowCountsPerPage).reduce((acc, key) => {
     if (parseInt(key) === pageIndex) {
@@ -219,8 +224,7 @@ interface Props extends WrappedComponentProps {
 const ElevatorClosuresList = ({
   stations_with_closures: stations,
   station_id: stationId,
-  lastUpdate,
-  onFinish,
+  updateVisibleData,
 }: Props) => {
   return (
     <div className="elevator-closures-list">
@@ -232,8 +236,7 @@ const ElevatorClosuresList = ({
       <OutsideClosureList
         stations={stations}
         stationId={stationId}
-        lastUpdate={lastUpdate}
-        onFinish={onFinish}
+        updateVisibleData={updateVisibleData}
       />
     </div>
   );
