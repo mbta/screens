@@ -1,0 +1,28 @@
+.flex-one-large__large,
+.flex-one-medium-two-small__left,
+.flex-two-medium__left,
+.flex-two-medium__right {
+  .evergreen-content-image__container,
+  .evergreen-content-video {
+    border-radius: 16px;
+    box-shadow: 0 12px 24px 0 rgb(23 31 38 / 25%);
+  }
+}
+
+.flex-one-medium-two-small__left,
+.flex-two-medium__left,
+.flex-two-medium__right {
+  .evergreen-content-image__container,
+  .evergreen-content-image__image {
+    width: 480px;
+    height: 580px;
+  }
+}
+
+.flex-one-large__large {
+  .evergreen-content-image__container,
+  .evergreen-content-image__image {
+    width: 1024px;
+    height: 576px;
+  }
+}
