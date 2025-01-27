@@ -115,8 +115,9 @@ defmodule Screens.V2.ScreenData.Parameters do
           night_volume: night_volume
         }
       } ->
-        {:ok, now} = DateTime.shift_zone(now, "America/New_York")
-        if Util.time_in_range?(now, night_start, night_end), do: night_volume, else: day_volume
+        if now |> Util.to_eastern() |> Util.time_in_range?(night_start, night_end),
+          do: night_volume,
+          else: day_volume
     end
   end
 

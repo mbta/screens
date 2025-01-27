@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
 
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
+  alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance
 
@@ -30,19 +31,14 @@ defmodule Screens.V2.WidgetInstance.OvernightCRDepartures do
   def serialize(%__MODULE__{
         destination: destination,
         direction_to_destination: direction_to_destination,
-        last_tomorrow_schedule:
-          %Schedule{
-            departure_time: departure_time
-          } = schedule
+        last_tomorrow_schedule: %Schedule{departure_time: departure_time} = schedule
       }) do
-    {:ok, local_departure_time} = DateTime.shift_zone(departure_time, "America/New_York")
-
     {headsign_stop, headsign_via} =
       format_headsign(Departure.headsign(%Departure{schedule: schedule}))
 
     %{
       direction: direction_to_destination,
-      last_schedule_departure_time: local_departure_time,
+      last_schedule_departure_time: Util.to_eastern(departure_time),
       last_schedule_headsign_stop: headsign_stop,
       last_schedule_headsign_via: serialize_via_string(destination, headsign_via)
     }

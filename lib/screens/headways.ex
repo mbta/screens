@@ -7,6 +7,7 @@ defmodule Screens.Headways do
   alias Screens.Routes.Route
   alias Screens.SignsUiConfig.Cache, as: SignsUi
   alias Screens.Stops.Stop
+  alias Screens.Util
 
   # Compact mapping of stop IDs to headway keys, leaning on the fact that subway stop IDs happen
   # to be numeric and often contiguous as we "traverse" the line in a given direction.
@@ -187,10 +188,8 @@ defmodule Screens.Headways do
 
   @spec period(DateTime.t()) :: :peak | :off_peak | :saturday | :sunday
   defp period(datetime) do
-    local_dt = DateTime.shift_zone!(datetime, "America/New_York")
-
-    # Subtract 3 hours, since the service day starts/ends at 3:00 AM
-    day_of_week = local_dt |> DateTime.add(-3, :hour) |> Date.day_of_week()
+    local_dt = Util.to_eastern(datetime)
+    day_of_week = local_dt |> Util.service_date() |> Date.day_of_week()
 
     time = {local_dt.hour, local_dt.minute}
     am_peak? = time >= {7, 0} and time < {9, 0}
