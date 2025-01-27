@@ -6,16 +6,15 @@ defmodule Screens.Elevator do
   alias Screens.Facilities.Facility
   alias Screens.Log
 
-  @enforce_keys ~w[id alternate_ids redundancy]a
+  @enforce_keys ~w[id alternate_ids entering_redundancy exiting_redundancy]a
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
           id: Facility.id(),
           alternate_ids: [Facility.id()],
-          redundancy: redundancy()
+          entering_redundancy: :nearby | :in_station | :shuttle | :other,
+          exiting_redundancy: :nearby | :in_station | {:other, summary :: String.t()}
         }
-
-  @type redundancy :: :nearby | :in_station | {:other, summary :: String.t()}
 
   @data_path :screens |> :code.priv_dir() |> Path.join("elevators.json")
   @data @data_path |> File.read!() |> Jason.decode!()
@@ -29,11 +28,21 @@ defmodule Screens.Elevator do
         nil
 
       %{"alternate_ids" => alternate_ids} = entry ->
-        %__MODULE__{id: id, alternate_ids: alternate_ids, redundancy: redundancy(entry)}
+        %__MODULE__{
+          id: id,
+          alternate_ids: alternate_ids,
+          entering_redundancy: entering_redundancy(entry),
+          exiting_redundancy: exiting_redundancy(entry)
+        }
     end
   end
 
-  defp redundancy(%{"redundancy" => 1}), do: :nearby
-  defp redundancy(%{"redundancy" => 2}), do: :in_station
-  defp redundancy(%{"summary" => summary}), do: {:other, summary}
+  defp entering_redundancy(%{"entering" => "1"}), do: :nearby
+  defp entering_redundancy(%{"entering" => "2"}), do: :in_station
+  defp entering_redundancy(%{"entering" => "3B"}), do: :shuttle
+  defp entering_redundancy(_other), do: :other
+
+  defp exiting_redundancy(%{"exiting" => "1"}), do: :nearby
+  defp exiting_redundancy(%{"exiting" => "2"}), do: :in_station
+  defp exiting_redundancy(%{"summary" => summary}), do: {:other, summary}
 end

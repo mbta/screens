@@ -174,7 +174,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   # If any of a closed elevator's alternates are also closed, it's always relevant.
   defp relevant_closure?(
-         %Closure{elevator: %Elevator{alternate_ids: alternate_ids, redundancy: redundancy}},
+         %Closure{
+           elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
+         },
          _home_station_id,
          closures
        ) do
@@ -182,7 +184,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   end
 
   defp backup_route_summary(
-         [%Closure{elevator: %Elevator{alternate_ids: alternate_ids, redundancy: redundancy}}],
+         [
+           %Closure{
+             elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
+           }
+         ],
          closures
        ) do
     # If any of a closed elevator's alternates are also closed, the normal summary may not be

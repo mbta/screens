@@ -46,9 +46,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   setup do
     stub(@alert, :fetch_elevator_alerts_with_facilities, fn -> {:ok, []} end)
 
-    stub(@elevator, :get, fn id ->
-      %Elevator{id: id, alternate_ids: [], redundancy: :in_station}
-    end)
+    stub(@elevator, :get, fn id -> build_elevator(id) end)
 
     stub(@facility, :fetch_stop_for_facility, fn _facility_id ->
       {:ok, %Stop{id: "place-test"}}
@@ -65,6 +63,18 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
   defp build_alert(fields) do
     struct!(%Alert{active_period: [{DateTime.utc_now(), nil}], effect: :elevator_closure}, fields)
+  end
+
+  defp build_elevator(id, fields \\ []) do
+    struct!(
+      %Elevator{
+        id: id,
+        alternate_ids: [],
+        entering_redundancy: :in_station,
+        exiting_redundancy: :in_station
+      },
+      fields
+    )
   end
 
   describe "elevator_status_instances/3" do
@@ -217,7 +227,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       assert logs =~ "elevator_closure_affects_multiple"
     end
 
-    test "filters out alerts at other stations with nearby redundancy", %{now: now} do
+    test "filters out alerts at other stations with nearby exiting redundancy", %{now: now} do
       expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok,
          %{
@@ -230,9 +240,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       stub(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
 
       stub(@elevator, :get, fn
-        "112" -> %Elevator{id: "112", alternate_ids: [], redundancy: :nearby}
-        "222" -> %Elevator{id: "222", alternate_ids: [], redundancy: :nearby}
-        "333" -> %Elevator{id: "333", alternate_ids: [], redundancy: :in_station}
+        "112" -> build_elevator("112", exiting_redundancy: :nearby)
+        "222" -> build_elevator("222", exiting_redundancy: :nearby)
+        "333" -> build_elevator("333", exiting_redundancy: :in_station)
       end)
 
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
@@ -284,14 +294,14 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
              ] = ElevatorClosures.elevator_status_instances(@screen, now)
     end
 
-    test "generates appropriate backup route summaries", %{now: now} do
+    test "generates backup route summaries based on exiting redundancy", %{now: now} do
       stub(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
 
       stub(@elevator, :get, fn
-        "1" -> %Elevator{id: "1", alternate_ids: [], redundancy: :in_station}
-        "2" -> %Elevator{id: "2", alternate_ids: [], redundancy: {:other, "some summary"}}
-        "3" -> %Elevator{id: "3", alternate_ids: ["alt"], redundancy: :nearby}
-        "alt" -> %Elevator{id: "alt", alternate_ids: [], redundancy: :nearby}
+        "1" -> build_elevator("1", exiting_redundancy: :in_station)
+        "2" -> build_elevator("2", exiting_redundancy: {:other, "some summary"})
+        "3" -> build_elevator("3", alternate_ids: ["alt"], exiting_redundancy: :nearby)
+        "alt" -> build_elevator("alt", exiting_redundancy: :nearby)
       end)
 
       expect(@stop, :fetch_parent_station_name_map, fn ->
