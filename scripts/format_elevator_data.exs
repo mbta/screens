@@ -25,7 +25,8 @@ formatted_data =
      %{
        "elevator_id" => id,
        "alternate_elevator_ids" => alternate,
-       "Exiting System Categorization" => category,
+       "Entering System Categorization" => entering,
+       "Exiting System Categorization" => exiting,
        "Short Text" => summary
      }} ->
       alternate_ids =
@@ -34,13 +35,15 @@ formatted_data =
           ids -> ids
         end
 
-      redundancy =
-        case Integer.parse(category) do
-          {integer, _rest} -> integer
-          :error -> nil
-        end
-
-      {id, %{alternate_ids: alternate_ids, redundancy: redundancy, summary: summary}}
+      {
+        id,
+        %{
+          alternate_ids: alternate_ids,
+          entering: entering |> String.split("-", parts: 2) |> hd() |> String.trim(),
+          exiting: exiting |> String.split("-", parts: 2) |> hd() |> String.trim(),
+          summary: summary
+        }
+      }
   end)
   |> Enum.reject(&is_nil/1)
   |> Map.new()
