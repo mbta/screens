@@ -106,12 +106,8 @@ const getAudioConfig = (): AudioConfig | null => {
   );
   const audioReadoutInterval = getDatasetValue("audioReadoutInterval");
 
-  if (
-    audioIntervalOffsetSeconds === undefined ||
-    audioReadoutInterval === undefined
-  ) {
+  if (!audioReadoutInterval || audioIntervalOffsetSeconds === undefined)
     return null;
-  }
 
   return {
     intervalOffsetSeconds: parseInt(audioIntervalOffsetSeconds),

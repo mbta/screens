@@ -15,6 +15,8 @@ defmodule ScreensWeb.Router do
 
   pipeline :api do
     plug :accepts, ["json"]
+    plug :fetch_session
+    plug :protect_from_forgery
   end
 
   pipeline :redirect_prod_http do
@@ -60,7 +62,7 @@ defmodule ScreensWeb.Router do
   end
 
   scope "/api/admin", ScreensWeb do
-    pipe_through [:redirect_prod_http, :api, :browser, :auth, :ensure_auth, :ensure_screens_group]
+    pipe_through [:redirect_prod_http, :api, :auth, :ensure_auth, :ensure_screens_group]
 
     get "/", AdminApiController, :index
     post "/screens/validate", AdminApiController, :validate
@@ -92,7 +94,7 @@ defmodule ScreensWeb.Router do
     end
 
     scope "/api/screen" do
-      pipe_through [:redirect_prod_http, :api, :browser]
+      pipe_through [:redirect_prod_http, :api]
 
       get "/:id", ScreenApiController, :show
       get "/:id/simulation", ScreenApiController, :simulation
@@ -111,7 +113,7 @@ defmodule ScreensWeb.Router do
     end
 
     scope "/audio" do
-      pipe_through [:redirect_prod_http, :browser, :api]
+      pipe_through [:redirect_prod_http, :api]
 
       get "/:id/readout.mp3", AudioController, :show
       get "/:id/volume", AudioController, :show_volume

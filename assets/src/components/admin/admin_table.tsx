@@ -3,7 +3,7 @@ import { useTable, useFilters, useRowSelect } from "react-table";
 import _ from "lodash";
 import weakKey from "weak-key";
 
-import { doSubmit } from "Util/admin";
+import { fetch } from "Util/admin";
 import { IndeterminateCheckbox } from "Components/admin/admin_cells";
 import AddModal from "Components/admin/admin_add_modal";
 import EditModal from "Components/admin/admin_edit_modal";
@@ -157,7 +157,7 @@ const dataToConfig = (data) => {
 const doValidate = async (data, onValidate) => {
   const config = dataToConfig(data);
   const dataToSubmit = { config: JSON.stringify(config, null, 2) };
-  const result = await doSubmit(VALIDATE_PATH, dataToSubmit);
+  const result = await fetch.post(VALIDATE_PATH, dataToSubmit);
   const validatedConfig = await configToData(result.config);
   onValidate(validatedConfig);
 };
@@ -165,7 +165,7 @@ const doValidate = async (data, onValidate) => {
 const doConfirm = async (data, setEditable) => {
   const config = dataToConfig(data);
   const dataToSubmit = { config: JSON.stringify(config, null, 2) };
-  const result = await doSubmit(CONFIRM_PATH, dataToSubmit);
+  const result = await fetch.post(CONFIRM_PATH, dataToSubmit);
   if (result.success === true) {
     alert("Config updated successfully");
     window.location.reload();
@@ -182,7 +182,7 @@ const doRefresh = async (data, selectedRowIds) => {
     const selectedRows = _.filter(data, (_row, i) => selectedRowIds[i]);
     const selectedScreenIds = _.map(selectedRows, ({ id }) => id);
     const dataToSubmit = { screen_ids: selectedScreenIds };
-    const result = await doSubmit(REFRESH_PATH, dataToSubmit);
+    const result = await fetch.post(REFRESH_PATH, dataToSubmit);
     if (result.success === true) {
       alert("Refresh scheduled successfully");
       window.location.reload();
@@ -269,10 +269,8 @@ const AdminTable = ({ columns, dataFilter }): JSX.Element => {
 
   // Fetch config on page load
   const fetchConfig = async () => {
-    const result = await fetch("/api/admin/");
-    const json = await result.json();
-    const config = JSON.parse(json.config);
-    setData(configToData(config));
+    const { config } = await fetch.get("/api/admin");
+    setData(configToData(JSON.parse(config)));
   };
 
   useEffect(() => {

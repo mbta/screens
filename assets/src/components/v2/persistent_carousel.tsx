@@ -1,6 +1,6 @@
 import React, { ComponentType, ReactNode } from "react";
 import makePersistent, { WrappedComponentProps } from "./persistent_wrapper";
-import useClientPaging from "Hooks/v2/use_client_paging";
+import useRefreshPaging from "Hooks/v2/use_refresh_paging";
 
 interface PageRendererProps<T> {
   page: T;
@@ -16,13 +16,11 @@ interface Props<T> extends WrappedComponentProps {
 const Carousel = <T,>({
   PageRenderer,
   pages,
-  onFinish,
-  lastUpdate,
+  updateVisibleData,
 }: Props<T>): ReactNode => {
-  const pageIndex = useClientPaging({
+  const pageIndex = useRefreshPaging({
     numPages: pages.length,
-    onFinish,
-    lastUpdate,
+    updateVisibleData,
   });
 
   return (

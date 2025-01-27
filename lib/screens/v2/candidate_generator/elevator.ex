@@ -5,12 +5,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
   alias Screens.V2.CandidateGenerator.Widgets.Evergreen
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Elevator
 
   @behaviour CandidateGenerator
 
+  @instance_fns [
+    &ElevatorClosures.elevator_status_instances/2,
+    &Evergreen.evergreen_content_instances/2
+  ]
+
+  @impl true
   def screen_template do
     {
       :screen,
@@ -26,29 +29,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
     |> Builder.build_template()
   end
 
-  def candidate_instances(
-        config,
-        now \\ DateTime.utc_now(),
-        elevator_closure_instances_fn \\ &ElevatorClosures.elevator_status_instances/3,
-        evergreen_content_instances_fn \\ &Evergreen.evergreen_content_instances/2
-      ) do
-    Enum.concat([
-      elevator_closure_instances_fn.(
-        config,
-        header_instance(config, now),
-        footer_instance(config)
-      ),
-      evergreen_content_instances_fn.(config, now)
-    ])
+  @impl true
+  def candidate_instances(config, now \\ DateTime.utc_now(), instance_fns \\ @instance_fns) do
+    instance_fns |> Enum.map(& &1.(config, now)) |> Enum.concat()
   end
 
+  @impl true
   def audio_only_instances(_widgets, _config), do: []
-
-  defp header_instance(%Screen{app_params: %Elevator{elevator_id: elevator_id}} = config, now) do
-    %NormalHeader{text: "Elevator #{elevator_id}", screen: config, time: now}
-  end
-
-  defp footer_instance(config) do
-    %Footer{screen: config}
-  end
 end
