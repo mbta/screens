@@ -27,7 +27,9 @@ defmodule Screens.Schedules.Schedule do
           direction_id: Trip.direction()
         }
 
-  @spec fetch(Departure.query_params(), String.t() | nil) :: {:ok, list(t())} | :error
+  @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error
+  @spec fetch(Departure.query_params(), DateTime.t() | Date.t() | String.t() | nil) ::
+          {:ok, list(t())} | :error
   def fetch(%{} = query_params, date \\ nil) do
     extra_params = if is_nil(date), do: %{}, else: %{date: date}
 

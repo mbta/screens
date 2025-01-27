@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink.Headways do
   @moduledoc false
 
   alias Screens.Schedules.Schedule
+  alias Screens.Util
 
   @dayparts [
     {:late_night, ~T[00:00:00], :close},
@@ -13,9 +14,9 @@ defmodule Screens.V2.CandidateGenerator.GlEink.Headways do
     {:late_night, ~T[20:00:00], :midnight}
   ]
 
-  def by_route_id(route_id, stop_id, direction_id, service_level, time \\ DateTime.utc_now()) do
-    current_schedule = schedule_with_override(time, service_level)
-    current_daypart = daypart(time, stop_id, direction_id)
+  def by_route_id(route_id, stop_id, direction_id, service_level, now \\ DateTime.utc_now()) do
+    current_schedule = schedule_with_override(now, service_level)
+    current_daypart = daypart(now, stop_id, direction_id)
     headway(route_id, current_schedule, current_daypart)
   end
 
@@ -79,34 +80,27 @@ defmodule Screens.V2.CandidateGenerator.GlEink.Headways do
   defp headway("Green-E", :sunday, :early_morning), do: 15
   defp headway("Green-E", :sunday, _), do: 12
 
-  defp schedule_with_override(time, service_level) do
+  defp schedule_with_override(datetime, service_level) do
     # Level 3 turns weekday into Saturday schedule
     # Level 4 is always Sunday schedule
     # Otherwise, use normal schedule
-    case {service_level, schedule(time)} do
+    case {service_level, schedule(datetime)} do
       {3, :weekday} -> :saturday
       {4, _} -> :sunday
       {_, schedule} -> schedule
     end
   end
 
-  defp schedule(utc_time) do
-    # Note: This is a hack.
-    # Split the service day at 3am by shifting to Pacific Time.
-    # Midnight at Pacific Time is always 3am here.
-    {:ok, pacific_time} = DateTime.shift_zone(utc_time, "America/Los_Angeles")
-    service_date = DateTime.to_date(pacific_time)
-
-    case Date.day_of_week(service_date) do
+  defp schedule(datetime) do
+    case datetime |> Util.service_date() |> Date.day_of_week() do
       7 -> :sunday
       6 -> :saturday
       _ -> :weekday
     end
   end
 
-  defp daypart(utc_time, stop_id, direction_id) do
-    {:ok, local_time} = DateTime.shift_zone(utc_time, "America/New_York")
-    local_time = DateTime.to_time(local_time)
+  defp daypart(datetime, stop_id, direction_id) do
+    local_time = datetime |> Util.to_eastern() |> DateTime.to_time()
 
     {daypart, _, _} =
       Enum.find(
@@ -148,12 +142,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink.Headways do
   defp service_start_or_end(stop_id, direction_id, min_or_max_fn) do
     with {:ok, schedules} <- Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id}),
          [_ | _] = arrival_times <- get_arrival_times(schedules) do
-      {:ok, local_dt} =
-        arrival_times
-        |> min_or_max_fn.()
-        |> DateTime.shift_zone("America/New_York")
-
-      DateTime.to_time(local_dt)
+      arrival_times |> min_or_max_fn.() |> Util.to_eastern() |> DateTime.to_time()
     else
       _ -> nil
     end

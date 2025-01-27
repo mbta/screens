@@ -2,10 +2,10 @@ defmodule Screens.LastTrip.Poller do
   @moduledoc """
   GenServer that polls predictions to calculate the last trip of the day
   """
-  alias Screens.LastTrip.Cache
-  alias Screens.LastTrip.Parser
-  alias Screens.LastTrip.TripUpdates
-  alias Screens.LastTrip.VehiclePositions
+
+  alias Screens.LastTrip.{Cache, Parser, TripUpdates, VehiclePositions}
+  alias Screens.Util
+
   use GenServer
 
   defstruct [:next_reset]
@@ -73,14 +73,10 @@ defmodule Screens.LastTrip.Poller do
     |> Cache.update_recent_departures()
   end
 
-  defp now(now_fn \\ &DateTime.utc_now/0) do
-    now_fn.() |> DateTime.shift_zone!("America/New_York")
-  end
+  defp now(now_fn \\ &DateTime.utc_now/0), do: now_fn.() |> Util.to_eastern()
 
   defp next_reset do
-    now()
-    |> DateTime.add(1, :day)
-    |> DateTime.to_date()
-    |> DateTime.new!(~T[03:30:00], "America/New_York")
+    now = now()
+    DateTime.new!(Date.add(now, 1), ~T[03:30:00], now.time_zone)
   end
 end

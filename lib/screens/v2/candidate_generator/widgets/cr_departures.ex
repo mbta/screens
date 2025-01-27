@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
   @moduledoc false
 
   alias Screens.Schedules.Schedule
+  alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightCRDepartures}
@@ -107,12 +108,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
   end
 
   defp fetch_last_schedule_tomorrow(direction_to_destination, station, now) do
-    # Any time between midnight and 3AM should be considered part of yesterday's service day.
-    service_datetime =
-      now |> DateTime.shift_zone!("America/New_York") |> DateTime.add(-3 * 60 * 60, :second)
-
-    next_service_day =
-      service_datetime |> DateTime.add(60 * 60 * 24, :second) |> Timex.format!("{YYYY}-{0M}-{0D}")
+    service_date_tomorrow = now |> Util.service_date() |> Date.add(1)
 
     params = %{
       direction_id: direction_to_destination,
@@ -127,7 +123,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
       sort: "-departure_time"
     }
 
-    {:ok, schedules} = Schedule.fetch(params, next_service_day)
+    {:ok, schedules} = Schedule.fetch(params, service_date_tomorrow)
     List.first(schedules)
   end
 

@@ -630,7 +630,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       end
 
     tomorrow =
-      case fetch_schedules_fn.(fetch_params, Util.get_service_date_tomorrow(now)) do
+      case fetch_schedules_fn.(fetch_params, now |> Util.service_date() |> Date.add(1)) do
         {:ok, schedules} when schedules != [] ->
           Enum.filter(schedules, &(&1.route.id in route_ids_serving_section))
 

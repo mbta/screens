@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   alias Screens.Log
   alias Screens.Predictions.Prediction
   alias Screens.Stops.Stop
+  alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.V2.CRDepartures
@@ -133,14 +134,12 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
          } = departure,
          now
        ) do
-    {:ok, scheduled_departure_time} =
+    scheduled_departure_time =
       if is_nil(schedule) do
         Log.error("cr_departures_no_scheduled_time", departure: departure)
-        {:ok, nil}
+        nil
       else
-        %Departure{schedule: schedule}
-        |> Departure.time()
-        |> DateTime.shift_zone("America/New_York")
+        %Departure{schedule: schedule} |> Departure.time() |> Util.to_eastern()
       end
 
     cond do
@@ -166,10 +165,8 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
 
   # Prediction is missing a vehicle so is not valuable to us. Show schedule but flag as delayed if departure time for prediction is after schedule.
   defp serialize_prediction_missing_vehicle(scheduled_departure_time, prediction) do
-    {:ok, predicted_departure_time} =
-      %Departure{prediction: prediction}
-      |> Departure.time()
-      |> DateTime.shift_zone("America/New_York")
+    predicted_departure_time =
+      %Departure{prediction: prediction} |> Departure.time() |> Util.to_eastern()
 
     is_delayed = delayed?(scheduled_departure_time, predicted_departure_time)
 
@@ -184,11 +181,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
        ) do
     %Prediction{stop: %Stop{id: stop_id}, vehicle: vehicle} = prediction
 
-    {:ok, predicted_departure_time} =
-      departure
-      |> Departure.time()
-      |> DateTime.shift_zone("America/New_York")
-
+    predicted_departure_time = departure |> Departure.time() |> Util.to_eastern()
     stop_type = Departure.stop_type(departure)
     second_diff = DateTime.diff(predicted_departure_time, now)
     minute_diff = round(second_diff / 60)

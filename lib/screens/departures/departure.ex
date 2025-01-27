@@ -62,12 +62,7 @@ defmodule Screens.Departures.Departure do
 
   @spec fetch_schedules_by_datetime(query_params(), DateTime.t()) :: {:ok, t()} | :error
   def fetch_schedules_by_datetime(%{} = query_params, dt) do
-    # Find the current service date by shifting the given datetime to Pacific Time.
-    # This splits the service day at 3am, as midnight at Pacific Time is always 3am here.
-    {:ok, pacific_time} = DateTime.shift_zone(dt, "America/Los_Angeles")
-    service_date = DateTime.to_date(pacific_time)
-
-    schedules = Schedule.fetch(query_params, Date.to_string(service_date))
+    schedules = Schedule.fetch(query_params, dt |> Util.service_date() |> Date.to_string())
 
     case schedules do
       {:ok, data} ->
@@ -378,7 +373,7 @@ defmodule Screens.Departures.Departure do
   end
 
   defp format_query_param({:date, %DateTime{} = date}) do
-    {"filter[date]", Util.get_service_date_today(date)}
+    {"filter[date]", Util.service_date(date)}
   end
 
   defp format_query_param({:date, %Date{} = date}) do

@@ -483,11 +483,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_timestamp(departure_time, now) do
-    {:ok, local_time} = DateTime.shift_zone(departure_time, "America/New_York")
+    local_time = Util.to_eastern(departure_time)
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
-    show_am_pm = Util.get_service_date_tomorrow(now).day == local_time.day
+    service_date_tomorrow = now |> Util.service_date() |> Date.add(1)
+    show_am_pm = local_time.day == service_date_tomorrow.day
     %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
   end
 end

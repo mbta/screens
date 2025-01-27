@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.LineMap do
 
   alias Screens.Predictions.Prediction
   alias Screens.Trips.Trip
+  alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.LineMap
   alias Screens.Vehicles.Vehicle
@@ -280,12 +281,8 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     if prediction_count < 2 and not is_nil(departure) do
       %{name: origin_stop_name} = Enum.at(stops, 0)
 
-      {:ok, local_time} =
-        departure
-        |> Departure.time()
-        |> DateTime.shift_zone("America/New_York")
-
-      {:ok, timestamp} = Timex.format(local_time, "{h12}:{m}")
+      {:ok, timestamp} =
+        departure |> Departure.time() |> Util.to_eastern() |> Timex.format("{h12}:{m}")
 
       %{timestamp: timestamp, station_name: origin_stop_name}
     end
