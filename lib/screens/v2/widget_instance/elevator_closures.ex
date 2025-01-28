@@ -1,5 +1,5 @@
-defmodule Screens.V2.WidgetInstance.ElevatorClosuresList do
-  @moduledoc false
+defmodule Screens.V2.WidgetInstance.ElevatorClosures do
+  @moduledoc "The main content of an elevator screen when its associated elevator is working."
 
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Elevator.Closure
@@ -44,16 +44,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresList do
       }
 
   defimpl Screens.V2.WidgetInstance do
-    alias Screens.V2.WidgetInstance.ElevatorClosuresList
+    alias Screens.V2.WidgetInstance.ElevatorClosures
 
     def priority(_instance), do: [1]
-    def serialize(instance), do: ElevatorClosuresList.serialize(instance)
+    def serialize(instance), do: ElevatorClosures.serialize(instance)
     def slot_names(_instance), do: [:main_content]
-    def widget_type(_instance), do: :elevator_closures_list
+    def widget_type(_instance), do: :elevator_closures
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}
     def audio_sort_key(_instance), do: [0]
     def audio_valid_candidate?(_instance), do: false
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorClosuresListView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorClosuresView
   end
 end

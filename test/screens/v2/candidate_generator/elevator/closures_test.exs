@@ -5,16 +5,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   alias Screens.Elevator
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
-  alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
+  alias Screens.V2.CandidateGenerator.Elevator.Closures, as: Generator
   alias Screens.V2.WidgetInstance.Elevator.Closure
-
-  alias Screens.V2.WidgetInstance.{
-    CurrentElevatorClosed,
-    Footer,
-    NormalHeader,
-    ElevatorClosuresList
-  }
-
+  alias Screens.V2.WidgetInstance.{ElevatorAlternatePath, ElevatorClosures, Footer, NormalHeader}
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator, as: ElevatorConfig
 
@@ -83,7 +76,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                _elevator_closures,
                %NormalHeader{screen: @screen, text: "Elevator 111", time: ^now, variant: nil},
                %Footer{screen: @screen, variant: nil}
-             ] = ElevatorClosures.elevator_status_instances(@screen, now)
+             ] = Generator.elevator_status_instances(@screen, now)
     end
 
     test "returns variant header and footer when current elevator is closed", %{now: now} do
@@ -98,7 +91,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       assert [_current_closed, %NormalHeader{variant: :closed}, %Footer{variant: :closed}] =
-               ElevatorClosures.elevator_status_instances(@screen, now)
+               Generator.elevator_status_instances(@screen, now)
     end
 
     test "returns a closure list based on currently-active elevator alerts", %{now: now} do
@@ -131,11 +124,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         {:ok, alerts}
       end)
 
-      expected_closures = %ElevatorClosuresList{
+      expected_closures = %ElevatorClosures{
         app_params: @screen.app_params,
         station_id: "place-test",
         stations_with_closures: [
-          %ElevatorClosuresList.Station{
+          %ElevatorClosures.Station{
             id: "place-test",
             name: "Place Test",
             route_icons: [%{type: :text, text: "RL", color: :red}],
@@ -145,7 +138,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         ]
       }
 
-      assert hd(ElevatorClosures.elevator_status_instances(@screen, now)) == expected_closures
+      assert hd(Generator.elevator_status_instances(@screen, now)) == expected_closures
     end
 
     test "groups multiple outside closures by station", %{now: now} do
@@ -179,9 +172,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       assert [
-               %ElevatorClosuresList{
+               %ElevatorClosures{
                  stations_with_closures: [
-                   %ElevatorClosuresList.Station{
+                   %ElevatorClosures.Station{
                      id: "place-haecl",
                      name: "Haymarket",
                      route_icons: [%{type: :text, text: "OL", color: :orange}],
@@ -194,7 +187,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                  ]
                }
                | _
-             ] = ElevatorClosures.elevator_status_instances(@screen, now)
+             ] = Generator.elevator_status_instances(@screen, now)
     end
 
     test "filters out alerts with no facilities or more than one facility", %{now: now} do
@@ -220,8 +213,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       logs =
         capture_log([level: :warning], fn ->
-          assert [%ElevatorClosuresList{stations_with_closures: []} | _] =
-                   ElevatorClosures.elevator_status_instances(@screen, now)
+          assert [%ElevatorClosures{stations_with_closures: []} | _] =
+                   Generator.elevator_status_instances(@screen, now)
         end)
 
       assert logs =~ "elevator_closure_affects_multiple"
@@ -274,15 +267,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       assert [
-               %ElevatorClosuresList{
+               %ElevatorClosures{
                  stations_with_closures: [
-                   %ElevatorClosuresList.Station{
+                   %ElevatorClosures.Station{
                      id: "place-test",
                      name: "This Station",
                      route_icons: [%{type: :text, text: "RL", color: :red}],
                      closures: [%Closure{id: "112", name: "In Station Elevator"}]
                    },
-                   %ElevatorClosuresList.Station{
+                   %ElevatorClosures.Station{
                      id: "place-test-no-redundancy",
                      name: "Other No Redundancy",
                      route_icons: [%{type: :text, text: "RL", color: :red}],
@@ -291,7 +284,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                  ]
                }
                | _
-             ] = ElevatorClosures.elevator_status_instances(@screen, now)
+             ] = Generator.elevator_status_instances(@screen, now)
     end
 
     test "generates backup route summaries based on exiting redundancy", %{now: now} do
@@ -346,19 +339,19 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       assert [
-               %ElevatorClosuresList{
+               %ElevatorClosures{
                  stations_with_closures: [
-                   %ElevatorClosuresList.Station{
+                   %ElevatorClosures.Station{
                      id: "place-1",
                      closures: [%Closure{id: "1"}],
                      summary: nil
                    },
-                   %ElevatorClosuresList.Station{
+                   %ElevatorClosures.Station{
                      id: "place-2",
                      closures: [%Closure{id: "2"}],
                      summary: "some summary"
                    },
-                   %ElevatorClosuresList.Station{
+                   %ElevatorClosures.Station{
                      id: "place-3",
                      closures: [%Closure{id: "3"}],
                      summary: "Visit mbta.com/elevators for more info"
@@ -366,10 +359,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                  ]
                }
                | _
-             ] = ElevatorClosures.elevator_status_instances(@screen, now)
+             ] = Generator.elevator_status_instances(@screen, now)
     end
 
-    test "returns CurrentElevatorClosed when configured elevator is closed", %{now: now} do
+    test "returns ElevatorAlternatePath when configured elevator is closed", %{now: now} do
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           build_alert(
@@ -382,8 +375,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       app_params = @screen.app_params
 
-      assert [%CurrentElevatorClosed{app_params: ^app_params} | _] =
-               ElevatorClosures.elevator_status_instances(@screen, now)
+      assert [%ElevatorAlternatePath{app_params: ^app_params} | _] =
+               Generator.elevator_status_instances(@screen, now)
     end
 
     test "omits route pills on closures when there is a routes API error", %{now: now} do
@@ -402,9 +395,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       end)
 
       assert [
-               %ElevatorClosuresList{
+               %ElevatorClosures{
                  stations_with_closures: [
-                   %ElevatorClosuresList.Station{
+                   %ElevatorClosures.Station{
                      id: "place-test",
                      name: "Place Test",
                      closures: [%Closure{id: "facility-test", name: "Test"}]
@@ -412,7 +405,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                  ]
                }
                | _
-             ] = ElevatorClosures.elevator_status_instances(@screen, now)
+             ] = Generator.elevator_status_instances(@screen, now)
     end
   end
 end

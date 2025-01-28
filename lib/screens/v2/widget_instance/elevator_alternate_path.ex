@@ -1,5 +1,5 @@
-defmodule Screens.V2.WidgetInstance.CurrentElevatorClosed do
-  @moduledoc false
+defmodule Screens.V2.WidgetInstance.ElevatorAlternatePath do
+  @moduledoc "The main content of an elevator screen when its associated elevator is closed."
 
   alias Screens.Util.Assets
   alias ScreensConfig.V2.Elevator
@@ -28,16 +28,16 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosed do
       }
 
   defimpl Screens.V2.WidgetInstance do
-    alias Screens.V2.WidgetInstance.CurrentElevatorClosed
+    alias Screens.V2.WidgetInstance.ElevatorAlternatePath
 
     def priority(_instance), do: [1]
-    def serialize(instance), do: CurrentElevatorClosed.serialize(instance)
+    def serialize(instance), do: ElevatorAlternatePath.serialize(instance)
     def slot_names(_instance), do: [:main_content]
-    def widget_type(_instance), do: :current_elevator_closed
+    def widget_type(_instance), do: :elevator_alternate_path
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}
     def audio_sort_key(_instance), do: [0]
     def audio_valid_candidate?(_instance), do: false
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.CurrentElevatorClosedView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorAlternatePathView
   end
 end

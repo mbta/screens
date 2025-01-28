@@ -2,14 +2,14 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.CandidateGenerator.Elevator.Closures, as: ElevatorClosures
+  alias Screens.V2.CandidateGenerator.Elevator.Closures
   alias Screens.V2.CandidateGenerator.Widgets.Evergreen
   alias Screens.V2.Template.Builder
 
   @behaviour CandidateGenerator
 
   @instance_fns [
-    &ElevatorClosures.elevator_status_instances/2,
+    &Closures.elevator_status_instances/2,
     &Evergreen.evergreen_content_instances/2
   ]
 

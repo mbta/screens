@@ -1,13 +1,13 @@
-defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
+defmodule Screens.V2.WidgetInstance.ElevatorAlternatePathTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.CurrentElevatorClosed
+  alias Screens.V2.WidgetInstance.ElevatorAlternatePath
   alias ScreensConfig.V2.Elevator
 
   setup do
     %{
-      instance: %CurrentElevatorClosed{
+      instance: %ElevatorAlternatePath{
         app_params:
           struct(Elevator,
             elevator_id: "111",
@@ -44,8 +44,8 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
   end
 
   describe "widget_type/1" do
-    test "returns current_elevator_closed", %{instance: instance} do
-      assert :current_elevator_closed == WidgetInstance.widget_type(instance)
+    test "returns elevator_alternate_path", %{instance: instance} do
+      assert :elevator_alternate_path == WidgetInstance.widget_type(instance)
     end
   end
 
@@ -68,8 +68,8 @@ defmodule Screens.V2.WidgetInstance.CurrentElevatorClosedTest do
   end
 
   describe "audio_view/1" do
-    test "returns CurrentElevatorClosedView", %{instance: instance} do
-      assert ScreensWeb.V2.Audio.CurrentElevatorClosedView == WidgetInstance.audio_view(instance)
+    test "returns ElevatorAlternatePathView", %{instance: instance} do
+      assert ScreensWeb.V2.Audio.ElevatorAlternatePathView == WidgetInstance.audio_view(instance)
     end
   end
 end
