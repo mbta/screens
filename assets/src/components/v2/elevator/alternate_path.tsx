@@ -12,7 +12,7 @@ import CurrentLocationBackground from "Images/svgr_bundled/current-location-back
 import NoService from "Images/svgr_bundled/no-service-black.svg";
 import ElevatorWayfinding from "Images/svgr_bundled/elevator-wayfinding.svg";
 import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
-import { CURRENT_CLOSED_PAGING_INTERVAL_MS } from "./elevator_constants";
+import { ALTERNATE_PATH_PAGING_INTERVAL_MS } from "./constants";
 
 type Coordinates = {
   x: number;
@@ -35,7 +35,7 @@ interface Props extends WrappedComponentProps {
   accessible_path_image_here_coordinates: Coordinates;
 }
 
-const CurrentElevatorClosed = ({
+const AlternatePath = ({
   alternate_direction_text: alternateDirectionText,
   accessible_path_direction_arrow: accessiblePathDirectionArrow,
   accessible_path_image_url: accessiblePathImageUrl,
@@ -45,7 +45,7 @@ const CurrentElevatorClosed = ({
   const numPages = accessiblePathImageUrl ? 2 : 1;
   const pageIndex = useIntervalPaging({
     numPages,
-    intervalMs: CURRENT_CLOSED_PAGING_INTERVAL_MS,
+    intervalMs: ALTERNATE_PATH_PAGING_INTERVAL_MS,
     updateVisibleData,
   });
 
@@ -56,7 +56,7 @@ const CurrentElevatorClosed = ({
   });
 
   return (
-    <div className="current-elevator-closed">
+    <div className="elevator-alternate-path">
       <div className="notch"></div>
       <div className="header">
         <div className="icons">
@@ -103,5 +103,5 @@ const CurrentElevatorClosed = ({
 };
 
 export default makePersistent(
-  CurrentElevatorClosed as ComponentType<WrappedComponentProps>,
+  AlternatePath as ComponentType<WrappedComponentProps>,
 );
