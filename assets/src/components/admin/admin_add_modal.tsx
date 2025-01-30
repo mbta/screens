@@ -89,6 +89,7 @@ const defaultAppParamsByAppId = {
   },
   on_bus_v2: {
     bus_id: "",
+    evergreen_content: [],
   },
 };
 

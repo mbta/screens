@@ -15,7 +15,6 @@ defmodule ScreensWeb.AdminApiController do
 
   def validate(conn, %{"id" => _id, "config" => screen_json}) do
     validated_json = screen_json |> Jason.decode!() |> Screen.from_json() |> Screen.to_json()
-    IO.puts(validated_json)
     json(conn, %{success: true, config: validated_json})
   end
 
