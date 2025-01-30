@@ -50,12 +50,13 @@
       .closure-list {
         display: flex;
         flex-flow: column wrap;
-        height: 904px;
+        height: 1000px;
         transform: translateX(calc(-100% * var(--closure-list-offset)));
 
         .closure-row {
           position: relative;
           width: 1080px;
+          height: 333px;
           padding: 26px 48px 24px;
 
           &:not(.current-station) {
@@ -82,6 +83,10 @@
 
           &.current-station {
             background-color: $warm-neutral-85;
+          }
+
+          &.large {
+            height: auto;
           }
 
           &__station-name {
@@ -116,6 +121,10 @@
             }
           }
 
+          &__elevator-name-container {
+            margin-bottom: 3px;
+          }
+
           &__elevator-name {
             font-weight: 500;
           }
@@ -124,10 +133,19 @@
             display: list-item;
             margin-bottom: 8px;
             margin-left: 48px;
+            font-size: 48px;
+            line-height: 62px;
+            list-style-position: inside;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: calc(100% - 96px);
           }
 
           &__summary.important {
             font-weight: 700;
+            font-size: 48px;
+            line-height: 62px;
           }
         }
       }
