@@ -131,20 +131,20 @@
 
           &__elevator-name.list-item {
             display: list-item;
+            max-width: calc(100% - 96px);
             margin-bottom: 8px;
             margin-left: 48px;
+            overflow: hidden;
             font-size: 48px;
             line-height: 62px;
-            list-style-position: inside;
-            white-space: nowrap;
-            overflow: hidden;
             text-overflow: ellipsis;
-            max-width: calc(100% - 96px);
+            white-space: nowrap;
+            list-style-position: inside;
           }
 
           &__summary.important {
-            font-weight: 700;
             font-size: 48px;
+            font-weight: 700;
             line-height: 62px;
           }
         }
