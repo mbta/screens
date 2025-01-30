@@ -31,7 +31,6 @@ const ClosureRow = ({
       className={cx("closure-row", {
         "current-station": isCurrentStation,
         "first-row-on-page": isFirstRowOnPage,
-        large: closures.length > 2,
       })}
     >
       <div className="closure-row__name-and-pills">
@@ -47,20 +46,18 @@ const ClosureRow = ({
         )}
       </div>
 
-      <div className={cx("closure-row__elevator-name-container")}>
-        {closures.map((closure) => {
-          return (
-            <div
-              key={closure.id}
-              className={cx("closure-row__elevator-name", {
-                "list-item": closures.length > 1,
-              })}
-            >
-              {closure.name} ({closure.id})
-            </div>
-          );
-        })}
-      </div>
+      {closures.map((closure) => {
+        return (
+          <div
+            key={closure.id}
+            className={cx("closure-row__elevator-name", {
+              "list-item": closures.length > 1,
+            })}
+          >
+            {closure.name} ({closure.id})
+          </div>
+        );
+      })}
 
       <div className={cx("closure-row__summary", { important: summary })}>
         {summary ?? "Accessible route available"}
