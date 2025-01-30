@@ -52,7 +52,7 @@ defmodule Screens.V2.ScreenData.Parameters do
     },
     on_bus_v2: %Static{
       candidate_generator: CandidateGenerator.OnBus,
-      refresh_rate: 5
+      refresh_rate: 20
     }
   }
 
