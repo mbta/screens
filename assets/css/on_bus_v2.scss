@@ -1,10 +1,23 @@
 @import "fonts/inter_font_face";
 @import "fonts/helvetica_font_face";
 
-@import "v2/on_bus/screen/normal";
-
 @import "v2/simulation_common";
-
+@import "v2/multi_screen_page";
 body {
   margin: 0;
+}
+
+.screen-container {
+  width: 650px;
+  height: 432px;
+}
+
+.multi-screen-page {
+  grid-auto-rows: 1920px;
+}
+
+.placeholder {
+  height: 100%;
+  width: 100%;
+  background-color: blue;
 }

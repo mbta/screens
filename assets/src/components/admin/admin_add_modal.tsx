@@ -18,7 +18,7 @@ const fields = [
       "dup_v2",
       "elevator_v2",
       "gl_eink_v2",
-      "on_bus_v22",
+      "on_bus_v2",
       "pre_fare_v2",
     ]),
   },

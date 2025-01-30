@@ -278,12 +278,15 @@ defmodule Screens.V2.ScreenData.Layout do
       |> Enum.unzip()
 
     paging_metadata = Map.new(paging_metadata_entries)
+    IO.puts('length: #{layouts |> Enum.count()}')
 
     selected_layouts =
       Enum.filter(layouts, fn
         layout when is_paged(layout) -> Template.get_slot_id(layout) in selected_paged_slot_ids
         _ -> true
       end)
+
+    IO.puts('length: #{selected_layouts |> Enum.count()}')
 
     # Now we have the list of layouts to keep, but still need to unpage them
     # and create a set of the paged slot ids to keep in the instance map.
@@ -300,6 +303,11 @@ defmodule Screens.V2.ScreenData.Layout do
           choose_visible_slot_ids(layout, refresh_rate, now)
       end)
       |> Util.unzip3()
+
+    # IO.puts('length unpaged_layouts: #{unpaged_layouts |> Enum.count()}')
+    # IO.puts('length paged_slot_sets: #{paged_slot_sets |> Enum.count()}')
+    # IO.puts('length paging_metadata_maps: #{paging_metadata_maps |> Enum.count()}')
+
 
     paged_slot_set = Enum.reduce(paged_slot_sets, &MapSet.union/2)
 
