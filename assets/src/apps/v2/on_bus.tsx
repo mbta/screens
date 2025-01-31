@@ -17,7 +17,6 @@ import Placeholder from "Components/v2/placeholder";
 
 const TYPE_TO_COMPONENT = {
   body: Placeholder,
-  placeholder: Placeholder,
 };
 
 const App = (): JSX.Element => {

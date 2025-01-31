@@ -28,7 +28,7 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   @impl CandidateGenerator
   def candidate_instances(_config, _now \\ DateTime.utc_now()) do
     [
-      %Placeholder{color: :blue, slot_names: [:placeholder], priority: 1 }
+      %Placeholder{color: "blue", slot_names: [:placeholder], priority: 1 }
     ]
   end
 

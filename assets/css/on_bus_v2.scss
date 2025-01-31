@@ -3,6 +3,8 @@
 
 @import "v2/simulation_common";
 @import "v2/multi_screen_page";
+@import "v2/placeholder.scss";
+
 body {
   margin: 0;
 }
@@ -12,12 +14,12 @@ body {
   height: 432px;
 }
 
-.multi-screen-page {
-  grid-auto-rows: 1920px;
-}
+// .placeholder {
+//   height: 100%;
+//   width: 100%;
+//   background-color: red;
+// }
 
-.placeholder {
-  height: 100%;
-  width: 100%;
-  background-color: blue;
-}
+// .placeholder__color__blue {
+//   background-color: blue;
+// }
