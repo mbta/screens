@@ -7,7 +7,6 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
 
   @behaviour CandidateGenerator
 
-
   @impl true
   @spec screen_template() ::
           atom()
@@ -18,8 +17,8 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
       :screen,
       %{
         body: [
-              :placeholder
-          ]
+          :placeholder
+        ]
       }
     }
     |> Builder.build_template()
@@ -28,12 +27,10 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   @impl CandidateGenerator
   def candidate_instances(_config, _now \\ DateTime.utc_now()) do
     [
-      %Placeholder{color: "blue", slot_names: [:placeholder], priority: 1 }
+      %Placeholder{color: "blue", slot_names: [:placeholder], priority: 1}
     ]
   end
 
-
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
-
 end
