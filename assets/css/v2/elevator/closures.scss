@@ -3,7 +3,7 @@
   flex: 1;
   flex-direction: column;
   font-size: 48px;
-  line-height: 64px;
+  line-height: 62px;
   color: $cool-black-30;
 
   .in-station-summary {
@@ -50,7 +50,7 @@
       .closure-list {
         display: flex;
         flex-flow: column wrap;
-        height: 1048px;
+        height: 1000px;
         transform: translateX(calc(-100% * var(--closure-list-offset)));
 
         .closure-row {
