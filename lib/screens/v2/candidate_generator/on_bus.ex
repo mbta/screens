@@ -34,7 +34,7 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
-  def body_instances() do
+  def body_instances do
     [%Placeholder{color: :blue, slot_names: [:main_content]}]
   end
 
