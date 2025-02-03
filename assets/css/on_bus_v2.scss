@@ -1,20 +1,16 @@
 @import "fonts/inter_font_face";
 @import "fonts/helvetica_font_face";
 
-@import "v2/simulation_common";
 @import "v2/multi_screen_page";
+@import "v2/on_bus/body_normal";
 @import "v2/placeholder";
+@import "v2/simulation_common";
 
 body {
   margin: 0;
 }
 
 .screen-container {
-  width: 650px;
-  height: 432px;
-}
-
-.body-normal__main-content{
   width: 650px;
   height: 432px;
 }

@@ -127,14 +127,6 @@ const v2Columns = [
     FormCell: FormTextCell,
   },
   {
-    Header: "Header",
-    accessor: buildAppParamAccessor("header"),
-    mutator: buildAppParamMutator("header"),
-    Cell: EditableTextarea,
-    disableFilters: true,
-    FormCell: FormTextarea,
-  },
-  {
     Header: "Evergreen Content",
     accessor: buildAppParamAccessor("evergreen_content"),
     mutator: buildAppParamMutator("evergreen_content"),
@@ -143,6 +135,15 @@ const v2Columns = [
     FormCell: FormTextarea,
   },
 ];
+
+const headerColumn = {
+  Header: "Header",
+  accessor: buildAppParamAccessor("header"),
+  mutator: buildAppParamMutator("header"),
+  Cell: EditableTextarea,
+  disableFilters: true,
+  FormCell: FormTextarea,
+};
 
 const departuresColumn = {
   Header: "Departures",
@@ -174,6 +175,7 @@ const alertsColumn = {
 const DupV2ScreensTable = (): JSX.Element => {
   const columns = [
     ...v2Columns,
+    headerColumn,
     {
       Header: "Primary Departures",
       accessor: buildAppParamAccessor("primary_departures"),
@@ -204,7 +206,13 @@ const BusEinkV2ScreensTable = (): JSX.Element => {
     return app_id === "bus_eink_v2";
   };
 
-  const columns = [...v2Columns, departuresColumn, footerColumn, alertsColumn];
+  const columns = [
+    ...v2Columns,
+    departuresColumn,
+    footerColumn,
+    alertsColumn,
+    headerColumn,
+  ];
 
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
@@ -212,6 +220,7 @@ const BusEinkV2ScreensTable = (): JSX.Element => {
 const GLEinkV2ScreensTable = (): JSX.Element => {
   const columns = [
     ...v2Columns,
+    headerColumn,
     {
       Header: "Line Map",
       accessor: buildAppParamAccessor("line_map"),
@@ -247,6 +256,7 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
 
   const columns = [
     ...v2Columns,
+    headerColumn,
     {
       Header: "Audio Offset",
       accessor: (row) => row.app_params.audio.interval_offset_seconds,
@@ -294,6 +304,7 @@ const PreFareV2ScreensTable = (): JSX.Element => {
 
   const columns = [
     ...v2Columns,
+    headerColumn,
     {
       Header: "Elevator Status",
       accessor: buildAppParamAccessor("elevator_status"),
@@ -446,7 +457,7 @@ const BuswayV2ScreensTable = (): JSX.Element => {
     return app_id === "busway_v2";
   };
 
-  const columns = [...v2Columns, departuresColumn];
+  const columns = [...v2Columns, departuresColumn, headerColumn];
 
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };

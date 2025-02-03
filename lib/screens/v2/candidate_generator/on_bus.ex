@@ -13,14 +13,14 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
       :screen,
       %{
         screen_normal: [
-         {:body,
-          %{
-            body_normal: [
-              :main_content,
-            ],
-          }
-        }
-      ]}
+          {:body,
+           %{
+             body_normal: [
+               :main_content
+             ]
+           }}
+        ]
+      }
     }
     |> Builder.build_template()
   end
@@ -28,9 +28,9 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   @impl CandidateGenerator
   def candidate_instances(_config, _now \\ DateTime.utc_now()) do
     [
-      fn -> body_instances() end,
+      fn -> body_instances() end
     ]
-    |> Task.async_stream(& &1.(), timeout: 30_000)
+    |> Task.async_stream(& &1.())
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
