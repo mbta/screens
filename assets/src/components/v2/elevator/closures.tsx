@@ -13,7 +13,7 @@ import {
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import NormalService from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
-import { CLOSURE_LIST_PAGING_INTERVAL_MS } from "./elevator_constants";
+import { CLOSURES_PAGING_INTERVAL_MS } from "./constants";
 
 interface ClosureRowProps {
   station: StationWithClosures;
@@ -100,16 +100,16 @@ const InStationSummary = ({ closures }: InStationSummaryProps) => {
   );
 };
 
-interface OutsideClosureListProps extends WrappedComponentProps {
+interface CurrentClosuresProps extends WrappedComponentProps {
   stations: StationWithClosures[];
   stationId: string;
 }
 
-const OutsideClosureList = ({
+const CurrentClosures = ({
   stations,
   stationId,
   updateVisibleData,
-}: OutsideClosureListProps) => {
+}: CurrentClosuresProps) => {
   const ref = useRef<HTMLDivElement>(null);
 
   const sortedStations = [...stations].sort((a, b) => {
@@ -135,7 +135,7 @@ const OutsideClosureList = ({
 
   const pageIndex = useIntervalPaging({
     numPages,
-    intervalMs: CLOSURE_LIST_PAGING_INTERVAL_MS,
+    intervalMs: CLOSURES_PAGING_INTERVAL_MS,
     updateVisibleData,
   });
 
@@ -221,19 +221,19 @@ interface Props extends WrappedComponentProps {
   station_id: string;
 }
 
-const ElevatorClosuresList = ({
+const Closures = ({
   stations_with_closures: stations,
   station_id: stationId,
   updateVisibleData,
 }: Props) => {
   return (
-    <div className="elevator-closures-list">
+    <div className="elevator-closures">
       <InStationSummary
         closures={stations
           .filter((s) => s.id === stationId)
           .flatMap((s) => s.closures)}
       />
-      <OutsideClosureList
+      <CurrentClosures
         stations={stations}
         stationId={stationId}
         updateVisibleData={updateVisibleData}
@@ -242,6 +242,4 @@ const ElevatorClosuresList = ({
   );
 };
 
-export default makePersistent(
-  ElevatorClosuresList as ComponentType<WrappedComponentProps>,
-);
+export default makePersistent(Closures as ComponentType<WrappedComponentProps>);

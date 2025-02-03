@@ -1,9 +1,9 @@
-.elevator-closures-list {
+.elevator-closures {
   display: flex;
   flex: 1;
   flex-direction: column;
   font-size: 48px;
-  line-height: 64px;
+  line-height: 62px;
   color: $cool-black-30;
 
   .in-station-summary {
@@ -50,7 +50,7 @@
       .closure-list {
         display: flex;
         flex-flow: column wrap;
-        height: 904px;
+        height: 1000px;
         transform: translateX(calc(-100% * var(--closure-list-offset)));
 
         .closure-row {
@@ -122,8 +122,13 @@
 
           &__elevator-name.list-item {
             display: list-item;
+            margin-right: 48px;
             margin-bottom: 8px;
             margin-left: 48px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            list-style-position: inside;
           }
 
           &__summary.important {

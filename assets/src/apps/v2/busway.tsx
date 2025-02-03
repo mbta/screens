@@ -21,6 +21,7 @@ import { MappingContext } from "Components/v2/widget";
 import NormalScreen from "Components/v2/busway/normal_screen";
 import TakeoverScreen from "Components/v2/takeover_screen";
 
+import EvergreenContent from "Components/v2/evergreen_content";
 import Placeholder from "Components/v2/placeholder";
 
 import NormalHeader from "Components/v2/lcd/normal_header";
@@ -36,6 +37,7 @@ import SimulationScreenPage from "Components/v2/simulation_screen_page";
 const TYPE_TO_COMPONENT = {
   normal: NormalScreen,
   takeover: TakeoverScreen,
+  evergreen_content: EvergreenContent,
   placeholder: Placeholder,
   normal_header: NormalHeader,
   departures: Departures,

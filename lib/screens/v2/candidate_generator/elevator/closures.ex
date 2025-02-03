@@ -1,8 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @moduledoc """
-  Generates the standard widgets for elevator screens: `CurrentElevatorClosed` when the screen's
-  elevator is closed, otherwise `ElevatorClosuresList`. Includes the header and footer, as these
-  have different variants depending on the "main" widget.
+  Generates the standard widgets for elevator screens: `ElevatorAlternatePath` when the screen's
+  elevator is closed, otherwise `ElevatorClosures`. Includes the header and footer, as these have
+  different variants depending on the "main" widget.
   """
 
   defmodule Closure do
@@ -31,16 +31,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.{Footer, NormalHeader}
-
-  alias Screens.V2.WidgetInstance.{
-    CurrentElevatorClosed,
-    ElevatorClosuresList,
-    Footer,
-    NormalHeader
-  }
-
   alias Screens.V2.WidgetInstance.Elevator.Closure, as: WidgetClosure
+  alias Screens.V2.WidgetInstance.{ElevatorAlternatePath, ElevatorClosures, Footer, NormalHeader}
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.Elevator, as: ElevatorConfig
@@ -67,11 +59,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
     case Enum.find(closures, fn %Closure{id: id} -> id == elevator_id end) do
       nil ->
-        [elevator_closures_list(closures, app_params) | header_footer_instances(config, now)]
+        [elevator_closures(closures, app_params) | header_footer_instances(config, now)]
 
       _closure ->
         [
-          %CurrentElevatorClosed{app_params: app_params}
+          %ElevatorAlternatePath{app_params: app_params}
           | header_footer_instances(config, now, :closed)
         ]
     end
@@ -112,7 +104,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   defp elevator_closure(_alert), do: []
 
-  defp elevator_closures_list(
+  defp elevator_closures(
          closures,
          %ElevatorConfig{elevator_id: elevator_id} = app_params
        ) do
@@ -120,7 +112,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     {:ok, station_names} = @stop.fetch_parent_station_name_map()
     station_route_pills = fetch_station_route_pills(closures, stop_id)
 
-    %ElevatorClosuresList{
+    %ElevatorClosures{
       app_params: app_params,
       station_id: stop_id,
       stations_with_closures:
@@ -149,7 +141,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     |> Enum.filter(&relevant_closure?(&1, home_station_id, closures))
     |> Enum.group_by(& &1.station_id)
     |> Enum.map(fn {station_id, station_closures} ->
-      %ElevatorClosuresList.Station{
+      %ElevatorClosures.Station{
         id: station_id,
         name: Map.fetch!(station_names, station_id),
         route_icons:
@@ -174,7 +166,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   # If any of a closed elevator's alternates are also closed, it's always relevant.
   defp relevant_closure?(
-         %Closure{elevator: %Elevator{alternate_ids: alternate_ids, redundancy: redundancy}},
+         %Closure{
+           elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
+         },
          _home_station_id,
          closures
        ) do
@@ -182,7 +176,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   end
 
   defp backup_route_summary(
-         [%Closure{elevator: %Elevator{alternate_ids: alternate_ids, redundancy: redundancy}}],
+         [
+           %Closure{
+             elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
+           }
+         ],
          closures
        ) do
     # If any of a closed elevator's alternates are also closed, the normal summary may not be

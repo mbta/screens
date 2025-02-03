@@ -1,0 +1,13 @@
+.evergreen-content-image__container,
+.evergreen-content-video {
+  overflow: hidden;
+  background-color: #e4e6e1;
+}
+
+.evergreen-content-image__container,
+.evergreen-content-image__image,
+.evergreen-content-video,
+.looping-video {
+  width: 100%;
+  height: 100%;
+}
