@@ -2,7 +2,6 @@
 @import "fonts/helvetica_font_face";
 
 @import "v2/multi_screen_page";
-@import "v2/on_bus/body_normal";
 @import "v2/placeholder";
 @import "v2/simulation_common";
 
@@ -13,4 +12,24 @@ body {
 .screen-container {
   width: 650px;
   height: 432px;
+}
+
+.screen-normal {
+  width: 100%;
+  height: 100%;
+}
+
+.screen-normal__body {
+  width: 100%;
+  height: 100%;
+}
+
+.body-normal {
+  width: 100%;
+  height: 100%;
+}
+
+.body-normal__main-content {
+  width: 100%;
+  height: 100%;
 }
