@@ -14,9 +14,13 @@ import { MappingContext } from "Components/v2/widget";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import Placeholder from "Components/v2/placeholder";
+import NormalScreen from "Components/v2/bus_eink/normal_screen";
+import NormalBody from "Components/v2/bus_eink/normal_body";
 
 const TYPE_TO_COMPONENT = {
-  body: Placeholder,
+  placeholder: Placeholder,
+  screen_normal: NormalScreen,
+  body_normal: NormalBody,
 };
 
 const App = (): JSX.Element => {

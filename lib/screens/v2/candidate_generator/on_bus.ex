@@ -8,18 +8,19 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   @behaviour CandidateGenerator
 
   @impl true
-  @spec screen_template() ::
-          atom()
-          | {atom() | non_neg_integer() | {non_neg_integer(), atom()},
-             atom() | %{optional(atom()) => list()}}
   def screen_template do
     {
       :screen,
       %{
-        body: [
-          :placeholder
-        ]
-      }
+        screen_normal: [
+         {:body,
+          %{
+            body_normal: [
+              :main_content,
+            ],
+          }
+        }
+      ]}
     }
     |> Builder.build_template()
   end
@@ -27,8 +28,14 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   @impl CandidateGenerator
   def candidate_instances(_config, _now \\ DateTime.utc_now()) do
     [
-      %Placeholder{color: "blue", slot_names: [:placeholder], priority: 1}
+      fn -> body_instances() end,
     ]
+    |> Task.async_stream(& &1.(), timeout: 30_000)
+    |> Enum.flat_map(fn {:ok, instances} -> instances end)
+  end
+
+  def body_instances() do
+    [%Placeholder{color: :blue, slot_names: [:main_content]}]
   end
 
   @impl CandidateGenerator
