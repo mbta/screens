@@ -208,10 +208,10 @@ const BusEinkV2ScreensTable = (): JSX.Element => {
 
   const columns = [
     ...v2Columns,
+    headerColumn,
     departuresColumn,
     footerColumn,
     alertsColumn,
-    headerColumn,
   ];
 
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
@@ -457,7 +457,7 @@ const BuswayV2ScreensTable = (): JSX.Element => {
     return app_id === "busway_v2";
   };
 
-  const columns = [...v2Columns, departuresColumn, headerColumn];
+  const columns = [...v2Columns, headerColumn, departuresColumn];
 
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
