@@ -49,6 +49,10 @@ defmodule Screens.V2.ScreenData.Parameters do
       audio_active_time: {~T[04:45:00], ~T[01:45:00]},
       candidate_generator: CandidateGenerator.PreFare,
       refresh_rate: 20
+    },
+    on_bus_v2: %Static{
+      candidate_generator: CandidateGenerator.OnBus,
+      refresh_rate: 20
     }
   }
 
