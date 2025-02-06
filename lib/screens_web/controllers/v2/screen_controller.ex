@@ -8,6 +8,7 @@ defmodule ScreensWeb.V2.ScreenController do
 
   @default_app_id :bus_eink_v2
   @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 elevator_v2 gl_eink_v2 on_bus_v2 pre_fare_v2]a
+  @query_params ~w[on_bus_v2]
   @app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   plug(:check_config)
@@ -78,14 +79,40 @@ defmodule ScreensWeb.V2.ScreenController do
     if match?(%Screen{app_id: app_id} when app_id in @recognized_app_ids, config) do
       assigns = get_assigns(params, screen_id, config)
 
-      conn
-      |> merge_assigns(assigns)
+      IO.inspect(get_url_params(conn, ["stop_id", "route_id", "trip_id"]))
+
+      conn2 = conn
+      |> merge_assigns(Enum.concat(assigns, get_url_params(conn, ["stop_id", "route_id", "trip_id"])))
       |> put_view(ScreensWeb.V2.ScreenView)
+      IO.inspect(conn2)
+
+      conn2
       |> render("index.html")
     else
       render_not_found(conn)
     end
   end
+
+  # def index(conn, %{"id" => } = params) do #TODO: Write a new index function that works only for onbus screens and pulls in the params
+  #   is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
+
+  #   _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, screen_side(params))
+
+  #   config = Cache.screen(screen_id)
+
+  #   if match?(%Screen{app_id: app_id} when app_id in @recognized_app_ids, config) do
+  #     assigns = get_assigns(params, screen_id, config)
+
+  #     IO.inspect(get_url_params(conn, ["stop_id", "route_id", "trip_id"]))
+
+  #     conn
+  #     |> merge_assigns(assigns)
+  #     |> put_view(ScreensWeb.V2.ScreenView)
+  #     |> render("index.html")
+  #   else
+  #     render_not_found(conn)
+  #   end
+  # end
 
   def index(conn, _params) do
     render_not_found(conn)
@@ -233,5 +260,15 @@ defmodule ScreensWeb.V2.ScreenController do
       _ ->
         a <= b
     end
+  end
+
+  defp get_url_params(conn, valid_keys) do
+    conn2 = conn
+      |> Plug.Conn.fetch_query_params()
+    # IO.inspect(conn2)
+    conn2
+      |> Map.get(:query_params, %{})
+      |> Map.take(valid_keys)
+      |> Map.to_list()
   end
 end
