@@ -38,11 +38,11 @@ defmodule Screens.Elevator do
   end
 
   defp entering_redundancy(%{"entering" => "1"}), do: :nearby
-  defp entering_redundancy(%{"entering" => "2"}), do: :in_station
+  defp entering_redundancy(%{"entering" => "2" <> _}), do: :in_station
   defp entering_redundancy(%{"entering" => "3B"}), do: :shuttle
   defp entering_redundancy(_other), do: :other
 
   defp exiting_redundancy(%{"exiting" => "1"}), do: :nearby
-  defp exiting_redundancy(%{"exiting" => "2"}), do: :in_station
+  defp exiting_redundancy(%{"exiting" => "2" <> _}), do: :in_station
   defp exiting_redundancy(%{"summary" => summary}), do: {:other, summary}
 end
