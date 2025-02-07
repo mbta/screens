@@ -70,8 +70,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     )
   end
 
-  describe "elevator_status_instances/3" do
-    test "returns normal header and footer when current elevator is not closed", %{now: now} do
+  describe "header and footer" do
+    test "have no variant when current elevator is not closed", %{now: now} do
       assert [
                _elevator_closures,
                %NormalHeader{screen: @screen, text: "Elevator 111", time: ^now, variant: nil},
@@ -79,7 +79,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
              ] = Generator.elevator_status_instances(@screen, now)
     end
 
-    test "returns variant header and footer when current elevator is closed", %{now: now} do
+    test "have closed variant when current elevator is closed", %{now: now} do
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           build_alert(
@@ -93,8 +93,29 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       assert [_current_closed, %NormalHeader{variant: :closed}, %Footer{variant: :closed}] =
                Generator.elevator_status_instances(@screen, now)
     end
+  end
 
-    test "returns a closure list based on currently-active elevator alerts", %{now: now} do
+  describe "alternate path widget" do
+    test "is returned when the screen's elevator is closed", %{now: now} do
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          build_alert(
+            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      app_params = @screen.app_params
+
+      assert [%ElevatorAlternatePath{app_params: ^app_params} | _] =
+               Generator.elevator_status_instances(@screen, now)
+    end
+  end
+
+  describe "closure list widget" do
+    test "is returned based on currently-active elevator alerts", %{now: now} do
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         active_period = {DateTime.add(now, -1, :day), DateTime.add(now, 1, :day)}
         upcoming_period = {DateTime.add(now, 1, :day), DateTime.add(now, 3, :day)}
@@ -126,6 +147,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       expected_closures = %ElevatorClosures{
         app_params: @screen.app_params,
+        now: now,
         station_id: "place-test",
         stations_with_closures: [
           %ElevatorClosures.Station{
@@ -362,23 +384,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
              ] = Generator.elevator_status_instances(@screen, now)
     end
 
-    test "returns ElevatorAlternatePath when configured elevator is closed", %{now: now} do
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
-        alerts = [
-          build_alert(
-            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
-          )
-        ]
-
-        {:ok, alerts}
-      end)
-
-      app_params = @screen.app_params
-
-      assert [%ElevatorAlternatePath{app_params: ^app_params} | _] =
-               Generator.elevator_status_instances(@screen, now)
-    end
-
     test "omits route pills on closures when there is a routes API error", %{now: now} do
       expect(@route, :fetch, fn %{stop_id: "place-test"} -> :error end)
 
@@ -406,6 +411,62 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                }
                | _
              ] = Generator.elevator_status_instances(@screen, now)
+    end
+  end
+
+  describe "upcoming closure" do
+    defp dt(date, time), do: DateTime.new!(date, time, "America/New_York")
+
+    test "is included when the screen's elevator has a planned closure" do
+      now = dt(~D[2025-01-01], ~T[09:00:00])
+
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          build_alert(
+            active_period: [
+              {dt(~D[2025-01-05], ~T[03:00:00]), dt(~D[2025-01-07], ~T[02:59:00])},
+              {dt(~D[2025-02-01], ~T[03:00:00]), dt(~D[2025-02-02], ~T[02:59:00])}
+            ],
+            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      expect(@elevator, :get, fn "111" ->
+        build_elevator("111", entering_redundancy: :in_station)
+      end)
+
+      assert [
+               %ElevatorClosures{
+                 upcoming_closure: %ElevatorClosures.Upcoming{
+                   period: {~D[2025-01-05], ~D[2025-01-06]},
+                   summary: "An accessible route will be available."
+                 }
+               }
+               | _
+             ] = Generator.elevator_status_instances(@screen, now)
+    end
+
+    test "is not included when the screen's elevator has nearby redundancy" do
+      now = dt(~D[2025-01-01], ~T[09:00:00])
+
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          build_alert(
+            active_period: [{dt(~D[2025-01-05], ~T[03:00:00]), dt(~D[2025-01-07], ~T[02:59:00])}],
+            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      expect(@elevator, :get, fn "111" -> build_elevator("111", entering_redundancy: :nearby) end)
+
+      assert [%ElevatorClosures{upcoming_closure: nil} | _] =
+               Generator.elevator_status_instances(@screen, now)
     end
   end
 end

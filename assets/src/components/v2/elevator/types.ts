@@ -8,7 +8,7 @@ export type StationWithClosures = {
   summary: string | null;
 };
 
-export type Closure = {
+type Closure = {
   id: string;
   name: string;
 };

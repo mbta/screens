@@ -98,6 +98,8 @@ defmodule Screens.Alerts.Alert do
           | :track_change
           | :unknown
 
+  @type active_period :: {DateTime.t() | nil, DateTime.t() | nil}
+
   @type informed_entity :: %{
           facility: %{id: String.t(), name: String.t()} | nil,
           stop: String.t() | nil,
@@ -113,7 +115,7 @@ defmodule Screens.Alerts.Alert do
           severity: integer,
           header: String.t(),
           informed_entities: list(informed_entity()),
-          active_period: list(),
+          active_period: list(active_period()),
           lifecycle: String.t(),
           timeframe: String.t(),
           created_at: DateTime.t(),
