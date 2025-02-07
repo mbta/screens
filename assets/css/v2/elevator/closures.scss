@@ -27,9 +27,38 @@
     }
   }
 
-  .closures-list {
+  .closures-info {
     height: 100%;
     background-color: $warm-neutral-90;
+
+    .upcoming-closure {
+      display: flex;
+      flex-direction: column;
+      margin: 48px;
+      font-size: 80px;
+      font-weight: 400;
+      line-height: 88px;
+
+      & > * {
+        margin-bottom: 40px;
+      }
+
+      &__title {
+        --size: 150px;
+
+        // Only allow taking up two lines of text. If longer, will X-overflow
+        // and be detected by a layout effect which shortens the text.
+        flex-basis: calc(var(--size) * 2);
+        font-size: var(--size);
+        font-weight: 700;
+        line-height: 1;
+      }
+
+      &__postfix {
+        font-weight: 700;
+        text-transform: capitalize;
+      }
+    }
 
     .header-container {
       margin: 48px;
@@ -137,20 +166,20 @@
         }
       }
     }
+  }
 
-    .paging-info-container {
-      position: absolute;
-      bottom: 0;
-      display: flex;
-      justify-content: space-between;
-      width: 100%;
-      height: 72px;
-      margin-bottom: 20px;
+  .paging-info-container {
+    position: absolute;
+    bottom: 0;
+    display: flex;
+    width: 100%;
+    height: 72px;
+    padding-left: 48px;
+    margin-bottom: 20px;
 
-      .more-elevators-text {
-        align-self: center;
-        padding: 0 48px 20px;
-      }
+    .paging-indicators {
+      // Align to right edge regardless of whether it's the only flex item
+      margin-left: auto;
     }
   }
 }
