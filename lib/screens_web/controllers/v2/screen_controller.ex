@@ -4,13 +4,12 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.Config.Cache
   alias Screens.Log
   alias Screens.V2.ScreenData.Parameters
+  alias Screens.V2.ScreenData.QueryParams
   alias ScreensConfig.Screen
 
   @default_app_id :bus_eink_v2
   @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 elevator_v2 gl_eink_v2 on_bus_v2 pre_fare_v2]a
   @app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
-  @url_param_strings ["route_id", "stop_id", "trip_id"]
-  # TODO: Consolidate query param strings here and in the API controller
 
   plug(:check_config)
   plug(:environment_name)
@@ -79,7 +78,7 @@ defmodule ScreensWeb.V2.ScreenController do
 
     if match?(%Screen{app_id: app_id} when app_id in @recognized_app_ids, config) do
       assigns = get_assigns(params, screen_id, config)
-      valid_params = get_url_params(conn)
+      valid_params = get_url_param_list(conn)
 
       conn
       |> merge_assigns(Enum.concat(assigns, valid_params))
@@ -238,11 +237,11 @@ defmodule ScreensWeb.V2.ScreenController do
     end
   end
 
-  defp get_url_params(conn) do
+  defp get_url_param_list(conn) do
     conn
     |> Plug.Conn.fetch_query_params()
     |> Map.get(:query_params, %{})
-    |> Map.take(@url_param_strings)
+    |> Map.take(QueryParams.valid_param_keys())
     |> Enum.map(fn {key, value} -> {String.to_atom(key), value} end)
     |> Map.new()
     |> Map.to_list()

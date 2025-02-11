@@ -6,12 +6,12 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias Screens.LogScreenData
   alias Screens.Util
   alias Screens.V2.{ScreenAudioData, ScreenData}
+  alias Screens.V2.ScreenData.QueryParams
   alias ScreensConfig.Screen
 
   @base_response %{data: nil, disabled: false, force_reload: false}
   @disabled_response %{@base_response | disabled: true}
   @outdated_response %{@base_response | force_reload: true}
-  @url_param_strings ["route_id", "stop_id", "trip_id"]
 
   plug(:check_config)
 
@@ -114,7 +114,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   defp merge_options(variant, conn, opts) do
     opts
-    |> Keyword.put(:query_params, get_url_params(conn, @url_param_strings))
+    |> Keyword.put(:query_params, get_url_param_map(conn))
     |> Keyword.put(:generator_variant, variant)
   end
 
@@ -268,10 +268,10 @@ defmodule ScreensWeb.V2.ScreenApiController do
     |> text("Not found")
   end
 
-  defp get_url_params(conn, valid_keys) do
+  defp get_url_param_map(conn) do
     conn
     |> Plug.Conn.fetch_query_params()
     |> Map.get(:query_params, %{})
-    |> Map.take(valid_keys)
+    |> Map.take(QueryParams.valid_param_keys())
   end
 end

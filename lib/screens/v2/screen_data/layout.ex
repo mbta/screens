@@ -5,11 +5,11 @@ defmodule Screens.V2.ScreenData.Layout do
 
   require Logger
 
-  alias ScreensConfig.Screen
   alias Screens.Util
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
   alias Screens.V2.ScreenData.QueryParams
+  alias ScreensConfig.Screen
 
   import Screens.Inject
   import Template.Guards, only: [is_paged: 1, is_paged_slot_id: 1, is_non_paged_slot_id: 1]
