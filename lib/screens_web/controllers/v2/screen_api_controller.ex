@@ -11,6 +11,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   @base_response %{data: nil, disabled: false, force_reload: false}
   @disabled_response %{@base_response | disabled: true}
   @outdated_response %{@base_response | force_reload: true}
+  @url_param_strings ["route_id", "stop_id", "trip_id"]
 
   plug(:check_config)
 
@@ -107,18 +108,14 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   defp screen_response(screen_id, _, variant, conn, opts) do
-    params = get_url_params(conn, ["stop_id"])
-    IO.inspect("URL params found in screen controller")
-    IO.inspect(params)
-
-    merged_opts = opts
-    |> Keyword.put(:stop_id, Map.get(params, "stop_id", nil))
-    |> Keyword.put(:generator_variant, variant)
-
-    # opts = Keyword.put(opts, params)
-    # IO.inspect(opts)
-    data = ScreenData.get(screen_id, merged_opts)
+    data = ScreenData.get(screen_id, merge_options(variant, conn, opts))
     %{@base_response | data: data}
+  end
+
+  defp merge_options(variant, conn, opts) do
+    opts
+    |> Keyword.put(:query_params, get_url_params(conn, @url_param_strings))
+    |> Keyword.put(:generator_variant, variant)
   end
 
   # Add extra fields used by the Mercury E-ink client
@@ -272,11 +269,9 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   defp get_url_params(conn, valid_keys) do
-    conn2 = conn
-      |> Plug.Conn.fetch_query_params()
-    # IO.inspect(conn2)
-    conn2
-      |> Map.get(:query_params, %{})
-      |> Map.take(valid_keys)
+    conn
+    |> Plug.Conn.fetch_query_params()
+    |> Map.get(:query_params, %{})
+    |> Map.take(valid_keys)
   end
 end

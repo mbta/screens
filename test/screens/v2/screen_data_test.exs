@@ -48,7 +48,7 @@ defmodule Screens.V2.ScreenDataTest do
       )
 
       assert ScreenData.get("test_id") ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
 
     test "generates widget data from a pending config" do
@@ -61,7 +61,7 @@ defmodule Screens.V2.ScreenDataTest do
       )
 
       assert ScreenData.get("test_id", pending_config: build_config(%{app_id: :test_app})) ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
 
     test "selects a variant candidate generator" do
@@ -74,7 +74,7 @@ defmodule Screens.V2.ScreenDataTest do
       )
 
       assert ScreenData.get("test_id", generator_variant: "test_variant") ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
 
     test "runs all variant generators in the background" do

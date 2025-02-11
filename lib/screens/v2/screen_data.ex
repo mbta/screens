@@ -52,14 +52,8 @@ defmodule Screens.V2.ScreenData do
   @spec select_variant(screen_id(), options(), (Layout.t(), Screen.t() -> data)) :: data
         when data: t() | simulation_data()
   defp select_variant(screen_id, opts, then_fn) do
-    IO.inspect(opts)
     config = get_config(screen_id, opts)
     selected_variant = Keyword.get(opts, :generator_variant)
-    if Keyword.get(opts, :stop_id) do
-      IO.inspect(Keyword.get(opts, :stop_id))
-      IO.inspect(config)
-    end
-
 
     if Keyword.get(opts, :run_all_variants?, false) do
       other_variants = List.delete([nil | @parameters.variants(config)], selected_variant)
@@ -73,7 +67,7 @@ defmodule Screens.V2.ScreenData do
     end
 
     config
-    |> Layout.generate(selected_variant, Keyword.get(opts, :stop_id))
+    |> Layout.generate(selected_variant, Keyword.get(opts, :query_params))
     |> tap(&update_visible_alerts(&1, screen_id, config, opts))
     |> then_fn.(config)
   end

@@ -38,7 +38,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
       assert %{
                "audio_data" => "",
                "data" => %{
-                 "main" => %{"color" => "green", "type" => "placeholder"},
+                 "main" => %{"color" => "green", "type" => "placeholder", "text" => ""},
                  "type" => "normal"
                },
                "disabled" => false,
@@ -68,7 +68,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
 
       assert %{
                "data" => %{
-                 "main" => %{"color" => "red", "type" => "placeholder"},
+                 "main" => %{"color" => "red", "type" => "placeholder", "text" => ""},
                  "type" => "normal"
                },
                "disabled" => false,

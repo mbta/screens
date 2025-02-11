@@ -28,14 +28,22 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   @impl CandidateGenerator
   def candidate_instances(config) do
     [
-      fn -> body_instances(config |> Map.get("query_params", %{}) |> Map.get("stop_id", nil)) end # TODO: handle case with no stop_id or query params
+      fn -> body_instances(config |> Map.get("query_params", %{})) end
     ]
     |> Task.async_stream(& &1.())
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
-  def body_instances(stop_id) do
-    [%Placeholder{color: :blue, slot_names: [:main_content], text: "Stop ID:\n #{stop_id}"}] # TODO: Do something different if passed nil
+  def body_instances(query_params) do
+    [%Placeholder{color: :blue, slot_names: [:main_content], text: build_body_text(query_params)}]
+  end
+
+  defp build_body_text(query_params) do
+    "Route ID: " <>
+      Map.get(query_params, "route_id", "N/A") <>
+      ", Stop ID:  " <>
+      Map.get(query_params, "stop_id", "N/A") <>
+      ", Trip ID:  " <> Map.get(query_params, "trip_id", "N/A")
   end
 
   @impl CandidateGenerator
