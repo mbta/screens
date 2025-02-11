@@ -142,7 +142,10 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
       last_refresh: getDatasetValue("lastRefresh"),
       requestor:
         getDatasetValue("requestor") ?? (isRealScreen() ? "real_screen" : null),
+      route_id: getDatasetValue("routeId"),
       screen_side: getScreenSide(),
+      stop_id: getDatasetValue("stopId"),
+      trip_id: getDatasetValue("tripId"),
       variant: getDatasetValue("variant"),
       ...loggingParams(),
     };

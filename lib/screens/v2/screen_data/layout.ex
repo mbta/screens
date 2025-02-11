@@ -13,6 +13,7 @@ defmodule Screens.V2.ScreenData.Layout do
   import Screens.Inject
   import Template.Guards, only: [is_paged: 1, is_paged_slot_id: 1, is_non_paged_slot_id: 1]
 
+  @type generate_params :: %{variant: String.t() | nil, stop_id: String.t | nil}
   @parameters injected(Screens.V2.ScreenData.Parameters)
 
   @type t :: {Template.layout(), %{Template.slot_id() => WidgetInstance.t()}}
@@ -28,12 +29,16 @@ defmodule Screens.V2.ScreenData.Layout do
         }
 
   @spec generate(Screen.t()) :: t()
-  @spec generate(Screen.t(), String.t() | nil) :: t()
-  def generate(config, variant \\ nil) do
+  @spec generate(Screen.t(), generate_params) :: t()
+  @spec generate(any(), any(), any()) ::
+          {{atom() | non_neg_integer() | {non_neg_integer(), atom()}, {atom(), list()}},
+           %{optional(atom() | {non_neg_integer(), atom()}) => any()}}
+  def generate(config, variant \\ nil, stop_id \\ nil) do
     candidate_generator = @parameters.candidate_generator(config, variant)
     screen_template = candidate_generator.screen_template()
 
     config
+    |> Map.put("query_params", %{"stop_id" => stop_id})
     |> candidate_generator.candidate_instances()
     |> Enum.filter(&WidgetInstance.valid_candidate?/1)
     |> pick_instances(screen_template)

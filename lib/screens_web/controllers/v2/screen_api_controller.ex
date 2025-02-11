@@ -84,7 +84,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> screen_response(screen, variant,
+          |> screen_response(screen, variant, conn,
             run_all_variants?: true,
             update_visible_alerts?: true
           )
@@ -94,20 +94,30 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
-  defp screen_response(screen_id, _, "all", opts) do
+  defp screen_response(screen_id, _, "all", _conn, opts) do
     {default, variants} = ScreenData.variants(screen_id, opts)
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
-  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, opts) do
+  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, _conn, opts) do
     %{full_page: data, flex_zone: flex_zone} =
       ScreenData.simulation(screen_id, Keyword.put(opts, :generator_variant, variant))
 
     Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
   end
 
-  defp screen_response(screen_id, _, variant, opts) do
-    data = ScreenData.get(screen_id, Keyword.put(opts, :generator_variant, variant))
+  defp screen_response(screen_id, _, variant, conn, opts) do
+    params = get_url_params(conn, ["stop_id"])
+    IO.inspect("URL params found in screen controller")
+    IO.inspect(params)
+
+    merged_opts = opts
+    |> Keyword.put(:stop_id, Map.get(params, "stop_id", nil))
+    |> Keyword.put(:generator_variant, variant)
+
+    # opts = Keyword.put(opts, params)
+    # IO.inspect(opts)
+    data = ScreenData.get(screen_id, merged_opts)
     %{@base_response | data: data}
   end
 
@@ -259,5 +269,14 @@ defmodule ScreensWeb.V2.ScreenApiController do
     conn
     |> put_status(:not_found)
     |> text("Not found")
+  end
+
+  defp get_url_params(conn, valid_keys) do
+    conn2 = conn
+      |> Plug.Conn.fetch_query_params()
+    # IO.inspect(conn2)
+    conn2
+      |> Map.get(:query_params, %{})
+      |> Map.take(valid_keys)
   end
 end
