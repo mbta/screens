@@ -16,11 +16,35 @@ import SimulationScreenPage from "Components/v2/simulation_screen_page";
 import Placeholder from "Components/v2/placeholder";
 import NormalScreen from "Components/v2/bus_eink/normal_screen";
 import NormalBody from "Components/v2/bus_eink/normal_body";
+import NoData from "Components/v2/on_bus/no_data";
+import {
+  ResponseMapper,
+  ResponseMapperContext,
+} from "Components/v2/screen_container";
 
 const TYPE_TO_COMPONENT = {
+  body_normal: NormalBody,
+  no_data: NoData,
   placeholder: Placeholder,
   screen_normal: NormalScreen,
-  body_normal: NormalBody,
+};
+
+const LOADING_LAYOUT = {
+  type: "no_data",
+};
+
+const responseMapper: ResponseMapper = (apiResponse) => {
+  switch (apiResponse.state) {
+    case "success":
+    case "simulation_success":
+      return apiResponse.data;
+    case "failure":
+      return LOADING_LAYOUT;
+    case "loading":
+      return LOADING_LAYOUT;
+    case "disabled":
+      return LOADING_LAYOUT;
+  }
 };
 
 const App = (): JSX.Element => {
@@ -28,11 +52,16 @@ const App = (): JSX.Element => {
     <Router>
       <Switch>
         <Route exact path="/v2/screen/on_bus_v2">
-          <MultiScreenPage components={TYPE_TO_COMPONENT} />
+          <MultiScreenPage
+            components={TYPE_TO_COMPONENT}
+            responseMapper={responseMapper}
+          />
         </Route>
         <Route exact path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <ScreenPage />
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <ScreenPage />
+            </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
         <Route
@@ -43,7 +72,9 @@ const App = (): JSX.Element => {
           ]}
         >
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-            <SimulationScreenPage />
+            <ResponseMapperContext.Provider value={responseMapper}>
+              <SimulationScreenPage />
+            </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>
       </Switch>
