@@ -141,6 +141,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     |> Enum.filter(&relevant_closure?(&1, home_station_id, closures))
     |> Enum.group_by(& &1.station_id)
     |> Enum.map(fn {station_id, station_closures} ->
+      # https://app.asana.com/0/1185117109217413/1209274790976901
+      # Checking if all screens have the same elevator closure ids or not
+      Log.warning("station_closures", ids: Enum.map(station_closures, & &1.id))
+
       %ElevatorClosures.Station{
         id: station_id,
         name: Map.fetch!(station_names, station_id),

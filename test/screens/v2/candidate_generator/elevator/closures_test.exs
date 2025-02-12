@@ -220,6 +220,41 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       assert logs =~ "elevator_closure_affects_multiple"
     end
 
+    test "logs elevator closures for debugging", %{now: now} do
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        active_period = {DateTime.add(now, -1, :day), DateTime.add(now, 1, :day)}
+        upcoming_period = {DateTime.add(now, 1, :day), DateTime.add(now, 3, :day)}
+
+        alerts = [
+          build_alert(
+            active_period: [active_period],
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
+            ]
+          ),
+          build_alert(
+            active_period: [active_period],
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test 2", id: "facility-test2"}}
+            ]
+          ),
+          build_alert(
+            effect: :detour,
+            active_period: [active_period],
+            informed_entities: [
+              %{stop: "place-test", facility: %{name: "Test 3", id: "facility-test3"}}
+            ]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      assert capture_log([level: :warning], fn ->
+               Generator.elevator_status_instances(@screen, now)
+             end) =~ "station_closures ids=[\"facility-test\", \"facility-test2\"]"
+    end
+
     test "filters out alerts at other stations with nearby exiting redundancy", %{now: now} do
       expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok,
