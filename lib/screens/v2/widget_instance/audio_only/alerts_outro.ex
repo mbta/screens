@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutro do
   An audio-only widget that follows the section of the readout describing alerts.
   """
 
-  alias Screens.Log
+  alias Screens.Report
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias ScreensConfig.Screen
@@ -34,7 +34,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutro do
 
     case last_alert_widget do
       nil ->
-        Log.warning("alerts_outro_widget_not_found")
+        Report.warning("alerts_outro_widget_not_found")
         [100]
 
       widget ->

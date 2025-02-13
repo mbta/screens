@@ -4,7 +4,7 @@ defmodule Screens.Elevator do
   """
 
   alias Screens.Facilities.Facility
-  alias Screens.Log
+  alias Screens.Report
 
   @enforce_keys ~w[id alternate_ids entering_redundancy exiting_redundancy]a
   defstruct @enforce_keys
@@ -24,7 +24,7 @@ defmodule Screens.Elevator do
   def get(id) do
     case Map.get(@data, id) do
       nil ->
-        Log.warning("elevator_redundancy_not_found", id: id)
+        Report.warning("elevator_redundancy_not_found", id: id)
         nil
 
       %{"alternate_ids" => alternate_ids} = entry ->

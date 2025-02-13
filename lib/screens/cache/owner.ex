@@ -9,7 +9,7 @@ defmodule Screens.Cache.Owner do
   or what kinds of queries will be made against it.
   """
   alias Screens.Cache.Engine
-  alias Screens.Log
+  alias Screens.Report
 
   use GenServer
 
@@ -159,12 +159,12 @@ defmodule Screens.Cache.Owner do
   end
 
   defp error_state(%{status: :error} = state) do
-    Log.error("cache_init_error", table_name: state.name)
+    Report.error("cache_init_error", table_name: state.name)
     %{state | retry_count: state.retry_count + 1}
   end
 
   defp error_state(state) do
-    Log.error("cache_update_error", table_name: state.name, retry_count: state.retry_count)
+    Report.error("cache_update_error", table_name: state.name, retry_count: state.retry_count)
     %{state | retry_count: state.retry_count + 1}
   end
 end

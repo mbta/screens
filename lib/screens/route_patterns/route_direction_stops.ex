@@ -1,7 +1,7 @@
 defmodule Screens.RoutePatterns.RouteDirectionStops do
   @moduledoc false
 
-  alias Screens.Log
+  alias Screens.Report
 
   def parse_result(%{"data" => data} = response, route_id) do
     included_data = response |> Map.get("included", []) |> parse_included_data()
@@ -66,7 +66,7 @@ defmodule Screens.RoutePatterns.RouteDirectionStops do
       [] ->
         # Happens sometimes in API dev (only?). If a trip has no stops, there is something wrong
         # with the data.
-        Log.warning("route_pattern_empty_stops", trip_id: trip_id)
+        Report.warning("route_pattern_empty_stops", trip_id: trip_id)
         :error
 
       _ ->
