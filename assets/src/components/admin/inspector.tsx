@@ -54,7 +54,8 @@ const Inspector: ComponentType = () => {
   }, []);
 
   const { search } = useLocation();
-  const screenId = new URLSearchParams(search).get("id");
+  const urlParams = new URLSearchParams(search);
+  const screenId = urlParams.get("id");
   const screen: ScreenWithId | null =
     config && screenId
       ? { id: screenId, config: config.screens[screenId] }
@@ -119,8 +120,17 @@ const Inspector: ComponentType = () => {
               ? new URL(
                   [
                     `/v2/screen/${screen.id}`,
-                    isSimulation ? "/simulation" : "",
-                    isVariantEnabled ? "?variant=all" : "",
+                    isSimulation ? "/simulation?" : "?",
+                    isVariantEnabled ? "variant=all&" : "",
+                    urlParams.get("route_id")
+                      ? `route_id=${urlParams.get("route_id")}&`
+                      : "",
+                    urlParams.get("stop_id")
+                      ? `stop_id=${urlParams.get("stop_id")}&`
+                      : "",
+                    urlParams.get("trip_id")
+                      ? `trip_id=${urlParams.get("trip_id")}&`
+                      : "",
                   ].join(""),
                   location.origin,
                 ).toString()

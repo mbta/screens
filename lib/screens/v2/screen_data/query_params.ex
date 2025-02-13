@@ -13,7 +13,7 @@ defmodule Screens.V2.ScreenData.QueryParams do
   # Valid keys for URL parameters to be passed into the screen app.
   # To process a new URL parameter, it needs to be added to this list.
   @valid_param_keys ["route_id", "stop_id", "trip_id"]
-  def valid_param_keys() do
+  def valid_param_keys do
     @valid_param_keys
   end
 
@@ -30,8 +30,6 @@ defmodule Screens.V2.ScreenData.QueryParams do
 
   @spec get_url_param_list(Plug.Conn.t()) :: list()
   def get_url_param_list(conn) do
-    IO.inspect(QueryParams.get_url_param_map(conn))
-
     QueryParams.valid_param_keys()
     |> Enum.map(fn key ->
       value = Map.get(QueryParams.get_url_param_map(conn), String.to_atom(key))

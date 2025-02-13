@@ -6,8 +6,8 @@ defmodule Screens.V2.ScreenData.Layout do
   require Logger
 
   alias Screens.Util
-  alias Screens.V2.Template
   alias Screens.V2.ScreenData.QueryParams
+  alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
 
