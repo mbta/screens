@@ -1,8 +1,8 @@
 defmodule Screens.V2.WidgetInstance.CRDepartures do
   @moduledoc false
 
-  alias Screens.Log
   alias Screens.Predictions.Prediction
+  alias Screens.Report
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.Departure
@@ -136,7 +136,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
        ) do
     scheduled_departure_time =
       if is_nil(schedule) do
-        Log.error("cr_departures_no_scheduled_time", departure: departure)
+        Report.error("cr_departures_no_scheduled_time", departure: departure)
         nil
       else
         %Departure{schedule: schedule} |> Departure.time() |> Util.to_eastern()

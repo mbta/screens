@@ -27,7 +27,7 @@ defmodule Screens.ScreensByAlert.Memcache do
   ```
   """
 
-  alias Screens.Log
+  alias Screens.Report
   alias Screens.ScreensByAlert.Memcache.TaskSupervisor
   alias Screens.Util
 
@@ -179,6 +179,6 @@ defmodule Screens.ScreensByAlert.Memcache do
   defp key_to_id(@screens_last_updated_key_prefix <> screen_id), do: screen_id
 
   defp log_warning(message, source, extra \\ []) do
-    Log.warning("memcache_error", [message: message, source: source] ++ extra)
+    Report.warning("memcache_error", [message: message, source: source] ++ extra)
   end
 end

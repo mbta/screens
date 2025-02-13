@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.Log
+  alias Screens.Report
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
   alias ScreensConfig.Screen
@@ -225,7 +225,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # we generate DUP alert widgets for, but in case one slips through, we
   # should know about it!
   defp log_layout_mismatch(t, delay_severity) do
-    Log.warning(
+    Report.warning(
       "dup_alert_no_matching_layout",
       t
       |> get_layout_parameters()

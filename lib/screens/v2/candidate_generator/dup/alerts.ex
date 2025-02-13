@@ -5,7 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.Log
+  alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
@@ -161,7 +161,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         Enum.any?(alert.informed_entities, &(&1.direction_id in 0..1))
 
     if directional do
-      Log.warning(
+      Report.warning(
         "dup_discarding_directional_alert",
         alert_id: alert.id,
         alert_effect: alert.effect

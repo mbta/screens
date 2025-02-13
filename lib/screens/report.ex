@@ -1,4 +1,4 @@
-defmodule Screens.Log do
+defmodule Screens.Report do
   @moduledoc "Conveniences for logging to Splunk and Sentry."
 
   require Logger

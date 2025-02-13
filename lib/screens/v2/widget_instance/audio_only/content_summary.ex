@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
   An audio-only widget that summarizes what's about to be read out.
   """
 
-  alias Screens.Log
+  alias Screens.Report
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
   alias ScreensConfig.Screen
@@ -35,7 +35,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     # Attempt to find a header widget and place this widget immediately after it
     case Enum.find(t.widgets_snapshot, &match?(%NormalHeader{}, &1)) do
       nil ->
-        Log.warning("content_summary_header_not_found")
+        Report.warning("content_summary_header_not_found")
         [0]
 
       header ->

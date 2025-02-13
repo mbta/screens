@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @moduledoc false
 
-  alias Screens.Log
+  alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.RouteType
 
@@ -207,7 +207,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   defp do_serialize("CR-" <> line, opts) do
     abbreviation =
       Map.get_lazy(@cr_line_abbreviations, line, fn ->
-        Log.warning("missing_route_pill_abbreviation", line: line)
+        Report.warning("missing_route_pill_abbreviation", line: line)
         nil
       end)
 

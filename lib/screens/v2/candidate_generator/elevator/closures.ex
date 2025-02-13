@@ -27,7 +27,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Elevator
   alias Screens.Facilities.Facility
-  alias Screens.Log
+  alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance
@@ -97,7 +97,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         [%Closure{id: id, name: name, station_id: station_id, elevator: @elevator.get(id)}]
 
       _multiple ->
-        Log.warning("elevator_closure_affects_multiple", alert_id: id)
+        Report.warning("elevator_closure_affects_multiple", alert_id: id)
         []
     end
   end

@@ -1,7 +1,7 @@
 defmodule Screens.Audio do
   @moduledoc false
 
-  alias Screens.Log
+  alias Screens.Report
 
   @lexicon_names ["mbtalexicon"]
 
@@ -17,7 +17,7 @@ defmodule Screens.Audio do
         {:ok, audio_data}
 
       {:error, error} ->
-        Log.error("synthesize_ssml_failed", [error: error, string: ssml_string] ++ log_meta)
+        Report.error("synthesize_ssml_failed", [error: error, string: ssml_string] ++ log_meta)
         :error
     end
   end
