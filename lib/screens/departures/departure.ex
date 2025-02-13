@@ -1,8 +1,8 @@
 defmodule Screens.Departures.Departure do
   @moduledoc false
 
-  alias Screens.Report
   alias Screens.Predictions.Prediction
+  alias Screens.Report
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
   alias Screens.Util
