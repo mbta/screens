@@ -117,7 +117,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       app_params: app_params,
       station_id: stop_id,
       stations_with_closures:
-        build_stations_with_closures(closures, stop_id, station_names, station_route_pills)
+        build_stations_with_closures(
+          closures,
+          stop_id,
+          station_names,
+          station_route_pills,
+          elevator_id
+        )
     }
   end
 
@@ -137,10 +143,16 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     end
   end
 
-  defp build_stations_with_closures(closures, home_station_id, station_names, station_route_pills) do
+  defp build_stations_with_closures(
+         closures,
+         home_station_id,
+         station_names,
+         station_route_pills,
+         elevator_id
+       ) do
     closures
     |> Enum.filter(&relevant_closure?(&1, home_station_id, closures))
-    |> log_station_closures()
+    |> log_station_closures(elevator_id)
     |> Enum.group_by(& &1.station_id)
     |> Enum.map(fn {station_id, station_closures} ->
       %ElevatorClosures.Station{
@@ -162,8 +174,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   # https://app.asana.com/0/1185117109217413/1209274790976901
   # Checking if all screens have the same elevator closure ids or not
-  defp log_station_closures(station_closures) do
-    Logger.info("station_closures: " <> Enum.map_join(station_closures, " ", & &1.id))
+  defp log_station_closures(station_closures, elevator_id) do
+    Logger.info(
+      "station_closures: " <>
+        "elevator_id=#{elevator_id} " <>
+        "closures=#{Enum.map_join(station_closures, ",", & &1.id)}"
+    )
+
     station_closures
   end
 
