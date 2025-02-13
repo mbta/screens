@@ -68,7 +68,6 @@ defmodule Screens.V2.ScreenData.QueryParamsTest do
     test "Processes a mix of valid and invalid param keys/values correctly" do
       conn =
         build_conn(%{"stop_id" => "456", "route_id" => "", "invalid_param_key" => "not_used"})
-
       assert QueryParams.get_url_param_list(conn) == [{:stop_id, "456"}]
     end
   end

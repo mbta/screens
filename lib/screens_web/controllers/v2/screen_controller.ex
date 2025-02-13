@@ -238,10 +238,4 @@ defmodule ScreensWeb.V2.ScreenController do
         a <= b
     end
   end
-
-  # %Screens.V2.ScreenData.QueryParams{
-  # route_id: nil,
-  # stop_id: "243",
-  # trip_id: "ABCDEFG"
-  # }
 end
