@@ -24,6 +24,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     defstruct @enforce_keys
   end
 
+  require Logger
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Elevator
   alias Screens.Facilities.Facility
@@ -140,11 +141,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     closures
     |> Enum.filter(&relevant_closure?(&1, home_station_id, closures))
     |> Enum.group_by(& &1.station_id)
+    |> log_station_closures()
     |> Enum.map(fn {station_id, station_closures} ->
-      # https://app.asana.com/0/1185117109217413/1209274790976901
-      # Checking if all screens have the same elevator closure ids or not
-      Log.warning("station_closures", ids: Enum.map(station_closures, & &1.id))
-
       %ElevatorClosures.Station{
         id: station_id,
         name: Map.fetch!(station_names, station_id),
@@ -160,6 +158,20 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         summary: backup_route_summary(station_closures, closures)
       }
     end)
+  end
+
+  # https://app.asana.com/0/1185117109217413/1209274790976901
+  # Checking if all screens have the same elevator closure ids or not
+  defp log_station_closures(station_closures) do
+    closures =
+      station_closures
+      |> Enum.flat_map(fn {_, list_of_closures} ->
+        list_of_closures
+      end)
+      |> Enum.map_join(" ", & &1.id)
+
+    Logger.info("station_closures:" <> " " <> closures)
+    station_closures
   end
 
   # If we couldn't find alternate/redundancy data for an elevator, assume it's relevant.
