@@ -114,7 +114,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   defp merge_options(variant, conn, opts) do
     opts
-    |> Keyword.put(:query_params, get_url_param_map(conn))
+    |> Keyword.put(:query_params, QueryParams.get_url_param_map(conn))
     |> Keyword.put(:generator_variant, variant)
   end
 
@@ -266,12 +266,5 @@ defmodule ScreensWeb.V2.ScreenApiController do
     conn
     |> put_status(:not_found)
     |> text("Not found")
-  end
-
-  defp get_url_param_map(conn) do
-    conn
-    |> Plug.Conn.fetch_query_params()
-    |> Map.get(:query_params, %{})
-    |> Map.take(QueryParams.valid_param_keys())
   end
 end

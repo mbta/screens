@@ -40,10 +40,10 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
 
   defp build_body_text(query_params) do
     "Route ID: " <>
-      Map.get(query_params, "route_id", "N/A") <>
+      (query_params.route_id || "N/A") <>
       ", Stop ID:  " <>
-      Map.get(query_params, "stop_id", "N/A") <>
-      ", Trip ID:  " <> Map.get(query_params, "trip_id", "N/A")
+      (query_params.stop_id || "N/A") <>
+      ", Trip ID:  " <> (query_params.trip_id || "N/A")
   end
 
   @impl CandidateGenerator
