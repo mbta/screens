@@ -1,5 +1,8 @@
 defmodule Screens.V2.ScreenData.QueryParams do
-  @moduledoc "Encodes valid query parameters that are currently only used by on bus screens."
+  @moduledoc """
+  Encodes valid query parameters that are currently only used by on bus screens.
+  Contains methods for processing query paramaters used by screen and api controllers.
+  """
   alias Screens.V2.ScreenData.QueryParams
 
   @type t :: %__MODULE__{
@@ -13,10 +16,8 @@ defmodule Screens.V2.ScreenData.QueryParams do
   # Valid keys for URL parameters to be passed into the screen app.
   # To process a new URL parameter, it needs to be added to this list.
   @valid_param_keys ["route_id", "stop_id", "trip_id"]
-  def valid_param_keys do
-    @valid_param_keys
-  end
 
+  @doc "Returns a QueryParam struct of all valid query param keys and corresponding values."
   @spec get_url_param_map(Plug.Conn.t()) :: struct()
   def get_url_param_map(conn) do
     conn
@@ -28,9 +29,10 @@ defmodule Screens.V2.ScreenData.QueryParams do
     |> then(&struct(__MODULE__, &1))
   end
 
+  @doc "Returns a list of tuples of all valid query param keys and corresponding values."
   @spec get_url_param_list(Plug.Conn.t()) :: list()
   def get_url_param_list(conn) do
-    QueryParams.valid_param_keys()
+    @valid_param_keys
     |> Enum.map(fn key ->
       value = Map.get(QueryParams.get_url_param_map(conn), String.to_atom(key))
       {String.to_atom(key), value}
