@@ -95,7 +95,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
-  defp screen_response(screen_id, _, variant = "all", conn, opts) do
+  defp screen_response(screen_id, _,  "all" = variant, conn, opts) do
     {default, variants} = ScreenData.variants(screen_id, merge_options(variant, conn, opts))
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
