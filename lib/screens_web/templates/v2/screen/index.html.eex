@@ -10,15 +10,6 @@
   data-is-real-screen="<%= @is_real_screen %>"
   data-is-pending="<%= @is_pending %>"
   data-sentry="<%= @sentry_dsn %>"
-  <%= if assigns[:route_id] do %>
-      data-route-id="<%= @route_id %>"
-  <% end %>
-  <%= if assigns[:stop_id] do %>
-      data-stop-id="<%= @stop_id %>"
-  <% end %>
-  <%= if assigns[:trip_id] do %>
-      data-trip-id="<%= @trip_id %>"
-  <% end %>
   <%= if not is_nil(@screen_side) do %>
     data-screen-side="<%= @screen_side %>"
   <% end %>

@@ -19,11 +19,11 @@ defmodule Screens.V2.ScreenData.QueryParams do
   @spec get_url_param_map(Plug.Conn.t()) :: struct()
   def get_url_param_map(conn) do
     conn
-    |> Plug.Conn.fetch_query_params()
+    # |> Plug.Conn.fetch_query_params()
     |> Map.get(:query_params, %{})
     |> Map.take(@valid_param_keys)
     |> Enum.filter(fn {_key, value} -> value != "" end)
-    |> Enum.into(%{}, fn {key, value} -> {String.to_atom(key), value} end)
+    |> Enum.into(%{}, fn {key, value} -> {String.to_existing_atom(key), value} end)
     |> then(&struct(__MODULE__, &1))
   end
 end

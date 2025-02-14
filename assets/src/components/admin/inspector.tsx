@@ -19,7 +19,7 @@ import {
   sendMessage,
   useReceiveMessage,
 } from "Util/inspector";
-import { SCREEN_TYPE_URL_PARAMS } from "Util/query_params";
+import { URL_PARAMS_BY_SCREEN_TYPE } from "Util/query_params";
 
 type ScreenWithId = { id: string; config: Screen };
 
@@ -55,8 +55,8 @@ const buildIframeUrlParams = (
     isVariantEnabled ? "variant=all&" : "",
   ].join("");
 
-  if (screenId && SCREEN_TYPE_URL_PARAMS[screenId]) {
-    return SCREEN_TYPE_URL_PARAMS[screenId].reduce((key) => {
+  if (screenId && URL_PARAMS_BY_SCREEN_TYPE[screenId]) {
+    return URL_PARAMS_BY_SCREEN_TYPE[screenId].reduce((key) => {
       return urlParams.get(key) ? `${key} =${urlParams.get(key)}&` : "";
     }, urlParamString);
   }

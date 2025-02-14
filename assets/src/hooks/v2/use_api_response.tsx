@@ -165,7 +165,7 @@ const useApiPath = (
   }, [screenId, appendPath]);
 };
 
-interface UseBaseApiResponseProps {
+interface UseBaseApiResponseOpts {
   id: string;
   appendPath?: string;
   queryParams?: Map<string, string>;
@@ -181,7 +181,7 @@ const useBaseApiResponse = ({
   id,
   appendPath,
   queryParams,
-}: UseBaseApiResponseProps): UseApiResponseReturn => {
+}: UseBaseApiResponseOpts): UseApiResponseReturn => {
   const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
