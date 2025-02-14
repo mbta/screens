@@ -20,7 +20,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew do
   defdelegate screen_template(), to: Screens.V2.CandidateGenerator.Dup
 
   @impl CandidateGenerator
-  def candidate_instances(config, now \\ DateTime.utc_now()) do
+  def candidate_instances(config, _query_params, now \\ DateTime.utc_now()) do
     Telemetry.span(@telemetry_name, fn ->
       context = Telemetry.context()
 

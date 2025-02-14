@@ -26,9 +26,9 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(config) do
+  def candidate_instances(_config, query_params) do
     [
-      fn -> body_instances(config |> Map.get("query_params", %{})) end
+      fn -> body_instances(query_params) end
     ]
     |> Task.async_stream(& &1.())
     |> Enum.flat_map(fn {:ok, instances} -> instances end)

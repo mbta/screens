@@ -40,8 +40,7 @@ defmodule Screens.V2.ScreenData.Layout do
     screen_template = candidate_generator.screen_template()
 
     config
-    |> Map.put("query_params", query_params)
-    |> candidate_generator.candidate_instances()
+    |> candidate_generator.candidate_instances(query_params)
     |> Enum.filter(&WidgetInstance.valid_candidate?/1)
     |> pick_instances(screen_template)
   end

@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
   alias ScreensConfig.V2.{Alerts, Departures, Header}
   alias ScreensConfig.V2.Dup, as: DupConfig
   alias Screens.V2.CandidateGenerator.Dup
+  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.NormalHeader
 
   setup do
@@ -90,6 +91,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       departures_instances_fn = fn _, _ -> [] end
       evergreen_content_instances_fn = fn _ -> [] end
       alerts_instances_fn = fn _, _ -> [] end
+      query_params = %QueryParams{}
 
       expected_headers =
         List.duplicate(
@@ -105,6 +107,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       actual_instances =
         Dup.candidate_instances(
           config,
+          query_params,
           now,
           fetch_stop_fn,
           evergreen_content_instances_fn,
