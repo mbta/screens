@@ -6,6 +6,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias Screens.LogScreenData
   alias Screens.Util
   alias Screens.V2.{ScreenAudioData, ScreenData}
+  alias Screens.V2.ScreenData.QueryParams
   alias ScreensConfig.Screen
 
   @base_response %{data: nil, disabled: false, force_reload: false}
@@ -84,7 +85,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> screen_response(screen, variant,
+          |> screen_response(screen, variant, conn,
             run_all_variants?: true,
             update_visible_alerts?: true
           )
@@ -94,21 +95,27 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
-  defp screen_response(screen_id, _, "all", opts) do
-    {default, variants} = ScreenData.variants(screen_id, opts)
+  defp screen_response(screen_id, _, "all" = variant, conn, opts) do
+    {default, variants} = ScreenData.variants(screen_id, merge_options(variant, conn, opts))
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
-  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, opts) do
+  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, conn, opts) do
     %{full_page: data, flex_zone: flex_zone} =
-      ScreenData.simulation(screen_id, Keyword.put(opts, :generator_variant, variant))
+      ScreenData.simulation(screen_id, merge_options(variant, conn, opts))
 
     Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
   end
 
-  defp screen_response(screen_id, _, variant, opts) do
-    data = ScreenData.get(screen_id, Keyword.put(opts, :generator_variant, variant))
+  defp screen_response(screen_id, _, variant, conn, opts) do
+    data = ScreenData.get(screen_id, merge_options(variant, conn, opts))
     %{@base_response | data: data}
+  end
+
+  defp merge_options(variant, conn, opts) do
+    opts
+    |> Keyword.put(:query_params, QueryParams.get_url_param_map(conn))
+    |> Keyword.put(:generator_variant, variant)
   end
 
   # Add extra fields used by the Mercury E-ink client

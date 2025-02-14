@@ -19,6 +19,7 @@ import {
   sendMessage,
   useReceiveMessage,
 } from "Util/inspector";
+import { URL_PARAMS_BY_SCREEN_TYPE } from "Util/query_params";
 
 type ScreenWithId = { id: string; config: Screen };
 
@@ -43,6 +44,28 @@ const AUDIO_SCREEN_TYPES = new Set([
 
 const SCREEN_TYPE_VARIANTS = { dup_v2: ["new_departures"] };
 
+const buildIframeUrl = (
+  screen: ScreenWithId,
+  screenId: string,
+  isSimulation: boolean,
+  isVariantEnabled: boolean,
+  urlParams: URLSearchParams,
+) => {
+  let urlParamString = [
+    isSimulation ? "/simulation?" : "?",
+    isVariantEnabled ? "variant=all&" : "",
+  ].join("");
+
+  if (screenId && URL_PARAMS_BY_SCREEN_TYPE[screenId]) {
+    URL_PARAMS_BY_SCREEN_TYPE[screenId].forEach((key) => {
+      urlParamString += urlParams.get(key)
+        ? `${key}=${urlParams.get(key)}&`
+        : "";
+    });
+  }
+  return [`/v2/screen/${screen.id}`, urlParamString].join("");
+};
+
 const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
 
@@ -54,7 +77,8 @@ const Inspector: ComponentType = () => {
   }, []);
 
   const { search } = useLocation();
-  const screenId = new URLSearchParams(search).get("id");
+  const urlParams = new URLSearchParams(search);
+  const screenId = urlParams.get("id");
   const screen: ScreenWithId | null =
     config && screenId
       ? { id: screenId, config: config.screens[screenId] }
@@ -117,12 +141,14 @@ const Inspector: ComponentType = () => {
           src={
             screen
               ? new URL(
-                  [
-                    `/v2/screen/${screen.id}`,
-                    isSimulation ? "/simulation" : "",
-                    isVariantEnabled ? "?variant=all" : "",
-                  ].join(""),
-                  location.origin,
+                  buildIframeUrl(
+                    screen,
+                    screen.config.app_id,
+                    isSimulation,
+                    isVariantEnabled,
+                    urlParams,
+                  ),
+                  location.origin.toString(),
                 ).toString()
               : "about:blank"
           }

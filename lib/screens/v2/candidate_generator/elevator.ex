@@ -30,7 +30,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   end
 
   @impl true
-  def candidate_instances(config, now \\ DateTime.utc_now(), instance_fns \\ @instance_fns) do
+  def candidate_instances(
+        config,
+        _query_params,
+        now \\ DateTime.utc_now(),
+        instance_fns \\ @instance_fns
+      ) do
     instance_fns |> Enum.map(& &1.(config, now)) |> Enum.concat()
   end
 

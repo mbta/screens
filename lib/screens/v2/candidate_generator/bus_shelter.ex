@@ -47,6 +47,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   # credo:disable-for-next-line Credo.Check.Design.DuplicatedCode
   def candidate_instances(
         config,
+        _query_params,
         now \\ DateTime.utc_now(),
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/2,

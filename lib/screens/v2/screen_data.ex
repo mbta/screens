@@ -54,6 +54,7 @@ defmodule Screens.V2.ScreenData do
   defp select_variant(screen_id, opts, then_fn) do
     config = get_config(screen_id, opts)
     selected_variant = Keyword.get(opts, :generator_variant)
+    query_params = Keyword.get(opts, :query_params)
 
     if Keyword.get(opts, :run_all_variants?, false) do
       other_variants = List.delete([nil | @parameters.variants(config)], selected_variant)
@@ -61,13 +62,13 @@ defmodule Screens.V2.ScreenData do
       Enum.each(other_variants, fn variant ->
         {:ok, _pid} =
           Task.Supervisor.start_child(ParallelRunSupervisor, fn ->
-            config |> Layout.generate(variant) |> then_fn.(config)
+            config |> Layout.generate(variant, query_params) |> then_fn.(config)
           end)
       end)
     end
 
     config
-    |> Layout.generate(selected_variant)
+    |> Layout.generate(selected_variant, query_params)
     |> tap(&update_visible_alerts(&1, screen_id, config, opts))
     |> then_fn.(config)
   end
@@ -82,7 +83,8 @@ defmodule Screens.V2.ScreenData do
     |> Task.Supervisor.async_stream(
       [nil | @parameters.variants(config)],
       fn variant ->
-        {variant, config |> Layout.generate(variant) |> then_fn.(config)}
+        {variant,
+         config |> Layout.generate(variant, Keyword.get(opts, :query_params)) |> then_fn.(config)}
       end
     )
     |> Enum.map(fn {:ok, result} -> result end)

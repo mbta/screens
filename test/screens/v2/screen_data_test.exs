@@ -17,10 +17,10 @@ defmodule Screens.V2.ScreenDataTest do
 
   require Stub
 
-  Stub.candidate_generator(GrayGenerator, fn _ -> [placeholder(:gray)] end)
-  Stub.candidate_generator(GreenGenerator, fn _ -> [placeholder(:green)] end)
+  Stub.candidate_generator(GrayGenerator, fn _, _ -> [placeholder(:gray)] end)
+  Stub.candidate_generator(GreenGenerator, fn _, _ -> [placeholder(:green)] end)
 
-  Stub.candidate_generator(CrashGenerator, fn %Screen{app_params: %{test_pid: pid}} ->
+  Stub.candidate_generator(CrashGenerator, fn %Screen{app_params: %{test_pid: pid}}, _ ->
     send(pid, {:crash_running, self()})
     raise "oopsie"
   end)
@@ -48,7 +48,7 @@ defmodule Screens.V2.ScreenDataTest do
       )
 
       assert ScreenData.get("test_id") ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
 
     test "generates widget data from a pending config" do
@@ -61,7 +61,7 @@ defmodule Screens.V2.ScreenDataTest do
       )
 
       assert ScreenData.get("test_id", pending_config: build_config(%{app_id: :test_app})) ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
 
     test "selects a variant candidate generator" do
@@ -74,7 +74,7 @@ defmodule Screens.V2.ScreenDataTest do
       )
 
       assert ScreenData.get("test_id", generator_variant: "test_variant") ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray}}
+               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
 
     test "runs all variant generators in the background" do

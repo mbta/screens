@@ -12,8 +12,8 @@ defmodule Screens.TestSupport.CandidateGeneratorStub do
         def screen_template(), do: Builder.build_template({:screen, %{normal: [:main]}})
 
         @impl CandidateGenerator
-        def candidate_instances(config) do
-          unquote(instances_fn).(config)
+        def candidate_instances(config, query_params) do
+          unquote(instances_fn).(config, query_params)
         end
 
         @impl CandidateGenerator

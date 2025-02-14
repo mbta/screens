@@ -29,7 +29,12 @@ defmodule Screens.V2.CandidateGenerator.Busway do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(config, now \\ DateTime.utc_now(), instance_fns \\ @instance_fns) do
+  def candidate_instances(
+        config,
+        _query_params,
+        now \\ DateTime.utc_now(),
+        instance_fns \\ @instance_fns
+      ) do
     [(&header_instances/2) | instance_fns]
     |> Task.async_stream(& &1.(config, now), timeout: 15_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)

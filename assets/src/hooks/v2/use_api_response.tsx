@@ -123,7 +123,11 @@ const loggingParams = () => {
   }
 };
 
-const useApiPath = (screenId: string, appendPath?: string): string => {
+const useApiPath = (
+  screenId: string,
+  appendPath?: string,
+  queryParams?: Map<string, string>,
+): string => {
   return useMemo(() => {
     const base = isDup() ? OUTFRONT_BASE_URI : document.baseURI;
     const path = [
@@ -137,7 +141,7 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
 
     const url = new URL(path, base);
 
-    const params: Record<string, string | null | undefined> = {
+    const datasetParams: Record<string, string | null | undefined> = {
       is_real_screen: isRealScreen() ? "true" : null,
       last_refresh: getDatasetValue("lastRefresh"),
       requestor:
@@ -147,7 +151,13 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
       ...loggingParams(),
     };
 
-    for (const [key, value] of Object.entries(params)) {
+    if (queryParams) {
+      queryParams.forEach((value, key) => {
+        url.searchParams.append(key, value);
+      });
+    }
+
+    for (const [key, value] of Object.entries(datasetParams)) {
       if (value) url.searchParams.append(key, value);
     }
 
@@ -155,21 +165,29 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
   }, [screenId, appendPath]);
 };
 
+interface UseBaseApiResponseOpts {
+  id: string;
+  appendPath?: string;
+  queryParams?: Map<string, string>;
+}
+
 interface UseApiResponseReturn {
   apiResponse: ApiResponse;
   requestCount: number;
   lastSuccess: number | null;
 }
 
-const useBaseApiResponse = (
-  id: string,
-  appendPath?: string,
-): UseApiResponseReturn => {
+const useBaseApiResponse = ({
+  id,
+  appendPath,
+  queryParams,
+}: UseBaseApiResponseOpts): UseApiResponseReturn => {
   const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const apiPath = useApiPath(id, appendPath);
+
+  const apiPath = useApiPath(id, appendPath, queryParams);
 
   const fetchData = async () => {
     try {
@@ -270,10 +288,11 @@ const useInspectorControls = (
   }, [lastSuccess]);
 };
 
-const useApiResponse = ({ id }) => useBaseApiResponse(id);
+const useApiResponse = ({ id, queryParams }): UseApiResponseReturn =>
+  useBaseApiResponse({ id, queryParams });
 
-const useSimulationApiResponse = ({ id }) =>
-  useBaseApiResponse(id, "simulation");
+const useSimulationApiResponse = ({ id }): UseApiResponseReturn =>
+  useBaseApiResponse({ id, appendPath: "simulation" });
 
 // For OFM apps--DUPs--we need to request a different
 // route that's more permissive of CORS, since these clients are loaded from a local html file
@@ -281,7 +300,8 @@ const useSimulationApiResponse = ({ id }) =>
 //
 // The /dup endpoint only has the CORS stuff, and otherwise runs exactly the same backend logic as
 // the normal one used by `useApiResponse`.
-const useDUPApiResponse = ({ id }) => useBaseApiResponse(id, "dup");
+const useDUPApiResponse = ({ id }): UseApiResponseReturn =>
+  useBaseApiResponse({ id, appendPath: "dup" });
 
 export default useApiResponse;
 export type { ApiResponse, SimulationData };

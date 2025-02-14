@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
 
   alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Elevator
+  alias Screens.V2.ScreenData.QueryParams
 
   setup do
     config = %Screen{
@@ -33,13 +34,15 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
   describe "candidate_instances/3" do
     test "calls instance generator functions and combines the results", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
+      query_params = %QueryParams{}
 
       instance_fns = [
         fn ^config, ^now -> ~w[one two]a end,
         fn ^config, ^now -> ~w[three]a end
       ]
 
-      assert Elevator.candidate_instances(config, now, instance_fns) == ~w[one two three]a
+      assert Elevator.candidate_instances(config, query_params, now, instance_fns) ==
+               ~w[one two three]a
     end
   end
 end

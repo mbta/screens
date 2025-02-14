@@ -13,8 +13,8 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
 
   require Stub
 
-  Stub.candidate_generator(MercuryGenerator, fn _ -> [placeholder(:green)] end)
-  Stub.candidate_generator(LgMriGenerator, fn _ -> [placeholder(:red)] end)
+  Stub.candidate_generator(MercuryGenerator, fn _, _ -> [placeholder(:green)] end)
+  Stub.candidate_generator(LgMriGenerator, fn _, _ -> [placeholder(:red)] end)
 
   describe "show/2" do
     test "only returns flex_zone for Mercury screens", %{conn: conn} do
@@ -38,7 +38,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
       assert %{
                "audio_data" => "",
                "data" => %{
-                 "main" => %{"color" => "green", "type" => "placeholder"},
+                 "main" => %{"color" => "green", "type" => "placeholder", "text" => ""},
                  "type" => "normal"
                },
                "disabled" => false,
@@ -68,7 +68,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
 
       assert %{
                "data" => %{
-                 "main" => %{"color" => "red", "type" => "placeholder"},
+                 "main" => %{"color" => "red", "type" => "placeholder", "text" => ""},
                  "type" => "normal"
                },
                "disabled" => false,

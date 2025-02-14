@@ -6,6 +6,7 @@ defmodule Screens.V2.ScreenData.Layout do
   require Logger
 
   alias Screens.Util
+  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
@@ -29,12 +30,17 @@ defmodule Screens.V2.ScreenData.Layout do
 
   @spec generate(Screen.t()) :: t()
   @spec generate(Screen.t(), String.t() | nil) :: t()
+  @spec generate(Screen.t(), String.t() | nil, QueryParams.t()) :: t()
   def generate(config, variant \\ nil) do
+    generate(config, variant, %QueryParams{})
+  end
+
+  def generate(config, variant, query_params) do
     candidate_generator = @parameters.candidate_generator(config, variant)
     screen_template = candidate_generator.screen_template()
 
     config
-    |> candidate_generator.candidate_instances()
+    |> candidate_generator.candidate_instances(query_params)
     |> Enum.filter(&WidgetInstance.valid_candidate?/1)
     |> pick_instances(screen_template)
   end

@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
 
   alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Busway
+  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.{DeparturesNoData, NormalHeader}
 
   @config %Screen{
@@ -32,7 +33,13 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
       config = put_in(@config.app_params.header.stop_name, "Ruggles")
 
       expected_header = %NormalHeader{screen: config, icon: :logo, text: "Ruggles", time: now}
-      assert expected_header in Busway.candidate_instances(config, now, _instance_fns = [])
+
+      assert expected_header in Busway.candidate_instances(
+               config,
+               %QueryParams{},
+               now,
+               _instance_fns = []
+             )
     end
 
     test "includes departures instances" do
@@ -40,7 +47,7 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
       no_data = %DeparturesNoData{screen: @config, show_alternatives?: true}
       instance_fns = [fn @config, ^now -> [no_data] end]
 
-      assert no_data in Busway.candidate_instances(@config, now, instance_fns)
+      assert no_data in Busway.candidate_instances(@config, %QueryParams{}, now, instance_fns)
     end
   end
 end
