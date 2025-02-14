@@ -76,7 +76,7 @@ defmodule ScreensWeb.V2.ScreenController do
     config = Cache.screen(screen_id)
 
     if match?(%Screen{app_id: app_id} when app_id in @recognized_app_ids, config) do
-      assigns = get_assigns(params, screen_id, config, conn)
+      assigns = get_assigns(params, screen_id, config)
 
       conn
       |> merge_assigns(assigns)
@@ -106,7 +106,7 @@ defmodule ScreensWeb.V2.ScreenController do
       # except they don't do data refreshes.
       assigns =
         params
-        |> get_assigns(screen_id, config, conn)
+        |> get_assigns(screen_id, config)
         |> Keyword.replace(:refresh_rate, 0)
         |> Keyword.put(:is_pending, true)
 
@@ -123,25 +123,23 @@ defmodule ScreensWeb.V2.ScreenController do
     render_not_found(conn)
   end
 
-  defp get_assigns(params, screen_id, %Screen{app_id: app_id} = config, conn) do
+  defp get_assigns(params, screen_id, %Screen{app_id: app_id} = config) do
     refresh_rate = Parameters.refresh_rate(app_id)
 
-    Enum.concat(
-      [
-        app_id: app_id,
-        audio_interval_offset_seconds: Parameters.audio_interval_offset_seconds(config),
-        audio_readout_interval: Parameters.audio_interval_minutes(config),
-        is_pending: false,
-        is_real_screen: match?(%{"is_real_screen" => "true"}, params),
-        refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate),
-        refresh_rate: refresh_rate,
-        requestor: params["requestor"],
-        rotation_index: rotation_index(params),
-        screen_side: screen_side(params),
-        sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
-        variant: params["variant"]
-      ]
-    )
+    [
+      app_id: app_id,
+      audio_interval_offset_seconds: Parameters.audio_interval_offset_seconds(config),
+      audio_readout_interval: Parameters.audio_interval_minutes(config),
+      is_pending: false,
+      is_real_screen: match?(%{"is_real_screen" => "true"}, params),
+      refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate),
+      refresh_rate: refresh_rate,
+      requestor: params["requestor"],
+      rotation_index: rotation_index(params),
+      screen_side: screen_side(params),
+      sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
+      variant: params["variant"]
+    ]
   end
 
   # Handles widget page GET requests with widget data as a query param.

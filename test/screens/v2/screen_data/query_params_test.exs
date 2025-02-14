@@ -38,38 +38,4 @@ defmodule Screens.V2.ScreenData.QueryParamsTest do
       assert QueryParams.get_url_param_map(conn) == %QueryParams{stop_id: "456"}
     end
   end
-
-  describe "get_url_param_list/1" do
-    test "Returns an empty list when no query params are provided" do
-      conn = build_conn(%{})
-      assert QueryParams.get_url_param_list(conn) == []
-    end
-
-    test "Returns a list of tuples when given only valid, non-nil values" do
-      conn = build_conn(%{"route_id" => "123", "stop_id" => "456", "trip_id" => "trip_abcd"})
-
-      assert QueryParams.get_url_param_list(conn) == [
-               {:route_id, "123"},
-               {:stop_id, "456"},
-               {:trip_id, "trip_abcd"}
-             ]
-    end
-
-    test "Filters out invalid param keys from the tuple list" do
-      conn = build_conn(%{"route_id" => "123", "stop_id" => "", "trip_id" => nil})
-      assert QueryParams.get_url_param_list(conn) == [{:route_id, "123"}]
-    end
-
-    test "Filters out nil and empty string values from the tuple list" do
-      conn = build_conn(%{"route_id" => "123", "stop_id" => "", "trip_id" => nil})
-      assert QueryParams.get_url_param_list(conn) == [{:route_id, "123"}]
-    end
-
-    test "Processes a mix of valid and invalid param keys/values correctly" do
-      conn =
-        build_conn(%{"stop_id" => "456", "route_id" => "", "invalid_param_key" => "not_used"})
-
-      assert QueryParams.get_url_param_list(conn) == [{:stop_id, "456"}]
-    end
-  end
 end
