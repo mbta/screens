@@ -3,6 +3,7 @@ defmodule Screens.V2.ScreenData do
 
   alias Screens.ScreensByAlert
   alias Screens.V2.AlertsWidget
+  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
@@ -54,7 +55,7 @@ defmodule Screens.V2.ScreenData do
   defp select_variant(screen_id, opts, then_fn) do
     config = get_config(screen_id, opts)
     selected_variant = Keyword.get(opts, :generator_variant)
-    query_params = Keyword.get(opts, :query_params)
+    query_params = Keyword.get(opts, :query_params) || %QueryParams{}
 
     if Keyword.get(opts, :run_all_variants?, false) do
       other_variants = List.delete([nil | @parameters.variants(config)], selected_variant)
@@ -78,13 +79,13 @@ defmodule Screens.V2.ScreenData do
         when data: t() | simulation_data()
   defp all_variants(screen_id, opts, then_fn) do
     config = get_config(screen_id, opts)
+    query_params = Keyword.get(opts, :query_params) || %QueryParams{}
 
     ParallelRunSupervisor
     |> Task.Supervisor.async_stream(
       [nil | @parameters.variants(config)],
       fn variant ->
-        {variant,
-         config |> Layout.generate(variant, Keyword.get(opts, :query_params)) |> then_fn.(config)}
+        {variant, config |> Layout.generate(variant, query_params) |> then_fn.(config)}
       end
     )
     |> Enum.map(fn {:ok, result} -> result end)
