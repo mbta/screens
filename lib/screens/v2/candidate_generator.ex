@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator do
   @moduledoc false
 
+  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
 
