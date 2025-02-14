@@ -45,22 +45,22 @@ const AUDIO_SCREEN_TYPES = new Set([
 const SCREEN_TYPE_VARIANTS = { dup_v2: ["new_departures"] };
 
 const buildIframeUrlParams = (
-  screenId: string | null,
+  screenId: string,
   isSimulation: boolean,
   isVariantEnabled: boolean,
   urlParams: URLSearchParams,
 ) => {
-  const urlParamString = [
+  let urlParamString = [
     isSimulation ? "/simulation?" : "?",
     isVariantEnabled ? "variant=all&" : "",
   ].join("");
-
   if (screenId && URL_PARAMS_BY_SCREEN_TYPE[screenId]) {
-    return URL_PARAMS_BY_SCREEN_TYPE[screenId].reduce((key) => {
-      return urlParams.get(key) ? `${key} =${urlParams.get(key)}&` : "";
-    }, urlParamString);
+    URL_PARAMS_BY_SCREEN_TYPE[screenId].forEach((key) => {
+      urlParamString += urlParams.get(key)
+        ? `${key}=${urlParams.get(key)}&`
+        : "";
+    });
   }
-
   return urlParamString;
 };
 
@@ -142,7 +142,7 @@ const Inspector: ComponentType = () => {
                   [
                     `/v2/screen/${screen.id}`,
                     buildIframeUrlParams(
-                      screenId,
+                      screen.config.app_id,
                       isSimulation,
                       isVariantEnabled,
                       urlParams,
