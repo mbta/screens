@@ -55,7 +55,7 @@ defmodule Screens.V2.ScreenData do
   defp select_variant(screen_id, opts, then_fn) do
     config = get_config(screen_id, opts)
     selected_variant = Keyword.get(opts, :generator_variant)
-    query_params = Keyword.get(opts, :query_params) || %QueryParams{}
+    query_params = Keyword.get(opts, :query_params, %QueryParams{})
 
     if Keyword.get(opts, :run_all_variants?, false) do
       other_variants = List.delete([nil | @parameters.variants(config)], selected_variant)
@@ -79,7 +79,7 @@ defmodule Screens.V2.ScreenData do
         when data: t() | simulation_data()
   defp all_variants(screen_id, opts, then_fn) do
     config = get_config(screen_id, opts)
-    query_params = Keyword.get(opts, :query_params) || %QueryParams{}
+    query_params = Keyword.get(opts, :query_params, %QueryParams{})
 
     ParallelRunSupervisor
     |> Task.Supervisor.async_stream(
