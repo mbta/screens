@@ -118,13 +118,18 @@ const getApiResponseHook = () => {
   }
 };
 
-const ScreenContainer = ({ id }) => {
+interface ScreenContainerProps {
+  id: string;
+  queryParams?: Map<string, string>;
+}
+
+const ScreenContainer = ({ id, queryParams }: ScreenContainerProps) => {
   const blinkConfig = useContext(BlinkConfigContext);
   const audioConfig = useContext(AudioConfigContext);
   const [showBlink, setShowBlink] = useState(false);
-
   const { apiResponse, requestCount, lastSuccess } = getApiResponseHook()({
     id,
+    queryParams,
   });
 
   useAudioReadout({ id, config: audioConfig });

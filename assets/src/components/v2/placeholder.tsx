@@ -10,7 +10,9 @@ interface Props {
 const Placeholder: React.ComponentType<Props> = ({ color, text }) => {
   return (
     <div className={classWithModifier("placeholder", color)}>
-      <div className="placeholder-text">{text}</div>
+      <div className="placeholder-text">
+        <h3>{text}</h3>
+      </div>
     </div>
   );
 };

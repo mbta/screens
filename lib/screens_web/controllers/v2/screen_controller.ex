@@ -4,7 +4,6 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.Config.Cache
   alias Screens.Log
   alias Screens.V2.ScreenData.Parameters
-  alias Screens.V2.ScreenData.QueryParams
   alias ScreensConfig.Screen
 
   @default_app_id :bus_eink_v2
@@ -141,8 +140,7 @@ defmodule ScreensWeb.V2.ScreenController do
         screen_side: screen_side(params),
         sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
         variant: params["variant"]
-      ],
-      QueryParams.get_url_param_list(conn)
+      ]
     )
   end
 
