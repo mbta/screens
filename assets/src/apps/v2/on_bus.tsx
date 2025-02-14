@@ -8,11 +8,7 @@ import "../../../css/on_bus_v2.scss";
 
 import React from "react";
 import ReactDOM from "react-dom";
-import {
-  BrowserRouter as Router,
-  Route,
-  Switch,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
 import { MappingContext } from "Components/v2/widget";
 import MultiScreenPage from "Components/v2/multi_screen_page";
@@ -25,10 +21,7 @@ import {
   ResponseMapper,
   ResponseMapperContext,
 } from "Components/v2/screen_container";
-
-// On Bus Screens update the state of their data based on values passed in through query params
-// This list allows us to filter and only pass through valid params
-const VALID_QUERY_PARAM_KEYS = ["route_id", "stop_id", "trip_id"];
+import { URL_PARAMS_BY_SCREEN_TYPE } from "Util/query_params";
 
 const TYPE_TO_COMPONENT = {
   body_normal: NormalBody,
@@ -68,7 +61,7 @@ const App = (): JSX.Element => {
         <Route exact path="/v2/screen/:id">
           <MappingContext.Provider value={TYPE_TO_COMPONENT}>
             <ResponseMapperContext.Provider value={responseMapper}>
-              <ScreenPage paramKeys={VALID_QUERY_PARAM_KEYS} />
+              <ScreenPage paramKeys={URL_PARAMS_BY_SCREEN_TYPE.on_bus_v2} />
             </ResponseMapperContext.Provider>
           </MappingContext.Provider>
         </Route>

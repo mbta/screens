@@ -19,6 +19,7 @@ import {
   sendMessage,
   useReceiveMessage,
 } from "Util/inspector";
+import { SCREEN_TYPE_URL_PARAMS } from "Util/query_params";
 
 type ScreenWithId = { id: string; config: Screen };
 
@@ -42,6 +43,26 @@ const AUDIO_SCREEN_TYPES = new Set([
 ]);
 
 const SCREEN_TYPE_VARIANTS = { dup_v2: ["new_departures"] };
+
+const buildIframeUrlParams = (
+  screenId: string | null,
+  isSimulation: boolean,
+  isVariantEnabled: boolean,
+  urlParams: URLSearchParams,
+) => {
+  const urlParamString = [
+    isSimulation ? "/simulation?" : "?",
+    isVariantEnabled ? "variant=all&" : "",
+  ].join("");
+
+  if (screenId && SCREEN_TYPE_URL_PARAMS[screenId]) {
+    return SCREEN_TYPE_URL_PARAMS[screenId].reduce((key) => {
+      return urlParams.get(key) ? `${key} =${urlParams.get(key)}&` : "";
+    }, urlParamString);
+  }
+
+  return urlParamString;
+};
 
 const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
@@ -120,17 +141,12 @@ const Inspector: ComponentType = () => {
               ? new URL(
                   [
                     `/v2/screen/${screen.id}`,
-                    isSimulation ? "/simulation?" : "?",
-                    isVariantEnabled ? "variant=all&" : "",
-                    urlParams.get("route_id")
-                      ? `route_id=${urlParams.get("route_id")}&`
-                      : "",
-                    urlParams.get("stop_id")
-                      ? `stop_id=${urlParams.get("stop_id")}&`
-                      : "",
-                    urlParams.get("trip_id")
-                      ? `trip_id=${urlParams.get("trip_id")}&`
-                      : "",
+                    buildIframeUrlParams(
+                      screenId,
+                      isSimulation,
+                      isVariantEnabled,
+                      urlParams,
+                    ),
                   ].join(""),
                   location.origin,
                 ).toString()
