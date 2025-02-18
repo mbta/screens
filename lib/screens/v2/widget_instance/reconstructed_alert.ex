@@ -1313,7 +1313,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
-  @suppressed_alert_ids ~w[590467]
+  @suppressed_alert_ids ~w[623609]
 
   def valid_candidate?(%__MODULE__{alert: %{id: alert_id}}) do
     alert_id not in @suppressed_alert_ids
