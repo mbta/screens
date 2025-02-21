@@ -58,11 +58,15 @@ defmodule Screens.V2.LocalizedAlert do
   """
   @spec get_headsign_from_informed_entities(t()) :: headsign
   def get_headsign_from_informed_entities(
-        %{screen: %Screen{app_id: app_id}, location_context: location_context, alert: alert} = t
+        %{
+          screen: %Screen{app_id: app_id},
+          location_context: location_context,
+          alert: %Alert{informed_entities: informed_entities}
+        } = t
       )
       when app_id in [:dup_v2, :pre_fare_v2] do
     with headsign_matchers when is_map(headsign_matchers) <- headsign_matchers(t) do
-      informed_stop_ids = MapSet.new(Alert.informed_entities(alert), & &1.stop)
+      informed_stop_ids = MapSet.new(informed_entities, & &1.stop)
 
       headsign_matchers
       |> Map.get(location_context.home_stop)
@@ -149,18 +153,19 @@ defmodule Screens.V2.LocalizedAlert do
 
   @spec location(t()) :: location()
   def location(
-        %{alert: alert, location_context: location_context},
+        %{
+          alert: %Alert{effect: effect, informed_entities: informed_entities},
+          location_context: location_context
+        },
         is_terminal_station \\ false
       ) do
-    informed_entities = Alert.informed_entities(alert)
-
     informed_zones_set =
       informed_entities
       |> Enum.flat_map(&informed_entity_to_zone(&1, location_context))
       |> Enum.uniq()
       |> Enum.sort()
 
-    get_location_atom(informed_zones_set, alert.effect, is_terminal_station)
+    get_location_atom(informed_zones_set, effect, is_terminal_station)
   end
 
   defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:upstream],
@@ -266,7 +271,10 @@ defmodule Screens.V2.LocalizedAlert do
   Gets the routes affected by an alert that also exist at the current stop. No downstream
   """
   @spec informed_routes_at_home_stop(t()) :: list(Route.id())
-  def informed_routes_at_home_stop(%{location_context: location_context, alert: alert}) do
+  def informed_routes_at_home_stop(%{
+        location_context: location_context,
+        alert: %Alert{informed_entities: informed_entities}
+      }) do
     rts = location_context.alert_route_types
     home_stop = location_context.home_stop
 
@@ -279,7 +287,7 @@ defmodule Screens.V2.LocalizedAlert do
     empty_set = MapSet.new()
 
     uninformed_routes =
-      Enum.reduce_while(Alert.informed_entities(alert), route_set, fn
+      Enum.reduce_while(informed_entities, route_set, fn
         _ie, ^empty_set ->
           {:halt, empty_set}
 

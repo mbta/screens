@@ -325,10 +325,6 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  def informed_entities(%__MODULE__{informed_entities: informed_entities}) do
-    informed_entities
-  end
-
   @doc "Returns IDs of all subway routes affected by the alert. Green Line routes are not consolidated."
   def informed_subway_routes(%__MODULE__{} = alert) do
     informed_route_ids = MapSet.new(alert.informed_entities, & &1.route)
@@ -338,8 +334,6 @@ defmodule Screens.Alerts.Alert do
       &(&1 in informed_route_ids)
     )
   end
-
-  def effect(%__MODULE__{effect: effect}), do: effect
 
   def direction_id(%__MODULE__{informed_entities: informed_entities}),
     do: List.first(informed_entities).direction_id

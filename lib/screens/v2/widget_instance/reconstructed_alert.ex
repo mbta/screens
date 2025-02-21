@@ -129,14 +129,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   defp get_destination(
-         %__MODULE__{alert: alert} = t,
+         %__MODULE__{alert: %Alert{effect: effect, informed_entities: informed_entities}} = t,
          location,
          route_id \\ nil
        ) do
-    informed_entities =
-      alert
-      |> Alert.informed_entities()
-      |> Enum.filter(fn entity ->
+    relevant_ies =
+      Enum.filter(informed_entities, fn entity ->
         (InformedEntity.parent_station?(entity) or is_nil(entity.stop)) and
           (is_nil(route_id) or String.starts_with?(entity.route, route_id))
       end)
@@ -144,8 +142,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     # Consolidate the list of entities into their direction from current station
     # and their affiliated route id
     list_of_directions_and_routes =
-      informed_entities
-      |> Enum.map(&get_direction_and_route_from_entity(&1, alert.effect, location))
+      relevant_ies
+      |> Enum.map(&get_direction_and_route_from_entity(&1, effect, location))
       |> Enum.filter(& &1)
       |> Enum.uniq()
 
@@ -391,22 +389,25 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def dual_screen_alert?(
         %__MODULE__{
           is_terminal_station: is_terminal_station,
-          alert: alert
+          alert: %Alert{effect: effect} = alert
         } = t
       ) do
-    Alert.effect(alert) in [:station_closure, :suspension, :shuttle] and
+    effect in [:station_closure, :suspension, :shuttle] and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
-      (is_nil(Alert.direction_id(t.alert)) or is_terminal_station)
+      (is_nil(Alert.direction_id(alert)) or is_terminal_station)
   end
 
   @spec serialize_dual_screen_alert(t()) :: dual_screen_serialized_response()
   defp serialize_dual_screen_alert(t)
 
   # Two screen alert, suspension
-  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :suspension} = alert} = t) do
-    %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
-    informed_entities = Alert.informed_entities(alert)
+  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
+    %__MODULE__{
+      alert: %Alert{cause: cause, informed_entities: informed_entities, updated_at: updated_at},
+      location_context: %LocationContext{home_stop: home_stop},
+      now: now
+    } = t
 
     route_id =
       case LocalizedAlert.consolidated_informed_subway_routes(t) do
@@ -414,7 +415,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         [route_id] -> route_id
       end
 
-    endpoints = get_endpoints(informed_entities, route_id, t.location_context.home_stop)
+    endpoints = get_endpoints(informed_entities, route_id, home_stop)
 
     %{
       issue: "No trains",
@@ -429,9 +430,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Two screen alert, shuttle
-  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t) do
-    %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
-    informed_entities = Alert.informed_entities(alert)
+  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :shuttle}} = t) do
+    %__MODULE__{
+      alert: %Alert{cause: cause, informed_entities: informed_entities, updated_at: updated_at},
+      location_context: %LocationContext{home_stop: home_stop},
+      now: now
+    } = t
 
     route_id =
       case LocalizedAlert.consolidated_informed_subway_routes(t) do
@@ -439,7 +443,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         [route_id] -> route_id
       end
 
-    endpoints = get_endpoints(informed_entities, route_id, t.location_context.home_stop)
+    endpoints = get_endpoints(informed_entities, route_id, home_stop)
 
     %{
       issue: "No trains",
@@ -533,11 +537,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_single_screen_alert(t, location)
 
   defp serialize_single_screen_alert(
-         %__MODULE__{alert: %Alert{effect: :suspension} = alert} = t,
+         %__MODULE__{alert: %Alert{effect: :suspension}} = t,
          location
        ) do
-    %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
-    informed_entities = Alert.informed_entities(alert)
+    %__MODULE__{
+      alert: %Alert{cause: cause, informed_entities: informed_entities, updated_at: updated_at},
+      location_context: %LocationContext{home_stop: home_stop},
+      now: now
+    } = t
 
     route_id =
       case LocalizedAlert.consolidated_informed_subway_routes(t) do
@@ -545,7 +552,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         [route_id] -> route_id
       end
 
-    endpoints = get_endpoints(informed_entities, route_id, t.location_context.home_stop)
+    endpoints = get_endpoints(informed_entities, route_id, home_stop)
     destination = get_destination(t, location)
 
     {issue, location_text} =
@@ -588,12 +595,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_single_screen_alert(
-         %__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t,
-         location
-       ) do
-    %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
-    informed_entities = Alert.informed_entities(alert)
+  defp serialize_single_screen_alert(%__MODULE__{alert: %Alert{effect: :shuttle}} = t, location) do
+    %__MODULE__{
+      alert: %Alert{cause: cause, informed_entities: informed_entities, updated_at: updated_at},
+      location_context: %LocationContext{home_stop: home_stop},
+      now: now
+    } = t
 
     route_id =
       case LocalizedAlert.consolidated_informed_subway_routes(t) do
@@ -601,7 +608,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         [route_id] -> route_id
       end
 
-    endpoints = get_endpoints(informed_entities, route_id, t.location_context.home_stop)
+    endpoints = get_endpoints(informed_entities, route_id, home_stop)
     destination = get_destination(t, location)
 
     {issue, location_text, remedy} =
@@ -947,8 +954,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          %__MODULE__{alert: %Alert{effect: :suspension} = alert} = t,
          location
        ) do
-    %{alert: %{cause: cause, header: header}} = t
-    informed_entities = Alert.informed_entities(alert)
+    %__MODULE__{
+      alert: %Alert{cause: cause, header: header, informed_entities: informed_entities}
+    } = t
+
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
@@ -990,8 +999,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t, location) do
-    %{alert: %{cause: cause, header: header}} = t
-    informed_entities = Alert.informed_entities(alert)
+    %__MODULE__{
+      alert: %Alert{cause: cause, header: header, informed_entities: informed_entities}
+    } = t
+
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do

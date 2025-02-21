@@ -299,9 +299,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   # If the current station's stop_id is the first or last entry in all stop_sequences,
   # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
-  defp relevant_direction?(%{alert: alert, location_context: location_context}) do
+  defp relevant_direction?(%{
+         alert: %Alert{informed_entities: informed_entities},
+         location_context: location_context
+       }) do
     stop_sequences = LocationContext.stop_sequences(location_context)
-    informed_entities = Alert.informed_entities(alert)
 
     direction_id =
       informed_entities
@@ -336,11 +338,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     relevant_direction_for_terminal == nil or relevant_direction_for_terminal == direction_id
   end
 
-  defp get_stations(%{effect: :station_closure} = alert, fetch_stop_name_fn) do
+  defp get_stations(
+         %{effect: :station_closure, informed_entities: informed_entities},
+         fetch_stop_name_fn
+       ) do
     stop_ids =
-      alert
-      |> Alert.informed_entities()
-      |> Enum.flat_map(fn %{stop: stop_id} ->
+      Enum.flat_map(informed_entities, fn %{stop: stop_id} ->
         case stop_id do
           nil -> []
           id -> [id]
