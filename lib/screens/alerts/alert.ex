@@ -121,19 +121,6 @@ defmodule Screens.Alerts.Alert do
           description: String.t()
         }
 
-  # Used by elevator status
-  def ap_to_map({nil, end_t}) do
-    %{"start" => nil, "end" => DateTime.to_iso8601(end_t)}
-  end
-
-  def ap_to_map({start_t, nil}) do
-    %{"start" => DateTime.to_iso8601(start_t), "end" => nil}
-  end
-
-  def ap_to_map({start_t, end_t}) do
-    %{"start" => DateTime.to_iso8601(start_t), "end" => DateTime.to_iso8601(end_t)}
-  end
-
   @spec fetch(keyword()) :: {:ok, list(t())} | :error
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     Screens.Telemetry.span([:screens, :alerts, :alert, :fetch], fn ->

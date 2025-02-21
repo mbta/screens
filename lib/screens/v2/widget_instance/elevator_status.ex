@@ -304,9 +304,18 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
     %{
       happening_now: Alert.happening_now?(alert, now),
-      active_period: Alert.ap_to_map(next_active_period)
+      active_period: serialize_active_period(next_active_period)
     }
   end
+
+  defp serialize_active_period({nil, end_t}),
+    do: %{"start" => nil, "end" => DateTime.to_iso8601(end_t)}
+
+  defp serialize_active_period({start_t, nil}),
+    do: %{"start" => DateTime.to_iso8601(start_t), "end" => nil}
+
+  defp serialize_active_period({start_t, end_t}),
+    do: %{"start" => DateTime.to_iso8601(start_t), "end" => DateTime.to_iso8601(end_t)}
 
   # Groups alerts by their informed parent station ID, and then sorts the station groups
   # by number of subway routes shared between that station and the home station, descending.
