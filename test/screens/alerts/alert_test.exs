@@ -87,24 +87,4 @@ defmodule Screens.Alerts.AlertTest do
       assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn2)
     end
   end
-
-  defp ie(opts) do
-    %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
-  end
-
-  describe "informed_entities/1" do
-    test "returns informed entities list from the widget's alert" do
-      ies = [ie(stop: "123"), ie(stop: "1129", route: "39")]
-
-      assert ies == Alert.informed_entities(%Alert{informed_entities: ies})
-    end
-  end
-
-  describe "effect/1" do
-    test "returns effect from the widget's alert" do
-      effect = :detour
-
-      assert effect == Alert.effect(%Alert{effect: effect})
-    end
-  end
 end
