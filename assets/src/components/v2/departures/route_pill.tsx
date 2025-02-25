@@ -98,7 +98,7 @@ type Props = {
 };
 
 const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
-  const modifiers: string[] = [pill.color];
+  let modifiers: string[] = [pill.color];
   if (outline) modifiers.push("outline");
 
   let innerContent: JSX.Element | null = null;
@@ -115,7 +115,12 @@ const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
   } else {
     switch (pill.type) {
       case "text":
-        innerContent = <TextRoutePill {...pill} outline={outline} />;
+        if (pill.text.length > 4) {
+          // Fallback for shuttle buses that may not have an existing route abbreviation in our system
+          innerContent = <IconRoutePill icon={"bus"} color={pill.color} />;
+        } else {
+          innerContent = <TextRoutePill {...pill} outline={outline} />;
+        }
         break;
 
       case "icon":
