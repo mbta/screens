@@ -98,7 +98,7 @@ type Props = {
 };
 
 const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
-  let modifiers: string[] = [pill.color];
+  const modifiers: string[] = [pill.color];
   if (outline) modifiers.push("outline");
 
   let innerContent: JSX.Element | null = null;
