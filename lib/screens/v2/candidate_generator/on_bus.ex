@@ -43,7 +43,9 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
       (query_params.route_id || "N/A") <>
       ", Stop ID:  " <>
       (query_params.stop_id || "N/A") <>
-      ", Trip ID:  " <> (query_params.trip_id || "N/A")
+      ", Trip ID:  " <>
+      (query_params.trip_id || "N/A") <>
+      ", Vehicle ID:  " <> (query_params.vehicle_id || "N/A")
   end
 
   @impl CandidateGenerator
