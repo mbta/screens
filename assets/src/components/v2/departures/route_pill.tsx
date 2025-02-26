@@ -115,12 +115,7 @@ const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
   } else {
     switch (pill.type) {
       case "text":
-        if (pill.text.length > 4) {
-          // Fallback for shuttle buses that may not have an existing route abbreviation in our system
-          innerContent = <IconRoutePill icon={"bus"} color={pill.color} />;
-        } else {
-          innerContent = <TextRoutePill {...pill} outline={outline} />;
-        }
+        innerContent = <TextRoutePill {...pill} outline={outline} />;
         break;
 
       case "icon":

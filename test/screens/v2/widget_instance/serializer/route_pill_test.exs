@@ -65,9 +65,24 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                serialize_for_departure("44", "", :bus, nil)
     end
 
-    test "Uses route name for non-special case routes if not empty" do
-      assert %{type: :text, text: "NewRoute999", color: :yellow} ==
+    test "Uses route ID for non-special case routes if route name is too long" do
+      assert %{type: :text, text: "999", color: :yellow} ==
                serialize_for_departure("999", "NewRoute999", :bus, nil)
+    end
+
+    test "Uses route name for non-special case routes if route ID is too long" do
+      assert %{type: :text, text: "SHU", color: :yellow} ==
+               serialize_for_departure(
+                 "Example Temporary Shuttle ID",
+                 "SHU",
+                 :bus,
+                 nil
+               )
+    end
+
+    test "Returns icon if both route ID and name are too long" do
+      assert %{type: :icon, icon: :bus, color: :yellow} ==
+               serialize_for_departure("Haverhill Shuttle", "North Station (Shuttle)", :bus, nil)
     end
   end
 
