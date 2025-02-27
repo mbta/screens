@@ -65,6 +65,9 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     "708" => "CT3"
   }
 
+  # Any text longer than this max is not designed to appear correctly in our Pill Components
+  @maximum_pill_text_length 3
+
   @spec serialize_for_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) :: t()
   def serialize_for_departure(route_id, route_name, route_type, track_number) do
     route =
@@ -229,11 +232,23 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   end
 
   defp do_serialize(route_id, opts) do
-    route_name = Map.get(opts, :route_name, "")
+    # For non-special cases, prioritizes displaying the route_name and then the route_id
+    # If neither are valid, then create an icon pill instead
+    opts
+    |> Map.get(:route_name, "")
+    |> then(fn name ->
+      if valid_text_for_pill?(name),
+        do: name,
+        else: route_id
+    end)
+    |> then(fn text ->
+      if valid_text_for_pill?(text),
+        do: %{type: :text, text: text},
+        else: %{type: :icon, icon: :bus}
+    end)
+  end
 
-    %{
-      type: :text,
-      text: if(route_name != "", do: route_name, else: route_id)
-    }
+  defp valid_text_for_pill?(text) do
+    text != "" and String.length(text) <= @maximum_pill_text_length
   end
 end
