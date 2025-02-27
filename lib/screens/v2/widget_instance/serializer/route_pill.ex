@@ -237,18 +237,18 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     opts
     |> Map.get(:route_name, "")
     |> then(fn name ->
-      if is_valid_text_for_pill(name),
+      if valid_text_for_pill?(name),
         do: name,
         else: route_id
     end)
     |> then(fn text ->
-      if is_valid_text_for_pill(text),
+      if valid_text_for_pill?(text),
         do: %{type: :text, text: text},
         else: %{type: :icon, icon: :bus}
     end)
   end
 
-  defp is_valid_text_for_pill(text) do
+  defp valid_text_for_pill?(text) do
     text != "" and String.length(text) < @maximum_pill_text_length
   end
 end
