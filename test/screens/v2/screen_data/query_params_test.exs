@@ -13,7 +13,7 @@ defmodule Screens.V2.ScreenData.QueryParamsTest do
       assert QueryParams.get_url_param_map(conn) == %QueryParams{}
     end
 
-    test "Retruns QueryParam struct when valid key/value params passed in" do
+    test "Returns QueryParam struct when valid key/value params passed in" do
       conn =
         build_conn(%{
           "route_id" => "123",
