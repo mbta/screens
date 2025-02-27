@@ -66,7 +66,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   }
 
   # Any text longer than this max is not designed to appear correctly in our Pill Components
-  @maximum_pill_text_length 4
+  @maximum_pill_text_length 3
 
   @spec serialize_for_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) :: t()
   def serialize_for_departure(route_id, route_name, route_type, track_number) do
@@ -249,6 +249,6 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   end
 
   defp valid_text_for_pill?(text) do
-    text != "" and String.length(text) < @maximum_pill_text_length
+    text != "" and String.length(text) <= @maximum_pill_text_length
   end
 end
