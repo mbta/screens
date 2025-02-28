@@ -56,11 +56,6 @@
   color: #fff;
 }
 
-.left-screen .normal-header-time,
-.right-screen .normal-header-title {
-  display: none;
-}
-
 .normal-header__environment {
   @include font--text--75bold;
 
