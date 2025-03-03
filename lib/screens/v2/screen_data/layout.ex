@@ -37,7 +37,7 @@ defmodule Screens.V2.ScreenData.Layout do
 
   def generate(config, variant, query_params) do
     candidate_generator = @parameters.candidate_generator(config, variant)
-    screen_template = candidate_generator.screen_template()
+    screen_template = candidate_generator.screen_template(config)
 
     config
     |> candidate_generator.candidate_instances(query_params)

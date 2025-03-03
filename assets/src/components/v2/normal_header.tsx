@@ -144,7 +144,7 @@ interface Props {
   maxHeight: number;
   showTo?: boolean;
   fullName?: boolean;
-  classModifiers?: string;
+  classModifier?: string;
   accentPattern?: string;
   variant?: string | null;
 }
@@ -158,7 +158,7 @@ const NormalHeader: ComponentType<Props> = ({
   maxHeight,
   showTo = false,
   fullName = false,
-  classModifiers,
+  classModifier,
   accentPattern,
   variant,
 }) => {
@@ -169,7 +169,7 @@ const NormalHeader: ComponentType<Props> = ({
   });
   return (
     <div
-      className={classWithModifiers("normal-header", [classModifiers, variant])}
+      className={classWithModifiers("normal-header", [classModifier, variant])}
     >
       <NormalHeaderTitle
         icon={icon}

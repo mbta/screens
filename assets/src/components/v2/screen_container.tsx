@@ -15,6 +15,7 @@ import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
 import Widget, { WidgetData } from "Components/v2/widget";
 import useAudioReadout from "Hooks/v2/use_audio_readout";
 import { isDup } from "Util/outfront";
+import { classWithModifier, getScreenSide } from "Util/utils";
 
 type ResponseMapper = (apiResponse: ApiResponse) => WidgetData | SimulationData;
 
@@ -101,7 +102,7 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   const widgetData = responseMapper(apiResponse) as WidgetData;
 
   return (
-    <div className="screen-container">
+    <div className={classWithModifier("screen-container", getScreenSide())}>
       <ErrorBoundaryOrFragment>
         {apiResponse && <Widget data={widgetData} />}
       </ErrorBoundaryOrFragment>

@@ -31,7 +31,7 @@ const NormalHeader = ({
       version={version}
       maxHeight={208}
       showTo={false}
-      classModifiers={color}
+      classModifier={color}
       accentPattern={accentPattern}
     />
   );

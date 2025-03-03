@@ -14,7 +14,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   ]
 
   @impl true
-  def screen_template do
+  def screen_template(_screen) do
     {
       :screen,
       %{

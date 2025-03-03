@@ -375,7 +375,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     test "returns takeover for a closure alert at this station", %{widget: widget} do
       widget = put_is_full_screen(widget, true)
       assert [1] == WidgetInstance.priority(widget)
-      assert [:full_body] == WidgetInstance.slot_names(widget)
+      assert [:full_body_duo] == WidgetInstance.slot_names(widget)
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
     end
 
@@ -388,7 +388,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       assert [1] == WidgetInstance.priority(widget)
-      assert [:full_body] == WidgetInstance.slot_names(widget)
+      assert [:full_body_duo] == WidgetInstance.slot_names(widget)
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
     end
 
@@ -428,7 +428,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       assert [1] == WidgetInstance.priority(widget)
-      assert [:full_body] == WidgetInstance.slot_names(widget)
+      assert [:full_body_duo] == WidgetInstance.slot_names(widget)
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
     end
 
@@ -452,7 +452,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_full_screen(true)
 
       assert [1] == WidgetInstance.priority(widget)
-      assert [:full_body] == WidgetInstance.slot_names(widget)
+      assert [:full_body_duo] == WidgetInstance.slot_names(widget)
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
     end
 

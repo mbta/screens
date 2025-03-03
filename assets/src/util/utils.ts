@@ -40,16 +40,22 @@ export const imagePath = (fileName: string): string =>
 export const isRealScreen = () =>
   isDup() || getDatasetValue("isRealScreen") === "true";
 
-type ScreenSide = "left" | "right";
+type ScreenSide = "left" | "right" | "duo" | "solo";
 const isScreenSide = (value: any): value is ScreenSide => {
-  return value === "left" || value === "right";
+  return (
+    value === "left" || value === "right" || value === "duo" || value === "solo"
+  );
 };
 
 /**
- * For screen types that are split across two separate displays (pre-fare),
- * this gets the value of the data attribute dictating which side to show.
+ * For screen types that can be split across multiple display units, indicates
+ * which display was requested for this instance of the app. Returns `null` if
+ * this data is missing or invalid.
  *
- * Returns null if the data attribute is missing or not a valid screen side value.
+ * - `left`: show only the left side of a duo screen.
+ * - `right`: show only the right side of a duo screen.
+ * - `duo`: show both sides of a duo screen.
+ * - `solo`: show "the only side" of a solo screen.
  */
 export const getScreenSide = (): ScreenSide | null => {
   const screenSide = getDatasetValue("screenSide");

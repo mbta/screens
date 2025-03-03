@@ -9,7 +9,7 @@ defmodule Screens.TestSupport.CandidateGeneratorStub do
         @behaviour CandidateGenerator
 
         @impl CandidateGenerator
-        def screen_template(), do: Builder.build_template({:screen, %{normal: [:main]}})
+        def screen_template(_screen), do: Builder.build_template({:screen, %{normal: [:main]}})
 
         @impl CandidateGenerator
         def candidate_instances(config, query_params) do

@@ -15,8 +15,22 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   @behaviour CandidateGenerator
 
+  @body_right_layout {:body_right,
+                      %{
+                        body_right_normal: [
+                          Builder.with_paging(
+                            {:upper_right,
+                             %{one_large: [:large], two_medium: [:medium_left, :medium_right]}},
+                            4
+                          ),
+                          :lower_right
+                        ],
+                        body_right_takeover: [:full_body_right],
+                        body_right_surge: [:orange_line_surge_upper, :orange_line_surge_lower]
+                      }}
+
   @impl CandidateGenerator
-  def screen_template do
+  def screen_template(%Screen{app_params: %PreFare{template: :duo}}) do
     {:screen,
      %{
        screen_normal: [
@@ -30,31 +44,24 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
                  body_left_takeover: [:full_body_left],
                  body_left_flex: Builder.with_paging(:paged_main_content_left, 4)
                }},
-              {:body_right,
-               %{
-                 body_right_normal: [
-                   Builder.with_paging(
-                     {:upper_right,
-                      %{
-                        one_large: [:large],
-                        two_medium: [:medium_left, :medium_right]
-                      }},
-                     4
-                   ),
-                   :lower_right
-                 ],
-                 body_right_takeover: [:full_body_right],
-                 body_right_surge: [
-                   :orange_line_surge_upper,
-                   :orange_line_surge_lower
-                 ]
-               }}
+              @body_right_layout
             ],
-            body_takeover: [:full_body]
+            body_takeover: [:full_body_duo]
           }}
        ],
-       screen_takeover: [:full_screen],
+       screen_takeover: [:full_duo_screen],
        screen_split_takeover: [:full_left_screen, :full_right_screen]
+     }}
+    |> Builder.build_template()
+  end
+
+  # The solo template is treated as a variant of the duo where the left screen does not exist,
+  # with some differences in the available "full body/screen" slots.
+  def screen_template(%Screen{app_params: %PreFare{template: :solo}}) do
+    {:screen,
+     %{
+       screen_normal: [:header, {:body, %{body_normal: [@body_right_layout]}}],
+       screen_split_takeover: [:full_right_screen]
      }}
     |> Builder.build_template()
   end
