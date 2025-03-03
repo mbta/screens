@@ -38,8 +38,8 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
     %{config: config, config_stop_name: config_stop_name}
   end
 
-  describe "screen_template/0" do
-    test "returns template" do
+  describe "screen_template/1" do
+    test "returns template", %{config: config} do
       assert {:screen,
               %{
                 screen_normal: [
@@ -80,7 +80,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
                      rotation_takeover_two: [:full_rotation_two]
                    }}
                 ]
-              }} == Dup.screen_template()
+              }} == Dup.screen_template(config)
     end
   end
 

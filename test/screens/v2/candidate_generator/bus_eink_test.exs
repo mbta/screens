@@ -23,8 +23,8 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
     %{config: config}
   end
 
-  describe "screen_template/0" do
-    test "returns correct template" do
+  describe "screen_template/1" do
+    test "returns correct template", %{config: config} do
       assert {:screen,
               %{
                 screen_normal: [
@@ -49,7 +49,7 @@ defmodule Screens.V2.CandidateGenerator.BusEinkTest do
                    }}
                 ],
                 screen_takeover: [:full_screen]
-              }} == BusEink.screen_template()
+              }} == BusEink.screen_template(config)
     end
   end
 

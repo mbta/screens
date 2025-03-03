@@ -33,8 +33,36 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     %{config: config}
   end
 
-  describe "screen_template/0" do
-    test "returns template" do
+  describe "screen_template/1" do
+    @body_right %{
+      body_right_normal: [
+        {{0, :upper_right},
+         %{
+           one_large: [{0, :large}],
+           two_medium: [{0, :medium_left}, {0, :medium_right}]
+         }},
+        {{1, :upper_right},
+         %{
+           one_large: [{1, :large}],
+           two_medium: [{1, :medium_left}, {1, :medium_right}]
+         }},
+        {{2, :upper_right},
+         %{
+           one_large: [{2, :large}],
+           two_medium: [{2, :medium_left}, {2, :medium_right}]
+         }},
+        {{3, :upper_right},
+         %{
+           one_large: [{3, :large}],
+           two_medium: [{3, :medium_left}, {3, :medium_right}]
+         }},
+        :lower_right
+      ],
+      body_right_takeover: [:full_body_right],
+      body_right_surge: [:orange_line_surge_upper, :orange_line_surge_lower]
+    }
+
+    test "returns duo template", %{config: config} do
       assert {:screen,
               %{
                 screen_normal: [
@@ -52,40 +80,22 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                            {3, :paged_main_content_left}
                          ]
                        },
-                       body_right: %{
-                         body_right_normal: [
-                           {{0, :upper_right},
-                            %{
-                              one_large: [{0, :large}],
-                              two_medium: [{0, :medium_left}, {0, :medium_right}]
-                            }},
-                           {{1, :upper_right},
-                            %{
-                              one_large: [{1, :large}],
-                              two_medium: [{1, :medium_left}, {1, :medium_right}]
-                            }},
-                           {{2, :upper_right},
-                            %{
-                              one_large: [{2, :large}],
-                              two_medium: [{2, :medium_left}, {2, :medium_right}]
-                            }},
-                           {{3, :upper_right},
-                            %{
-                              one_large: [{3, :large}],
-                              two_medium: [{3, :medium_left}, {3, :medium_right}]
-                            }},
-                           :lower_right
-                         ],
-                         body_right_takeover: [:full_body_right],
-                         body_right_surge: [:orange_line_surge_upper, :orange_line_surge_lower]
-                       }
+                       body_right: @body_right
                      ],
-                     body_takeover: [:full_body]
+                     body_takeover: [:full_body_duo]
                    }}
                 ],
-                screen_takeover: [:full_screen],
+                screen_takeover: [:full_duo_screen],
                 screen_split_takeover: [:full_left_screen, :full_right_screen]
-              }} == PreFare.screen_template()
+              }} == PreFare.screen_template(config)
+    end
+
+    test "returns solo template", %{config: config} do
+      assert {:screen,
+              %{
+                screen_normal: [:header, {:body, %{body_normal: [body_right: @body_right]}}],
+                screen_split_takeover: [:full_right_screen]
+              }} == PreFare.screen_template(put_in(config.app_params.template, :solo))
     end
   end
 

@@ -5,6 +5,7 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.Report
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
+  alias ScreensConfig.V2.PreFare
 
   @default_app_id :bus_eink_v2
   @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 elevator_v2 gl_eink_v2 on_bus_v2 pre_fare_v2]a
@@ -39,13 +40,11 @@ defmodule ScreensWeb.V2.ScreenController do
     put_layout(conn, html: {ScreensWeb.V2.LayoutView, :app})
   end
 
-  defp screen_side(params) do
-    case params["screen_side"] do
-      "left" -> "left"
-      "right" -> "right"
-      _ -> nil
-    end
-  end
+  defp screen_side(%PreFare{template: :duo}, %{"screen_side" => "left"}), do: "left"
+  defp screen_side(%PreFare{template: :duo}, %{"screen_side" => "right"}), do: "right"
+  defp screen_side(%PreFare{template: :duo}, _query_params), do: "duo"
+  defp screen_side(%PreFare{template: :solo}, _query_params), do: "solo"
+  defp screen_side(_app_params, _query_params), do: nil
 
   defp rotation_index(params) do
     case params["rotation_index"] do
@@ -70,9 +69,7 @@ defmodule ScreensWeb.V2.ScreenController do
 
   def index(conn, %{"id" => screen_id} = params) do
     is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
-
-    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, screen_side(params))
-
+    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, params["screen_side"])
     config = Cache.screen(screen_id)
 
     if match?(%Screen{app_id: app_id} when app_id in @recognized_app_ids, config) do
@@ -123,7 +120,7 @@ defmodule ScreensWeb.V2.ScreenController do
     render_not_found(conn)
   end
 
-  defp get_assigns(params, screen_id, %Screen{app_id: app_id} = config) do
+  defp get_assigns(params, screen_id, %Screen{app_id: app_id, app_params: app_params} = config) do
     refresh_rate = Parameters.refresh_rate(app_id)
 
     [
@@ -134,7 +131,7 @@ defmodule ScreensWeb.V2.ScreenController do
       sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
       refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate),
       is_real_screen: match?(%{"is_real_screen" => "true"}, params),
-      screen_side: screen_side(params),
+      screen_side: screen_side(app_params, params),
       requestor: params["requestor"],
       rotation_index: rotation_index(params),
       variant: params["variant"],

@@ -17,7 +17,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew do
                        |> Enum.map(fn {name, func} -> {@telemetry_name ++ [name], func} end)
 
   @impl CandidateGenerator
-  defdelegate screen_template(), to: Screens.V2.CandidateGenerator.Dup
+  defdelegate screen_template(screen), to: Screens.V2.CandidateGenerator.Dup
 
   @impl CandidateGenerator
   def candidate_instances(config, _query_params, now \\ DateTime.utc_now()) do

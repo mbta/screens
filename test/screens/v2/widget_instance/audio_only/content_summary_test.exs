@@ -39,7 +39,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
 
     instance_with_takeover_content = %ContentSummary{
       screen: nil,
-      widgets_snapshot: [%MockWidget{slot_names: [:full_body]}],
+      widgets_snapshot: [%MockWidget{slot_names: [:full_body_duo]}],
       lines_at_station: [:red, :orange]
     }
 

@@ -43,6 +43,15 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     end
   end
 
+  @pre_fare_takeover_slots MapSet.new(~w[
+      full_body_duo
+      full_body_left
+      full_body_right
+      full_duo_screen
+      full_left_screen
+      full_right_screen
+    ]a)
+
   def audio_valid_candidate?(
         %__MODULE__{
           screen: %Screen{
@@ -56,15 +65,12 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     if has_surge_widgets?(widgets) and stop_id in ["place-welln"] do
       false
     else
-      # On pre-fare screens, we only include a content summary when
-      # there's no takeover content.
-      takeover_slots = MapSet.new(~w[full_body_left full_body_right full_body full_screen]a)
-
+      # On pre-fare screens, we only include a content summary when there's no takeover content.
       Enum.all?(t.widgets_snapshot, fn widget ->
         widget
         |> WidgetInstance.slot_names()
         |> MapSet.new()
-        |> MapSet.disjoint?(takeover_slots)
+        |> MapSet.disjoint?(@pre_fare_takeover_slots)
       end)
     end
   end
