@@ -308,9 +308,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     }
   end
 
-  defp serialize_active_period({nil, end_t}),
-    do: %{"start" => nil, "end" => DateTime.to_iso8601(end_t)}
-
   defp serialize_active_period({start_t, nil}),
     do: %{"start" => DateTime.to_iso8601(start_t), "end" => nil}
 

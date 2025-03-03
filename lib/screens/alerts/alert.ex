@@ -98,7 +98,7 @@ defmodule Screens.Alerts.Alert do
           | :track_change
           | :unknown
 
-  @type active_period :: {DateTime.t() | nil, DateTime.t() | nil}
+  @type active_period :: {DateTime.t(), DateTime.t() | nil}
 
   @type informed_entity :: %{
           facility: %{id: String.t(), name: String.t()} | nil,
@@ -255,10 +255,6 @@ defmodule Screens.Alerts.Alert do
 
   def happening_now?(%{active_period: aps}, now \\ DateTime.utc_now()) do
     Enum.any?(aps, &in_active_period(&1, now))
-  end
-
-  defp in_active_period({nil, end_t}, t) do
-    DateTime.compare(t, end_t) in [:lt, :eq]
   end
 
   defp in_active_period({start_t, nil}, t) do
