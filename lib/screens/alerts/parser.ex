@@ -47,8 +47,8 @@ defmodule Screens.Alerts.Parser do
           active_period: parse_and_sort_active_periods(active_period),
           lifecycle: lifecycle,
           timeframe: timeframe,
-          created_at: parse_time(created_at),
-          updated_at: parse_time(updated_at),
+          created_at: parse_datetime(created_at),
+          updated_at: parse_datetime(updated_at),
           url: url,
           description: description
         }
@@ -97,32 +97,17 @@ defmodule Screens.Alerts.Parser do
 
   defp parse_and_sort_active_periods(periods) do
     periods
-    |> Enum.map(&parse_active_period/1)
-    |> Enum.sort_by(fn {start, _} -> start end, fn dt1, dt2 ->
-      DateTime.compare(dt1, dt2) in [:lt, :eq]
+    |> Enum.map(fn %{"start" => start_str, "end" => end_str} ->
+      {parse_datetime(start_str), if(is_nil(end_str), do: nil, else: parse_datetime(end_str))}
     end)
+    |> Enum.sort_by(
+      fn {start, _} -> start end,
+      fn dt1, dt2 -> DateTime.compare(dt1, dt2) in [:lt, :eq] end
+    )
   end
 
-  defp parse_active_period(%{"start" => nil, "end" => end_str}) do
-    end_t = parse_time(end_str)
-    {nil, end_t}
-  end
-
-  defp parse_active_period(%{"start" => start_str, "end" => nil}) do
-    start_t = parse_time(start_str)
-    {start_t, nil}
-  end
-
-  defp parse_active_period(%{"start" => start_str, "end" => end_str}) do
-    start_t = parse_time(start_str)
-    end_t = parse_time(end_str)
-    {start_t, end_t}
-  end
-
-  defp parse_time(nil), do: nil
-
-  defp parse_time(s) do
-    {:ok, time, _} = DateTime.from_iso8601(s)
+  defp parse_datetime(iso_str) do
+    {:ok, time, _offset} = DateTime.from_iso8601(iso_str)
     time
   end
 

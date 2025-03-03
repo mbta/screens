@@ -3,27 +3,76 @@ defmodule Screens.Alerts.AlertTest do
 
   alias Screens.Alerts.Alert
 
-  defp alert_json(id) do
-    %{
-      "id" => id,
-      "attributes" => %{
-        "active_period" => [],
-        "created_at" => nil,
-        "updated_at" => nil,
-        "cause" => nil,
-        "effect" => nil,
-        "header" => nil,
-        "informed_entity" => [],
-        "lifecycle" => nil,
-        "severity" => nil,
-        "timeframe" => nil,
-        "url" => nil,
-        "description" => nil
+  # Minimal valid attributes by V3 API resource definitions.
+  @minimal_attributes %{
+    "active_period" => [%{"start" => "2017-08-14T14:54:01-04:00", "end" => nil}],
+    "banner" => nil,
+    "cause" => "ACCIDENT",
+    "created_at" => "2017-08-14T14:54:01-04:00",
+    "description" => nil,
+    "duration_certainty" => "UNKNOWN",
+    "effect" => "DELAY",
+    "header" => "Route 1 experiencing delays up to 20 minutes due to an accident.",
+    "image" => nil,
+    "image_alternative_text" => nil,
+    "informed_entity" => [
+      %{
+        "activities" => ~w[BOARD EXIT RIDE],
+        "direction_id" => nil,
+        "facility" => nil,
+        "route" => "1",
+        "route_type" => nil,
+        "stop" => nil,
+        "trip" => nil
       }
-    }
+    ],
+    "lifecycle" => "ONGOING",
+    "service_effect" => "Route 1 delay",
+    "severity" => 5,
+    "short_header" => "Route 1 delayed up to 20 minutes due to an accident.",
+    "timeframe" => nil,
+    "updated_at" => "2017-08-14T14:54:01-04:00",
+    "url" => nil
+  }
+
+  describe "fetch/2" do
+    test "fetches and parses alerts" do
+      get_json_fn = fn "alerts", %{"filter[route]" => "1"} ->
+        {:ok, %{"data" => [%{"id" => "999", "attributes" => @minimal_attributes}]}}
+      end
+
+      expected = %Alert{
+        active_period: [{~U[2017-08-14 18:54:01Z], nil}],
+        cause: :accident,
+        created_at: ~U[2017-08-14 18:54:01Z],
+        description: nil,
+        effect: :delay,
+        header: "Route 1 experiencing delays up to 20 minutes due to an accident.",
+        id: "999",
+        informed_entities: [
+          %{
+            stop: nil,
+            route: "1",
+            direction_id: nil,
+            route_type: nil,
+            activities: ~w[BOARD EXIT RIDE],
+            facility: nil
+          }
+        ],
+        lifecycle: "ONGOING",
+        severity: 5,
+        timeframe: nil,
+        updated_at: ~U[2017-08-14 18:54:01Z],
+        url: nil
+      }
+
+      assert Alert.fetch([route_ids: ["1"]], get_json_fn) == {:ok, [expected]}
+    end
   end
 
   describe "fetch_by_stop_and_route/3" do
+    defp alert_json(id), do: %{"id" => id, "attributes" => @minimal_attributes}
+
     setup do
       stop_based_alerts = [alert_json("1"), alert_json("2"), alert_json("3")]
       route_based_alerts = [alert_json("4"), alert_json("3"), alert_json("5")]

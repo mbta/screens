@@ -205,7 +205,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   defp build_upcoming_closure([]), do: nil
 
   defp build_upcoming_closure([closure | _] = closures) do
-    # Note: don't have to account for periods with `nil` start here; those are `happening_now?`
     next_date_period =
       closures
       |> Enum.filter(fn
