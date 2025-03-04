@@ -65,7 +65,10 @@
 }
 
 .inspector__screen {
+  display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
+  gap: 0.5em;
 
   iframe {
     width: 100%;
