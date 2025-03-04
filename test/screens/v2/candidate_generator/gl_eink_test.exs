@@ -28,8 +28,8 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
     %{config: config}
   end
 
-  describe "screen_template/0" do
-    test "returns correct template" do
+  describe "screen_template/1" do
+    test "returns correct template", %{config: config} do
       assert {:screen,
               %{
                 screen_normal: [
@@ -68,7 +68,7 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
                    }}
                 ],
                 screen_takeover: [:full_screen]
-              }} == GlEink.screen_template()
+              }} == GlEink.screen_template(config)
     end
   end
 

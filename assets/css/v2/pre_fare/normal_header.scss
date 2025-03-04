@@ -19,8 +19,16 @@
 .normal-header-title {
   position: absolute;
   bottom: 40px;
-  left: 40px;
-  width: 1000px;
+
+  .normal-header--duo & {
+    left: 40px;
+    width: 1000px;
+  }
+
+  .normal-header--solo & {
+    left: 1120px;
+    width: 800px;
+  }
 
   &--large {
     font-size: 104px;
@@ -54,11 +62,6 @@
   font-weight: 600;
   line-height: 56px;
   color: #fff;
-}
-
-.left-screen .normal-header-time,
-.right-screen .normal-header-title {
-  display: none;
 }
 
 .normal-header__environment {

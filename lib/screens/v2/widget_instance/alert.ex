@@ -258,8 +258,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   @spec seconds_from_onset(t()) :: integer()
-  def seconds_from_onset(%__MODULE__{alert: %Alert{active_period: [{start, _} | _]}, now: now})
-      when not is_nil(start) do
+  def seconds_from_onset(%__MODULE__{alert: %Alert{active_period: [{start, _} | _]}, now: now}) do
     DateTime.diff(now, start, :second)
   end
 

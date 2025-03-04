@@ -304,6 +304,14 @@ const PreFareV2ScreensTable = (): JSX.Element => {
 
   const columns = [
     ...v2Columns,
+    {
+      Header: "Template",
+      accessor: buildAppParamAccessor("template"),
+      mutator: buildAppParamMutator("template"),
+      Cell: EditableSelect,
+      Filter: SelectColumnFilter,
+      FormCell: buildFormSelect(["duo", "solo"], false),
+    },
     headerColumn,
     {
       Header: "Elevator Status",

@@ -23,8 +23,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
     %{config: config}
   end
 
-  describe "screen_template/0" do
-    test "returns template" do
+  describe "screen_template/1" do
+    test "returns template", %{config: config} do
       assert {:screen,
               %{
                 screen_normal: [
@@ -69,7 +69,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
                    }}
                 ],
                 screen_takeover: [:full_screen]
-              }} == BusShelter.screen_template()
+              }} == BusShelter.screen_template(config)
     end
   end
 

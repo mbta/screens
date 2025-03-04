@@ -21,13 +21,13 @@ defmodule Screens.V2.CandidateGenerator.ElevatorTest do
     %{config: config}
   end
 
-  describe "screen_template/0" do
-    test "returns template" do
+  describe "screen_template/1" do
+    test "returns template", %{config: config} do
       assert {:screen,
               %{
                 normal: [:header, :main_content, :footer],
                 takeover: [:full_screen]
-              }} == Elevator.screen_template()
+              }} == Elevator.screen_template(config)
     end
   end
 

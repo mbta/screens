@@ -6,9 +6,9 @@ defmodule Screens.V2.CandidateGenerator do
   alias ScreensConfig.Screen
 
   @doc """
-  Returns the template for this screen type.
+  Returns the template for this screen.
   """
-  @callback screen_template() :: Screens.V2.Template.template()
+  @callback screen_template(Screen.t()) :: Screens.V2.Template.template()
 
   @doc """
   Fetches data and returns a list of candidate widget instances to be

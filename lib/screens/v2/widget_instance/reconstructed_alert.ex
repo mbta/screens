@@ -1310,7 +1310,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def slot_names(%__MODULE__{} = t) do
     if dual_screen_alert?(t),
-      do: [:full_body],
+      do: [:full_body_duo],
       else: [:paged_main_content_left]
   end
 

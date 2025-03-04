@@ -17,13 +17,13 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
     app_id: :solari_test_v2
   }
 
-  describe "screen_template/0" do
+  describe "screen_template/1" do
     test "returns correct template" do
       assert {:screen,
               %{
                 normal: [:header, :main_content],
                 takeover: [:full_screen]
-              }} == Busway.screen_template()
+              }} == Busway.screen_template(@config)
     end
   end
 
