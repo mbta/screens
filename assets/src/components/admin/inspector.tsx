@@ -146,6 +146,8 @@ const Inspector: ComponentType = () => {
       </div>
 
       <div className="inspector__screen">
+        <input disabled value={iframeUrl} />
+
         <iframe
           name={INSPECTOR_FRAME_NAME}
           onLoad={adjustFrame}
