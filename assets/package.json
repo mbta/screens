@@ -75,7 +75,7 @@
     "stylelint-config-recess-order": "^5.0.1",
     "stylelint-config-standard-scss": "^13.1.0",
     "terser-webpack-plugin": "^4.2.3",
-    "ts-jest": "^29.1.2",
+    "ts-jest": "^29.2.6",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.1",
     "webpack": "^4.46.0",
