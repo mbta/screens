@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{CRDepartures, PreFare}
+  alias ScreensConfig.V2.{ContentSummary, CRDepartures, ElevatorStatus, PreFare}
   alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
@@ -17,10 +17,25 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   # Currently testing PreFare only
   defp setup_base(_context) do
+    station_id = "place-xyz"
+    current_stop_id = %CurrentStopId{stop_id: station_id}
+
     %{
       widget: %ReconstructedAlert{
         alert: %Alert{id: "123", updated_at: ~U[2023-06-09T09:00:00Z]},
-        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
+        screen: %Screen{
+          app_id: nil,
+          app_params: %PreFare{
+            content_summary: %ContentSummary{parent_station_id: station_id},
+            elevator_status: %ElevatorStatus{parent_station_id: station_id, platform_stop_ids: []},
+            full_line_map: [],
+            header: current_stop_id,
+            reconstructed_alert_widget: current_stop_id
+          },
+          device_id: nil,
+          name: nil,
+          vendor: nil
+        },
         location_context: %LocationContext{
           home_stop: nil,
           tagged_stop_sequences: nil,
