@@ -9,6 +9,7 @@ import {
   useSimulationApiResponse,
 } from "Hooks/v2/use_api_response";
 import WidgetTreeErrorBoundary from "Components/v2/widget_tree_error_boundary";
+import { classWithModifier, getScreenSide } from "Util/utils";
 
 interface SimulationScreenLayoutProps {
   apiResponse: ApiResponse;
@@ -43,7 +44,10 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
         {apiResponse && (
           <div className="simulation__full-page">
             <div className="simulation__title">Live view</div>
-            <div className="simulation" id="simulation">
+            <div
+              className={classWithModifier("simulation", getScreenSide())}
+              id="simulation"
+            >
               <WidgetTreeErrorBoundary>
                 <Widget data={fullPage} />
               </WidgetTreeErrorBoundary>

@@ -1,0 +1,23 @@
+.screen-container,
+.simulation {
+  height: 1920px;
+  overflow: hidden;
+  // width of a single Pre-Fare display unit; "duo" installations are two of
+  // these side-by-side
+  --panel-width: 1080px;
+
+  &--duo {
+    width: calc(var(--panel-width) * 2);
+  }
+
+  &--left,
+  &--right,
+  &--solo {
+    width: var(--panel-width);
+  }
+
+  &--right > *,
+  &--solo > * {
+    margin-left: calc(var(--panel-width) * -1);
+  }
+}
