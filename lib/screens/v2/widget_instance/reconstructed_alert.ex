@@ -22,8 +22,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             location_context: nil,
             informed_stations: nil,
             is_terminal_station: false,
-            # Full screen alert, whether that's a single or dual screen alert
-            is_full_screen: false,
+            is_priority: false,
             partial_closure_platform_names: []
 
   @type stop_id :: String.t()
@@ -37,7 +36,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           location_context: LocationContext.t(),
           informed_stations: list(String.t()),
           is_terminal_station: boolean(),
-          is_full_screen: boolean(),
+          is_priority: boolean(),
           partial_closure_platform_names: list(String.t())
         }
 
@@ -365,33 +364,33 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_cause(:unknown), do: nil
   defp get_cause(cause), do: cause
 
-  def dual_screen_alert?(%__MODULE__{is_full_screen: false}), do: false
+  defp dual_screen_alert?(%__MODULE__{is_priority: false}), do: false
 
-  def dual_screen_alert?(%__MODULE__{
-        screen: %Screen{
-          app_params: %PreFare{
-            cr_departures: %CRDepartures{
-              enabled: true,
-              pair_with_alert_widget: true
-            }
-          }
-        }
-      }),
-      do: false
+  defp dual_screen_alert?(%__MODULE__{
+         screen: %Screen{
+           app_params: %PreFare{
+             cr_departures: %CRDepartures{
+               enabled: true,
+               pair_with_alert_widget: true
+             }
+           }
+         }
+       }),
+       do: false
 
-  def dual_screen_alert?(%__MODULE__{
-        alert: %Alert{effect: :station_closure},
-        partial_closure_platform_names: partial_closure_platform_names
-      })
-      when partial_closure_platform_names != [],
-      do: false
+  defp dual_screen_alert?(%__MODULE__{
+         alert: %Alert{effect: :station_closure},
+         partial_closure_platform_names: partial_closure_platform_names
+       })
+       when partial_closure_platform_names != [],
+       do: false
 
-  def dual_screen_alert?(
-        %__MODULE__{
-          is_terminal_station: is_terminal_station,
-          alert: %Alert{effect: effect} = alert
-        } = t
-      ) do
+  defp dual_screen_alert?(
+         %__MODULE__{
+           is_terminal_station: is_terminal_station,
+           alert: %Alert{effect: effect} = alert
+         } = t
+       ) do
     effect in [:station_closure, :suspension, :shuttle] and
       LocalizedAlert.location(t, is_terminal_station) == :inside and
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
@@ -1223,7 +1222,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(
         %__MODULE__{
-          is_full_screen: true,
+          is_priority: true,
           alert: %Alert{effect: :station_closure},
           partial_closure_platform_names: partial_closure_platform_names
         } = t,
@@ -1236,7 +1235,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def serialize(
         %__MODULE__{
-          is_full_screen: true,
+          is_priority: true,
           alert: %Alert{effect: effect}
         } = t,
         log_fn
@@ -1293,7 +1292,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     serialize_single_screen_alert(t, location)
   end
 
-  def audio_sort_key(%__MODULE__{is_full_screen: true}), do: [1]
+  def audio_sort_key(%__MODULE__{is_priority: true}), do: [1]
 
   def audio_sort_key(%__MODULE__{} = t) do
     case serialize(t) do
@@ -1303,10 +1302,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def priority(%__MODULE__{is_full_screen: true}), do: [1]
+  def priority(%__MODULE__{is_priority: true}), do: [1]
   def priority(_t), do: [3]
 
-  def slot_names(%__MODULE__{is_full_screen: false}), do: [:large]
+  def slot_names(%__MODULE__{is_priority: false}), do: [:large]
 
   def slot_names(%__MODULE__{} = t) do
     if dual_screen_alert?(t),
@@ -1314,7 +1313,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       else: [:paged_main_content_left]
   end
 
-  def widget_type(%__MODULE__{is_full_screen: false}), do: :reconstructed_large_alert
+  def widget_type(%__MODULE__{is_priority: false}), do: :reconstructed_large_alert
 
   def widget_type(%__MODULE__{} = t) do
     if dual_screen_alert?(t),

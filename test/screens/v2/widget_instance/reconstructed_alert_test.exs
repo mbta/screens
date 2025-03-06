@@ -115,8 +115,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | is_terminal_station: is_terminal_station}
   end
 
-  defp put_is_full_screen(widget, is_full_screen) do
-    %{widget | is_full_screen: is_full_screen}
+  defp put_is_priority(widget, is_priority) do
+    %{widget | is_priority: is_priority}
   end
 
   defp put_pair_with_cr_widget(widget, pair_with_alert_widget) do
@@ -373,7 +373,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     setup @valid_alert_setup_group
 
     test "returns takeover for a closure alert at this station", %{widget: widget} do
-      widget = put_is_full_screen(widget, true)
+      widget = put_is_priority(widget, true)
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body_duo] == WidgetInstance.slot_names(widget)
       assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
@@ -385,7 +385,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(route: "Red", route_type: 1, stop: "place-dwnxg"),
           ie(route: "Orange", route_type: 1, stop: "place-dwnxg")
         ])
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body_duo] == WidgetInstance.slot_names(widget)
@@ -425,7 +425,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ]
         })
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body_duo] == WidgetInstance.slot_names(widget)
@@ -449,7 +449,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ]
         })
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       assert [1] == WidgetInstance.priority(widget)
       assert [:full_body_duo] == WidgetInstance.slot_names(widget)
@@ -475,7 +475,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ]
         })
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
         |> put_pair_with_cr_widget(true)
 
       assert [1] == WidgetInstance.priority(widget)
@@ -536,7 +536,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_home_stop(PreFare, "place-forhl")
         |> put_effect(:station_closure)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       assert [1] == WidgetInstance.priority(widget)
       assert [:paged_main_content_left] == WidgetInstance.slot_names(widget)
@@ -556,7 +556,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains to Forest Hills",
@@ -596,7 +596,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-astao", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains to Forest Hills",
@@ -634,7 +634,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "Station closed",
@@ -675,7 +675,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-astao", route: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains to Forest Hills",
@@ -715,7 +715,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains",
@@ -753,7 +753,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_is_terminal_station(true)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains",
@@ -794,7 +794,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-mlmnl", route: "Orange", route_type: 1, direction_id: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains to Oak Grove",
@@ -833,7 +833,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-mlmnl", route: "Orange", route_type: 1, direction_id: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains to Oak Grove",
@@ -873,7 +873,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
         |> put_severity(5)
         |> put_alert_header("Delays are happening")
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "Trains may be delayed up to 20 minutes",
@@ -897,7 +897,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
         |> put_alert_header("Delays are happening")
 
       expected = %{
@@ -923,7 +923,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
         |> put_severity(5)
         |> put_alert_header("Delays are happening")
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "Trains may be delayed up to 20 minutes",
@@ -947,7 +947,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:construction)
         |> put_severity(10)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
         |> put_alert_header("Delays are happening")
 
       expected = %{
@@ -972,7 +972,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
         |> put_alert_header("Delays are happening")
 
       expected = %{
@@ -997,7 +997,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-astao", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains",
@@ -1036,7 +1036,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-astao", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No trains",
@@ -1079,7 +1079,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           "Red" => [["place-portr", "place-asmnl"]]
         })
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
         |> put_alert_header("Test Alert")
         |> put_routes_at_stop([
           %{
@@ -1121,7 +1121,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           "Red" => [["place-portr", "place-asmnl"]]
         })
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
         |> put_alert_header("Test Alert")
         |> put_routes_at_stop([
           %{
@@ -1162,7 +1162,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-dwnxg", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: nil,
@@ -1202,7 +1202,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-haecl", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         cause: nil,
@@ -1244,7 +1244,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-chncl", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "No Orange Line trains",
@@ -1286,7 +1286,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         issue: "Trains may be delayed up to 20 minutes",
@@ -1731,7 +1731,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         cause: nil,
@@ -1756,7 +1756,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         cause: nil,
@@ -1911,7 +1911,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             direction_destinations: ["Ashmont/Braintree", "Alewife"]
           }
         ])
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         cause: nil,
@@ -2027,7 +2027,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             direction_destinations: ["Ashmont/Braintree", "Alewife"]
           }
         ])
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         cause: nil,
@@ -2140,7 +2140,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             direction_destinations: ["Ashmont/Braintree", "Alewife"]
           }
         ])
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       expected = %{
         cause: "",
@@ -2449,7 +2449,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-dwnxg", route: "Red", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_full_screen(true)
+        |> put_is_priority(true)
 
       assert [1] == WidgetInstance.audio_sort_key(widget)
     end
@@ -2776,7 +2776,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected ==
                ReconstructedAlert.serialize(
-                 %{alert_widget | is_full_screen: false},
+                 %{alert_widget | is_priority: false},
                  &fake_log/1
                )
     end
@@ -3171,7 +3171,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected ==
                ReconstructedAlert.serialize(
-                 %{alert_widget | is_full_screen: false},
+                 %{alert_widget | is_priority: false},
                  &fake_log/1
                )
     end
