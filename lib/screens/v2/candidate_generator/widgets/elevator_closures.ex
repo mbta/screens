@@ -23,13 +23,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     @type t :: %__MODULE__{
             id: Facility.id(),
             alert_id: String.t(),
-            name: String.t(),
-            station_id: Stop.id(),
-            periods: [Alert.active_period()],
-            elevator: Elevator.t() | nil
+            elevator: Elevator.t() | nil,
+            station_id: Stop.id()
           }
 
-    @enforce_keys ~w[id alert_id name station_id periods elevator]a
+    @enforce_keys ~w[id alert_id elevator station_id]a
     defstruct @enforce_keys
   end
 
@@ -46,29 +44,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, parent_station_id, now),
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
          {:ok, alerts} <- fetch_elevator_alerts_with_facilities_fn.() do
-      elevator_alerts = relevant_alerts(alerts)
-
-      icon_map = get_icon_map(elevator_alerts, parent_station_id)
-
       elevator_closures =
-        elevator_alerts
-        |> Enum.flat_map(&elevator_closure/1)
+        elevator_alerts(alerts)
+        |> Enum.flat_map(&closure_details/1)
 
       elevator_closure_ids =
         elevator_closures
-        |> Enum.filter(&relevant_closure?(&1, elevator_closures))
-        |> Enum.map(fn %Closure{alert_id: alert_id} -> alert_id end)
+        |> Enum.filter(&relevant_closure?(&1, elevator_closures, parent_station_id))
+        |> Enum.map(fn %{alert_id: alert_id} -> alert_id end)
+        |> MapSet.new()
 
       [
         %ElevatorStatusWidget{
           alerts:
-            elevator_alerts
+            alerts
             |> Enum.filter(fn %Alert{id: id} -> id in elevator_closure_ids end),
           location_context: location_context,
           screen: config,
           now: now,
           station_id_to_name: parent_station_map,
-          station_id_to_icons: icon_map
+          station_id_to_icons: get_icon_map(elevator_closures, parent_station_id)
         }
       ]
     else
@@ -76,7 +71,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     end
   end
 
-  defp relevant_alerts(alerts) do
+  defp elevator_alerts(alerts) do
     Enum.filter(alerts, fn
       %Alert{effect: :elevator_closure} = alert -> alert
       _ -> false
@@ -85,22 +80,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
 
   defp get_icon_map(elevator_closures, home_parent_station_id) do
     elevator_closures
-    |> get_parent_station_ids_from_entities()
+    |> Enum.map(fn %{station_id: station_id} -> station_id end)
     |> MapSet.new()
     |> MapSet.put(home_parent_station_id)
     |> Enum.map(fn station_id ->
       {station_id, station_id |> routes_serving_stop() |> routes_to_icons()}
     end)
     |> Enum.into(%{})
-  end
-
-  defp get_parent_station_ids_from_entities(alerts) do
-    alerts
-    |> Enum.flat_map(fn %Alert{informed_entities: informed_entities} ->
-      informed_entities
-      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-      |> Enum.filter(&String.starts_with?(&1, "place-"))
-    end)
   end
 
   defp routes_serving_stop(stop_id) do
@@ -122,9 +108,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
     |> Enum.uniq()
   end
 
-  defp elevator_closure(%Alert{
+  defp closure_details(%Alert{
          id: alert_id,
-         active_period: active_periods,
          effect: :elevator_closure,
          informed_entities: entities
        }) do
@@ -140,14 +125,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
       [] ->
         []
 
-      [{station_id, %{id: id, name: name}}] ->
+      [{station_id, %{id: id}}] ->
         [
-          %Closure{
+          %{
             id: id,
             alert_id: alert_id,
-            name: name,
             station_id: station_id,
-            periods: active_periods,
             elevator: @elevator.get(id)
           }
         ]
@@ -159,15 +142,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   end
 
   # If we couldn't find alternate/redundancy data for an elevator, assume it's relevant.
-  defp relevant_closure?(%Closure{elevator: nil}, _closures), do: true
+  defp relevant_closure?(%{elevator: nil}, _closures, _parent_station_id), do: true
 
   # If any of a closed elevator's alternates are also closed, it's always relevant.
   defp relevant_closure?(
-         %Closure{
+         %{
+           id: _,
+           station_id: station_id,
+           alert_id: _,
            elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
          },
-         closures
+         closures,
+         parent_station_id
        ) do
-    Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) or redundancy != :nearby
+    Enum.any?(closures, fn %{id: id} -> id in alternate_ids end) or redundancy != :nearby or
+      station_id == parent_station_id
   end
 end
