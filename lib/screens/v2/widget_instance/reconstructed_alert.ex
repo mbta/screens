@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.Stops.{Stop, Subway}
   alias Screens.Util
@@ -13,8 +14,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.{CRDepartures, FreeText, FreeTextLine, PreFare}
-
-  require Logger
 
   defstruct screen: nil,
             alert: nil,
@@ -1218,15 +1217,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "between #{min_station} and #{max_station}"
   end
 
-  def serialize(widget, log_fn \\ &Logger.warning/1)
-
   def serialize(
         %__MODULE__{
           is_priority: true,
           alert: %Alert{effect: :station_closure},
           partial_closure_platform_names: partial_closure_platform_names
-        } = t,
-        _log_fn
+        } = t
       )
       when partial_closure_platform_names != [] do
     location = LocalizedAlert.location(t)
@@ -1237,16 +1233,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         %__MODULE__{
           is_priority: true,
           alert: %Alert{effect: effect}
-        } = t,
-        log_fn
+        } = t
       ) do
     location = LocalizedAlert.location(t)
-    diagram_data = serialize_diagram(t, log_fn)
+    diagram_data = serialize_diagram(t)
     main_data = pick_layout_serializer(t, diagram_data, effect, location, dual_screen_alert?(t))
     Map.merge(main_data, diagram_data)
   end
 
-  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t, _log_fn) do
+  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
     case LocalizedAlert.location(t, is_terminal_station) do
       :inside ->
         t |> serialize_inside_flex_alert() |> Map.put(:region, :inside)
@@ -1259,16 +1254,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp serialize_diagram(%__MODULE__{alert: %Alert{effect: :delay}}, _), do: %{}
+  defp serialize_diagram(%__MODULE__{alert: %Alert{effect: :delay}}), do: %{}
 
-  defp serialize_diagram(%__MODULE__{} = t, log_fn) do
+  defp serialize_diagram(%__MODULE__{} = t) do
     case DisruptionDiagram.serialize(t) do
       {:ok, serialized_diagram} ->
         %{disruption_diagram: serialized_diagram}
 
       {:error, reason} ->
-        log_fn.(
-          "[disruption diagram error] alert_id=#{t.alert.id} home_stop=#{t.location_context.home_stop} #{reason}"
+        Report.warning("disruption_diagram_error",
+          alert_id: t.alert.id,
+          home_stop: t.location_context.home_stop,
+          reason: reason
         )
 
         %{}
