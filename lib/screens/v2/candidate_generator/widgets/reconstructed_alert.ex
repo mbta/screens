@@ -91,17 +91,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
             create_alert_instances(moderate_delays, false, common_parameters)
 
         Enum.any?(downstream_disruptions) ->
-          fullscreen_alerts =
+          closest_downstream =
             find_closest_downstream_alerts(
               downstream_disruptions,
               stop_id,
               LocationContext.stop_sequences(location_context)
             )
 
-          flex_zone_alerts = downstream_disruptions -- fullscreen_alerts
+          other_downstream = downstream_disruptions -- closest_downstream
 
-          create_alert_instances(fullscreen_alerts, true, common_parameters) ++
-            create_alert_instances(flex_zone_alerts, false, common_parameters) ++
+          create_alert_instances(closest_downstream, true, common_parameters) ++
+            create_alert_instances(other_downstream, false, common_parameters) ++
             create_alert_instances(moderate_delays, false, common_parameters)
 
         true ->
@@ -154,7 +154,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp create_alert_instances(
          alerts,
-         is_full_screen,
+         is_priority,
          config: config,
          location_context: location_context,
          fetch_stop_name_fn: fetch_stop_name_fn,
@@ -173,7 +173,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         location_context: location_context,
         informed_stations: get_stations(alert, fetch_stop_name_fn),
         is_terminal_station: is_terminal_station,
-        is_full_screen: is_full_screen,
+        is_priority: is_priority,
         partial_closure_platform_names: all_platforms_names_at_informed_station
       }
     end)

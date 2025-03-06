@@ -131,7 +131,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       }
     end
 
-    test "returns fullscreen instances for immediate disruptions", context do
+    test "returns priority instances for immediate disruptions", context do
       %{
         config: config,
         location_context: location_context,
@@ -182,7 +182,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_full_screen: true,
+            is_priority: true,
             informed_stations: ["Oak Grove"]
           },
           expected_common_data
@@ -207,7 +207,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_full_screen: false,
+            is_priority: false,
             informed_stations: []
           },
           expected_common_data
@@ -225,7 +225,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                )
     end
 
-    test "returns fullscreen instances for closest downstream disruptions if no immediate disruptions",
+    test "returns priority instances for closest downstream disruptions if no immediate disruptions",
          context do
       %{
         config: config,
@@ -277,7 +277,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_full_screen: true,
+            is_priority: true,
             informed_stations: ["Malden Center"]
           },
           expected_common_data
@@ -290,7 +290,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-mlmnl"), ie(stop: "place-welln")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_full_screen: true,
+            is_priority: true,
             informed_stations: []
           },
           expected_common_data
@@ -320,7 +320,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                )
     end
 
-    test "returns fullscreen instances for moderate disruptions if no immediate/downstream disruptions",
+    test "returns priority instances for moderate disruptions if no immediate/downstream disruptions",
          context do
       %{
         config: config,
@@ -361,7 +361,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_full_screen: true,
+            is_priority: true,
             informed_stations: []
           },
           expected_common_data
@@ -457,7 +457,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_full_screen: true
+            is_priority: true
           },
           expected_common_data
         ),
@@ -480,7 +480,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_full_screen: false
+            is_priority: false
           },
           expected_common_data
         )
@@ -512,7 +512,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         is_terminal_station: true,
-        is_full_screen: true,
+        is_priority: true,
         all_platforms_at_informed_station: []
       }
 
