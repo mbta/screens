@@ -45,6 +45,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           | flex_serialized_response()
 
   @type dual_screen_serialized_response :: %{
+          optional(:disruption_diagram) => DisruptionDiagram.serialized_response(),
           optional(:other_closures) => list(String.t()),
           issue: String.t(),
           remedy: String.t(),
@@ -62,6 +63,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         }
 
   @type single_screen_serialized_response :: %{
+          optional(:disruption_diagram) => DisruptionDiagram.serialized_response(),
           # Unique to station closures
           optional(:unaffected_routes) => list(enriched_route()),
           optional(:location) => String.t() | nil,
@@ -83,6 +85,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         }
 
   @type flex_serialized_response :: %{
+          region: :boundary | :inside | :outside,
           issue: String.t(),
           remedy: String.t(),
           location: String.t(),
@@ -363,9 +366,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_cause(:unknown), do: nil
   defp get_cause(cause), do: cause
 
-  defp dual_screen_alert?(%__MODULE__{is_priority: false}), do: false
-
-  defp dual_screen_alert?(%__MODULE__{
+  defp placement(%__MODULE__{
+         is_priority: true,
          screen: %Screen{
            app_params: %PreFare{
              cr_departures: %CRDepartures{
@@ -375,32 +377,29 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            }
          }
        }),
-       do: false
+       do: :single_screen
 
-  defp dual_screen_alert?(%__MODULE__{
-         alert: %Alert{effect: :station_closure},
-         partial_closure_platform_names: partial_closure_platform_names
-       })
-       when partial_closure_platform_names != [],
-       do: false
-
-  defp dual_screen_alert?(
+  defp placement(
          %__MODULE__{
+           alert: %Alert{effect: effect} = alert,
+           is_priority: true,
            is_terminal_station: is_terminal_station,
-           alert: %Alert{effect: effect} = alert
+           partial_closure_platform_names: []
          } = t
-       ) do
-    effect in [:station_closure, :suspension, :shuttle] and
-      LocalizedAlert.location(t, is_terminal_station) == :inside and
-      LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
-      (is_nil(Alert.direction_id(alert)) or is_terminal_station)
+       )
+       when effect in [:station_closure, :suspension, :shuttle] do
+    if LocalizedAlert.location(t, is_terminal_station) == :inside and
+         LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
+         (is_nil(Alert.direction_id(alert)) or is_terminal_station),
+       do: :dual_screen,
+       else: :single_screen
   end
 
-  @spec serialize_dual_screen_alert(t()) :: dual_screen_serialized_response()
-  defp serialize_dual_screen_alert(t)
+  defp placement(%__MODULE__{is_priority: true}), do: :single_screen
+  defp placement(%__MODULE__{}), do: :flex_zone
 
   # Two screen alert, suspension
-  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
+  defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
     %__MODULE__{
       alert: %Alert{cause: cause, informed_entities: informed_entities, updated_at: updated_at},
       location_context: %LocationContext{home_stop: home_stop},
@@ -428,7 +427,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Two screen alert, shuttle
-  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :shuttle}} = t) do
+  defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :shuttle}} = t) do
     %__MODULE__{
       alert: %Alert{cause: cause, informed_entities: informed_entities, updated_at: updated_at},
       location_context: %LocationContext{home_stop: home_stop},
@@ -457,8 +456,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Two screen alert, station closure
-  defp serialize_dual_screen_alert(%__MODULE__{alert: %Alert{effect: :station_closure}} = t) do
-    %{
+  defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t) do
+    %__MODULE__{
       alert: %{cause: cause, updated_at: updated_at},
       now: now,
       location_context: %{home_stop_name: stop_name},
@@ -499,10 +498,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  # When an alert violates our assumptions and we're unable to make a disruption diagram
-  # we show this fallback format for dual / single screen alerts
-  @spec serialize_dual_screen_fallback_alert(t()) :: dual_screen_serialized_response()
-  defp serialize_dual_screen_fallback_alert(%__MODULE__{alert: alert, now: now} = t) do
+  # Fallback for when we're unable to build a disruption diagram
+  defp dual_screen_fallback_fields(%__MODULE__{alert: alert, now: now} = t) do
     %{
       issue: if(alert.effect == :station_closure, do: "Station closed", else: "No trains"),
       remedy: if(alert.effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
@@ -514,30 +511,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec serialize_single_screen_fallback_alert(t(), LocalizedAlert.location()) ::
-          single_screen_serialized_response()
-  defp serialize_single_screen_fallback_alert(%__MODULE__{alert: alert, now: now} = t, location) do
-    %{
-      issue: nil,
-      remedy: nil,
-      remedy_bold: alert.header,
-      location: nil,
-      cause: format_cause(alert.cause),
-      routes: get_route_pills(t, location),
-      effect: alert.effect,
-      updated_at: format_updated_at(alert.updated_at, now),
-      region: get_region_from_location(location)
-    }
-  end
-
-  @spec serialize_single_screen_alert(t(), LocalizedAlert.location()) ::
-          single_screen_serialized_response()
-  defp serialize_single_screen_alert(t, location)
-
-  defp serialize_single_screen_alert(
-         %__MODULE__{alert: %Alert{effect: :suspension}} = t,
-         location
-       ) do
+  defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t, location) do
     %__MODULE__{
       alert: %Alert{cause: cause, informed_entities: informed_entities, updated_at: updated_at},
       location_context: %LocationContext{home_stop: home_stop},
@@ -593,7 +567,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_single_screen_alert(%__MODULE__{alert: %Alert{effect: :shuttle}} = t, location) do
+  defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :shuttle}} = t, location) do
     %__MODULE__{
       alert: %Alert{cause: cause, informed_entities: informed_entities, updated_at: updated_at},
       location_context: %LocationContext{home_stop: home_stop},
@@ -646,11 +620,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Station closure for 1 line at a multi-line station
-  defp serialize_single_screen_alert(
-         %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
-         :inside
-       ) do
-    %{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
+  defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, :inside) do
+    %__MODULE__{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
@@ -682,11 +653,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Downstream closure
-  defp serialize_single_screen_alert(
-         %__MODULE__{alert: %Alert{effect: :station_closure}} = t,
-         location
-       ) do
-    %{
+  defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, location) do
+    %__MODULE__{
       alert: %{cause: cause, updated_at: updated_at},
       now: now,
       informed_stations: informed_stations
@@ -706,11 +674,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_single_screen_alert(
-         %__MODULE__{alert: %Alert{effect: :delay}} = t,
-         location
-       ) do
-    %{
+  defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :delay}} = t, location) do
+    %__MODULE__{
       alert: %{cause: cause, updated_at: updated_at, severity: severity, header: header},
       now: now
     } = t
@@ -742,14 +707,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec serialize_inside_flex_alert(t()) :: flex_serialized_response()
-  defp serialize_inside_flex_alert(t)
+  # Fallback for when we're unable to build a disruption diagram
+  defp single_screen_fallback_fields(%__MODULE__{alert: alert, now: now} = t, location) do
+    %{
+      issue: nil,
+      remedy: nil,
+      remedy_bold: alert.header,
+      location: nil,
+      cause: format_cause(alert.cause),
+      routes: get_route_pills(t, location),
+      effect: alert.effect,
+      updated_at: format_updated_at(alert.updated_at, now),
+      region: get_region_from_location(location)
+    }
+  end
 
-  defp serialize_inside_flex_alert(
-         %__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t
-       )
+  defp inside_flex_fields(%__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t)
        when severity > 3 and severity < 7 do
-    %{alert: %{header: header}} = t
+    %__MODULE__{alert: %{header: header}} = t
 
     %{
       issue: header,
@@ -762,11 +737,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_inside_flex_alert(
-         %__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t
-       )
+  defp inside_flex_fields(%__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t)
        when severity >= 7 do
-    %{alert: %{cause: cause}} = t
+    %__MODULE__{alert: %{cause: cause}} = t
     cause_text = Alert.get_cause_string(cause)
     {delay_description, delay_minutes} = Alert.interpret_severity(severity)
     destination = get_destination(t, :inside)
@@ -797,11 +770,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec serialize_boundary_alert(t(), any()) :: flex_serialized_response()
-  defp serialize_boundary_alert(t, location)
-
-  defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :suspension}} = t, location) do
-    %{alert: %{cause: cause, header: header}} = t
+  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t, location) do
+    %__MODULE__{alert: %{cause: cause, header: header}} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
@@ -817,13 +787,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     else
       destination = get_destination(t, location)
       cause_text = Alert.get_cause_string(cause)
-
-      issue =
-        if is_nil(destination) do
-          "No trains"
-        else
-          "No #{destination} trains"
-        end
+      issue = if is_nil(destination), do: "No trains", else: "No #{destination} trains"
 
       %{
         issue: issue,
@@ -837,8 +801,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :shuttle}} = t, location) do
-    %{alert: %{cause: cause, header: header}} = t
+  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :shuttle}} = t, location) do
+    %__MODULE__{alert: %{cause: cause, header: header}} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
@@ -874,15 +838,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :station_closure}}, _location),
+  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :station_closure}}, _location),
     do: nil
 
-  defp serialize_boundary_alert(
+  defp boundary_flex_fields(
          %__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t,
          _location
        )
        when severity > 3 and severity < 7 do
-    %{alert: %{header: header}} = t
+    %__MODULE__{alert: %{header: header}} = t
 
     %{
       issue: header,
@@ -895,12 +859,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_boundary_alert(
+  defp boundary_flex_fields(
          %__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t,
          location
        )
        when severity >= 7 do
-    %{alert: %{cause: cause, header: header}} = t
+    %__MODULE__{alert: %{cause: cause, header: header}} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
@@ -925,11 +889,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         end
 
       issue =
-        if is_nil(destination) do
-          "Trains may be delayed #{duration_text}"
-        else
-          "#{destination} trains may be delayed #{duration_text}"
-        end
+        if is_nil(destination),
+          do: "Trains may be delayed #{duration_text}",
+          else: "#{destination} trains may be delayed #{duration_text}"
 
       %{
         issue: issue,
@@ -943,15 +905,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp serialize_boundary_alert(%__MODULE__{alert: %Alert{effect: :delay}}, _location), do: nil
+  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :delay}}, _location), do: nil
 
-  @spec serialize_outside_alert(t(), any()) :: flex_serialized_response()
-  defp serialize_outside_alert(t, location)
-
-  defp serialize_outside_alert(
-         %__MODULE__{alert: %Alert{effect: :suspension} = alert} = t,
-         location
-       ) do
+  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :suspension} = alert} = t, location) do
     %__MODULE__{
       alert: %Alert{cause: cause, header: header, informed_entities: informed_entities}
     } = t
@@ -996,7 +952,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp serialize_outside_alert(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t, location) do
+  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t, location) do
     %__MODULE__{
       alert: %Alert{cause: cause, header: header, informed_entities: informed_entities}
     } = t
@@ -1042,7 +998,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Partial closure
-  defp serialize_outside_alert(
+  defp outside_flex_fields(
          %__MODULE__{
            informed_stations: [informed_station],
            partial_closure_platform_names: partial_closure_platform_names
@@ -1076,13 +1032,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Full closure
-  defp serialize_outside_alert(
-         %__MODULE__{
-           alert: %Alert{effect: :station_closure}
-         } = t,
-         _location
-       ) do
-    %{alert: %{cause: cause}, informed_stations: informed_stations} = t
+  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, _location) do
+    %__MODULE__{alert: %{cause: cause}, informed_stations: informed_stations} = t
     cause_text = Alert.get_cause_string(cause)
 
     informed_stations_string = Util.format_name_list_to_string(informed_stations)
@@ -1098,11 +1049,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp serialize_outside_alert(
-         %__MODULE__{alert: %Alert{effect: :delay}} = t,
-         _location
-       ) do
-    %{alert: %{header: header}} = t
+  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :delay}} = t, _location) do
+    %__MODULE__{alert: %{header: header}} = t
 
     %{
       issue: header,
@@ -1136,13 +1084,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def do_get_endpoints(ie, "Green") do
+  defp do_get_endpoints(ie, "Green") do
     Enum.find_value(@green_line_branches, fn branch ->
       do_get_endpoints(ie, branch)
     end)
   end
 
-  def do_get_endpoints(informed_entities, route_id) do
+  defp do_get_endpoints(informed_entities, route_id) do
     case Subway.stop_sequence_containing_informed_entities(informed_entities, route_id) do
       nil ->
         nil
@@ -1207,86 +1155,75 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   @spec format_endpoint_string({String.t(), String.t()} | nil) :: String.t() | nil
-  def format_endpoint_string(nil), do: nil
+  defp format_endpoint_string(nil), do: nil
 
-  def format_endpoint_string({station, station}) do
+  defp format_endpoint_string({station, station}) do
     "at #{station}"
   end
 
-  def format_endpoint_string({min_station, max_station}) do
+  defp format_endpoint_string({min_station, max_station}) do
     "between #{min_station} and #{max_station}"
   end
 
-  def serialize(
-        %__MODULE__{
-          is_priority: true,
-          alert: %Alert{effect: :station_closure},
-          partial_closure_platform_names: partial_closure_platform_names
-        } = t
-      )
-      when partial_closure_platform_names != [] do
-    location = LocalizedAlert.location(t)
-    serialize_single_screen_fallback_alert(t, location)
-  end
-
-  def serialize(
-        %__MODULE__{
-          is_priority: true,
-          alert: %Alert{effect: effect}
-        } = t
-      ) do
-    location = LocalizedAlert.location(t)
-    diagram_data = serialize_diagram(t)
-    main_data = pick_layout_serializer(t, diagram_data, effect, location, dual_screen_alert?(t))
-    Map.merge(main_data, diagram_data)
-  end
-
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
-    case LocalizedAlert.location(t, is_terminal_station) do
-      :inside ->
-        t |> serialize_inside_flex_alert() |> Map.put(:region, :inside)
+    location = LocalizedAlert.location(t, is_terminal_station)
 
-      location when location in [:boundary_upstream, :boundary_downstream] ->
-        t |> serialize_boundary_alert(location) |> Map.put(:region, :boundary)
-
-      location when location in [:downstream, :upstream] ->
-        t |> serialize_outside_alert(location) |> Map.put(:region, :outside)
+    case placement(t) do
+      :dual_screen -> serialize_dual_screen(t)
+      :single_screen -> serialize_single_screen(t, location)
+      :flex_zone -> serialize_flex_zone(t, location)
     end
   end
 
-  defp serialize_diagram(%__MODULE__{alert: %Alert{effect: :delay}}), do: %{}
-
-  defp serialize_diagram(%__MODULE__{} = t) do
+  @spec serialize_dual_screen(t()) :: dual_screen_serialized_response()
+  defp serialize_dual_screen(t) do
     case DisruptionDiagram.serialize(t) do
-      {:ok, serialized_diagram} ->
-        %{disruption_diagram: serialized_diagram}
+      {:ok, diagram} -> t |> dual_screen_fields() |> Map.put(:disruption_diagram, diagram)
+      {:error, reason} -> t |> report_diagram_error(reason) |> dual_screen_fallback_fields()
+    end
+  end
+
+  @spec serialize_single_screen(t(), LocalizedAlert.location()) ::
+          single_screen_serialized_response()
+
+  defp serialize_single_screen(%__MODULE__{alert: %Alert{effect: :delay}} = t, location),
+    do: single_screen_fields(t, location)
+
+  defp serialize_single_screen(%__MODULE__{partial_closure_platform_names: []} = t, location) do
+    case DisruptionDiagram.serialize(t) do
+      {:ok, diagram} ->
+        t |> single_screen_fields(location) |> Map.put(:disruption_diagram, diagram)
 
       {:error, reason} ->
-        Report.warning("disruption_diagram_error",
-          alert_id: t.alert.id,
-          home_stop: t.location_context.home_stop,
-          reason: reason
-        )
-
-        %{}
+        t |> report_diagram_error(reason) |> single_screen_fallback_fields(location)
     end
   end
 
-  def pick_layout_serializer(t, diagram, effect, location, is_dual_screen_alert)
+  # Use diagram-less fallback presentation for partial station closures
+  defp serialize_single_screen(t, location), do: single_screen_fallback_fields(t, location)
 
-  def pick_layout_serializer(t, diagram, effect, _, true)
-      when diagram == %{} and effect != :delay,
-      do: serialize_dual_screen_fallback_alert(t)
+  @spec serialize_flex_zone(t(), LocalizedAlert.location()) :: flex_serialized_response()
+  defp serialize_flex_zone(t, location) do
+    case location do
+      :inside ->
+        t |> inside_flex_fields() |> Map.put(:region, :inside)
 
-  def pick_layout_serializer(t, diagram, effect, location, false)
-      when diagram == %{} and effect != :delay do
-    serialize_single_screen_fallback_alert(t, location)
+      l when l in [:boundary_upstream, :boundary_downstream] ->
+        t |> boundary_flex_fields(location) |> Map.put(:region, :boundary)
+
+      l when l in [:downstream, :upstream] ->
+        t |> outside_flex_fields(location) |> Map.put(:region, :outside)
+    end
   end
 
-  def pick_layout_serializer(t, _, _, _, true), do: serialize_dual_screen_alert(t)
+  defp report_diagram_error(%__MODULE__{} = t, reason) do
+    Report.warning("disruption_diagram_error",
+      alert_id: t.alert.id,
+      home_stop: t.location_context.home_stop,
+      reason: reason
+    )
 
-  def pick_layout_serializer(t, _, _, location, _) do
-    serialize_single_screen_alert(t, location)
+    t
   end
 
   def audio_sort_key(%__MODULE__{is_priority: true}), do: [1]
@@ -1299,23 +1236,30 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  def audio_view(%__MODULE__{} = t) do
+    case placement(t) do
+      :flex_zone -> ScreensWeb.V2.Audio.ReconstructedAlertView
+      _full_screen -> ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView
+    end
+  end
+
   def priority(%__MODULE__{is_priority: true}), do: [1]
   def priority(_t), do: [3]
 
-  def slot_names(%__MODULE__{is_priority: false}), do: [:large]
-
   def slot_names(%__MODULE__{} = t) do
-    if dual_screen_alert?(t),
-      do: [:full_body_duo],
-      else: [:paged_main_content_left]
+    case placement(t) do
+      :dual_screen -> [:full_body_duo]
+      :single_screen -> [:paged_main_content_left]
+      :flex_zone -> [:large]
+    end
   end
 
-  def widget_type(%__MODULE__{is_priority: false}), do: :reconstructed_large_alert
-
   def widget_type(%__MODULE__{} = t) do
-    if dual_screen_alert?(t),
-      do: :reconstructed_takeover,
-      else: :single_screen_alert
+    case placement(t) do
+      :dual_screen -> :reconstructed_takeover
+      :single_screen -> :single_screen_alert
+      :flex_zone -> :reconstructed_large_alert
+    end
   end
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
@@ -1335,13 +1279,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)
     def audio_sort_key(t), do: ReconstructedAlert.audio_sort_key(t)
     def audio_valid_candidate?(t), do: ReconstructedAlert.valid_candidate?(t)
-
-    def audio_view(t),
-      do:
-        if(ReconstructedAlert.widget_type(t) == :reconstructed_large_alert,
-          do: ScreensWeb.V2.Audio.ReconstructedAlertView,
-          else: ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView
-        )
+    def audio_view(t), do: ReconstructedAlert.audio_view(t)
   end
 
   defimpl Screens.V2.AlertsWidget do
