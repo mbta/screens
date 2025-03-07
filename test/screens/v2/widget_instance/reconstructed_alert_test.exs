@@ -337,10 +337,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget: put_effect(widget, :station_closure)}
   end
 
-  # We can't build disruption diagrams for some of these alert scenarios.
-  # Prevent `ReconstructedAlert.serialize` from filling the console with log noise when this happens.
-  defp fake_log(_message), do: nil
-
   # Pass this to `setup` to set up "context" data on the alert widget, without setting up the API alert itself.
   @transfer_stations_alert_widget_context_setup_group [
     :setup_transfer_station,
@@ -583,7 +579,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :boundary
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles shuttle", %{widget: widget} do
@@ -623,7 +619,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles station closure", %{widget: widget} do
@@ -662,7 +658,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles alert with cause", %{widget: widget} do
@@ -702,7 +698,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :boundary
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles terminal boundary suspension", %{widget: widget} do
@@ -740,7 +736,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles terminal boundary shuttle", %{widget: widget} do
@@ -778,7 +774,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
@@ -821,7 +817,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles boundary shuttle", %{widget: widget} do
@@ -860,7 +856,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles moderate delay", %{widget: widget} do
@@ -885,7 +881,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :here
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles severe delay", %{widget: widget} do
@@ -910,7 +906,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :here
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles directional delay", %{widget: widget} do
@@ -935,7 +931,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :here
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles alert with cause", %{widget: widget} do
@@ -960,7 +956,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :here
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles downstream delay", %{widget: widget} do
@@ -985,7 +981,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :outside
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles downstream shuttle", %{widget: widget} do
@@ -1024,7 +1020,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles downstream suspension", %{widget: widget} do
@@ -1063,7 +1059,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles platform closure at home station", %{widget: widget} do
@@ -1105,7 +1101,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :here
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles downstream platform closure", %{widget: widget} do
@@ -1147,7 +1143,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :outside
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
@@ -1188,7 +1184,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles :inside suspension on 1 line", %{widget: widget} do
@@ -1231,7 +1227,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles :inside shuttle on 1 line", %{widget: widget} do
@@ -1273,7 +1269,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles multi line delay", %{widget: widget} do
@@ -1298,7 +1294,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :here
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
@@ -1327,7 +1323,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: ""
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles severe delay", %{widget: widget} do
@@ -1351,7 +1347,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: ""
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
@@ -1379,7 +1375,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles shuttle", %{widget: widget} do
@@ -1403,7 +1399,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles moderate delay", %{widget: widget} do
@@ -1429,7 +1425,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: ""
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles severe delay", %{widget: widget} do
@@ -1454,7 +1450,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: ""
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles alert with cause", %{widget: widget} do
@@ -1479,7 +1475,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: ""
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
@@ -1506,7 +1502,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles downstream suspension range", %{widget: widget} do
@@ -1530,7 +1526,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles downstream suspension range, one direction only", %{widget: widget} do
@@ -1554,7 +1550,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles shuttle at one stop", %{widget: widget} do
@@ -1577,7 +1573,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles full station closure", %{widget: widget} do
@@ -1603,7 +1599,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles platform closure", %{widget: widget} do
@@ -1635,7 +1631,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: nil
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles multiple platform closures at same station", %{widget: widget} do
@@ -1668,7 +1664,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: nil
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles delay", %{widget: widget} do
@@ -1692,7 +1688,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: ""
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "handles alert with cause", %{widget: widget} do
@@ -1718,9 +1714,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
+    @tag :capture_log
     test "two screen fallback layout for an alert that violates assumptions (suspension that's only 1 stop)",
          %{widget: widget} do
       widget =
@@ -1743,9 +1740,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         updated_at: "Friday, 5:00 am"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
+    @tag :capture_log
     test "one screen fallback layout for an alert that violates assumptions (suspension that's only 1 stop)",
          %{widget: widget} do
       widget =
@@ -1770,7 +1768,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy_bold: "Simulation of PIO text"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
@@ -1839,7 +1837,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "gets correct destination for RL alert affecting trunk and a whole branch", %{
@@ -1957,7 +1955,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "gets correct destination for RL alert affecting one branch starting at JFK", %{
@@ -2070,9 +2068,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
+    @tag :capture_log
     test "gets correct destination for RL alert affecting both branches", %{widget: widget} do
       widget =
         widget
@@ -2157,7 +2156,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy_bold: "Simulation of PIO text"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
@@ -2215,7 +2214,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "reverses endpoints for GL trunk alert", %{widget: widget} do
@@ -2322,7 +2321,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "reverses endpoints for GL western branch alert", %{widget: widget} do
@@ -2369,7 +2368,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
 
     test "does not reverse endpoints for GLX alert", %{
@@ -2417,7 +2416,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected == ReconstructedAlert.serialize(widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
@@ -2760,7 +2759,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         }
       }
 
-      assert expected == ReconstructedAlert.serialize(alert_widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(alert_widget)
 
       # Flexzone test
       expected = %{
@@ -2774,13 +2773,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route"
       }
 
-      assert expected ==
-               ReconstructedAlert.serialize(
-                 %{alert_widget | is_priority: false},
-                 &fake_log/1
-               )
+      assert expected == ReconstructedAlert.serialize(%{alert_widget | is_priority: false})
     end
 
+    @tag :capture_log
     test "handles GL boundary shuttle at Govt Center" do
       stop_id = "place-gover"
 
@@ -3155,7 +3151,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station."
       }
 
-      assert expected == ReconstructedAlert.serialize(alert_widget, &fake_log/1)
+      assert expected == ReconstructedAlert.serialize(alert_widget)
 
       # Flexzone test
       expected = %{
@@ -3169,11 +3165,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Use shuttle bus"
       }
 
-      assert expected ==
-               ReconstructedAlert.serialize(
-                 %{alert_widget | is_priority: false},
-                 &fake_log/1
-               )
+      assert expected == ReconstructedAlert.serialize(%{alert_widget | is_priority: false})
     end
   end
 
