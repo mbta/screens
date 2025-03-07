@@ -29,7 +29,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
          {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
          {:ok, alerts} <- fetch_elevator_alerts_with_facilities_fn.() do
       elevator_closures =
-        elevator_alerts(alerts)
+        alerts
+        |> elevator_alerts()
         |> Enum.flat_map(&closure_details/1)
 
       elevator_closure_ids =
