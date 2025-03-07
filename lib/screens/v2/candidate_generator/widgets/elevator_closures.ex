@@ -3,7 +3,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
 
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Elevator
-  alias Screens.Facilities.Facility
   alias Screens.LocationContext
   alias Screens.Report
   alias Screens.Routes.Route
@@ -15,21 +14,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   import Screens.Inject
 
   @elevator injected(Elevator)
-
-  defmodule Closure do
-    @moduledoc false
-    # Internal struct used while generating widgets. Represents a single elevator which is closed.
-
-    @type t :: %__MODULE__{
-            id: Facility.id(),
-            alert_id: String.t(),
-            elevator: Elevator.t() | nil,
-            station_id: Stop.id()
-          }
-
-    @enforce_keys ~w[id alert_id elevator station_id]a
-    defstruct @enforce_keys
-  end
 
   def elevator_status_instances(
         %Screen{
