@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
 
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Elevator
+  alias Screens.Facilities.Facility
   alias Screens.LocationContext
   alias Screens.Report
   alias Screens.Routes.Route
@@ -14,6 +15,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   import Screens.Inject
 
   @elevator injected(Elevator)
+  @route injected(Route)
+  @stop injected(Stop)
+
+  defmodule Closure do
+    @moduledoc false
+    # Internal struct used while generating widgets. Represents a single elevator which is closed.
+
+    @type t :: %__MODULE__{
+            id: Facility.id(),
+            alert_id: String.t(),
+            elevator: Elevator.t() | nil,
+            station_id: Stop.id()
+          }
+
+    @enforce_keys ~w[id alert_id elevator station_id]a
+    defstruct @enforce_keys
+  end
 
   def elevator_status_instances(
         %Screen{
@@ -26,7 +44,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
         fetch_elevator_alerts_with_facilities_fn \\ &Alert.fetch_elevator_alerts_with_facilities/0
       ) do
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, parent_station_id, now),
-         {:ok, parent_station_map} <- Stop.fetch_parent_station_name_map(),
+         {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
          {:ok, alerts} <- fetch_elevator_alerts_with_facilities_fn.() do
       elevator_closures =
         alerts
@@ -65,7 +83,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
 
   defp get_icon_map(elevator_closures, home_parent_station_id) do
     elevator_closures
-    |> Enum.map(fn %{station_id: station_id} -> station_id end)
+    |> Enum.map(fn %Closure{station_id: station_id} -> station_id end)
     |> MapSet.new()
     |> MapSet.put(home_parent_station_id)
     |> Enum.map(fn station_id ->
@@ -75,7 +93,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   end
 
   defp routes_serving_stop(stop_id) do
-    case Route.fetch(%{stop_id: stop_id}) do
+    case @route.fetch(%{stop_id: stop_id}) do
       {:ok, routes} -> routes
       :error -> []
     end
@@ -112,7 +130,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
 
       [{station_id, %{id: id}}] ->
         [
-          %{
+          %Closure{
             id: id,
             alert_id: alert_id,
             station_id: station_id,
@@ -131,10 +149,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
 
   # If any of a closed elevator's alternates are also closed, it's always relevant.
   defp relevant_closure?(
-         %{
-           id: _,
+         %Closure{
            station_id: station_id,
-           alert_id: _,
            elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
          },
          closures,
