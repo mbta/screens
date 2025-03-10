@@ -132,4 +132,78 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
 
     assert [%ElevatorStatusWidget{alerts: [%Alert{id: "alert_1"}]}] = result
   end
+
+  test "filters out closure with an alternate elevator open", %{config: config, now: now} do
+    location_context_mock = fn _screen_type, _station_id, _now ->
+      {:ok, :mocked_location_context}
+    end
+
+    alerts_mock = fn ->
+      {:ok,
+       [
+         build_alert(
+           id: "alert_1",
+           informed_entities: [%{facility: %{id: "elev_1"}, stop: "place-1"}]
+         ),
+         build_alert(
+           id: "alert_2",
+           informed_entities: [%{facility: %{id: "elev_2"}, stop: "place-2"}]
+         )
+       ]}
+    end
+
+    stub(@elevator, :get, fn
+      "elev_1" -> build_elevator("elev_1", exiting_redundancy: :nearby, alternate_ids: ["elev_3"])
+      "elev_2" -> build_elevator("elev_2", exiting_redundancy: :nearby)
+      "elev_3" -> build_elevator("elev_3", exiting_redundancy: :nearby)
+    end)
+
+    result =
+      ElevatorClosures.elevator_status_instances(config, now, location_context_mock, alerts_mock)
+
+    assert [%ElevatorStatusWidget{alerts: []}] = result
+  end
+
+  test "does not filter out closure with an alternate elevator closed", %{
+    config: config,
+    now: now
+  } do
+    location_context_mock = fn _screen_type, _station_id, _now ->
+      {:ok, :mocked_location_context}
+    end
+
+    alerts_mock = fn ->
+      {:ok,
+       [
+         build_alert(
+           id: "alert_1",
+           informed_entities: [%{facility: %{id: "elev_1"}, stop: "place-1"}]
+         ),
+         build_alert(
+           id: "alert_2",
+           informed_entities: [%{facility: %{id: "elev_2"}, stop: "place-2"}]
+         ),
+         build_alert(
+           id: "alert_3",
+           informed_entities: [%{facility: %{id: "elev_3"}, stop: "place-1"}]
+         )
+       ]}
+    end
+
+    stub(@elevator, :get, fn
+      "elev_1" ->
+        build_elevator("elev_1", exiting_redundancy: :nearby, alternate_ids: ["elev_3"])
+
+      "elev_2" ->
+        build_elevator("elev_2", exiting_redundancy: :nearby)
+
+      "elev_3" ->
+        build_elevator("elev_3", exiting_redundancy: :nearby)
+    end)
+
+    result =
+      ElevatorClosures.elevator_status_instances(config, now, location_context_mock, alerts_mock)
+
+    assert [%ElevatorStatusWidget{alerts: [%Alert{id: "alert_1"}]}] = result
+  end
 end
