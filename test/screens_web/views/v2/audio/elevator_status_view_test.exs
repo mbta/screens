@@ -8,7 +8,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
         active_at_home_pages: [],
         list_pages: [],
         upcoming_at_home_pages: [],
-        elsewhere_pages: [],
+        elsewhere_pages: []
       }
 
       assert render(assigns) =~ "All elevators are working at this station."
@@ -21,9 +21,11 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
         active_at_home_pages: test_stations(),
         list_pages: [],
         upcoming_at_home_pages: [],
-        elsewhere_pages: [],
+        elsewhere_pages: []
       }
-      assert render(assigns) =~ "All other MBTA elevators are working or have a backup elevator within 20 feet."
+
+      assert render(assigns) =~
+               "All other MBTA elevators are working or have a backup elevator within 20 feet."
     end
   end
 
@@ -33,35 +35,38 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
         active_at_home_pages: test_stations(),
         list_pages: test_stations(),
         upcoming_at_home_pages: [],
-        elsewhere_pages: [],
+        elsewhere_pages: []
       }
+
       assert render(assigns) =~ "For a full list of elevator alerts"
     end
-
   end
 
   ## Helper functions
 
   defp test_stations do
     [
-      %{station: %{
-        is_at_home_stop: true,
-        name: "Haymarket",
-        elevator_closures: [
-          %{
-            elevator_id: "1",
-            elevator_name: "haymarket elevator",
-            description: "take a differente elevator :)",
-            timeframe: %{
-              active_period: %{
-                "start" => "2022-01-01T00:00:00Z",
-                "end" => "2022-01-01T22:00:00Z"
-              },
-              happening_now: true
-            },
-          }
-        ]
-    }}]
+      %{
+        station: %{
+          is_at_home_stop: true,
+          name: "Haymarket",
+          elevator_closures: [
+            %{
+              elevator_id: "1",
+              elevator_name: "haymarket elevator",
+              description: "take a differente elevator :)",
+              timeframe: %{
+                active_period: %{
+                  "start" => "2022-01-01T00:00:00Z",
+                  "end" => "2022-01-01T22:00:00Z"
+                },
+                happening_now: true
+              }
+            }
+          ]
+        }
+      }
+    ]
   end
 
   defp render(data) do
