@@ -6,9 +6,11 @@
 1. Install [`asdf`](https://github.com/asdf-vm/asdf)
 1. Install language build dependencies: `brew install coreutils`
 1. Add `asdf` plugins:
-   1. `asdf plugin-add erlang`
-   1. `asdf plugin-add elixir`
-   1. `asdf plugin-add nodejs`
+   ```bash
+   asdf plugin add erlang
+   asdf plugin add elixir
+   asdf plugin add nodejs
+   ```
 1. Install versions specified in `.tool-versions` with `asdf install`
 
 #### Set up environment
@@ -27,10 +29,11 @@
    the app expects to find this configuration when running locally.
    - This script uses the `aws` CLI, so it assumes you have this installed and
      configured with working credentials, and that your AWS account has Screens
-     team permissions. If you don't have all this completely set up but do have
-     S3 access through the AWS web console, you can get the files from there,
-     referring to the script to see what to copy and where to save it. Or, ask
-     the team if someone can send you their files!
+     team permissions.
+   - Once you have the CLI installed, go to the console and then go to your
+     account and select "Security Credentials". Under "Access Keys" select
+     "Create access key" if you don't have one already. Use the access key id
+     and secret access key to auth in the CLI with the `aws configure` command.
 
 #### Start the server
 
