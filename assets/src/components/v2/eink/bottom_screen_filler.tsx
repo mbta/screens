@@ -5,7 +5,7 @@ const BottomScreenFiller: ComponentType = () => (
   <div className="bottom-screen-filler">
     <div className="bottom-screen-filler__alternatives-container">
       <div className="bottom-screen-filler__alternatives__message">
-        For the latest schedules and updates, go to{" "}
+        For real-time service alerts and updates, go to{" "}
       </div>
       <div className="bottom-screen-filler__alternatives__link-app">
         <span className="bottom-screen-filler__alternatives__message__em">
