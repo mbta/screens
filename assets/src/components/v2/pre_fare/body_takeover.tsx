@@ -3,14 +3,16 @@ import React from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
-  full_body: WidgetData;
+  full_body_duo: WidgetData;
 }
 
-const BodyTakeover: React.ComponentType<Props> = ({ full_body: fullBody }) => {
+const BodyTakeover: React.ComponentType<Props> = ({
+  full_body_duo: fullBodyDuo,
+}) => {
   return (
     <div className="body-takeover">
       <div className="body-takeover__full-body">
-        <Widget data={fullBody} />
+        <Widget data={fullBodyDuo} />
       </div>
     </div>
   );
