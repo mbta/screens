@@ -82,7 +82,7 @@ const ImageUpload = (): JSX.Element => {
     formData.append("image", stagedImageUpload, stagedImageUpload.name);
 
     try {
-      const result = await fetch.post("/api/admin/image", formData);
+      const result = await fetch.formData("/api/admin/image", formData);
 
       if (result.success) {
         alert(`Success. Image has been uploaded as "${result.uploaded_name}".`);

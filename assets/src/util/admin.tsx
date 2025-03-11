@@ -42,6 +42,16 @@ const fetch = {
   delete: (path) => doFetch(path, { method: "DELETE" }),
 
   text: (path) => doFetch(path, {}, (response) => response.text()),
+
+  formData: (path: string, data: FormData) => {
+    return doFetch(path, {
+      body: data,
+      headers: {
+        "x-csrf-token": getCsrfToken(),
+      },
+      method: "POST",
+    });
+  },
 };
 
 const doFetch = async (
