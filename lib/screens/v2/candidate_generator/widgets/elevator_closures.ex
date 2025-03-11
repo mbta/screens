@@ -59,9 +59,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
 
       [
         %ElevatorStatusWidget{
-          alerts:
-            alerts
-            |> Enum.filter(fn %Alert{id: id} -> id in elevator_closure_ids end),
+          alerts: Enum.filter(alerts, fn %Alert{id: id} -> id in elevator_closure_ids end),
           location_context: location_context,
           screen: config,
           now: now,
@@ -145,7 +143,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   end
 
   # If we couldn't find alternate/redundancy data for an elevator, assume it's relevant.
-  defp relevant_closure?(%{elevator: nil}, _closures, _parent_station_id), do: true
+  defp relevant_closure?(%Closure{elevator: nil}, _closures, _parent_station_id), do: true
 
   # If any of a closed elevator's alternates are also closed, it's always relevant.
   defp relevant_closure?(

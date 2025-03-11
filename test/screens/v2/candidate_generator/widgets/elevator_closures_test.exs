@@ -16,6 +16,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
   @route injected(Route)
   @stop injected(Stop)
 
+  setup :verify_on_exit!
+
   setup do
     stub(@elevator, :get, fn id -> build_elevator(id) end)
 
