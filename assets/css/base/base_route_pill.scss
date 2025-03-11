@@ -1,3 +1,5 @@
+@use "../fonts";
+
 .base-route-pill__pill {
   text-align: center;
 
@@ -13,7 +15,7 @@
 }
 
 .base-route-pill__route-text {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   letter-spacing: 0.0277em;
 

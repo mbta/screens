@@ -1,3 +1,5 @@
+@use "fonts";
+
 .fares {
   height: 263px;
 }
@@ -21,7 +23,7 @@
 }
 
 .fares__info-header {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   display: inline-block;
   margin-top: 48px;
@@ -32,7 +34,7 @@
 }
 
 .fares__info-link {
-  @include font--text--55regular;
+  @include fonts.text--55regular;
 
   display: inline-block;
   width: 540px;
@@ -43,19 +45,19 @@
 }
 
 .fares__info-row-cost {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   font-size: 44px;
 }
 
 .fares__info-row-description {
-  @include font--text--55regular;
+  @include fonts.text--55regular;
 
   font-size: 44px;
 }
 
 .fares__info-row-details {
-  @include font--text--55regular;
+  @include fonts.text--55regular;
 
   font-size: 32px;
 }

@@ -1,3 +1,5 @@
+@use "fonts";
+
 .full-screen-takeover__container {
   position: relative;
   width: 1200px;
@@ -6,7 +8,7 @@
 }
 
 .full-screen-takeover__time {
-  @include font--text--55regular;
+  @include fonts.text--55regular;
 
   position: absolute;
   top: 28px;

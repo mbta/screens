@@ -1,11 +1,13 @@
+@use "../fonts";
+
 .base-departure-destination__primary {
-  @include font--text--65medium;
+  @include fonts.text--65medium;
 
   line-height: 1em;
 }
 
 .base-departure-destination__secondary {
-  @include font--text--55regular;
+  @include fonts.text--55regular;
 
   font-size: 0.611em;
   line-height: 1em;
