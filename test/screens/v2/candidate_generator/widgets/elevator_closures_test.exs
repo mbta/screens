@@ -30,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
         header: nil,
         reconstructed_alert_widget: nil,
         elevator_status: %ElevatorStatus{
-          parent_station_id: "station_1",
+          parent_station_id: "place-test-parent-station-id",
           platform_stop_ids: ["1001", "1002"]
         },
         full_line_map: nil,
@@ -199,6 +199,34 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
 
       "elev_3" ->
         build_elevator("elev_3", exiting_redundancy: :nearby)
+    end)
+
+    result =
+      ElevatorClosures.elevator_status_instances(config, now, location_context_mock, alerts_mock)
+
+    assert [%ElevatorStatusWidget{alerts: [%Alert{id: "alert_1"}]}] = result
+  end
+
+  test "does not filter closure in the same station, even if redundancy exists", %{
+    config: config,
+    now: now
+  } do
+    location_context_mock = fn _screen_type, _station_id, _now ->
+      {:ok, :mocked_location_context}
+    end
+
+    alerts_mock = fn ->
+      {:ok,
+       [
+         build_alert(
+           id: "alert_1",
+           informed_entities: [%{facility: %{id: "elev_1"}, stop: "place-test-parent-station-id"}]
+         )
+       ]}
+    end
+
+    stub(@elevator, :get, fn
+      "elev_1" -> build_elevator("elev_1", exiting_redundancy: :nearby, alternate_ids: ["elev_2"])
     end)
 
     result =
