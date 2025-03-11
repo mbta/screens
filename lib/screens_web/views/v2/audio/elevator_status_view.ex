@@ -15,16 +15,12 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
     |
   end
 
+  defp render_closures([], [], []) do
+    "All other MBTA elevators are working or have a backup elevator within 20 feet."
+  end
+
   defp render_closures(list_pages, upcoming_at_home_pages, elsewhere_pages) do
-    if Enum.empty?(list_pages) and Enum.empty?(upcoming_at_home_pages) and
-         Enum.empty?(elsewhere_pages) do
-      "All other MBTA elevators are working or have a backup elevator within 20 feet."
-    else
-      Enum.map(list_pages, &render_page/1)
-      Enum.map(upcoming_at_home_pages, &render_page/1)
-      Enum.map(elsewhere_pages, &render_page/1)
-      render_cta()
-    end
+    Enum.map(list_pages ++ upcoming_at_home_pages ++ elsewhere_pages, &render_page/1) ++ render_cta()
   end
 
   defp render_cta do

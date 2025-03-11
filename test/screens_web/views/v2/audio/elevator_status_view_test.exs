@@ -11,12 +11,12 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
         elsewhere_pages: []
       }
 
-      assert render(assigns) =~ "All elevators are working at this station."
+      assert render(assigns) == "\n    <p>Elevator Closures across the T.</p>\n    <p>All elevators are working at this station.</p>\n    <p>Other elevator closures:</p>\n    <p>All other MBTA elevators are working or have a backup elevator within 20 feet.</p>\n    "
     end
   end
 
-  describe "Single elevator alert" do
-    test "renders no additional closures messages" do
+  describe "Elevator alert" do
+    test "with no additional closures renders closure message + other elevators working message" do
       assigns = %{
         active_at_home_pages: test_stations(),
         list_pages: [],
@@ -24,13 +24,12 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
         elsewhere_pages: []
       }
 
+      assert render(assigns) =~ "take a different elevator :)"
       assert render(assigns) =~
                "All other MBTA elevators are working or have a backup elevator within 20 feet."
     end
-  end
 
-  describe "Multiple elevator alerts" do
-    test "render additional closure messages" do
+    test "with additional closures renders closure message + additional closures message" do
       assigns = %{
         active_at_home_pages: test_stations(),
         list_pages: test_stations(),
@@ -38,6 +37,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
         elsewhere_pages: []
       }
 
+      assert render(assigns) =~ "take a different elevator :)"
       assert render(assigns) =~ "For a full list of elevator alerts"
     end
   end
@@ -53,8 +53,8 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
           elevator_closures: [
             %{
               elevator_id: "1",
-              elevator_name: "haymarket elevator",
-              description: "take a differente elevator :)",
+              elevator_name: "Haymarket",
+              description: "take a different elevator :)",
               timeframe: %{
                 active_period: %{
                   "start" => "2022-01-01T00:00:00Z",
