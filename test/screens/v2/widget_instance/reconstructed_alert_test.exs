@@ -964,7 +964,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-swnxg", route: "Orange", route_type: 1)
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
@@ -974,7 +974,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         cause: nil,
-        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :delay,
         remedy: "Delays are happening",
         updated_at: "Friday, 5:00 am",
