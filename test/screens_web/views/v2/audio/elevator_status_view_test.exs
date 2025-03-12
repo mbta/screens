@@ -55,7 +55,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
           elevator_closures: [
             %{
               elevator_id: "1",
-              elevator_name: "Haymarket",
+              elevator_name: "Haymarket1",
               description: "take a different elevator :)",
               timeframe: %{
                 active_period: %{
