@@ -20,7 +20,8 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
   end
 
   defp render_closures(list_pages, upcoming_at_home_pages, elsewhere_pages) do
-    Enum.map(list_pages ++ upcoming_at_home_pages ++ elsewhere_pages, &render_page/1) ++ render_cta()
+    Enum.map(list_pages ++ upcoming_at_home_pages ++ elsewhere_pages, &render_page/1) ++
+      render_cta()
   end
 
   defp render_cta do

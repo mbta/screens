@@ -11,7 +11,8 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
         elsewhere_pages: []
       }
 
-      assert render(assigns) == "\n    <p>Elevator Closures across the T.</p>\n    <p>All elevators are working at this station.</p>\n    <p>Other elevator closures:</p>\n    <p>All other MBTA elevators are working or have a backup elevator within 20 feet.</p>\n    "
+      assert render(assigns) ==
+               "\n    <p>Elevator Closures across the T.</p>\n    <p>All elevators are working at this station.</p>\n    <p>Other elevator closures:</p>\n    <p>All other MBTA elevators are working or have a backup elevator within 20 feet.</p>\n    "
     end
   end
 
@@ -25,6 +26,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
       }
 
       assert render(assigns) =~ "take a different elevator :)"
+
       assert render(assigns) =~
                "All other MBTA elevators are working or have a backup elevator within 20 feet."
     end
