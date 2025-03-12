@@ -9,14 +9,19 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
       }) do
     ~E|
     <p>Elevator Closures across the T.</p>
-    <p><%= render_cta() %></p>
     <p><%= render_active_at_home(active_at_home_pages) %></p>
     <p>Other elevator closures:</p>
-    <p><%= Enum.map(list_pages, &render_page/1) %></p>
-    <p><%= Enum.map(upcoming_at_home_pages, &render_page/1) %></p>
-    <p><%= Enum.map(elsewhere_pages, &render_page/1) %></p>
-    <p><%= render_cta() %></p>
+    <p><%= render_closures(list_pages, upcoming_at_home_pages, elsewhere_pages) %></p>
     |
+  end
+
+  defp render_closures([], [], []) do
+    "All other MBTA elevators are working or have a backup elevator within 20 feet."
+  end
+
+  defp render_closures(list_pages, upcoming_at_home_pages, elsewhere_pages) do
+    Enum.map(list_pages ++ upcoming_at_home_pages ++ elsewhere_pages, &render_page/1) ++
+      render_cta()
   end
 
   defp render_cta do
