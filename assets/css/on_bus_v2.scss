@@ -1,9 +1,9 @@
-@import "fonts/inter_font_face";
-@import "fonts/helvetica_font_face";
+@use "fonts/inter_font_face";
+@use "fonts/helvetica_font_face";
 
-@import "v2/multi_screen_page";
-@import "v2/placeholder";
-@import "v2/simulation_common";
+@use "v2/multi_screen_page";
+@use "v2/placeholder";
+@use "v2/simulation_common";
 
 body {
   margin: 0;

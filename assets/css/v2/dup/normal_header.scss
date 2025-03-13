@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .normal-header {
   position: relative;
   width: 100%;
@@ -5,31 +7,31 @@
   background: rgb(23 31 38);
 
   &--red {
-    background-color: $line-color-red;
+    background-color: colors.$line-red;
   }
 
   &--orange {
-    background-color: $line-color-orange;
+    background-color: colors.$line-orange;
   }
 
   &--green {
-    background-color: $line-color-green;
+    background-color: colors.$line-green;
   }
 
   &--blue {
-    background-color: $line-color-blue;
+    background-color: colors.$line-blue;
   }
 
   &--teal {
-    background-color: $line-color-ferry;
+    background-color: colors.$line-ferry;
   }
 
   &--silver {
-    background-color: $line-color-silver;
+    background-color: colors.$line-silver;
   }
 
   &--yellow {
-    background-color: $alert-yellow;
+    background-color: colors.$alert-yellow;
 
     .normal-header-title__text {
       color: #171f26;

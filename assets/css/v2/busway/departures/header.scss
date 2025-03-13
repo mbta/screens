@@ -1,4 +1,5 @@
-@use "../../../fonts";
+@use "CSS/colors";
+@use "CSS/fonts";
 
 .departures-header {
   @include fonts.inter--bold;
@@ -12,12 +13,12 @@
   text-transform: uppercase;
   letter-spacing: 3px;
   white-space: pre-line; // Allow using embedded line breaks to control wrapping
-  border-top: 4px solid $true-grey-70;
+  border-top: 4px solid colors.$true-grey-70;
 
   &:not(:empty) {
     min-height: 104px;
     padding: 18px 32px 18px 48px;
-    background-color: $warm-neutral-80;
+    background-color: colors.$warm-neutral-80;
   }
 }
 

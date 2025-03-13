@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .footer {
   height: 100%;
   padding: 26px 48px;
@@ -5,7 +7,7 @@
   font-weight: 500;
   line-height: 62px;
   color: white;
-  background-color: $cool-black-30;
+  background-color: colors.$cool-black-30;
 
   b {
     letter-spacing: -0.2px;

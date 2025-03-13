@@ -1,66 +1,51 @@
+@use "v2/arrow";
+@use "v2/clock_icon";
+@use "v2/multi_screen_page";
+@use "v2/placeholder";
+@use "v2/simulation_common";
+
+@use "v2/lcd_common/no_data" as *;
+@use "v2/lcd_common/page_load_no_data";
+@use "v2/lcd_common/route_pill";
+
+@use "v2/pre_fare/alert-banner";
+@use "v2/pre_fare/body/normal" as *;
+@use "v2/pre_fare/body/takeover" as *;
+@use "v2/pre_fare/body_left/flex";
+@use "v2/pre_fare/body_left/normal" as *;
+@use "v2/pre_fare/body_left/takeover" as *;
+@use "v2/pre_fare/body_right/normal" as *;
+@use "v2/pre_fare/body_right/surge";
+@use "v2/pre_fare/body_right/takeover" as *;
+@use "v2/pre_fare/cr_departures/cr_departure_time";
+@use "v2/pre_fare/cr_departures/cr_departures";
+@use "v2/pre_fare/cr_departures/cr_departures_header";
+@use "v2/pre_fare/cr_departures/cr_departures_table";
+@use "v2/pre_fare/cr_departures/overnight_cr_departures";
+@use "v2/pre_fare/departure_time";
+@use "v2/pre_fare/disruption_diagram/disruption_diagram";
+@use "v2/pre_fare/elevator_status";
+@use "v2/pre_fare/evergreen/image";
+@use "v2/pre_fare/evergreen/video";
+@use "v2/pre_fare/flex/one_large";
+@use "v2/pre_fare/flex/paging_indicator";
+@use "v2/pre_fare/flex/two_medium";
+@use "v2/pre_fare/free_text";
+@use "v2/pre_fare/full_line_map";
+@use "v2/pre_fare/no_data" as *;
+@use "v2/pre_fare/normal_header";
+@use "v2/pre_fare/prefare_single_screen_alert";
+@use "v2/pre_fare/reconstructed_alert";
+@use "v2/pre_fare/screen/normal" as *;
+@use "v2/pre_fare/screen/split_takeover";
+@use "v2/pre_fare/screen/takeover" as *;
+@use "v2/pre_fare/screen_container";
+@use "v2/pre_fare/shuttle_bus_info";
+@use "v2/pre_fare/simulation";
+@use "v2/pre_fare/subway_status";
+@use "v2/pre_fare/viewport";
+
 @import "https://rsms.me/inter/inter.css";
-
-@import "colors";
-
-@import "v2/arrow";
-@import "v2/clock_icon";
-
-@import "v2/pre_fare/screen_container";
-
-@import "v2/pre_fare/screen/normal";
-@import "v2/pre_fare/screen/takeover";
-@import "v2/pre_fare/screen/split_takeover";
-
-@import "v2/pre_fare/body/normal";
-@import "v2/pre_fare/body/takeover";
-
-@import "v2/pre_fare/body_left/normal";
-@import "v2/pre_fare/body_left/takeover";
-@import "v2/pre_fare/body_left/flex";
-
-@import "v2/pre_fare/body_right/normal";
-@import "v2/pre_fare/body_right/takeover";
-@import "v2/pre_fare/body_right/surge";
-
-@import "v2/pre_fare/normal_header";
-
-@import "v2/pre_fare/flex/one_large";
-@import "v2/pre_fare/flex/two_medium";
-
-@import "v2/pre_fare/evergreen/image";
-@import "v2/pre_fare/evergreen/video";
-
-@import "v2/placeholder";
-@import "v2/pre_fare/departure_time";
-@import "v2/pre_fare/elevator_status";
-@import "v2/pre_fare/flex/paging_indicator";
-@import "v2/pre_fare/full_line_map";
-@import "v2/pre_fare/reconstructed_alert";
-@import "v2/pre_fare/alert-banner";
-@import "v2/pre_fare/prefare_single_screen_alert";
-@import "v2/pre_fare/free_text";
-@import "v2/pre_fare/shuttle_bus_info";
-
-@import "v2/pre_fare/cr_departures/cr_departures";
-@import "v2/pre_fare/cr_departures/overnight_cr_departures";
-@import "v2/pre_fare/cr_departures/cr_departures_header";
-@import "v2/pre_fare/cr_departures/cr_departures_table";
-@import "v2/pre_fare/cr_departures/cr_departure_time";
-
-@import "v2/pre_fare/subway_status";
-@import "v2/lcd_common/route_pill";
-
-@import "v2/lcd_common/no_data";
-@import "v2/lcd_common/page_load_no_data";
-@import "v2/pre_fare/no_data";
-
-@import "v2/multi_screen_page";
-
-@import "v2/simulation_common";
-@import "v2/pre_fare/simulation";
-@import "v2/pre_fare/viewport";
-
-@import "v2/pre_fare/disruption_diagram/disruption_diagram";
 
 body {
   margin: 0;

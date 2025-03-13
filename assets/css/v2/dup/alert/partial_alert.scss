@@ -1,35 +1,37 @@
+@use "CSS/colors";
+
 .partial-alert {
   border-top: 6px solid #00000040;
 
   &--green {
-    background: $line-color-green;
+    background: colors.$line-green;
   }
 
   &--blue {
-    background: $line-color-blue;
+    background: colors.$line-blue;
   }
 
   &--red {
-    background: $line-color-red;
+    background: colors.$line-red;
   }
 
   &--orange {
-    background: $line-color-orange;
+    background: colors.$line-orange;
   }
 
   &--silver {
-    background: $line-color-silver;
+    background: colors.$line-silver;
   }
 
   &--purple {
-    background: $line-color-cr;
+    background: colors.$line-cr;
   }
 
   &--yellow {
-    background: $alert-yellow;
+    background: colors.$alert-yellow;
   }
 
   &--teal {
-    background: $line-color-ferry;
+    background: colors.$line-ferry;
   }
 }

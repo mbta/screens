@@ -1,36 +1,38 @@
+@use "CSS/colors";
+
 .end-slot__arrow {
   &--red {
-    fill: $line-color-red;
+    fill: colors.$line-red;
   }
 
   &--blue {
-    fill: $line-color-blue;
+    fill: colors.$line-blue;
   }
 
   &--orange {
-    fill: $line-color-orange;
+    fill: colors.$line-orange;
   }
 
   &--green {
-    fill: $line-color-green;
+    fill: colors.$line-green;
   }
 }
 
 .end-slot__icon {
   &--red {
-    stroke: $line-color-red;
+    stroke: colors.$line-red;
   }
 
   &--blue {
-    stroke: $line-color-blue;
+    stroke: colors.$line-blue;
   }
 
   &--orange {
-    stroke: $line-color-orange;
+    stroke: colors.$line-orange;
   }
 
   &--green {
-    stroke: $line-color-green;
+    stroke: colors.$line-green;
   }
 
   &--affected {
@@ -44,37 +46,37 @@
 
 .middle-slot__background {
   &--red {
-    fill: $line-color-red;
+    fill: colors.$line-red;
   }
 
   &--blue {
-    fill: $line-color-blue;
+    fill: colors.$line-blue;
   }
 
   &--orange {
-    fill: $line-color-orange;
+    fill: colors.$line-orange;
   }
 
   &--green {
-    fill: $line-color-green;
+    fill: colors.$line-green;
   }
 }
 
 .middle-slot__icon {
   &--red {
-    stroke: $line-color-red;
+    stroke: colors.$line-red;
   }
 
   &--blue {
-    stroke: $line-color-blue;
+    stroke: colors.$line-blue;
   }
 
   &--orange {
-    stroke: $line-color-orange;
+    stroke: colors.$line-orange;
   }
 
   &--green {
-    stroke: $line-color-green;
+    stroke: colors.$line-green;
   }
 }
 

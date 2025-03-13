@@ -1,43 +1,38 @@
-@import "fonts/inter_font_face";
-@import "fonts/helvetica_font_face";
+@use "fonts/inter_font_face";
+@use "fonts/helvetica_font_face";
 
-@import "v2/bus_eink/screen/normal";
-@import "v2/eink/screen/takeover";
+@use "v2/multi_screen_page";
+@use "v2/placeholder";
+@use "v2/simulation_common";
 
-@import "v2/bus_eink/body/normal";
-@import "v2/eink/body/takeover";
-@import "v2/bus_eink/body/bottom_takeover";
-@import "v2/bus_eink/body/flex_zone_takeover";
+@use "v2/eink/alert";
+@use "v2/eink/body/takeover" as *;
+@use "v2/eink/bottom_screen_filler";
+@use "v2/eink/departures";
+@use "v2/eink/departures_no_data";
+@use "v2/eink/departures_no_service";
+@use "v2/eink/fare_info_footer";
+@use "v2/eink/flex/one_medium";
+@use "v2/eink/flex/page_indicator";
+@use "v2/eink/free_text";
+@use "v2/eink/link_footer";
+@use "v2/eink/no_data";
+@use "v2/eink/normal_header";
+@use "v2/eink/page_load_no_data";
+@use "v2/eink/route_pill";
+@use "v2/eink/screen/takeover" as *;
+@use "v2/eink/subway_status";
 
-@import "v2/placeholder";
-@import "v2/eink/normal_header";
-@import "v2/eink/link_footer";
-@import "v2/eink/fare_info_footer";
-@import "v2/eink/free_text";
-@import "v2/eink/departures";
-@import "v2/eink/no_data";
-@import "v2/eink/page_load_no_data";
-@import "v2/eink/alert";
-@import "v2/eink/bottom_screen_filler";
-@import "v2/eink/departures_no_data";
-@import "v2/eink/departures_no_service";
-@import "v2/eink/subway_status";
-
-@import "v2/eink/flex/page_indicator";
-@import "v2/eink/flex/one_medium";
-
-@import "v2/eink/route_pill";
-@import "v2/bus_eink/departures/row";
-@import "v2/bus_eink/departures/destination";
-@import "v2/bus_eink/departures/time";
-@import "v2/bus_eink/departures/crowding";
-
-@import "v2/bus_eink/evergreen/image";
-
-@import "v2/multi_screen_page";
-
-@import "v2/simulation_common";
-@import "v2/bus_eink/simulation";
+@use "v2/bus_eink/body/bottom_takeover";
+@use "v2/bus_eink/body/flex_zone_takeover";
+@use "v2/bus_eink/body/normal" as *;
+@use "v2/bus_eink/departures/crowding";
+@use "v2/bus_eink/departures/destination";
+@use "v2/bus_eink/departures/row";
+@use "v2/bus_eink/departures/time";
+@use "v2/bus_eink/evergreen/image";
+@use "v2/bus_eink/screen/normal" as *;
+@use "v2/bus_eink/simulation";
 
 body {
   margin: 0;
