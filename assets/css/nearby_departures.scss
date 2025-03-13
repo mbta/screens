@@ -1,3 +1,5 @@
+@use "fonts";
+
 .nearby-departures__header {
   height: 128px;
   padding-top: 32px;
@@ -16,7 +18,7 @@
 }
 
 .nearby-departures__header-text {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   display: inline-block;
   margin-top: 22px;
@@ -44,7 +46,7 @@
 }
 
 .nearby-departures-row__stop-name {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   display: inline-block;
   font-size: 44px;

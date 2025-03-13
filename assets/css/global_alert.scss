@@ -1,3 +1,5 @@
+@use "fonts";
+
 .global-alert {
   margin-top: auto;
   margin-right: 34px;
@@ -24,7 +26,7 @@
 }
 
 .global-alert__header-effect {
-  @include font--display--75bold;
+  @include fonts.display--75bold;
 
   display: inline-block;
   width: 720px;
@@ -34,7 +36,7 @@
 }
 
 .global-alert__header-timestamp {
-  @include font--text--55regular;
+  @include fonts.text--55regular;
 
   display: inline-block;
   width: 194px;
@@ -51,7 +53,7 @@
 }
 
 .global-alert__body-description {
-  @include font--paragraph--regular;
+  @include fonts.paragraph--regular;
 
   padding: 25px 40px 51px 208px;
   font-size: 40px;
