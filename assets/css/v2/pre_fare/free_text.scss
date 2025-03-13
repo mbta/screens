@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .free-text__element {
   &:not(:last-child)::after {
     content: " ";
@@ -28,28 +30,28 @@
   &--green_c,
   &--green_d,
   &--green_e {
-    background: $line-color-green;
+    background: colors.$line-green;
   }
 
   &--blue {
-    background: $line-color-blue;
+    background: colors.$line-blue;
   }
 
   &--red,
   &--mattapan {
-    background: $line-color-red;
+    background: colors.$line-red;
   }
 
   &--orange {
-    background: $line-color-orange;
+    background: colors.$line-orange;
   }
 
   &--silver {
-    background: $line-color-silver;
+    background: colors.$line-silver;
   }
 
   &--cr {
-    background: $line-color-cr;
+    background: colors.$line-cr;
   }
 
   .free-text__route-pill_text {

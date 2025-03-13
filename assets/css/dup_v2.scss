@@ -1,41 +1,36 @@
-@import "fonts/inter_font_face";
-@import "fonts/helvetica_font_face";
-@import "colors";
-@import "v2/common/widget";
+@use "fonts/inter_font_face";
+@use "fonts/helvetica_font_face";
 
-@import "v2/dup/screen/normal";
-@import "v2/dup/rotation/normal";
-@import "v2/dup/rotation/takeover";
-@import "v2/dup/body/normal";
-@import "v2/dup/body/split";
-@import "v2/dup/viewport";
-@import "v2/dup/free_text";
+@use "v2/common/widget";
+@use "v2/multi_screen_page";
+@use "v2/outfront_common/debug" as *;
+@use "v2/placeholder";
+@use "v2/simulation_common";
 
-@import "v2/placeholder";
-@import "v2/dup/normal_header";
-@import "v2/dup/evergreen";
-@import "v2/dup/departures";
-@import "v2/dup/departures/section";
-@import "v2/dup/departures/row";
-@import "v2/dup/departures/destination";
-@import "v2/dup/departures/time";
-@import "v2/dup/departures/crowding";
-@import "v2/dup/departures/route_pill";
-@import "v2/dup/departures/headway_section";
-@import "v2/dup/departures/no_data_section";
-@import "v2/dup/departures/overnight";
-
-@import "v2/dup/alert/partial_alert";
-@import "v2/dup/alert/full_screen_alert";
-
-@import "v2/multi_screen_page";
-@import "v2/simulation_common";
-@import "v2/dup/simulation";
-
-@import "v2/outfront_common/debug";
-@import "v2/dup/debug";
-
-@import "v2/dup/empty_state";
+@use "v2/dup/alert/full_screen_alert";
+@use "v2/dup/alert/partial_alert";
+@use "v2/dup/body/normal" as *;
+@use "v2/dup/body/split";
+@use "v2/dup/debug" as *;
+@use "v2/dup/departures";
+@use "v2/dup/departures/crowding";
+@use "v2/dup/departures/destination";
+@use "v2/dup/departures/headway_section";
+@use "v2/dup/departures/no_data_section";
+@use "v2/dup/departures/overnight";
+@use "v2/dup/departures/route_pill";
+@use "v2/dup/departures/row";
+@use "v2/dup/departures/section";
+@use "v2/dup/departures/time";
+@use "v2/dup/empty_state";
+@use "v2/dup/evergreen";
+@use "v2/dup/free_text";
+@use "v2/dup/normal_header";
+@use "v2/dup/rotation/normal" as *;
+@use "v2/dup/rotation/takeover";
+@use "v2/dup/screen/normal" as *;
+@use "v2/dup/simulation";
+@use "v2/dup/viewport";
 
 body {
   margin: 0;

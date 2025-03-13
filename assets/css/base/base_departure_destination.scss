@@ -1,4 +1,4 @@
-@use "../fonts";
+@use "CSS/fonts";
 
 .base-departure-destination__primary {
   @include fonts.text--65medium;

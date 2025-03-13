@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .route-pill {
   position: relative;
   width: 248px;
@@ -6,31 +8,31 @@
   border-radius: 100px;
 
   &--blue {
-    background-color: $line-color-blue;
+    background-color: colors.$line-blue;
   }
 
   &--green {
-    background-color: $line-color-green;
+    background-color: colors.$line-green;
   }
 
   &--orange {
-    background-color: $line-color-orange;
+    background-color: colors.$line-orange;
   }
 
   &--purple {
-    background-color: $line-color-cr;
+    background-color: colors.$line-cr;
   }
 
   &--red {
-    background-color: $line-color-red;
+    background-color: colors.$line-red;
   }
 
   &--silver {
-    background-color: $line-color-silver;
+    background-color: colors.$line-silver;
   }
 
   &--teal {
-    background-color: $line-color-ferry;
+    background-color: colors.$line-ferry;
   }
 
   &--yellow {
@@ -41,7 +43,7 @@
     margin-left: 0;
     color: black;
     letter-spacing: -2px;
-    background-color: $line-color-bus;
+    background-color: colors.$line-bus;
     border-radius: 0 20px 20px 0;
     box-shadow: 2px 4px 2px rgb(0 0 0 / 25%);
   }
