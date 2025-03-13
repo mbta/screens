@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Widgets.OnBus
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.Placeholder
 
@@ -26,9 +27,14 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(_config, query_params) do
+  def candidate_instances(
+        config,
+        query_params,
+        departures_instances_fn \\ &OnBus.Departures.departures_instances/3
+      ) do
     [
-      fn -> body_instances(query_params) end
+      fn -> body_instances(query_params) end,
+      fn -> departures_instances_fn.(config, query_params.route_id, query_params.stop_id) end
     ]
     |> Task.async_stream(& &1.())
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
