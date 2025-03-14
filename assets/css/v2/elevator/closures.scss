@@ -28,16 +28,16 @@
   }
 
   .divider {
-    border-radius: 2px;
     background-color: #73737364;
+    border-radius: 2px;
   }
 
   .no-closures {
     position: relative;
     display: flex;
     flex-direction: column;
-    padding: 148px 72px;
     gap: 80px;
+    padding: 148px 72px;
     color: $cool-black-15;
 
     .no-closures-header {
@@ -47,10 +47,10 @@
     }
 
     .no-closures-text {
+      margin-bottom: 30px;
       font-size: 70px;
       font-weight: 400;
       line-height: 92px;
-      margin-bottom: 30px;
     }
   }
 
@@ -61,10 +61,10 @@
     .upcoming-closure-small {
       display: flex;
       flex-direction: row;
+      justify-content: space-between;
+      padding: 24px 72px;
       font-size: 48px;
       font-weight: 400;
-      padding: 24px 72px;
-      justify-content: space-between;
 
       .divider {
         height: 24px;
