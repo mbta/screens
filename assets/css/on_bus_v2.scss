@@ -5,6 +5,8 @@
 @use "v2/placeholder";
 @use "v2/simulation_common";
 
+@use "v2/on_bus/departures";
+
 body {
   margin: 0;
 }
