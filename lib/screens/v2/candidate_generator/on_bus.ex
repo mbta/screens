@@ -30,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   def candidate_instances(
         config,
         query_params,
-        departures_instances_fn \\ &OnBus.Departures.departures_instances/3
+        departures_instances_fn \\ &OnBus.Departures.departures_candidate/3
       ) do
     [
       fn -> body_instances(query_params) end,

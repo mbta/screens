@@ -39,8 +39,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     }
   end
 
-  defp departures_instances(config, route_id, stop_id, options) do
-    Departures.departures_instances(
+  defp departures_candidate(config, route_id, stop_id, options) do
+    Departures.departures_candidate(
       config,
       route_id,
       stop_id,
@@ -53,13 +53,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     )
   end
 
-  describe "departures_instances/4" do
+  describe "departures_candidate/4" do
     test "happy path returns a DeparturesWidget with single section containing two departures" do
       config = build_config()
-      route_id = "88"
+      route_id = "86"
       stop_id = "100"
 
-      mock_departures = [build_departure(~c"66", 0), build_departure(~c"109", 0)]
+      mock_departures = [build_departure("66", 0), build_departure("109", 0)]
 
       mock_fetch_fn = fn %{stop_ids: [^stop_id]}, [include_schedules: false] ->
         {:ok, mock_departures}
@@ -73,16 +73,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                  ]
                }
              ] =
-               departures_instances(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn)
+               departures_candidate(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn)
     end
 
     test "returns DeparturesNoData section when fetch fails" do
-      route_id = "88"
+      route_id = "86"
       stop_id = "100"
       mock_fetch_fn = fn _, _ -> {:error, :service_down} end
       config = build_config()
 
-      assert departures_instances(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn) ==
+      assert departures_candidate(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn) ==
                [
                  %DeparturesNoData{screen: config, show_alternatives?: true}
                ]
@@ -94,13 +94,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
       stop_id = "22549"
 
       mock_departures = [
-        build_departure(~c"66", 0),
-        build_departure(~c"109", 0)
+        build_departure("66", 0),
+        build_departure("109", 0)
       ]
 
       # 86 prediction scheduled for 1 minute earlier
       mock_departures_on_route = [
-        build_departure(~c"86", 0, :bus, ~U[2024-01-01 11:59:00Z])
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:59:00Z])
       ]
 
       mock_fetch_fn = fn %{stop_ids: [^stop_id]}, [include_schedules: false] ->
@@ -115,7 +115,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                  ]
                }
              ] =
-               departures_instances(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn)
+               departures_candidate(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn)
     end
   end
 end
