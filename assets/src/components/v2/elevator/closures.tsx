@@ -12,6 +12,7 @@ import CalendarIcon from "Images/svgr_bundled/calendar.svg";
 import CalendarAlertIcon from "Images/svgr_bundled/calendar-alert.svg";
 import NormalServiceIcon from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
+import Logo from "Images/svgr_bundled/logo.svg";
 import { hasOverflowX } from "Util/utils";
 import { CLOSURES_PAGING_INTERVAL_MS } from "./constants";
 
@@ -161,6 +162,42 @@ const UpcomingClosure = ({
   );
 };
 
+const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
+  return (
+    <>
+      {closure && (
+        <div className="closures-info">
+          <div className="upcoming-closure-small">
+            <div>
+              This elevator will be closed {closure.details.titles[0]}{" "}
+              {closure.details.postfix}
+            </div>
+            <div>
+              <CalendarIcon width={72} height={72} />
+            </div>
+          </div>
+          <div className="divider" />
+        </div>
+      )}
+      <div className="no-closures">
+        <NormalServiceIcon height={150} width={150} fill="#145A06" />
+        <div className="no-closures-header">
+          All MBTA elevators are working.
+        </div>
+        <svg height={4} width={936} className="divider">
+          <line x1="0" y1="4" x2={936} y2={4} />
+        </svg>
+        <div className="no-closures-text">
+          For info on elevator outages and alternate paths:{" "}
+          <b>mbta.com/elevators</b> or call the elevator hotline:{" "}
+          <b>617-222-2828</b>
+        </div>
+        {!closure && <Logo height={124} width={124} />}
+      </div>
+    </>
+  );
+};
+
 const sortStations = (
   stations: StationWithClosures[],
   thisStationId: string,
@@ -253,41 +290,52 @@ const Closures = ({
 
   return (
     <div className="elevator-closures">
-      <InStationSummary
-        numClosures={numClosuresInStation}
-        upcomingClosure={isUpcomingClosurePage ? undefined : upcomingClosure}
-      />
+      {stations.length > 0 ? (
+        <>
+          <InStationSummary
+            numClosures={numClosuresInStation}
+            upcomingClosure={
+              isUpcomingClosurePage ? undefined : upcomingClosure
+            }
+          />
 
-      <div className="closures-info">
-        {isUpcomingClosurePage ? (
-          <UpcomingClosure closure={upcomingClosure} />
-        ) : (
-          <div className="header-container">
-            <div className="header">
-              <div className="header__title">MBTA Elevator Closures</div>
-              <div>
-                <AccessibilityAlert height={128} width={155} />
+          <div className="closures-info">
+            {isUpcomingClosurePage ? (
+              <UpcomingClosure closure={upcomingClosure} />
+            ) : (
+              <div className="header-container">
+                <div className="header">
+                  <div className="header__title">MBTA Elevator Closures</div>
+                  <div>
+                    <AccessibilityAlert height={128} width={155} />
+                  </div>
+                </div>
               </div>
+            )}
+
+            <div className="closure-list-container">
+              {
+                <div
+                  className="closure-list"
+                  ref={listRef}
+                  style={listOffsetStyle}
+                >
+                  {sortStations(stations, stationId).map((station, index) => (
+                    <ClosureRow
+                      isCurrentStation={station.id == stationId}
+                      isFirstRowOnPage={firstRowIndices.includes(index)}
+                      key={station.id}
+                      station={station}
+                    />
+                  ))}
+                </div>
+              }
             </div>
           </div>
-        )}
-
-        <div className="closure-list-container">
-          {
-            <div className="closure-list" ref={listRef} style={listOffsetStyle}>
-              {sortStations(stations, stationId).map((station, index) => (
-                <ClosureRow
-                  isCurrentStation={station.id == stationId}
-                  isFirstRowOnPage={firstRowIndices.includes(index)}
-                  key={station.id}
-                  station={station}
-                />
-              ))}
-            </div>
-          }
-        </div>
-      </div>
-
+        </>
+      ) : (
+        <NoCurrentClosures closure={upcomingClosure} />
+      )}
       {numPages > 1 && (
         <div className="paging-info-container">
           {!isUpcomingClosurePage && numRowsOffPage > 0 && (

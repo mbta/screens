@@ -27,9 +27,50 @@
     }
   }
 
+  .divider {
+    border-radius: 2px;
+    background-color: #73737364;
+  }
+
+  .no-closures {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    padding: 148px 72px;
+    gap: 80px;
+    color: $cool-black-15;
+
+    .no-closures-header {
+      font-size: 90px;
+      font-weight: 700;
+      line-height: 106px;
+    } 
+
+    .no-closures-text {
+      font-size: 70px;
+      font-weight: 400;
+      line-height: 92px;
+      margin-bottom: 30px;
+    }
+  }
+
   .closures-info {
     height: 100%;
     background-color: $warm-neutral-90;
+
+    .upcoming-closure-small {
+      display: flex;
+      flex-direction: row;
+      font-size: 48px;
+      font-weight: 400;
+      padding: 24px 72px;
+      justify-content: space-between;
+    }
+
+    .divider {
+      height: 24px;
+      background-color: $cool-black-15;
+    }
 
     .upcoming-closure {
       display: flex;
