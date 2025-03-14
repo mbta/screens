@@ -366,6 +366,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_cause(:unknown), do: nil
   defp get_cause(cause), do: cause
 
+  # Special case for CR Departures; only supported on duo screens.
   defp placement(%__MODULE__{
          is_priority: true,
          screen: %Screen{
@@ -373,7 +374,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
              cr_departures: %CRDepartures{
                enabled: true,
                pair_with_alert_widget: true
-             }
+             },
+             template: :duo
            }
          }
        }),
@@ -381,22 +383,41 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp placement(
          %__MODULE__{
+           is_terminal_station: is_terminal_station,
+           screen: %Screen{app_params: %PreFare{template: template}}
+         } = t
+       ) do
+    location = LocalizedAlert.location(t, is_terminal_station)
+    t |> duo_placement(location) |> adjust_placement(location, template)
+  end
+
+  defp duo_placement(
+         %__MODULE__{
            alert: %Alert{effect: effect} = alert,
            is_priority: true,
            is_terminal_station: is_terminal_station,
            partial_closure_platform_names: []
-         } = t
+         } = t,
+         location
        )
        when effect in [:station_closure, :suspension, :shuttle] do
-    if LocalizedAlert.location(t, is_terminal_station) == :inside and
+    if location == :inside and
          LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
          (is_nil(Alert.direction_id(alert)) or is_terminal_station),
        do: :dual_screen,
        else: :single_screen
   end
 
-  defp placement(%__MODULE__{is_priority: true}), do: :single_screen
-  defp placement(%__MODULE__{}), do: :flex_zone
+  defp duo_placement(%__MODULE__{is_priority: true}, _location), do: :single_screen
+  defp duo_placement(%__MODULE__{}, _location), do: :flex_zone
+
+  # "Downgrade" placement by one level for solo screens. Exception: single-screen alerts that we
+  # are "inside" should remain single-screen and not be downgraded to the flex zone.
+  defp adjust_placement(placement, _location, :duo), do: placement
+  defp adjust_placement(:dual_screen, _location, :solo), do: :single_screen
+  defp adjust_placement(:single_screen, :inside, :solo), do: :single_screen
+  defp adjust_placement(:single_screen, _location, :solo), do: :flex_zone
+  defp adjust_placement(:flex_zone, _location, :solo), do: :flex_zone
 
   # Two screen alert, suspension
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
@@ -1246,11 +1267,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def priority(%__MODULE__{is_priority: true}), do: [1]
   def priority(_t), do: [3]
 
-  def slot_names(%__MODULE__{} = t) do
+  def slot_names(%__MODULE__{screen: %Screen{app_params: %PreFare{template: template}}} = t) do
     case placement(t) do
-      :dual_screen -> [:full_body_duo]
-      :single_screen -> [:paged_main_content_left]
-      :flex_zone -> [:large]
+      :dual_screen ->
+        [:full_body_duo]
+
+      :single_screen ->
+        if template == :duo, do: [:paged_main_content_left], else: [:full_body_right]
+
+      :flex_zone ->
+        [:large]
     end
   end
 
