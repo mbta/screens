@@ -1,10 +1,20 @@
+$panel-width: 1080px;
+
+.screen-container {
+  // width of a single Pre-Fare display unit; "duo" installations are two of
+  // these side-by-side
+  --panel-width: #{$panel-width};
+}
+
+.simulation {
+  // width of a single Pre-Fare display unit scaled down by 17.92%
+  --panel-width: #{$panel-width * 0.1792};
+}
+
 .screen-container,
 .simulation {
   height: 1920px;
   overflow: hidden;
-  // width of a single Pre-Fare display unit; "duo" installations are two of
-  // these side-by-side
-  --panel-width: 1080px;
 
   &--duo {
     width: calc(var(--panel-width) * 2);
