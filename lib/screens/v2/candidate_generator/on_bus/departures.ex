@@ -10,32 +10,24 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService}
   alias ScreensConfig.Screen
 
+  import Screens.Inject
+
+  @stop injected(Stop)
+
   @max_departure_results 2
 
-  @type widget ::
-          DeparturesNoData.t() | DeparturesNoService.t() | DeparturesWidget.t()
-  @type options :: [
-          departure_fetch_fn: Departure.fetch(),
-          now: DateTime.t()
+  @type widget :: DeparturesNoData.t() | DeparturesNoService.t() | DeparturesWidget.t()
+
+  @spec departures_candidate(Screen.t(), QueryParams.t(), DateTime.t(), Departure.fetch()) :: [
+          widget()
         ]
-
-  @spec departures_candidate(Screen.t(), QueryParams.t(), options()) :: [widget()]
-  def departures_candidate(config, query_params, options \\ [])
-
-  def departures_candidate(
-        config,
-        %{stop_id: stop_id, route_id: route_id},
-        options
-      ) do
-    now = Keyword.get(options, :now, DateTime.utc_now())
-    fetch_fn = Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2)
-
+  def departures_candidate(config, %{stop_id: stop_id, route_id: route_id}, now, fetch_fn) do
     route_id
     |> fetch_departures(stop_id, fetch_fn)
     |> process_response(config, now)
   end
 
-  def departures_candidate(config, _query_params, _options) do
+  def departures_candidate(config, _, _, _fetch_fn) do
     build_no_data_widget(config)
   end
 
@@ -52,7 +44,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
 
   @spec fetch_connecting_stops(String.t()) :: nonempty_list(String.t())
   defp fetch_connecting_stops(stop_id) do
-    case Stop.fetch_connecting(%{ids: [stop_id]}) do
+    case @stop.fetch_connecting(%{ids: [stop_id]}) do
       {:ok, stops} ->
         Enum.map(stops, &stop_id(&1))
 
@@ -69,13 +61,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     Enum.filter(departures, &(&1.prediction.route.id != route_id))
   end
 
-  @spec process_response({:error, any()}, Screen.t(), DateTime.t()) ::
+  @spec process_response(:error, Screen.t(), DateTime.t()) ::
           nonempty_list(DeparturesNoData.t())
   @spec process_response({:ok, []}, Screen.t(), DateTime.t()) ::
           nonempty_list(DeparturesNoService.t())
-  @spec process_response({:ok, [Departure.t()]}, Screen.t(), DateTime.t()) ::
+  @spec process_response({:ok, nonempty_list(Departure.t())}, Screen.t(), DateTime.t()) ::
           nonempty_list(DeparturesWidget.t())
-  defp process_response({:error, _}, config, _) do
+  defp process_response(:error, config, _) do
     build_no_data_widget(config)
   end
 
@@ -101,6 +93,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   defp build_no_data_widget(config) do
-    [%DeparturesNoData{screen: config, show_alternatives?: true}]
+    [%DeparturesNoData{screen: config}]
   end
 end

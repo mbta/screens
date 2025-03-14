@@ -1,18 +1,24 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.WidgetInstance.DeparturesNoService
-  alias Screens.V2.ScreenData.QueryParams
-  alias Screens.V2.WidgetInstance.DeparturesNoData
-  alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
+  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.V2.CandidateGenerator.Widgets.OnBus.Departures
   alias Screens.V2.Departure
+  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.Departures.NormalSection
+  alias Screens.V2.WidgetInstance.DeparturesNoData
+  alias Screens.V2.WidgetInstance.DeparturesNoService
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.OnBus
+
+  import Mox
+  import Screens.Inject
+
+  @stop injected(Stop)
 
   defp build_config() do
     %Screen{
@@ -41,17 +47,34 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     }
   end
 
-  defp departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id}, options) do
+  defp build_stops(ids) do
+    Enum.map(ids, fn id ->
+      %Stop{
+        id: id,
+        name: "Test Stop Name",
+        location_type: 0,
+        parent_station: nil,
+        child_stops: nil,
+        platform_code: nil
+      }
+    end)
+  end
+
+  defp departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id}, fetch_fn) do
     Departures.departures_candidate(
       config,
       %QueryParams{route_id: route_id, stop_id: stop_id},
-      Keyword.merge(
-        [
-          departure_fetch_fn: fn _, _ -> :error end
-        ],
-        options
-      )
+      DateTime.utc_now(),
+      fetch_fn
     )
+  end
+
+  setup do
+    stub(@stop, :fetch_connecting, fn _ ->
+      {:ok, build_stops(~w[100])}
+    end)
+
+    {:ok, %{now: DateTime.utc_now()}}
   end
 
   describe "departures_candidate/3" do
@@ -74,22 +97,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                  ]
                }
              ] =
-               departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id},
-                 departure_fetch_fn: mock_fetch_fn
+               departures_candidate(
+                 config,
+                 %QueryParams{route_id: route_id, stop_id: stop_id},
+                 mock_fetch_fn
                )
     end
 
     test "returns DeparturesNoData section when fetch fails" do
       route_id = "86"
       stop_id = "100"
-      mock_fetch_fn = fn _, _ -> {:error, :service_down} end
+      mock_fetch_fn = fn _, _ -> :error end
       config = build_config()
 
-      assert departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id},
-               departure_fetch_fn: mock_fetch_fn
+      assert departures_candidate(
+               config,
+               %QueryParams{route_id: route_id, stop_id: stop_id},
+               mock_fetch_fn
              ) ==
                [
-                 %DeparturesNoData{screen: config, show_alternatives?: true}
+                 %DeparturesNoData{screen: config}
                ]
     end
 
@@ -97,6 +124,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
       config = build_config()
       route_id = "86"
       stop_id = "22549"
+
+      connecting_routes = ~w[100 12345 22549]
+
+      stub(@stop, :fetch_connecting, fn _ ->
+        {:ok, build_stops(connecting_routes)}
+      end)
 
       mock_departures = [
         build_departure("66", 0),
@@ -108,7 +141,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
         build_departure("86", 0, :bus, ~U[2024-01-01 11:59:00Z])
       ]
 
-      mock_fetch_fn = fn %{stop_ids: [^stop_id]}, [include_schedules: false] ->
+      mock_fetch_fn = fn %{stop_ids: ^connecting_routes}, [include_schedules: false] ->
         {:ok, mock_departures ++ mock_departures_on_route}
       end
 
@@ -120,8 +153,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                  ]
                }
              ] =
-               departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id},
-                 departure_fetch_fn: mock_fetch_fn
+               departures_candidate(
+                 config,
+                 %QueryParams{route_id: route_id, stop_id: stop_id},
+                 mock_fetch_fn
                )
     end
 
@@ -131,8 +166,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
       mock_fetch_fn = fn _, _ -> {:ok, []} end
       config = build_config()
 
-      assert departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id},
-               departure_fetch_fn: mock_fetch_fn
+      assert departures_candidate(
+               config,
+               %QueryParams{route_id: route_id, stop_id: stop_id},
+               mock_fetch_fn
              ) ==
                [
                  %DeparturesNoService{screen: config}

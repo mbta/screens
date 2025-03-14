@@ -63,7 +63,7 @@ defmodule Screens.Stops.Stop do
   def fetch_connecting(params, get_json_fn \\ &V3Api.get_json/2) do
     include_params =
       Enum.join(
-        ~w[connecting_stops, child_stops.connecting_stops, parent_station.connecting_stops, connecting_stops],
+        ~w[connecting_stops child_stops.connecting_stops parent_station.connecting_stops connecting_stops],
         ","
       )
 
