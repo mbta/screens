@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
   use ExUnit.Case, async: true
 
+  alias Screens.V2.WidgetInstance.DeparturesNoService
+  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.Predictions.Prediction
@@ -39,11 +41,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     }
   end
 
-  defp departures_candidate(config, route_id, stop_id, options) do
+  defp departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id}, options) do
     Departures.departures_candidate(
       config,
-      route_id,
-      stop_id,
+      %QueryParams{route_id: route_id, stop_id: stop_id},
       Keyword.merge(
         [
           departure_fetch_fn: fn _, _ -> :error end
@@ -53,7 +54,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     )
   end
 
-  describe "departures_candidate/4" do
+  describe "departures_candidate/3" do
     test "happy path returns a DeparturesWidget with single section containing two departures" do
       config = build_config()
       route_id = "86"
@@ -73,7 +74,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                  ]
                }
              ] =
-               departures_candidate(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn)
+               departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id},
+                 departure_fetch_fn: mock_fetch_fn
+               )
     end
 
     test "returns DeparturesNoData section when fetch fails" do
@@ -82,7 +85,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
       mock_fetch_fn = fn _, _ -> {:error, :service_down} end
       config = build_config()
 
-      assert departures_candidate(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn) ==
+      assert departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id},
+               departure_fetch_fn: mock_fetch_fn
+             ) ==
                [
                  %DeparturesNoData{screen: config, show_alternatives?: true}
                ]
@@ -115,7 +120,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                  ]
                }
              ] =
-               departures_candidate(config, route_id, stop_id, departure_fetch_fn: mock_fetch_fn)
+               departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id},
+                 departure_fetch_fn: mock_fetch_fn
+               )
+    end
+
+    test "returns DeparturesNoService section when fetch finds no departures" do
+      route_id = "86"
+      stop_id = "100"
+      mock_fetch_fn = fn _, _ -> {:ok, []} end
+      config = build_config()
+
+      assert departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id},
+               departure_fetch_fn: mock_fetch_fn
+             ) ==
+               [
+                 %DeparturesNoService{screen: config}
+               ]
     end
   end
 end

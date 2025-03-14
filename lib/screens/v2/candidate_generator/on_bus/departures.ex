@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   @moduledoc false
 
   alias Screens.V2.Departure
+  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService}
@@ -16,14 +17,24 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
           now: DateTime.t()
         ]
 
-  @spec departures_candidate(Screen.t(), String.t(), String.t(), options()) :: [widget()]
-  def departures_candidate(config, route_id, stop_id, options \\ []) do
+  @spec departures_candidate(Screen.t(), QueryParams.t(), options()) :: [widget()]
+  def departures_candidate(config, query_params, options \\ [])
+
+  def departures_candidate(
+        config,
+        %{stop_id: stop_id, route_id: route_id},
+        options
+      ) do
+    now = Keyword.get(options, :now, DateTime.utc_now())
+    fetch_fn = Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2)
+
     route_id
-    |> fetch_departures(
-      stop_id,
-      Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2)
-    )
-    |> process_response(config, Keyword.get(options, :now, DateTime.utc_now()))
+    |> fetch_departures(stop_id, fetch_fn)
+    |> process_response(config, now)
+  end
+
+  def departures_candidate(config, _query_params, _options) do
+    build_no_data_widget(config)
   end
 
   defp fetch_departures(route_id, stop_id, departure_fetch_fn) do
@@ -46,7 +57,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   @spec process_response({:ok, []}, Screen.t(), DateTime.t()) :: [DeparturesNoService]
   @spec process_response({:ok, [Departure.t()]}, Screen.t(), DateTime.t()) :: [DeparturesWidget]
   defp process_response({:error, _}, config, _) do
-    [%DeparturesNoData{screen: config, show_alternatives?: true}]
+    build_no_data_widget(config)
   end
 
   defp process_response({:ok, []}, config, _) do
@@ -77,5 +88,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
         slot_names: [:main_content]
       }
     ]
+  end
+
+  defp build_no_data_widget(config) do
+    [%DeparturesNoData{screen: config, show_alternatives?: true}]
   end
 end

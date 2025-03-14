@@ -30,11 +30,11 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   def candidate_instances(
         config,
         query_params,
-        departures_instances_fn \\ &OnBus.Departures.departures_candidate/3
+        departures_instances_fn \\ &OnBus.Departures.departures_candidate/2
       ) do
     [
       fn -> body_instances(query_params) end,
-      fn -> departures_instances_fn.(config, query_params.route_id, query_params.stop_id) end
+      fn -> departures_instances_fn.(config, query_params) end
     ]
     |> Task.async_stream(& &1.())
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
