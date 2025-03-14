@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   @moduledoc false
 
+  alias Screens.Stops.Stop
   alias Screens.V2.Departure
   alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -38,7 +39,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   defp fetch_departures(route_id, stop_id, departure_fetch_fn) do
-    fetch_params = %{:stop_ids => [stop_id]}
+    fetch_params = %{:stop_ids => fetch_connecting_stops(stop_id)}
     fetch_opts = [include_schedules: false]
 
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
@@ -48,14 +49,24 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     end
   end
 
+  defp fetch_connecting_stops(stop_id) do
+    {:ok, stops} = Stop.fetch_connecting(%{ids: [stop_id]})
+    Enum.map(stops, &stop_id(&1))
+  end
+
+  defp stop_id(stop), do: stop.id
+
   # Only return departures that are not from the bus's current route in either direction
   defp filter_current_route(departures, route_id) do
     Enum.filter(departures, &(&1.prediction.route.id != route_id))
   end
 
-  @spec process_response({:error, any()}, Screen.t(), DateTime.t()) :: [DeparturesNoData]
-  @spec process_response({:ok, []}, Screen.t(), DateTime.t()) :: [DeparturesNoService]
-  @spec process_response({:ok, [Departure.t()]}, Screen.t(), DateTime.t()) :: [DeparturesWidget]
+  @spec process_response({:error, any()}, Screen.t(), DateTime.t()) ::
+          nonempty_list(DeparturesNoData.t())
+  @spec process_response({:ok, []}, Screen.t(), DateTime.t()) ::
+          nonempty_list(DeparturesNoService.t())
+  @spec process_response({:ok, [Departure.t()]}, Screen.t(), DateTime.t()) ::
+          nonempty_list(DeparturesWidget.t())
   defp process_response({:error, _}, config, _) do
     build_no_data_widget(config)
   end
@@ -70,18 +81,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
         screen: config,
         sections: [
           %NormalSection{
-            rows: departure_data,
-            layout: %ScreensConfig.V2.Departures.Layout{
-              base: nil,
-              include_later: false,
-              max: @max_departure_results,
-              min: 0
-            },
-            header: %ScreensConfig.V2.Departures.Header{
-              arrow: nil,
-              read_as: nil,
-              title: nil
-            }
+            rows: Enum.take(departure_data, @max_departure_results),
+            layout: %ScreensConfig.V2.Departures.Layout{},
+            header: %ScreensConfig.V2.Departures.Header{}
           }
         ],
         now: now,

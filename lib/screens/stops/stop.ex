@@ -59,6 +59,26 @@ defmodule Screens.Stops.Stop do
     end
   end
 
+  @callback fetch_connecting(params()) :: :error | {:ok, list()}
+  def fetch_connecting(params, get_json_fn \\ &V3Api.get_json/2) do
+    include_params =
+      Enum.join(
+        ~w[connecting_stops, child_stops.connecting_stops, parent_station.connecting_stops, connecting_stops],
+        ","
+      )
+
+    encoded_params =
+      params
+      |> Enum.flat_map(&encode_param/1)
+      |> Map.new()
+      |> Map.put("include", include_params)
+
+    case get_json_fn.("stops", encoded_params) do
+      {:ok, response} -> {:ok, Parser.parse(response)}
+      _ -> :error
+    end
+  end
+
   defp encode_param({:ids, ids}), do: [{"filter[id]", Enum.join(ids, ",")}]
   defp encode_param({:location_types, lts}), do: [{"filter[location_type]", Enum.join(lts, ",")}]
   defp encode_param({:route_types, rts}), do: [{"filter[route_type]", Enum.join(rts, ",")}]
