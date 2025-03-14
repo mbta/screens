@@ -10,15 +10,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   @max_departure_results 2
 
   @type widget ::
-          DeparturesNoData.t()
-          | DeparturesNoService.t()
-          | DeparturesWidget.t()
+          DeparturesNoData.t() | DeparturesNoService.t() | DeparturesWidget.t()
   @type options :: [
           departure_fetch_fn: Departure.fetch(),
           now: DateTime.t()
         ]
 
-  @spec departures_instances(Screen.t(), String.t(), String.t(), options()) :: [DeparturesWidget]
+  @spec departures_instances(Screen.t(), String.t(), String.t(), options()) :: widget()
   def departures_instances(config, route_id, stop_id, options \\ []) do
     departures =
       fetch_departures(
@@ -30,6 +28,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     case departures do
       {:error, _} ->
         [%DeparturesNoData{screen: config, show_alternatives?: true}]
+
+      {:ok, []} ->
+        %DeparturesNoService{screen: config}
 
       {:ok, departure_data} ->
         [
@@ -51,7 +52,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
                 }
               }
             ],
-            now: DateTime.utc_now(),
+            now: Keyword.get(options, :now, DateTime.utc_now()),
             slot_names: [:main_content]
           }
         ]
@@ -67,27 +68,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
       {:ok,
        departures
-       |> filter_current_route(route_id)
-       |> make_bidirectional(is_bidirectional)}
+       |> filter_current_route(route_id)}
     end
   end
 
   # Only return departures that are not from the bus's current route in either direction
   defp filter_current_route(departures, route_id) do
     Enum.filter(departures, &(&1.prediction.trip.route_id != route_id))
-  end
-
-  # "Bidirectional" mode: take only the first departure, and the next departure in the opposite
-  # direction from the first, if one exists.
-  defp make_bidirectional([first | rest], true) do
-    first_direction = Departure.direction_id(first)
-
-    opposite? =
-      Enum.find(rest, Enum.at(rest, 0), fn departure ->
-        Departure.direction_id(departure) == 1 - first_direction
-      end)
-
-    Enum.reject([first, opposite?], &is_nil/1)
   end
 
   defp make_bidirectional(departures, _), do: departures

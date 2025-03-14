@@ -28,6 +28,7 @@ const TYPE_TO_COMPONENT = {
   body_normal: NormalBody,
   departures: Departures,
   departures_no_data: NoData,
+  departures_no_service: NoData,
   no_data: NoData,
   placeholder: Placeholder,
   screen_normal: NormalScreen,

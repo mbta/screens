@@ -39,12 +39,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     }
   end
 
-  # defp build_fetch_fn(stop_ids_to_result, stop_id) do
-  #   fn %{stop_ids: [stop_id]}, %{include_schedules: false} ->
-  #     Map.fetch!(stop_ids_to_result, stop_id)
-  #   end
-  # end
-
   defp departures_instances(config, route_id, stop_id, options) do
     Departures.departures_instances(
       config,
