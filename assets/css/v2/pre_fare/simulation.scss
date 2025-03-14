@@ -22,8 +22,10 @@
   }
 
   .simulation {
-    transform: scale(17.92%);
-    transform-origin: top left;
+    & > * {
+      transform: scale(17.92%);
+      transform-origin: top left;
+    }
   }
 
   .simulation__full-page {
