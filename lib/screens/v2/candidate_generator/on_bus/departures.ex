@@ -44,13 +44,47 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
       {:ok,
        departures
-       |> filter_current_route(route_id)}
+       |> filter_current_route(route_id)
+       |> filter_duplicates()
+       |> sort_by_mode()}
     end
   end
 
   # Only return departures that are not from the bus's current route in either direction
   defp filter_current_route(departures, route_id) do
     Enum.filter(departures, &(&1.prediction.route.id != route_id))
+  end
+
+  defp filter_duplicates(departures) do
+    # TODO: What if there is only one route ID/direction in the departures at this stop? Should we still return two
+    Enum.uniq_by(departures, fn dep ->
+      {dep.prediction.route.id, dep.prediction.trip.direction_id}
+    end)
+  end
+
+  defp sort_by_mode(departures) do
+    # TODO: Compile time type checking?
+    priority = %{
+      :subway => 1,
+      :light_rail => 1,
+      :bus => 2,
+      :commuter_rail => 3,
+      :ferry => 4
+    }
+
+    Enum.sort(departures, fn a, b ->
+      priority_a =
+        Map.get(priority, a.prediction.route.type)
+
+      priority_b =
+        Map.get(priority, b.prediction.route.type)
+
+      if priority_a == priority_b do
+        a.prediction.arrival_time >= b.prediction.arrival_time
+      else
+        priority_a < priority_b
+      end
+    end)
   end
 
   @spec process_response({:error, any()}, Screen.t(), DateTime.t()) :: [DeparturesNoData]
