@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   @moduledoc false
 
+  alias Screens.Report
   alias Screens.Stops.Stop
   alias Screens.V2.Departure
   alias Screens.V2.ScreenData.QueryParams
@@ -49,9 +50,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     end
   end
 
+  @spec fetch_connecting_stops(String.t()) :: nonempty_list(String.t())
   defp fetch_connecting_stops(stop_id) do
-    {:ok, stops} = Stop.fetch_connecting(%{ids: [stop_id]})
-    Enum.map(stops, &stop_id(&1))
+    case Stop.fetch_connecting(%{ids: [stop_id]}) do
+      {:ok, stops} ->
+        Enum.map(stops, &stop_id(&1))
+
+      :error ->
+        Report.warning("fetch_connecting_stops_error", stop_id: stop_id)
+        [stop_id]
+    end
   end
 
   defp stop_id(stop), do: stop.id
