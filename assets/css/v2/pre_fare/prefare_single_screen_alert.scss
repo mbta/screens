@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 @mixin large-text {
   font-size: 112px;
   font-weight: 700;
@@ -26,23 +28,23 @@
   /* Background colors */
 
   &.alert-container--blue {
-    background-color: $line-color-blue;
+    background-color: colors.$line-blue;
   }
 
   &.alert-container--red {
-    background-color: $line-color-red;
+    background-color: colors.$line-red;
   }
 
   &.alert-container--orange {
-    background-color: $line-color-orange;
+    background-color: colors.$line-orange;
   }
 
   &.alert-container--yellow {
-    background-color: $alert-yellow;
+    background-color: colors.$alert-yellow;
   }
 
   &.alert-container--green {
-    background-color: $line-color-green;
+    background-color: colors.$line-green;
   }
 
   /* Alert contents */

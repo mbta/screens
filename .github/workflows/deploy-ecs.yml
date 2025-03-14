@@ -23,7 +23,7 @@ jobs:
       - working-directory: ./assets
         run: npm run deploy
   call-workflow:
-    uses: mbta/workflows/.github/workflows/deploy-ecs.yml@v3
+    uses: mbta/workflows/.github/workflows/deploy-ecs.yml@v4
     with:
       app-name: screens
       environment: ${{ github.event.inputs.environment || 'dev' }}

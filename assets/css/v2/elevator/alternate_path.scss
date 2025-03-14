@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .elevator-alternate-path {
   position: relative;
   height: 100%;
@@ -7,7 +9,7 @@
     top: 0;
     right: 0;
     display: inline-block;
-    border-right: 345px solid $accessibility-blue;
+    border-right: 345px solid colors.$accessibility-blue;
     border-bottom: 300px solid transparent;
   }
 
@@ -59,7 +61,7 @@
     }
 
     .alternate-direction-text {
-      color: $cool-black-30;
+      color: colors.$cool-black-30;
 
       &.small {
         font-size: 48px;

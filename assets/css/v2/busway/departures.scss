@@ -1,5 +1,5 @@
-@import "departures/header";
-@import "departures/arrow";
+@use "departures/arrow";
+@use "departures/header";
 
 .departures-container {
   height: 100%;

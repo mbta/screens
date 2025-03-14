@@ -17,11 +17,6 @@ export default {
     // Docs: "We recommend turning this rule off if you use a lot of nesting."
     "no-descending-specificity": null,
 
-    // Since we use SCSS exclusively, our `@import`s are all Sass imports
-    // (which are allowed to appear anywhere in a file) and not native CSS
-    // imports (which aren't, as this rule warns about).
-    "no-invalid-position-at-import-rule": null,
-
     // Existing class/mixin names do not follow a single consistent scheme; for
     // now, these patterns just allow them all, while not allowing anything too
     // far beyond that. Most names are "BEM-like" (`block__element--modifier`).

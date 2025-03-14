@@ -1,3 +1,5 @@
+@use "fonts";
+
 .nearby-connections__header {
   height: 128px;
   padding-top: 32px;
@@ -16,7 +18,7 @@
 }
 
 .nearby-connections__header-text {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   display: inline-block;
   margin-top: 22px;
@@ -39,7 +41,7 @@
 }
 
 .nearby-connections-row__stop-name {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   display: inline-block;
   font-size: 44px;
@@ -47,14 +49,14 @@
 }
 
 .nearby-connections-row__distance {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   font-size: 44px;
   line-height: 54px;
 }
 
 .nearby-connections-row__distance-label {
-  @include font--text--55regular;
+  @include fonts.text--55regular;
 
   display: inline-block;
   float: right;
@@ -103,7 +105,7 @@
 }
 
 .nearby-connections-route__text {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   display: inline-block;
   color: white;
