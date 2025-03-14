@@ -30,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
         [%DeparturesNoData{screen: config, show_alternatives?: true}]
 
       {:ok, []} ->
-        %DeparturesNoService{screen: config}
+        [%DeparturesNoService{screen: config}]
 
       {:ok, departure_data} ->
         [
@@ -76,6 +76,4 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   defp filter_current_route(departures, route_id) do
     Enum.filter(departures, &(&1.prediction.trip.route_id != route_id))
   end
-
-  defp make_bidirectional(departures, _), do: departures
 end
