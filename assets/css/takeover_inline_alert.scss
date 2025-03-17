@@ -1,9 +1,11 @@
+@use "fonts";
+
 .takeover-inline-alert {
   margin-right: 40px;
 }
 
 .takeover-inline-alert__badge {
-  @include font--text--55regular;
+  @include fonts.text--55regular;
 
   padding: 12px 16px;
   font-size: 32px;
@@ -31,5 +33,5 @@
 }
 
 .takeover-inline-alert__link {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 }

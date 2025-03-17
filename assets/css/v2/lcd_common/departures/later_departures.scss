@@ -1,4 +1,5 @@
 @use "sass:math";
+@use "CSS/colors";
 
 .later-departures__carousel {
   position: relative;
@@ -18,7 +19,7 @@
   flex-direction: column;
   flex-shrink: 0;
   width: 100%;
-  background-color: $warm-neutral-90;
+  background-color: colors.$warm-neutral-90;
 
   &__header {
     box-sizing: inherit;
@@ -26,7 +27,7 @@
     flex-direction: row;
     justify-content: space-between;
     margin: 0 32px;
-    border-bottom: 4px solid $true-grey-70;
+    border-bottom: 4px solid colors.$true-grey-70;
 
     h3 {
       box-sizing: inherit;
@@ -37,7 +38,7 @@
       font-size: 40px;
       font-weight: 500;
       line-height: 43px;
-      color: $cool-black-15;
+      color: colors.$cool-black-15;
       text-transform: uppercase;
       letter-spacing: 2px;
     }
@@ -97,9 +98,9 @@
       width: $caret-size;
       height: $caret-size;
       content: " ";
-      background-color: $warm-neutral-90;
-      border-top: 4px solid $true-grey-70;
-      border-left: 4px solid $true-grey-70;
+      background-color: colors.$warm-neutral-90;
+      border-top: 4px solid colors.$true-grey-70;
+      border-left: 4px solid colors.$true-grey-70;
       transform: rotate(45deg);
     }
   }

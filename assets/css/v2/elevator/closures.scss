@@ -1,10 +1,12 @@
+@use "CSS/colors";
+
 .elevator-closures {
   display: flex;
   flex: 1;
   flex-direction: column;
   font-size: 48px;
   line-height: 62px;
-  color: $cool-black-30;
+  color: colors.$cool-black-30;
 
   .in-station-summary {
     position: relative;
@@ -23,7 +25,7 @@
       width: 100%;
       height: 24px;
       content: "";
-      background: $cool-black-15;
+      background: colors.$cool-black-15;
     }
   }
 
@@ -56,7 +58,7 @@
 
   .closures-info {
     height: 100%;
-    background-color: $warm-neutral-90;
+    background-color: colors.$warm-neutral-90;
 
     .upcoming-closure-small {
       display: flex;
@@ -137,7 +139,7 @@
               height: 2px;
               margin: 0 24px;
               content: "";
-              background: $true-grey-45;
+              background: colors.$true-grey-45;
               opacity: 0.5;
             }
 
@@ -151,14 +153,14 @@
           }
 
           &.current-station {
-            background-color: $warm-neutral-85;
+            background-color: colors.$warm-neutral-85;
           }
 
           &__station-name {
             font-size: 62px;
             font-weight: 600;
             line-height: 80px;
-            color: $cool-black-15;
+            color: colors.$cool-black-15;
           }
 
           &__name-and-pills {

@@ -1,3 +1,5 @@
+@use "CSS/fonts";
+
 .normal-header {
   position: relative;
   width: 100%;
@@ -49,7 +51,7 @@
 }
 
 .normal-header__environment {
-  @include font--text--75bold;
+  @include fonts.text--75bold;
 
   position: absolute;
   padding-top: 10px;

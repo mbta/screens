@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .normal-header {
   display: flex;
   align-items: center;
@@ -7,6 +9,6 @@
   font-family: Inter, sans-serif;
   font-size: 48px;
   line-height: 62px;
-  color: $warm-neutral-90;
-  background-color: $cool-black-15;
+  color: colors.$warm-neutral-90;
+  background-color: colors.$cool-black-15;
 }

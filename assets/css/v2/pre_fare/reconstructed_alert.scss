@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 $takeover-card-height: 1656px;
 $takeover-card-footer-height: 84px;
 
@@ -357,22 +359,22 @@ $alert-card-footer-height: 80px;
 .alert-container--urgent {
   /* Background colors */
   &.alert-container--blue {
-    background-color: $line-color-blue;
+    background-color: colors.$line-blue;
   }
 
   &.alert-container--red {
-    background-color: $line-color-red;
+    background-color: colors.$line-red;
   }
 
   &.alert-container--orange {
-    background-color: $line-color-orange;
+    background-color: colors.$line-orange;
   }
 
   &.alert-container--yellow {
-    background-color: $alert-yellow;
+    background-color: colors.$alert-yellow;
   }
 
   &.alert-container--green {
-    background-color: $line-color-green;
+    background-color: colors.$line-green;
   }
 }

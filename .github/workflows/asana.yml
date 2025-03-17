@@ -10,7 +10,7 @@ on:
 
 jobs:
   asana:
-    uses: mbta/workflows/.github/workflows/asana.yml@v3
+    uses: mbta/workflows/.github/workflows/asana.yml@v4
     with:
       development-section: In Progress
       review-section: In Review

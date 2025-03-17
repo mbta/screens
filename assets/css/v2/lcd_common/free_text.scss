@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .free-text {
   font-family: Inter, sans-serif;
   font-size: 48px;
@@ -51,41 +53,41 @@
   &--green_c,
   &--green_d,
   &--green_e {
-    background: $line-color-green;
+    background: colors.$line-green;
   }
 
   &--blue {
-    background: $line-color-blue;
+    background: colors.$line-blue;
   }
 
   &--red,
   &--mattapan {
-    background: $line-color-red;
+    background: colors.$line-red;
   }
 
   &--orange {
-    background: $line-color-orange;
+    background: colors.$line-orange;
   }
 
   &--silver {
-    background: $line-color-silver;
+    background: colors.$line-silver;
   }
 
   &--cr,
   &--purple {
-    background: $line-color-cr;
+    background: colors.$line-cr;
   }
 
   &--bus,
   &--yellow {
     color: black;
-    background: $line-color-bus;
+    background: colors.$line-bus;
     box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
   }
 
   &--ferry,
   &--teal {
-    background-color: $line-color-ferry;
+    background-color: colors.$line-ferry;
   }
 }
 
