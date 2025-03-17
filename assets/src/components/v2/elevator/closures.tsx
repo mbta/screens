@@ -162,7 +162,13 @@ const UpcomingClosure = ({
   );
 };
 
-const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
+const NoCurrentClosures = ({
+  closure,
+  status,
+}: {
+  closure?: UpcomingClosureInfo;
+  status: ClosuresStatus;
+}) => {
   const getClosureTitle = (titles: string[]) => {
     const titlesParsed = titles[0].split(" ");
     if (titlesParsed[0] === "This") {
@@ -204,7 +210,10 @@ const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
       <div className="no-closures">
         <NormalServiceIcon height={150} width={150} fill="#145A06" />
         <div className="no-closures-header">
-          All MBTA elevators are working.
+          All MBTA elevators are working
+          {status === "nearby_redundancy" &&
+            "or have a backup elevator within 20 feet."}
+          .
         </div>
         <svg height={4} width={936} className="divider">
           <line x1="0" y1="4" x2={936} y2={4} />
@@ -239,7 +248,7 @@ const sortStations = (
     }
   });
 
-type ClosuresStatus = "no_closures";
+type ClosuresStatus = "no_closures" | "nearby_redundancy";
 
 interface Props extends WrappedComponentProps {
   id: string;
@@ -316,8 +325,8 @@ const Closures = ({
 
   return (
     <div className="elevator-closures">
-      {stations === "no_closures" ? (
-        <NoCurrentClosures closure={upcomingClosure} />
+      {stations === "no_closures" || stations === "nearby_redundancy" ? (
+        <NoCurrentClosures closure={upcomingClosure} status={stations} />
       ) : (
         <>
           <InStationSummary
