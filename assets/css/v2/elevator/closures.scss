@@ -12,6 +12,7 @@
     position: relative;
     display: flex;
     justify-content: space-between;
+    align-items: center;
     padding: 24px 48px;
 
     .text {
@@ -64,14 +65,15 @@
       display: flex;
       flex-direction: row;
       justify-content: space-between;
+      align-items: center;
       padding: 24px 72px;
       font-size: 48px;
       font-weight: 400;
-
-      .divider {
-        height: 24px;
-        background-color: colors.$cool-black-15;
-      }
+      gap: 10px;
+    }
+    .closure-divider {
+      height: 24px;
+      background-color: colors.$cool-black-15;
     }
 
     .upcoming-closure {

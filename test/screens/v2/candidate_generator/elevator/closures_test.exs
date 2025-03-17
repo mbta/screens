@@ -58,6 +58,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     struct!(%Alert{active_period: [{DateTime.utc_now(), nil}], effect: :elevator_closure}, fields)
   end
 
+  defp build_alert(start_date, fields) do
+    struct!(%Alert{active_period: [{start_date, nil}], effect: :elevator_closure}, fields)
+  end
+
   defp build_elevator(id, fields \\ []) do
     struct!(
       %Elevator{
@@ -71,14 +75,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   end
 
   describe "header and footer" do
-    test "have no variant when current elevator is not closed", %{now: now} do
-      assert [
-               _elevator_closures,
-               %NormalHeader{screen: @screen, text: "Elevator 111", time: ^now, variant: nil},
-               %Footer{screen: @screen, variant: nil}
-             ] = Generator.elevator_status_instances(@screen, now)
-    end
-
     test "have closed variant when current elevator is closed", %{now: now} do
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
@@ -92,6 +88,50 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       assert [_current_closed, %NormalHeader{variant: :closed}, %Footer{variant: :closed}] =
                Generator.elevator_status_instances(@screen, now)
+    end
+  end
+
+  describe "when all elevators are working" do
+    test "footer is not displayed, normal header is displayed with no variant", %{now: now} do
+      assert [
+               _elevator_closures,
+               %NormalHeader{screen: @screen, text: "Elevator 111", time: ^now, variant: nil}
+             ] = Generator.elevator_status_instances(@screen, now)
+    end
+
+    test "but there is an upcoming closure at the current elevator, upcoming closure is displayed",
+         %{now: now} do
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        upcoming_period = {DateTime.add(now, 1, :day), DateTime.add(now, 3, :day)}
+
+        alerts = [
+          build_alert(
+            active_period: [upcoming_period],
+            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      expected_closures = %ElevatorClosures{
+        app_params: @screen.app_params,
+        now: now,
+        station_id: "place-test",
+        stations_with_closures: :no_closures,
+        upcoming_closure: %ElevatorClosures.Station{
+          id: "place-test",
+          name: "Place Test",
+          route_icons: [%{type: :text, text: "RL", color: :red}],
+          closures: [%Closure{id: "facility-test", name: "Test"}],
+          summary: nil
+        }
+      }
+
+      assert [
+               expected_closures,
+               %NormalHeader{screen: @screen, text: "Elevator 111", time: ^now, variant: nil}
+             ] = Generator.elevator_status_instances(@screen, now)
     end
   end
 
@@ -213,12 +253,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     end
 
     test "filters out alerts with no facilities or more than one facility", %{now: now} do
-      expect(@stop, :fetch_parent_station_name_map, fn ->
-        {:ok, %{"place-haecl" => "Haymarket"}}
-      end)
-
-      expect(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
-
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           build_alert(informed_entities: [%{stop: "place-haecl", facility: nil}]),
@@ -235,7 +269,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       logs =
         capture_log([level: :warning], fn ->
-          assert [%ElevatorClosures{stations_with_closures: []} | _] =
+          assert [%ElevatorClosures{stations_with_closures: :no_closures} | _] =
                    Generator.elevator_status_instances(@screen, now)
         end)
 

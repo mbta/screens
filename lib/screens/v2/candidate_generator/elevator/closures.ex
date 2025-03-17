@@ -76,12 +76,19 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
           upcoming |> Enum.flat_map(&elevator_closure/1) |> Enum.filter(at_this_elevator?)
 
         [
-          elevator_closures(relevant_closures, upcoming_closures, app_params, now, stop_id)
+          elevator_closures(
+            relevant_closures,
+            active_closures,
+            upcoming_closures,
+            app_params,
+            now,
+            stop_id
+          )
           | header_footer_instances(
               config,
               now,
               nil,
-              relevant_closures ++ upcoming_closures
+              relevant_closures
             )
         ]
 
@@ -173,6 +180,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   defp elevator_closures(
          [],
+         _active_closures,
          upcoming_closures,
          %ElevatorConfig{elevator_id: _elevator_id} = app_params,
          now,
@@ -188,6 +196,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   end
 
   defp elevator_closures(
+         relevant_closures,
          active_closures,
          upcoming_closures,
          %ElevatorConfig{elevator_id: elevator_id} = app_params,
@@ -203,6 +212,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       station_id: stop_id,
       stations_with_closures:
         build_stations_with_closures(
+          relevant_closures,
           active_closures,
           station_names,
           station_route_pills,
@@ -229,12 +239,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   end
 
   defp build_stations_with_closures(
-         closures,
+         relevant_closures,
+         active_closures,
          station_names,
          station_route_pills,
          elevator_id
        ) do
-    closures
+    relevant_closures
     |> log_station_closures(elevator_id)
     |> Enum.group_by(& &1.station_id)
     |> Enum.map(fn {station_id, station_closures} ->
@@ -250,7 +261,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
             station_closures,
             fn %Closure{id: id, name: name} -> %WidgetClosure{id: id, name: name} end
           ),
-        summary: active_summary(station_closures, closures)
+        summary: active_summary(station_closures, active_closures)
       }
     end)
   end

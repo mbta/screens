@@ -163,20 +163,42 @@ const UpcomingClosure = ({
 };
 
 const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
+  const getClosureTitle = (titles: string[]) => {
+    const titlesParsed = titles[0].split(" ");
+    if (titlesParsed[0] === "This") {
+      return (
+        <b>
+          {titlesParsed[0]} {titlesParsed[1]}:{" "}
+        </b>
+      );
+    }
+    return;
+  };
+  const getClosureDetail = (titles: string[]) => {
+    const titlesParsed = titles[0].split(" ");
+    if (titlesParsed[0] === "This") {
+      return titlesParsed.slice(1);
+    } else {
+      return titlesParsed.join(" ");
+    }
+  };
+
   return (
     <>
       {closure && (
         <div className="closures-info">
           <div className="upcoming-closure-small">
             <div>
-              This elevator will be closed {closure.details.titles[0]}{" "}
+              {getClosureTitle(closure.details.titles)}
+              This elevator will be closed{" "}
+              {getClosureDetail(closure.details.titles)}{" "}
               {closure.details.postfix}
             </div>
             <div>
               <CalendarIcon width={72} height={72} />
             </div>
           </div>
-          <div className="divider" />
+          <div className="closure-divider" />
         </div>
       )}
       <div className="no-closures">
