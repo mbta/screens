@@ -20,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
             id: Stop.id(),
             name: String.t(),
             route_icons: list(Route.icon()),
-            closures: list(Closure.t()),
+            closures: list(Closure.t()) | :no_closures,
             summary: String.t() | nil
           }
   end
@@ -119,7 +119,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   @type t :: %__MODULE__{
           app_params: Elevator.t(),
           now: DateTime.t(),
-          stations_with_closures: list(Station.t()),
+          stations_with_closures: list(Station.t()) | :no_closures,
           station_id: String.t(),
           upcoming_closure: Upcoming.t() | nil
         }

@@ -217,9 +217,11 @@ const sortStations = (
     }
   });
 
+type ClosuresStatus = "no_closures";
+
 interface Props extends WrappedComponentProps {
   id: string;
-  stations_with_closures: StationWithClosures[];
+  stations_with_closures: StationWithClosures[] | ClosuresStatus;
   station_id: string;
   upcoming_closure?: UpcomingClosureInfo;
 }
@@ -230,9 +232,11 @@ const Closures = ({
   upcoming_closure: upcomingClosure,
   updateVisibleData,
 }: Props) => {
-  const numClosuresInStation = stations
-    .filter((s) => s.id === stationId)
-    .flatMap((s) => s.closures).length;
+  const numClosuresInStation =
+    typeof stations === "string"
+      ? 0
+      : stations.filter((s) => s.id === stationId).flatMap((s) => s.closures)
+          .length;
 
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -290,7 +294,9 @@ const Closures = ({
 
   return (
     <div className="elevator-closures">
-      {stations.length > 0 ? (
+      {stations === "no_closures" ? (
+        <NoCurrentClosures closure={upcomingClosure} />
+      ) : (
         <>
           <InStationSummary
             numClosures={numClosuresInStation}
@@ -333,8 +339,6 @@ const Closures = ({
             </div>
           </div>
         </>
-      ) : (
-        <NoCurrentClosures closure={upcomingClosure} />
       )}
       {numPages > 1 && (
         <div className="paging-info-container">
