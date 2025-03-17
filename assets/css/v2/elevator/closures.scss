@@ -40,7 +40,7 @@
     flex-direction: column;
     gap: 80px;
     padding: 148px 72px;
-    color: $cool-black-15;
+    color: colors.$cool-black-15;
 
     .no-closures-header {
       font-size: 90px;
@@ -70,7 +70,7 @@
 
       .divider {
         height: 24px;
-        background-color: $cool-black-15;
+        background-color: colors.$cool-black-15;
       }
     }
 
