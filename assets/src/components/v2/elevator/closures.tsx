@@ -212,7 +212,7 @@ const NoCurrentClosures = ({
         <div className="no-closures-header">
           All MBTA elevators are working
           {status === "nearby_redundancy" &&
-            "or have a backup elevator within 20 feet."}
+            " or have a backup elevator within 20 feet"}
           .
         </div>
         <svg height={4} width={936} className="divider">
