@@ -11,8 +11,8 @@
   .in-station-summary {
     position: relative;
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
     padding: 24px 48px;
 
     .text {
@@ -64,13 +64,14 @@
     .upcoming-closure-small {
       display: flex;
       flex-direction: row;
-      justify-content: space-between;
+      gap: 10px;
       align-items: center;
+      justify-content: space-between;
       padding: 24px 72px;
       font-size: 48px;
       font-weight: 400;
-      gap: 10px;
     }
+
     .closure-divider {
       height: 24px;
       background-color: colors.$cool-black-15;
