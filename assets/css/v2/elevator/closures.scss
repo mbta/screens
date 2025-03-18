@@ -31,6 +31,8 @@
   }
 
   .divider {
+    height: 4px;
+    width: 936px;
     background-color: #73737364;
     border-radius: 2px;
   }
@@ -43,13 +45,13 @@
     padding: 148px 72px;
     color: colors.$cool-black-15;
 
-    .no-closures-header {
+    &__header {
       font-size: 90px;
       font-weight: 700;
       line-height: 106px;
     }
 
-    .no-closures-text {
+    &__text {
       margin-bottom: 30px;
       font-size: 70px;
       font-weight: 400;
@@ -60,6 +62,28 @@
   .closures-info {
     height: 100%;
     background-color: colors.$warm-neutral-90;
+
+    .small-info-strip {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      padding: 24px 72px;
+      font-size: 48px;
+      font-weight: 400;
+
+      &__divider {
+        height: 24px;
+        background-color: colors.$cool-black-15;
+      }
+    }
+
+    .maintenance-header {
+      font-size: 150px;
+      font-weight: 700;
+      line-height: 150px;
+    }
 
     .upcoming-closure {
       display: flex;

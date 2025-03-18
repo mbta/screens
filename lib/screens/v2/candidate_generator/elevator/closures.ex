@@ -68,7 +68,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     {:ok, %Stop{id: stop_id}} = @facility.fetch_stop_for_facility(elevator_id)
 
     relevant_closures =
-      active_closures |> Enum.filter(&relevant_closure?(&1, stop_id, active_closures))
+      Enum.filter(active_closures, &relevant_closure?(&1, stop_id, active_closures))
 
     case Enum.find(active_closures, at_this_elevator?) do
       nil ->
@@ -88,7 +88,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
               config,
               now,
               nil,
-              relevant_closures
+              relevant_closures ++ upcoming_closures
             )
         ]
 
