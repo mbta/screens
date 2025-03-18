@@ -58,10 +58,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     struct!(%Alert{active_period: [{DateTime.utc_now(), nil}], effect: :elevator_closure}, fields)
   end
 
-  defp build_alert(start_date, fields) do
-    struct!(%Alert{active_period: [{start_date, nil}], effect: :elevator_closure}, fields)
-  end
-
   defp build_elevator(id, fields \\ []) do
     struct!(
       %Elevator{
