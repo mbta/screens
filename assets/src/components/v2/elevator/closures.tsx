@@ -162,61 +162,21 @@ const UpcomingClosure = ({
   );
 };
 
-const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
-  const getClosureTitle = (titles: string[]) => {
-    const titlesParsed = titles[0].split(" ");
-    if (titlesParsed[0] === "This") {
-      return (
-        <b>
-          {titlesParsed[0]} {titlesParsed[1]}:{" "}
-        </b>
-      );
-    }
-    return;
-  };
-  const getClosureDetail = (titles: string[]) => {
-    const titlesParsed = titles[0].split(" ");
-    if (titlesParsed[0] === "This") {
-      return titlesParsed.slice(1);
-    } else {
-      return titlesParsed.join(" ");
-    }
-  };
-
+const NoCurrentClosures = () => {
   return (
-    <>
-      {closure && (
-        <div className="closures-info">
-          <div className="upcoming-closure-small">
-            <div>
-              {getClosureTitle(closure.details.titles)}
-              This elevator will be closed{" "}
-              {getClosureDetail(closure.details.titles)}{" "}
-              {closure.details.postfix}
-            </div>
-            <div>
-              <CalendarIcon width={72} height={72} />
-            </div>
-          </div>
-          <div className="closure-divider" />
-        </div>
-      )}
-      <div className="no-closures">
-        <NormalServiceIcon height={150} width={150} fill="#145A06" />
-        <div className="no-closures-header">
-          All MBTA elevators are working.
-        </div>
-        <svg height={4} width={936} className="divider">
-          <line x1="0" y1="4" x2={936} y2={4} />
-        </svg>
-        <div className="no-closures-text">
-          For info on elevator outages and alternate paths:{" "}
-          <b>mbta.com/elevators</b> or call the elevator hotline:{" "}
-          <b>617-222-2828</b>
-        </div>
-        {!closure && <Logo height={124} width={124} />}
+    <div className="no-closures">
+      <NormalServiceIcon height={150} width={150} fill="#145A06" />
+      <div className="no-closures-header">All MBTA elevators are working.</div>
+      <svg height={4} width={936} className="divider">
+        <line x1="0" y1="4" x2={936} y2={4} />
+      </svg>
+      <div className="no-closures-text">
+        For info on elevator outages and alternate paths:{" "}
+        <b>mbta.com/elevators</b> or call the elevator hotline:{" "}
+        <b>617-222-2828</b>
       </div>
-    </>
+      <Logo height={124} width={124} />
+    </div>
   );
 };
 
@@ -317,7 +277,7 @@ const Closures = ({
   return (
     <div className="elevator-closures">
       {stations === "no_closures" ? (
-        <NoCurrentClosures closure={upcomingClosure} />
+        <NoCurrentClosures />
       ) : (
         <>
           <InStationSummary

@@ -61,22 +61,6 @@
     height: 100%;
     background-color: colors.$warm-neutral-90;
 
-    .upcoming-closure-small {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-      align-items: center;
-      justify-content: space-between;
-      padding: 24px 72px;
-      font-size: 48px;
-      font-weight: 400;
-    }
-
-    .closure-divider {
-      height: 24px;
-      background-color: colors.$cool-black-15;
-    }
-
     .upcoming-closure {
       display: flex;
       flex-direction: column;
