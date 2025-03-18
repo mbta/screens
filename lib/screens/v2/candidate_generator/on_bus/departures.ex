@@ -57,17 +57,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     end
   end
 
-  @spec connecting_stop_ids(Stop) :: nonempty_list(String.t())
+  @spec connecting_stop_ids(Stop) :: [String.t()]
   defp connecting_stop_ids(stop) do
     stop |> Map.get(:connecting_stops) |> Enum.map(&stop_id(&1))
   end
 
+  @spec connecting_stop_ids(Stop) :: [String.t()]
   defp child_stop_ids(stop) do
     stop
     |> Map.get(:child_stops)
     |> Enum.map(&stop_id(&1))
   end
 
+  @spec connecting_stop_ids(Stop) :: [String.t()]
   defp parent_stop_ids(stop) do
     parent_station =
       stop
