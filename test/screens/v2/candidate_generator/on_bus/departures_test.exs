@@ -47,15 +47,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     }
   end
 
-  defp build_stops(ids) do
+  defp build_stops(ids, connecting_stop_ids) do
     Enum.map(ids, fn id ->
       %Stop{
-        id: id,
-        name: "Test Stop Name",
-        location_type: 0,
-        parent_station: nil,
-        child_stops: nil,
-        platform_code: nil
+        :id => id,
+        :name => "Test Stop Name",
+        :location_type => 0,
+        :parent_station => nil,
+        :child_stops => [],
+        :connecting_stops => Enum.flat_map(connecting_stop_ids, &build_stops([&1], [])),
+        :platform_code => nil
       }
     end)
   end
@@ -70,8 +71,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
   end
 
   setup do
-    stub(@stop, :fetch_connecting, fn _ ->
-      {:ok, build_stops(~w[100])}
+    stub(@stop, :fetch, fn _, _ ->
+      {:ok, build_stops(["100"], [])}
     end)
 
     {:ok, %{now: DateTime.utc_now()}}
@@ -125,14 +126,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
       route_id = "86"
       stop_id = "22549"
 
-      connecting_routes = ~w[100 12345 22549]
+      connecting_stops = ["100", "12345"]
 
-      stub(@stop, :fetch_connecting, fn _ ->
-        {:ok, build_stops(connecting_routes)}
+      all_stops = Enum.concat(connecting_stops, [stop_id])
+
+      stub(@stop, :fetch, fn _, _ ->
+        {:ok, build_stops([stop_id], connecting_stops)}
       end)
 
       mock_departures = [
         build_departure("66", 0),
+        build_departure("78", 0),
         build_departure("109", 0)
       ]
 
@@ -141,7 +145,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
         build_departure("86", 0, :bus, ~U[2024-01-01 11:59:00Z])
       ]
 
-      mock_fetch_fn = fn %{stop_ids: ^connecting_routes}, [include_schedules: false] ->
+      mock_fetch_fn = fn %{stop_ids: ^all_stops}, _ ->
         {:ok, mock_departures ++ mock_departures_on_route}
       end
 

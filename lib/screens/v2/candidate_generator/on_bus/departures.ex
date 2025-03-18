@@ -14,7 +14,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
 
   @stop injected(Stop)
 
-  @max_departure_results 2
+  @max_departure_results 3
 
   @type widget :: DeparturesNoData.t() | DeparturesNoService.t() | DeparturesWidget.t()
 
@@ -44,13 +44,45 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
 
   @spec fetch_connecting_stops(String.t()) :: nonempty_list(String.t())
   defp fetch_connecting_stops(stop_id) do
-    case @stop.fetch_connecting(%{ids: [stop_id]}) do
+    case @stop.fetch(%{ids: [stop_id], location_types: [0, 1]}, true) do
       {:ok, stops} ->
-        Enum.map(stops, &stop_id(&1))
+        Enum.flat_map(stops, &parent_stop_ids/1) ++
+          Enum.flat_map(stops, &connecting_stop_ids/1) ++
+          Enum.flat_map(stops, &child_stop_ids/1) ++
+          [stop_id]
 
       :error ->
         Report.warning("fetch_connecting_stops_error", stop_id: stop_id)
         [stop_id]
+    end
+  end
+
+  @spec connecting_stop_ids(Stop) :: nonempty_list(String.t())
+  defp connecting_stop_ids(stop) do
+    stop |> Map.get(:connecting_stops) |> Enum.map(&stop_id(&1))
+  end
+
+  defp child_stop_ids(stop) do
+    stop
+    |> Map.get(:child_stops)
+    |> Enum.map(&stop_id(&1))
+  end
+
+  defp parent_stop_ids(stop) do
+    parent_station =
+      stop
+      |> Map.get(:parent_station)
+
+    case parent_station do
+      nil ->
+        []
+
+      # If a parent_station has any connecting stops, we also get those IDs
+      _ ->
+        parent_station
+        |> Enum.filter(fn stop -> stop.location_type == 0 end)
+        |> Enum.map(&stop_id(&1))
+        |> Enum.concat(&connecting_stop_ids(&1))
     end
   end
 

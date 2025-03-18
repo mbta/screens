@@ -42,7 +42,8 @@ defmodule Screens.Stops.StopTest do
         fn "stops",
            %{
              "filter[id]" => "s1,p1,p2,c3",
-             "include" => "child_stops,parent_station.child_stops"
+             "include" =>
+               "child_stops.connecting_stops,parent_station.child_stops,parent_station.connecting_stops,connecting_stops,parent_station"
            } ->
           {
             :ok,

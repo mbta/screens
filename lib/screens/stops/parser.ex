@@ -56,12 +56,26 @@ defmodule Screens.Stops.Parser do
           end)
       end
 
+    connecting_stops =
+      case get_in(relationships, ~w[connecting_stops data]) do
+        nil ->
+          nil
+
+        stop_references ->
+          Enum.map(stop_references, fn %{"id" => id} ->
+            # Always leave the `parent_station` of stops in `connecting_stops` unloaded, else parsing
+            # would recurse infinitely.
+            included |> Map.fetch!({id, "stop"}) |> parse_stop(included, false)
+          end)
+      end
+
     %Screens.Stops.Stop{
       id: id,
       name: name,
       location_type: location_type,
       parent_station: parent_station,
       child_stops: child_stops,
+      connecting_stops: connecting_stops,
       platform_code: platform_code,
       platform_name: platform_name,
       vehicle_type: if(is_nil(vehicle_type), do: nil, else: RouteType.from_id(vehicle_type))

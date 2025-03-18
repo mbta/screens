@@ -13,12 +13,15 @@ defmodule Screens.Stops.Stop do
     location_type
     parent_station
     child_stops
+    connecting_stops
     platform_code
     platform_name
     vehicle_type
   ]a
 
   @type id :: String.t()
+  # A location_type of 1 indicates a parent station complex, whereas 0 indicates a distinct boarding location.
+  # A value of2 designates a station entrance/exit, and 3 indicates a generic node within a station, such as the end of a staircase, elevator, or escalator.
   @type location_type :: 0 | 1 | 2 | 3
 
   @type t :: %__MODULE__{
@@ -27,6 +30,7 @@ defmodule Screens.Stops.Stop do
           location_type: location_type(),
           parent_station: t() | nil | :unloaded,
           child_stops: [t()] | :unloaded,
+          connecting_stops: [t()] | :unloaded,
           platform_code: String.t() | nil,
           platform_name: String.t() | nil,
           vehicle_type: RouteType.t() | nil
@@ -47,31 +51,18 @@ defmodule Screens.Stops.Stop do
       |> Map.new()
       |> then(fn params ->
         if include_related? do
-          Map.put(params, "include", Enum.join(~w[child_stops parent_station.child_stops], ","))
+          Map.put(
+            params,
+            "include",
+            Enum.join(
+              ~w[child_stops.connecting_stops parent_station.child_stops parent_station.connecting_stops connecting_stops parent_station],
+              ","
+            )
+          )
         else
           params
         end
       end)
-
-    case get_json_fn.("stops", encoded_params) do
-      {:ok, response} -> {:ok, Parser.parse(response)}
-      _ -> :error
-    end
-  end
-
-  @callback fetch_connecting(params()) :: :error | {:ok, list()}
-  def fetch_connecting(params, get_json_fn \\ &V3Api.get_json/2) do
-    include_params =
-      Enum.join(
-        ~w[connecting_stops child_stops.connecting_stops parent_station.connecting_stops connecting_stops],
-        ","
-      )
-
-    encoded_params =
-      params
-      |> Enum.flat_map(&encode_param/1)
-      |> Map.new()
-      |> Map.put("include", include_params)
 
     case get_json_fn.("stops", encoded_params) do
       {:ok, response} -> {:ok, Parser.parse(response)}
