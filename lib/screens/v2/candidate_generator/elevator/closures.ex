@@ -158,25 +158,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   defp elevator_closure(_alert), do: []
 
-  # True state of no closures; 0 elevators are closed
-  defp elevator_closures(
-         [],
-         [],
-         upcoming_closures,
-         %ElevatorConfig{elevator_id: _elevator_id} = app_params,
-         now,
-         stop_id
-       ) do
-    %ElevatorClosures{
-      app_params: app_params,
-      now: now,
-      station_id: stop_id,
-      stations_with_closures: :no_closures,
-      upcoming_closure: build_upcoming_closure(upcoming_closures)
-    }
-  end
-
-  # Some elevators are closed but there are relevant backups
   defp elevator_closures(
          [],
          _active_closures,
@@ -189,7 +170,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       app_params: app_params,
       now: now,
       station_id: stop_id,
-      stations_with_closures: :nearby_redundancy,
+      stations_with_closures:
+        if(upcoming_closures !== [], do: :nearby_redundancy, else: :no_closures),
       upcoming_closure: build_upcoming_closure(upcoming_closures)
     }
   end
