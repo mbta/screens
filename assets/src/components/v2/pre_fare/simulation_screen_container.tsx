@@ -45,7 +45,7 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
           <div className="simulation__full-page">
             <div className="simulation__title">Live view</div>
             <div
-              className={classWithModifier("simulation", getScreenSide())}
+              className={`simulation ${classWithModifier("simulation-viewport", getScreenSide())}`}
               id="simulation"
             >
               <WidgetTreeErrorBoundary>
