@@ -63,8 +63,8 @@ defmodule Screens.Stops.Parser do
 
         stop_references ->
           Enum.map(stop_references, fn %{"id" => id} ->
-            # Always leave the `parent_station` of stops in `connecting_stops` unloaded, else parsing
-            # would recurse infinitely.
+            # We expect all connecting_stops to have no parent station,
+            # but leave it unloaded just in case there is one, to avoid infinite recursion.
             included |> Map.fetch!({id, "stop"}) |> parse_stop(included, false)
           end)
       end

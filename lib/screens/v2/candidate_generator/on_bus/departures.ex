@@ -13,29 +13,28 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   import Screens.Inject
 
   @stop injected(Stop)
+  @departure injected(Departure)
 
   @max_departure_results 3
 
   @type widget :: DeparturesNoData.t() | DeparturesNoService.t() | DeparturesWidget.t()
 
-  @spec departures_candidate(Screen.t(), QueryParams.t(), DateTime.t(), Departure.fetch()) :: [
-          widget()
-        ]
-  def departures_candidate(config, %{stop_id: stop_id, route_id: route_id}, now, fetch_fn) do
+  @spec departures_candidate(Screen.t(), QueryParams.t(), DateTime.t()) :: [widget()]
+  def departures_candidate(config, %{stop_id: stop_id, route_id: route_id}, now) do
     route_id
-    |> fetch_departures(stop_id, fetch_fn)
-    |> process_response(config, now)
+    |> fetch_departures(stop_id)
+    |> departures_widget(config, now)
   end
 
-  def departures_candidate(config, _, _, _fetch_fn) do
-    build_no_data_widget(config)
+  def departures_candidate(config, _, _) do
+    [%DeparturesNoData{screen: config}]
   end
 
-  defp fetch_departures(route_id, stop_id, departure_fetch_fn) do
+  defp fetch_departures(route_id, stop_id) do
     fetch_params = %{:stop_ids => fetch_connecting_stops(stop_id)}
     fetch_opts = [include_schedules: false]
 
-    with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
+    with {:ok, departures} <- @departure.fetch(fetch_params, fetch_opts) do
       {:ok,
        departures
        |> filter_current_route(route_id)}
@@ -44,12 +43,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
 
   @spec fetch_connecting_stops(String.t()) :: nonempty_list(String.t())
   defp fetch_connecting_stops(stop_id) do
-    case @stop.fetch(%{ids: [stop_id], location_types: [0, 1]}, true) do
+    case @stop.fetch(%{ids: [stop_id]}, true) do
       {:ok, stops} ->
-        Enum.flat_map(stops, &parent_stop_ids/1) ++
-          Enum.flat_map(stops, &connecting_stop_ids/1) ++
-          Enum.flat_map(stops, &child_stop_ids/1) ++
-          [stop_id]
+        List.flatten([
+          stop_id,
+          Enum.map(stops, &child_stop_ids/1),
+          Enum.map(stops, &connecting_stop_ids/1),
+          Enum.map(stops, &parent_stop_ids/1)
+        ])
 
       :error ->
         Report.warning("fetch_connecting_stops_error", stop_id: stop_id)
@@ -58,58 +59,44 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   @spec connecting_stop_ids(Stop.t()) :: [String.t()]
-  defp connecting_stop_ids(stop) do
-    stop |> Map.get(:connecting_stops) |> Enum.map(&stop_id(&1))
-  end
+  defp connecting_stop_ids(%Stop{connecting_stops: stops}), do: Enum.map(stops, & &1.id)
 
   @spec child_stop_ids(Stop.t()) :: [String.t()]
-  defp child_stop_ids(stop) do
-    stop
-    |> Map.get(:child_stops)
-    |> Enum.map(&stop_id(&1))
+  defp child_stop_ids(%Stop{child_stops: stops}) do
+    stops
+    |> Enum.filter(fn child -> child.location_type == 0 end)
+    |> Enum.map(& &1.id)
   end
 
   @spec parent_stop_ids(Stop.t()) :: [String.t()]
-  defp parent_stop_ids(stop) do
-    parent_station =
-      stop
-      |> Map.get(:parent_station)
+  defp parent_stop_ids(%Stop{parent_station: nil}), do: []
 
-    case parent_station do
-      nil ->
-        []
-
-      # If a parent_station has any connecting stops, we also get those IDs
-      _ ->
-        parent_station
-        |> Enum.filter(fn stop -> stop.location_type == 0 end)
-        |> Enum.map(&stop_id(&1))
-        |> Enum.concat(&connecting_stop_ids(&1))
-    end
+  defp parent_stop_ids(%Stop{parent_station: stop}) do
+    [stop.id]
+    |> Enum.concat(child_stop_ids(stop))
+    |> Enum.concat(connecting_stop_ids(stop))
   end
-
-  defp stop_id(stop), do: stop.id
 
   # Only return departures that are not from the bus's current route in either direction
   defp filter_current_route(departures, route_id) do
     Enum.filter(departures, &(&1.prediction.route.id != route_id))
   end
 
-  @spec process_response(:error, Screen.t(), DateTime.t()) ::
+  @spec departures_widget(:error, Screen.t(), DateTime.t()) ::
           nonempty_list(DeparturesNoData.t())
-  @spec process_response({:ok, []}, Screen.t(), DateTime.t()) ::
+  @spec departures_widget({:ok, []}, Screen.t(), DateTime.t()) ::
           nonempty_list(DeparturesNoService.t())
-  @spec process_response({:ok, nonempty_list(Departure.t())}, Screen.t(), DateTime.t()) ::
+  @spec departures_widget({:ok, nonempty_list(Departure.t())}, Screen.t(), DateTime.t()) ::
           nonempty_list(DeparturesWidget.t())
-  defp process_response(:error, config, _) do
-    build_no_data_widget(config)
+  defp departures_widget(:error, config, _) do
+    [%DeparturesNoData{screen: config}]
   end
 
-  defp process_response({:ok, []}, config, _) do
+  defp departures_widget({:ok, []}, config, _) do
     [%DeparturesNoService{screen: config}]
   end
 
-  defp process_response({:ok, departure_data}, config, now) do
+  defp departures_widget({:ok, departure_data}, config, now) do
     [
       %DeparturesWidget{
         screen: config,
@@ -124,9 +111,5 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
         slot_names: [:main_content]
       }
     ]
-  end
-
-  defp build_no_data_widget(config) do
-    [%DeparturesNoData{screen: config}]
   end
 end

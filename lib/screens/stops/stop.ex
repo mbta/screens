@@ -21,7 +21,7 @@ defmodule Screens.Stops.Stop do
 
   @type id :: String.t()
   # A location_type of 1 indicates a parent station complex, whereas 0 indicates a distinct boarding location.
-  # A value of2 designates a station entrance/exit, and 3 indicates a generic node within a station, such as the end of a staircase, elevator, or escalator.
+  # A value of 2 designates a station entrance/exit, and 3 indicates a generic node within a station, such as the end of a staircase, elevator, or escalator.
   @type location_type :: 0 | 1 | 2 | 3
 
   @type t :: %__MODULE__{
@@ -55,7 +55,7 @@ defmodule Screens.Stops.Stop do
             params,
             "include",
             Enum.join(
-              ~w[child_stops.connecting_stops parent_station.child_stops parent_station.connecting_stops connecting_stops parent_station],
+              ~w[child_stops connecting_stops parent_station.child_stops parent_station.connecting_stops],
               ","
             )
           )

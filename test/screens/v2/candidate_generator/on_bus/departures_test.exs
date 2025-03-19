@@ -18,19 +18,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
   import Mox
   import Screens.Inject
 
+  @departure injected(Departure)
   @stop injected(Stop)
 
-  defp build_config() do
-    %Screen{
-      app_params: %OnBus{
-        evergreen_content: []
-      },
-      vendor: nil,
-      device_id: nil,
-      name: nil,
-      app_id: :on_bus_v2
-    }
-  end
+  @config %Screen{
+    app_params: %OnBus{
+      evergreen_content: []
+    },
+    vendor: nil,
+    device_id: nil,
+    name: nil,
+    app_id: :on_bus_v2
+  }
 
   defp build_departure(
          route_id,
@@ -47,31 +46,33 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     }
   end
 
-  defp build_stop(id, options \\ %{connecting_ids: [], child_ids: [], parent_id: nil}) do
+  defp build_stop(id, options \\ []) do
+    parent_station_id = Keyword.get(options, :parent_station_id, nil)
+
     [
       %Stop{
-        :id => id,
-        :name => "Test Stop Name",
-        :location_type => 0,
-        :parent_station =>
-          if options.parent_id != nil do
-            build_stop(options.parent_id)
+        id: id,
+        name: "Test Stop Name",
+        location_type: 0,
+        parent_station:
+          if parent_station_id != nil do
+            build_stop(parent_station_id)
           else
             nil
           end,
-        :child_stops => Enum.flat_map(options.child_ids, &build_stop(&1)),
-        :connecting_stops => Enum.flat_map(options.connecting_ids, &build_stop(&1)),
-        :platform_code => nil
+        child_stops: Enum.flat_map(Keyword.get(options, :child_ids, []), &build_stop(&1)),
+        connecting_stops:
+          Enum.flat_map(Keyword.get(options, :connecting_ids, []), &build_stop(&1)),
+        platform_code: nil
       }
     ]
   end
 
-  defp departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id}, fetch_fn) do
+  defp departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id}) do
     Departures.departures_candidate(
       config,
       %QueryParams{route_id: route_id, stop_id: stop_id},
-      DateTime.utc_now(),
-      fetch_fn
+      DateTime.utc_now()
     )
   end
 
@@ -85,62 +86,48 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
 
   describe "departures_candidate/3" do
     test "happy path returns a DeparturesWidget with single section containing two departures" do
-      config = build_config()
       route_id = "86"
       stop_id = "100"
 
       mock_departures = [build_departure("66", 0), build_departure("109", 0)]
 
-      mock_fetch_fn = fn %{stop_ids: [^stop_id]}, [include_schedules: false] ->
+      stub(@departure, :fetch, fn _, _ ->
         {:ok, mock_departures}
-      end
+      end)
 
       assert [
                %DeparturesWidget{
-                 screen: ^config,
+                 screen: @config,
                  sections: [
                    %NormalSection{rows: ^mock_departures}
                  ]
                }
-             ] =
-               departures_candidate(
-                 config,
-                 %QueryParams{route_id: route_id, stop_id: stop_id},
-                 mock_fetch_fn
-               )
+             ] = departures_candidate(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
     end
 
     test "returns DeparturesNoData section when fetch fails" do
       route_id = "86"
       stop_id = "100"
-      mock_fetch_fn = fn _, _ -> :error end
-      config = build_config()
 
-      assert departures_candidate(
-               config,
-               %QueryParams{route_id: route_id, stop_id: stop_id},
-               mock_fetch_fn
-             ) ==
-               [
-                 %DeparturesNoData{screen: config}
-               ]
+      stub(@departure, :fetch, fn _, _ -> :error end)
+
+      assert departures_candidate(@config, %QueryParams{route_id: route_id, stop_id: stop_id}) ==
+               [%DeparturesNoData{screen: @config}]
     end
 
     test "filters out departures for the current route_id" do
-      config = build_config()
       route_id = "86"
       stop_id = "22549"
-      connecting_stops = ["100", "12345"]
       child_stops = ["2", "5"]
-      all_stops = connecting_stops |> Enum.concat(child_stops) |> Enum.concat([stop_id])
+      connecting_stops = ["100", "12345"]
+      all_stops = [stop_id] |> Enum.concat(child_stops) |> Enum.concat(connecting_stops)
 
       stub(@stop, :fetch, fn _, _ ->
         {:ok,
-         build_stop(stop_id, %{
+         build_stop(stop_id,
            connecting_ids: connecting_stops,
-           child_ids: child_stops,
-           parent_id: nil
-         })}
+           child_ids: child_stops
+         )}
       end)
 
       mock_departures = [
@@ -150,43 +137,34 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
       ]
 
       # 86 prediction scheduled for 1 minute earlier
-      mock_departures_on_route = [
-        build_departure("86", 0, :bus, ~U[2024-01-01 11:59:00Z])
-      ]
+      mock_departures_on_route = [build_departure("86", 0, :bus, ~U[2024-01-01 11:59:00Z])]
 
-      mock_fetch_fn = fn %{stop_ids: ^all_stops}, _ ->
+      stub(@departure, :fetch, fn %{stop_ids: ^all_stops}, _ ->
         {:ok, mock_departures ++ mock_departures_on_route}
-      end
+      end)
 
       assert [
                %DeparturesWidget{
-                 screen: ^config,
+                 screen: @config,
                  sections: [
                    %NormalSection{rows: ^mock_departures}
                  ]
                }
-             ] =
-               departures_candidate(
-                 config,
-                 %QueryParams{route_id: route_id, stop_id: stop_id},
-                 mock_fetch_fn
-               )
+             ] = departures_candidate(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
     end
 
     test "returns DeparturesNoService section when fetch finds no departures" do
       route_id = "86"
       stop_id = "100"
-      mock_fetch_fn = fn _, _ -> {:ok, []} end
-      config = build_config()
+
+      stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->
+        {:ok, []}
+      end)
 
       assert departures_candidate(
-               config,
-               %QueryParams{route_id: route_id, stop_id: stop_id},
-               mock_fetch_fn
-             ) ==
-               [
-                 %DeparturesNoService{screen: config}
-               ]
+               @config,
+               %QueryParams{route_id: route_id, stop_id: stop_id}
+             ) == [%DeparturesNoService{screen: @config}]
     end
   end
 end
