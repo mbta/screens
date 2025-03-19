@@ -9,7 +9,6 @@ import PagingIndicators from "Components/v2/elevator/paging_indicators";
 import { type StationWithClosures } from "Components/v2/elevator/types";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import CalendarIcon from "Images/svgr_bundled/calendar.svg";
-import CalendarAlertIcon from "Images/svgr_bundled/calendar-alert.svg";
 import NormalServiceIcon from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import Logo from "Images/svgr_bundled/logo.svg";
@@ -142,7 +141,7 @@ const UpcomingClosure = ({
 
   return (
     <div className="upcoming-closure">
-      <CalendarAlertIcon width={224} />
+      <AccessibilityAlert height={249} width={249} />
       <div className="upcoming-closure__title" ref={titleRef}>
         {title}:
       </div>
@@ -163,23 +162,6 @@ const UpcomingClosure = ({
 };
 
 const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
-  const getClosureTitle = (titles: string[]) => {
-    const titlesParsed = titles[0].split(" ");
-    return (
-      <b>
-        {titlesParsed[0]} {titlesParsed[1]}:{" "}
-      </b>
-    );
-  };
-  const getClosureDetail = (titles: string[]) => {
-    const titlesParsed = titles[0].split(" ");
-    if (titlesParsed[0] === "This") {
-      return titlesParsed.slice(1);
-    } else {
-      return titlesParsed.join(" ");
-    }
-  };
-
   return (
     <>
       {closure ? (
@@ -191,20 +173,7 @@ const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
             </div>
           </div>
           <div className="small-info-strip__divider" />
-          <div className="upcoming-closure">
-            <AccessibilityAlert height={249} width={249} />
-            <div className="maintenance-header">
-              {getClosureTitle(closure.details.titles)}
-            </div>
-            <div className="no-closures__text">
-              This elevator will be closed{" "}
-              {getClosureDetail(closure.details.titles)}{" "}
-              {closure.details.postfix}.
-              <br />
-              <br />
-              {closure.details.summary}
-            </div>
-          </div>
+          <UpcomingClosure closure={closure} />
         </div>
       ) : (
         <div className="no-closures">

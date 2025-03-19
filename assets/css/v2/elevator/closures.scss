@@ -31,8 +31,8 @@
   }
 
   .divider {
-    height: 4px;
     width: 936px;
+    height: 4px;
     background-color: #73737364;
     border-radius: 2px;
   }
@@ -77,12 +77,6 @@
         height: 24px;
         background-color: colors.$cool-black-15;
       }
-    }
-
-    .maintenance-header {
-      font-size: 150px;
-      font-weight: 700;
-      line-height: 150px;
     }
 
     .upcoming-closure {
