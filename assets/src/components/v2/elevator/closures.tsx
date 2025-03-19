@@ -9,7 +9,6 @@ import PagingIndicators from "Components/v2/elevator/paging_indicators";
 import { type StationWithClosures } from "Components/v2/elevator/types";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import CalendarIcon from "Images/svgr_bundled/calendar.svg";
-import CalendarAlertIcon from "Images/svgr_bundled/calendar-alert.svg";
 import NormalServiceIcon from "Images/svgr_bundled/normal-service.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import Logo from "Images/svgr_bundled/logo.svg";
@@ -142,7 +141,7 @@ const UpcomingClosure = ({
 
   return (
     <div className="upcoming-closure">
-      <CalendarAlertIcon width={224} />
+      <AccessibilityAlert height={249} width={249} />
       <div className="upcoming-closure__title" ref={titleRef}>
         {title}:
       </div>
@@ -169,62 +168,37 @@ const NoCurrentClosures = ({
   closure?: UpcomingClosureInfo;
   status: ClosuresStatus;
 }) => {
-  const getClosureTitle = (titles: string[]) => {
-    const titlesParsed = titles[0].split(" ");
-    if (titlesParsed[0] === "This") {
-      return (
-        <b>
-          {titlesParsed[0]} {titlesParsed[1]}:{" "}
-        </b>
-      );
-    }
-    return;
-  };
-  const getClosureDetail = (titles: string[]) => {
-    const titlesParsed = titles[0].split(" ");
-    if (titlesParsed[0] === "This") {
-      return titlesParsed.slice(1);
-    } else {
-      return titlesParsed.join(" ");
-    }
-  };
-
   return (
     <>
-      {closure && (
+      {closure ? (
         <div className="closures-info">
-          <div className="upcoming-closure-small">
+          <div className="small-info-strip">
+            <div>All MBTA elevators are working.</div>
             <div>
-              {getClosureTitle(closure.details.titles)}
-              This elevator will be closed{" "}
-              {getClosureDetail(closure.details.titles)}{" "}
-              {closure.details.postfix}
-            </div>
-            <div>
-              <CalendarIcon width={72} height={72} />
+              <NormalServiceIcon width={72} height={72} fill="#145A06" />
             </div>
           </div>
-          <div className="closure-divider" />
+          <div className="small-info-strip__divider" />
+          <UpcomingClosure closure={closure} />
+        </div>
+      ) : (
+        <div className="no-closures">
+          <NormalServiceIcon height={150} width={150} fill="#145A06" />
+          <div className="no-closures__header">
+            All MBTA elevators are working{" "}
+            {status === "nearby_redundancy" &&
+              " or have a backup elevator within 20 feet"}
+            .
+          </div>
+          <div className="divider" />
+          <div className="no-closures__text">
+            For info on elevator outages and alternate paths:{" "}
+            <b>mbta.com/elevators</b> or call the elevator hotline:{" "}
+            <b>617-222-2828</b>
+          </div>
+          <Logo height={124} width={124} />
         </div>
       )}
-      <div className="no-closures">
-        <NormalServiceIcon height={150} width={150} fill="#145A06" />
-        <div className="no-closures-header">
-          All MBTA elevators are working
-          {status === "nearby_redundancy" &&
-            " or have a backup elevator within 20 feet"}
-          .
-        </div>
-        <svg height={4} width={936} className="divider">
-          <line x1="0" y1="4" x2={936} y2={4} />
-        </svg>
-        <div className="no-closures-text">
-          For info on elevator outages and alternate paths:{" "}
-          <b>mbta.com/elevators</b> or call the elevator hotline:{" "}
-          <b>617-222-2828</b>
-        </div>
-        {!closure && <Logo height={124} width={124} />}
-      </div>
     </>
   );
 };

@@ -31,6 +31,8 @@
   }
 
   .divider {
+    width: 936px;
+    height: 4px;
     background-color: #73737364;
     border-radius: 2px;
   }
@@ -43,13 +45,13 @@
     padding: 148px 72px;
     color: colors.$cool-black-15;
 
-    .no-closures-header {
+    &__header {
       font-size: 90px;
       font-weight: 700;
       line-height: 106px;
     }
 
-    .no-closures-text {
+    &__text {
       margin-bottom: 30px;
       font-size: 70px;
       font-weight: 400;
@@ -61,7 +63,7 @@
     height: 100%;
     background-color: colors.$warm-neutral-90;
 
-    .upcoming-closure-small {
+    .small-info-strip {
       display: flex;
       flex-direction: row;
       gap: 10px;
@@ -70,11 +72,11 @@
       padding: 24px 72px;
       font-size: 48px;
       font-weight: 400;
-    }
 
-    .closure-divider {
-      height: 24px;
-      background-color: colors.$cool-black-15;
+      &__divider {
+        height: 24px;
+        background-color: colors.$cool-black-15;
+      }
     }
 
     .upcoming-closure {

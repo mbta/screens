@@ -68,12 +68,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     {:ok, %Stop{id: stop_id}} = @facility.fetch_stop_for_facility(elevator_id)
 
     relevant_closures =
-      active_closures |> Enum.filter(&relevant_closure?(&1, stop_id, active_closures))
+      Enum.filter(active_closures, &relevant_closure?(&1, stop_id, active_closures))
 
     case Enum.find(active_closures, at_this_elevator?) do
       nil ->
         upcoming_closures =
           upcoming |> Enum.flat_map(&elevator_closure/1) |> Enum.filter(at_this_elevator?)
+
+        footer =
+          if relevant_closures ++ upcoming_closures == [], do: [], else: [%Footer{screen: config}]
 
         [
           elevator_closures(
@@ -83,13 +86,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
             app_params,
             now,
             stop_id
+          ),
+          header_instances(
+            config,
+            now
           )
-          | header_footer_instances(
-              config,
-              now,
-              nil,
-              relevant_closures
-            )
+          | footer
         ]
 
       _closure ->
@@ -111,34 +113,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     ]
   end
 
-  defp header_footer_instances(
+  defp header_instances(
          %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id}} = config,
          now,
-         variant,
-         closures
+         variant \\ nil
        ) do
-    case Enum.any?(closures) do
-      true ->
-        [
-          %NormalHeader{
-            text: "Elevator #{elevator_id}",
-            screen: config,
-            time: now,
-            variant: variant
-          },
-          %Footer{screen: config, variant: variant}
-        ]
-
-      false ->
-        [
-          %NormalHeader{
-            text: "Elevator #{elevator_id}",
-            screen: config,
-            time: now,
-            variant: variant
-          }
-        ]
-    end
+    %NormalHeader{text: "Elevator #{elevator_id}", screen: config, time: now, variant: variant}
   end
 
   defp elevator_closure(%Alert{

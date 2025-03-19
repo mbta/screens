@@ -20,7 +20,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
             id: Stop.id(),
             name: String.t(),
             route_icons: list(Route.icon()),
-            closures: list(Closure.t()) | :no_closures | :nearby_redundancy,
+            closures: list(Closure.t()),
             summary: String.t() | nil
           }
   end
