@@ -37,7 +37,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     with {:ok, departures} <- @departure.fetch(fetch_params, fetch_opts) do
       {:ok,
        departures
-       |> filter_current_route(route_id)}
+       |> filter_current_route(route_id)
+       |> filter_duplicates()
+       |> sort_by_mode()}
     end
   end
 
@@ -78,6 +80,43 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   # Only return departures that are not from the bus's current route in either direction
   defp filter_current_route(departures, route_id) do
     Enum.filter(departures, &(&1.prediction.route.id != route_id))
+  end
+
+  defp filter_duplicates(departures) do
+    unique_departures =
+      Enum.uniq_by(departures, fn dep ->
+        {dep.prediction.route.id, dep.prediction.trip.direction_id}
+      end)
+
+    # Return at least 3 departures, even if there are not enough unique routes
+    case length(unique_departures) do
+      count when count >= 3 -> unique_departures
+      _ -> Enum.take(departures, 3)
+    end
+  end
+
+  defp sort_by_mode(departures) do
+    priority = %{
+      :subway => 1,
+      :light_rail => 1,
+      :bus => 2,
+      :commuter_rail => 3,
+      :ferry => 4
+    }
+
+    Enum.sort(departures, fn a, b ->
+      priority_a =
+        Map.get(priority, a.prediction.route.type)
+
+      priority_b =
+        Map.get(priority, b.prediction.route.type)
+
+      if priority_a == priority_b do
+        a.prediction.arrival_time <= b.prediction.arrival_time
+      else
+        priority_a < priority_b
+      end
+    end)
   end
 
   @spec departures_widget(:error, Screen.t(), DateTime.t()) ::
