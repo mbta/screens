@@ -83,14 +83,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   defp filter_duplicates(departures) do
-    # TODO: What if there is only one route ID/direction in the departures at this stop? Should we still return two
-    Enum.uniq_by(departures, fn dep ->
-      {dep.prediction.route.id, dep.prediction.trip.direction_id}
-    end)
+    unique_departures =
+      Enum.uniq_by(departures, fn dep ->
+        {dep.prediction.route.id, dep.prediction.trip.direction_id}
+      end)
+
+    # Return at least 3 departures, even if there are not enough unique routes
+    case length(unique_departures) do
+      count when count >= 3 -> unique_departures
+      _ -> Enum.take(departures, 3)
+    end
   end
 
   defp sort_by_mode(departures) do
-    # TODO: Compile time type checking?
     priority = %{
       :subway => 1,
       :light_rail => 1,
