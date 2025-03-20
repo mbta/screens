@@ -42,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   @spec fetch_connecting_stops(String.t()) :: nonempty_list(String.t())
-  defp fetch_connecting_stops(stop_id) do
+  def fetch_connecting_stops(stop_id) do
     case @stop.fetch(%{ids: [stop_id]}, true) do
       {:ok, stops} ->
         List.flatten([
@@ -62,6 +62,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   defp connecting_stop_ids(%Stop{connecting_stops: stops}), do: Enum.map(stops, & &1.id)
 
   @spec child_stop_ids(Stop.t()) :: [String.t()]
+
   defp child_stop_ids(%Stop{child_stops: stops}) do
     stops
     |> Enum.filter(fn child -> child.location_type == 0 end)
@@ -71,8 +72,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   @spec parent_stop_ids(Stop.t()) :: [String.t()]
   defp parent_stop_ids(%Stop{parent_station: nil}), do: []
 
-  defp parent_stop_ids(%Stop{parent_station: stop}) do
-    [stop.id]
+  defp parent_stop_ids(%Stop{parent_station: stop = %Stop{id: id}}) do
+    [id]
     |> Enum.concat(child_stop_ids(stop))
     |> Enum.concat(connecting_stop_ids(stop))
   end
