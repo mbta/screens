@@ -15,6 +15,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.V2.OnBus
 
+  import ExUnit.CaptureLog
   import Mox
   import Screens.Inject
 
@@ -238,7 +239,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
 
       stub(@stop, :fetch, fn %{ids: [^stop_id]}, _ -> :error end)
 
-      assert [^stop_id] = Departures.fetch_connecting_stops(stop_id)
+      warning_log =
+        capture_log([level: :warning], fn ->
+          [^stop_id] = Departures.fetch_connecting_stops(stop_id)
+        end)
+
+      assert warning_log =~ stop_id
     end
   end
 end
