@@ -19,14 +19,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
 
   @type widget :: DeparturesNoData.t() | DeparturesNoService.t() | DeparturesWidget.t()
 
-  @spec departures_candidate(Screen.t(), QueryParams.t(), DateTime.t()) :: [widget()]
-  def departures_candidate(config, %{stop_id: stop_id, route_id: route_id}, now) do
+  @spec departures_candidates(Screen.t(), QueryParams.t(), DateTime.t()) :: [widget()]
+  def departures_candidates(config, %{stop_id: stop_id, route_id: route_id}, now) do
     route_id
     |> fetch_departures(stop_id)
     |> departures_widget(config, now)
   end
 
-  def departures_candidate(config, _, _) do
+  def departures_candidates(config, _, _) do
     [%DeparturesNoData{screen: config}]
   end
 
@@ -62,7 +62,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   defp connecting_stop_ids(%Stop{connecting_stops: stops}), do: Enum.map(stops, & &1.id)
 
   @spec child_stop_ids(Stop.t()) :: [String.t()]
-
   defp child_stop_ids(%Stop{child_stops: stops}) do
     stops
     |> Enum.filter(fn child -> child.location_type == 0 end)
@@ -73,9 +72,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   defp parent_stop_ids(%Stop{parent_station: nil}), do: []
 
   defp parent_stop_ids(%Stop{parent_station: stop = %Stop{id: id}}) do
-    [id]
-    |> Enum.concat(child_stop_ids(stop))
-    |> Enum.concat(connecting_stop_ids(stop))
+    Enum.concat([[id], child_stop_ids(stop), connecting_stop_ids(stop)])
   end
 
   # Only return departures that are not from the bus's current route in either direction

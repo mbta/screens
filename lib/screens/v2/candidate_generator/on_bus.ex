@@ -30,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
         config,
         query_params,
         now \\ DateTime.utc_now(),
-        departures_instances_fn \\ &OnBus.Departures.departures_candidate/3
+        departures_instances_fn \\ &OnBus.Departures.departures_candidates/3
       ) do
     [fn -> departures_instances_fn.(config, query_params, now) end]
     |> Task.async_stream(& &1.())

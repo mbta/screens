@@ -72,8 +72,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     }
   end
 
-  defp departures_candidate(config, %QueryParams{route_id: route_id, stop_id: stop_id}) do
-    Departures.departures_candidate(
+  defp departures_candidates(config, %QueryParams{route_id: route_id, stop_id: stop_id}) do
+    Departures.departures_candidates(
       config,
       %QueryParams{route_id: route_id, stop_id: stop_id},
       DateTime.utc_now()
@@ -88,7 +88,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     {:ok, %{now: DateTime.utc_now()}}
   end
 
-  describe "departures_candidate/3" do
+  describe "departures_candidates/3" do
     test "happy path returns a DeparturesWidget with single section containing two departures" do
       route_id = "86"
       stop_id = "100"
@@ -106,7 +106,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                    %NormalSection{rows: ^mock_departures}
                  ]
                }
-             ] = departures_candidate(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
+             ] =
+               departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
     end
 
     test "returns DeparturesNoData section when fetch fails" do
@@ -115,7 +116,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
 
       stub(@departure, :fetch, fn _, _ -> :error end)
 
-      assert departures_candidate(@config, %QueryParams{route_id: route_id, stop_id: stop_id}) ==
+      assert departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id}) ==
                [%DeparturesNoData{screen: @config}]
     end
 
@@ -124,7 +125,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
       stop_id = "22549"
       child_stops = ["2", "5"]
       connecting_stops = ["100", "12345"]
-      all_stops = [stop_id] |> Enum.concat(child_stops) |> Enum.concat(connecting_stops)
+      all_stops = Enum.concat([[stop_id], child_stops, connecting_stops])
 
       stub(@stop, :fetch, fn %{ids: [^stop_id]}, _ ->
         {:ok,
@@ -156,7 +157,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                    %NormalSection{rows: ^mock_departures}
                  ]
                }
-             ] = departures_candidate(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
+             ] =
+               departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
     end
 
     test "returns DeparturesNoService section when fetch finds no departures" do
@@ -167,7 +169,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
         {:ok, []}
       end)
 
-      assert departures_candidate(
+      assert departures_candidates(
                @config,
                %QueryParams{route_id: route_id, stop_id: stop_id}
              ) == [%DeparturesNoService{screen: @config}]
@@ -215,10 +217,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
       connections_of_parent_ids = ["conn_1", "conn_2", "conn_3"]
 
       all_stop_ids =
-        [stop_id]
-        |> Enum.concat([parent_id])
-        |> Enum.concat(children_of_parent_ids)
-        |> Enum.concat(connections_of_parent_ids)
+        Enum.concat([[stop_id], [parent_id], children_of_parent_ids, connections_of_parent_ids])
 
       stub(@stop, :fetch, fn %{ids: [^stop_id]}, _ ->
         {:ok,
