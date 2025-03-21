@@ -198,13 +198,12 @@ defmodule Screens.V2.Departure do
   def vehicle_status(_), do: nil
 
   defp crowding_data_relevant?(%Trip{id: trip_trip_id, stops: [first_stop | _]}, %Vehicle{
-         current_status: current_status,
          trip_id: vehicle_trip_id,
          stop_id: next_stop
        })
        when not is_nil(trip_trip_id) and not is_nil(vehicle_trip_id) do
     vehicle_on_prediction_trip? = trip_trip_id == vehicle_trip_id
-    vehicle_started_trip? = not (current_status == :in_transit_to and next_stop == first_stop)
+    vehicle_started_trip? = not (next_stop == first_stop)
     vehicle_on_prediction_trip? and vehicle_started_trip?
   end
 

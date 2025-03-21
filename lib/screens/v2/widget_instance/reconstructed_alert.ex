@@ -366,6 +366,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp get_cause(:unknown), do: nil
   defp get_cause(cause), do: cause
 
+  # Special case for CR Departures; only supported on duo screens.
   defp placement(%__MODULE__{
          is_priority: true,
          screen: %Screen{
@@ -373,7 +374,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
              cr_departures: %CRDepartures{
                enabled: true,
                pair_with_alert_widget: true
-             }
+             },
+             template: :duo
            }
          }
        }),
@@ -381,22 +383,40 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp placement(
          %__MODULE__{
+           is_terminal_station: is_terminal_station,
+           screen: %Screen{app_params: %PreFare{template: template}}
+         } = t
+       ) do
+    location = LocalizedAlert.location(t, is_terminal_station)
+    t |> duo_placement(location) |> adjust_placement(location, template)
+  end
+
+  defp duo_placement(
+         %__MODULE__{
            alert: %Alert{effect: effect} = alert,
            is_priority: true,
            is_terminal_station: is_terminal_station,
            partial_closure_platform_names: []
-         } = t
+         } = t,
+         location
        )
        when effect in [:station_closure, :suspension, :shuttle] do
-    if LocalizedAlert.location(t, is_terminal_station) == :inside and
+    if location == :inside and
          LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
          (is_nil(Alert.direction_id(alert)) or is_terminal_station),
        do: :dual_screen,
        else: :single_screen
   end
 
-  defp placement(%__MODULE__{is_priority: true}), do: :single_screen
-  defp placement(%__MODULE__{}), do: :flex_zone
+  defp duo_placement(%__MODULE__{is_priority: true}, _location), do: :single_screen
+  defp duo_placement(%__MODULE__{}, _location), do: :flex_zone
+
+  # "Downgrade" placement by one level for solo screens, with some exceptions.
+  defp adjust_placement(placement, _location, :duo), do: placement
+  defp adjust_placement(:dual_screen, _location, :solo), do: :single_screen
+  defp adjust_placement(:single_screen, :inside, :solo), do: :single_screen
+  defp adjust_placement(:single_screen, _location, :solo), do: :flex_zone
+  defp adjust_placement(:flex_zone, _location, :solo), do: :flex_zone
 
   # Two screen alert, suspension
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
@@ -907,91 +927,42 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :delay}}, _location), do: nil
 
-  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :suspension} = alert} = t, location) do
+  # Shuttle or suspension
+  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: effect} = alert} = t, location)
+       when effect in ~w[shuttle suspension]a do
     %__MODULE__{
       alert: %Alert{cause: cause, header: header, informed_entities: informed_entities}
     } = t
 
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
-    if length(affected_routes) > 1 do
+    location_text =
+      informed_entities
+      |> get_endpoints(hd(affected_routes), t.location_context.home_stop)
+      |> format_endpoint_string()
+
+    if is_nil(location_text) or length(affected_routes) > 1 do
       %{
         issue: header,
-        remedy: "Seek alternate route",
+        remedy: "",
         location: "",
         cause: "",
         routes: get_route_pills(t),
-        effect: :suspension,
+        effect: effect,
         urgent: false
       }
     else
-      direction_id = Alert.direction_id(alert)
-      cause_text = Alert.get_cause_string(cause)
-
-      location_text =
-        informed_entities
-        |> get_endpoints(hd(affected_routes), t.location_context.home_stop)
-        |> format_endpoint_string()
-
-      issue =
-        if is_nil(direction_id) do
-          "No trains"
-        else
-          "No #{get_destination(t, location)} trains"
-        end
-
       %{
-        issue: issue,
-        remedy: "Seek alternate route",
+        issue:
+          if(is_nil(Alert.direction_id(alert)),
+            do: "No trains",
+            else: "No #{get_destination(t, location)} trains"
+          ),
+        remedy: if(effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
         location: location_text,
-        cause: cause_text,
+        cause: Alert.get_cause_string(cause),
         routes: get_route_pills(t),
-        effect: :suspension,
-        urgent: false
-      }
-    end
-  end
-
-  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :shuttle} = alert} = t, location) do
-    %__MODULE__{
-      alert: %Alert{cause: cause, header: header, informed_entities: informed_entities}
-    } = t
-
-    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
-
-    if length(affected_routes) > 1 do
-      %{
-        issue: header,
-        remedy: "Use shuttle bus",
-        location: "",
-        cause: "",
-        routes: get_route_pills(t),
-        effect: :suspension,
-        urgent: false
-      }
-    else
-      direction_id = Alert.direction_id(alert)
-      cause_text = Alert.get_cause_string(cause)
-
-      location_text =
-        informed_entities
-        |> get_endpoints(hd(affected_routes), t.location_context.home_stop)
-        |> format_endpoint_string()
-
-      issue =
-        if is_nil(direction_id) do
-          "No trains"
-        else
-          "No #{get_destination(t, location)} trains"
-        end
-
-      %{
-        issue: issue,
-        remedy: "Use shuttle bus",
-        location: location_text,
-        cause: cause_text,
-        routes: get_route_pills(t),
-        effect: :shuttle,
+        effect: effect,
         urgent: false
       }
     end
@@ -1246,11 +1217,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def priority(%__MODULE__{is_priority: true}), do: [1]
   def priority(_t), do: [3]
 
-  def slot_names(%__MODULE__{} = t) do
+  def slot_names(%__MODULE__{screen: %Screen{app_params: %PreFare{template: template}}} = t) do
     case placement(t) do
-      :dual_screen -> [:full_body_duo]
-      :single_screen -> [:paged_main_content_left]
-      :flex_zone -> [:large]
+      :dual_screen ->
+        [:full_body_duo]
+
+      :single_screen ->
+        if template == :duo, do: [:paged_main_content_left], else: [:full_body_right]
+
+      :flex_zone ->
+        [:large]
     end
   end
 
