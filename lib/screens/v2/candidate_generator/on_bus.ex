@@ -2,8 +2,8 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Widgets.OnBus
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.Placeholder
 
   @behaviour CandidateGenerator
 
@@ -26,26 +26,15 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(_config, query_params) do
-    [
-      fn -> body_instances(query_params) end
-    ]
+  def candidate_instances(
+        config,
+        query_params,
+        now \\ DateTime.utc_now(),
+        departures_instances_fn \\ &OnBus.Departures.departures_candidates/3
+      ) do
+    [fn -> departures_instances_fn.(config, query_params, now) end]
     |> Task.async_stream(& &1.())
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
-  end
-
-  def body_instances(query_params) do
-    [%Placeholder{color: :blue, slot_names: [:main_content], text: build_body_text(query_params)}]
-  end
-
-  defp build_body_text(query_params) do
-    "Route ID: " <>
-      (query_params.route_id || "N/A") <>
-      ", Stop ID:  " <>
-      (query_params.stop_id || "N/A") <>
-      ", Trip ID:  " <>
-      (query_params.trip_id || "N/A") <>
-      ", Vehicle ID:  " <> (query_params.vehicle_id || "N/A")
   end
 
   @impl CandidateGenerator
