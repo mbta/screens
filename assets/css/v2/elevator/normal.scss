@@ -1,6 +1,9 @@
 .screen-normal {
   position: relative;
+  display: flex;
+  flex-direction: column;
   width: 1080px;
+  height: 1920px;
   margin-right: auto;
   margin-left: auto;
 }
@@ -11,12 +14,13 @@
 }
 
 .screen-normal__body {
+  flex: 1;
   width: 1080px;
-  height: 100%;
 }
 
 .screen-normal__footer {
   position: relative;
+  flex: 0;
   width: 1080px;
-  height: 184px;
+  max-height: 184px;
 }

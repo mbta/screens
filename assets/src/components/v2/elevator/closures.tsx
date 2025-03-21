@@ -10,6 +10,7 @@ import { type StationWithClosures } from "Components/v2/elevator/types";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import CalendarIcon from "Images/svgr_bundled/calendar.svg";
 import NormalServiceIcon from "Images/svgr_bundled/normal-service.svg";
+import CalenderAlertIcon from "Images/svgr_bundled/calendar-alert.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import Logo from "Images/svgr_bundled/logo.svg";
 import { hasOverflowX } from "Util/utils";
@@ -141,7 +142,7 @@ const UpcomingClosure = ({
 
   return (
     <div className="upcoming-closure">
-      <AccessibilityAlert height={249} width={249} />
+      <CalenderAlertIcon height={249} width={249} />
       <div className="upcoming-closure__title" ref={titleRef}>
         {title}:
       </div>
@@ -172,13 +173,12 @@ const NoCurrentClosures = ({
     <>
       {closure ? (
         <div className="closures-info">
-          <div className="small-info-strip">
+          <div className="in-station-summary">
             <div>All MBTA elevators are working.</div>
             <div>
               <NormalServiceIcon width={72} height={72} fill="#145A06" />
             </div>
           </div>
-          <div className="small-info-strip__divider" />
           <UpcomingClosure closure={closure} />
         </div>
       ) : (
