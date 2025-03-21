@@ -119,7 +119,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   @type t :: %__MODULE__{
           app_params: Elevator.t(),
           now: DateTime.t(),
-          stations_with_closures: list(Station.t()),
+          stations_with_closures: list(Station.t()) | :no_closures,
           station_id: String.t(),
           upcoming_closure: Upcoming.t() | nil
         }
