@@ -76,7 +76,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
           upcoming |> Enum.flat_map(&elevator_closure/1) |> Enum.filter(at_this_elevator?)
 
         footer =
-          if relevant_closures ++ upcoming_closures == [], do: [], else: [%Footer{screen: config}]
+          if Enum.empty?(relevant_closures) and Enum.empty?(upcoming_closures),
+            do: [],
+            else: [%Footer{screen: config}]
 
         [
           elevator_closures(
@@ -162,7 +164,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
          [],
          _active_closures,
          upcoming_closures,
-         %ElevatorConfig{elevator_id: _elevator_id} = app_params,
+         app_params,
          now,
          stop_id
        ) do
