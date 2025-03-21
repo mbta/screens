@@ -162,7 +162,13 @@ const UpcomingClosure = ({
   );
 };
 
-const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
+const NoCurrentClosures = ({
+  closure,
+  status,
+}: {
+  closure?: UpcomingClosureInfo;
+  status: ClosuresStatus;
+}) => {
   return (
     <>
       {closure ? (
@@ -179,7 +185,10 @@ const NoCurrentClosures = ({ closure }: { closure?: UpcomingClosureInfo }) => {
         <div className="no-closures">
           <NormalServiceIcon height={150} width={150} fill="#145A06" />
           <div className="no-closures__header">
-            All MBTA elevators are working.
+            All MBTA elevators are working{" "}
+            {status === "nearby_redundancy" &&
+              " or have a backup elevator within 20 feet"}
+            .
           </div>
           <div className="divider" />
           <div className="no-closures__text">
@@ -213,7 +222,7 @@ const sortStations = (
     }
   });
 
-type ClosuresStatus = "no_closures";
+type ClosuresStatus = "no_closures" | "nearby_redundancy";
 
 interface Props extends WrappedComponentProps {
   id: string;
@@ -290,8 +299,8 @@ const Closures = ({
 
   return (
     <div className="elevator-closures">
-      {stations === "no_closures" ? (
-        <NoCurrentClosures closure={upcomingClosure} />
+      {stations === "no_closures" || stations === "nearby_redundancy" ? (
+        <NoCurrentClosures closure={upcomingClosure} status={stations} />
       ) : (
         <>
           <InStationSummary
