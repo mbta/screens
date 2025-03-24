@@ -4,9 +4,11 @@ on:
     types:
       - closed
       - converted_to_draft
+      - edited
       - opened
       - ready_for_review
       - reopened
+      - review_requested
 
 jobs:
   asana:
