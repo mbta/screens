@@ -456,16 +456,7 @@ config :screens,
     "Wickford Junction" => "Wickford Jct",
     "Needham Heights" => "Needham Hts",
     "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
-    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn",
-    "Middleborough/Lakeville" => "Middleborough / Lakeville",
-
-    # The following are special headsigns for the 2022 Orange Line surge
-    "Needham Heights via Ruggles" => "Needham Hts via Ruggles",
-    "Needham Heights via Forest Hills" => "Needham Hts via Forest Hills",
-    "Wickford Junction via Ruggles" => "Wickford Jct via Ruggles",
-    "Wickford Junction via Forest Hills" => "Wickford Jct via Forest Hills",
-    "Providence & Needham via Forest Hills" => "Providence via Forest Hills",
-    "Norwood Central via Ruggles" => "Norwood Cntrl via Ruggles"
+    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn"
   },
   dup_headway_branch_stations: ["place-kencl", "place-jfk", "place-coecl"],
   dup_headway_branch_terminals: [

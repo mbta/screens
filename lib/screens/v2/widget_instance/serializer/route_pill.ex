@@ -47,8 +47,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     "Haverhill" => "HVL",
     "Kingston" => "KNG",
     "Lowell" => "LWL",
-    "Middleborough" => "MID",
     "Needham" => "NDM",
+    "NewBedford" => "FRV",
     "Newburyport" => "NBP",
     "Providence" => "PVD",
     "Worcester" => "WOR"
