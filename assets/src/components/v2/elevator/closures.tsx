@@ -174,7 +174,12 @@ const NoCurrentClosures = ({
       {closure ? (
         <div className="closures-info">
           <div className="in-station-summary">
-            <div>All MBTA elevators are working.</div>
+            <div>
+              All MBTA elevators are working{" "}
+              {status === "nearby_redundancy" &&
+                " or have a backup elevator within 20 ft"}
+              .
+            </div>
             <div>
               <NormalServiceIcon width={72} height={72} fill="#145A06" />
             </div>

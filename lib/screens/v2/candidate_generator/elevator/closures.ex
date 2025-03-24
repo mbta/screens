@@ -162,7 +162,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   defp elevator_closures(
          [],
-         _active_closures,
+         active_closures,
          upcoming_closures,
          app_params,
          now,
@@ -173,7 +173,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       now: now,
       station_id: stop_id,
       stations_with_closures:
-        if(upcoming_closures !== [], do: :nearby_redundancy, else: :no_closures),
+        if(active_closures !== [], do: :nearby_redundancy, else: :no_closures),
       upcoming_closure: build_upcoming_closure(upcoming_closures)
     }
   end
