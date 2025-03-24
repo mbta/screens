@@ -639,7 +639,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  # Station closure for 1 line at a multi-line station
+  # This station closed for entire/only route
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, :inside) do
     %__MODULE__{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
@@ -661,7 +661,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
-      issue: nil,
+      issue: if(unaffected_routes == [], do: "Station closed"),
+      remedy: if(unaffected_routes == [], do: "Seek alternate route"),
       unaffected_routes:
         Enum.flat_map(unaffected_routes, fn route -> build_pills_from_headsign(route, nil) end),
       cause: get_cause(cause),

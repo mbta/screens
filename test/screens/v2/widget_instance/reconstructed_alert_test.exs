@@ -653,7 +653,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:unknown)
         |> put_is_priority(true)
 
-      expected = %{
+      diagram = %{
+        effect: :station_closure,
+        closed_station_slot_indices: [1],
+        line: :orange,
+        current_station_slot_index: 1,
+        slots: [
+          %{type: :terminal, label_id: "place-ogmnl"},
+          %{label: %{full: "Malden Center", abbrev: "Malden Ctr"}, show_symbol: true},
+          %{label: %{full: "Wellington", abbrev: "Wellington"}, show_symbol: true},
+          %{type: :terminal, label_id: "place-astao"}
+        ]
+      }
+
+      expected_duo = %{
         issue: "Station closed",
         location: %ScreensConfig.V2.FreeTextLine{
           icon: nil,
@@ -665,24 +678,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         updated_at: "Friday, 5:00 am",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
         other_closures: ["Malden Center"],
-        disruption_diagram: %{
-          effect: :station_closure,
-          closed_station_slot_indices: [1],
-          line: :orange,
-          current_station_slot_index: 1,
-          slots: [
-            %{type: :terminal, label_id: "place-ogmnl"},
-            %{label: %{full: "Malden Center", abbrev: "Malden Ctr"}, show_symbol: true},
-            %{label: %{full: "Wellington", abbrev: "Wellington"}, show_symbol: true},
-            %{type: :terminal, label_id: "place-astao"}
-          ]
-        }
+        disruption_diagram: diagram
       }
 
-      assert expected == ReconstructedAlert.serialize(widget)
+      expected_solo = %{
+        cause: nil,
+        effect: :station_closure,
+        region: :here,
+        disruption_diagram: diagram,
+        issue: "Station closed",
+        remedy: "Seek alternate route",
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        unaffected_routes: [],
+        updated_at: "Friday, 5:00 am"
+      }
 
-      assert %{effect: :station_closure, region: :here} =
-               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+      assert expected_duo == ReconstructedAlert.serialize(widget)
+      assert expected_solo == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
     test "boundary suspension with cause", %{widget: widget} do
@@ -1276,8 +1288,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: nil,
-        unaffected_routes: [%{route_id: "Red", svg_name: "rl"}],
+        remedy: nil,
         cause: nil,
+        unaffected_routes: [%{route_id: "Red", svg_name: "rl"}],
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :station_closure,
         updated_at: "Friday, 5:00 am",

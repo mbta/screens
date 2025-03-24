@@ -315,8 +315,14 @@ const MapSection: React.ComponentType<MapSectionProps> = ({
   );
 };
 
-const isMultiLine = (effect: string, region: string) =>
-  effect === "station_closure" && region === "here";
+const isMultiLine = (
+  effect: string,
+  region: string,
+  unaffectedRoutes: EnrichedRoute[],
+) =>
+  effect === "station_closure" &&
+  region === "here" &&
+  unaffectedRoutes.length > 0;
 
 const PreFareSingleScreenAlert: React.ComponentType<
   PreFareSingleScreenAlertProps
@@ -359,11 +365,22 @@ const PreFareSingleScreenAlert: React.ComponentType<
         />
       );
       break;
-    case effect === "station_closure" && region === "here":
+    case isMultiLine(effect, region, unaffected_routes):
       layout = (
         <MultiLineLayout
           routes={routes}
           unaffected_routes={unaffected_routes}
+          disruptionDiagram={disruption_diagram}
+        />
+      );
+      break;
+    case effect === "station_closure" && region === "here":
+      layout = (
+        <StandardLayout
+          issue={issue}
+          remedy={remedy}
+          effect={effect}
+          location={location}
           disruptionDiagram={disruption_diagram}
         />
       );
@@ -414,7 +431,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
       );
   }
 
-  const showBanner = !isMultiLine(effect, region);
+  const showBanner = !isMultiLine(effect, region, unaffected_routes);
 
   return (
     <div className="pre-fare-alert__page">
