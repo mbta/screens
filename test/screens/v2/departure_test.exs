@@ -85,7 +85,7 @@ defmodule Screens.V2.DepartureTest do
       assert nil == Departure.crowding_level(departure)
     end
 
-    test "returns nil when the vehicle is in transit to the first stop" do
+    test "returns nil when the vehicle is at the first stop" do
       trip = %Trip{id: "trip-1", stops: ["1", "2", "3"]}
 
       vehicle = %Vehicle{
