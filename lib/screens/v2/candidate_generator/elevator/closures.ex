@@ -65,13 +65,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     active_closures = Enum.flat_map(active, &elevator_closure/1)
     at_this_elevator? = fn %Closure{id: id} -> id == elevator_id end
 
-    {:ok, %Stop{id: stop_id}} = @facility.fetch_stop_for_facility(elevator_id)
-
-    relevant_closures =
-      Enum.filter(active_closures, &relevant_closure?(&1, stop_id, active_closures))
-
     case Enum.find(active_closures, at_this_elevator?) do
       nil ->
+        {:ok, %Stop{id: stop_id}} = @facility.fetch_stop_for_facility(elevator_id)
+
+        relevant_closures =
+          Enum.filter(active_closures, &relevant_closure?(&1, stop_id, active_closures))
+
         upcoming_closures =
           upcoming |> Enum.flat_map(&elevator_closure/1) |> Enum.filter(at_this_elevator?)
 
@@ -82,17 +82,14 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
         [
           elevator_closures(
-            relevant_closures,
             active_closures,
+            relevant_closures,
             upcoming_closures,
             app_params,
             now,
             stop_id
           ),
-          header_instances(
-            config,
-            now
-          )
+          header_instances(config, now)
           | footer
         ]
 
@@ -161,26 +158,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   defp elevator_closure(_alert), do: []
 
   defp elevator_closures(
-         [],
          active_closures,
-         upcoming_closures,
-         app_params,
-         now,
-         stop_id
-       ) do
-    %ElevatorClosures{
-      app_params: app_params,
-      now: now,
-      station_id: stop_id,
-      stations_with_closures:
-        if(active_closures !== [], do: :nearby_redundancy, else: :no_closures),
-      upcoming_closure: build_upcoming_closure(upcoming_closures)
-    }
-  end
-
-  defp elevator_closures(
          relevant_closures,
-         active_closures,
          upcoming_closures,
          %ElevatorConfig{elevator_id: elevator_id} = app_params,
          now,
@@ -195,8 +174,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       station_id: stop_id,
       stations_with_closures:
         build_stations_with_closures(
-          relevant_closures,
           active_closures,
+          relevant_closures,
           station_names,
           station_route_pills,
           elevator_id
@@ -221,9 +200,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     end
   end
 
+  defp build_stations_with_closures([] = _active_closures, _, _, _, _), do: :no_closures
+  defp build_stations_with_closures(_, [] = _relevant_closures, _, _, _), do: :nearby_redundancy
+
   defp build_stations_with_closures(
-         relevant_closures,
          active_closures,
+         relevant_closures,
          station_names,
          station_route_pills,
          elevator_id
