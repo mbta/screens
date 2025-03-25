@@ -300,7 +300,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       case redundancy do
         # `nil` indicates the specially-formatted in-station summary text for active closures.
         type when type in ~w[nearby in_station]a -> nil
-        {:other, summary} -> summary
+        # TEMP: Use fallback text instead of actual exiting summary. These are worded in a way
+        # that only makes sense when using the elevator to exit the station, but it might not be
+        # possible for a rider to get into that situation if they enter the system at the station
+        # where this summary is being displayed (without doubling back on themselves). Temporarily
+        # disabled until we implement logic to determine when showing this summary is appropriate.
+        {:other, _summary} -> @active_summary_fallback
       end
     end
   end

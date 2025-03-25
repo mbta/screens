@@ -415,7 +415,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                    %ElevatorClosures.Station{
                      id: "place-2",
                      closures: [%Closure{id: "2"}],
-                     summary: "some summary"
+                     # TEMP: currently not using exiting summaries, see implementation for details
+                     summary: "Visit mbta.com/elevators for more info"
                    },
                    %ElevatorClosures.Station{
                      id: "place-3",
