@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   alias Screens.V2.WidgetInstance.Elevator.Closure
   alias Screens.V2.WidgetInstance.ElevatorClosures
   alias Screens.V2.WidgetInstance.ElevatorClosures.{Station, Upcoming}
-  alias ScreensConfig.V2.Elevator
+  alias ScreensConfig.Screen.Elevator
 
   @instance %ElevatorClosures{
     app_params: %Elevator{

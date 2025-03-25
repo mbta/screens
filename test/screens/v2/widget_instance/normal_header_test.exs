@@ -1,8 +1,9 @@
 defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.V2.{GlEink, Header}
   alias Screens.V2.WidgetInstance
+  alias ScreensConfig.Header
+  alias ScreensConfig.Screen.GlEink
 
   setup do
     %{

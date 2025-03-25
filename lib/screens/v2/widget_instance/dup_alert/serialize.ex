@@ -6,7 +6,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   alias Screens.Alerts.Alert
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert
-  alias ScreensConfig.V2.FreeTextLine
+  alias ScreensConfig.FreeTextLine
 
   @type full_screen_alert_map :: %{
           text: FreeTextLine.t(),

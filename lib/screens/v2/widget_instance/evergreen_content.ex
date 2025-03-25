@@ -3,8 +3,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
 
   alias Screens.Util
   alias Screens.V2.WidgetInstance
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{RecurrentSchedule, Schedule}
+  alias ScreensConfig.{RecurrentSchedule, Schedule, Screen}
 
   @enforce_keys ~w[screen slot_names asset_url priority now]a
   defstruct screen: nil,

@@ -5,9 +5,9 @@ defmodule Screens.V2.CandidateGenerator.Busway do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.NormalHeader
+  alias ScreensConfig.Header.CurrentStopName
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Busway
-  alias ScreensConfig.V2.Header.CurrentStopName
+  alias ScreensConfig.Screen.Busway
 
   @behaviour CandidateGenerator
 

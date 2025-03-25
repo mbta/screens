@@ -18,8 +18,8 @@ defmodule Screens.V2.RDS do
   alias Screens.Stops.Stop
   alias Screens.V2.Departure
 
-  alias ScreensConfig.V2.Departures
-  alias ScreensConfig.V2.Departures.{Query, Section}
+  alias ScreensConfig.Departures
+  alias ScreensConfig.Departures.{Query, Section}
 
   alias __MODULE__.NoDepartures
 

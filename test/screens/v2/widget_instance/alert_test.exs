@@ -1,14 +1,13 @@
 defmodule Screens.V2.WidgetInstance.AlertTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.V2.Audio
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{BusEink, BusShelter, GlEink}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
+  alias ScreensConfig.{Audio, Screen}
+  alias ScreensConfig.Screen.{BusEink, BusShelter, GlEink}
 
   setup :setup_base
 

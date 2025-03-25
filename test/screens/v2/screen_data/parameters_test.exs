@@ -1,9 +1,10 @@
 defmodule Screens.V2.ScreenData.ParametersTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.ScreenData.{Parameters, Static}
   alias Screens.V2.ScreenData.Static.PeriodicAudio
+  alias ScreensConfig, as: Config
+  alias ScreensConfig.Screen
 
   defp build_params(static_fields) do
     %{bus_shelter_v2: struct!(%Static{candidate_generator: nil, refresh_rate: 0}, static_fields)}
@@ -26,12 +27,12 @@ defmodule Screens.V2.ScreenData.ParametersTest do
       app_id: :bus_shelter_v2,
       app_params:
         struct!(
-          %V2.BusShelter{
-            alerts: %V2.Alerts{stop_id: "1"},
-            departures: %V2.Departures{sections: []},
-            footer: %V2.Footer{},
-            header: %V2.Header.CurrentStopId{stop_id: "1"},
-            audio: %V2.Audio{
+          %Screen.BusShelter{
+            alerts: %Config.Alerts{stop_id: "1"},
+            departures: %Config.Departures{sections: []},
+            footer: %Config.Footer{},
+            header: %Config.Header.CurrentStopId{stop_id: "1"},
+            audio: %Config.Audio{
               interval_enabled: true
             }
           },
@@ -76,7 +77,7 @@ defmodule Screens.V2.ScreenData.ParametersTest do
     end
 
     test "is nil for a screen with audio interval disabled" do
-      screen = build_screen(%{audio: %V2.Audio{interval_enabled: false}})
+      screen = build_screen(%{audio: %Config.Audio{interval_enabled: false}})
       assert Parameters.audio_interval_minutes(screen) == nil
     end
   end
@@ -88,7 +89,7 @@ defmodule Screens.V2.ScreenData.ParametersTest do
     end
 
     test "is the configured offset for a screen with periodic audio" do
-      screen = build_screen(audio: %V2.Audio{interval_offset_seconds: 90})
+      screen = build_screen(audio: %Config.Audio{interval_offset_seconds: 90})
       assert Parameters.audio_interval_offset_seconds(screen) == 90
     end
   end

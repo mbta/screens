@@ -1,12 +1,12 @@
 defmodule Screens.V2.CandidateGenerator.DupTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Alerts, Departures, Header}
-  alias ScreensConfig.V2.Dup, as: DupConfig
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.NormalHeader
+  alias ScreensConfig.{Alerts, Departures, Header}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.Screen.Dup, as: DupConfig
 
   setup do
     config = %Screen{

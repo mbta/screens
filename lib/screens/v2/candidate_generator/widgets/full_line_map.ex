@@ -3,8 +3,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.FullLineMap do
 
   alias Screens.Util.Assets
   alias Screens.V2.WidgetInstance.FullLineMap, as: FullLineMapWidget
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{FullLineMap, PreFare}
+  alias ScreensConfig.{FullLineMap, Screen}
+  alias ScreensConfig.Screen.PreFare
 
   def full_line_map_instances(
         %Screen{app_params: %PreFare{full_line_map: full_line_map}} = config

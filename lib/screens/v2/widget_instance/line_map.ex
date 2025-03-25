@@ -7,7 +7,7 @@ defmodule Screens.V2.WidgetInstance.LineMap do
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.LineMap
   alias Screens.Vehicles.Vehicle
-  alias ScreensConfig.{Screen, V2}
+  alias ScreensConfig.Screen
 
   defstruct screen: nil,
             stops: [],
@@ -36,8 +36,8 @@ defmodule Screens.V2.WidgetInstance.LineMap do
           now \\ DateTime.utc_now()
         ) do
       %Screen{
-        app_params: %V2.GlEink{
-          line_map: %V2.LineMap{stop_id: current_stop, direction_id: direction_id}
+        app_params: %Screen.GlEink{
+          line_map: %ScreensConfig.LineMap{stop_id: current_stop, direction_id: direction_id}
         }
       } = config
 
