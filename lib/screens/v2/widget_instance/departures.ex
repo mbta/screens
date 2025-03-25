@@ -12,17 +12,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Departures.Header
-  alias ScreensConfig.V2.Departures.Layout
-  alias ScreensConfig.V2.FreeTextLine
+  alias ScreensConfig.Departures.Header
+  alias ScreensConfig.Departures.Layout
+  alias ScreensConfig.{FreeTextLine, Screen}
 
   defmodule NormalSection do
     @moduledoc "Section which includes a number of independent 'rows' or items."
     alias Screens.V2.Departure
-    alias ScreensConfig.V2.Departures.Header
-    alias ScreensConfig.V2.Departures.Layout
-    alias ScreensConfig.V2.FreeTextLine
+    alias ScreensConfig.Departures.Header
+    alias ScreensConfig.Departures.Layout
+    alias ScreensConfig.FreeTextLine
 
     @type row :: Departure.t() | FreeTextLine.t()
 

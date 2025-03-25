@@ -7,7 +7,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
   """
 
   alias Screens.V2.WidgetInstance
-  alias ScreensConfig.V2.FreeText
+  alias ScreensConfig.{FreeText, FreeTextLine}
 
   @enforce_keys [:alert_ids, :slot_names, :widget_type, :special_case]
   defstruct @enforce_keys ++ [:branches]
@@ -30,7 +30,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
     case t do
       %{special_case: :kenmore_westbound_shuttles, widget_type: :partial_alert} ->
         %{
-          text: %ScreensConfig.V2.FreeTextLine{
+          text: %FreeTextLine{
             icon: :warning,
             text: get_kenmore_special_text(t.branches, :partial_alert)
           },
@@ -39,12 +39,12 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
 
       %{special_case: :kenmore_westbound_shuttles, widget_type: :takeover_alert} ->
         %{
-          text: %ScreensConfig.V2.FreeTextLine{
+          text: %FreeTextLine{
             icon: :warning,
             text: get_kenmore_special_text(t.branches, :takeover_alert)
           },
           header: %{color: :green, text: "Kenmore"},
-          remedy: %ScreensConfig.V2.FreeTextLine{
+          remedy: %FreeTextLine{
             icon: :shuttle,
             text: [%{format: :bold, text: "Use shuttle bus"}]
           }
@@ -52,12 +52,9 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
 
       %{special_case: :wtc_detour} ->
         %{
-          text: %ScreensConfig.V2.FreeTextLine{
-            icon: :warning,
-            text: ["Building closed"]
-          },
+          text: %FreeTextLine{icon: :warning, text: ["Building closed"]},
           header: %{color: :silver, text: "World Trade Ctr"},
-          remedy: %ScreensConfig.V2.FreeTextLine{
+          remedy: %FreeTextLine{
             icon: :shuttle,
             text: [%{format: :bold, text: "Board Silver Line on street"}]
           }

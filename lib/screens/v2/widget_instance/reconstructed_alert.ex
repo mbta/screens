@@ -12,8 +12,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{CRDepartures, FreeText, FreeTextLine, PreFare}
+  alias ScreensConfig.{CRDepartures, FreeText, FreeTextLine, Screen}
+  alias ScreensConfig.Screen.PreFare
 
   defstruct screen: nil,
             alert: nil,

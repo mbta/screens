@@ -2,9 +2,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{ContentSummary, CRDepartures, ElevatorStatus, PreFare}
-  alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Subway
@@ -12,6 +9,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
+  alias ScreensConfig.{ContentSummary, CRDepartures, ElevatorStatus, Screen}
+  alias ScreensConfig.Header.CurrentStopId
+  alias ScreensConfig.Screen.PreFare
 
   setup :setup_base
 
@@ -668,7 +668,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected_duo = %{
         issue: "Station closed",
-        location: %ScreensConfig.V2.FreeTextLine{
+        location: %ScreensConfig.FreeTextLine{
           icon: nil,
           text: ["Orange Line trains skip ", %{format: :nowrap, text: "Malden Center"}]
         },

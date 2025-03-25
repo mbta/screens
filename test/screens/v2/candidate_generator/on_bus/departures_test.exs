@@ -13,7 +13,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias Screens.V2.WidgetInstance.DeparturesNoService
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.OnBus
+  alias ScreensConfig.Screen.OnBus
 
   import ExUnit.CaptureLog
   import Mox

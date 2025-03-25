@@ -9,7 +9,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   alias Screens.V2.WidgetInstance.Elevator.Closure
   alias Screens.V2.WidgetInstance.{ElevatorAlternatePath, ElevatorClosures, Footer, NormalHeader}
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Elevator, as: ElevatorConfig
+  alias ScreensConfig.Screen.Elevator, as: ElevatorConfig
 
   import ExUnit.CaptureLog
   import Screens.Inject

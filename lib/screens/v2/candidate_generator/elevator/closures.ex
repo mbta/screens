@@ -39,7 +39,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias Screens.V2.WidgetInstance.{ElevatorAlternatePath, ElevatorClosures, Footer, NormalHeader}
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Elevator, as: ElevatorConfig
+  alias ScreensConfig.Screen.Elevator, as: ElevatorConfig
 
   import Screens.Inject
 

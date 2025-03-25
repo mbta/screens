@@ -8,7 +8,7 @@ defmodule Screens.LocationContext do
   alias Screens.Stops.Stop
   alias Screens.Util
 
-  alias ScreensConfig.V2.{BusEink, BusShelter, Dup, GlEink, PreFare}
+  alias ScreensConfig.Screen.{BusEink, BusShelter, Dup, GlEink, PreFare}
 
   @enforce_keys [:home_stop]
   defstruct home_stop: "",

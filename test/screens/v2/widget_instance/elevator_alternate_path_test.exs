@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorAlternatePathTest do
 
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ElevatorAlternatePath
-  alias ScreensConfig.V2.Elevator
+  alias ScreensConfig.Screen.Elevator
 
   setup do
     %{

@@ -6,9 +6,10 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{BottomScreenFiller, FareInfoFooter, NormalHeader}
+  alias ScreensConfig.Footer
+  alias ScreensConfig.Header.CurrentStopId
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{BusEink, Footer}
-  alias ScreensConfig.V2.Header.CurrentStopId
+  alias ScreensConfig.Screen.BusEink
 
   @behaviour CandidateGenerator
 

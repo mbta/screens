@@ -1,12 +1,12 @@
 defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Alerts, Departures, Dup, FreeTextLine}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
+  alias ScreensConfig.{Alerts, Departures, FreeTextLine, Screen}
+  alias ScreensConfig.Screen.Dup
 
   defp routes("place-kencl") do
     [
@@ -1187,12 +1187,9 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         )
 
       expected_serialized_json = %{
-        text: %ScreensConfig.V2.FreeTextLine{
-          icon: :warning,
-          text: ["Building closed"]
-        },
+        text: %FreeTextLine{icon: :warning, text: ["Building closed"]},
         header: %{color: :silver, text: "World Trade Ctr"},
-        remedy: %ScreensConfig.V2.FreeTextLine{
+        remedy: %FreeTextLine{
           icon: :shuttle,
           text: [%{format: :bold, text: "Board Silver Line on street"}]
         }

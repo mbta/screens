@@ -1,21 +1,21 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.BusShelter
-  alias ScreensConfig.V2.Departures.Filters.RouteDirections
-  alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
-  alias ScreensConfig.V2.Departures.{Filters, Header, Layout, Query, Section}
-  alias ScreensConfig.V2.Departures, as: DeparturesConfig
-  alias ScreensConfig.V2.FreeTextLine
+  alias Screens.Predictions.Prediction
+  alias Screens.Routes.Route
+  alias Screens.Trips.Trip
   alias Screens.V2.CandidateGenerator.Widgets.Departures
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
-  alias Screens.Predictions.Prediction
-  alias Screens.Routes.Route
-  alias Screens.Trips.Trip
+  alias ScreensConfig.Departures.Filters.RouteDirections
+  alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
+  alias ScreensConfig.Departures.{Filters, Header, Layout, Query, Section}
+  alias ScreensConfig.Departures, as: DeparturesConfig
+  alias ScreensConfig.FreeTextLine
+  alias ScreensConfig.Screen
+  alias ScreensConfig.Screen.BusShelter
 
   defp build_departure(
          route_id,

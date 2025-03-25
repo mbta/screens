@@ -5,12 +5,11 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias ScreensConfig.V2.Departures
-  alias ScreensConfig.V2.Departures.{Query, Section}
-  alias ScreensConfig.V2.Departures.Query.Params
-  alias ScreensConfig.V2.FreeTextLine
-  alias ScreensConfig.{Screen, V2}
-  alias ScreensConfig.V2.{Footer, GlEink, Header}
+  alias ScreensConfig.{Departures, Footer, Header}
+  alias ScreensConfig.Departures.{Query, Section}
+  alias ScreensConfig.Departures.Query.Params
+  alias ScreensConfig.{FreeTextLine, Screen}
+  alias ScreensConfig.Screen.GlEink
 
   alias Screens.V2.WidgetInstance.{
     BottomScreenFiller,
@@ -108,7 +107,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   defp line_map_instances(
          %Screen{
            app_params: %GlEink{
-             line_map: %V2.LineMap{
+             line_map: %ScreensConfig.LineMap{
                station_id: station_id,
                direction_id: direction_id,
                route_id: route_id

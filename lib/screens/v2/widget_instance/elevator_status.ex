@@ -80,8 +80,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   alias Screens.LocationContext
   alias Screens.V2.AlertsWidget
   alias Screens.V2.LocalizedAlert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{ElevatorStatus, PreFare}
+  alias ScreensConfig.{ElevatorStatus, Screen}
+  alias ScreensConfig.Screen.PreFare
 
   defstruct screen: nil,
             now: nil,

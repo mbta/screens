@@ -9,9 +9,9 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias Screens.V2.WidgetInstance.NormalHeader
   alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Header.CurrentStopId
-  alias ScreensConfig.V2.{PreFare, ShuttleBusInfo}
+  alias ScreensConfig.Header.CurrentStopId
+  alias ScreensConfig.{Screen, ShuttleBusInfo}
+  alias ScreensConfig.Screen.PreFare
 
   @behaviour CandidateGenerator
 
