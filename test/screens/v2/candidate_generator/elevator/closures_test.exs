@@ -72,6 +72,22 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
   describe "header and footer" do
     test "have no variant when current elevator is not closed", %{now: now} do
+      expect(@stop, :fetch_parent_station_name_map, fn ->
+        {:ok, %{"place-haecl" => "Haymarket"}}
+      end)
+
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          build_alert(
+            informed_entities: [
+              %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-2"}}
+            ]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
       assert [
                _elevator_closures,
                %NormalHeader{screen: @screen, text: "Elevator 111", time: ^now, variant: nil},
@@ -92,6 +108,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       assert [_current_closed, %NormalHeader{variant: :closed}, %Footer{variant: :closed}] =
                Generator.elevator_status_instances(@screen, now)
+    end
+
+    test "have footer not displayed and header with no variant when all elevators are working", %{
+      now: now
+    } do
+      assert [
+               _elevator_closures,
+               %NormalHeader{screen: @screen, text: "Elevator 111", time: ^now, variant: nil}
+             ] = Generator.elevator_status_instances(@screen, now)
     end
   end
 
@@ -212,13 +237,32 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
              ] = Generator.elevator_status_instances(@screen, now)
     end
 
-    test "filters out alerts with no facilities or more than one facility", %{now: now} do
-      expect(@stop, :fetch_parent_station_name_map, fn ->
-        {:ok, %{"place-haecl" => "Haymarket"}}
+    test "uses :no_closures when all elevators are working", %{now: now} do
+      assert [%ElevatorClosures{stations_with_closures: :no_closures} | _] =
+               Generator.elevator_status_instances(@screen, now)
+    end
+
+    test "uses :nearby_redundancy when all closed elevators have nearby redundancy", %{now: now} do
+      stub(@elevator, :get, fn
+        "111" -> build_elevator("111")
+        "222" -> build_elevator("222", exiting_redundancy: :nearby)
       end)
 
-      expect(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          build_alert(
+            informed_entities: [%{stop: "place-other", facility: %{name: "Elevator", id: "222"}}]
+          )
+        ]
 
+        {:ok, alerts}
+      end)
+
+      assert [%ElevatorClosures{stations_with_closures: :nearby_redundancy} | _] =
+               Generator.elevator_status_instances(@screen, now)
+    end
+
+    test "filters out alerts with no facilities or more than one facility", %{now: now} do
       expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
         alerts = [
           build_alert(informed_entities: [%{stop: "place-haecl", facility: nil}]),
@@ -235,7 +279,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
       logs =
         capture_log([level: :warning], fn ->
-          assert [%ElevatorClosures{stations_with_closures: []} | _] =
+          assert [%ElevatorClosures{stations_with_closures: :no_closures} | _] =
                    Generator.elevator_status_instances(@screen, now)
         end)
 
@@ -371,7 +415,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                    %ElevatorClosures.Station{
                      id: "place-2",
                      closures: [%Closure{id: "2"}],
-                     summary: "some summary"
+                     # TEMP: currently not using exiting summaries, see implementation for details
+                     summary: "Visit mbta.com/elevators for more info"
                    },
                    %ElevatorClosures.Station{
                      id: "place-3",

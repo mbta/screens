@@ -46,7 +46,6 @@ updates:
           - "@jest*"
       babel:
         patterns:
-          - "babel*"
           - "@babel*"
       webpack:
         patterns:
