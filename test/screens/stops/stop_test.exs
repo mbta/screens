@@ -4,7 +4,13 @@ defmodule Screens.Stops.StopTest do
   alias Screens.Stops.Stop
 
   describe "fetch/2" do
-    defp stop_data(id, attributes, parent_station_ref \\ nil, child_stop_refs \\ nil) do
+    defp stop_data(
+           id,
+           attributes,
+           parent_station_ref \\ nil,
+           child_stop_refs \\ nil,
+           connecting_stop_refs \\ nil
+         ) do
       data =
         %{
           "id" => id,
@@ -25,10 +31,17 @@ defmodule Screens.Stops.StopTest do
           }
         }
 
-      if is_nil(child_stop_refs) do
-        data
+      data_child =
+        if is_nil(child_stop_refs) do
+          data
+        else
+          put_in(data, ~w[relationships child_stops], %{"data" => child_stop_refs})
+        end
+
+      if is_nil(connecting_stop_refs) do
+        data_child
       else
-        put_in(data, ~w[relationships child_stops], %{"data" => child_stop_refs})
+        put_in(data_child, ~w[relationships connecting_stops], %{"data" => connecting_stop_refs})
       end
     end
 
@@ -41,21 +54,28 @@ defmodule Screens.Stops.StopTest do
       get_json_fn =
         fn "stops",
            %{
-             "filter[id]" => "s1,p1,p2,c3",
-             "include" => "child_stops,parent_station.child_stops"
+             "filter[id]" => "s1,s2,p1,p2,c3",
+             "include" =>
+               "child_stops,connecting_stops,parent_station.child_stops,parent_station.connecting_stops"
            } ->
           {
             :ok,
             %{
               "data" => [
                 stop_data("s1", %{}),
-                stop_data("p1", %{"location_type" => 1}, nil, [stop_ref("c1"), stop_ref("c2")]),
+                stop_data("s2", %{}, nil, [], [stop_ref("conn2"), stop_ref("conn3")]),
+                stop_data("p1", %{"location_type" => 1}, nil, [stop_ref("c1"), stop_ref("c2")], [
+                  stop_ref("conn1")
+                ]),
                 stop_p2,
                 stop_c3
               ],
               "included" => [
                 stop_data("c1", %{}, stop_ref("p1")),
                 stop_data("c2", %{}, stop_ref("p1")),
+                stop_data("conn1", %{}, stop_ref("p1")),
+                stop_data("conn2", %{}, stop_ref("s2")),
+                stop_data("conn3", %{}, stop_ref("s2")),
                 stop_c3,
                 stop_p2
               ]
@@ -74,12 +94,26 @@ defmodule Screens.Stops.StopTest do
                    vehicle_type: :bus
                  },
                  %Stop{
+                   id: "s2",
+                   location_type: 0,
+                   parent_station: nil,
+                   child_stops: [],
+                   connecting_stops: [
+                     %Stop{id: "conn2", parent_station: :unloaded},
+                     %Stop{id: "conn3", parent_station: :unloaded}
+                   ],
+                   vehicle_type: :bus
+                 },
+                 %Stop{
                    id: "p1",
                    location_type: 1,
                    parent_station: nil,
                    child_stops: [
                      %Stop{id: "c1", parent_station: :unloaded},
                      %Stop{id: "c2", parent_station: :unloaded}
+                   ],
+                   connecting_stops: [
+                     %Stop{id: "conn1", parent_station: :unloaded}
                    ]
                  },
                  %Stop{
@@ -98,7 +132,7 @@ defmodule Screens.Stops.StopTest do
                    }
                  }
                ]
-             } = Stop.fetch(%{ids: ~w[s1 p1 p2 c3]}, true, get_json_fn)
+             } = Stop.fetch(%{ids: ~w[s1 s2 p1 p2 c3]}, true, get_json_fn)
     end
   end
 end
