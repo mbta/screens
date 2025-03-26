@@ -38,7 +38,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
       {:ok,
        departures
        |> filter_current_route(route_id)
-       |> filter_duplicates()
+       |> filter_duplicate_routes()
        |> sort_by_mode()}
     end
   end
@@ -82,16 +82,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     Enum.filter(departures, &(&1.prediction.route.id != route_id))
   end
 
-  defp filter_duplicates(departures) do
+  defp filter_duplicate_routes(departures) do
     unique_departures =
       Enum.uniq_by(departures, fn dep ->
         {dep.prediction.route.id, dep.prediction.trip.direction_id}
       end)
 
-    # Return at least 3 departures, even if there are not enough unique routes
+    # Return at least 3 departures if they exist, even if there are not enough unique routes
     case length(unique_departures) do
-      count when count >= 3 -> unique_departures
-      _ -> Enum.take(departures, 3)
+      count when count >= 3 ->
+        unique_departures
+
+      _ ->
+        unique_departures ++
+          Enum.take(departures -- unique_departures, 3 - length(unique_departures))
     end
   end
 

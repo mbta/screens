@@ -245,6 +245,42 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
              ] =
                departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
     end
+
+    test "When only 2 unique route/directions, return 3 stops, including one of each" do
+      route_id = "66"
+      stop_id = "22549"
+
+      stub(@stop, :fetch, fn %{ids: [^stop_id]}, _ ->
+        {:ok, [build_stop(stop_id)]}
+      end)
+
+      priority_departures = [
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:51:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:52:00Z]),
+        build_departure("86", 1, :bus, ~U[2024-01-01 11:59:00Z])
+      ]
+
+      # earlier departures also with direction_id of 0
+      additional_departures = [
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:53:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:54:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:55:00Z])
+      ]
+
+      stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->
+        {:ok, priority_departures ++ additional_departures}
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 screen: @config,
+                 sections: [
+                   %NormalSection{rows: ^priority_departures}
+                 ]
+               }
+             ] =
+               departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
+    end
   end
 
   describe "fetch_connecting_stops/1 behavior within departures_candidates/3 " do
