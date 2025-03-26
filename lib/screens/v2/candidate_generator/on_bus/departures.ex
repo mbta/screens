@@ -44,7 +44,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   @spec fetch_connecting_stops(String.t()) :: nonempty_list(String.t())
-  def fetch_connecting_stops(stop_id) do
+  defp fetch_connecting_stops(stop_id) do
     case @stop.fetch(%{ids: [stop_id]}, true) do
       {:ok, stops} ->
         List.flatten([
