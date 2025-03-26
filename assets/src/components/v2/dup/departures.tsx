@@ -5,6 +5,7 @@ import NormalSection from "./departures/normal_section";
 import HeadwaySection from "./departures/headway_section";
 import NoDataSection from "./departures/no_data_section";
 import OvernightSection from "./departures/overnight_section";
+import DeparturesHeader from "../on_bus/departures_header";
 
 type Section =
   | SectionBase
@@ -14,11 +15,13 @@ type Section =
 
 interface Props {
   sections: Section[];
+  includeHeader: boolean;
 }
 
-const Departures: ComponentType<Props> = ({ sections }) => {
+const Departures: ComponentType<Props> = ({ sections, includeHeader = false}) => {
   return (
     <div className="departures-container">
+      {includeHeader && <div className="departures-header"><DeparturesHeader/></div>}
       <div className="departures">
         {sections.map((section, i) => {
           switch (section.type) {

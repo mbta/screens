@@ -31,7 +31,7 @@ const DepartureRow: ComponentType<DepartureRow> = ({
       </div>
       <div className="departure-row__time">
         
-        <DepartureTimes timesWithCrowding={timesWithCrowding} //TODO: Don't need crowding /> 
+        <DepartureTimes timesWithCrowding={timesWithCrowding} /> 
       </div>
     </div>
   );
