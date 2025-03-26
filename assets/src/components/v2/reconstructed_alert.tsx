@@ -76,7 +76,7 @@ const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
               </div>
               <div className="alert-card__body__remedy">
                 {remedy}
-                {effect === "shuttle" && (
+                {remedy && effect === "shuttle" && (
                   <img
                     className="alert-card__body__isa-icon"
                     src={imagePath("ISA_Blue.svg")}

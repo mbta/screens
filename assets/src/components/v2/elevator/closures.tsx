@@ -9,9 +9,10 @@ import PagingIndicators from "Components/v2/elevator/paging_indicators";
 import { type StationWithClosures } from "Components/v2/elevator/types";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import CalendarIcon from "Images/svgr_bundled/calendar.svg";
-import CalendarAlertIcon from "Images/svgr_bundled/calendar-alert.svg";
 import NormalServiceIcon from "Images/svgr_bundled/normal-service.svg";
+import CalenderAlertIcon from "Images/svgr_bundled/calendar-alert.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
+import Logo from "Images/svgr_bundled/logo.svg";
 import { hasOverflowX } from "Util/utils";
 import { CLOSURES_PAGING_INTERVAL_MS } from "./constants";
 
@@ -141,7 +142,7 @@ const UpcomingClosure = ({
 
   return (
     <div className="upcoming-closure">
-      <CalendarAlertIcon width={224} />
+      <CalenderAlertIcon height={249} width={249} />
       <div className="upcoming-closure__title" ref={titleRef}>
         {title}:
       </div>
@@ -158,6 +159,52 @@ const UpcomingClosure = ({
 
       <div className="upcoming-closure__postfix">{postfix}</div>
     </div>
+  );
+};
+
+const NoCurrentClosures = ({
+  closure,
+  status,
+}: {
+  closure?: UpcomingClosureInfo;
+  status: ClosuresStatus;
+}) => {
+  return (
+    <>
+      {closure ? (
+        <div className="closures-info">
+          <div className="in-station-summary">
+            <div>
+              All MBTA elevators are working{" "}
+              {status === "nearby_redundancy" &&
+                " or have a backup elevator within 20 ft"}
+              .
+            </div>
+            <div>
+              <NormalServiceIcon width={72} height={72} fill="#145A06" />
+            </div>
+          </div>
+          <UpcomingClosure closure={closure} />
+        </div>
+      ) : (
+        <div className="no-closures">
+          <NormalServiceIcon height={150} width={150} fill="#145A06" />
+          <div className="no-closures__header">
+            All MBTA elevators are working{" "}
+            {status === "nearby_redundancy" &&
+              " or have a backup elevator within 20 feet"}
+            .
+          </div>
+          <div className="divider" />
+          <div className="no-closures__text">
+            For info on elevator outages and alternate paths:{" "}
+            <b>mbta.com/elevators</b> or call the elevator hotline:{" "}
+            <b>617-222-2828</b>
+          </div>
+          <Logo height={124} width={124} />
+        </div>
+      )}
+    </>
   );
 };
 
@@ -180,9 +227,11 @@ const sortStations = (
     }
   });
 
+type ClosuresStatus = "no_closures" | "nearby_redundancy";
+
 interface Props extends WrappedComponentProps {
   id: string;
-  stations_with_closures: StationWithClosures[];
+  stations_with_closures: StationWithClosures[] | ClosuresStatus;
   station_id: string;
   upcoming_closure?: UpcomingClosureInfo;
 }
@@ -193,9 +242,11 @@ const Closures = ({
   upcoming_closure: upcomingClosure,
   updateVisibleData,
 }: Props) => {
-  const numClosuresInStation = stations
-    .filter((s) => s.id === stationId)
-    .flatMap((s) => s.closures).length;
+  const numClosuresInStation =
+    typeof stations === "string"
+      ? 0
+      : stations.filter((s) => s.id === stationId).flatMap((s) => s.closures)
+          .length;
 
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -253,41 +304,52 @@ const Closures = ({
 
   return (
     <div className="elevator-closures">
-      <InStationSummary
-        numClosures={numClosuresInStation}
-        upcomingClosure={isUpcomingClosurePage ? undefined : upcomingClosure}
-      />
+      {stations === "no_closures" || stations === "nearby_redundancy" ? (
+        <NoCurrentClosures closure={upcomingClosure} status={stations} />
+      ) : (
+        <>
+          <InStationSummary
+            numClosures={numClosuresInStation}
+            upcomingClosure={
+              isUpcomingClosurePage ? undefined : upcomingClosure
+            }
+          />
 
-      <div className="closures-info">
-        {isUpcomingClosurePage ? (
-          <UpcomingClosure closure={upcomingClosure} />
-        ) : (
-          <div className="header-container">
-            <div className="header">
-              <div className="header__title">MBTA Elevator Closures</div>
-              <div>
-                <AccessibilityAlert height={128} width={155} />
+          <div className="closures-info">
+            {isUpcomingClosurePage ? (
+              <UpcomingClosure closure={upcomingClosure} />
+            ) : (
+              <div className="header-container">
+                <div className="header">
+                  <div className="header__title">MBTA Elevator Closures</div>
+                  <div>
+                    <AccessibilityAlert height={128} width={155} />
+                  </div>
+                </div>
               </div>
+            )}
+
+            <div className="closure-list-container">
+              {
+                <div
+                  className="closure-list"
+                  ref={listRef}
+                  style={listOffsetStyle}
+                >
+                  {sortStations(stations, stationId).map((station, index) => (
+                    <ClosureRow
+                      isCurrentStation={station.id == stationId}
+                      isFirstRowOnPage={firstRowIndices.includes(index)}
+                      key={station.id}
+                      station={station}
+                    />
+                  ))}
+                </div>
+              }
             </div>
           </div>
-        )}
-
-        <div className="closure-list-container">
-          {
-            <div className="closure-list" ref={listRef} style={listOffsetStyle}>
-              {sortStations(stations, stationId).map((station, index) => (
-                <ClosureRow
-                  isCurrentStation={station.id == stationId}
-                  isFirstRowOnPage={firstRowIndices.includes(index)}
-                  key={station.id}
-                  station={station}
-                />
-              ))}
-            </div>
-          }
-        </div>
-      </div>
-
+        </>
+      )}
       {numPages > 1 && (
         <div className="paging-info-container">
           {!isUpcomingClosurePage && numRowsOffPage > 0 && (

@@ -67,12 +67,30 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
     case Enum.find(active_closures, at_this_elevator?) do
       nil ->
+        {:ok, %Stop{id: stop_id}} = @facility.fetch_stop_for_facility(elevator_id)
+
+        relevant_closures =
+          Enum.filter(active_closures, &relevant_closure?(&1, stop_id, active_closures))
+
         upcoming_closures =
           upcoming |> Enum.flat_map(&elevator_closure/1) |> Enum.filter(at_this_elevator?)
 
+        footer =
+          if Enum.empty?(relevant_closures) and Enum.empty?(upcoming_closures),
+            do: [],
+            else: [%Footer{screen: config}]
+
         [
-          elevator_closures(active_closures, upcoming_closures, app_params, now)
-          | header_footer_instances(config, now)
+          elevator_closures(
+            active_closures,
+            relevant_closures,
+            upcoming_closures,
+            app_params,
+            now,
+            stop_id
+          ),
+          header_instances(config, now)
+          | footer
         ]
 
       _closure ->
@@ -86,12 +104,20 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   defp header_footer_instances(
          %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id}} = config,
          now,
-         variant \\ nil
+         variant
        ) do
     [
       %NormalHeader{text: "Elevator #{elevator_id}", screen: config, time: now, variant: variant},
       %Footer{screen: config, variant: variant}
     ]
+  end
+
+  defp header_instances(
+         %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id}} = config,
+         now,
+         variant \\ nil
+       ) do
+    %NormalHeader{text: "Elevator #{elevator_id}", screen: config, time: now, variant: variant}
   end
 
   defp elevator_closure(%Alert{
@@ -133,11 +159,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   defp elevator_closures(
          active_closures,
+         relevant_closures,
          upcoming_closures,
          %ElevatorConfig{elevator_id: elevator_id} = app_params,
-         now
+         now,
+         stop_id
        ) do
-    {:ok, %Stop{id: stop_id}} = @facility.fetch_stop_for_facility(elevator_id)
     {:ok, station_names} = @stop.fetch_parent_station_name_map()
     station_route_pills = fetch_station_route_pills(active_closures, stop_id)
 
@@ -148,7 +175,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       stations_with_closures:
         build_stations_with_closures(
           active_closures,
-          stop_id,
+          relevant_closures,
           station_names,
           station_route_pills,
           elevator_id
@@ -173,15 +200,17 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     end
   end
 
+  defp build_stations_with_closures([] = _active_closures, _, _, _, _), do: :no_closures
+  defp build_stations_with_closures(_, [] = _relevant_closures, _, _, _), do: :nearby_redundancy
+
   defp build_stations_with_closures(
-         closures,
-         home_station_id,
+         active_closures,
+         relevant_closures,
          station_names,
          station_route_pills,
          elevator_id
        ) do
-    closures
-    |> Enum.filter(&relevant_closure?(&1, home_station_id, closures))
+    relevant_closures
     |> log_station_closures(elevator_id)
     |> Enum.group_by(& &1.station_id)
     |> Enum.map(fn {station_id, station_closures} ->
@@ -197,7 +226,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
             station_closures,
             fn %Closure{id: id, name: name} -> %WidgetClosure{id: id, name: name} end
           ),
-        summary: active_summary(station_closures, closures)
+        summary: active_summary(station_closures, active_closures)
       }
     end)
   end
@@ -271,7 +300,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       case redundancy do
         # `nil` indicates the specially-formatted in-station summary text for active closures.
         type when type in ~w[nearby in_station]a -> nil
-        {:other, summary} -> summary
+        # TEMP: Use fallback text instead of actual exiting summary. These are worded in a way
+        # that only makes sense when using the elevator to exit the station, but it might not be
+        # possible for a rider to get into that situation if they enter the system at the station
+        # where this summary is being displayed (without doubling back on themselves). Temporarily
+        # disabled until we implement logic to determine when showing this summary is appropriate.
+        {:other, _summary} -> @active_summary_fallback
       end
     end
   end

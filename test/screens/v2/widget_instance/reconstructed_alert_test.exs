@@ -3,7 +3,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{CRDepartures, PreFare}
+  alias ScreensConfig.V2.{ContentSummary, CRDepartures, ElevatorStatus, PreFare}
   alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
@@ -15,12 +15,27 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   setup :setup_base
 
-  # Currently testing PreFare only
   defp setup_base(_context) do
+    station_id = "place-xyz"
+    current_stop_id = %CurrentStopId{stop_id: station_id}
+
     %{
       widget: %ReconstructedAlert{
-        alert: %Alert{id: "123", updated_at: ~U[2023-06-09T09:00:00Z]},
-        screen: %Screen{app_params: nil, vendor: nil, device_id: nil, name: nil, app_id: nil},
+        alert: %Alert{id: "123", informed_entities: [], updated_at: ~U[2023-06-09T09:00:00Z]},
+        screen: %Screen{
+          app_id: nil,
+          app_params: %PreFare{
+            content_summary: %ContentSummary{parent_station_id: station_id},
+            elevator_status: %ElevatorStatus{parent_station_id: station_id, platform_stop_ids: []},
+            full_line_map: [],
+            header: current_stop_id,
+            reconstructed_alert_widget: current_stop_id,
+            template: :duo
+          },
+          device_id: nil,
+          name: nil,
+          vendor: nil
+        },
         location_context: %LocationContext{
           home_stop: nil,
           tagged_stop_sequences: nil,
@@ -33,6 +48,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
     }
   end
+
+  defp put_solo_screen(widget), do: put_in(widget.screen.app_params.template, :solo)
 
   defp put_active_period(widget, ap) do
     %{widget | alert: %{widget.alert | active_period: ap}}
@@ -368,14 +385,45 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   describe "priority/1, slot_names/1, widget_type/1" do
     setup @valid_alert_setup_group
 
-    test "returns takeover for a closure alert at this station", %{widget: widget} do
-      widget = put_is_priority(widget, true)
-      assert [1] == WidgetInstance.priority(widget)
-      assert [:full_body_duo] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
+    @dual_screen {:full_body_duo, :reconstructed_takeover}
+    @left_screen {:paged_main_content_left, :single_screen_alert}
+    @right_screen {:full_body_right, :single_screen_alert}
+    @flex_zone {:large, :reconstructed_large_alert}
+
+    defp assert_values(widget, values), do: assert_values(widget, values, values)
+
+    defp assert_values(
+           duo_widget,
+           {duo_priority, {duo_slot, duo_type}},
+           {solo_priority, {solo_slot, solo_type}}
+         ) do
+      solo_widget = put_solo_screen(duo_widget)
+
+      assert [duo_priority] == WidgetInstance.priority(duo_widget)
+      assert [duo_slot] == WidgetInstance.slot_names(duo_widget)
+      assert duo_type == WidgetInstance.widget_type(duo_widget)
+
+      assert [solo_priority] == WidgetInstance.priority(solo_widget)
+      assert [solo_slot] == WidgetInstance.slot_names(solo_widget)
+      assert solo_type == WidgetInstance.widget_type(solo_widget)
     end
 
-    test "returns takeover for a suspension that affects all station trips", %{widget: widget} do
+    test "station closure at this station", %{widget: widget} do
+      widget = put_is_priority(widget, true)
+
+      assert_values(widget, {1, @dual_screen}, {1, @right_screen})
+    end
+
+    test "station closure not at this station", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_is_priority(true)
+
+      assert_values(widget, {1, @left_screen}, {1, @flex_zone})
+    end
+
+    test "suspension that affects all station trips", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
           ie(route: "Red", route_type: 1, stop: "place-dwnxg"),
@@ -383,28 +431,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_is_priority(true)
 
-      assert [1] == WidgetInstance.priority(widget)
-      assert [:full_body_duo] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
+      assert_values(widget, {1, @dual_screen}, {1, @right_screen})
     end
 
-    test "returns flex zone alert for a suspension that affects some station trips", %{
-      widget: widget
-    } do
+    test "suspension that affects some station trips", %{widget: widget} do
       widget = put_informed_entities(widget, [ie(route: "Red", route_type: 1)])
-      assert [3] == WidgetInstance.priority(widget)
-      assert [:large] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+
+      assert_values(widget, {3, @flex_zone})
     end
 
-    test "returns flex zone alert for a downstream alert", %{widget: widget} do
+    test "downstream alert", %{widget: widget} do
       widget = put_informed_entities(widget, [ie(stop: "place-pktrm")])
-      assert [3] == WidgetInstance.priority(widget)
-      assert [:large] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+
+      assert_values(widget, {3, @flex_zone})
     end
 
-    test "returns takeover for a terminal boundary suspension", %{widget: widget} do
+    test "terminal boundary suspension", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-forhl")
@@ -423,12 +465,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_terminal_station(true)
         |> put_is_priority(true)
 
-      assert [1] == WidgetInstance.priority(widget)
-      assert [:full_body_duo] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
+      assert_values(widget, {1, @dual_screen}, {1, @right_screen})
     end
 
-    test "returns takeover for a terminal boundary shuttle", %{widget: widget} do
+    test "terminal boundary shuttle", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-forhl")
@@ -447,14 +487,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_terminal_station(true)
         |> put_is_priority(true)
 
-      assert [1] == WidgetInstance.priority(widget)
-      assert [:full_body_duo] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_takeover == WidgetInstance.widget_type(widget)
+      assert_values(widget, {1, @dual_screen}, {1, @right_screen})
     end
 
-    test "returns :paged_main_content_left for a takeover when paired with CR widget", %{
-      widget: widget
-    } do
+    test "dual-screen reduces to single-screen when paired with CR widget", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-forhl")
@@ -474,35 +510,30 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
         |> put_pair_with_cr_widget(true)
 
-      assert [1] == WidgetInstance.priority(widget)
-      assert [:paged_main_content_left] == WidgetInstance.slot_names(widget)
-      assert :single_screen_alert == WidgetInstance.widget_type(widget)
+      assert_values(widget, {1, @left_screen}, {1, @right_screen})
     end
 
-    test "returns flex zone alert for a severe delay", %{widget: widget} do
+    test "severe delay", %{widget: widget} do
       widget = put_effect(widget, :severe_delay)
-      assert [3] == WidgetInstance.priority(widget)
-      assert [:large] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+
+      assert_values(widget, {3, @flex_zone})
     end
 
-    test "returns flex zone alert for a boundary suspension", %{widget: widget} do
+    test "boundary suspension", %{widget: widget} do
       widget = put_informed_entities(widget, [ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
       widget = put_effect(widget, :suspension)
-      assert [3] == WidgetInstance.priority(widget)
-      assert [:large] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+
+      assert_values(widget, {3, @flex_zone})
     end
 
-    test "returns flex zone alert for a boundary shuttle", %{widget: widget} do
+    test "boundary shuttle", %{widget: widget} do
       widget = put_informed_entities(widget, [ie(stop: "place-dwnxg"), ie(stop: "place-pktrm")])
       widget = put_effect(widget, :shuttle)
-      assert [3] == WidgetInstance.priority(widget)
-      assert [:large] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
+
+      assert_values(widget, {3, @flex_zone})
     end
 
-    test "returns flex zone alert for a terminal boundary delay", %{widget: widget} do
+    test "terminal boundary delay", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-forhl")
@@ -520,30 +551,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         })
         |> put_is_terminal_station(true)
 
-      assert [3] == WidgetInstance.priority(widget)
-      assert [:large] == WidgetInstance.slot_names(widget)
-      assert :reconstructed_large_alert == WidgetInstance.widget_type(widget)
-    end
-
-    test "returns :paged_main_content_left for full screen single platform closures", %{
-      widget: widget
-    } do
-      widget =
-        widget
-        |> put_home_stop(PreFare, "place-forhl")
-        |> put_effect(:station_closure)
-        |> put_is_priority(true)
-
-      assert [1] == WidgetInstance.priority(widget)
-      assert [:paged_main_content_left] == WidgetInstance.slot_names(widget)
-      assert :single_screen_alert == WidgetInstance.widget_type(widget)
+      assert_values(widget, {3, @flex_zone})
     end
   end
 
-  describe "serialize_dual_screen_alert/1 single line station" do
+  describe "priority: single-line station" do
     setup @one_line_station_alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "handles suspension", %{widget: widget} do
+    test "suspension at this station", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -580,9 +595,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "No Forest Hills trains"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles shuttle", %{widget: widget} do
+    test "shuttle at this station", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-welln")
@@ -620,9 +638,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "No Forest Hills trains"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles station closure", %{widget: widget} do
+    test "closure at this station", %{widget: widget} do
       widget =
         widget
         |> put_effect(:station_closure)
@@ -659,9 +680,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{effect: :station_closure, region: :here} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles alert with cause", %{widget: widget} do
+    test "boundary suspension with cause", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-welln")
@@ -699,9 +723,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "No Forest Hills trains"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles terminal boundary suspension", %{widget: widget} do
+    test "terminal boundary suspension", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -737,9 +764,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "No Orange Line trains"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles terminal boundary shuttle", %{widget: widget} do
+    test "terminal boundary shuttle", %{widget: widget} do
       widget =
         widget
         |> put_effect(:shuttle)
@@ -775,13 +805,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "No Orange Line trains"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
-  end
 
-  describe "serialize_fullscreen_alert/1 one line" do
-    setup @one_line_station_alert_widget_context_setup_group ++ [:setup_active_period]
-
-    test "handles boundary suspension", %{widget: widget} do
+    test "boundary suspension", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -818,9 +847,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "No Oak Grove trains"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles boundary shuttle", %{widget: widget} do
+    test "boundary shuttle", %{widget: widget} do
       widget =
         widget
         |> put_effect(:shuttle)
@@ -857,9 +889,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "No Oak Grove trains"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles moderate delay", %{widget: widget} do
+    test "moderate delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -882,9 +917,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Trains may be delayed up to 20 minutes"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles severe delay", %{widget: widget} do
+    test "severe delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -907,9 +945,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Trains may be delayed over 60 minutes"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles directional delay", %{widget: widget} do
+    test "directional delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -932,9 +973,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Trains may be delayed up to 20 minutes"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles alert with cause", %{widget: widget} do
+    test "inside delay with cause", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -957,14 +1001,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Trains may be delayed over 60 minutes"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles downstream delay", %{widget: widget} do
+    test "downstream delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop: "place-swnxg", route: "Orange", route_type: 1)
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
@@ -974,7 +1021,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
         cause: nil,
-        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :delay,
         remedy: "Delays are happening",
         updated_at: "Friday, 5:00 am",
@@ -982,9 +1029,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Delays are happening"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles downstream shuttle", %{widget: widget} do
+    test "downstream shuttle", %{widget: widget} do
       widget =
         widget
         |> put_effect(:shuttle)
@@ -1021,9 +1071,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert %{issue: "No trains"} = widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles downstream suspension", %{widget: widget} do
+    test "downstream suspension", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -1060,9 +1111,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert %{issue: "No trains"} = widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles platform closure at home station", %{widget: widget} do
+    test "partial platform closure at home station", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-portr")
@@ -1102,9 +1154,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{remedy_bold: "Test Alert"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles downstream platform closure", %{widget: widget} do
+    test "downstream partial platform closure", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-asmnl")
@@ -1144,13 +1199,72 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Bypassing 2 platforms at Malden Center"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+    end
+
+    @tag :capture_log
+    test "two-screen fallback for an alert that violates assumptions (one-stop suspension)", %{
+      widget: widget
+    } do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_alert_header("Simulation of PIO text")
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+
+      expected = %{
+        cause: nil,
+        effect: :suspension,
+        issue: "No trains",
+        location: "Simulation of PIO text",
+        remedy: "Seek alternate route",
+        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
+        updated_at: "Friday, 5:00 am"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    @tag :capture_log
+    test "one-screen fallback for an alert that violates assumptions (one-stop suspension)", %{
+      widget: widget
+    } do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_alert_header("Simulation of PIO text")
+        |> put_informed_entities([
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+
+      expected = %{
+        cause: nil,
+        effect: :suspension,
+        issue: nil,
+        location: nil,
+        remedy: nil,
+        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
+        updated_at: "Friday, 5:00 am",
+        region: :outside,
+        remedy_bold: "Simulation of PIO text"
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
     end
   end
 
-  describe "serialize_fullscreen_alert/1 transfer station" do
+  describe "priority: transfer station" do
     setup @transfer_stations_alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "handles :inside station closure on 1 line", %{widget: widget} do
+    test "inside station closure on one line", %{widget: widget} do
       widget =
         widget
         |> put_effect(:station_closure)
@@ -1185,9 +1299,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{effect: :station_closure, region: :here} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles :inside suspension on 1 line", %{widget: widget} do
+    test "inside suspension on one line", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -1228,9 +1345,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{effect: :suspension, region: :here} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles :inside shuttle on 1 line", %{widget: widget} do
+    test "inside shuttle on one line", %{widget: widget} do
       widget =
         widget
         |> put_effect(:shuttle)
@@ -1270,9 +1390,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{effect: :shuttle, region: :here} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles multi line delay", %{widget: widget} do
+    test "delay on multiple lines", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -1295,13 +1418,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{effect: :delay, region: :here} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
-  describe "serialize_inside_flex_alert/1" do
+  describe "inside flex" do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "handles moderate delay", %{widget: widget} do
+    test "moderate delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -1324,9 +1450,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles severe delay", %{widget: widget} do
+    test "severe delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -1348,13 +1475,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
-  describe "serialize_boundary_alert/1" do
+  describe "boundary flex" do
     setup @alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "handles suspension", %{widget: widget} do
+    test "suspension", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -1376,9 +1504,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles shuttle", %{widget: widget} do
+    test "shuttle", %{widget: widget} do
       widget =
         widget
         |> put_effect(:shuttle)
@@ -1400,9 +1529,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles moderate delay", %{widget: widget} do
+    test "moderate delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -1426,9 +1556,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles severe delay", %{widget: widget} do
+    test "severe delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -1451,9 +1582,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles alert with cause", %{widget: widget} do
+    test "boundary delay with cause", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -1476,13 +1608,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
-  describe "serialize_outside_alert/1" do
+  describe "outside flex" do
     setup @one_line_station_alert_widget_context_setup_group ++ [:setup_active_period]
 
-    test "handles downstream suspension at one stop", %{widget: widget} do
+    test "downstream suspension at one stop", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -1503,9 +1636,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles downstream suspension range", %{widget: widget} do
+    test "downstream suspension at stop range", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -1527,9 +1661,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles downstream suspension range, one direction only", %{widget: widget} do
+    test "downstream suspension range, one direction only", %{widget: widget} do
       widget =
         widget
         |> put_effect(:suspension)
@@ -1551,9 +1686,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles shuttle at one stop", %{widget: widget} do
+    test "shuttle at one stop", %{widget: widget} do
       widget =
         widget
         |> put_effect(:shuttle)
@@ -1574,9 +1710,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles full station closure", %{widget: widget} do
+    test "full station closure", %{widget: widget} do
       widget =
         widget
         |> put_effect(:station_closure)
@@ -1600,9 +1737,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles platform closure", %{widget: widget} do
+    test "platform closure", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-asmnl")
@@ -1632,9 +1770,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles multiple platform closures at same station", %{widget: widget} do
+    test "multiple platform closures at same station", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-andrw")
@@ -1665,9 +1804,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles delay", %{widget: widget} do
+    test "downstream delay", %{widget: widget} do
       widget =
         widget
         |> put_effect(:delay)
@@ -1689,9 +1829,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "handles alert with cause", %{widget: widget} do
+    test "outside station closure with cause", %{widget: widget} do
       widget =
         widget
         |> put_effect(:station_closure)
@@ -1715,60 +1856,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
-    end
-
-    @tag :capture_log
-    test "two screen fallback layout for an alert that violates assumptions (suspension that's only 1 stop)",
-         %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:suspension)
-        |> put_alert_header("Simulation of PIO text")
-        |> put_informed_entities([
-          ie(stop: "place-mlmnl", route: "Orange", route_type: 1)
-        ])
-        |> put_cause(:unknown)
-        |> put_is_priority(true)
-
-      expected = %{
-        cause: nil,
-        effect: :suspension,
-        issue: "No trains",
-        location: "Simulation of PIO text",
-        remedy: "Seek alternate route",
-        routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
-        updated_at: "Friday, 5:00 am"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
-    end
-
-    @tag :capture_log
-    test "one screen fallback layout for an alert that violates assumptions (suspension that's only 1 stop)",
-         %{widget: widget} do
-      widget =
-        widget
-        |> put_effect(:suspension)
-        |> put_alert_header("Simulation of PIO text")
-        |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1)
-        ])
-        |> put_cause(:unknown)
-        |> put_is_priority(true)
-
-      expected = %{
-        cause: nil,
-        effect: :suspension,
-        issue: nil,
-        location: nil,
-        remedy: nil,
-        routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
-        updated_at: "Friday, 5:00 am",
-        region: :outside,
-        remedy_bold: "Simulation of PIO text"
-      }
-
-      assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
@@ -1838,6 +1926,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
     test "gets correct destination for RL alert affecting trunk and a whole branch", %{
@@ -1956,6 +2045,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{
+               issue: "No trains",
+               location: "between Broadway and Ashmont",
+               remedy: "Use shuttle bus"
+             } = widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
     test "gets correct destination for RL alert affecting one branch starting at JFK", %{
@@ -2069,6 +2164,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{
+               issue: "No trains",
+               location: "between JFK/UMass and Ashmont",
+               remedy: "Use shuttle bus"
+             } = widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
     @tag :capture_log
@@ -2157,6 +2258,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Simulation of PIO text"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
@@ -2215,6 +2319,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
     test "reverses endpoints for GL trunk alert", %{widget: widget} do
@@ -2322,6 +2427,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
     test "reverses endpoints for GL western branch alert", %{widget: widget} do
@@ -2369,11 +2475,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "does not reverse endpoints for GLX alert", %{
-      widget: widget
-    } do
+    test "does not reverse endpoints for GLX alert", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-esomr")
@@ -2417,6 +2522,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
@@ -2487,9 +2593,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   describe "audio_view/1" do
-    test "returns ReconstructedAlertView" do
-      instance = %ReconstructedAlert{}
-      assert ScreensWeb.V2.Audio.ReconstructedAlertView == WidgetInstance.audio_view(instance)
+    test "returns ReconstructedAlertView", %{widget: widget} do
+      assert ScreensWeb.V2.Audio.ReconstructedAlertView == WidgetInstance.audio_view(widget)
     end
   end
 
