@@ -40,17 +40,24 @@ function cacheEvent(options: RavenTransportOptions) {
   } catch {}
 }
 
+function buildSentryAuthHeader(auth) {
+  return `Sentry sentry_version=${auth.sentry_version}, sentry_client=${auth.sentry_client}, sentry_key=${auth.sentry_key}`;
+}
+
 function resendCachedEvents() {
   const cached = localStorage.getItem(offline_events_key);
   if (!cached) return;
 
   // Retry each event in the cache
   JSON.parse(cached).forEach((event: RavenTransportOptions) => {
+    const headers = {
+      "Content-Type": "application/json",
+      "X-Sentry-Auth": buildSentryAuthHeader(event.auth),
+    };
+
     fetch(event.url, {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers,
       body: JSON.stringify(event.data),
     });
   });
