@@ -49,7 +49,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @route injected(Route)
   @stop injected(Stop)
 
-  @active_summary_fallback "Visit mbta.com/elevators for more info"
+  @active_summary_fallback {:other, "Visit mbta.com/elevators for more info"}
   @upcoming_summaries %{
     in_station: "An accessible route will be available.",
     shuttle: "An accessible route will be available via shuttle bus."
@@ -267,27 +267,30 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     station_closures
   end
 
-  # If we couldn't find alternate/redundancy data for an elevator, assume it's relevant.
-  defp relevant_closure?(%Closure{elevator: nil}, _home_station_id, _closures), do: true
-
   # Elevators at the home station ID are always relevant.
   defp relevant_closure?(%Closure{station_id: station_id}, station_id, _closures), do: true
 
-  # If any of a closed elevator's alternates are also closed, it's always relevant.
+  # Elevators with nearby redundancy are only relevant if any of their alternates are also closed.
   defp relevant_closure?(
-         %Closure{
-           elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
-         },
+         %Closure{elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: :nearby}},
          _home_station_id,
          closures
        ) do
-    Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) or redundancy != :nearby
+    Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end)
   end
+
+  # Elevators with other kinds of exiting redundancy, or where we don't have redundancy data, are
+  # always relevant.
+  defp relevant_closure?(_closure, _home_station_id, _closures), do: true
 
   defp active_summary(
          [
            %Closure{
-             elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
+             elevator: %Elevator{
+               alternate_ids: alternate_ids,
+               exiting_redundancy: redundancy,
+               exiting_summary: summary
+             }
            }
          ],
          closures
@@ -298,14 +301,14 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       @active_summary_fallback
     else
       case redundancy do
-        # `nil` indicates the specially-formatted in-station summary text for active closures.
-        type when type in ~w[nearby in_station]a -> nil
+        :nearby -> {:inside, summary}
+        :in_station -> {:inside, summary}
         # TEMP: Use fallback text instead of actual exiting summary. These are worded in a way
         # that only makes sense when using the elevator to exit the station, but it might not be
         # possible for a rider to get into that situation if they enter the system at the station
         # where this summary is being displayed (without doubling back on themselves). Temporarily
         # disabled until we implement logic to determine when showing this summary is appropriate.
-        {:other, _summary} -> @active_summary_fallback
+        :other -> @active_summary_fallback
       end
     end
   end

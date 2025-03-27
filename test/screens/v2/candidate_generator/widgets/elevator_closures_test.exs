@@ -57,7 +57,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
         id: id,
         alternate_ids: [],
         entering_redundancy: :none,
-        exiting_redundancy: :none
+        exiting_redundancy: :none,
+        exiting_summary: ""
       },
       fields
     )

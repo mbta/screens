@@ -64,7 +64,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         id: id,
         alternate_ids: [],
         entering_redundancy: :in_station,
-        exiting_redundancy: :in_station
+        exiting_redundancy: :in_station,
+        exiting_summary: "Accessible route available"
       },
       fields
     )
@@ -180,7 +181,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
             name: "Place Test",
             route_icons: [%{type: :text, text: "RL", color: :red}],
             closures: [%Closure{id: "facility-test", name: "Test"}],
-            summary: nil
+            summary: {:inside, "Accessible route available"}
           }
         ]
       }
@@ -229,7 +230,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                        %Closure{id: "facility-test-1", name: "Test 1"},
                        %Closure{id: "facility-test-2", name: "Test 2"}
                      ],
-                     summary: "Visit mbta.com/elevators for more info"
+                     summary: {:other, "Visit mbta.com/elevators for more info"}
                    }
                  ]
                }
@@ -357,8 +358,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       stub(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
 
       stub(@elevator, :get, fn
-        "1" -> build_elevator("1", exiting_redundancy: :in_station)
-        "2" -> build_elevator("2", exiting_redundancy: {:other, "some summary"})
+        "1" -> build_elevator("1", exiting_redundancy: :in_station, exiting_summary: "es1")
+        "2" -> build_elevator("2", exiting_redundancy: :other, exiting_summary: "es2")
         "3" -> build_elevator("3", alternate_ids: ["alt"], exiting_redundancy: :nearby)
         "alt" -> build_elevator("alt", exiting_redundancy: :nearby)
       end)
@@ -410,18 +411,18 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                    %ElevatorClosures.Station{
                      id: "place-1",
                      closures: [%Closure{id: "1"}],
-                     summary: nil
+                     summary: {:inside, "es1"}
                    },
                    %ElevatorClosures.Station{
                      id: "place-2",
                      closures: [%Closure{id: "2"}],
                      # TEMP: currently not using exiting summaries, see implementation for details
-                     summary: "Visit mbta.com/elevators for more info"
+                     summary: {:other, "Visit mbta.com/elevators for more info"}
                    },
                    %ElevatorClosures.Station{
                      id: "place-3",
                      closures: [%Closure{id: "3"}],
-                     summary: "Visit mbta.com/elevators for more info"
+                     summary: {:other, "Visit mbta.com/elevators for more info"}
                    }
                  ]
                }
