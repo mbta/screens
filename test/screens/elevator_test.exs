@@ -33,8 +33,11 @@ defmodule Screens.ElevatorTest do
     test "gets elevators in each exiting redundancy category" do
       assert %Elevator{exiting_redundancy: :nearby} = Elevator.get("996")
       assert %Elevator{exiting_redundancy: :in_station} = Elevator.get("918")
+      assert %Elevator{exiting_redundancy: :other} = Elevator.get("780")
+    end
 
-      assert %Elevator{exiting_redundancy: {:other, "Request assistance from conductor."}} =
+    test "gets exiting redundancy summaries" do
+      assert %Elevator{exiting_summary: "Request assistance from conductor."} =
                Elevator.get("780")
     end
 
