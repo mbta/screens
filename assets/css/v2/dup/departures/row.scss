@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .departure-row {
   position: relative;
   height: 208px;
@@ -9,7 +11,7 @@
     width: 1586px;
     height: 4px;
     content: "";
-    background-color: #cccbc8;
+    background-color: colors.$warm-neutral-80;
   }
 }
 

@@ -18,7 +18,7 @@ interface Props {
   includeHeader: boolean;
 }
 
-const Departures: ComponentType<Props> = ({ sections, includeHeader = false}) => {
+const Departures: ComponentType<Props> = ({ sections, includeHeader = true}) => {
   return (
     <div className="departures-container">
       {includeHeader && <div className="departures-header"><DeparturesHeader/></div>}
