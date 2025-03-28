@@ -86,8 +86,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
             relevant_closures,
             upcoming_closures,
             app_params,
-            now,
-            stop_id
+            stop_id,
+            now
           ),
           header_instances(config, now)
           | footer
@@ -161,34 +161,34 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
          active_closures,
          relevant_closures,
          upcoming_closures,
-         %ElevatorConfig{elevator_id: elevator_id} = app_params,
-         now,
-         stop_id
+         %ElevatorConfig{elevator_id: screen_elevator_id} = app_params,
+         screen_station_id,
+         now
        ) do
     {:ok, station_names} = @stop.fetch_parent_station_name_map()
-    station_route_pills = fetch_station_route_pills(active_closures, stop_id)
+    station_route_pills = fetch_station_route_pills(active_closures, screen_station_id)
 
     %ElevatorClosures{
       app_params: app_params,
       now: now,
-      station_id: stop_id,
+      station_id: screen_station_id,
       stations_with_closures:
         build_stations_with_closures(
           active_closures,
           relevant_closures,
           station_names,
           station_route_pills,
-          elevator_id
+          screen_elevator_id
         ),
       upcoming_closure: build_upcoming_closure(upcoming_closures)
     }
   end
 
-  defp fetch_station_route_pills(closures, home_station_id) do
+  defp fetch_station_route_pills(closures, screen_station_id) do
     closures
     |> Enum.map(& &1.station_id)
     |> MapSet.new()
-    |> MapSet.put(home_station_id)
+    |> MapSet.put(screen_station_id)
     |> Map.new(fn station_id -> {station_id, fetch_route_pills(station_id)} end)
   end
 
@@ -208,10 +208,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
          relevant_closures,
          station_names,
          station_route_pills,
-         elevator_id
+         screen_elevator_id
        ) do
     relevant_closures
-    |> log_station_closures(elevator_id)
+    |> log_station_closures(screen_elevator_id)
     |> Enum.group_by(& &1.station_id)
     |> Enum.map(fn {station_id, station_closures} ->
       %ElevatorClosures.Station{
@@ -267,13 +267,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     station_closures
   end
 
-  # Elevators at the home station ID are always relevant.
+  # Elevators at the screen's station are always relevant.
   defp relevant_closure?(%Closure{station_id: station_id}, station_id, _closures), do: true
 
   # Elevators with nearby redundancy are only relevant if any of their alternates are also closed.
   defp relevant_closure?(
          %Closure{elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: :nearby}},
-         _home_station_id,
+         _screen_station_id,
          closures
        ) do
     Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end)
@@ -281,7 +281,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   # Elevators with other kinds of exiting redundancy, or where we don't have redundancy data, are
   # always relevant.
-  defp relevant_closure?(_closure, _home_station_id, _closures), do: true
+  defp relevant_closure?(_closure, _screen_station_id, _closures), do: true
 
   defp active_summary(
          [
