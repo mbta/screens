@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -41,8 +42,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
        ) do
     %Departure{
       prediction: %Prediction{
-        route: %Route{id: route_id, type: route_type},
-        trip: %Trip{direction_id: direction_id},
+        route: %Route{id: route_id, type: route_type, line: %Line{id: route_id}},
+        trip: %Trip{direction_id: direction_id, headsign: "headsign"},
         arrival_time: arrival_time
       }
     }

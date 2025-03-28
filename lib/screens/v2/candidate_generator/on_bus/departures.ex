@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
 
   alias Screens.Report
   alias Screens.Stops.Stop
+  alias Screens.Trips.Trip
   alias Screens.V2.Departure
   alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -18,6 +19,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   @max_departure_results 3
 
   @type widget :: DeparturesNoData.t() | DeparturesNoService.t() | DeparturesWidget.t()
+
+  @priority %{
+    :subway => 1,
+    :light_rail => 1,
+    :bus => 2,
+    :commuter_rail => 3,
+    :ferry => 4
+  }
 
   @spec departures_candidates(Screen.t(), QueryParams.t(), DateTime.t()) :: [widget()]
   def departures_candidates(config, %{stop_id: stop_id, route_id: route_id}, now) do
@@ -85,10 +94,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   defp filter_duplicate_routes(departures) do
     unique_departures =
       Enum.uniq_by(departures, fn dep ->
-        {dep.prediction.route.id, dep.prediction.trip.direction_id}
+        {dep.prediction.route.line.id, dep.prediction.trip.direction_id,
+         Trip.representative_headsign(dep.prediction.trip)}
       end)
 
-    # Return at least 3 departures if they exist, even if there are not enough unique routes
+    # If there are fewer than 3 unique connecting departures, then return at least 3 based on soonest departure time.
     case length(unique_departures) do
       count when count >= 3 ->
         unique_departures
@@ -100,26 +110,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   defp sort_by_mode(departures) do
-    priority = %{
-      :subway => 1,
-      :light_rail => 1,
-      :bus => 2,
-      :commuter_rail => 3,
-      :ferry => 4
-    }
-
-    Enum.sort(departures, fn a, b ->
-      priority_a =
-        Map.get(priority, a.prediction.route.type)
-
-      priority_b =
-        Map.get(priority, b.prediction.route.type)
-
-      if priority_a == priority_b do
-        a.prediction.arrival_time <= b.prediction.arrival_time
-      else
-        priority_a < priority_b
-      end
+    Enum.sort_by(departures, fn departure ->
+      priority = Map.get(@priority, departure.prediction.route.type)
+      {priority, departure.prediction.arrival_time}
     end)
   end
 
