@@ -30,8 +30,7 @@ const DepartureRow: ComponentType<DepartureRow> = ({
         <Destination {...headsign} />
       </div>
       <div className="departure-row__time">
-        
-        <DepartureTimes timesWithCrowding={timesWithCrowding} /> 
+        <DepartureTimes timesWithCrowding={timesWithCrowding} />
       </div>
     </div>
   );

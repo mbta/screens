@@ -5,7 +5,7 @@
   align-items: center;
   width: 100%;
   height: 108px;
-    
+
   &:not(:first-child)::before {
     position: absolute;
     top: 0;
@@ -13,9 +13,8 @@
     width: 492px;
     height: 2px;
     content: "";
-    background-color: colors.$warm-neutral-80
+    background-color: colors.$warm-neutral-80;
   }
-
 }
 
 .departure-row__route {
@@ -33,60 +32,66 @@
 }
 
 .departure-destination__headsign {
-  font-feature-settings: 'liga' off, 'clig' off;
+  display: inline-block;
+  font-feature-settings:
+    "liga" off,
+    "clig" off;
   font-family: Inter;
   font-size: 47px;
   font-style: normal;
   font-weight: 700;
   line-height: 63px;
-  width: 354px;
+  width: 364px;
   margin-top: 22.5px;
   margin-left: 20px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .departure-row__time {
   display: inline-block;
   vertical-align: top;
   height: 100%;
-  width: 131px;
+  width: 121px;
   vertical-align: top;
   margin-right: 24px;
 }
 
 .departure-time {
-    font-feature-settings: 'liga' off, 'clig' off;
-    font-family: Inter;
-    font-size: 47px;
-    font-style: normal;
-    width: 100%;
-    display: inline-block;
-    align-items: center;
-    justify-content: end;
-    vertical-align: middle;
-    margin-top: 25.5px;
+  font-feature-settings:
+    "liga" off,
+    "clig" off;
+  font-family: Inter;
+  font-size: 47px;
+  font-style: normal;
+  width: 100%;
+  display: inline-block;
+  align-items: center;
+  justify-content: end;
+  vertical-align: middle;
+  margin-top: 25.5px;
 }
 
-.departure-time__minutes{
-    display: inline-block;
-    text-align: right;
-    width: 89px;
-    height: 100%;
-    font-weight: 800;
+.departure-time__minutes {
+  display: inline-block;
+  text-align: right;
+  width: 69px;
+  height: 100%;
+  font-weight: 800;
 }
 
 .departure-time__minutes-label {
-    width: 42px;
-    display: inline-block;
-    height: 100%;
-    text-align: left;
-    font-weight: 400;
+  width: 42px;
+  display: inline-block;
+  height: 100%;
+  text-align: left;
+  font-weight: 400;
 }
 
-.departure-time__text
-{
-    display: inline-block;
-    width: 100%;
-    font-weight: 800;
-    text-align: right;
+.departure-time__text {
+  display: inline-block;
+  width: 100%;
+  font-weight: 800;
+  text-align: right;
 }
-
