@@ -121,6 +121,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                [%DeparturesNoData{screen: @config}]
     end
 
+    test "returns DeparturesNoService section when fetch finds no departures" do
+      route_id = "86"
+      stop_id = "100"
+
+      stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->
+        {:ok, []}
+      end)
+
+      assert departures_candidates(
+               @config,
+               %QueryParams{route_id: route_id, stop_id: stop_id}
+             ) == [%DeparturesNoService{screen: @config}]
+    end
+
     test "filters out departures for the current route_id" do
       route_id = "86"
       stop_id = "22549"
@@ -162,18 +176,110 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
                departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
     end
 
-    test "returns DeparturesNoService section when fetch finds no departures" do
+    test "Orders departures of different modes correctly and filters duplicates" do
       route_id = "86"
-      stop_id = "100"
+      stop_id = "22549"
 
-      stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->
-        {:ok, []}
+      stub(@stop, :fetch, fn %{ids: [^stop_id]}, _ ->
+        {:ok, [build_stop(stop_id)]}
       end)
 
-      assert departures_candidates(
-               @config,
-               %QueryParams{route_id: route_id, stop_id: stop_id}
-             ) == [%DeparturesNoService{screen: @config}]
+      priority_departures = [
+        build_departure("subway_id", 0, :subway, ~U[2024-01-01 11:55:00Z]),
+        build_departure("light_rail_id", 0, :light_rail, ~U[2024-01-01 11:55:00Z]),
+        build_departure("bus_early", 0, :bus, ~U[2024-01-01 11:50:00Z])
+      ]
+
+      additional_departures = [
+        build_departure("bus_later", 0, :bus, ~U[2024-01-01 11:52:00Z]),
+        build_departure("subway_id", 0, :subway, ~U[2024-01-01 11:59:00Z]),
+        build_departure("commuter_rail_id", 0, :commuter_rail, ~U[2024-01-01 11:45:00Z])
+      ]
+
+      stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->
+        {:ok, priority_departures ++ additional_departures}
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 screen: @config,
+                 sections: [
+                   %NormalSection{rows: ^priority_departures}
+                 ]
+               }
+             ] =
+               departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
+    end
+
+    test "Returns 3 departures, even if they are all for the same route" do
+      route_id = "66"
+      stop_id = "22549"
+
+      stub(@stop, :fetch, fn %{ids: [^stop_id]}, _ ->
+        {:ok, [build_stop(stop_id)]}
+      end)
+
+      priority_departures = [
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:51:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:52:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:53:00Z])
+      ]
+
+      additional_departures = [
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:54:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:55:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:56:00Z])
+      ]
+
+      stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->
+        {:ok, priority_departures ++ additional_departures}
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 screen: @config,
+                 sections: [
+                   %NormalSection{rows: ^priority_departures}
+                 ]
+               }
+             ] =
+               departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
+    end
+
+    test "When only 2 unique route/directions, return 3 stops, including one of each" do
+      route_id = "66"
+      stop_id = "22549"
+
+      stub(@stop, :fetch, fn %{ids: [^stop_id]}, _ ->
+        {:ok, [build_stop(stop_id)]}
+      end)
+
+      priority_departures = [
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:51:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:52:00Z]),
+        build_departure("86", 1, :bus, ~U[2024-01-01 11:59:00Z])
+      ]
+
+      # earlier departures also with direction_id of 0
+      additional_departures = [
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:53:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:54:00Z]),
+        build_departure("86", 0, :bus, ~U[2024-01-01 11:55:00Z])
+      ]
+
+      stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->
+        {:ok, priority_departures ++ additional_departures}
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 screen: @config,
+                 sections: [
+                   %NormalSection{rows: ^priority_departures}
+                 ]
+               }
+             ] =
+               departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
     end
   end
 
