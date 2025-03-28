@@ -54,50 +54,60 @@ defmodule Screens.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:phoenix, "~> 1.7.14"},
-      {:phoenix_pubsub, "~> 2.0"},
-      {:phoenix_html, "~> 4.0"},
-      {:phoenix_view, "~> 2.0"},
-      {:phoenix_live_reload, "~> 1.3", only: :dev},
-      {:phoenix_live_view, "~> 0.20.17"},
-      {:phoenix_live_dashboard, "~> 0.8.4"},
-      {:phoenix_html_helpers, "~> 1.0"},
-      {:gettext, "~> 0.26.1"},
-      {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.6"},
-      {:cowboy, "== 2.12.0"},
-      {:httpoison, "~> 2.2.1"},
-      {:tzdata, "~> 1.1"},
-      {:credo, "~> 1.7.7"},
-      {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
-      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
-      {:ex_aws, "~> 2.1"},
-      {:ex_aws_s3, "~> 2.1"},
-      {:ex_aws_polly, "~> 0.5.0"},
-      {:ehmon, github: "mbta/ehmon", only: :prod},
-      {:sweet_xml, "~> 0.7.0"},
-      {:timex, "~> 3.6"},
-      {:hackney, "== 1.20.1"},
-      {:guardian, "~> 2.3.1"},
-      {:ueberauth, "~> 0.10"},
-      {:ueberauth_oidcc, "~> 0.4"},
-      {:corsica, "~> 2.1"},
-      {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
-      {:sentry, "~> 10.4"},
-      {:retry, "~> 0.18.0"},
-      {:mox, "~> 1.0", only: :test},
-      {:stream_data, "~> 1.1", only: :test},
-      {:memcachex, "~> 0.5.5"},
       {:aja, "~> 0.7.0"},
-      {:telemetry, "~> 1.2"},
-      {:telemetry_poller, "~> 1.0"},
-      {:telemetry_metrics, "~> 1.0"},
-      {:screens_config, github: "mbta/screens-config-lib"},
-      {:nebulex, "~> 2.6"},
-      {:remote_ip, "~> 1.2"},
-      {:hackney_telemetry, "~> 0.2.0"},
+      {:corsica, "~> 2.1"},
+      {:cowboy, "== 2.12.0"},
+      {:ex_aws, "~> 2.1"},
+      {:ex_aws_polly, "~> 0.5.0"},
+      {:ex_aws_s3, "~> 2.1"},
       {:ex_cldr_messages, "~> 1.0"},
-      {:recon, "~> 2.5.6"}
+      {:gettext, "~> 0.26.1"},
+      {:guardian, "~> 2.3.1"},
+      {:hackney, "== 1.20.1"},
+      {:hackney_telemetry, "~> 0.2.0"},
+      {:httpoison, "~> 2.2.1"},
+      {:jason, "~> 1.0"},
+      {:memcachex, "~> 0.5.5"},
+      {:nebulex, "~> 2.6"},
+      {:phoenix, "~> 1.7.14"},
+      {:phoenix_html, "~> 4.0"},
+      {:phoenix_html_helpers, "~> 1.0"},
+      {:phoenix_live_dashboard, "~> 0.8.4"},
+      {:phoenix_live_view, "~> 0.20.17"},
+      {:phoenix_pubsub, "~> 2.0"},
+      {:phoenix_view, "~> 2.0"},
+      {:plug_cowboy, "~> 2.6"},
+      {:recon, "~> 2.5.6"},
+      {:remote_ip, "~> 1.2"},
+      {:retry, "~> 0.18.0"},
+      {:screens_config, github: "mbta/screens-config-lib"},
+      {:sentry, "~> 10.4"},
+      {:sweet_xml, "~> 0.7.0"},
+      {:telemetry, "~> 1.2"},
+      {:telemetry_metrics, "~> 1.0"},
+      {:telemetry_poller, "~> 1.0"},
+      {:timex, "~> 3.6"},
+      {:tzdata, "~> 1.1"},
+      {:ueberauth, "~> 0.10"},
+      {:ueberauth_oidcc, "~> 0.4"}
+    ] ++ dev_deps() ++ prod_deps()
+  end
+
+  defp dev_deps do
+    [
+      {:credo, "~> 1.7.7", only: [:dev, :test], runtime: false},
+      {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
+      {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
+      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
+      {:mox, "~> 1.0", only: :test},
+      {:phoenix_live_reload, "~> 1.3", only: :dev},
+      {:stream_data, "~> 1.1", only: :test}
+    ]
+  end
+
+  defp prod_deps do
+    [
+      {:ehmon, github: "mbta/ehmon", only: :prod}
     ]
   end
 end
