@@ -2,13 +2,13 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureLog
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Header.CurrentStopId
-  alias ScreensConfig.V2.PreFare
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
   alias Screens.V2.WidgetInstance.MockWidget
   alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
+  alias ScreensConfig.Header.CurrentStopId
+  alias ScreensConfig.Screen
+  alias ScreensConfig.Screen.PreFare
 
   setup do
     pre_fare_config =

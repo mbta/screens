@@ -6,8 +6,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.CRDepartures do
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.CRDepartures, as: CRDeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightCRDepartures}
+  alias ScreensConfig.CRDepartures
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{CRDepartures, PreFare}
+  alias ScreensConfig.Screen.PreFare
 
   def departures_instances(
         config,

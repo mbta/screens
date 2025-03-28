@@ -8,8 +8,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   alias Screens.Routes.Route
   alias Screens.Stops.Subway
   alias Screens.V2.WidgetInstance.SubwayStatus
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Footer, GlEink}
+  alias ScreensConfig.{Footer, Screen}
+  alias ScreensConfig.Screen.GlEink
 
   defmodule SubwayStatusAlert do
     @moduledoc false
@@ -87,7 +87,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
   defimpl Screens.V2.WidgetInstance do
-    alias ScreensConfig.V2.{Audio, BusShelter}
+    alias ScreensConfig.Audio
+    alias ScreensConfig.Screen.BusShelter
 
     def priority(_instance), do: [2, 1]
 

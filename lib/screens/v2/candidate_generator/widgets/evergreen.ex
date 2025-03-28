@@ -3,8 +3,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
 
   alias Screens.Util.Assets
   alias Screens.V2.WidgetInstance.EvergreenContent
+  alias ScreensConfig.EvergreenContentItem
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.EvergreenContentItem
 
   def evergreen_content_instances(
         %Screen{app_params: %_app{evergreen_content: evergreen_content}} = config,

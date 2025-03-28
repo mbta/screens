@@ -4,12 +4,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   import Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Header.CurrentStopId
-  alias ScreensConfig.V2.{Busway, PreFare}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
+  alias ScreensConfig.Header.CurrentStopId
+  alias ScreensConfig.Screen
+  alias ScreensConfig.Screen.{Busway, PreFare}
 
   defp ie(opts) do
     %{

@@ -42,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   @spec fetch_connecting_stops(String.t()) :: nonempty_list(String.t())
-  def fetch_connecting_stops(stop_id) do
+  defp fetch_connecting_stops(stop_id) do
     case @stop.fetch(%{ids: [stop_id]}, true) do
       {:ok, stops} ->
         List.flatten([
@@ -101,8 +101,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
         sections: [
           %NormalSection{
             rows: Enum.take(departure_data, @max_departure_results),
-            layout: %ScreensConfig.V2.Departures.Layout{},
-            header: %ScreensConfig.V2.Departures.Header{}
+            layout: %ScreensConfig.Departures.Layout{},
+            header: %ScreensConfig.Departures.Header{}
           }
         ],
         now: now,

@@ -1,18 +1,19 @@
 defmodule Screens.V2.CandidateGenerator.BusShelterTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.BusShelter
   alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
+  alias ScreensConfig, as: Config
+  alias ScreensConfig.Screen
 
   setup do
     config = %Screen{
-      app_params: %V2.BusShelter{
-        departures: %V2.Departures{sections: []},
-        header: %V2.Header.CurrentStopId{stop_id: "1216"},
-        footer: %V2.Footer{stop_id: "1216"},
-        alerts: %V2.Alerts{stop_id: "1216"}
+      app_params: %Screen.BusShelter{
+        departures: %Config.Departures{sections: []},
+        header: %Config.Header.CurrentStopId{stop_id: "1216"},
+        footer: %Config.Footer{stop_id: "1216"},
+        alerts: %Config.Alerts{stop_id: "1216"}
       },
       vendor: :lg_mri,
       device_id: "TEST",
@@ -110,7 +111,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
 
     test "supports CurrentStopName header config", %{config: config} do
       config =
-        put_in(config.app_params.header, %V2.Header.CurrentStopName{stop_name: "Walnut Ave"})
+        put_in(config.app_params.header, %Config.Header.CurrentStopName{stop_name: "Walnut Ave"})
 
       departures_instances_fn = fn _, _ -> [] end
       alert_instances_fn = fn _ -> [] end

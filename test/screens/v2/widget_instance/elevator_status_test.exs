@@ -1,12 +1,12 @@
 defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.WidgetInstance
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{ElevatorStatus, PreFare}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
+  alias Screens.V2.WidgetInstance
+  alias ScreensConfig.{ElevatorStatus, Screen}
+  alias ScreensConfig.Screen.PreFare
 
   # Convenience function to build an elevator alert
   defp alert(opts) do

@@ -5,7 +5,7 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.Report
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.PreFare
+  alias ScreensConfig.Screen.PreFare
 
   @default_app_id :bus_eink_v2
   @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 elevator_v2 gl_eink_v2 on_bus_v2 pre_fare_v2]a

@@ -1,18 +1,19 @@
 defmodule Screens.V2.CandidateGenerator.GlEinkTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.GlEink
   alias Screens.V2.WidgetInstance.{FareInfoFooter, NormalHeader}
+  alias ScreensConfig, as: Config
+  alias ScreensConfig.Screen
 
   setup do
     config = %Screen{
-      app_params: %V2.GlEink{
-        departures: %V2.Departures{sections: []},
-        header: %V2.Header.Destination{route_id: "Green-C", direction_id: 0},
-        footer: %V2.Footer{stop_id: "1722"},
-        alerts: %V2.Alerts{stop_id: "1722"},
-        line_map: %V2.LineMap{
+      app_params: %Screen.GlEink{
+        departures: %Config.Departures{sections: []},
+        header: %Config.Header.Destination{route_id: "Green-C", direction_id: 0},
+        footer: %Config.Footer{stop_id: "1722"},
+        alerts: %Config.Alerts{stop_id: "1722"},
+        line_map: %Config.LineMap{
           direction_id: 0,
           route_id: "Green-C",
           station_id: "place-bcnwa",

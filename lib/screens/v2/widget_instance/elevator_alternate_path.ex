@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorAlternatePath do
   @moduledoc "The main content of an elevator screen when its associated elevator is closed."
 
   alias Screens.Util.Assets
-  alias ScreensConfig.V2.Elevator
+  alias ScreensConfig.Screen.Elevator
 
   defstruct ~w[app_params]a
 

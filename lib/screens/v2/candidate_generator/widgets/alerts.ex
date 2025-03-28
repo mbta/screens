@@ -6,8 +6,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   alias Screens.Routes.Route
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
+  alias ScreensConfig.Alerts
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Alerts, BusEink, BusShelter, GlEink}
+  alias ScreensConfig.Screen.{BusEink, BusShelter, GlEink}
 
   @alert_supporting_screen_types [BusEink, BusShelter, GlEink]
 

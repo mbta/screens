@@ -10,15 +10,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
   use ExUnitProperties
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.PreFare
-  alias ScreensConfig.V2.Header.CurrentStopId
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Subway
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance.ReconstructedAlert
+  alias ScreensConfig.Header.CurrentStopId
+  alias ScreensConfig.Screen
+  alias ScreensConfig.Screen.PreFare
 
   # TBD: should have more alerts that match troublesome alerts we've seen before
   @alerts [

@@ -4,11 +4,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
   import Screens.V2.CandidateGenerator.Widgets.Alerts
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Alerts, BusShelter, Busway}
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
+  alias ScreensConfig.{Alerts, Screen}
+  alias ScreensConfig.Screen.{BusShelter, Busway}
 
   defp ie(opts \\ []) do
     %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}

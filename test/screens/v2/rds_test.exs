@@ -11,8 +11,8 @@ defmodule Screens.V2.RDSTest do
   alias Screens.Trips.Trip
   alias Screens.V2.Departure
   alias Screens.V2.RDS
-  alias ScreensConfig.V2.Departures
-  alias ScreensConfig.V2.Departures.{Query, Section}
+  alias ScreensConfig.Departures
+  alias ScreensConfig.Departures.{Query, Section}
 
   import Screens.Inject
   import Mox

@@ -2,9 +2,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
-  alias ScreensConfig.Screen
   alias Screens.V2.WidgetInstance.EvergreenContent
-  alias ScreensConfig.V2.Schedule
+  alias ScreensConfig.{Schedule, Screen}
 
   setup do
     %{

@@ -2,9 +2,9 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Header do
   @moduledoc false
 
   alias Screens.V2.WidgetInstance.NormalHeader
+  alias ScreensConfig.Header.{CurrentStopId, CurrentStopName}
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Dup
-  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
+  alias ScreensConfig.Screen.Dup
 
   import Screens.Inject
 

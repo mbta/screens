@@ -7,19 +7,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Departures.Filters.RouteDirections
-  alias ScreensConfig.V2.Departures.Filters.RouteDirections.RouteDirection
-  alias ScreensConfig.V2.Departures.{Filters, Query, Section}
-
-  alias ScreensConfig.V2.{
-    BusEink,
-    BusShelter,
-    Busway,
-    Departures,
-    FreeTextLine,
-    GlEink
-  }
+  alias ScreensConfig.{Departures, FreeTextLine, Screen}
+  alias ScreensConfig.Departures.Filters.RouteDirections
+  alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
+  alias ScreensConfig.Departures.{Filters, Query, Section}
+  alias ScreensConfig.Screen.{BusEink, BusShelter, Busway, GlEink}
 
   @type options :: [
           departure_fetch_fn: Departure.fetch(),

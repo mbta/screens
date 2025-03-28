@@ -1,26 +1,27 @@
 defmodule Screens.V2.CandidateGenerator.PreFareTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.PreFare
   alias Screens.V2.WidgetInstance.NormalHeader
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
+  alias ScreensConfig, as: Config
+  alias ScreensConfig.Screen
 
   setup do
     config = %Screen{
-      app_params: %V2.PreFare{
-        header: %V2.Header.CurrentStopId{stop_id: "place-gover"},
-        elevator_status: %V2.ElevatorStatus{
+      app_params: %Screen.PreFare{
+        header: %Config.Header.CurrentStopId{stop_id: "place-gover"},
+        elevator_status: %Config.ElevatorStatus{
           parent_station_id: "place-foo",
           platform_stop_ids: []
         },
         full_line_map: [
-          %V2.FullLineMap{
+          %Config.FullLineMap{
             asset_path: "test/path"
           }
         ],
-        reconstructed_alert_widget: %V2.Header.CurrentStopId{stop_id: "place-gover"},
-        content_summary: %V2.ContentSummary{
+        reconstructed_alert_widget: %Config.Header.CurrentStopId{stop_id: "place-gover"},
+        content_summary: %Config.ContentSummary{
           parent_station_id: "place-foo"
         }
       },

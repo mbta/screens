@@ -1,14 +1,14 @@
 defmodule Screens.V2.CandidateGenerator.ElevatorTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Elevator
   alias Screens.V2.ScreenData.QueryParams
+  alias ScreensConfig.Screen
 
   setup do
     config = %Screen{
       app_id: :elevator_v2,
-      app_params: %V2.Elevator{
+      app_params: %Screen.Elevator{
         elevator_id: "1",
         alternate_direction_text: "Test",
         accessible_path_direction_arrow: :n

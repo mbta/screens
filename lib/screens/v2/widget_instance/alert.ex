@@ -6,8 +6,8 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Audio, BusShelter}
+  alias ScreensConfig.{Audio, Screen}
+  alias ScreensConfig.Screen.BusShelter
 
   defstruct screen: nil,
             alert: nil,

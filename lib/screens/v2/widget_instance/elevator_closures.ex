@@ -4,7 +4,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
   alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Elevator.Closure
-  alias ScreensConfig.V2.Elevator
+  alias ScreensConfig.Screen.Elevator
 
   defmodule Station do
     @moduledoc "A station where one or more elevators are currently closed."

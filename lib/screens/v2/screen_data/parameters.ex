@@ -76,7 +76,7 @@ defmodule Screens.V2.ScreenData.Parameters do
   def audio_interval_minutes(
         %Screen{
           app_id: app_id,
-          app_params: %{audio: %ScreensConfig.V2.Audio{interval_enabled: interval_enabled}}
+          app_params: %{audio: %ScreensConfig.Audio{interval_enabled: interval_enabled}}
         },
         static_params
       ) do
@@ -96,8 +96,8 @@ defmodule Screens.V2.ScreenData.Parameters do
 
   @spec audio_interval_offset_seconds(Screen.t()) :: pos_integer() | nil
   def audio_interval_offset_seconds(%Screen{
-        app_params: %ScreensConfig.V2.BusShelter{
-          audio: %ScreensConfig.V2.Audio{interval_offset_seconds: interval_offset_seconds}
+        app_params: %ScreensConfig.Screen.BusShelter{
+          audio: %ScreensConfig.Audio{interval_offset_seconds: interval_offset_seconds}
         }
       }) do
     interval_offset_seconds

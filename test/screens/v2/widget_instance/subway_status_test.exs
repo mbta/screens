@@ -1,12 +1,11 @@
 defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.V2.Audio
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.BusShelter
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.SubwayStatus
+  alias ScreensConfig.{Audio, Screen}
+  alias ScreensConfig.Screen.BusShelter
 
   defp subway_alerts(alerts),
     do: Enum.map(alerts, &%{alert: &1, context: %{all_platforms_at_informed_station: []}})

@@ -1,13 +1,14 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
   use ExUnit.Case, async: true
+
   alias Screens.Alerts.Alert
   alias Screens.Elevator
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Widgets.ElevatorClosures
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorStatusWidget
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{ElevatorStatus, PreFare}
+  alias ScreensConfig.{ElevatorStatus, Screen}
+  alias ScreensConfig.Screen.PreFare
 
   import Mox
   import Screens.Inject

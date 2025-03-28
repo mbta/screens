@@ -1,15 +1,16 @@
 defmodule Screens.V2.CandidateGenerator.BuswayTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.CandidateGenerator.Busway
   alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.{DeparturesNoData, NormalHeader}
+  alias ScreensConfig, as: Config
+  alias ScreensConfig.Screen
 
   @config %Screen{
-    app_params: %V2.Busway{
-      departures: %V2.Departures{sections: []},
-      header: %V2.Header.CurrentStopName{stop_name: ""}
+    app_params: %Screen.Busway{
+      departures: %Config.Departures{sections: []},
+      header: %Config.Header.CurrentStopName{stop_name: ""}
     },
     vendor: :solari,
     device_id: "TEST",

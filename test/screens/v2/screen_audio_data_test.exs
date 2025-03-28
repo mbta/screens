@@ -1,19 +1,20 @@
 defmodule Screens.V2.ScreenAudioDataTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.{Screen, V2}
   alias Screens.V2.ScreenAudioData
   alias Screens.V2.WidgetInstance.MockWidget
+  alias ScreensConfig, as: Config
+  alias ScreensConfig.Screen
 
   setup do
     %{
       config_bus_shelter: %Screen{
-        app_params: %V2.BusShelter{
-          audio: %V2.Audio{interval_enabled: true},
-          departures: %V2.Departures{sections: []},
-          footer: %V2.Footer{},
-          header: %V2.Header.CurrentStopId{stop_id: "1"},
-          alerts: %V2.Alerts{stop_id: "1"}
+        app_params: %Screen.BusShelter{
+          audio: %Config.Audio{interval_enabled: true},
+          departures: %Config.Departures{sections: []},
+          footer: %Config.Footer{},
+          header: %Config.Header.CurrentStopId{stop_id: "1"},
+          alerts: %Config.Alerts{stop_id: "1"}
         },
         vendor: :lg_mri,
         device_id: "TEST",
@@ -21,11 +22,11 @@ defmodule Screens.V2.ScreenAudioDataTest do
         app_id: :bus_shelter_v2
       },
       config_dup: %Screen{
-        app_params: %V2.Dup{
-          primary_departures: %V2.Departures{sections: []},
-          secondary_departures: %V2.Departures{sections: []},
-          header: %V2.Header.CurrentStopId{stop_id: "1"},
-          alerts: %V2.Alerts{stop_id: "1"}
+        app_params: %Screen.Dup{
+          primary_departures: %Config.Departures{sections: []},
+          secondary_departures: %Config.Departures{sections: []},
+          header: %Config.Header.CurrentStopId{stop_id: "1"},
+          alerts: %Config.Alerts{stop_id: "1"}
         },
         vendor: :outfront,
         device_id: "TEST",
