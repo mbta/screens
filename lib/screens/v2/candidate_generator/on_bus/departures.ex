@@ -104,16 +104,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
         unique_departures
 
       _ ->
-        unique_departures ++
-          Enum.take(departures -- unique_departures, 3 - length(unique_departures))
+        unique_departures
+        |> Enum.concat(Enum.take(departures -- unique_departures, 3 - length(unique_departures)))
+        |> Enum.sort_by(& &1.prediction.arrival_time)
     end
   end
 
   defp sort_by_mode(departures) do
-    Enum.sort_by(departures, fn departure ->
-      priority = Map.get(@priority, departure.prediction.route.type)
-      {priority, departure.prediction.arrival_time}
-    end)
+    Enum.sort_by(departures, &Map.get(@priority, &1.prediction.route.type))
   end
 
   @spec departures_widget(:error, Screen.t(), DateTime.t()) ::
