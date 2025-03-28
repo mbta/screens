@@ -226,7 +226,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
             station_closures,
             fn %Closure{id: id, name: name} -> %WidgetClosure{id: id, name: name} end
           ),
-        summary: active_summary(station_closures, active_closures)
+        summary: active_summary(station_closures, screen_elevator_id, active_closures)
       }
     end)
   end
@@ -293,29 +293,34 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
              }
            }
          ],
+         screen_elevator_id,
          closures
        ) do
-    # If any of a closed elevator's alternates are also closed, the normal summary may not be
-    # applicable.
-    if Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) do
-      @active_summary_fallback
-    else
-      case redundancy do
-        :nearby -> {:inside, summary}
-        :in_station -> {:inside, summary}
+    cond do
+      Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) ->
+        # If any of a closed elevator's alternates are also closed, the normal summary may not be
+        # applicable.
+        @active_summary_fallback
+
+      redundancy in ~w[nearby in_station]a and screen_elevator_id in alternate_ids ->
+        {:inside, "This is the backup elevator"}
+
+      redundancy in ~w[nearby in_station]a ->
+        {:inside, summary}
+
+      true ->
         # TEMP: Use fallback text instead of actual exiting summary. These are worded in a way
         # that only makes sense when using the elevator to exit the station, but it might not be
         # possible for a rider to get into that situation if they enter the system at the station
         # where this summary is being displayed (without doubling back on themselves). Temporarily
         # disabled until we implement logic to determine when showing this summary is appropriate.
-        :other -> @active_summary_fallback
-      end
+        @active_summary_fallback
     end
   end
 
   # Use the fallback when there are multiple closures at the same station or we have no redundancy
   # data for an elevator.
-  defp active_summary(_other, _all_closures), do: @active_summary_fallback
+  defp active_summary(_other, _screen_elevator_id, _closures), do: @active_summary_fallback
 
   # `nil` indicates the specially-formatted fallback summary for upcoming closures.
   defp upcoming_summary(%Closure{elevator: nil}), do: nil

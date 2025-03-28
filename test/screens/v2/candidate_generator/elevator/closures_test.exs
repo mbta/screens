@@ -355,8 +355,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     end
 
     test "generates backup route summaries based on exiting redundancy", %{now: now} do
-      stub(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
-
       stub(@elevator, :get, fn
         "1" -> build_elevator("1", exiting_redundancy: :in_station, exiting_summary: "es1")
         "2" -> build_elevator("2", exiting_redundancy: :other, exiting_summary: "es2")
@@ -428,6 +426,77 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                }
                | _
              ] = Generator.elevator_status_instances(@screen, now)
+    end
+
+    test "uses a different summary when the screen's elevator is the backup", %{now: now} do
+      stub(@elevator, :get, fn
+        "1" ->
+          build_elevator("1",
+            alternate_ids: ["alt"],
+            exiting_redundancy: :nearby,
+            exiting_summary: "es1"
+          )
+
+        "2" ->
+          build_elevator("2", alternate_ids: ["alt"], exiting_redundancy: :other)
+
+        "alt" ->
+          build_elevator("alt")
+      end)
+
+      expect(@stop, :fetch_parent_station_name_map, fn ->
+        {:ok, %{"place-1" => "one", "place-2" => "two"}}
+      end)
+
+      stub(@facility, :fetch_stop_for_facility, fn facility_id ->
+        {:ok,
+         %Stop{
+           id:
+             case facility_id do
+               "1" -> "place-1"
+               "2" -> "place-2"
+               "alt" -> "place-1"
+             end
+         }}
+      end)
+
+      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+        alerts = [
+          build_alert(
+            informed_entities: [
+              %{stop: "place-1", facility: %{name: "in station", id: "1"}}
+            ]
+          ),
+          build_alert(
+            informed_entities: [
+              # don't use special text when "this" is the backup for a closure at another station
+              %{stop: "place-2", facility: %{name: "outside station", id: "2"}}
+            ]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      screen = %{@screen | app_params: %{@app_params | elevator_id: "alt"}}
+
+      assert [
+               %ElevatorClosures{
+                 stations_with_closures: [
+                   %ElevatorClosures.Station{
+                     id: "place-1",
+                     closures: [%Closure{id: "1"}],
+                     summary: {:inside, "This is the backup elevator"}
+                   },
+                   %ElevatorClosures.Station{
+                     id: "place-2",
+                     closures: [%Closure{id: "2"}],
+                     summary: {:other, "Visit mbta.com/elevators for more info"}
+                   }
+                 ]
+               }
+               | _
+             ] = Generator.elevator_status_instances(screen, now)
     end
 
     test "omits route pills on closures when there is a routes API error", %{now: now} do
