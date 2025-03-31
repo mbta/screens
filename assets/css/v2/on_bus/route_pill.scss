@@ -1,13 +1,13 @@
 @use "CSS/colors";
 
 .route-pill {
-  display: flex;
+    position: relative;
+display: flex;
   align-items: center;
-  position: relative;
-  width: 100%;
+  width: 112px;
   height: 72px;
-  border-radius: 100px;
   margin-top: 18px;
+  border-radius: 100px;
 
   &--blue {
     background-color: colors.$line-blue;
@@ -38,10 +38,10 @@
   }
 
   &--yellow {
-    background-color: colors.$line-bus;
     height: 72px;
     color: black;
     letter-spacing: -2px;
+    background-color: colors.$line-bus;
     border-radius: 0 10px 10px 0;
     box-shadow: 2px 4px 2px rgb(0 0 0 / 25%);
   }
@@ -61,8 +61,8 @@
     font-style: normal;
     font-weight: 700;
     line-height: 55px; /* 114.775% */
-    letter-spacing: -0.857px;
     color: black;
+    letter-spacing: -0.857px;
   }
 
   &--green {
@@ -85,9 +85,9 @@
   position: absolute;
   width: 100%;
   font-family: neue-haas-grotesk-text;
-  font-size: 32px;
+  font-size: 47px;
   font-weight: 700;
-  line-height: 74px;
+  line-height: 55px;
   text-align: center;
 }
 

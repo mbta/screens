@@ -28,32 +28,27 @@
 
 .departure-row__destination {
   display: inline-block;
-  vertical-align: top;
   height: 100%;
+  vertical-align: top;
 }
 
 .departure-destination__headsign {
   display: inline-block;
-  font-feature-settings:
-    "liga" off,
-    "clig" off;
+  width: 364px;
+  margin-top: 22.5px;
+  margin-left: 20px;
+  overflow: hidden;
   font-family: Inter;
   font-size: 47px;
   font-style: normal;
   font-weight: 700;
-  line-height: 63px;
-  width: 364px;
-  margin-top: 22.5px;
-  margin-left: 20px;
-  // white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+    line-height: 63px;
+text-overflow: ellipsis;
 }
 
 .departure-row__time {
   display: inline-block;
-  vertical-align: top;
-  height: 100%;
   width: 130px;
+  height: 100%;
   vertical-align: top;
 }
