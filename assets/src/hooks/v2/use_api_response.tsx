@@ -91,6 +91,7 @@ const doFailureBuffer = (
     setApiResponse(FAILURE_RESPONSE);
   } else {
     const elapsedMs = Date.now() - lastSuccess;
+
     if (elapsedMs < MINUTE_IN_MS) {
       setApiResponse((state) => state);
     }
