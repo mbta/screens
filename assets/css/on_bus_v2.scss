@@ -8,6 +8,7 @@
 @use "v2/on_bus/departures_header";
 @use "v2/on_bus/departures_row";
 @use "v2/on_bus/route_pill";
+@use "v2/on_bus/time";
 
 body {
   margin: 0;

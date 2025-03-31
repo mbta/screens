@@ -4,7 +4,7 @@
   display: flex;
   align-items: center;
   position: relative;
-  width: 120px;
+  width: 100%;
   height: 72px;
   border-radius: 100px;
   margin-top: 18px;
@@ -38,15 +38,11 @@
   }
 
   &--yellow {
-    width: 112px;
+    background-color: colors.$line-bus;
     height: 72px;
-    padding: 4.286px;
-    justify-content: center;
-    align-items: center;
     color: black;
     letter-spacing: -2px;
-    background-color: colors.$line-bus;
-    border-radius: 0 20px 20px 0;
+    border-radius: 0 10px 10px 0;
     box-shadow: 2px 4px 2px rgb(0 0 0 / 25%);
   }
 }
@@ -54,16 +50,14 @@
 .route-pill__text {
   position: absolute;
   width: 100%;
-  font-family: Helvetica, sans-serif;
-  font-size: 48px;
+  font-family: Inter;
+  font-size: 47px;
   font-weight: 700;
   color: white;
   text-align: center;
   letter-spacing: 0.0277em;
 
   &--yellow {
-    font-family: Inter, sans-serif;
-    font-size: 48px;
     font-style: normal;
     font-weight: 700;
     line-height: 55px; /* 114.775% */
@@ -103,26 +97,4 @@
 
 .route-pill__slashed-part-2 {
   display: inline-block;
-}
-
-.alert-widget__content__route-pills--small {
-  .route-pill {
-    width: 104px;
-    height: 64px;
-  }
-
-  .route-pill__text {
-    font-size: 42px;
-    line-height: 64px;
-  }
-
-  .route-pill__icon-image {
-    height: 52px;
-    margin-top: 6px;
-  }
-
-  .route-pill__slashed-text {
-    font-size: 28px;
-    line-height: 64px;
-  }
 }

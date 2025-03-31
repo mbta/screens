@@ -1,11 +1,11 @@
 import React, { ComponentType } from "react";
 
 import type DepartureRowBase from "Components/v2/departures/departure_row";
+import type DestinationBase from "Components/v2/departures/destination";
 import RoutePill, { Pill } from "Components/v2/departures/route_pill";
 import Destination from "./destination";
-import DepartureTimes, {
-  TimeWithCrowding,
-} from "../departures/departure_times";
+import { type TimeWithCrowding } from "Components/v2/departures/departure_times";
+import DepartureTime from "Components/v2/departures/departure_time";
 
 interface Props extends DepartureRowBase {
   currentPage: number;
@@ -14,7 +14,7 @@ interface Props extends DepartureRowBase {
 type DepartureRow = {
   id: string;
   route: Pill;
-  headsign: Destination;
+  headsign: DestinationBase;
   times_with_crowding: TimeWithCrowding[];
 };
 
@@ -32,7 +32,7 @@ const DepartureRow: ComponentType<Props> = ({
         <Destination {...headsign} />
       </div>
       <div className="departure-row__time">
-        <DepartureTimes timesWithCrowding={timesWithCrowding} />
+        <DepartureTime {...timesWithCrowding[0].time}  />
       </div>
     </div>
   );
