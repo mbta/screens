@@ -31,7 +31,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     name: nil,
     app_id: :on_bus_v2
   }
-
   @route_id "route_id"
 
   defp build_departure(
@@ -229,7 +228,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     test "single stop with only a parent station" do
       stop_id = "has_a_parent_id"
       parent_id = "parent_id"
-
       all_stops = [build_stop(stop_id, parent_station_id: parent_id)]
       all_stop_ids = Enum.concat([[stop_id], [parent_id]])
       mock_departures = [build_departure("66", 0)]
