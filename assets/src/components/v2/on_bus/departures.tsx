@@ -14,6 +14,7 @@ interface Props {
 }
 
 const Departures: ComponentType<Props> = ({ sections }) => {
+  console.log(sections);
   return (
     <div className="departures-container">
       <div className="departures-header">

@@ -5,6 +5,8 @@ import RoutePill from "Components/v2/departures/route_pill";
 import Destination from "./destination";
 import DepartureTimes from "./departure_times";
 
+const LINE_HEIGHT = 138; // px
+
 interface Props extends DepartureRowBase {
   currentPage: number;
 }
@@ -21,7 +23,11 @@ const DepartureRow: ComponentType<Props> = ({
         <RoutePill pill={route} />
       </div>
       <div className="departure-row__destination">
-        <Destination {...headsign} currentPage={currentPage} />
+        <Destination
+          {...headsign}
+          currentPage={currentPage}
+          lineHeight={LINE_HEIGHT}
+        />
       </div>
       <div className="departure-row__time">
         <DepartureTimes

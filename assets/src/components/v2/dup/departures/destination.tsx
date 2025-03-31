@@ -2,8 +2,6 @@ import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
 
 import type DestinationBase from "Components/v2/departures/destination";
 
-const LINE_HEIGHT = 138; // px
-
 // Global abbreviations
 const ABBREVIATIONS = {
   Center: "Ctr",
@@ -46,13 +44,21 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
 
 interface Props extends DestinationBase {
   currentPage: number;
+  lineHeight: number;
 }
 
-const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
+const Destination: ComponentType<Props> = ({
+  headsign,
+  variation,
+  currentPage,
+  lineHeight,
+}) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
-  let parts = headsign.split(" ");
+  let parts = variation
+    ? [...headsign.split(" "), ...variation.split(" ")]
+    : headsign.split(" ");
 
   const [index1, setIndex1] = useState(parts.length);
   const [index2, setIndex2] = useState(parts.length);
@@ -66,10 +72,10 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
   useLayoutEffect(() => {
     if (firstLineRef.current && secondLineRef.current) {
       const firstLines = Math.round(
-        firstLineRef.current.clientHeight / LINE_HEIGHT,
+        firstLineRef.current.clientHeight / lineHeight,
       );
       const secondLines = Math.round(
-        secondLineRef.current.clientHeight / LINE_HEIGHT,
+        secondLineRef.current.clientHeight / lineHeight,
       );
 
       switch (phase) {
