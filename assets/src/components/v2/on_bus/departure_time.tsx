@@ -11,7 +11,7 @@ interface MinutesDeparture {
 
 type DepartureTime =
   | (TextDeparture & { type: "text" })
-  | (MinutesDeparture & { type: "minutes" })
+  | (MinutesDeparture & { type: "minutes" });
 
 const TextDepartureTime = ({ text }) => {
   return <div className="departure-time__text">{text}</div>;
@@ -32,7 +32,7 @@ interface Props {
 
 const DepartureTime: ComponentType<Props> = ({ time }) => {
   let predictedTime;
-   if (time.type === "text") {
+  if (time.type === "text") {
     predictedTime = <TextDepartureTime {...time} />;
   } else if (time.type === "minutes") {
     predictedTime = <MinutesDepartureTime {...time} />;
