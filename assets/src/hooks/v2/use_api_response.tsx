@@ -92,7 +92,6 @@ const doFailureBuffer = (
   } else {
     const elapsedMs = Date.now() - lastSuccess;
     if (elapsedMs < MINUTE_IN_MS) {
-      SentryLogger.info("Keeping current state.");
       setApiResponse((state) => state);
     }
     if (elapsedMs >= MINUTE_IN_MS) {
@@ -200,6 +199,7 @@ const useBaseApiResponse = ({
       const response = parseRawResponse(json);
 
       if (response.state == "failure") {
+        SentryLogger.info("Request failed.", { json });
         doFailureBuffer(lastSuccess, setApiResponse, response);
       } else {
         setApiResponse((prevApiResponse) => {
@@ -210,7 +210,8 @@ const useBaseApiResponse = ({
         });
         setLastSuccess(now);
       }
-    } catch {
+    } catch (err) {
+      SentryLogger.captureException(err);
       doFailureBuffer(lastSuccess, setApiResponse);
     }
 

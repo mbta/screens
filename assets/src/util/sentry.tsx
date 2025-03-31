@@ -8,24 +8,34 @@ import Raven, { RavenOptions, RavenTransportOptions } from "raven-js";
 // https://docs.sentry.io/clients/javascript/usage/#raven-js-additional-context
 type LogLevel = "info" | "warning" | "error";
 
-const log = (message: string, level: LogLevel) => {
-  Raven.captureMessage(message, { level });
+const log = (message: string, level: LogLevel, extra?: any) => {
+  const options: RavenOptions = { level };
+  if (extra) {
+    options.extra = extra;
+  }
+  Raven.captureMessage(message, options);
 };
-const info = (message: string) => log(message, "info");
-const warn = (message: string) => log(message, "warning");
-const error = (message: string) => log(message, "error");
+const info = (message: string, extra?: any) => log(message, "info", extra);
+const warn = (message: string, extra?: any) => log(message, "warning", extra);
+const error = (message: string, extra?: any) => log(message, "error", extra);
 
 const captureException = (ex: unknown, options?: RavenOptions) => {
   Raven.captureException(ex, options);
 };
 
-const offline_events_key = "sentry_offline_events";
+const OFFLINE_EVENTS_KEY = "sentry_offline_events";
 
 // Store offline Sentry events in localStorage for later retry
 function cacheEvent(options: RavenTransportOptions) {
   try {
-    const cached = localStorage.getItem(offline_events_key);
+    const cached = localStorage.getItem(OFFLINE_EVENTS_KEY);
     const events = cached ? JSON.parse(cached) : [];
+
+    // Remove oldest event if limit is reached
+    if (events.length >= 30) {
+      events.shift();
+    }
+
     events.push({
       ...options,
       data: {
@@ -36,7 +46,7 @@ function cacheEvent(options: RavenTransportOptions) {
         },
       },
     });
-    localStorage.setItem(offline_events_key, JSON.stringify(events));
+    localStorage.setItem(OFFLINE_EVENTS_KEY, JSON.stringify(events));
   } catch {}
 }
 
@@ -45,7 +55,7 @@ function buildSentryAuthHeader(auth) {
 }
 
 function resendCachedEvents() {
-  const cached = localStorage.getItem(offline_events_key);
+  const cached = localStorage.getItem(OFFLINE_EVENTS_KEY);
   if (!cached) return;
 
   // Retry each event in the cache
@@ -62,9 +72,12 @@ function resendCachedEvents() {
     });
   });
 
-  localStorage.removeItem(offline_events_key);
+  localStorage.removeItem(OFFLINE_EVENTS_KEY);
 }
 
+// Once we are no longer bounded by browser constraints (old bus-eink),
+// we can migrate off of Raven to @sentry/browser and use their built-in offline caching.
+// Documentation for reference: https://docs.sentry.io/platforms/javascript/guides/react/best-practices/offline-caching/
 function customTransport(options: RavenTransportOptions) {
   fetch(options.url, {
     method: "POST",
@@ -91,6 +104,8 @@ const initSentry = (appString: string) => {
 
     // Set listener to retry any cached Sentry events any time the browser transitions from offline to online
     window.addEventListener("online", resendCachedEvents);
+    // 5 minute interval for retries in case "online" event never fires
+    setInterval(resendCachedEvents, 5 * 60 * 1000);
 
     if (isDup()) {
       const today = new Date();
