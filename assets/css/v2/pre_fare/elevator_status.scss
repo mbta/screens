@@ -10,14 +10,16 @@ If any changes to this stylesheet affect that, be sure to update
 the backend page-fitting logic as well.
 *** HEADS UP ***/
 
+@use "CSS/colors";
+
 .elevator-status {
   position: relative;
   width: 1024px;
   height: 1000px;
   margin: 16px 28px;
   overflow: hidden;
-  color: #171f26;
-  background: #e5e4e1;
+  color: colors.$cool-black-15;
+  background: colors.$warm-neutral-90;;
   border-radius: 16px;
   box-shadow: 0 10px 20px 0 rgb(0 0 0 / 25%);
 
@@ -47,7 +49,7 @@ the backend page-fitting logic as well.
     bottom: 0;
     width: 1024px;
     height: 124px;
-    background: #cccbc8;
+    background: colors.$warm-neutral-80;
     border-radius: 0 0 16px 16px;
 
     .elevator-status__footer-text {

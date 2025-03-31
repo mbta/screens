@@ -1,13 +1,15 @@
+@use "CSS/colors";
+
 .departures-container {
   height: 100%;
   padding: 32px;
   font-family: Inter, sans-serif;
-  background-color: #80276c;
+  background-color: colors.$line-cr;
 }
 
 .departures-card {
   height: 1656px;
-  background-color: #d9d6d0;
+  background-color: colors.$warm-neutral-85;
   border-radius: 16px;
 }
 

@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .departures-section {
   & > .departure-row:not(:last-child)::after {
     position: absolute;
@@ -6,7 +8,7 @@
     width: 848px;
     height: 4px;
     content: "";
-    background-color: #cccbc8;
+    background-color: colors.$warm-neutral-80;
     border-radius: 2px;
   }
 }

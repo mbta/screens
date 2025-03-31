@@ -1,3 +1,4 @@
+@use "CSS/colors";
 @use "CSS/v2/lcd_common/subway_status";
 
 .subway-status {
@@ -5,10 +6,10 @@
 }
 
 .subway-status-footer {
-  background-color: #cccbc8;
+  background-color: colors.$warm-neutral-80;
 }
 
 .subway-status-footer__link {
   font-weight: unset;
-  color: #171f26;
+  color: colors.$cool-black-15;
 }

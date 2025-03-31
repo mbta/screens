@@ -53,7 +53,7 @@
     display: flex;
     flex-direction: column;
     height: 100%;
-    background-color: #e5e4e1;
+    background-color: colors.$warm-neutral-90;;
     box-shadow: 0 10px 20px 0 rgb(23 31 38 / 25%);
 
     &--no-banner {
@@ -118,7 +118,7 @@
     min-width: 124px;
     height: 124px;
     margin-right: 45px;
-    color: #171f26;
+    color: colors.$cool-black-15;
   }
 
   .alert-card__content-block__text {
@@ -143,7 +143,7 @@
   .alert-card__fallback__icon {
     height: 192px;
     margin-bottom: 48px;
-    color: #171f26;
+    color: colors.$cool-black-15;
   }
 
   .alert-card__fallback__issue-text {
@@ -190,7 +190,7 @@
     height: 84px;
     padding: 20px 60px;
     font-size: 32px;
-    background: #cccbc8;
+    background: colors.$warm-neutral-80;
     border-radius: 0 0 4px 4px;
   }
 
