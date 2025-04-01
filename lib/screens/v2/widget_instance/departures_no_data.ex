@@ -1,8 +1,7 @@
 defmodule Screens.V2.WidgetInstance.DeparturesNoData do
   @moduledoc false
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Alerts
+  alias ScreensConfig.{Alerts, Screen}
 
   defstruct screen: nil, show_alternatives?: nil, slot_name: nil
 

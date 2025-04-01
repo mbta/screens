@@ -8,9 +8,10 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
   alias Screens.V2.WidgetInstance.Survey, as: SurveyInstance
+  alias ScreensConfig.{Footer, Survey}
+  alias ScreensConfig.Header.{CurrentStopId, CurrentStopName}
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{BusShelter, Footer, Survey}
-  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
+  alias ScreensConfig.Screen.BusShelter
 
   @behaviour CandidateGenerator
 

@@ -1,13 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.DupNewTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Alerts, Departures, EvergreenContentItem, Header, Schedule}
-  alias ScreensConfig.V2.Dup, as: DupConfig
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator.DupNew
   alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.{DeparturesNoData, EvergreenContent, NormalHeader}
+  alias ScreensConfig.{Alerts, Departures, EvergreenContentItem, Header, Schedule}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.Screen.Dup, as: DupConfig
 
   import Screens.Inject
   import Mox

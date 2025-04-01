@@ -1,10 +1,6 @@
 defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.V2.Departures.Header
-  alias ScreensConfig.V2.Departures.Layout
-  alias ScreensConfig.V2.FreeTextLine
-  alias ScreensConfig.Screen
   alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -16,6 +12,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Departures.{HeadwaySection, NoDataSection, NormalSection}
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
+  alias ScreensConfig.Departures.Header
+  alias ScreensConfig.Departures.Layout
+  alias ScreensConfig.{FreeTextLine, Screen}
 
   describe "priority/1" do
     test "returns 2" do

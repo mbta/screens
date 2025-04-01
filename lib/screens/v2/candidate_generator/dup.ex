@@ -8,9 +8,9 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.NormalHeader
+  alias ScreensConfig.Header.{CurrentStopId, CurrentStopName}
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Dup
-  alias ScreensConfig.V2.Header.{CurrentStopId, CurrentStopName}
+  alias ScreensConfig.Screen.Dup
 
   @behaviour CandidateGenerator
 

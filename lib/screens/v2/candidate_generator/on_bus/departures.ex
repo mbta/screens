@@ -135,8 +135,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
         sections: [
           %NormalSection{
             rows: Enum.take(departure_data, @max_departure_results),
-            layout: %ScreensConfig.V2.Departures.Layout{},
-            header: %ScreensConfig.V2.Departures.Header{}
+            layout: %ScreensConfig.Departures.Layout{},
+            header: %ScreensConfig.Departures.Header{}
           }
         ],
         now: now,

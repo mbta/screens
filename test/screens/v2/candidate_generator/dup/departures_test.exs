@@ -2,11 +2,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.{Alerts, Departures, Header}
-  alias ScreensConfig.V2.Departures.Header, as: SectionHeader
-  alias ScreensConfig.V2.Departures.{Layout, Query, Section}
-  alias ScreensConfig.V2.Dup, as: DupConfig
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -18,6 +13,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.{HeadwaySection, NoDataSection, NormalSection}
   alias Screens.V2.WidgetInstance.OvernightDepartures
+  alias ScreensConfig.{Alerts, Departures, Header}
+  alias ScreensConfig.Departures.Header, as: SectionHeader
+  alias ScreensConfig.Departures.{Layout, Query, Section}
+  alias ScreensConfig.Screen
+  alias ScreensConfig.Screen.Dup, as: DupConfig
 
   import Screens.Inject
   import Mox

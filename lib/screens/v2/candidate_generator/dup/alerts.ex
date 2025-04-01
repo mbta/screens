@@ -10,9 +10,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
+  alias ScreensConfig.Alerts, as: AlertsConfig
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Alerts, as: AlertsConfig
-  alias ScreensConfig.V2.Dup
+  alias ScreensConfig.Screen.Dup
 
   require Logger
 

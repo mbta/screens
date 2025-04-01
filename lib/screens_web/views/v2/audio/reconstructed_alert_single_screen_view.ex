@@ -8,11 +8,8 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
     ~E|<p><%= render_banner(alert) %><%= render_alert(alert) %></p>|
   end
 
-  # The field `unaffected_routes` is reserved for single line closures at transfer station
-  def render_banner(%{
-        unaffected_routes: _unaffected_routes
-      }),
-      do: nil
+  # `unaffected_routes` is non-empty for single line closures at transfer station
+  def render_banner(%{unaffected_routes: [_ | _]}), do: nil
 
   # The field `region` is reserved for single-pane alerts.
   # Routes will only be empty if the banner should be empty (e.g. multiline delay)
@@ -122,7 +119,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         effect: :station_closure,
         routes: route_svg_names,
         cause: cause,
-        unaffected_routes: unaffected_routes
+        unaffected_routes: [_ | _] = unaffected_routes
       }) do
     ~E|<%= get_line_name(route_svg_names) %> trains are skipping this station<%= render_cause(cause) %>. Please seek an alternate route. <%= get_line_name(unaffected_routes) %> trains are stopping here as usual.|
   end

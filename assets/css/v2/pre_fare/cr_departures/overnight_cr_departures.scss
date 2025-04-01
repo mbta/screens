@@ -1,13 +1,15 @@
+@use "CSS/colors";
+
 .overnight-cr-departures__container {
   position: relative;
   height: 100%;
   padding: 32px;
   font-family: Inter, sans-serif;
-  background-color: #80276c;
+  background-color: colors.$line-cr;
 
   .overnight-cr-departures__card {
     height: 1656px;
-    background-color: #d9d6d0;
+    background-color: colors.$warm-neutral-85;
     border-radius: 16px;
 
     .overnight-cr-departures__body {

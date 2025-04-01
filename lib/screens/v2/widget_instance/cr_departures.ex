@@ -7,7 +7,7 @@ defmodule Screens.V2.WidgetInstance.CRDepartures do
   alias Screens.Util
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.V2.CRDepartures
+  alias ScreensConfig.CRDepartures
 
   defstruct config: nil,
             departures_data: [],

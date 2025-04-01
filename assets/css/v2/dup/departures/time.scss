@@ -1,8 +1,10 @@
+@use "CSS/colors";
+
 .departure-time {
   font-family: Inter, sans-serif;
   font-size: 138px;
   line-height: 1em;
-  color: #171f26;
+  color: colors.$cool-black-15;
   text-align: right;
 
   &:not(:first-child) {

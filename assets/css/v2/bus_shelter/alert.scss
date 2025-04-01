@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .alert-widget--flex-zone {
   // Slot dimensions are 480x580, but this leaves space for the drop-shadow.
   width: 520px;
@@ -108,7 +110,7 @@
 .alert-widget--full-body {
   width: 1080px;
   height: 1648px;
-  background: #fd0;
+  background: colors.$alert-yellow;
 
   .alert-widget__card {
     transform: translateY(10px);

@@ -22,8 +22,8 @@ interface PreFareSingleScreenAlertProps {
   routes: EnrichedRoute[];
   unaffected_routes: EnrichedRoute[];
   endpoints: [string, string];
-  effect: string;
-  region: string;
+  effect: "suspension" | "shuttle" | "station_closure" | "delay";
+  region: "here" | "boundary" | "outside";
   updated_at: string;
   disruption_diagram?: DisruptionDiagramData;
 }
@@ -106,7 +106,7 @@ const DownstreamLayout: React.ComponentType<DownstreamLayoutProps> = ({
   </div>
 );
 
-interface MultiLineLayoutProps {
+interface PartialClosureLayoutProps {
   routes: EnrichedRoute[];
   unaffected_routes: EnrichedRoute[];
   disruptionDiagram?: DisruptionDiagramData;
@@ -115,7 +115,7 @@ interface MultiLineLayoutProps {
 // Covers the case where a station_closure only affects one line at a transfer station.
 // In the even rarer case that there are multiple branches in the routes list or unaffected routes list
 // the font size may need to shrink to accommodate.
-const MultiLineLayout: React.ComponentType<MultiLineLayoutProps> = ({
+const PartialClosureLayout: React.ComponentType<PartialClosureLayoutProps> = ({
   routes,
   unaffected_routes,
   disruptionDiagram,
@@ -315,8 +315,14 @@ const MapSection: React.ComponentType<MapSectionProps> = ({
   );
 };
 
-const isMultiLine = (effect: string, region: string) =>
-  effect === "station_closure" && region === "here";
+const isPartialClosure = ({
+  effect,
+  region,
+  unaffected_routes,
+}: PreFareSingleScreenAlertProps): boolean =>
+  effect === "station_closure" &&
+  region === "here" &&
+  unaffected_routes.length > 0;
 
 const PreFareSingleScreenAlert: React.ComponentType<
   PreFareSingleScreenAlertProps
@@ -339,8 +345,8 @@ const PreFareSingleScreenAlert: React.ComponentType<
   /**
    * This switch statement picks the alert layout
    * - fallback: icon, followed by a summary & pio text, or just the pio text
-   * - multiline: icon + route pill + text explaining the lines that are closed at the station
-   *              and then icon + route pill + text explaining normal service. Finally, the map section
+   * - partial closure: icon + route pill + text explaining the lines that are closed at the station
+   *                    and then icon + route pill + text explaining normal service. Finally, the map section
    * - standard: icon + issue, and icon + remedy, and then map section
    * - downstream: map, issue without icon, then icon + remedy
    **/
@@ -359,11 +365,22 @@ const PreFareSingleScreenAlert: React.ComponentType<
         />
       );
       break;
-    case effect === "station_closure" && region === "here":
+    case isPartialClosure(alert):
       layout = (
-        <MultiLineLayout
+        <PartialClosureLayout
           routes={routes}
           unaffected_routes={unaffected_routes}
+          disruptionDiagram={disruption_diagram}
+        />
+      );
+      break;
+    case effect === "station_closure" && region === "here":
+      layout = (
+        <StandardLayout
+          issue={issue}
+          remedy={remedy}
+          effect={effect}
+          location={location}
           disruptionDiagram={disruption_diagram}
         />
       );
@@ -414,7 +431,7 @@ const PreFareSingleScreenAlert: React.ComponentType<
       );
   }
 
-  const showBanner = !isMultiLine(effect, region);
+  const showBanner = !isPartialClosure(alert);
 
   return (
     <div className="pre-fare-alert__page">

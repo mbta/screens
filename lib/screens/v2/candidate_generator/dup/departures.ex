@@ -11,11 +11,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
-  alias ScreensConfig.Screen
-  alias ScreensConfig.V2.Departures
-  alias ScreensConfig.V2.Departures.{Header, Layout, Query, Section}
-  alias ScreensConfig.V2.Departures.Query.Params
-  alias ScreensConfig.V2.Dup
+  alias ScreensConfig.{Departures, Screen}
+  alias ScreensConfig.Departures.{Header, Layout, Query, Section}
+  alias ScreensConfig.Departures.Query.Params
+  alias ScreensConfig.Screen.Dup
 
   alias Screens.V2.WidgetInstance.Departures.{
     HeadwaySection,

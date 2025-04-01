@@ -1,9 +1,8 @@
+@use "CSS/colors";
+
 .subway-status {
   /// Reusable values for the component
   /// (Defined here to avoid polluting the global namespace)
-  $text-dark-gray: #171f26;
-  $widget-background: #e5e4e1;
-  $rule-color: #cccbc8;
   $rule-width: 808px;
   $status-top-padding: 18px;
   $status-left-padding: 24px;
@@ -25,8 +24,8 @@
   padding-top: 6px;
   overflow: hidden;
   font-family: Inter, sans-serif;
-  color: $text-dark-gray;
-  background: $widget-background;
+  color: colors.$cool-black-15;
+  background: colors.$warm-neutral-90;
   border-radius: 16px;
   box-shadow: 0 12px 24px 0 rgb(23 31 38 / 25%);
 
@@ -77,7 +76,7 @@
     width: $rule-width;
     height: 4px;
     content: "";
-    background: $rule-color;
+    background: colors.$warm-neutral-80;
     border-radius: 2px;
   }
 

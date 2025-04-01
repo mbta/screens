@@ -9,7 +9,7 @@ $alert-card-footer-height: 80px;
 .alert-container {
   // Takeover fonts
   font-family: Inter, sans-serif;
-  color: #171f26;
+  color: colors.$cool-black-15;
 
   .x-large-text {
     font-size: 200px;
@@ -181,7 +181,7 @@ $alert-card-footer-height: 80px;
 
   .alert-card__footer {
     height: $alert-card-footer-height;
-    background-color: #cccbc8;
+    background-color: colors.$warm-neutral-80;
     border-radius: 0 0 32px 32px;
   }
 
@@ -204,8 +204,8 @@ $alert-card-footer-height: 80px;
   .alert-card {
     width: 1016px;
     height: 100%;
-    color: #171f26;
-    background-color: #e5e4e1;
+    color: colors.$cool-black-15;
+    background-color: colors.$warm-neutral-90;
     border-radius: 4px;
 
     &__body {
@@ -294,7 +294,7 @@ $alert-card-footer-height: 80px;
       font-weight: 400;
       color: #000;
       text-align: center;
-      background-color: #cccbc8;
+      background-color: colors.$warm-neutral-80;
       border-radius: 0 0 4px 4px;
 
       &__cause {
@@ -351,7 +351,7 @@ $alert-card-footer-height: 80px;
   .alert-card__body__route-pills
     .route-pills__branches
     .route-pills__branches__dot {
-    background-color: #171f26;
+    background-color: colors.$cool-black-15;
   }
 }
 

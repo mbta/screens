@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
   alias Screens.V2.WidgetInstance.Elevator.Closure
   alias Screens.V2.WidgetInstance.ElevatorClosures
   alias Screens.V2.WidgetInstance.ElevatorClosures.{Station, Upcoming}
-  alias ScreensConfig.V2.Elevator
+  alias ScreensConfig.Screen.Elevator
 
   @instance %ElevatorClosures{
     app_params: %Elevator{
@@ -17,9 +17,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
     station_id: "place-abc",
     stations_with_closures: [
       %Station{
+        id: "place-forhl",
         name: "Forest Hills",
         route_icons: ["Orange"],
-        closures: [%Closure{id: "222", name: "FH Elevator"}]
+        closures: [%Closure{id: "222", name: "FH Elevator"}],
+        summary: {:other, "Visit mbta.com/elevators"}
       }
     ]
   }
@@ -29,7 +31,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
       assert WidgetInstance.serialize(@instance) == %{
                id: @instance.app_params.elevator_id,
                station_id: @instance.station_id,
-               stations_with_closures: @instance.stations_with_closures,
+               stations_with_closures: [
+                 %{
+                   id: "place-forhl",
+                   name: "Forest Hills",
+                   route_icons: ["Orange"],
+                   closures: [%Closure{id: "222", name: "FH Elevator"}],
+                   summary: %{type: :other, text: "Visit mbta.com/elevators"}
+                 }
+               ],
                upcoming_closure: nil
              }
     end

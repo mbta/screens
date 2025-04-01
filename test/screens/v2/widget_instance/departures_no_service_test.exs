@@ -1,8 +1,9 @@
 defmodule Screens.V2.WidgetInstance.DeparturesNoSerivceTest do
   use ExUnit.Case, async: true
+
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
-  alias ScreensConfig.V2.BusEink
+  alias ScreensConfig.Screen.BusEink
 
   setup do
     %{
