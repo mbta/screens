@@ -1,18 +1,19 @@
 @use "CSS/colors";
 
-.departures-header {
+.connections_header {
   display: flex;
   align-items: center;
   height: 108px;
   margin-left: 26px;
 }
 
-.departures_header__text {
+.connections_header__text {
   font-family: Inter;
   font-size: 47px;
   font-style: normal;
   font-weight: 500;
   line-height: normal;
+  letter-spacing: 3%;
   color: colors.$cool-black-30;
-  text-align: center;
+  text-align: left;
 }

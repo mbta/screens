@@ -1,3 +1,4 @@
+@use "CSS/colors";
 @use "fonts/inter_font_face";
 
 @use "v2/multi_screen_page";
@@ -5,8 +6,8 @@
 @use "v2/simulation_common";
 
 @use "v2/on_bus/departures";
-@use "v2/on_bus/departures_header";
 @use "v2/on_bus/departures_row";
+@use "v2/on_bus/header";
 @use "v2/on_bus/route_pill";
 @use "v2/on_bus/time";
 
@@ -17,6 +18,7 @@ body {
 .screen-container {
   width: 650px;
   height: 432px;
+  background-color: colors.$warm-neutral-90;
 }
 
 .screen-normal {
@@ -24,16 +26,17 @@ body {
   height: 100%;
 }
 
+.screen-normal__header {
+  width: 100%;
+  height: 108px;
+}
+
 .screen-normal__body {
   width: 100%;
-  height: 100%;
+  height: 324px;
 }
 
-.body-normal {
-  width: 100%;
-  height: 100%;
-}
-
+.body-normal,
 .body-normal__main-content {
   width: 100%;
   height: 100%;

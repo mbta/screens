@@ -1,6 +1,5 @@
-@use "CSS/colors";
-
-.departures-container {
+.departures-container,
+.departures-section {
   position: relative;
-  background-color: colors.$warm-neutral-90;
+  height: 100%;
 }

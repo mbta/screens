@@ -22,13 +22,15 @@ import {
   ResponseMapperContext,
 } from "Components/v2/screen_container";
 import { URL_PARAMS_BY_SCREEN_TYPE } from "Util/query_params";
-import Departures from "Components/v2/on_bus/departures";
+import Departures from "Components/v2/departures";
+import ConnectionsHeader from "Components/v2/on_bus/header";
 
 const TYPE_TO_COMPONENT = {
   body_normal: NormalBody,
   departures: Departures,
   departures_no_data: NoData,
   departures_no_service: NoData,
+  normal_header: ConnectionsHeader,
   no_data: NoData,
   placeholder: Placeholder,
   screen_normal: NormalScreen,

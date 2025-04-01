@@ -10,6 +10,16 @@
   vertical-align: middle;
 }
 
+.departure-times-with-crowding,
+.departure-time-with-crowding {
+  height: 100%;
+}
+
+.departure-crowding {
+  width: 0px;
+  height: 0px;
+}
+
 .departure-time__minutes {
   display: inline-block;
   width: 88px;
