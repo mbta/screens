@@ -1,7 +1,9 @@
+@use "CSS/colors";
+
 .link-footer {
   position: relative;
   height: 156px;
-  background: #d9d6d0;
+  background: colors.$warm-neutral-85;
 }
 
 .link-footer__contents {

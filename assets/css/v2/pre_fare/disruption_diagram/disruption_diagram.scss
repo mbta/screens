@@ -36,12 +36,12 @@
   }
 
   &--affected {
-    stroke: #171f26;
+    stroke: colors.$cool-black-15;
   }
 }
 
 .shuttle-stop {
-  stroke: #171f26;
+  stroke: colors.$cool-black-15;
 }
 
 .middle-slot__background {
@@ -118,7 +118,7 @@
 }
 
 .station-closure-icon {
-  fill: #171f26;
+  fill: colors.$cool-black-15;
 
   &--current-stop {
     fill: #ee2e24;

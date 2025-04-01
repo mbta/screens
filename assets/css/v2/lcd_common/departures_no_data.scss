@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .departures-no-data-container {
   position: relative;
   box-sizing: border-box;
@@ -33,7 +35,7 @@
   width: 753px;
   height: 2px;
   content: "";
-  background: #737373;
+  background: colors.$true-grey-45;
 }
 
 .departures-no-data__alternatives-container {
