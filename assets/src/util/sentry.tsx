@@ -54,25 +54,32 @@ function buildSentryAuthHeader(auth) {
   return `Sentry sentry_version=${auth.sentry_version}, sentry_client=${auth.sentry_client}, sentry_key=${auth.sentry_key}`;
 }
 
-function resendCachedEvents() {
+async function resendCachedEvents() {
   const cached = localStorage.getItem(OFFLINE_EVENTS_KEY);
   if (!cached) return;
 
-  // Retry each event in the cache
-  JSON.parse(cached).forEach((event: RavenTransportOptions) => {
-    const headers = {
-      "Content-Type": "application/json",
-      "X-Sentry-Auth": buildSentryAuthHeader(event.auth),
-    };
+  let events = JSON.parse(cached);
 
-    fetch(event.url, {
-      method: "POST",
-      headers,
-      body: JSON.stringify(event.data),
-    });
-  });
+  for (let i = 0; i < events.length; i++) {
+    try {
+      const event = events[i];
+      const response = await fetch(event.url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Sentry-Auth": buildSentryAuthHeader(event.auth),
+        },
+        body: JSON.stringify(event.data),
+      });
 
-  localStorage.removeItem(OFFLINE_EVENTS_KEY);
+      if (response.ok) {
+        events.splice(i, 1);
+        i--;
+      }
+    } catch {}
+  }
+
+  localStorage.setItem(OFFLINE_EVENTS_KEY, JSON.stringify(events));
 }
 
 // Once we are no longer bounded by browser constraints (old bus-eink),
