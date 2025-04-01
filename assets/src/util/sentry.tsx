@@ -58,7 +58,7 @@ async function resendCachedEvents() {
   const cached = localStorage.getItem(OFFLINE_EVENTS_KEY);
   if (!cached) return;
 
-  let events = JSON.parse(cached);
+  const events = JSON.parse(cached);
 
   for (let i = 0; i < events.length; i++) {
     try {
