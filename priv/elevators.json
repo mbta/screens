@@ -34,7 +34,7 @@
   "958": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Shawmut. Take an Alewife train back to Fields Corner.",
+    "summary": "Exit at Shawmut Station. Take an Alewife train back to Fields Corner.",
     "alternate_ids": [
       "953",
       "964",
@@ -58,7 +58,7 @@
   "921": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Copley. Take a Heath St train back to Prudential.",
+    "summary": "Exit at Copley Station. Take a Heath St train back to Prudential.",
     "alternate_ids": [
       "920",
       "917",
@@ -77,7 +77,7 @@
   "816": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Harvard. Request shuttle bus back to Davis.",
+    "summary": "Exit at Harvard Station. Request shuttle bus back to Davis.",
     "alternate_ids": [
       "821",
       "973"
@@ -86,7 +86,7 @@
   "866": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Harvard. Take an Ashmont/Braintree train back to Kendall/MIT.",
+    "summary": "Exit at Harvard Station. Take an Ashmont/Braintree train back to Kendall/MIT.",
     "alternate_ids": [
       "863",
       "821",
@@ -98,7 +98,7 @@
   "996": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "997"
     ]
@@ -125,7 +125,7 @@
   "842": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "724"
     ]
@@ -141,7 +141,7 @@
   "856": {
     "exiting": "3D",
     "entering": "3D",
-    "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
+    "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay.",
     "alternate_ids": [
       "849",
       "850",
@@ -152,7 +152,7 @@
   "879": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at JFK/UMass. Take an Alewife train back to Andrew.",
+    "summary": "Exit at JFK/UMass Station. Take an Alewife train back to Andrew.",
     "alternate_ids": [
       "880",
       "872"
@@ -171,7 +171,7 @@
   "922": {
     "exiting": "3A",
     "entering": "3",
-    "summary": "Exit at Tufts Medical Center. Take an Oak Grove train back to Chinatown.",
+    "summary": "Exit at Tufts Medical Center Station. Take an Oak Grove train back to Chinatown.",
     "alternate_ids": [
       "876",
       "857",
@@ -182,7 +182,7 @@
   "945": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Oak Grove. Request shuttle bus back to Malden Center.",
+    "summary": "Exit at Oak Grove Station. Request shuttle bus back to Malden Center.",
     "alternate_ids": [
       "800",
       "801"
@@ -191,7 +191,7 @@
   "701": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "702",
       "703"
@@ -234,7 +234,7 @@
   "957": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Savin Hill. Take an Ashmont train back to Fields Corner.",
+    "summary": "Exit at Savin Hill Station. Take an Ashmont train back to Fields Corner.",
     "alternate_ids": [
       "958",
       "953",
@@ -244,7 +244,7 @@
   "998": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "999",
       "869"
@@ -264,7 +264,7 @@
   "913": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "924",
       "925"
@@ -273,7 +273,7 @@
   "855": {
     "exiting": "3D",
     "entering": "3D",
-    "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
+    "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay.",
     "alternate_ids": [
       "849",
       "850",
@@ -301,7 +301,7 @@
   "854": {
     "exiting": "3D",
     "entering": "3D",
-    "summary": "Exit at Ruggles or Forest Hills. Take the Orange Line to Back Bay.",
+    "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay.",
     "alternate_ids": [
       "849",
       "850",
@@ -312,7 +312,7 @@
   "815": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "814"
     ]
@@ -329,7 +329,7 @@
   "938": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at World Trade Center. Take an inbound SL bus to Courthouse.",
+    "summary": "Exit at World Trade Center Station. Take an inbound SL bus to Courthouse.",
     "alternate_ids": [
       "937",
       "935",
@@ -354,7 +354,7 @@
   "886": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Suffolk Downs. Take a Wonderland train back to Beachmont.",
+    "summary": "Exit at Suffolk Downs Station. Take a Wonderland train back to Beachmont.",
     "alternate_ids": [
       "887",
       "884",
@@ -364,7 +364,7 @@
   "994": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "995"
     ]
@@ -381,7 +381,7 @@
   "933": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Sullivan. Request shuttle bus back to Community College.",
+    "summary": "Exit at Sullivan Station. Request shuttle bus back to Community College.",
     "alternate_ids": [
       "840",
       "881"
@@ -436,7 +436,7 @@
   "813": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "961"
     ]
@@ -456,7 +456,7 @@
   "724": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "842"
     ]
@@ -478,7 +478,7 @@
   "972": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Copley. Take a Kenmore & West train back to Kenmore.",
+    "summary": "Exit at Copley Station. Take a Kenmore & West train back to Kenmore.",
     "alternate_ids": [
       "971",
       "948",
@@ -518,7 +518,7 @@
   "859": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
+    "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center.",
     "alternate_ids": [
       "853",
       "858"
@@ -527,7 +527,7 @@
   "702": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "701",
       "703"
@@ -536,7 +536,7 @@
   "757": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "756",
       "866",
@@ -549,7 +549,7 @@
   "965": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "966"
     ]
@@ -557,7 +557,7 @@
   "722": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "723"
     ]
@@ -592,7 +592,7 @@
   "807": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "806"
     ]
@@ -600,7 +600,7 @@
   "852": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Back Bay. Request shuttle bus back to Mass Ave.",
+    "summary": "Exit at Back Bay Station. Request shuttle bus back to Mass Ave.",
     "alternate_ids": [
       "853"
     ]
@@ -608,7 +608,7 @@
   "858": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
+    "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center.",
     "alternate_ids": [
       "853",
       "859"
@@ -628,7 +628,7 @@
   "850": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Jackson Sq. Request shuttle bus back to Ruggles.",
+    "summary": "Exit at Jackson Sq Station. Request shuttle bus back to Ruggles.",
     "alternate_ids": [
       "846",
       "847"
@@ -637,7 +637,7 @@
   "967": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "974",
       "975",
@@ -647,7 +647,7 @@
   "768": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "767"
     ]
@@ -670,7 +670,7 @@
   "868": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Andrew. Request shuttle bus back to Broadway.",
+    "summary": "Exit at Andrew Station. Request shuttle bus back to Broadway.",
     "alternate_ids": [
       "872",
       "879",
@@ -686,7 +686,7 @@
   "920": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Northeastern. Take a Medford/Tufts train back to Prudential.",
+    "summary": "Exit at Northeastern Station. Take a Medford/Tufts train back to Prudential.",
     "alternate_ids": [
       "921",
       "917",
@@ -706,7 +706,7 @@
   "746": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "743"
     ]
@@ -714,7 +714,7 @@
   "805": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "736",
       "810"
@@ -723,7 +723,7 @@
   "930": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "929"
     ]
@@ -754,7 +754,7 @@
   "966": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "965"
     ]
@@ -762,7 +762,7 @@
   "946": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at JFK/UMass. Request shuttle bus back to Savin Hill.",
+    "summary": "Exit at JFK/UMass Station. Request shuttle bus back to Savin Hill.",
     "alternate_ids": [
       "831",
       "830"
@@ -771,7 +771,7 @@
   "814": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "815"
     ]
@@ -789,7 +789,7 @@
   "721": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "720"
     ]
@@ -797,7 +797,7 @@
   "762": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "763",
       "764"
@@ -806,7 +806,7 @@
   "846": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Stony Brook. Request shuttle bus back to Jackson Sq.",
+    "summary": "Exit at Stony Brook Station. Request shuttle bus back to Jackson Sq.",
     "alternate_ids": [
       "845",
       "847"
@@ -815,7 +815,7 @@
   "802": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "967",
       "974",
@@ -825,7 +825,7 @@
   "880": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Broadway. Take an Ashmont/Braintree train back to Andrew.",
+    "summary": "Exit at Broadway Station. Take an Ashmont/Braintree train back to Andrew.",
     "alternate_ids": [
       "879",
       "872"
@@ -840,7 +840,7 @@
   "876": {
     "exiting": "3C",
     "entering": "3A",
-    "summary": "Exit at Tufts Medical Center. Take an SL4 or SL5 bus to Chinatown.",
+    "summary": "Exit at Tufts Medical Center Station. Take an SL4 or SL5 bus to Chinatown.",
     "alternate_ids": [
       "922",
       "857",
@@ -868,7 +868,7 @@
   "969": {
     "exiting": "2",
     "entering": "2",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "968"
     ]
@@ -876,7 +876,7 @@
   "890": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Orient Heights. Take a Bowdoin train back to Wood Island.",
+    "summary": "Exit at Orient Heights Station. Take a Bowdoin train back to Wood Island.",
     "alternate_ids": [
       "712",
       "714",
@@ -896,7 +896,7 @@
   "889": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Airport. Take a Wonderland train back to Wood Island.",
+    "summary": "Exit at Airport Station. Take a Wonderland train back to Wood Island.",
     "alternate_ids": [
       "712",
       "714",
@@ -927,7 +927,7 @@
   "870": {
     "exiting": "3",
     "entering": "3",
-    "summary": "Exit at Park St. ",
+    "summary": "Exit at Park St Station.",
     "alternate_ids": [
       "979",
       "978"
@@ -946,7 +946,7 @@
   "964": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Copley. Request shuttle bus back to Arlington.",
+    "summary": "Exit at Copley Station. Request shuttle bus back to Arlington.",
     "alternate_ids": [
       "976",
       "977"
@@ -955,7 +955,7 @@
   "982": {
     "exiting": "1",
     "entering": "2",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "985"
     ]
@@ -963,7 +963,7 @@
   "847": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Ruggles. Request shuttle bus back to Roxbury Crossing.",
+    "summary": "Exit at Ruggles Station. Request shuttle bus back to Roxbury Crossing.",
     "alternate_ids": [
       "846",
       "850"
@@ -981,7 +981,7 @@
   "857": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Back Bay. Request shuttle bus back to Tufts Medical Center.",
+    "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center.",
     "alternate_ids": [
       "853",
       "876",
@@ -1009,7 +1009,7 @@
   "851": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Ruggles. Request shuttle bus back to Ruggles.",
+    "summary": "Exit at Ruggles Station. Request shuttle bus back to Ruggles.",
     "alternate_ids": [
       "N/A"
     ]
@@ -1029,7 +1029,7 @@
   "806": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "807"
     ]
@@ -1037,7 +1037,7 @@
   "849": {
     "exiting": "3D",
     "entering": "3D",
-    "summary": "Exit at Back Bay. Take the Orange Line to Ruggles. ",
+    "summary": "Exit at Back Bay Station. Take the Orange Line to Ruggles. ",
     "alternate_ids": [
       "850",
       "853",
@@ -1049,7 +1049,7 @@
   "885": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Wonderland. Take a Bowdoin train back to Revere Beach.",
+    "summary": "Exit at Wonderland Station. Take a Bowdoin train back to Revere Beach.",
     "alternate_ids": [
       "884",
       "709",
@@ -1070,7 +1070,7 @@
   "845": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Jackson Sq. Request shuttle bus back to Stony Brook.",
+    "summary": "Exit at Jackson Sq Station. Request shuttle bus back to Stony Brook.",
     "alternate_ids": [
       "846"
     ]
@@ -1078,7 +1078,7 @@
   "811": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Quincy Adams. Request shuttle bus back to Braintree.",
+    "summary": "Exit at Quincy Adams Station. Request shuttle bus back to Braintree.",
     "alternate_ids": [
       "805",
       "810"
@@ -1097,7 +1097,7 @@
   "763": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "762",
       "764"
@@ -1125,7 +1125,7 @@
   "841": {
     "exiting": "3D",
     "entering": "3D",
-    "summary": "Exit at Ruggles or Back Bay. Take the Orange Line to Forest Hills.",
+    "summary": "Exit at Ruggles or Back Bay Stations. Take the Orange Line to Forest Hills.",
     "alternate_ids": [
       "850",
       "849",
@@ -1139,7 +1139,7 @@
   "999": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "998",
       "869"
@@ -1160,7 +1160,7 @@
   "954": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Ashmont. Take an Alewife train back to Shawmut.",
+    "summary": "Exit at Ashmont Station. Take an Alewife train back to Shawmut.",
     "alternate_ids": [
       "953",
       "957",
@@ -1173,7 +1173,7 @@
   "953": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Fields Corner. Take an Ashmont train back to Shawmut.",
+    "summary": "Exit at Fields Corner Station. Take an Ashmont train back to Shawmut.",
     "alternate_ids": [
       "954",
       "957",
@@ -1186,7 +1186,7 @@
   "772": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "770"
     ]
@@ -1206,7 +1206,7 @@
   "952": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Kendall/MIT. Take an Ashmont/Braintree train back to Charles/MGH.",
+    "summary": "Exit at Kendall/MIT Station. Take an Ashmont/Braintree train back to Charles/MGH.",
     "alternate_ids": [
       "951",
       "866",
@@ -1214,15 +1214,15 @@
     ]
   },
   "843": {
-    "exiting": "2",
-    "entering": "2",
-    "summary": "Accessible route available",
+    "exiting": "2C",
+    "entering": "2C",
+    "summary": "Accessible ramp available",
     "alternate_ids": []
   },
   "962": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Copley. Take a Park St & North train back to Arlington.",
+    "summary": "Exit at Copley Station. Take a Park St & North train back to Arlington.",
     "alternate_ids": [
       "963",
       "812",
@@ -1234,7 +1234,7 @@
   "884": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Beachmont. Take a Wonderland train back to Revere Beach.",
+    "summary": "Exit at Beachmont Station. Take a Wonderland train back to Revere Beach.",
     "alternate_ids": [
       "885",
       "709",
@@ -1254,7 +1254,7 @@
   "723": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "722"
     ]
@@ -1296,7 +1296,7 @@
   "765": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "766"
     ]
@@ -1313,7 +1313,7 @@
   "963": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Park St. Take a westbound train back to Arlington.",
+    "summary": "Exit at Park St Station. Take a westbound train back to Arlington.",
     "alternate_ids": [
       "962",
       "812",
@@ -1345,7 +1345,7 @@
   "736": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "805",
       "810"
@@ -1354,7 +1354,7 @@
   "867": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Andrew. Request shuttle bus back to Broadway.",
+    "summary": "Exit at Andrew Station. Request shuttle bus back to Broadway.",
     "alternate_ids": [
       "872",
       "879",
@@ -1364,7 +1364,7 @@
   "756": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "757",
       "866",
@@ -1415,7 +1415,7 @@
   "764": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "762",
       "763"
@@ -1424,7 +1424,7 @@
   "703": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "701",
       "702"
@@ -1433,7 +1433,7 @@
   "887": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Revere Beach. Take a Bowdoin train back to Beachmont.",
+    "summary": "Exit at Revere Beach Station. Take a Bowdoin train back to Beachmont.",
     "alternate_ids": [
       "886",
       "884",
@@ -1443,7 +1443,7 @@
   "872": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Broadway. Request shuttle bus back to Andrew.",
+    "summary": "Exit at Broadway Station. Request shuttle bus back to Andrew.",
     "alternate_ids": [
       "868",
       "867"
@@ -1470,7 +1470,7 @@
   "817": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Harvard. Request shuttle bus back to Davis.",
+    "summary": "Exit at Harvard Station. Request shuttle bus back to Davis.",
     "alternate_ids": [
       "821",
       "973"
@@ -1479,7 +1479,7 @@
   "853": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Mass Ave. Request shuttle bus back to Back Bay.",
+    "summary": "Exit at Mass Ave Station. Request shuttle bus back to Back Bay.",
     "alternate_ids": [
       "852"
     ]
@@ -1496,7 +1496,7 @@
   "968": {
     "exiting": "2",
     "entering": "2",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "969"
     ]
@@ -1527,7 +1527,7 @@
   "766": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "765"
     ]
@@ -1535,7 +1535,7 @@
   "961": {
     "exiting": "2A",
     "entering": "2A",
-    "summary": "Accessible route available",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "813"
     ]
@@ -1549,7 +1549,7 @@
   "997": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "996"
     ]
@@ -1592,7 +1592,7 @@
   "976": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Arlington. Take a westbound train back to Copley.",
+    "summary": "Exit at Arlington Station. Take a westbound train back to Copley.",
     "alternate_ids": [
       "977",
       "962",
@@ -1621,7 +1621,7 @@
   "983": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "987"
     ]
@@ -1629,7 +1629,7 @@
   "743": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "746"
     ]
@@ -1637,7 +1637,7 @@
   "810": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Quincy Adams. Request shuttle bus back to Quincy Center.",
+    "summary": "Exit at Quincy Adams Station. Request shuttle bus back to Quincy Center.",
     "alternate_ids": [
       "805",
       "806"
@@ -1655,7 +1655,7 @@
   "987": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "983"
     ]
@@ -1663,7 +1663,7 @@
   "720": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "721"
     ]
@@ -1688,7 +1688,7 @@
   "911": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Community College. Take Forest Hills train back to North Station.",
+    "summary": "Exit at Community College Station. Take Forest Hills train back to North Station.",
     "alternate_ids": [
       "910",
       "905",
@@ -1699,7 +1699,7 @@
   "981": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Lechmere. Take a Copley & West  train back to Science Park/West End.",
+    "summary": "Exit at Lechmere Station. Take a Copley & West  train back to Science Park/West End.",
     "alternate_ids": [
       "980"
     ]
@@ -1725,7 +1725,7 @@
   "980": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at North Station. Take a Lechmere & North train back to Science Park/West End.",
+    "summary": "Exit at North Station Station. Take a Lechmere & North train back to Science Park/West End.",
     "alternate_ids": [
       "981"
     ]
@@ -1741,7 +1741,7 @@
   "929": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "930"
     ]
@@ -1769,7 +1769,7 @@
   "844": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Forest Hills. Request shuttle bus back to Green Street.",
+    "summary": "Exit at Forest Hills Station. Request shuttle bus back to Green Street.",
     "alternate_ids": [
       "842"
     ]
@@ -1802,7 +1802,7 @@
   "770": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "772"
     ]
@@ -1810,7 +1810,7 @@
   "860": {
     "exiting": "3A",
     "entering": "3C",
-    "summary": "Exit at Harvard. Take an Ashmont/Braintree train back to Central.",
+    "summary": "Exit at Harvard Station. Take an Ashmont/Braintree train back to Central.",
     "alternate_ids": [
       "861",
       "821",
@@ -1820,7 +1820,7 @@
   "951": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at Park St. Take an Alewife train back to Charles/MGH.",
+    "summary": "Exit at Park St Station. Take an Alewife train back to Charles/MGH.",
     "alternate_ids": [
       "952",
       "866",
@@ -1895,7 +1895,7 @@
   "801": {
     "exiting": "3B",
     "entering": "3B",
-    "summary": "Exit at Malden Center. Request shuttle bus back to Oak Grove.",
+    "summary": "Exit at Malden Center Station. Request shuttle bus back to Oak Grove.",
     "alternate_ids": [
       "744",
       "800",
@@ -1905,7 +1905,7 @@
   "767": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "768"
     ]
@@ -1922,7 +1922,7 @@
   "995": {
     "exiting": "1",
     "entering": "1",
-    "summary": "N/A",
+    "summary": "Alternative elevator available at station",
     "alternate_ids": [
       "994"
     ]

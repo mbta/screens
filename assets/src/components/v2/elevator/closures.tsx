@@ -1,12 +1,14 @@
 import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
 import cx from "classnames";
 import _ from "lodash";
-import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
+import RoutePill, {
+  type Pill,
+  routePillKey,
+} from "Components/v2/departures/route_pill";
 import makePersistent, {
   WrappedComponentProps,
 } from "Components/v2/persistent_wrapper";
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
-import { type StationWithClosures } from "Components/v2/elevator/types";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import CalendarIcon from "Images/svgr_bundled/calendar.svg";
 import NormalServiceIcon from "Images/svgr_bundled/normal-service.svg";
@@ -15,6 +17,19 @@ import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import Logo from "Images/svgr_bundled/logo.svg";
 import { hasOverflowX } from "Util/utils";
 import { CLOSURES_PAGING_INTERVAL_MS } from "./constants";
+
+type StationWithClosures = {
+  id: string;
+  name: string;
+  route_icons: Pill[];
+  closures: Closure[];
+  summary: { text: string; type: "inside" | "other" };
+};
+
+type Closure = {
+  id: string;
+  name: string;
+};
 
 type UpcomingClosureInfo = {
   banner: { title: string; postfix: string | null };
@@ -63,8 +78,12 @@ const ClosureRow = ({
         </div>
       ))}
 
-      <div className={cx("closure-row__summary", { important: summary })}>
-        {summary ?? "Accessible route available"}
+      <div
+        className={cx("closure-row__summary", {
+          important: summary.type === "other",
+        })}
+      >
+        {summary.text}
       </div>
     </div>
   );

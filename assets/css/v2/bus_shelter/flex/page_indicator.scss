@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .flex-zone-page-indicator {
   position: absolute;
   top: 624px;
@@ -10,7 +12,7 @@
 .flex-zone-page-indicator__page__progress-bar {
   position: absolute;
   height: 16px;
-  background: #171f26;
+  background: colors.$cool-black-15;
 }
 
 .flex-zone-page-indicator__page {
@@ -20,7 +22,7 @@
   height: 16px;
   margin-left: 44px;
   overflow: hidden;
-  background: #cccbc8;
+  background: colors.$warm-neutral-80;
   border-radius: 24px;
   box-shadow: inset 1px 2px 6px 0 #bfbebb;
 

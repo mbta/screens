@@ -1,8 +1,9 @@
 @use "CSS/base/base_departure_time";
+@use "CSS/colors";
 
 .departure-time {
   display: inline-block;
-  color: #171f26;
+  color: colors.$cool-black-15;
   text-align: right;
   vertical-align: middle;
 

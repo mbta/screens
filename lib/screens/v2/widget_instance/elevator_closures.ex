@@ -21,8 +21,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
             name: String.t(),
             route_icons: list(Route.icon()),
             closures: list(Closure.t()),
-            summary: String.t() | nil
+            summary: {:inside | :other, String.t()}
           }
+
+    def serialize(%__MODULE__{summary: {type, text}} = t) do
+      %{Map.from_struct(t) | summary: %{type: type, text: text}}
+    end
   end
 
   defmodule Upcoming do
@@ -133,7 +137,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
       }),
       do: %{
         id: id,
-        stations_with_closures: stations_with_closures,
+        stations_with_closures: Enum.map(stations_with_closures, &Station.serialize/1),
         station_id: station_id,
         upcoming_closure: if(upcoming_closure, do: Upcoming.serialize(upcoming_closure, now))
       }

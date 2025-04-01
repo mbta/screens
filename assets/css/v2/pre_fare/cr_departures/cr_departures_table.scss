@@ -1,3 +1,5 @@
+@use "CSS/colors";
+
 .cr-departures-table {
   table-layout: fixed;
   border-collapse: collapse;
@@ -11,7 +13,7 @@
   tr {
     &:not(:first-child) {
       height: 272px;
-      border-top: 4px solid #cccbc8;
+      border-top: 4px solid colors.$warm-neutral-80;
     }
   }
 

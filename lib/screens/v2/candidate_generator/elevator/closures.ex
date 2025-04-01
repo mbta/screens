@@ -49,7 +49,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   @route injected(Route)
   @stop injected(Stop)
 
-  @active_summary_fallback "Visit mbta.com/elevators for more info"
+  @active_summary_fallback {:other, "Visit mbta.com/elevators for more info"}
   @upcoming_summaries %{
     in_station: "An accessible route will be available.",
     shuttle: "An accessible route will be available via shuttle bus."
@@ -86,8 +86,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
             relevant_closures,
             upcoming_closures,
             app_params,
-            now,
-            stop_id
+            stop_id,
+            now
           ),
           header_instances(config, now)
           | footer
@@ -161,34 +161,34 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
          active_closures,
          relevant_closures,
          upcoming_closures,
-         %ElevatorConfig{elevator_id: elevator_id} = app_params,
-         now,
-         stop_id
+         %ElevatorConfig{elevator_id: screen_elevator_id} = app_params,
+         screen_station_id,
+         now
        ) do
     {:ok, station_names} = @stop.fetch_parent_station_name_map()
-    station_route_pills = fetch_station_route_pills(active_closures, stop_id)
+    station_route_pills = fetch_station_route_pills(active_closures, screen_station_id)
 
     %ElevatorClosures{
       app_params: app_params,
       now: now,
-      station_id: stop_id,
+      station_id: screen_station_id,
       stations_with_closures:
         build_stations_with_closures(
           active_closures,
           relevant_closures,
           station_names,
           station_route_pills,
-          elevator_id
+          screen_elevator_id
         ),
       upcoming_closure: build_upcoming_closure(upcoming_closures)
     }
   end
 
-  defp fetch_station_route_pills(closures, home_station_id) do
+  defp fetch_station_route_pills(closures, screen_station_id) do
     closures
     |> Enum.map(& &1.station_id)
     |> MapSet.new()
-    |> MapSet.put(home_station_id)
+    |> MapSet.put(screen_station_id)
     |> Map.new(fn station_id -> {station_id, fetch_route_pills(station_id)} end)
   end
 
@@ -208,10 +208,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
          relevant_closures,
          station_names,
          station_route_pills,
-         elevator_id
+         screen_elevator_id
        ) do
     relevant_closures
-    |> log_station_closures(elevator_id)
+    |> log_station_closures(screen_elevator_id)
     |> Enum.group_by(& &1.station_id)
     |> Enum.map(fn {station_id, station_closures} ->
       %ElevatorClosures.Station{
@@ -226,7 +226,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
             station_closures,
             fn %Closure{id: id, name: name} -> %WidgetClosure{id: id, name: name} end
           ),
-        summary: active_summary(station_closures, active_closures)
+        summary: active_summary(station_closures, screen_elevator_id, active_closures)
       }
     end)
   end
@@ -267,52 +267,60 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     station_closures
   end
 
-  # If we couldn't find alternate/redundancy data for an elevator, assume it's relevant.
-  defp relevant_closure?(%Closure{elevator: nil}, _home_station_id, _closures), do: true
-
-  # Elevators at the home station ID are always relevant.
+  # Elevators at the screen's station are always relevant.
   defp relevant_closure?(%Closure{station_id: station_id}, station_id, _closures), do: true
 
-  # If any of a closed elevator's alternates are also closed, it's always relevant.
+  # Elevators with nearby redundancy are only relevant if any of their alternates are also closed.
   defp relevant_closure?(
-         %Closure{
-           elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
-         },
-         _home_station_id,
+         %Closure{elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: :nearby}},
+         _screen_station_id,
          closures
        ) do
-    Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) or redundancy != :nearby
+    Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end)
   end
+
+  # Elevators with other kinds of exiting redundancy, or where we don't have redundancy data, are
+  # always relevant.
+  defp relevant_closure?(_closure, _screen_station_id, _closures), do: true
 
   defp active_summary(
          [
            %Closure{
-             elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
+             elevator: %Elevator{
+               alternate_ids: alternate_ids,
+               exiting_redundancy: redundancy,
+               exiting_summary: summary
+             }
            }
          ],
+         screen_elevator_id,
          closures
        ) do
-    # If any of a closed elevator's alternates are also closed, the normal summary may not be
-    # applicable.
-    if Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) do
-      @active_summary_fallback
-    else
-      case redundancy do
-        # `nil` indicates the specially-formatted in-station summary text for active closures.
-        type when type in ~w[nearby in_station]a -> nil
+    cond do
+      Enum.any?(closures, fn %Closure{id: id} -> id in alternate_ids end) ->
+        # If any of a closed elevator's alternates are also closed, the normal summary may not be
+        # applicable.
+        @active_summary_fallback
+
+      redundancy in ~w[nearby in_station]a and screen_elevator_id in alternate_ids ->
+        {:inside, "This is the backup elevator"}
+
+      redundancy in ~w[nearby in_station]a ->
+        {:inside, summary}
+
+      true ->
         # TEMP: Use fallback text instead of actual exiting summary. These are worded in a way
         # that only makes sense when using the elevator to exit the station, but it might not be
         # possible for a rider to get into that situation if they enter the system at the station
         # where this summary is being displayed (without doubling back on themselves). Temporarily
         # disabled until we implement logic to determine when showing this summary is appropriate.
-        {:other, _summary} -> @active_summary_fallback
-      end
+        @active_summary_fallback
     end
   end
 
   # Use the fallback when there are multiple closures at the same station or we have no redundancy
   # data for an elevator.
-  defp active_summary(_other, _all_closures), do: @active_summary_fallback
+  defp active_summary(_other, _screen_elevator_id, _closures), do: @active_summary_fallback
 
   # `nil` indicates the specially-formatted fallback summary for upcoming closures.
   defp upcoming_summary(%Closure{elevator: nil}), do: nil

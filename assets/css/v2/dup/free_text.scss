@@ -147,7 +147,7 @@
 .partial-alert {
   &--yellow {
     .free-text {
-      color: #171f26;
+      color: colors.$cool-black-15;
     }
   }
 
@@ -193,7 +193,7 @@
 
 .headway-section {
   .free-text {
-    color: #171f26;
+    color: colors.$cool-black-15;
   }
 
   .free-text__text-pill {
@@ -229,7 +229,7 @@
   .free-text__line {
     width: 1400px;
     font-weight: 600;
-    color: #171f26;
+    color: colors.$cool-black-15;
   }
 
   .free-text__icon-container {
