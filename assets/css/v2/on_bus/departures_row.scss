@@ -1,0 +1,55 @@
+@use "CSS/colors";
+
+.departure-row {
+  position: relative;
+  align-items: center;
+  width: 100%;
+  height: 108px;
+
+  &:not(:first-child)::after {
+    position: absolute;
+    top: 105px;
+    left: 132px;
+    width: 492px;
+    height: 2px;
+    content: "";
+    background-color: colors.$warm-neutral-80;
+  }
+}
+
+.departure-row__route {
+  display: inline-block;
+  width: 112px;
+}
+
+.departure-destination {
+  vertical-align: middle;
+}
+
+.departure-row__destination {
+  display: inline-block;
+  height: 100%;
+  vertical-align: top;
+}
+
+.departure-destination__headsign {
+  display: inline-block;
+  width: 364px;
+  margin-top: 22.5px;
+  margin-left: 20px;
+  overflow: hidden;
+  font-family: Inter;
+  font-size: 47px;
+  font-style: normal;
+  font-weight: 700;
+  line-height: 63px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.departure-row__time {
+  display: inline-block;
+  width: 130px;
+  height: 100%;
+  vertical-align: top;
+}

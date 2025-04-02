@@ -1,0 +1,19 @@
+@use "CSS/colors";
+
+.connections_header {
+  display: flex;
+  align-items: center;
+  height: 108px;
+  margin-left: 26px;
+}
+
+.connections_header__text {
+  font-family: Inter;
+  font-size: 47px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  color: colors.$cool-black-30;
+  text-align: left;
+  letter-spacing: 3%;
+}
