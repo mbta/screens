@@ -43,7 +43,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
     %Departure{
       prediction: %Prediction{
         route: %Route{id: route_id, type: route_type, line: %Line{id: route_id}},
-        trip: %Trip{direction_id: direction_id, headsign: "headsign"},
+        trip: %Trip{direction_id: direction_id, headsign: "headign #{direction_id}"},
         arrival_time: arrival_time
       }
     }
@@ -195,6 +195,40 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.DeparturesTest do
         build_departure("bus_later", 0, :bus, ~U[2024-01-01 11:52:00Z]),
         build_departure("subway_id", 0, :subway, ~U[2024-01-01 11:59:00Z]),
         build_departure("commuter_rail_id", 0, :commuter_rail, ~U[2024-01-01 11:45:00Z])
+      ]
+
+      stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->
+        {:ok, priority_departures ++ additional_departures}
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 screen: @config,
+                 sections: [
+                   %NormalSection{rows: ^priority_departures}
+                 ]
+               }
+             ] =
+               departures_candidates(@config, %QueryParams{route_id: route_id, stop_id: stop_id})
+    end
+
+    test "Properly filters duplicates out" do
+      route_id = "86"
+      stop_id = "22549"
+
+      stub(@stop, :fetch, fn %{ids: [^stop_id]}, _ ->
+        {:ok, [build_stop(stop_id)]}
+      end)
+
+      priority_departures = [
+        build_departure("subway_id", 0, :subway, ~U[2024-01-01 11:55:00Z]),
+        build_departure("subway_id", 1, :subway, ~U[2024-01-01 11:55:00Z]),
+        build_departure("bus_late", 0, :bus, ~U[2024-01-01 11:59:00Z])
+      ]
+
+      additional_departures = [
+        build_departure("subway_id", 0, :bus, ~U[2024-01-01 11:56:00Z]),
+        build_departure("subway_id", 1, :subway, ~U[2024-01-01 11:56:00Z])
       ]
 
       stub(@departure, :fetch, fn %{stop_ids: [^stop_id]}, _ ->

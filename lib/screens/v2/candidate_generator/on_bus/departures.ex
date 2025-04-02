@@ -94,19 +94,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   defp filter_duplicate_routes(departures) do
     unique_departures =
       Enum.uniq_by(departures, fn dep ->
-        {dep.prediction.route.line.id, dep.prediction.trip.direction_id,
-         Trip.representative_headsign(dep.prediction.trip)}
+        {dep.prediction.route.line.id, Trip.representative_headsign(dep.prediction.trip)}
       end)
 
-    # If there are fewer than 3 unique connecting departures, then return at least 3 based on soonest departure time.
-    case length(unique_departures) do
-      count when count >= 3 ->
-        unique_departures
+    if length(unique_departures) >= 3 do
+      unique_departures
+    else
+      # If there are fewer than 3 unique connecting departures, then return at least 3.
+      # Maintain sorting based on the original departure list sorting, which is currently by departure time.
+      departure_indexes = departures |> Enum.with_index() |> Map.new()
 
-      _ ->
-        unique_departures
-        |> Enum.concat(Enum.take(departures -- unique_departures, 3 - length(unique_departures)))
-        |> Enum.sort_by(& &1.prediction.arrival_time)
+      unique_departures
+      |> Enum.concat(Enum.take(departures -- unique_departures, 3 - length(unique_departures)))
+      |> Enum.sort_by(&Map.fetch!(departure_indexes, &1))
     end
   end
 
