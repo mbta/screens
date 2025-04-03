@@ -1,13 +1,10 @@
 @use "CSS/colors";
 
-.connections_header {
+.departures-header {
   display: flex;
   align-items: center;
   height: 108px;
   margin-left: 26px;
-}
-
-.connections_header__text {
   font-family: Inter;
   font-size: 47px;
   font-style: normal;
