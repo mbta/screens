@@ -4,7 +4,6 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets.OnBus
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.NormalHeader
 
   @behaviour CandidateGenerator
 
@@ -14,7 +13,6 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
       :screen,
       %{
         screen_normal: [
-          :header,
           {:body,
            %{
              body_normal: [
@@ -34,16 +32,9 @@ defmodule Screens.V2.CandidateGenerator.OnBus do
         now \\ DateTime.utc_now(),
         departures_instances_fn \\ &OnBus.Departures.departures_candidates/3
       ) do
-    [
-      fn -> departures_instances_fn.(config, query_params, now) end,
-      fn -> header_instances(config, now) end
-    ]
+    [fn -> departures_instances_fn.(config, query_params, now) end]
     |> Task.async_stream(& &1.())
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
-  end
-
-  defp header_instances(config, now) do
-    [%NormalHeader{screen: config, time: now, text: "CONNECTIONS"}]
   end
 
   @impl CandidateGenerator

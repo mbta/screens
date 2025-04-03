@@ -21,21 +21,8 @@ body {
   background-color: colors.$warm-neutral-90;
 }
 
-.screen-normal {
-  width: 100%;
-  height: 100%;
-}
-
-.screen-normal__header {
-  width: 100%;
-  height: 108px;
-}
-
-.screen-normal__body {
-  width: 100%;
-  height: 324px;
-}
-
+.screen-normal,
+.screen-normal__body,
 .body-normal,
 .body-normal__main-content {
   width: 100%;
