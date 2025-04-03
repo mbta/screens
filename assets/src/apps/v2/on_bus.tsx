@@ -33,7 +33,7 @@ const TYPE_TO_COMPONENT = {
   normal_header: ConnectionsHeader,
   no_data: NoData,
   placeholder: Placeholder,
-  screen_normal: NormalScreen,
+  screen_normal: NoData,
 };
 
 const LOADING_LAYOUT = {
