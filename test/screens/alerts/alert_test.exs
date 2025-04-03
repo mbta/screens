@@ -2,6 +2,7 @@ defmodule Screens.Alerts.AlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias Screens.Facilities.Facility
 
   # Minimal valid attributes by V3 API resource definitions.
   @minimal_attributes %{
@@ -15,17 +16,7 @@ defmodule Screens.Alerts.AlertTest do
     "header" => "Route 1 experiencing delays up to 20 minutes due to an accident.",
     "image" => nil,
     "image_alternative_text" => nil,
-    "informed_entity" => [
-      %{
-        "activities" => ~w[BOARD EXIT RIDE],
-        "direction_id" => nil,
-        "facility" => nil,
-        "route" => "1",
-        "route_type" => nil,
-        "stop" => nil,
-        "trip" => nil
-      }
-    ],
+    "informed_entity" => [%{"activities" => ~w[BOARD EXIT RIDE], "route" => "1"}],
     "lifecycle" => "ONGOING",
     "service_effect" => "Route 1 delay",
     "severity" => 5,
@@ -67,6 +58,42 @@ defmodule Screens.Alerts.AlertTest do
       }
 
       assert Alert.fetch([route_ids: ["1"]], get_json_fn) == {:ok, [expected]}
+    end
+
+    test "parses related facilities" do
+      attributes = %{
+        @minimal_attributes
+        | "informed_entity" => [%{"activities" => ~w[USING_WHEELCHAIR], "facility" => "870"}]
+      }
+
+      facility_data = %{
+        "id" => "870",
+        "type" => "facility",
+        "attributes" => %{
+          "latitude" => nil,
+          "longitude" => nil,
+          "long_name" => "longname",
+          "short_name" => "shortname",
+          "properties" => [],
+          "type" => "ELEVATOR"
+        },
+        "relationships" => %{
+          "stop" => %{"data" => %{"id" => "place-test", "type" => "stop"}}
+        }
+      }
+
+      get_json_fn = fn "alerts", %{} ->
+        {:ok,
+         %{
+           "data" => [%{"id" => "999", "attributes" => attributes}],
+           "included" => [facility_data]
+         }}
+      end
+
+      {:ok, [alert]} = Alert.fetch([], get_json_fn)
+
+      assert %Alert{informed_entities: [%{facility: %Facility{id: "870", type: :elevator}}]} =
+               alert
     end
   end
 

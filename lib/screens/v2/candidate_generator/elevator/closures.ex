@@ -60,14 +60,14 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id} = app_params} = config,
         now
       ) do
-    {:ok, alerts} = @alert.fetch_elevator_alerts_with_facilities()
+    {:ok, alerts} = @alert.fetch(activity: "USING_WHEELCHAIR")
     {active, upcoming} = Enum.split_with(alerts, &Alert.happening_now?/1)
     active_closures = Enum.flat_map(active, &elevator_closure/1)
     at_this_elevator? = fn %Closure{id: id} -> id == elevator_id end
 
     case Enum.find(active_closures, at_this_elevator?) do
       nil ->
-        {:ok, %Stop{id: stop_id}} = @facility.fetch_stop_for_facility(elevator_id)
+        {:ok, %Facility{stop: %Stop{id: stop_id}}} = @facility.fetch_by_id(elevator_id)
 
         relevant_closures =
           Enum.filter(active_closures, &relevant_closure?(&1, stop_id, active_closures))
@@ -138,7 +138,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
       [] ->
         []
 
-      [{station_id, %{id: id, name: name}}] ->
+      [{station_id, %Facility{id: id, short_name: name}}] ->
         [
           %Closure{
             id: id,

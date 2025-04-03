@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Elevator
+  alias Screens.Facilities.Facility
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Widgets.ElevatorClosures
@@ -16,6 +17,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
   @elevator injected(Elevator)
   @route injected(Route)
   @stop injected(Stop)
+
+  @alert_opts [activity: "USING_WHEELCHAIR"]
 
   setup :verify_on_exit!
 
@@ -64,6 +67,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
     )
   end
 
+  defp build_facility(id, fields \\ []) do
+    struct!(
+      %Facility{id: id, long_name: "long", short_name: "short", type: :elevator, stop: :unloaded},
+      fields
+    )
+  end
+
   defp build_alert(fields) do
     struct!(%Alert{active_period: [{DateTime.utc_now(), nil}], effect: :elevator_closure}, fields)
   end
@@ -73,12 +83,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
       {:ok, :mocked_location_context}
     end
 
-    alerts_mock = fn ->
+    alerts_mock = fn @alert_opts ->
       {:ok,
        [
          build_alert(
            id: "alert_1",
-           informed_entities: [%{facility: %{id: "elev_1", name: "Test"}, stop: "place-test"}]
+           informed_entities: [%{facility: build_facility("elev_1"), stop: "place-test"}]
          )
        ]}
     end
@@ -99,7 +109,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
       {:ok, :mocked_location_context}
     end
 
-    alerts_mock = fn -> {:ok, []} end
+    alerts_mock = fn @alert_opts -> {:ok, []} end
 
     result =
       ElevatorClosures.elevator_status_instances(config, now, location_context_mock, alerts_mock)
@@ -112,16 +122,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
       {:ok, :mocked_location_context}
     end
 
-    alerts_mock = fn ->
+    alerts_mock = fn @alert_opts ->
       {:ok,
        [
          build_alert(
            id: "alert_1",
-           informed_entities: [%{facility: %{id: "elev_1"}, stop: "place-1"}]
+           informed_entities: [%{facility: build_facility("elev_1"), stop: "place-1"}]
          ),
          build_alert(
            id: "alert_2",
-           informed_entities: [%{facility: %{id: "elev_2"}, stop: "place-2"}]
+           informed_entities: [%{facility: build_facility("elev_2"), stop: "place-2"}]
          )
        ]}
     end
@@ -142,16 +152,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
       {:ok, :mocked_location_context}
     end
 
-    alerts_mock = fn ->
+    alerts_mock = fn @alert_opts ->
       {:ok,
        [
          build_alert(
            id: "alert_1",
-           informed_entities: [%{facility: %{id: "elev_1"}, stop: "place-1"}]
+           informed_entities: [%{facility: build_facility("elev_1"), stop: "place-1"}]
          ),
          build_alert(
            id: "alert_2",
-           informed_entities: [%{facility: %{id: "elev_2"}, stop: "place-2"}]
+           informed_entities: [%{facility: build_facility("elev_2"), stop: "place-2"}]
          )
        ]}
     end
@@ -176,20 +186,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
       {:ok, :mocked_location_context}
     end
 
-    alerts_mock = fn ->
+    alerts_mock = fn @alert_opts ->
       {:ok,
        [
          build_alert(
            id: "alert_1",
-           informed_entities: [%{facility: %{id: "elev_1"}, stop: "place-1"}]
+           informed_entities: [%{facility: build_facility("elev_1"), stop: "place-1"}]
          ),
          build_alert(
            id: "alert_2",
-           informed_entities: [%{facility: %{id: "elev_2"}, stop: "place-2"}]
+           informed_entities: [%{facility: build_facility("elev_2"), stop: "place-2"}]
          ),
          build_alert(
            id: "alert_3",
-           informed_entities: [%{facility: %{id: "elev_3"}, stop: "place-1"}]
+           informed_entities: [%{facility: build_facility("elev_3"), stop: "place-1"}]
          )
        ]}
     end
@@ -219,12 +229,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
       {:ok, :mocked_location_context}
     end
 
-    alerts_mock = fn ->
+    alerts_mock = fn @alert_opts ->
       {:ok,
        [
          build_alert(
            id: "alert_1",
-           informed_entities: [%{facility: %{id: "elev_1"}, stop: "place-test-parent-station-id"}]
+           informed_entities: [
+             %{facility: build_facility("elev_1"), stop: "place-test-parent-station-id"}
+           ]
          )
        ]}
     end

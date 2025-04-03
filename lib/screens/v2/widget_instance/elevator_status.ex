@@ -77,6 +77,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   @subway_icons ~w[red blue orange green silver]a
 
   alias Screens.Alerts.Alert
+  alias Screens.Facilities.Facility
   alias Screens.LocationContext
   alias Screens.V2.AlertsWidget
   alias Screens.V2.LocalizedAlert
@@ -251,7 +252,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     end)
   end
 
-  defp serialize_closure(alert, %{name: name, id: id}, now) do
+  defp serialize_closure(alert, %Facility{id: id, short_name: name}, now) do
     %{
       alert_id: alert.id,
       elevator_name: name,
@@ -276,11 +277,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     closures =
       alerts
       |> Enum.sort_by(&get_informed_facility(&1.informed_entities))
-      |> Enum.map(fn %Alert{
-                       informed_entities: entities
-                     } = alert ->
+      |> Enum.map(fn %Alert{informed_entities: entities} = alert ->
         facility = get_informed_facility(entities)
-
         serialize_closure(alert, facility, now)
       end)
 

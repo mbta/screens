@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias Screens.Facilities.Facility
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance
@@ -19,6 +20,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
   # Convenience function to build an informed entity
   defp ie(opts), do: %{stop: opts[:stop], facility: opts[:facility]}
+
+  defp facility(id) do
+    %Facility{
+      id: to_string(id),
+      long_name: "",
+      short_name: "Elevator #{id}",
+      stop: :unloaded,
+      type: :elevator
+    }
+  end
 
   setup do
     home_station_id = "place-foo"
@@ -47,8 +58,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
     now = ~U[2022-01-01T10:00:00Z]
     happening_now_active_period = [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
     upcoming_active_period = [{~U[2022-02-01T00:00:00Z], ~U[2022-02-01T22:00:00Z]}]
-
-    facility_id_to_map = fn id -> %{id: to_string(id), name: "Elevator #{id}"} end
 
     station_id_to_name = %{
       "place-foo" => "Foo Station",
@@ -83,28 +92,28 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
     }
 
     home_ies = fn facility_id ->
-      facility = facility_id_to_map.(facility_id)
+      facility = facility(facility_id)
 
       [ie(stop: home_station_id, facility: facility)] ++
         Enum.map(home_platform_ids, &ie(stop: &1, facility: facility))
     end
 
     connecting_ies = fn facility_id ->
-      facility = facility_id_to_map.(facility_id)
+      facility = facility(facility_id)
 
       [ie(stop: connecting_station_id, facility: facility)] ++
         Enum.map(connecting_platform_ids, &ie(stop: &1, facility: facility))
     end
 
     elsewhere_ies = fn facility_id ->
-      facility = facility_id_to_map.(facility_id)
+      facility = facility(facility_id)
 
       [ie(stop: elsewhere_station_id, facility: facility)] ++
         Enum.map(elsewhere_platform_ids, &ie(stop: &1, facility: facility))
     end
 
     other_elsewhere_ies = fn facility_id ->
-      facility = facility_id_to_map.(facility_id)
+      facility = facility(facility_id)
 
       [ie(stop: other_elsewhere_station_id, facility: facility)] ++
         Enum.map(other_elsewhere_platform_ids, &ie(stop: &1, facility: facility))
