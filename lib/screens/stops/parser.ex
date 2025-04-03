@@ -59,7 +59,7 @@ defmodule Screens.Stops.Parser do
     connecting_stops =
       case get_in(relationships, ~w[connecting_stops data]) do
         nil ->
-          nil
+          :unloaded
 
         stop_references ->
           Enum.map(stop_references, fn %{"id" => id} ->

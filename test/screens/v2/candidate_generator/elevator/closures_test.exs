@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Elevator
+  alias Screens.Facilities.Facility
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: Generator
@@ -36,15 +37,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     vendor: :mimo
   }
 
+  @alert_opts [activity: "USING_WHEELCHAIR"]
+
   setup do
-    stub(@alert, :fetch_elevator_alerts_with_facilities, fn -> {:ok, []} end)
-
+    stub(@alert, :fetch, fn @alert_opts -> {:ok, []} end)
     stub(@elevator, :get, fn id -> build_elevator(id) end)
-
-    stub(@facility, :fetch_stop_for_facility, fn _facility_id ->
-      {:ok, %Stop{id: "place-test"}}
-    end)
-
+    stub(@facility, :fetch_by_id, fn id -> {:ok, build_facility(id)} end)
     stub(@route, :fetch, fn _params -> {:ok, [%Route{id: "Red", type: :subway}]} end)
 
     stub(@stop, :fetch_parent_station_name_map, fn ->
@@ -71,19 +69,28 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     )
   end
 
+  defp build_facility(id, fields \\ []) do
+    struct!(
+      %Facility{
+        id: id,
+        long_name: "long",
+        short_name: "short",
+        type: :elevator,
+        stop: %Stop{id: "place-test"}
+      },
+      fields
+    )
+  end
+
   describe "header and footer" do
     test "have no variant when current elevator is not closed", %{now: now} do
       expect(@stop, :fetch_parent_station_name_map, fn ->
         {:ok, %{"place-haecl" => "Haymarket"}}
       end)
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
-          build_alert(
-            informed_entities: [
-              %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-2"}}
-            ]
-          )
+          build_alert(informed_entities: [%{stop: "place-haecl", facility: build_facility("f1")}])
         ]
 
         {:ok, alerts}
@@ -97,11 +104,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     end
 
     test "have closed variant when current elevator is closed", %{now: now} do
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
-          build_alert(
-            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
-          )
+          build_alert(informed_entities: [%{stop: "place-test", facility: build_facility("111")}])
         ]
 
         {:ok, alerts}
@@ -123,11 +128,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
   describe "alternate path widget" do
     test "is returned when the screen's elevator is closed", %{now: now} do
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
-          build_alert(
-            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
-          )
+          build_alert(informed_entities: [%{stop: "place-test", facility: build_facility("111")}])
         ]
 
         {:ok, alerts}
@@ -142,7 +145,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
   describe "closure list widget" do
     test "is returned based on currently-active elevator alerts", %{now: now} do
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         active_period = {DateTime.add(now, -1, :day), DateTime.add(now, 1, :day)}
         upcoming_period = {DateTime.add(now, 1, :day), DateTime.add(now, 3, :day)}
 
@@ -150,21 +153,17 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
           build_alert(
             active_period: [active_period],
             informed_entities: [
-              %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
+              %{stop: "place-test", facility: build_facility("f1", short_name: "Test 1")}
             ]
           ),
           build_alert(
             active_period: [upcoming_period],
-            informed_entities: [
-              %{stop: "place-test", facility: %{name: "Test 2", id: "facility-test2"}}
-            ]
+            informed_entities: [%{stop: "place-test", facility: build_facility("f2")}]
           ),
           build_alert(
             effect: :detour,
             active_period: [active_period],
-            informed_entities: [
-              %{stop: "place-test", facility: %{name: "Test 3", id: "facility-test3"}}
-            ]
+            informed_entities: [%{stop: "place-test", facility: build_facility("f3")}]
           )
         ]
 
@@ -180,7 +179,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
             id: "place-test",
             name: "Place Test",
             route_icons: [%{type: :text, text: "RL", color: :red}],
-            closures: [%Closure{id: "facility-test", name: "Test"}],
+            closures: [%Closure{id: "f1", name: "Test 1"}],
             summary: {:inside, "Accessible route available"}
           }
         ]
@@ -202,16 +201,16 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
           {:ok, [%Route{id: "Red", type: :subway}]}
       end)
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
           build_alert(
             informed_entities: [
-              %{stop: "place-haecl", facility: %{name: "Test 1", id: "facility-test-1"}}
+              %{stop: "place-haecl", facility: build_facility("f1", short_name: "Test 1")}
             ]
           ),
           build_alert(
             informed_entities: [
-              %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-2"}}
+              %{stop: "place-haecl", facility: build_facility("f2", short_name: "Test 2")}
             ]
           )
         ]
@@ -227,8 +226,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                      name: "Haymarket",
                      route_icons: [%{type: :text, text: "OL", color: :orange}],
                      closures: [
-                       %Closure{id: "facility-test-1", name: "Test 1"},
-                       %Closure{id: "facility-test-2", name: "Test 2"}
+                       %Closure{id: "f1", name: "Test 1"},
+                       %Closure{id: "f2", name: "Test 2"}
                      ],
                      summary: {:other, "Visit mbta.com/elevators for more info"}
                    }
@@ -249,10 +248,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         "222" -> build_elevator("222", exiting_redundancy: :nearby)
       end)
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
           build_alert(
-            informed_entities: [%{stop: "place-other", facility: %{name: "Elevator", id: "222"}}]
+            informed_entities: [%{stop: "place-other", facility: build_facility("222")}]
           )
         ]
 
@@ -264,13 +263,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     end
 
     test "filters out alerts with no facilities or more than one facility", %{now: now} do
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
           build_alert(informed_entities: [%{stop: "place-haecl", facility: nil}]),
           build_alert(
             informed_entities: [
-              %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-2"}},
-              %{stop: "place-haecl", facility: %{name: "Test 2", id: "facility-test-3"}}
+              %{stop: "place-haecl", facility: build_facility("f1")},
+              %{stop: "place-haecl", facility: build_facility("f2")}
             ]
           )
         ]
@@ -305,18 +304,21 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         "333" -> build_elevator("333", exiting_redundancy: :in_station)
       end)
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
           build_alert(
             informed_entities: [
-              %{stop: "place-test", facility: %{name: "In Station Elevator", id: "112"}}
+              %{
+                stop: "place-test",
+                facility: build_facility("112", short_name: "In Station Elevator")
+              }
             ]
           ),
           build_alert(
             informed_entities: [
               %{
                 stop: "place-test-redundancy",
-                facility: %{name: "Other With Redundancy", id: "222"}
+                facility: build_facility("222", short_name: "Other With Redundancy")
               }
             ]
           ),
@@ -324,7 +326,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
             informed_entities: [
               %{
                 stop: "place-test-no-redundancy",
-                facility: %{name: "Other Without Redundancy", id: "333"}
+                facility: build_facility("333", short_name: "Other Without Redundancy")
               }
             ]
           )
@@ -372,32 +374,18 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
          }}
       end)
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
-          build_alert(
-            informed_entities: [
-              %{stop: "place-1", facility: %{name: "backup in station", id: "1"}}
-            ]
-          ),
-          build_alert(
-            informed_entities: [
-              %{stop: "place-2", facility: %{name: "custom backup summary", id: "2"}}
-            ]
-          ),
-          build_alert(
-            informed_entities: [
-              # despite having "nearby" redundancy, should not be filtered out, because its
-              # alternate elevator is also down
-              %{stop: "place-3", facility: %{name: "alternate elevator down", id: "3"}}
-            ]
-          ),
-          build_alert(
-            informed_entities: [
-              # somewhat unrealistically, place elevator 3's "nearby" alternate at a different
-              # station, so they aren't combined
-              %{stop: "place-4", facility: %{name: "alternate", id: "alt"}}
-            ]
-          )
+          # backup in station
+          build_alert(informed_entities: [%{stop: "place-1", facility: build_facility("1")}]),
+          # other with exiting summary
+          build_alert(informed_entities: [%{stop: "place-2", facility: build_facility("2")}]),
+          # despite having "nearby" redundancy, should not be filtered out, because its alternate
+          # elevator is also down
+          build_alert(informed_entities: [%{stop: "place-3", facility: build_facility("3")}]),
+          # somewhat unrealistically, place elevator 3's "nearby" alternate at a different
+          # station, so they aren't combined
+          build_alert(informed_entities: [%{stop: "place-4", facility: build_facility("alt")}])
         ]
 
         {:ok, alerts}
@@ -448,31 +436,27 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         {:ok, %{"place-1" => "one", "place-2" => "two"}}
       end)
 
-      stub(@facility, :fetch_stop_for_facility, fn facility_id ->
-        {:ok,
-         %Stop{
-           id:
-             case facility_id do
-               "1" -> "place-1"
-               "2" -> "place-2"
-               "alt" -> "place-1"
-             end
-         }}
+      stub(@facility, :fetch_by_id, fn id ->
+        {
+          :ok,
+          build_facility(id,
+            stop: %Stop{
+              id:
+                case id do
+                  "1" -> "place-1"
+                  "2" -> "place-2"
+                  "alt" -> "place-1"
+                end
+            }
+          )
+        }
       end)
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
-          build_alert(
-            informed_entities: [
-              %{stop: "place-1", facility: %{name: "in station", id: "1"}}
-            ]
-          ),
-          build_alert(
-            informed_entities: [
-              # don't use special text when "this" is the backup for a closure at another station
-              %{stop: "place-2", facility: %{name: "outside station", id: "2"}}
-            ]
-          )
+          build_alert(informed_entities: [%{stop: "place-1", facility: build_facility("1")}]),
+          # don't use special text when "this" is the backup for a closure at another station
+          build_alert(informed_entities: [%{stop: "place-2", facility: build_facility("2")}])
         ]
 
         {:ok, alerts}
@@ -502,13 +486,9 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     test "omits route pills on closures when there is a routes API error", %{now: now} do
       expect(@route, :fetch, fn %{stop_id: "place-test"} -> :error end)
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
-          build_alert(
-            informed_entities: [
-              %{stop: "place-test", facility: %{name: "Test", id: "facility-test"}}
-            ]
-          )
+          build_alert(informed_entities: [%{stop: "place-test", facility: build_facility("f1")}])
         ]
 
         {:ok, alerts}
@@ -520,7 +500,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                    %ElevatorClosures.Station{
                      id: "place-test",
                      name: "Place Test",
-                     closures: [%Closure{id: "facility-test", name: "Test"}]
+                     closures: [%Closure{id: "f1"}]
                    }
                  ]
                }
@@ -535,14 +515,14 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     test "is included when the screen's elevator has a planned closure" do
       now = dt(~D[2025-01-01], ~T[09:00:00])
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
           build_alert(
             active_period: [
               {dt(~D[2025-01-05], ~T[03:00:00]), dt(~D[2025-01-07], ~T[02:59:00])},
               {dt(~D[2025-02-01], ~T[03:00:00]), dt(~D[2025-02-02], ~T[02:59:00])}
             ],
-            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
+            informed_entities: [%{stop: "place-test", facility: build_facility("111")}]
           )
         ]
 
@@ -567,11 +547,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     test "is not included when the screen's elevator has nearby redundancy" do
       now = dt(~D[2025-01-01], ~T[09:00:00])
 
-      expect(@alert, :fetch_elevator_alerts_with_facilities, fn ->
+      expect(@alert, :fetch, fn @alert_opts ->
         alerts = [
           build_alert(
             active_period: [{dt(~D[2025-01-05], ~T[03:00:00]), dt(~D[2025-01-07], ~T[02:59:00])}],
-            informed_entities: [%{stop: "place-test", facility: %{name: "Test", id: "111"}}]
+            informed_entities: [%{stop: "place-test", facility: build_facility("111")}]
           )
         ]
 
