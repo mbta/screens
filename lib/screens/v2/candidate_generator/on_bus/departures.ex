@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
 
   alias Screens.Report
   alias Screens.Stops.Stop
+  alias Screens.Trips.Trip
   alias Screens.V2.Departure
   alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
@@ -18,6 +19,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   @max_departure_results 3
 
   @type widget :: DeparturesNoData.t() | DeparturesNoService.t() | DeparturesWidget.t()
+
+  @priority %{
+    :subway => 1,
+    :light_rail => 1,
+    :bus => 2,
+    :commuter_rail => 3,
+    :ferry => 4
+  }
 
   @spec departures_candidates(Screen.t(), QueryParams.t(), DateTime.t()) :: [widget()]
   def departures_candidates(config, %{stop_id: stop_id, route_id: route_id}, now) do
@@ -37,7 +46,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
     with {:ok, departures} <- @departure.fetch(fetch_params, fetch_opts) do
       {:ok,
        departures
-       |> filter_current_route(route_id)}
+       |> filter_current_route(route_id)
+       |> filter_duplicate_routes()
+       |> sort_by_mode()}
     end
   end
 
@@ -78,6 +89,29 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   # Only return departures that are not from the bus's current route in either direction
   defp filter_current_route(departures, route_id) do
     Enum.filter(departures, &(&1.prediction.route.id != route_id))
+  end
+
+  defp filter_duplicate_routes(departures) do
+    unique_departures =
+      Enum.uniq_by(departures, fn dep ->
+        {dep.prediction.route.line.id, Trip.representative_headsign(dep.prediction.trip)}
+      end)
+
+    if length(unique_departures) >= 3 do
+      unique_departures
+    else
+      # If there are fewer than 3 unique connecting departures, then return at least 3.
+      # Maintain sorting based on the original departure list sorting, which is currently by departure time.
+      departure_indexes = departures |> Enum.with_index() |> Map.new()
+
+      unique_departures
+      |> Enum.concat(Enum.take(departures -- unique_departures, 3 - length(unique_departures)))
+      |> Enum.sort_by(&Map.fetch!(departure_indexes, &1))
+    end
+  end
+
+  defp sort_by_mode(departures) do
+    Enum.sort_by(departures, &Map.get(@priority, &1.prediction.route.type))
   end
 
   @spec departures_widget(:error, Screen.t(), DateTime.t()) ::
