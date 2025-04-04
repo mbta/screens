@@ -1,7 +1,7 @@
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
-  alias Screens.Alerts.{Alert, InformedEntity, Parser}
+  alias Screens.Alerts.InformedEntity
   alias Screens.Facilities.Facility
   alias Screens.Routes.Route
   alias Screens.RouteType
@@ -153,7 +153,7 @@ defmodule Screens.Alerts.Alert do
         |> Map.put("include", Enum.join(includes, ","))
 
       case get_json_fn.("alerts", params) do
-        {:ok, response} -> {:ok, Parser.parse(response)}
+        {:ok, response} -> {:ok, V3Api.Parser.parse(response)}
         _ -> :error
       end
     end)
@@ -352,7 +352,7 @@ defmodule Screens.Alerts.Alert do
 
   def partial_station_closure?(_, _), do: false
 
-  @spec informs_stop_id?(Alert.t(), Stop.id()) :: boolean()
+  @spec informs_stop_id?(t(), Stop.id()) :: boolean()
   def informs_stop_id?(%__MODULE__{informed_entities: informed_entities}, stop_id) do
     Enum.any?(informed_entities, &(&1.stop == stop_id))
   end

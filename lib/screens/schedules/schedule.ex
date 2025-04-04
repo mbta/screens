@@ -34,16 +34,10 @@ defmodule Screens.Schedules.Schedule do
           {:ok, list(t())} | :error
   def fetch(%{} = params, date \\ nil) do
     params = if is_nil(date), do: params, else: Map.put(params, :date, date)
+    result = Departure.do_fetch("schedules", Map.put(params, :include, @includes))
 
-    schedules =
-      Departure.do_fetch(
-        "schedules",
-        Map.put(params, :include, @includes),
-        Screens.Schedules.Parser
-      )
-
-    case schedules do
-      {:ok, result} -> {:ok, Enum.reject(result, &is_nil(&1.departure_time))}
+    case result do
+      {:ok, schedules} -> {:ok, Enum.reject(schedules, &is_nil(&1.departure_time))}
       :error -> :error
     end
   end

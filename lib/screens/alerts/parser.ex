@@ -2,18 +2,9 @@ defmodule Screens.Alerts.Parser do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Facilities
+  alias Screens.V3Api
 
-  def parse(%{"data" => data} = response) do
-    included =
-      response
-      |> Map.get("included", [])
-      |> Map.new(fn %{"id" => id, "type" => type} = resource -> {{id, type}, resource} end)
-
-    Enum.map(data, &parse_alert(&1, included))
-  end
-
-  def parse_alert(
+  def parse(
         %{
           "id" => id,
           "attributes" => %{
@@ -63,9 +54,8 @@ defmodule Screens.Alerts.Parser do
 
   defp parse_informed_facility(nil, _included), do: nil
 
-  defp parse_informed_facility(id, included) do
-    included |> Map.fetch!({id, "facility"}) |> Facilities.Parser.parse_facility(included)
-  end
+  defp parse_informed_facility(id, included),
+    do: V3Api.Parser.included!(%{"data" => %{"id" => id, "type" => "facility"}}, included)
 
   defp parse_and_sort_active_periods(periods) do
     periods

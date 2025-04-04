@@ -33,15 +33,10 @@ defmodule Screens.Predictions.Prediction do
 
   @spec fetch(Departure.params()) :: {:ok, list(t())} | :error
   def fetch(%{} = params) do
-    predictions =
-      Departure.do_fetch(
-        "predictions",
-        Map.put(params, :include, @includes),
-        Screens.Predictions.Parser
-      )
+    result = Departure.do_fetch("predictions", Map.put(params, :include, @includes))
 
-    case predictions do
-      {:ok, result} -> {:ok, Enum.reject(result, &is_nil(&1.departure_time))}
+    case result do
+      {:ok, predictions} -> {:ok, Enum.reject(predictions, &is_nil(&1.departure_time))}
       :error -> :error
     end
   end

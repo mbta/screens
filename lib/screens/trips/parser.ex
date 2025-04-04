@@ -3,16 +3,7 @@ defmodule Screens.Trips.Parser do
 
   alias Screens.Trips.Trip
 
-  def parse(%{"data" => data} = response) do
-    included =
-      response
-      |> Map.get("included", [])
-      |> Map.new(fn %{"id" => id, "type" => type} = resource -> {{id, type}, resource} end)
-
-    Enum.map(data, &parse_trip(&1, included))
-  end
-
-  def parse_trip(
+  def parse(
         %{
           "id" => id,
           "attributes" => %{"headsign" => headsign, "direction_id" => direction_id},

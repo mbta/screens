@@ -8,6 +8,7 @@ defmodule Screens.V2.Departure do
   alias Screens.Trips.Trip
   alias Screens.Util
   alias Screens.V2.Departure.Builder
+  alias Screens.V3Api
   alias Screens.Vehicles.Vehicle
 
   @type t :: %__MODULE__{
@@ -85,7 +86,7 @@ defmodule Screens.V2.Departure do
     end
   end
 
-  def do_fetch(endpoint, params, parser) do
+  def do_fetch(endpoint, params) do
     encoded_params =
       @default_params
       |> Map.merge(params)
@@ -93,8 +94,8 @@ defmodule Screens.V2.Departure do
       |> Enum.reject(&is_nil/1)
       |> Map.new()
 
-    case Screens.V3Api.get_json(endpoint, encoded_params) do
-      {:ok, result} -> {:ok, parser.parse(result)}
+    case V3Api.get_json(endpoint, encoded_params) do
+      {:ok, result} -> {:ok, V3Api.Parser.parse(result)}
       _ -> :error
     end
   end
