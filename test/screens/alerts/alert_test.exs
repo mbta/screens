@@ -29,7 +29,10 @@ defmodule Screens.Alerts.AlertTest do
   describe "fetch/2" do
     test "fetches and parses alerts" do
       get_json_fn = fn "alerts", %{"filter[route]" => "1"} ->
-        {:ok, %{"data" => [%{"id" => "999", "attributes" => @minimal_attributes}]}}
+        {
+          :ok,
+          %{"data" => [%{"id" => "999", "type" => "alert", "attributes" => @minimal_attributes}]}
+        }
       end
 
       expected = %Alert{
@@ -85,7 +88,7 @@ defmodule Screens.Alerts.AlertTest do
       get_json_fn = fn "alerts", %{} ->
         {:ok,
          %{
-           "data" => [%{"id" => "999", "attributes" => attributes}],
+           "data" => [%{"id" => "999", "type" => "alert", "attributes" => attributes}],
            "included" => [facility_data]
          }}
       end
@@ -98,7 +101,7 @@ defmodule Screens.Alerts.AlertTest do
   end
 
   describe "fetch_by_stop_and_route/3" do
-    defp alert_json(id), do: %{"id" => id, "attributes" => @minimal_attributes}
+    defp alert_json(id), do: %{"id" => id, "type" => "alert", "attributes" => @minimal_attributes}
 
     setup do
       stop_based_alerts = [alert_json("1"), alert_json("2"), alert_json("3")]

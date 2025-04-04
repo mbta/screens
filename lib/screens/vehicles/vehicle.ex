@@ -2,6 +2,7 @@ defmodule Screens.Vehicles.Vehicle do
   @moduledoc false
 
   alias Screens.Trips.Trip
+  alias Screens.V3Api.Parser
   alias Screens.Vehicles.Carriage
 
   defstruct id: nil,
@@ -40,7 +41,7 @@ defmodule Screens.Vehicles.Vehicle do
            "filter[route]" => route_id,
            "filter[direction_id]" => direction_id
          }) do
-      {:ok, result} -> Screens.Vehicles.Parser.parse_result(result)
+      {:ok, result} -> result |> Parser.parse() |> Enum.reject(&is_nil(&1.stop_id))
       _ -> []
     end
   end

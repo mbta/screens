@@ -35,7 +35,6 @@ defmodule Screens.Predictions.Prediction do
       Departure.do_query_and_parse(
         query_params,
         "predictions",
-        Screens.Predictions.Parser,
         %{include: ~w[route.line stop trip.route_pattern.representative_trip trip.stops vehicle]}
       )
 
