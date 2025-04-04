@@ -6,6 +6,7 @@ defmodule Screens.V2.Departure do
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
+  alias Screens.Util
   alias Screens.V2.Departure.Builder
   alias Screens.Vehicles.Vehicle
 
@@ -20,6 +21,7 @@ defmodule Screens.V2.Departure do
           optional(:direction_id) => Trip.direction() | :both,
           optional(:route_ids) => [Route.id()],
           optional(:route_type) => nil | :bus | :ferry | :light_rail | :rail | :subway,
+          optional(:sort) => String.t(),
           optional(:stop_ids) => [Stop.id()]
         }
 
@@ -31,6 +33,8 @@ defmodule Screens.V2.Departure do
   @type result :: {:ok, [t()]} | :error
 
   @type fetch :: (params(), opts() -> result())
+
+  @default_params %{sort: "departure_time"}
 
   @callback fetch(params(), opts()) :: result()
   def fetch(params, opts \\ []) do
@@ -80,6 +84,37 @@ defmodule Screens.V2.Departure do
         :error
     end
   end
+
+  def do_fetch(endpoint, params, parser) do
+    encoded_params =
+      @default_params
+      |> Map.merge(params)
+      |> Enum.map(&encode_param/1)
+      |> Enum.reject(&is_nil/1)
+      |> Map.new()
+
+    case Screens.V3Api.get_json(endpoint, encoded_params) do
+      {:ok, result} -> {:ok, parser.parse(result)}
+      _ -> :error
+    end
+  end
+
+  defp encode_param({:date, %DateTime{} = date}), do: {"filter[date]", Util.service_date(date)}
+  defp encode_param({:date, %Date{} = date}), do: {"filter[date]", Date.to_iso8601(date)}
+  defp encode_param({:date, date}), do: {"filter[date]", date}
+  defp encode_param({:direction_id, :both}), do: nil
+  defp encode_param({:direction_id, direction_id}), do: {"filter[direction_id]", direction_id}
+  defp encode_param({:include, relationships}), do: {"include", Enum.join(relationships, ",")}
+  defp encode_param({:route_ids, []}), do: nil
+  defp encode_param({:route_ids, route_ids}), do: {"filter[route]", Enum.join(route_ids, ",")}
+  defp encode_param({:route_type, nil}), do: nil
+
+  defp encode_param({:route_type, route_type}),
+    do: {"filter[route_type]", Screens.RouteType.to_id(route_type)}
+
+  defp encode_param({:sort, sort}), do: {"sort", sort}
+  defp encode_param({:stop_ids, []}), do: nil
+  defp encode_param({:stop_ids, stop_ids}), do: {"filter[stop]", Enum.join(stop_ids, ",")}
 
   ### Accessor functions
 

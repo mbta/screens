@@ -1,8 +1,8 @@
 defmodule Screens.Predictions.Prediction do
   @moduledoc false
 
-  alias Screens.Departures.Departure
   alias Screens.Predictions.ScheduleRelationship
+  alias Screens.V2.Departure
   alias Screens.Vehicles.Vehicle
 
   defstruct id: nil,
@@ -29,14 +29,15 @@ defmodule Screens.Predictions.Prediction do
           schedule_relationship: ScheduleRelationship.t()
         }
 
-  @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error
-  def fetch(%{} = query_params) do
+  @includes ~w[route.line stop trip.route_pattern.representative_trip trip.stops vehicle]
+
+  @spec fetch(Departure.params()) :: {:ok, list(t())} | :error
+  def fetch(%{} = params) do
     predictions =
-      Departure.do_query_and_parse(
-        query_params,
+      Departure.do_fetch(
         "predictions",
-        Screens.Predictions.Parser,
-        %{include: ~w[route.line stop trip.route_pattern.representative_trip trip.stops vehicle]}
+        Map.put(params, :include, @includes),
+        Screens.Predictions.Parser
       )
 
     case predictions do
