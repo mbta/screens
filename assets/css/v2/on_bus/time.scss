@@ -30,15 +30,9 @@
   font-weight: 400;
 }
 
-.departure-time__text {
-  display: inline-block;
+.departure-time__text,
+.departure-time__timestamp {
   width: 100%;
   font-weight: 800;
   text-align: right;
-}
-
-.departure-time__timestamp {
-  width: 42px;
-  height: 100%;
-  font-weight: 400;
 }
