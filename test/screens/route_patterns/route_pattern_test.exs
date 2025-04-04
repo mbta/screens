@@ -16,6 +16,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
               "data" => [
                 %{
                   "id" => "Blue-6-0",
+                  "type" => "route_pattern",
                   "attributes" => %{
                     "canonical" => true,
                     "direction_id" => 0,
@@ -30,6 +31,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                 },
                 %{
                   "id" => "Blue-8-0",
+                  "type" => "route_pattern",
                   "attributes" => %{
                     "canonical" => false,
                     "direction_id" => 0,
@@ -215,6 +217,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
               "data" => [
                 %{
                   "id" => "rp-blue",
+                  "type" => "route_pattern",
                   "attributes" => %{
                     "canonical" => true,
                     "direction_id" => 0,
@@ -229,6 +232,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                 },
                 %{
                   "id" => "rp-bus-1",
+                  "type" => "route_pattern",
                   "attributes" => %{
                     "canonical" => false,
                     "direction_id" => 0,

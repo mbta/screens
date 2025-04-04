@@ -4,7 +4,6 @@ defmodule Screens.Stops.Stop do
   require Logger
 
   alias Screens.RouteType
-  alias Screens.Stops.Parser
   alias Screens.V3Api
 
   defstruct ~w[
@@ -65,7 +64,7 @@ defmodule Screens.Stops.Stop do
       end)
 
     case get_json_fn.("stops", encoded_params) do
-      {:ok, response} -> {:ok, Parser.parse(response)}
+      {:ok, response} -> {:ok, V3Api.Parser.parse(response)}
       _ -> :error
     end
   end
