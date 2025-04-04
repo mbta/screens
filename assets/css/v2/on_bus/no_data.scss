@@ -24,23 +24,9 @@
 
 .no-data__main-content__text {
   font-family: Inter;
-  font-weight: 600;
-  font-size: 47px;
-  line-height: 59px;
+  font-weight: 700;
+  font-size: 59px;
+  line-height: 66px;
   letter-spacing: 0px;
   color: colors.$cool-black-15;
-}
-
-.no-data__subcontent {
-  position: relative;
-  top: 23px;
-}
-
-.no-data__subcontent__text {
-  font-family: Inter;
-  font-weight: 400;
-  font-size: 47px;
-  line-height: 52px;
-  letter-spacing: 0px;
-  color: colors.$true-grey-45;
 }

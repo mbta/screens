@@ -23,17 +23,16 @@ import {
 } from "Components/v2/screen_container";
 import { URL_PARAMS_BY_SCREEN_TYPE } from "Util/query_params";
 import Departures from "Components/v2/departures";
-import ConnectionsHeader from "Components/v2/on_bus/header";
+import DeparturesNoService from "Components/v2/on_bus/no_service";
 
 const TYPE_TO_COMPONENT = {
   body_normal: NormalBody,
   departures: Departures,
   departures_no_data: NoData,
-  departures_no_service: NoData,
-  normal_header: ConnectionsHeader,
+  departures_no_service: DeparturesNoService,
   no_data: NoData,
   placeholder: Placeholder,
-  screen_normal: NoData,
+  screen_normal: NormalScreen,
 };
 
 const LOADING_LAYOUT = {

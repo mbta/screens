@@ -1,0 +1,13 @@
+@use "CSS/colors";
+
+.departures-no-service {
+  position: relative;
+  width: 515px;
+  left: 26px;
+  font-family: Inter;
+  font-weight: 700;
+  font-size: 59px;
+  line-height: 66px;
+  letter-spacing: 0px;
+  color: colors.$cool-black-15;
+}

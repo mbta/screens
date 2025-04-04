@@ -95,19 +95,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
   end
 
   defp departures_widget({:ok, departure_data}, config, now) do
-    [
-      %DeparturesWidget{
-        screen: config,
-        sections: [
-          %NormalSection{
-            rows: Enum.take(departure_data, @max_departure_results),
-            layout: %ScreensConfig.Departures.Layout{},
-            header: %ScreensConfig.Departures.Header{title: "CONNECTIONS"}
-          }
-        ],
-        now: now,
-        slot_names: [:main_content]
-      }
-    ]
+    [%DeparturesNoService{screen: config}]
+
+    # [
+    #   %DeparturesWidget{
+    #     screen: config,
+    #     sections: [
+    #       %NormalSection{
+    #         rows: Enum.take(departure_data, @max_departure_results),
+    #         layout: %ScreensConfig.Departures.Layout{},
+    #         header: %ScreensConfig.Departures.Header{title: "CONNECTIONS"}
+    #       }
+    #     ],
+    #     now: now,
+    #     slot_names: [:main_content]
+    #   }
+    # ]
   end
 end

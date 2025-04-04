@@ -15,12 +15,7 @@ const NoData: ComponentType = () => {
         </div>
         <div className="no-data__main-content">
           <div className="no-data__main-content__text">
-            Live departure info is temporarily unavailable
-          </div>
-        </div>
-        <div className="no-data__subcontent">
-          <div className="no-data__subcontent__text">
-            more on mbta.com/schedules.
+            Live connections updates <br/> are temporarily unavailable.
           </div>
         </div>
       </div>
