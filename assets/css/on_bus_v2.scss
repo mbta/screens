@@ -1,4 +1,4 @@
-@use "CSS/colors";
+@use "colors";
 @use "fonts/inter_font_face";
 
 @use "v2/multi_screen_page";
@@ -18,6 +18,7 @@ body {
 .screen-container {
   width: 650px;
   height: 432px;
+  font-family: Inter, sans-serif;
   background-color: colors.$warm-neutral-90;
 }
 

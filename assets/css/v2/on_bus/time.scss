@@ -1,12 +1,8 @@
 .departure-time {
   display: inline-block;
-  align-items: center;
-  justify-content: end;
   width: 100%;
   margin-top: 25.5px;
-  font-family: Inter;
   font-size: 47px;
-  font-style: normal;
   vertical-align: middle;
 }
 
@@ -16,8 +12,7 @@
 }
 
 .departure-crowding {
-  width: 0;
-  height: 0;
+  display: none;
 }
 
 .departure-time__minutes {
@@ -33,7 +28,6 @@
   width: 42px;
   height: 100%;
   font-weight: 400;
-  text-align: left;
 }
 
 .departure-time__text {
@@ -41,4 +35,10 @@
   width: 100%;
   font-weight: 800;
   text-align: right;
+}
+
+.departure-time__timestamp {
+  width: 42px;
+  height: 100%;
+  font-weight: 400;
 }

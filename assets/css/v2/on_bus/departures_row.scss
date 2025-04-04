@@ -1,17 +1,19 @@
 @use "CSS/colors";
+@use "vars";
+
 
 .departure-row {
   position: relative;
   align-items: center;
   width: 100%;
-  height: 108px;
+  height: vars.$row-height;
 
   &:not(:first-child)::after {
     position: absolute;
-    top: 105px;
-    left: 132px;
-    width: 492px;
-    height: 2px;
+    top: calc(vars.$row-height - vars.$border-height - vars.$border-offset);
+    left: calc(vars.$route-pill-width + vars.$headsign-left-margin);
+    width: calc(vars.$headsign-width + vars.$time-width);
+    height: vars.$border-height;
     content: "";
     background-color: colors.$warm-neutral-80;
   }
@@ -36,11 +38,9 @@
   display: inline-block;
   width: 364px;
   margin-top: 22.5px;
-  margin-left: 20px;
+  margin-left: vars.$headsign-left-margin;
   overflow: hidden;
-  font-family: Inter;
   font-size: 47px;
-  font-style: normal;
   font-weight: 700;
   line-height: 63px;
   text-overflow: ellipsis;
@@ -49,7 +49,7 @@
 
 .departure-row__time {
   display: inline-block;
-  width: 130px;
+  width: vars.$time-width;
   height: 100%;
   vertical-align: top;
 }

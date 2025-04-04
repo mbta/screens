@@ -14,7 +14,6 @@ type Section =
 
 interface Props {
   sections: Section[];
-  includeHeader: boolean;
 }
 
 const Departures: ComponentType<Props> = ({ sections }) => {
