@@ -1,0 +1,98 @@
+@use "CSS/colors";
+@use "vars";
+
+.route-pill {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: vars.$route-pill-width;
+  height: 72px;
+  margin-top: 18px;
+  border-radius: 100px;
+
+  &--blue {
+    background-color: colors.$line-blue;
+  }
+
+  &--green {
+    background-color: colors.$line-green;
+  }
+
+  &--orange {
+    background-color: colors.$line-orange;
+  }
+
+  &--purple {
+    background-color: colors.$line-cr;
+  }
+
+  &--red {
+    background-color: colors.$line-red;
+  }
+
+  &--silver {
+    background-color: colors.$line-silver;
+  }
+
+  &--teal {
+    background-color: colors.$line-ferry;
+  }
+
+  &--yellow {
+    color: black;
+    letter-spacing: -2px;
+    background-color: colors.$line-bus;
+    border-radius: 0 10px 10px 0;
+    box-shadow: 2px 4px 2px rgb(0 0 0 / 25%);
+  }
+}
+
+.route-pill__text {
+  position: absolute;
+  width: 100%;
+  font-size: 47px;
+  font-weight: 700;
+  color: white;
+  text-align: center;
+  letter-spacing: 0.0277em;
+
+  &--yellow {
+    font-weight: 700;
+    line-height: 55px;
+    color: black;
+    letter-spacing: -0.85px;
+  }
+
+  &--green {
+    font-size: 38px;
+  }
+}
+
+.route-pill__icon {
+  position: absolute;
+  width: 100%;
+  text-align: center;
+}
+
+.route-pill__icon-image {
+  height: 112.5px;
+  margin-top: 15.75px;
+}
+
+.route-pill__slashed-text {
+  position: absolute;
+  width: 100%;
+  font-family: neue-haas-grotesk-text;
+  font-size: 47px;
+  font-weight: 700;
+  line-height: 55px;
+  text-align: center;
+}
+
+.route-pill__slashed-part-1 {
+  display: inline-block;
+}
+
+.route-pill__slashed-part-2 {
+  display: inline-block;
+}

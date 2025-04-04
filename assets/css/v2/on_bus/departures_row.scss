@@ -1,0 +1,54 @@
+@use "CSS/colors";
+@use "vars";
+
+.departure-row {
+  position: relative;
+  align-items: center;
+  width: 100%;
+  height: vars.$row-height;
+
+  &:not(:first-child)::after {
+    position: absolute;
+    top: calc(vars.$row-height - vars.$border-height - vars.$border-offset);
+    left: calc(vars.$route-pill-width + vars.$headsign-left-margin);
+    width: calc(vars.$headsign-width + vars.$time-width);
+    height: vars.$border-height;
+    content: "";
+    background-color: colors.$warm-neutral-80;
+  }
+}
+
+.departure-row__route {
+  display: inline-block;
+  width: 112px;
+}
+
+.departure-destination {
+  vertical-align: middle;
+}
+
+.departure-row__destination {
+  display: inline-block;
+  height: 100%;
+  vertical-align: top;
+}
+
+.departure-destination__headsign {
+  display: inline-block;
+  width: 364px;
+  margin-top: 22.5px;
+  margin-left: vars.$headsign-left-margin;
+  overflow: hidden;
+  font-size: 47px;
+  font-weight: 700;
+  line-height: 63px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.departure-row__time {
+  display: inline-block;
+  width: vars.$time-width;
+  height: 100%;
+  vertical-align: top;
+}

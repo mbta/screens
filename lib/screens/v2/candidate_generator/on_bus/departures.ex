@@ -136,7 +136,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.OnBus.Departures do
           %NormalSection{
             rows: Enum.take(departure_data, @max_departure_results),
             layout: %ScreensConfig.Departures.Layout{},
-            header: %ScreensConfig.Departures.Header{}
+            header: %ScreensConfig.Departures.Header{title: "CONNECTIONS"}
           }
         ],
         now: now,
