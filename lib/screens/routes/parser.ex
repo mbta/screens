@@ -1,18 +1,9 @@
 defmodule Screens.Routes.Parser do
   @moduledoc false
 
-  alias Screens.{Lines, Routes, RouteType}
+  alias Screens.{Routes, RouteType, V3Api}
 
-  def parse(%{"data" => data} = response) do
-    included =
-      response
-      |> Map.get("included", [])
-      |> Map.new(fn %{"id" => id, "type" => type} = resource -> {{id, type}, resource} end)
-
-    Enum.map(data, &parse_route(&1, included))
-  end
-
-  def parse_route(
+  def parse(
         %{
           "id" => id,
           "attributes" => %{
@@ -21,7 +12,7 @@ defmodule Screens.Routes.Parser do
             "direction_destinations" => direction_destinations,
             "type" => route_type
           },
-          "relationships" => %{"line" => %{"data" => %{"id" => line_id}}}
+          "relationships" => %{"line" => line}
         },
         included
       ) do
@@ -31,7 +22,7 @@ defmodule Screens.Routes.Parser do
       long_name: long_name,
       direction_destinations: direction_destinations,
       type: RouteType.from_id(route_type),
-      line: included |> Map.fetch!({line_id, "line"}) |> Lines.Parser.parse_line()
+      line: V3Api.Parser.included!(line, included)
     }
   end
 end

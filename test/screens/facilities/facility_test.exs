@@ -6,6 +6,7 @@ defmodule Screens.Facilities.FacilityTest do
 
   @data %{
     "id" => "954",
+    "type" => "facility",
     "attributes" => %{
       "latitude" => -71.194994,
       "longitude" => 42.316115,

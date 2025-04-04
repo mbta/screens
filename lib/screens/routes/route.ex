@@ -2,7 +2,6 @@ defmodule Screens.Routes.Route do
   @moduledoc false
 
   alias Screens.Lines.Line
-  alias Screens.Routes.Parser
   alias Screens.RouteType
   alias Screens.Stops.Stop
   alias Screens.V3Api
@@ -58,7 +57,7 @@ defmodule Screens.Routes.Route do
       |> Map.put("include", "line")
 
     case get_json_fn.("routes/", params) do
-      {:ok, response} -> {:ok, Parser.parse(response)}
+      {:ok, response} -> {:ok, V3Api.Parser.parse(response)}
       _ -> :error
     end
   end

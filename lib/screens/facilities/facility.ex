@@ -3,7 +3,6 @@ defmodule Screens.Facilities.Facility do
   Functions for fetching facility data from the V3 API.
   """
 
-  alias Screens.Facilities.Parser
   alias Screens.Stops.Stop
   alias Screens.V3Api
 
@@ -51,7 +50,7 @@ defmodule Screens.Facilities.Facility do
       params |> Enum.map(&encode_param/1) |> Map.new() |> Map.put("include", "stop")
 
     case get_json_fn.("facilities", encoded_params) do
-      {:ok, response} -> {:ok, Parser.parse(response)}
+      {:ok, response} -> {:ok, V3Api.Parser.parse(response)}
       _ -> :error
     end
   end
@@ -68,7 +67,7 @@ defmodule Screens.Facilities.Facility do
   @callback fetch_by_id(id()) :: {:ok, Stop.t()} | :error
   def fetch_by_id(id, get_json_fn \\ &V3Api.get_json/2) do
     case get_json_fn.("facilities/#{id}", %{"include" => "stop"}) do
-      {:ok, response} -> {:ok, Parser.parse(response)}
+      {:ok, response} -> {:ok, V3Api.Parser.parse(response)}
       _ -> :error
     end
   end

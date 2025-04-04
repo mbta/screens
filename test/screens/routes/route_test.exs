@@ -10,6 +10,7 @@ defmodule Screens.Routes.RouteTest do
           ids,
           &%{
             "id" => &1,
+            "type" => "route",
             "attributes" => %{
               "short_name" => nil,
               "long_name" => nil,

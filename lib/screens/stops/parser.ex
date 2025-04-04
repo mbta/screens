@@ -3,16 +3,7 @@ defmodule Screens.Stops.Parser do
 
   alias Screens.RouteType
 
-  def parse(%{"data" => data} = response) do
-    included =
-      response
-      |> Map.get("included", [])
-      |> Map.new(fn %{"id" => id, "type" => type} = resource -> {{id, type}, resource} end)
-
-    Enum.map(data, &parse_stop(&1, included))
-  end
-
-  def parse_stop(
+  def parse(
         %{
           "id" => id,
           "attributes" => %{
@@ -38,7 +29,7 @@ defmodule Screens.Stops.Parser do
           if is_nil(data) or not load_parent_station?,
             # Only non-parent-stations can have a parent station.
             do: if(location_type != 1, do: :unloaded, else: nil),
-            else: parse_stop(data, included)
+            else: parse(data, included)
       end
 
     child_stops =
@@ -52,7 +43,7 @@ defmodule Screens.Stops.Parser do
             # Always leave the `parent_station` of stops in `child_stops` unloaded, else parsing
             # would recurse infinitely. This covers the complete "stop family" regardless of where
             # we start. ("parent -> children" or "child -> parent -> all children")
-            included |> Map.fetch!({id, "stop"}) |> parse_stop(included, false)
+            included |> Map.fetch!({id, "stop"}) |> parse(included, false)
           end)
       end
 
@@ -63,9 +54,9 @@ defmodule Screens.Stops.Parser do
 
         stop_references ->
           Enum.map(stop_references, fn %{"id" => id} ->
-            # We expect all connecting_stops to have no parent station,
-            # but leave it unloaded just in case there is one, to avoid infinite recursion.
-            included |> Map.fetch!({id, "stop"}) |> parse_stop(included, false)
+            # We expect all `connecting_stops` to have no parent station, but leave it unloaded
+            # just in case there is one, to avoid infinite recursion.
+            included |> Map.fetch!({id, "stop"}) |> parse(included, false)
           end)
       end
 

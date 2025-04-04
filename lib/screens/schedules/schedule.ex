@@ -37,7 +37,6 @@ defmodule Screens.Schedules.Schedule do
       Departure.do_query_and_parse(
         query_params,
         "schedules",
-        Screens.Schedules.Parser,
         Map.put(
           extra_params,
           :include,

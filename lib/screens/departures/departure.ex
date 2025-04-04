@@ -6,6 +6,7 @@ defmodule Screens.Departures.Departure do
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
   alias Screens.Util
+  alias Screens.V3Api
   alias Screens.Vehicles.Vehicle
 
   defstruct id: nil,
@@ -323,7 +324,7 @@ defmodule Screens.Departures.Departure do
     |> deduplicate_slashed_routes()
   end
 
-  def do_query_and_parse(%{} = query_params, api_endpoint, parser, extra_params \\ %{}) do
+  def do_query_and_parse(%{} = query_params, api_endpoint, extra_params \\ %{}) do
     default_params = %{sort: "departure_time"}
     all_params = [default_params, query_params, extra_params]
 
@@ -334,8 +335,8 @@ defmodule Screens.Departures.Departure do
       |> Enum.reject(&is_nil/1)
       |> Enum.into(%{})
 
-    case Screens.V3Api.get_json(api_endpoint, api_query_params) do
-      {:ok, result} -> {:ok, parser.parse(result)}
+    case V3Api.get_json(api_endpoint, api_query_params) do
+      {:ok, response} -> {:ok, V3Api.Parser.parse(response)}
       _ -> :error
     end
   end

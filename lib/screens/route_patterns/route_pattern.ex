@@ -1,7 +1,7 @@
 defmodule Screens.RoutePatterns.RoutePattern do
   @moduledoc false
 
-  alias Screens.RoutePatterns.{Parser, RouteDirectionStops}
+  alias Screens.RoutePatterns.RouteDirectionStops
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
@@ -47,7 +47,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
 
     case get_json_fn.("route_patterns", encoded_params) do
       {:ok, response} ->
-        {:ok, Enum.reduce(filter_params, Parser.parse(response), &apply_filter/2)}
+        {:ok, Enum.reduce(filter_params, V3Api.Parser.parse(response), &apply_filter/2)}
 
       _ ->
         :error

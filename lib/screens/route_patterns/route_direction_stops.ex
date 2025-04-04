@@ -17,7 +17,7 @@ defmodule Screens.RoutePatterns.RouteDirectionStops do
   end
 
   defp parse_included(%{"type" => "stop"} = item) do
-    Screens.Stops.Parser.parse_stop(item, %{})
+    Screens.V3Api.Parser.parse_resource(item, %{})
   end
 
   defp parse_included(%{

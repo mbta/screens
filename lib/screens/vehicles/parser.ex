@@ -1,45 +1,23 @@
 defmodule Screens.Vehicles.Parser do
   @moduledoc false
 
-  def parse_result(%{"data" => data}) do
-    data
-    |> Enum.map(&parse_vehicle/1)
-    |> Enum.reject(&is_nil(&1.stop_id))
-  end
-
-  def parse_vehicle(%{
-        "attributes" => %{
-          "direction_id" => direction_id,
-          "carriages" => carriages,
-          "current_status" => current_status,
-          "occupancy_status" => occupancy_status
+  def parse(
+        %{
+          "id" => id,
+          "attributes" => %{
+            "direction_id" => direction_id,
+            "carriages" => carriages,
+            "current_status" => current_status,
+            "occupancy_status" => occupancy_status
+          },
+          "relationships" => %{"trip" => trip_data, "stop" => stop_data}
         },
-        "id" => vehicle_id,
-        "relationships" => %{"trip" => trip_data, "stop" => stop_data}
-      }) do
+        _included
+      ) do
     %Screens.Vehicles.Vehicle{
-      id: vehicle_id,
+      id: id,
       direction_id: direction_id,
       carriages: parse_carriages(carriages),
-      current_status: parse_current_status(current_status),
-      occupancy_status: parse_occupancy_status(occupancy_status),
-      trip_id: trip_id_from_trip_data(trip_data),
-      stop_id: stop_id_from_stop_data(stop_data)
-    }
-  end
-
-  def parse_vehicle(%{
-        "attributes" => %{
-          "direction_id" => direction_id,
-          "current_status" => current_status,
-          "occupancy_status" => occupancy_status
-        },
-        "id" => vehicle_id,
-        "relationships" => %{"trip" => trip_data, "stop" => stop_data}
-      }) do
-    %Screens.Vehicles.Vehicle{
-      id: vehicle_id,
-      direction_id: direction_id,
       current_status: parse_current_status(current_status),
       occupancy_status: parse_occupancy_status(occupancy_status),
       trip_id: trip_id_from_trip_data(trip_data),
