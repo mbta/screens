@@ -1,0 +1,31 @@
+@use "CSS/colors";
+
+.no-data__container {
+  position: relative;
+  width: 552px;
+  height: 354px;
+  margin-bottom: 23px;
+  margin-left: 36px;
+}
+
+.no-data__header {
+  position: relative;
+  top: 23px;
+  bottom: 23px;
+  width: 90px;
+  height: 90px;
+  background-color: colors.$warm-neutral-90;
+}
+
+.no-data__main-content {
+  position: relative;
+  top: 23px;
+}
+
+.no-data__main-content__text {
+  font-size: 59px;
+  font-weight: 700;
+  line-height: 66px;
+  color: colors.$cool-black-15;
+  letter-spacing: 0;
+}
