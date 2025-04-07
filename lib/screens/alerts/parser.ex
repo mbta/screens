@@ -1,98 +1,70 @@
 defmodule Screens.Alerts.Parser do
   @moduledoc false
 
-  def parse_result(%{"data" => data, "included" => included}) when is_list(data) do
-    facility_data = parse_facility_data(included)
+  alias Screens.Alerts.Alert
+  alias Screens.Facilities
 
-    data
-    |> Enum.map(&parse_alert(&1, facility_data))
-    |> Enum.reject(&is_nil/1)
+  def parse(%{"data" => data} = response) do
+    included =
+      response
+      |> Map.get("included", [])
+      |> Map.new(fn %{"id" => id, "type" => type} = resource -> {{id, type}, resource} end)
+
+    Enum.map(data, &parse_alert(&1, included))
   end
 
-  def parse_result(%{"data" => data}) when is_list(data) do
-    data
-    |> Enum.map(&parse_alert/1)
-    |> Enum.reject(&is_nil/1)
-  end
-
-  def parse_alert(alert, facilities \\ %{})
-
-  def parse_alert(%{"id" => id, "attributes" => attributes}, _) when map_size(attributes) == 0 do
-    %Screens.Alerts.Alert{id: id}
-  end
-
-  def parse_alert(%{"id" => id, "attributes" => attributes}, facilities) do
-    case attributes do
-      %{
-        "active_period" => active_period,
-        "created_at" => created_at,
-        "updated_at" => updated_at,
-        "cause" => cause,
-        "effect" => effect,
-        "header" => header,
-        "informed_entity" => informed_entities,
-        "lifecycle" => lifecycle,
-        "severity" => severity,
-        "timeframe" => timeframe,
-        "url" => url,
-        "description" => description
-      } ->
-        %Screens.Alerts.Alert{
-          id: id,
-          cause: parse_cause(cause),
-          effect: parse_effect(effect),
-          severity: severity,
-          header: header,
-          informed_entities: parse_informed_entities(informed_entities, facilities),
-          active_period: parse_and_sort_active_periods(active_period),
-          lifecycle: lifecycle,
-          timeframe: timeframe,
-          created_at: parse_datetime(created_at),
-          updated_at: parse_datetime(updated_at),
-          url: url,
-          description: description
-        }
-
-      _ ->
-        nil
-    end
-  end
-
-  defp parse_informed_entities(ies, facilities) when map_size(facilities) > 0 do
-    Enum.map(ies, &parse_informed_entity_with_facilities(&1, facilities))
-  end
-
-  defp parse_informed_entities(ies, _) do
-    Enum.map(ies, &parse_informed_entity/1)
-  end
-
-  defp parse_informed_entity(ie) do
-    %{
-      activities: get_in(ie, ["activities"]),
-      stop: get_in(ie, ["stop"]),
-      route: get_in(ie, ["route"]),
-      route_type: get_in(ie, ["route_type"]),
-      direction_id: get_in(ie, ["direction_id"]),
-      facility: nil
+  def parse_alert(
+        %{
+          "id" => id,
+          "attributes" => %{
+            "active_period" => active_period,
+            "cause" => cause,
+            "created_at" => created_at,
+            "description" => description,
+            "effect" => effect,
+            "header" => header,
+            "informed_entity" => informed_entities,
+            "lifecycle" => lifecycle,
+            "severity" => severity,
+            "timeframe" => timeframe,
+            "updated_at" => updated_at,
+            "url" => url
+          }
+        },
+        included
+      ) do
+    %Alert{
+      id: id,
+      active_period: parse_and_sort_active_periods(active_period),
+      cause: parse_cause(cause),
+      created_at: parse_datetime(created_at),
+      description: description,
+      effect: parse_effect(effect),
+      header: header,
+      informed_entities: Enum.map(informed_entities, &parse_informed_entity(&1, included)),
+      lifecycle: lifecycle,
+      severity: severity,
+      timeframe: timeframe,
+      updated_at: parse_datetime(updated_at),
+      url: url
     }
   end
 
-  defp parse_informed_entity_with_facilities(ie, facilities) do
-    parsed = parse_informed_entity(ie)
+  defp parse_informed_entity(ie, included) do
+    %{
+      activities: ie["activities"],
+      direction_id: ie["direction_id"],
+      facility: parse_informed_facility(ie["facility"], included),
+      route: ie["route"],
+      route_type: ie["route_type"],
+      stop: ie["stop"]
+    }
+  end
 
-    facility_id = get_in(ie, ["facility"])
+  defp parse_informed_facility(nil, _included), do: nil
 
-    facility_name =
-      case Map.fetch(facilities, facility_id) do
-        {:ok, name} -> name
-        :error -> nil
-      end
-
-    if not is_nil(facility_id) and not is_nil(facility_name) do
-      Map.put(parsed, :facility, %{id: facility_id, name: facility_name})
-    else
-      parsed
-    end
+  defp parse_informed_facility(id, included) do
+    included |> Map.fetch!({id, "facility"}) |> Facilities.Parser.parse_facility(included)
   end
 
   defp parse_and_sort_active_periods(periods) do
@@ -188,15 +160,5 @@ defmodule Screens.Alerts.Parser do
 
   defp parse_cause(cause) do
     Map.get(@causes, cause, :unknown)
-  end
-
-  defp parse_facility_data(nil), do: %{}
-
-  defp parse_facility_data(facilities) do
-    facilities
-    |> Enum.map(fn %{"attributes" => %{"short_name" => short_name}, "id" => id} ->
-      {id, short_name}
-    end)
-    |> Enum.into(%{})
   end
 end

@@ -1,7 +1,8 @@
 defmodule Screens.Alerts.Alert do
   @moduledoc false
 
-  alias Screens.Alerts.{Alert, InformedEntity}
+  alias Screens.Alerts.{Alert, InformedEntity, Parser}
+  alias Screens.Facilities.Facility
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
@@ -101,9 +102,9 @@ defmodule Screens.Alerts.Alert do
   @type active_period :: {DateTime.t(), DateTime.t() | nil}
 
   @type informed_entity :: %{
-          facility: %{id: String.t(), name: String.t()} | nil,
-          stop: String.t() | nil,
-          route: String.t() | nil,
+          facility: Facility.t() | nil,
+          stop: Stop.id() | nil,
+          route: Route.id() | nil,
           route_type: non_neg_integer() | nil,
           direction_id: Trip.direction() | nil
         }
@@ -123,20 +124,37 @@ defmodule Screens.Alerts.Alert do
           description: String.t()
         }
 
-  @spec fetch(keyword()) :: {:ok, list(t())} | :error
+  @type options :: [
+          activity: String.t(),
+          fields: [String.t()],
+          include_all?: boolean(),
+          route_id: Route.id(),
+          route_ids: [Route.id()],
+          route_types: RouteType.t() | [RouteType.t()],
+          stop_id: Stop.id(),
+          stop_ids: [Stop.id()]
+        ]
+
+  @base_includes ~w[facilities]
+  @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops]
+
+  @callback fetch(options()) :: {:ok, list(t())} | :error
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     Screens.Telemetry.span([:screens, :alerts, :alert, :fetch], fn ->
+      includes =
+        if Keyword.get(opts, :include_all?, false),
+          do: @all_includes,
+          else: @base_includes
+
       params =
         opts
         |> Enum.flat_map(&format_query_param/1)
-        |> Enum.into(%{})
+        |> Map.new()
+        |> Map.put("include", Enum.join(includes, ","))
 
       case get_json_fn.("alerts", params) do
-        {:ok, result} ->
-          {:ok, Screens.Alerts.Parser.parse_result(result)}
-
-        _ ->
-          :error
+        {:ok, response} -> {:ok, Parser.parse(response)}
+        _ -> :error
       end
     end)
   end
@@ -190,19 +208,6 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  @callback fetch_elevator_alerts_with_facilities() :: {:ok, list(Alert.t())} | :error
-  def fetch_elevator_alerts_with_facilities(get_json_fn \\ &V3Api.get_json/2) do
-    query_opts = [activity: "USING_WHEELCHAIR", include: ~w[facilities]]
-
-    case fetch(query_opts, get_json_fn) do
-      {:ok, alerts} ->
-        {:ok, alerts}
-
-      _ ->
-        :error
-    end
-  end
-
   defp format_query_param({:fields, fields}) when is_list(fields) do
     [
       {"fields[alert]", Enum.join(fields, ",")}
@@ -245,10 +250,6 @@ defmodule Screens.Alerts.Alert do
 
   defp format_query_param({:activity, activity}) do
     [{"activity", activity}]
-  end
-
-  defp format_query_param({:include, relationships}) do
-    [{"include", Enum.join(relationships, ",")}]
   end
 
   defp format_query_param(_), do: []

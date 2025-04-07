@@ -1,10 +1,11 @@
 @use "CSS/colors";
+@use "vars";
 
 .route-pill {
   position: relative;
   display: flex;
   align-items: center;
-  width: 112px;
+  width: vars.$route-pill-width;
   height: 72px;
   margin-top: 18px;
   border-radius: 100px;
@@ -38,7 +39,6 @@
   }
 
   &--yellow {
-    height: 72px;
     color: black;
     letter-spacing: -2px;
     background-color: colors.$line-bus;
@@ -50,7 +50,6 @@
 .route-pill__text {
   position: absolute;
   width: 100%;
-  font-family: Inter;
   font-size: 47px;
   font-weight: 700;
   color: white;
@@ -58,11 +57,10 @@
   letter-spacing: 0.0277em;
 
   &--yellow {
-    font-style: normal;
     font-weight: 700;
-    line-height: 55px; /* 114.775% */
+    line-height: 55px;
     color: black;
-    letter-spacing: -0.857px;
+    letter-spacing: -0.85px;
   }
 
   &--green {

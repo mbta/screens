@@ -156,7 +156,8 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
         platform_code: nil,
         platform_name: "Exit Only",
         vehicle_type: :subway,
-        child_stops: []
+        child_stops: [],
+        connecting_stops: :unloaded
       }
 
       orient_heights = %Stop{
@@ -166,7 +167,8 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
         platform_code: nil,
         platform_name: "Bowdoin",
         vehicle_type: :subway,
-        child_stops: []
+        child_stops: [],
+        connecting_stops: :unloaded
       }
 
       wonderland = %Stop{
@@ -176,7 +178,8 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
         platform_code: "1",
         platform_name: "Bowdoin",
         vehicle_type: :subway,
-        child_stops: []
+        child_stops: [],
+        connecting_stops: :unloaded
       }
 
       expected = [

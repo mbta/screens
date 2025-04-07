@@ -1,8 +1,8 @@
 defmodule Screens.Schedules.Schedule do
   @moduledoc false
 
-  alias Screens.Departures.Departure
   alias Screens.Trips.Trip
+  alias Screens.V2.Departure
 
   defstruct id: nil,
             trip: nil,
@@ -27,22 +27,19 @@ defmodule Screens.Schedules.Schedule do
           direction_id: Trip.direction()
         }
 
-  @spec fetch(Departure.query_params()) :: {:ok, list(t())} | :error
-  @spec fetch(Departure.query_params(), DateTime.t() | Date.t() | String.t() | nil) ::
+  @includes ~w[route.line stop trip.route_pattern.representative_trip trip.stops]
+
+  @spec fetch(Departure.params()) :: {:ok, list(t())} | :error
+  @spec fetch(Departure.params(), DateTime.t() | Date.t() | String.t() | nil) ::
           {:ok, list(t())} | :error
-  def fetch(%{} = query_params, date \\ nil) do
-    extra_params = if is_nil(date), do: %{}, else: %{date: date}
+  def fetch(%{} = params, date \\ nil) do
+    params = if is_nil(date), do: params, else: Map.put(params, :date, date)
 
     schedules =
-      Departure.do_query_and_parse(
-        query_params,
+      Departure.do_fetch(
         "schedules",
-        Screens.Schedules.Parser,
-        Map.put(
-          extra_params,
-          :include,
-          ~w[route.line stop trip.route_pattern.representative_trip trip.stops]
-        )
+        Map.put(params, :include, @includes),
+        Screens.Schedules.Parser
       )
 
     case schedules do
