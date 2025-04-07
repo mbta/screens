@@ -23,6 +23,16 @@ defmodule Screens.Alerts.Alert do
             url: nil,
             description: nil
 
+  @type activity ::
+          :board
+          | :bringing_bike
+          | :exit
+          | :park_car
+          | :ride
+          | :store_bike
+          | :using_escalator
+          | :using_wheelchair
+
   @type cause ::
           :accident
           | :amtrak
@@ -102,11 +112,12 @@ defmodule Screens.Alerts.Alert do
   @type active_period :: {DateTime.t(), DateTime.t() | nil}
 
   @type informed_entity :: %{
+          activities: nonempty_list(activity()),
+          direction_id: Trip.direction() | nil,
           facility: Facility.t() | nil,
-          stop: Stop.id() | nil,
           route: Route.id() | nil,
           route_type: non_neg_integer() | nil,
-          direction_id: Trip.direction() | nil
+          stop: Stop.id() | nil
         }
 
   @type t :: %__MODULE__{
@@ -125,7 +136,7 @@ defmodule Screens.Alerts.Alert do
         }
 
   @type options :: [
-          activity: String.t(),
+          activities: [activity()] | :all,
           fields: [String.t()],
           include_all?: boolean(),
           route_id: Route.id(),
@@ -248,8 +259,15 @@ defmodule Screens.Alerts.Alert do
     format_query_param({:route_types, [route_type]})
   end
 
-  defp format_query_param({:activity, activity}) do
-    [{"activity", activity}]
+  defp format_query_param({:activities, :all}), do: [{"activity", "ALL"}]
+
+  defp format_query_param({:activities, activities}) when is_list(activities) do
+    [
+      {
+        "activity",
+        Enum.map_join(activities, ",", fn value -> value |> to_string() |> String.upcase() end)
+      }
+    ]
   end
 
   defp format_query_param(_), do: []

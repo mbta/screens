@@ -18,7 +18,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
   @route injected(Route)
   @stop injected(Stop)
 
-  @alert_opts [activity: "USING_WHEELCHAIR"]
+  @alert_opts [activities: [:using_wheelchair]]
 
   setup :verify_on_exit!
 

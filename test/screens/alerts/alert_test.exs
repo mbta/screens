@@ -49,7 +49,7 @@ defmodule Screens.Alerts.AlertTest do
             route: "1",
             direction_id: nil,
             route_type: nil,
-            activities: ~w[BOARD EXIT RIDE],
+            activities: ~w[board exit ride]a,
             facility: nil
           }
         ],

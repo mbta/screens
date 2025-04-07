@@ -46,7 +46,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
       ) do
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, parent_station_id, now),
          {:ok, parent_station_map} <- @stop.fetch_parent_station_name_map(),
-         {:ok, alerts} <- fetch_alerts_fn.(activity: "USING_WHEELCHAIR") do
+         {:ok, alerts} <- fetch_alerts_fn.(activities: [:using_wheelchair]) do
       elevator_closures =
         alerts
         |> elevator_alerts()

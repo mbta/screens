@@ -60,7 +60,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         %Screen{app_params: %ElevatorConfig{elevator_id: elevator_id} = app_params} = config,
         now
       ) do
-    {:ok, alerts} = @alert.fetch(activity: "USING_WHEELCHAIR")
+    {:ok, alerts} = @alert.fetch(activities: [:using_wheelchair])
     {active, upcoming} = Enum.split_with(alerts, &Alert.happening_now?/1)
     active_closures = Enum.flat_map(active, &elevator_closure/1)
     at_this_elevator? = fn %Closure{id: id} -> id == elevator_id end
