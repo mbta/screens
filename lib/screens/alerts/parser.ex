@@ -43,7 +43,8 @@ defmodule Screens.Alerts.Parser do
 
   defp parse_informed_entity(ie, included) do
     %{
-      activities: ie["activities"],
+      activities:
+        ie["activities"] |> Enum.map(&String.downcase/1) |> Enum.map(&String.to_existing_atom/1),
       direction_id: ie["direction_id"],
       facility: parse_informed_facility(ie["facility"], included),
       route: ie["route"],

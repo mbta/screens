@@ -37,7 +37,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     vendor: :mimo
   }
 
-  @alert_opts [activity: "USING_WHEELCHAIR"]
+  @alert_opts [activities: [:using_wheelchair]]
 
   setup do
     stub(@alert, :fetch, fn @alert_opts -> {:ok, []} end)
