@@ -15,7 +15,7 @@
     "unused": "knip --tags=-knipignore",
     "styles": "stylelint --fix \"css/**/*\"",
     "styles:check": "stylelint \"css/**/*\"",
-    "format": "prettier --write .",
+    "format": "prettier --write --list-different .",
     "format:check": "prettier --check ."
   },
   "dependencies": {
