@@ -38,7 +38,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      - uses: mbta/actions/dialyzer@v2
+      - uses: mbta/actions/dialyzer@a1315d4c21861fbb35dd4d5ba79345f5067ebc91
 
   ex-format:
     name: Elixir Format
