@@ -44,6 +44,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosuresTest do
              }
     end
 
+    test "serializes a no-closures state" do
+      instance = %{@instance | stations_with_closures: :no_closures}
+
+      assert WidgetInstance.serialize(instance) == %{
+               id: @instance.app_params.elevator_id,
+               station_id: @instance.station_id,
+               stations_with_closures: :no_closures,
+               upcoming_closure: nil
+             }
+    end
+
     test "serializes an upcoming closure" do
       instance = %{
         @instance

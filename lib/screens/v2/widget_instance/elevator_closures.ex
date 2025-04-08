@@ -137,10 +137,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorClosures do
       }),
       do: %{
         id: id,
-        stations_with_closures: Enum.map(stations_with_closures, &Station.serialize/1),
+        stations_with_closures: serialize_stations(stations_with_closures),
         station_id: station_id,
         upcoming_closure: if(upcoming_closure, do: Upcoming.serialize(upcoming_closure, now))
       }
+
+  defp serialize_stations(stations) when is_list(stations),
+    do: Enum.map(stations, &Station.serialize/1)
+
+  defp serialize_stations(other), do: other
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.ElevatorClosures
