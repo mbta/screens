@@ -41,10 +41,20 @@ defmodule Screens.Alerts.Parser do
     }
   end
 
+  @activities %{
+    "BOARD" => :board,
+    "BRINGING_BIKE" => :bringing_bike,
+    "EXIT" => :exit,
+    "PARK_CAR" => :park_car,
+    "RIDE" => :ride,
+    "STORE_BIKE" => :store_bike,
+    "USING_ESCALATOR" => :using_escalator,
+    "USING_WHEELCHAIR" => :using_wheelchair
+  }
+
   defp parse_informed_entity(ie, included) do
     %{
-      activities:
-        ie["activities"] |> Enum.map(&String.downcase/1) |> Enum.map(&String.to_existing_atom/1),
+      activities: Enum.map(ie["activities"], &Map.fetch!(@activities, &1)),
       direction_id: ie["direction_id"],
       facility: parse_informed_facility(ie["facility"], included),
       route: ie["route"],
