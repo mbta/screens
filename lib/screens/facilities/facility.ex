@@ -36,7 +36,7 @@ defmodule Screens.Facilities.Facility do
           long_name: String.t(),
           short_name: String.t(),
           stop: Stop.t() | :unloaded,
-          type: type()
+          type: type() | :unknown
         }
 
   @type params :: [stop_ids: [Stop.id()], types: [type()]]
