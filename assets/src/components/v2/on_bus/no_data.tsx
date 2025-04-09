@@ -1,23 +1,14 @@
 import React, { ComponentType } from "react";
-import { imagePath } from "Util/utils";
+import NoConnection from "Images/svgr_bundled/live-data-none.svg";
 
 const NoData: ComponentType = () => {
   return (
-    <div className="screen-container">
-      <div className="no-data__container">
-        <div className="no-data__header">
-          <div className="no-data__logo-container">
-            <img
-              className="no-data__logo-image"
-              src={imagePath(`no-wifi.svg`)}
-            />
-          </div>
-        </div>
-        <div className="no-data__main-content">
-          <div className="no-data__main-content__text">
-            Live connections updates <br /> are temporarily unavailable.
-          </div>
-        </div>
+    <div className="no-data">
+      <div className="no-data__header">
+        <NoConnection width="90" height="90" color="#171F26" />
+      </div>
+      <div className="no-data__content">
+        Live connection updates <br /> are temporarily unavailable.
       </div>
     </div>
   );

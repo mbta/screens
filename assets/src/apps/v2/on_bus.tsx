@@ -27,7 +27,7 @@ import Departures from "Components/v2/departures";
 
 const TYPE_TO_COMPONENT = {
   body_normal: NormalBody,
-  departures: Departures,
+  departures: NoData,
   departures_no_data: NoData,
   departures_no_service: DeparturesNoService,
   no_data: NoData,

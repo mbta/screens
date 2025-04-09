@@ -1,6 +1,6 @@
 @use "CSS/colors";
 
-.no-data__container {
+.no-data {
   position: relative;
   width: 552px;
   height: 354px;
@@ -11,18 +11,14 @@
 .no-data__header {
   position: relative;
   top: 23px;
-  bottom: 23px;
   width: 90px;
   height: 90px;
   background-color: colors.$warm-neutral-90;
 }
 
-.no-data__main-content {
+.no-data__content {
   position: relative;
-  top: 23px;
-}
-
-.no-data__main-content__text {
+  top: 28px;
   font-size: 59px;
   font-weight: 700;
   line-height: 66px;
