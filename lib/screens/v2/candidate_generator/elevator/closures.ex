@@ -149,48 +149,22 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
          screen_station_id,
          now
        ) do
-    station_route_pills = fetch_station_route_pills(active_closures, screen_station_id)
-
     %ElevatorClosures{
       app_params: app_params,
       now: now,
       station_id: screen_station_id,
       stations_with_closures:
-        build_stations_with_closures(
-          active_closures,
-          relevant_closures,
-          station_route_pills,
-          screen_elevator_id
-        ),
+        build_stations_with_closures(active_closures, relevant_closures, screen_elevator_id),
       upcoming_closure: build_upcoming_closure(upcoming_closures)
     }
   end
 
-  defp fetch_station_route_pills(closures, screen_station_id) do
-    closures
-    |> Enum.map(& &1.facility.stop.id)
-    |> MapSet.new()
-    |> MapSet.put(screen_station_id)
-    |> Map.new(fn station_id -> {station_id, fetch_route_pills(station_id)} end)
-  end
+  defp build_stations_with_closures([] = _active_closures, _, _), do: :no_closures
+  defp build_stations_with_closures(_, [] = _relevant_closures, _), do: :nearby_redundancy
 
-  defp fetch_route_pills(stop_id) do
-    case @route.fetch(%{stop_id: stop_id}) do
-      {:ok, routes} -> routes |> Enum.map(&Route.icon/1) |> Enum.uniq()
-      # Show no route pills instead of crashing the screen
-      :error -> []
-    end
-  end
+  defp build_stations_with_closures(active_closures, relevant_closures, screen_elevator_id) do
+    station_route_pills = fetch_station_route_pills(relevant_closures)
 
-  defp build_stations_with_closures([] = _active_closures, _, _, _), do: :no_closures
-  defp build_stations_with_closures(_, [] = _relevant_closures, _, _), do: :nearby_redundancy
-
-  defp build_stations_with_closures(
-         active_closures,
-         relevant_closures,
-         station_route_pills,
-         screen_elevator_id
-       ) do
     relevant_closures
     |> log_station_closures(screen_elevator_id)
     |> Enum.group_by(& &1.facility.stop)
@@ -212,6 +186,21 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         summary: active_summary(station_closures, screen_elevator_id, active_closures)
       }
     end)
+  end
+
+  defp fetch_station_route_pills(closures) do
+    closures
+    |> Enum.map(& &1.facility.stop.id)
+    |> Enum.uniq()
+    |> Map.new(fn station_id -> {station_id, fetch_route_pills(station_id)} end)
+  end
+
+  defp fetch_route_pills(stop_id) do
+    case @route.fetch(%{stop_id: stop_id}) do
+      {:ok, routes} -> routes |> Enum.map(&Route.icon/1) |> Enum.uniq()
+      # Show no route pills instead of crashing the screen
+      :error -> []
+    end
   end
 
   defp build_upcoming_closure([]), do: nil

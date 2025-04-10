@@ -183,12 +183,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     end
 
     test "groups multiple outside closures by station", %{now: now} do
-      expect(@route, :fetch, 2, fn
-        %{stop_id: "place-haecl"} ->
-          {:ok, [%Route{id: "Orange", type: :subway}]}
-
-        %{stop_id: "place-test"} ->
-          {:ok, [%Route{id: "Red", type: :subway}]}
+      expect(@route, :fetch, fn %{stop_id: "place-haecl"} ->
+        {:ok, [%Route{id: "Orange", type: :subway}]}
       end)
 
       expect(@alert, :fetch, fn @alert_opts ->
