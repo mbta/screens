@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   alias Screens.Alerts.Alert
   alias Screens.Elevator
   alias Screens.Facilities.Facility
+  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Elevator.Closures, as: Generator
@@ -21,6 +22,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   @elevator injected(Elevator)
   @facility injected(Screens.Facilities.Facility)
   @route injected(Route)
+  @route_pattern injected(RoutePattern)
 
   @app_params %ElevatorConfig{
     elevator_id: "111",
@@ -43,6 +45,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     stub(@elevator, :get, fn id -> build_elevator(id) end)
     stub(@facility, :fetch_by_id, fn id -> {:ok, build_facility(id)} end)
     stub(@route, :fetch, fn _params -> {:ok, [%Route{id: "Red", type: :subway}]} end)
+    stub(@route_pattern, :fetch, fn _params -> {:ok, []} end)
 
     {:ok, %{now: DateTime.utc_now()}}
   end
@@ -52,9 +55,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   end
 
   defp build_facility_alert(facility_id, station_id, opts \\ []) do
-    {opts, alert_fields} = Keyword.split(opts, [:facility_name, :station_name])
+    {opts, alert_fields} =
+      Keyword.split(opts, ~w[child_stop_ids facility_name facility_excludes station_name]a)
+
     facility_name = Keyword.get(opts, :facility_name, "Elevator #{facility_id}")
+    facility_excludes = Keyword.get(opts, :facility_excludes, [])
     station_name = Keyword.get(opts, :station_name, "#{station_id} Station")
+    child_stop_ids = Keyword.get(opts, :child_stop_ids, [])
 
     alert_fields
     |> Keyword.merge(
@@ -62,8 +69,14 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         %{
           facility:
             build_facility(facility_id,
+              excludes_stop_ids: facility_excludes,
               short_name: facility_name,
-              stop: %Stop{id: station_id, name: station_name}
+              stop: %Stop{
+                id: station_id,
+                name: station_name,
+                location_type: 1,
+                child_stops: Enum.map(child_stop_ids, &%Stop{id: &1})
+              }
             )
         }
       ]
@@ -91,10 +104,20 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         long_name: "long",
         short_name: "short",
         type: :elevator,
-        stop: %Stop{id: "place-test"}
+        stop: %Stop{id: "place-test", location_type: 1, child_stops: []}
       },
       fields
     )
+  end
+
+  defp build_route_pattern(direction_id, child_and_parent_ids) do
+    %RoutePattern{
+      direction_id: direction_id,
+      stops:
+        Enum.map(child_and_parent_ids, fn {child_id, parent_id} ->
+          %Stop{id: child_id, parent_station: %Stop{id: parent_id, location_type: 1}}
+        end)
+    }
   end
 
   describe "header and footer" do
@@ -143,6 +166,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
   end
 
   describe "closure list widget" do
+    @fallback_summary {:other, "Visit mbta.com/elevators for more info"}
+
     test "is returned based on currently-active elevator alerts", %{now: now} do
       expect(@alert, :fetch, fn @alert_opts ->
         active_period = {DateTime.add(now, -1, :day), DateTime.add(now, 1, :day)}
@@ -213,7 +238,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                        %Closure{id: "f1", name: "Test 1"},
                        %Closure{id: "f2", name: "Test 2"}
                      ],
-                     summary: {:other, "Visit mbta.com/elevators for more info"}
+                     summary: @fallback_summary
                    }
                  ]
                }
@@ -305,8 +330,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     test "generates backup route summaries based on exiting redundancy", %{now: now} do
       stub(@elevator, :get, fn
         "1" -> build_elevator("1", exiting_redundancy: :in_station, exiting_summary: "es1")
-        "2" -> build_elevator("2", exiting_redundancy: :other, exiting_summary: "es2")
-        "3" -> build_elevator("3", alternate_ids: ["alt"], exiting_redundancy: :nearby)
+        "2" -> build_elevator("2", alternate_ids: ["alt"], exiting_redundancy: :nearby)
         "alt" -> build_elevator("alt", exiting_redundancy: :nearby)
       end)
 
@@ -314,14 +338,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         alerts = [
           # backup in station
           build_facility_alert("1", "place-1"),
-          # other with exiting summary
-          build_facility_alert("2", "place-2"),
           # despite having "nearby" redundancy, should not be filtered out, because its alternate
           # elevator is also down
-          build_facility_alert("3", "place-3"),
-          # somewhat unrealistically, place elevator 3's "nearby" alternate at a different
-          # station, so they aren't combined
-          build_facility_alert("alt", "place-4")
+          build_facility_alert("2", "place-2"),
+          # has "nearby" redundancy, so will be filtered out
+          build_facility_alert("alt", "place-2")
         ]
 
         {:ok, alerts}
@@ -338,13 +359,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                    %ElevatorClosures.Station{
                      id: "place-2",
                      closures: [%Closure{id: "2"}],
-                     # TEMP: currently not using exiting summaries, see implementation for details
-                     summary: {:other, "Visit mbta.com/elevators for more info"}
-                   },
-                   %ElevatorClosures.Station{
-                     id: "place-3",
-                     closures: [%Closure{id: "3"}],
-                     summary: {:other, "Visit mbta.com/elevators for more info"}
+                     summary: @fallback_summary
                    }
                  ]
                }
@@ -368,20 +383,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
           build_elevator("alt")
       end)
 
-      stub(@facility, :fetch_by_id, fn id ->
-        {
-          :ok,
-          build_facility(id,
-            stop: %Stop{
-              id:
-                case id do
-                  "1" -> "place-1"
-                  "2" -> "place-2"
-                  "alt" -> "place-1"
-                end
-            }
-          )
-        }
+      expect(@facility, :fetch_by_id, fn "alt" ->
+        {:ok, build_facility("alt", stop: %Stop{id: "place-1"})}
       end)
 
       expect(@alert, :fetch, fn @alert_opts ->
@@ -407,12 +410,133 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
                    %ElevatorClosures.Station{
                      id: "place-2",
                      closures: [%Closure{id: "2"}],
-                     summary: {:other, "Visit mbta.com/elevators for more info"}
+                     summary: @fallback_summary
                    }
                  ]
                }
                | _
              ] = Generator.elevator_status_instances(screen, now)
+    end
+
+    test "uses custom summaries for closures downstream of the screen's station", %{now: now} do
+      stub(@elevator, :get, fn
+        "upstream" ->
+          build_elevator("upstream", exiting_redundancy: :other)
+
+        "here" ->
+          build_elevator("here", exiting_redundancy: :other)
+
+        "downstream" ->
+          build_elevator("downstream", exiting_redundancy: :other, exiting_summary: "es1")
+
+        "elsewhere" ->
+          build_elevator("elsewhere", exiting_redundancy: :other)
+      end)
+
+      expect(
+        @route_pattern,
+        :fetch,
+        fn %{canonical?: true, stop_ids: ~w[dir0-p1 dir0-p2 dir0-p3 dir1-p2 dir1-p4]} ->
+          {
+            :ok,
+            [
+              build_route_pattern(0, [
+                {"dir0-p1", "place-1"},
+                {"dir0-p2", "place-2"},
+                {"dir0-p3", "place-3"},
+                {"dir0-p4", "place-4"}
+              ]),
+              build_route_pattern(1, [
+                {"dir1-p4", "place-4"},
+                {"dir1-p3", "place-3"},
+                {"dir1-p2", "place-2"},
+                {"dir1-p1", "place-1"}
+              ])
+            ]
+          }
+        end
+      )
+
+      expect(@facility, :fetch_by_id, fn "111" ->
+        {
+          :ok,
+          build_facility("111",
+            stop: %Stop{
+              id: "place-2",
+              location_type: 1,
+              child_stops: [%Stop{id: "dir0-p2"}, %Stop{id: "dir1-p2"}]
+            }
+          )
+        }
+      end)
+
+      expect(@alert, :fetch, fn @alert_opts ->
+        alerts = [
+          build_facility_alert("upstream", "place-1",
+            child_stop_ids: ~w[dir0-p1 dir1-p1],
+            facility_excludes: ~w[dir1-p1]
+          ),
+          build_facility_alert("here", "place-2", child_stop_ids: ~w[dir0-p2 dir1-p2]),
+          build_facility_alert("downstream", "place-3",
+            child_stop_ids: ~w[dir0-p3 dir1-p3],
+            facility_excludes: ~w[dir1-p3]
+          ),
+          # served child stop not reachable from the screen's station without reversing direction
+          build_facility_alert("elsewhere", "place-4",
+            child_stop_ids: ~w[dir0-p4 dir1-p4],
+            facility_excludes: ~w[dir0-p4]
+          )
+        ]
+
+        {:ok, alerts}
+      end)
+
+      assert [
+               %ElevatorClosures{
+                 stations_with_closures: [
+                   %ElevatorClosures.Station{
+                     id: "place-1",
+                     closures: [%Closure{id: "upstream"}],
+                     summary: @fallback_summary
+                   },
+                   %ElevatorClosures.Station{
+                     id: "place-2",
+                     closures: [%Closure{id: "here"}],
+                     summary: @fallback_summary
+                   },
+                   %ElevatorClosures.Station{
+                     id: "place-3",
+                     closures: [%Closure{id: "downstream"}],
+                     summary: {:other, "es1"}
+                   },
+                   %ElevatorClosures.Station{
+                     id: "place-4",
+                     closures: [%Closure{id: "elsewhere"}],
+                     summary: @fallback_summary
+                   }
+                 ]
+               }
+               | _
+             ] = Generator.elevator_status_instances(@screen, now)
+    end
+
+    test "uses fallback summary when there is a route patterns API error", %{now: now} do
+      expect(@route_pattern, :fetch, fn _params -> :error end)
+
+      expect(@alert, :fetch, fn @alert_opts ->
+        {:ok, [build_facility_alert("f1", "place-1")]}
+      end)
+
+      expect(@elevator, :get, fn "f1" -> build_elevator("f1", exiting_redundancy: :other) end)
+
+      assert [
+               %ElevatorClosures{
+                 stations_with_closures: [
+                   %ElevatorClosures.Station{id: "place-1", summary: @fallback_summary}
+                 ]
+               }
+               | _
+             ] = Generator.elevator_status_instances(@screen, now)
     end
 
     test "omits route pills on closures when there is a routes API error", %{now: now} do
