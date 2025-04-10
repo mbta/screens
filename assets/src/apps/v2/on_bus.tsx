@@ -17,6 +17,7 @@ import Placeholder from "Components/v2/placeholder";
 import NormalScreen from "Components/v2/bus_eink/normal_screen";
 import NormalBody from "Components/v2/bus_eink/normal_body";
 import NoData from "Components/v2/on_bus/no_data";
+import DeparturesNoService from "Components/v2/on_bus/no_service";
 import {
   ResponseMapper,
   ResponseMapperContext,
@@ -27,8 +28,7 @@ import Departures from "Components/v2/departures";
 const TYPE_TO_COMPONENT = {
   body_normal: NormalBody,
   departures: Departures,
-  departures_no_data: NoData,
-  departures_no_service: NoData,
+  departures_no_service: DeparturesNoService,
   no_data: NoData,
   placeholder: Placeholder,
   screen_normal: NormalScreen,
