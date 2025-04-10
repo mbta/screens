@@ -71,4 +71,16 @@ defmodule Screens.Facilities.Facility do
       _ -> :error
     end
   end
+
+  @doc """
+  Given a facility whose `stop` field is loaded, returns the inverse of `excludes_stop_ids`, i.e.
+  the child stops that *are* served by the facility.
+  """
+  @spec served_stop_ids(t()) :: [Stop.id()]
+  def served_stop_ids(%__MODULE__{
+        excludes_stop_ids: excludes_stop_ids,
+        stop: %Stop{child_stops: child_stops, location_type: 1}
+      })
+      when is_list(child_stops),
+      do: Enum.map(child_stops, & &1.id) -- excludes_stop_ids
 end
