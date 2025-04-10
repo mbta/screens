@@ -200,6 +200,7 @@ const useBaseApiResponse = ({
       const response = parseRawResponse(json);
 
       if (response.state == "failure") {
+        SentryLogger.info("Request failed.", { json });
         doFailureBuffer(lastSuccess, setApiResponse, response);
       } else {
         setApiResponse((prevApiResponse) => {
@@ -210,7 +211,8 @@ const useBaseApiResponse = ({
         });
         setLastSuccess(now);
       }
-    } catch {
+    } catch (err) {
+      SentryLogger.captureException(err);
       doFailureBuffer(lastSuccess, setApiResponse);
     }
 
