@@ -9,7 +9,8 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
   describe "fetch/2" do
     test "fetches and parses route patterns" do
       get_json_fn =
-        fn "route_patterns", %{"include" => "route.line,representative_trip.stops"} ->
+        fn "route_patterns",
+           %{"include" => "route.line,representative_trip.stops.parent_station"} ->
           {
             :ok,
             %{
@@ -210,7 +211,8 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
 
     test "filters by route type or typicality" do
       get_json_fn =
-        fn "route_patterns", %{"include" => "route.line,representative_trip.stops"} ->
+        fn "route_patterns",
+           %{"include" => "route.line,representative_trip.stops.parent_station"} ->
           {
             :ok,
             %{

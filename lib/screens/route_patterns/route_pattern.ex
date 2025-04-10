@@ -43,7 +43,10 @@ defmodule Screens.RoutePatterns.RoutePattern do
       fetch_params
       |> Enum.flat_map(&encode_param/1)
       |> Map.new()
-      |> Map.put("include", Enum.join(~w[route.line representative_trip.stops], ","))
+      |> Map.put(
+        "include",
+        Enum.join(~w[route.line representative_trip.stops.parent_station], ",")
+      )
 
     case get_json_fn.("route_patterns", encoded_params) do
       {:ok, response} ->
