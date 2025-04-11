@@ -56,6 +56,13 @@ defmodule Screens.Facilities.FacilityTest do
     type: :elevator
   }
 
+  defp build(fields) do
+    struct!(
+      %Facility{id: "test", long_name: "L", short_name: "S", stop: :unloaded, type: :elevator},
+      fields
+    )
+  end
+
   describe "fetch/2" do
     test "fetches and parses facilities" do
       get_json_fn = fn "facilities",
@@ -79,6 +86,21 @@ defmodule Screens.Facilities.FacilityTest do
       end
 
       assert Facility.fetch_by_id("954", get_json_fn) == {:ok, @expected}
+    end
+  end
+
+  describe "served_stop_ids/1" do
+    test "determines which child stop IDs the facility serves based on its excluded stop IDs" do
+      facility =
+        build(
+          excludes_stop_ids: ~w[2 3],
+          stop: %Stop{
+            location_type: 1,
+            child_stops: [%Stop{id: "1"}, %Stop{id: "2"}, %Stop{id: "3"}, %Stop{id: "4"}]
+          }
+        )
+
+      assert Facility.served_stop_ids(facility) == ~w[1 4]
     end
   end
 end
