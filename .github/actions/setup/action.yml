@@ -1,5 +1,9 @@
 name: Setup
 description: Installs tools and dependencies
+inputs:
+  fail-on-cache-miss:
+    description: Whether to fail on a cache miss
+    default: "true"
 
 runs:
   using: composite
@@ -9,10 +13,11 @@ runs:
       with:
         path: ~/.asdf
         key: asdf-${{ hashFiles('.tool-versions') }}
+        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
     - uses: asdf-vm/actions/install@v3
       if: steps.asdf-cache.outputs.cache-hit != 'true'
     - uses: mbta/actions/reshim-asdf@v2
-
+      if: steps.asdf-cache.outputs.cache-hit == 'true'
     - name: Elixir tools
       if: steps.asdf-cache.outputs.cache-hit != 'true'
       shell: bash
@@ -26,20 +31,27 @@ runs:
         path: |
           _build
           deps
-        key: ex-deps-${{ hashFiles('**/mix.lock') }}
+        key: ex-deps-${{ hashFiles('mix.lock') }}
+        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
     - name: Elixir dependencies
-      if: steps.ex-deps-cache.outputs.cache-hit != 'true'
+      if: >-
+        steps.ex-deps-cache.outputs.cache-hit != 'true'
+        || steps.asdf-cache.outputs.cache-hit != 'true'
       shell: bash
       run: |
         mix deps.get
         mix deps.compile
+        mix dialyzer --plt
 
     - uses: actions/cache@v4
       id: js-deps-cache
       with:
         path: assets/node_modules
-        key: js-deps-${{ hashFiles('**/package-lock.json') }}
+        key: js-deps-${{ hashFiles('assets/package-lock.json') }}
+        fail-on-cache-miss: ${{ inputs.fail-on-cache-miss }}
     - name: JS dependencies
-      if: steps.js-deps-cache.outputs.cache-hit != 'true'
+      if: >-
+        steps.js-deps-cache.outputs.cache-hit != 'true'
+        || steps.asdf-cache.outputs.cache-hit != 'true'
       shell: bash
       run: npm ci --prefix assets

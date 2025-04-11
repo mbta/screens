@@ -1,6 +1,9 @@
 name: CI
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
     paths-ignore:
       - docs/**
@@ -16,9 +19,19 @@ env:
   MIX_ENV: test
 
 jobs:
+  setup:
+    name: Setup
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup
+        with:
+          fail-on-cache-miss: "false"
+
   ex-compile:
     name: Elixir Warnings
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -27,6 +40,7 @@ jobs:
   ex-credo:
     name: Elixir Credo
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -35,14 +49,16 @@ jobs:
   ex-dialyzer:
     name: Elixir Dialyze
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
-      - uses: mbta/actions/dialyzer@v2
+      - run: mix dialyzer
 
   ex-format:
     name: Elixir Format
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -51,6 +67,7 @@ jobs:
   ex-tests:
     name: Elixir Tests
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -59,6 +76,7 @@ jobs:
   js-build:
     name: Frontend Build
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -68,6 +86,7 @@ jobs:
   js-format:
     name: Frontend Format
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -77,6 +96,7 @@ jobs:
   js-lint:
     name: Frontend Lint
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -86,6 +106,7 @@ jobs:
   js-styles:
     name: Frontend Styles
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -95,6 +116,7 @@ jobs:
   js-tests:
     name: Frontend Tests
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -104,6 +126,7 @@ jobs:
   js-types:
     name: Frontend Types
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
@@ -113,6 +136,7 @@ jobs:
   js-unused:
     name: Frontend Unused
     runs-on: ubuntu-latest
+    needs: setup
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup
