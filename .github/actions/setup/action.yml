@@ -12,7 +12,7 @@ runs:
     - uses: asdf-vm/actions/install@v3
       if: steps.asdf-cache.outputs.cache-hit != 'true'
     - uses: mbta/actions/reshim-asdf@v2
-
+      if: steps.asdf-cache.outputs.cache-hit == 'true'
     - name: Elixir tools
       if: steps.asdf-cache.outputs.cache-hit != 'true'
       shell: bash
@@ -26,7 +26,7 @@ runs:
         path: |
           _build
           deps
-        key: ex-deps-${{ hashFiles('**/mix.lock') }}
+        key: ex-deps-${{ hashFiles('.tool-versions', '**/mix.lock') }}
     - name: Elixir dependencies
       if: steps.ex-deps-cache.outputs.cache-hit != 'true'
       shell: bash
@@ -38,7 +38,7 @@ runs:
       id: js-deps-cache
       with:
         path: assets/node_modules
-        key: js-deps-${{ hashFiles('**/package-lock.json') }}
+        key: js-deps-${{ hashFiles('.tool-versions', '**/package-lock.json') }}
     - name: JS dependencies
       if: steps.js-deps-cache.outputs.cache-hit != 'true'
       shell: bash
