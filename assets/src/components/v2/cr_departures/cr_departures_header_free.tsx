@@ -1,6 +1,6 @@
 import React from "react";
 
-import CRPill from "Images/svgr_bundled/pills/commuter-rail.svg";
+import CRPill from "Images/pills/commuter-rail.svg";
 import RoutePill from "../departures/route_pill";
 import { getHexColor } from "Util/svg_utils";
 

@@ -10,11 +10,11 @@ import makePersistent, {
 } from "Components/v2/persistent_wrapper";
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
-import CalendarIcon from "Images/svgr_bundled/calendar.svg";
-import NormalServiceIconBase from "Images/svgr_bundled/normal-service.svg";
-import CalenderAlertIcon from "Images/svgr_bundled/calendar-alert.svg";
-import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
-import Logo from "Images/svgr_bundled/logo.svg";
+import CalendarIcon from "Images/calendar.svg";
+import NormalServiceIconBase from "Images/normal-service.svg";
+import CalenderAlertIcon from "Images/calendar-alert.svg";
+import AccessibilityAlert from "Images/accessibility-alert.svg";
+import Logo from "Images/logo.svg";
 import { hasOverflowX } from "Util/utils";
 import { CLOSURES_PAGING_INTERVAL_MS } from "./constants";
 

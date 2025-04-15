@@ -7,11 +7,11 @@ import makePersistent, {
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import useTextResizer from "Hooks/v2/use_text_resizer";
-import CurrentLocationMarker from "Images/svgr_bundled/current-location-marker.svg";
-import CurrentLocationBackground from "Images/svgr_bundled/current-location-background.svg";
-import NoService from "Images/svgr_bundled/no-service-black.svg";
-import ElevatorWayfinding from "Images/svgr_bundled/elevator-wayfinding.svg";
-import IsaNegative from "Images/svgr_bundled/isa-negative.svg";
+import CurrentLocationMarker from "Images/current-location-marker.svg";
+import CurrentLocationBackground from "Images/current-location-background.svg";
+import NoService from "Images/no-service-black.svg";
+import ElevatorWayfinding from "Images/elevator-wayfinding.svg";
+import IsaNegative from "Images/isa-negative.svg";
 import { ALTERNATE_PATH_PAGING_INTERVAL_MS } from "./constants";
 
 type Coordinates = {

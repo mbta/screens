@@ -1,6 +1,6 @@
 import React, { ComponentType } from "react";
 
-import NoConnection from "Images/svgr_bundled/live-data-none.svg";
+import NoConnection from "Images/live-data-none.svg";
 import FreeText, { FreeTextType } from "Components/v2/free_text";
 
 interface NoDataSection {
