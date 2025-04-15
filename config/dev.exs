@@ -66,7 +66,7 @@ config :ueberauth_oidcc,
 config :screens, ScreensWeb.Endpoint,
   live_reload: [
     patterns: [
-      ~r"priv/static/.*(js|css|png|jpeg|jpg|gif|svg)$",
+      ~r"priv/static/.*(js|css)$",
       ~r"priv/gettext/.*(po)$",
       ~r"lib/screens_web/{live,views}/.*(ex)$",
       ~r"lib/screens_web/templates/.*(eex)$"

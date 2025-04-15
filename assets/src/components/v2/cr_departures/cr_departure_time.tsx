@@ -1,7 +1,7 @@
 import moment from "moment";
 import React from "react";
 import { TimeRepresentation } from "Util/time_representation";
-import LiveDataSvg from "Images/svgr_bundled/live-data-small.svg";
+import LiveDataSvg from "Images/live-data-small.svg";
 
 const baseDepartureTime = (time: TimeRepresentation): JSX.Element | null => {
   if (time.type === "text") {

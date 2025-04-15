@@ -1,6 +1,6 @@
 import React from "react";
-import PagingDotUnselected from "Images/svgr_bundled/paging_dot_unselected.svg";
-import PagingDotSelected from "Images/svgr_bundled/paging_dot_selected.svg";
+import PagingDotUnselected from "Images/paging_dot_unselected.svg";
+import PagingDotSelected from "Images/paging_dot_selected.svg";
 
 interface PagingIndicatorsProps {
   numPages: number;
