@@ -9,13 +9,13 @@ import React, {
 } from "react";
 import { classWithModifier, classWithModifiers } from "Util/utils";
 
-import LargeXOctagonBordered from "Images/svgr_bundled/disruption_diagram/large-x-octagon-bordered.svg";
-import SmallXOctagon from "Images/svgr_bundled/disruption_diagram/small-x-octagon.svg";
-import CurrentStopDiamond from "Images/svgr_bundled/disruption_diagram/current-stop-diamond.svg";
-import CurrentStopOpenDiamond from "Images/svgr_bundled/disruption_diagram/current-stop-open-diamond.svg";
-import ArrowLeftEndpoint from "Images/svgr_bundled/disruption_diagram/arrow-left-endpoint.svg";
-import ArrowRightEndpoint from "Images/svgr_bundled/disruption_diagram/arrow-right-endpoint.svg";
-import ShuttleBusIcon from "Images/svgr_bundled/disruption_diagram/shuttle-emphasis-icon.svg";
+import LargeXOctagonBordered from "Images/disruption_diagram/large-x-octagon-bordered.svg";
+import SmallXOctagon from "Images/disruption_diagram/small-x-octagon.svg";
+import CurrentStopDiamond from "Images/disruption_diagram/current-stop-diamond.svg";
+import CurrentStopOpenDiamond from "Images/disruption_diagram/current-stop-open-diamond.svg";
+import ArrowLeftEndpoint from "Images/disruption_diagram/arrow-left-endpoint.svg";
+import ArrowRightEndpoint from "Images/disruption_diagram/arrow-right-endpoint.svg";
+import ShuttleBusIcon from "Images/disruption_diagram/shuttle-emphasis-icon.svg";
 
 // Width of the disruption diagram, dependent on the screen width
 const DIAGRAM_WIDTH = 904;

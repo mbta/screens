@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import NoConnection from "Images/svgr_bundled/live-data-none.svg";
+import NoConnection from "Images/live-data-none.svg";
 
 const NoData: ComponentType = () => {
   return (

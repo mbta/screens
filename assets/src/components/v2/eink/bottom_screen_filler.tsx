@@ -1,5 +1,5 @@
 import React, { ComponentType } from "react";
-import HandWithPhone from "Images/svgr_bundled/hand-with-phone.svg";
+import HandWithPhone from "Images/hand-with-phone.svg";
 
 const BottomScreenFiller: ComponentType = () => (
   <div className="bottom-screen-filler">

@@ -1,6 +1,6 @@
 import React from "react";
 import cx from "classnames";
-import Arrow45 from "Images/svgr_bundled/Arrow-45-no-padding.svg";
+import Arrow45 from "Images/Arrow-45-no-padding.svg";
 
 type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 

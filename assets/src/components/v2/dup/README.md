@@ -25,7 +25,7 @@
   ```sh
   for ROTATION_INDEX in {0..2}; do
     echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/v2/dup/rotation_index.tsx && \
-    npm --prefix ../../assets run deploy && \
+    npm --prefix ../../assets run deploy:dup && \
     cp -r css/packaged_dup_v2.css js/packaged_dup_polyfills.js js/packaged_dup_v2.js js/packaged_dup_v2.js.map ../dup_preview.png ../dup-app.html . && \
     cp ../dup_template.json ./template.json && \
     sed -i "" "s/DUP APP ./DUP APP ${ROTATION_INDEX}/" template.json && \

@@ -6,12 +6,12 @@ import DisruptionDiagram, {
 } from "./disruption_diagram/disruption_diagram";
 import { classWithModifier, classWithModifiers, formatCause } from "Util/utils";
 
-import ClockIcon from "Images/svgr_bundled/clock-negative.svg";
-import NoServiceIcon from "Images/svgr_bundled/no-service.svg";
-import InfoIcon from "Images/svgr_bundled/info.svg";
-import ISAIcon from "Images/svgr_bundled/isa.svg";
-import WalkingIcon from "Images/svgr_bundled/nearby.svg";
-import ShuttleBusIcon from "Images/svgr_bundled/bus.svg";
+import ClockIcon from "Images/clock-negative.svg";
+import NoServiceIcon from "Images/no-service.svg";
+import InfoIcon from "Images/info.svg";
+import ISAIcon from "Images/isa.svg";
+import WalkingIcon from "Images/nearby.svg";
+import ShuttleBusIcon from "Images/bus.svg";
 
 interface PreFareSingleScreenAlertProps {
   issue: string;

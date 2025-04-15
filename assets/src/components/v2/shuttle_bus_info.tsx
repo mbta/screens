@@ -1,7 +1,7 @@
 import React, { ComponentType } from "react";
 import { imagePath } from "Util/utils";
-import IsaSvg from "Images/svgr_bundled/isa-negative.svg";
-import Free from "Images/svgr_bundled/free.svg";
+import IsaSvg from "Images/isa-negative.svg";
+import Free from "Images/free.svg";
 import Arrow, { Direction } from "Components/v2/arrow";
 import ClockIcon from "Components/v2/clock_icon";
 
