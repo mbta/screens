@@ -263,7 +263,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         %Stop{parent_station: %Stop{id: ^screen_station_id}}, :unseen ->
           @empty_set
 
-        %Stop{parent_station: %Stop{id: _other}}, :unseen ->
+        _other, :unseen ->
           :unseen
 
         %Stop{id: stop_id}, %MapSet{} = downstream_facility_ids ->
