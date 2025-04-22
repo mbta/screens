@@ -11,4 +11,10 @@
     background-color: colors.$warm-neutral-80;
     border-radius: 2px;
   }
+
+  & > .departure-row.direction-split::after {
+    left: 0;
+    width: 100%;
+    background-color: colors.$true-grey-70;
+  }
 }

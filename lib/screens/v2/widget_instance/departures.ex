@@ -25,8 +25,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     @type row :: Departure.t() | FreeTextLine.t()
 
-    @type t :: %__MODULE__{header: Header.t(), layout: Layout.t(), rows: [row()]}
-    defstruct ~w[header layout rows]a
+    @type t :: %__MODULE__{
+            header: Header.t(),
+            layout: Layout.t(),
+            grouping_type: :time | :destination,
+            rows: [row()]
+          }
+    defstruct header: nil, layout: nil, grouping_type: :time, rows: []
   end
 
   defmodule HeadwaySection do
@@ -155,7 +160,34 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %NormalSection{rows: rows, layout: layout, header: header},
+        %NormalSection{rows: rows, header: header, grouping_type: :destination},
+        screen,
+        now,
+        _is_only_section
+      ) do
+    serialized_rows =
+      rows
+      |> group_by_unique_destination()
+      |> Enum.take(@max_rows_per_section)
+      |> Enum.map(&serialize_departure_group(&1, screen, now))
+
+    %{
+      type: :normal_section,
+      rows: serialized_rows,
+      layout:
+        Layout.to_json(%Layout{
+          max: nil,
+          base: length(serialized_rows),
+          min: 2,
+          include_later: false
+        }),
+      header: Header.to_json(header),
+      grouping_type: :destination
+    }
+  end
+
+  def serialize_section(
+        %NormalSection{rows: rows, layout: layout, header: header, grouping_type: grouping_type},
         screen,
         now,
         _is_only_section
@@ -170,7 +202,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :normal_section,
       rows: serialized_rows,
       layout: Layout.to_json(layout),
-      header: Header.to_json(header)
+      header: Header.to_json(header),
+      grouping_type: grouping_type
     }
   end
 
@@ -233,6 +266,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   @doc """
+  Groups unique destinations together by their headsign and direction id
+  """
+  @spec group_by_unique_destination([NormalSection.row()]) :: [[NormalSection.row()]]
+  def group_by_unique_destination(rows) do
+    rows
+    |> Enum.uniq_by(&row_departure_grouping(&1))
+    |> Enum.map(&[&1])
+  end
+
+  @doc """
   Groups consecutive departures that have the same route and headsign.
   Rows that are not departures are never grouped.
   """
@@ -244,10 +287,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def group_consecutive_departures(rows, _screen) do
-    Enum.chunk_by(rows, fn
-      %Departure{} = d -> {Departure.route(d), Departure.headsign(d)}
-      %FreeTextLine{} -> make_ref()
-    end)
+    Enum.chunk_by(rows, &row_departure_grouping(&1))
   end
 
   # Groups all departures of the same route and headsign.
@@ -263,10 +303,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           list({:normal, [Departure.t()]} | {:notice, FreeTextLine.t()})
   defp group_section_rows_for_audio(rows, now, app_id) do
     rows
-    |> Util.group_by_with_order(fn
-      %Departure{} = d -> {Departure.route(d), Departure.headsign(d)}
-      %FreeTextLine{} -> make_ref()
-    end)
+    |> Util.group_by_with_order(&row_departure_grouping(&1))
     |> Enum.map(fn
       {ref, [%FreeTextLine{} = text]} when is_reference(ref) ->
         {:notice, text}
@@ -275,6 +312,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
         {:normal, filter_audio_departure_group(departures, app_id, now)}
     end)
   end
+
+  defp row_departure_grouping(%Departure{} = row),
+    do: {Departure.route(row), Departure.headsign(row)}
+
+  defp row_departure_grouping(%FreeTextLine{}), do: make_ref()
 
   defp filter_audio_departure_group([first_departure | _] = departure_group, :busway_v2, now) do
     if first_departure |> Departure.time() |> DateTime.diff(now, :minute) <= 2 do
@@ -315,6 +357,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       route: serialize_route(departures, route_pill_serializer),
       headsign: serialize_headsign(departures, screen),
       times_with_crowding: serialize_times_with_crowding(departures, screen, now),
+      direction_id: serialize_direction_id(departures),
       # Temporarily retained for compatibility with deployed clients that expect this field
       inline_alerts: []
     }
@@ -385,6 +428,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
       id: Departure.id(departure),
       crowding: crowding
     })
+  end
+
+  def serialize_direction_id([first_departure | _]) do
+    Departure.direction_id(first_departure)
   end
 
   # Timestamps represent a time further in the future (except for CR, which doesn't have crowding)

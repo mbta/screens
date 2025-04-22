@@ -9,6 +9,7 @@ export const normalSection = Factory.define<Section>(() => ({
   layout: { min: 1, base: null, max: null, include_later: false },
   rows: departureRow.buildList(1),
   header: { title: null, arrow: null },
+  grouping_type: "time",
 }));
 
 export const departureRow = Factory.define<Row>(({ sequence }) => ({
@@ -17,6 +18,8 @@ export const departureRow = Factory.define<Row>(({ sequence }) => ({
   route: { type: "text", color: "yellow", text: sequence.toString() },
   headsign: { headsign: `Destination ${sequence}` },
   times_with_crowding: timeWithCrowding.buildList(1),
+  direction_id: 0,
+  isBeforeDirectionSplit: false,
 }));
 
 export const timeWithCrowding = Factory.define<TimeWithCrowding>(

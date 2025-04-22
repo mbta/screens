@@ -87,11 +87,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         true ->
           sections =
             Enum.map(sections_data, fn
-              %{section: %Section{header: header, layout: layout}, result: result} ->
+              %{
+                section: %Section{header: header, layout: layout, grouping_type: grouping_type},
+                result: result
+              } ->
                 %NormalSection{
                   rows: normal_section_rows(result),
                   layout: layout,
-                  header: header
+                  header: header,
+                  grouping_type: grouping_type
                 }
             end)
 
@@ -177,7 +181,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         %Section{
           query: %Query{opts: opts, params: params},
           filters: filters,
-          bidirectional: is_bidirectional
+          bidirectional: is_bidirectional,
+          grouping_type: grouping_type
         },
         disabled_route_types,
         departure_fetch_fn,
@@ -187,11 +192,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     fetch_opts = opts |> Map.from_struct() |> Keyword.new()
 
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
+      filtered_departures =
+        departures
+        |> Enum.reject(&(Departure.route(&1).type in disabled_route_types))
+        |> filter_departures(filters, now)
+
       {:ok,
-       departures
-       |> Enum.reject(&(Departure.route(&1).type in disabled_route_types))
-       |> filter_departures(filters, now)
-       |> make_bidirectional(is_bidirectional)}
+       cond do
+         is_bidirectional -> make_bidirectional(filtered_departures)
+         grouping_type == :destination -> sort_by_direction_id(filtered_departures)
+         true -> filtered_departures
+       end}
     end
   end
 
@@ -240,7 +251,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   # "Bidirectional" mode: take only the first departure, and the next departure in the opposite
   # direction from the first, if one exists.
-  defp make_bidirectional([first | rest], true) do
+  defp make_bidirectional([first | rest]) do
     first_direction = Departure.direction_id(first)
 
     opposite? =
@@ -251,7 +262,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     Enum.reject([first, opposite?], &is_nil/1)
   end
 
-  defp make_bidirectional(departures, _), do: departures
+  defp sort_by_direction_id(departures),
+    do: Enum.sort_by(departures, &(1 - Departure.direction_id(&1)))
 
   # Some screen types are always configured to show departures for one specific transit mode. In
   # that case, if the mode is devops-disabled, we immediately know the whole screen should display
