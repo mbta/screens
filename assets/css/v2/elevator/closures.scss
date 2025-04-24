@@ -41,9 +41,16 @@
     position: relative;
     display: flex;
     flex-direction: column;
-    gap: 80px;
     padding: 148px 72px;
     color: colors.$cool-black-15;
+
+    & > * {
+      margin-bottom: 80px;
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
 
     &__header {
       font-size: 90px;
@@ -52,7 +59,7 @@
     }
 
     &__text {
-      margin-bottom: 30px;
+      padding-bottom: 30px;
       font-size: 70px;
       font-weight: 400;
       line-height: 92px;
@@ -90,7 +97,10 @@
 
       &__postfix {
         font-weight: 700;
-        text-transform: capitalize;
+
+        &::first-letter {
+          text-transform: capitalize;
+        }
       }
     }
 
