@@ -8,13 +8,16 @@ defmodule ScreensWeb.V2.Audio.CRDeparturesView do
 
   def render("_widget.ssml", %{
         departures: departures,
-        station: station,
-        header_pill: header_pill
+        header_pill: header_pill,
+        is_free: is_free,
+        station: station
       }) do
     ~E|
-    <p>Consider taking Commuter Rail during <%= render_route_pill(header_pill) %> delays:</p>
+    <%= if is_free do %>
+      <p>Free Commuter Rail during <%= render_route_pill(header_pill) %> disruption.</p>
+    <% end %>
+    <p>Upcoming Commuter Rail departures:</p>
     <%= render_departures(departures, station) %>
-    <p>Riders can take the Commuter Rail free of charge.</p>
     |
   end
 
