@@ -11,7 +11,7 @@ import makePersistent, {
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
 import CalendarIcon from "Images/svgr_bundled/calendar.svg";
-import NormalServiceIcon from "Images/svgr_bundled/normal-service.svg";
+import NormalServiceIconBase from "Images/svgr_bundled/normal-service.svg";
 import CalenderAlertIcon from "Images/svgr_bundled/calendar-alert.svg";
 import AccessibilityAlert from "Images/svgr_bundled/accessibility-alert.svg";
 import Logo from "Images/svgr_bundled/logo.svg";
@@ -41,6 +41,10 @@ interface ClosureRowProps {
   isCurrentStation: boolean;
   isFirstRowOnPage: boolean;
 }
+
+const NormalServiceIcon = ({ size }: { size: number }) => (
+  <NormalServiceIconBase height={size} width={size} fill="#145A06" />
+);
 
 const ClosureRow = ({
   station: { id, name, closures, route_icons, summary },
@@ -136,7 +140,7 @@ const InStationSummary = ({
         {upcomingClosure ? (
           <CalendarIcon height={72} width={72} />
         ) : (
-          <NormalServiceIcon height={72} width={72} fill="#145A06" />
+          <NormalServiceIcon size={72} />
         )}
       </span>
     </div>
@@ -182,42 +186,44 @@ const UpcomingClosure = ({
 };
 
 const NoCurrentClosures = ({
-  closure,
   status,
+  upcomingClosure,
 }: {
-  closure?: UpcomingClosureInfo;
   status: ClosuresStatus;
+  upcomingClosure?: UpcomingClosureInfo;
 }) => {
+  const header = [
+    "All MBTA elevators are working",
+    status === "nearby_redundancy"
+      ? ` or have a backup elevator within 20 ${upcomingClosure ? "ft" : "feet"}`
+      : "",
+    ".",
+  ].join("");
+
   return (
     <>
-      {closure ? (
+      {upcomingClosure ? (
         <div className="closures-info">
           <div className="in-station-summary">
+            <div>{header}</div>
             <div>
-              All MBTA elevators are working{" "}
-              {status === "nearby_redundancy" &&
-                " or have a backup elevator within 20 ft"}
-              .
-            </div>
-            <div>
-              <NormalServiceIcon width={72} height={72} fill="#145A06" />
+              <NormalServiceIcon size={72} />
             </div>
           </div>
-          <UpcomingClosure closure={closure} />
+          <UpcomingClosure closure={upcomingClosure} />
         </div>
       ) : (
         <div className="no-closures">
-          <NormalServiceIcon height={150} width={150} fill="#145A06" />
-          <div className="no-closures__header">
-            All MBTA elevators are working{" "}
-            {status === "nearby_redundancy" &&
-              " or have a backup elevator within 20 feet"}
-            .
-          </div>
+          <NormalServiceIcon size={150} />
+          <div className="no-closures__header">{header}</div>
           <div className="divider" />
           <div className="no-closures__text">
-            For info on elevator outages and alternate paths:{" "}
-            <b>mbta.com/elevators</b> or call the elevator hotline:{" "}
+            For info on elevator outages and alternate paths:
+            <br />
+            <b>mbta.com/elevators</b>
+            <br />
+            or call the elevator hotline:
+            <br />
             <b>617-222-2828</b>
           </div>
           <Logo height={124} width={124} />
@@ -324,7 +330,10 @@ const Closures = ({
   return (
     <div className="elevator-closures">
       {stations === "no_closures" || stations === "nearby_redundancy" ? (
-        <NoCurrentClosures closure={upcomingClosure} status={stations} />
+        <NoCurrentClosures
+          status={stations}
+          upcomingClosure={upcomingClosure}
+        />
       ) : (
         <>
           <InStationSummary
