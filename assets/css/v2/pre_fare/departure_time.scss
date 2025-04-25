@@ -3,6 +3,7 @@
 
 .departure-time {
   display: inline-block;
+  font-variant-numeric: tabular-nums;
   color: colors.$cool-black-15;
   text-align: right;
   vertical-align: middle;
