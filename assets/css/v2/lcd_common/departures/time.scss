@@ -37,6 +37,7 @@
 .departure-time {
   display: inline-block;
   font-family: Inter, sans-serif;
+  font-variant-numeric: tabular-nums;
   color: colors.$cool-black-15;
   vertical-align: middle;
 }
