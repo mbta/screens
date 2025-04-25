@@ -18,7 +18,7 @@ jobs:
       review-section: In Review
       merged-section: Ready to Deploy
       attach-pr: true
-      trigger-phrase: "\\*\\*Asana task\\*\\*:"
+      trigger-phrase: "\*\*Asana task\*\*:"
     secrets:
       asana-token: ${{ secrets.ASANA_SECRET_FOR_INSURIFY_ACTION }}
       github-secret: ${{ secrets.ASANA_GITHUB_INTEGRATION_SECRET }}
