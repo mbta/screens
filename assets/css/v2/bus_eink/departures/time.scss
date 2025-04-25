@@ -17,9 +17,9 @@
 .departure-time {
   display: inline-block;
   font-family: Inter;
+  font-variant-numeric: tabular-nums;
   color: black;
   vertical-align: middle;
-  font-variant-numeric: tabular-nums;
 }
 
 .departure-time__text {
