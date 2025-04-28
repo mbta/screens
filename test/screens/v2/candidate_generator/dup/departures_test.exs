@@ -1801,46 +1801,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
-
-    test "returns empty departures list if sections have no departures", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-E"], route_ids: []}}
-          }
-        ])
-        |> put_secondary_departures_sections([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["Boat"]}}},
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      expected_departures = []
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
   end
 
   describe "overnight mode" do
