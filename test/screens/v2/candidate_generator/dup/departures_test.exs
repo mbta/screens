@@ -12,6 +12,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.{HeadwaySection, NoDataSection, NormalSection}
+  alias Screens.V2.WidgetInstance.DeparturesNoData
   alias Screens.V2.WidgetInstance.OvernightDepartures
   alias ScreensConfig.{Alerts, Departures, Header}
   alias ScreensConfig.Departures.Header, as: SectionHeader
@@ -1801,6 +1802,54 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
+
+    test "consolidates into DeparturesNoData only when all rotations have no data", %{
+      config: config,
+      fetch_departures_fn: fetch_departures_fn,
+      fetch_alerts_fn: fetch_alerts_fn,
+      fetch_schedules_fn: fetch_schedules_fn,
+      fetch_routes_fn: fetch_routes_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
+    } do
+      now = ~U[2020-04-06T10:00:00Z]
+
+      instances_partial_data =
+        config
+        |> put_primary_departures([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: []}}}
+        ])
+        |> put_secondary_departures_sections([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["nonexist"], route_ids: []}}}
+        ])
+        |> Dup.Departures.departures_instances(
+          now,
+          fetch_departures_fn,
+          fetch_alerts_fn,
+          fetch_schedules_fn,
+          fetch_routes_fn,
+          fetch_vehicles_fn
+        )
+
+      instances_no_data =
+        config
+        |> put_primary_departures([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["nonexist1"], route_ids: []}}}
+        ])
+        |> put_secondary_departures_sections([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["nonexist2"], route_ids: []}}}
+        ])
+        |> Dup.Departures.departures_instances(
+          now,
+          fetch_departures_fn,
+          fetch_alerts_fn,
+          fetch_schedules_fn,
+          fetch_routes_fn,
+          fetch_vehicles_fn
+        )
+
+      assert Enum.all?(instances_partial_data, &match?(%DeparturesWidget{}, &1))
+      assert Enum.all?(instances_no_data, &match?(%DeparturesNoData{}, &1))
+    end
   end
 
   describe "overnight mode" do
@@ -2078,7 +2127,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     end
 
     @tag capture_log: true
-    test "returns empty departures if now is after tomorrow's first schedule",
+    test "returns no-data if now is after tomorrow's first schedule",
          %{
            config: config,
            fetch_departures_fn: fetch_departures_fn,
@@ -2118,25 +2167,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            ]}
       end
 
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
-          slot_names: [:main_content_two],
-          now: now
-        }
+      expected_instances = [
+        %DeparturesNoData{screen: config, slot_name: :main_content_zero},
+        %DeparturesNoData{screen: config, slot_name: :main_content_one},
+        %DeparturesNoData{screen: config, slot_name: :main_content_two}
       ]
 
       actual_instances =
@@ -2150,10 +2184,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_vehicles_fn
         )
 
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+      assert Enum.all?(expected_instances, &Enum.member?(actual_instances, &1))
     end
 
-    test "returns empty departures if now is before today's last schedule and there are no schedules tomorrow",
+    test "returns no-data if now is before today's last schedule and there are no schedules tomorrow",
          %{
            config: config,
            fetch_departures_fn: fetch_departures_fn,
@@ -2186,25 +2220,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           {:ok, []}
       end
 
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [%NormalSection{layout: %Layout{}, header: %SectionHeader{}, rows: []}],
-          slot_names: [:main_content_two],
-          now: now
-        }
+      expected_instances = [
+        %DeparturesNoData{screen: config, slot_name: :main_content_zero},
+        %DeparturesNoData{screen: config, slot_name: :main_content_one},
+        %DeparturesNoData{screen: config, slot_name: :main_content_two}
       ]
 
       actual_instances =
@@ -2218,7 +2237,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           fetch_vehicles_fn
         )
 
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+      assert Enum.all?(expected_instances, &Enum.member?(actual_instances, &1))
     end
 
     test "returns OvernightDepartures if all routes in section are overnight",

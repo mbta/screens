@@ -85,13 +85,27 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_vehicles_fn
       )
 
-    widget_instances = primary_departures_instances ++ secondary_departures_instances
+    instances = primary_departures_instances ++ secondary_departures_instances
 
-    # If every rotation is showing OvernightDepartures, we don't need to render any route pills.
-    if Enum.all?(widget_instances, &is_struct(&1, OvernightDepartures)) do
-      Enum.map(widget_instances, &%OvernightDepartures{&1 | routes: []})
-    else
-      widget_instances
+    cond do
+      # If every rotation is showing OvernightDepartures, we don't need to render any route pills.
+      Enum.all?(instances, &is_struct(&1, OvernightDepartures)) ->
+        Enum.map(instances, &%OvernightDepartures{&1 | routes: []})
+
+      # If every rotation consists entirely of NoDataSections, replace all with DeparturesNoData.
+      Enum.all?(instances, fn
+        %DeparturesWidget{sections: sections} ->
+          Enum.all?(sections, &is_struct(&1, NoDataSection))
+
+        _ ->
+          false
+      end) ->
+        Enum.map(instances, fn %DeparturesWidget{screen: screen, slot_names: [slot_name]} ->
+          %DeparturesNoData{screen: screen, slot_name: slot_name}
+        end)
+
+      true ->
+        instances
     end
   end
 
@@ -116,27 +130,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       )
 
     Enum.map(slot_ids, fn slot_id ->
-      cond do
-        Enum.all?(sections, &is_struct(&1, NoDataSection)) ->
-          %DeparturesNoData{
-            screen: config,
-            slot_name: slot_id
-          }
-
-        Enum.all?(sections, &is_struct(&1, OvernightSection)) ->
-          %OvernightDepartures{
-            screen: config,
-            slot_names: [slot_id],
-            routes: get_route_pills_for_rotation(sections)
-          }
-
-        true ->
-          %DeparturesWidget{
-            screen: config,
-            sections: sections,
-            slot_names: [slot_id],
-            now: now
-          }
+      if Enum.all?(sections, &is_struct(&1, OvernightSection)) do
+        %OvernightDepartures{
+          screen: config,
+          slot_names: [slot_id],
+          routes: get_route_pills_for_rotation(sections)
+        }
+      else
+        %DeparturesWidget{
+          screen: config,
+          sections: sections,
+          slot_names: [slot_id],
+          now: now
+        }
       end
     end)
   end
@@ -188,11 +194,25 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     cond do
       # All routes in section are overnight
-      overnight_schedules_for_section != [] and departures == [] ->
+      departures == [] and overnight_schedules_for_section != [] ->
         %OvernightSection{routes: routes}
 
-      # There are still predictions to show
-      headway_mode == :inactive ->
+      # Headway mode
+      headway_mode != :inactive ->
+        {:active, time_range, headsign} = headway_mode
+
+        %HeadwaySection{
+          route: get_section_route_from_entities(stop_ids, alert_informed_entities),
+          time_range: time_range,
+          headsign: headsign
+        }
+
+      # No departures to show and no headway mode
+      departures == [] ->
+        %NoDataSection{route: hd(routes)}
+
+      # Normal departures mode
+      true ->
         # Add overnight departures to the end.
         # This allows overnight departures to appear as we start to run out of predictions to show.
         departures = departures ++ overnight_schedules_for_section
@@ -206,16 +226,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
         # DUPs don't support Layout or Header for now
         %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
-
-      # Headway mode
-      true ->
-        {:active, time_range, headsign} = headway_mode
-
-        %HeadwaySection{
-          route: get_section_route_from_entities(stop_ids, alert_informed_entities),
-          time_range: time_range,
-          headsign: headsign
-        }
     end
   end
 
