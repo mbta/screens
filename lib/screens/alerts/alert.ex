@@ -146,10 +146,13 @@ defmodule Screens.Alerts.Alert do
           stop_ids: [Stop.id()]
         ]
 
+  @type result :: {:ok, [t()]} | :error
+  @type fetch :: (options() -> result())
+
   @base_includes ~w[facilities]
   @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops]
 
-  @callback fetch(options()) :: {:ok, list(t())} | :error
+  @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     Screens.Telemetry.span([:screens, :alerts, :alert, :fetch], fn ->
       includes =
