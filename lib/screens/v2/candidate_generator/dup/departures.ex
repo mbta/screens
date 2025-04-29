@@ -3,14 +3,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   require Logger
 
-  alias Screens.Alerts.Alert
+  alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Report
   alias Screens.Routes.Route
+  alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
+  alias Screens.Vehicles.Vehicle
   alias ScreensConfig.{Departures, Screen}
   alias ScreensConfig.Departures.{Header, Layout, Query, Section}
   alias ScreensConfig.Departures.Query.Params
@@ -41,51 +44,38 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_routes_fn \\ &Screens.Routes.Route.fetch/1,
         fetch_vehicles_fn \\ &Screens.Vehicles.Vehicle.by_route_and_direction/2
       ) do
-    primary_departures_instances =
-      primary_sections
-      |> get_sections_data(
-        fetch_departures_fn,
-        fetch_alerts_fn,
-        fetch_routes_fn,
-        now
-      )
-      |> sections_data_to_departure_instances(
-        config,
+    [primary_instance, secondary_instance] =
+      Enum.map([primary_sections, secondary_sections], fn sections ->
+        sections
+        |> get_sections_data(fetch_departures_fn, fetch_alerts_fn, fetch_routes_fn, now)
+        |> sections_data_to_instance_fn(config, now, fetch_schedules_fn, fetch_vehicles_fn)
+      end)
+
+    # When the secondary instance would not be displaying anything useful, make it a copy of the
+    # primary instance.
+    secondary_instance =
+      if secondary_sections == [] or no_departures?(secondary_instance),
+        do: primary_instance,
+        else: secondary_instance
+
+    primary_instances =
+      Enum.map(
         [
           :main_content_zero,
           :main_content_one,
           :main_content_reduced_zero,
           :main_content_reduced_one
         ],
-        now,
-        fetch_schedules_fn,
-        fetch_vehicles_fn
+        &struct!(primary_instance, slot_names: [&1])
       )
 
-    secondary_sections =
-      if secondary_sections == [] do
-        primary_sections
-      else
-        secondary_sections
-      end
-
-    secondary_departures_instances =
-      secondary_sections
-      |> get_sections_data(
-        fetch_departures_fn,
-        fetch_alerts_fn,
-        fetch_routes_fn,
-        now
-      )
-      |> sections_data_to_departure_instances(
-        config,
+    secondary_instances =
+      Enum.map(
         [:main_content_two, :main_content_reduced_two],
-        now,
-        fetch_schedules_fn,
-        fetch_vehicles_fn
+        &struct!(secondary_instance, slot_names: [&1])
       )
 
-    instances = primary_departures_instances ++ secondary_departures_instances
+    instances = primary_instances ++ secondary_instances
 
     cond do
       # If every rotation is showing OvernightDepartures, we don't need to render any route pills.
@@ -93,13 +83,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         Enum.map(instances, &%OvernightDepartures{&1 | routes: []})
 
       # If every rotation consists entirely of NoDataSections, replace all with DeparturesNoData.
-      Enum.all?(instances, fn
-        %DeparturesWidget{sections: sections} ->
-          Enum.all?(sections, &is_struct(&1, NoDataSection))
-
-        _ ->
-          false
-      end) ->
+      Enum.all?(instances, &no_departures?/1) ->
         Enum.map(instances, fn %DeparturesWidget{screen: screen, slot_names: [slot_name]} ->
           %DeparturesNoData{screen: screen, slot_name: slot_name}
         end)
@@ -109,45 +93,61 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     end
   end
 
-  defp sections_data_to_departure_instances(
+  defp no_departures?(%DeparturesWidget{sections: sections}),
+    do: Enum.all?(sections, &is_struct(&1, NoDataSection))
+
+  defp no_departures?(_widget_instance), do: false
+
+  @typep section_data ::
+           %{type: :no_data_section, route: Route.t()}
+           | %{
+               departures: [Departure.t()],
+               alert_informed_entities: [InformedEntity.t()],
+               stop_ids: [Stop.id()],
+               routes: [Route.t()],
+               params: Params.t()
+             }
+
+  @spec sections_data_to_instance_fn(
+          [section_data()],
+          Screen.t(),
+          DateTime.t(),
+          Schedule.fetch_with_date(),
+          Vehicle.by_route_and_direction()
+        ) :: DeparturesWidget.t() | OvernightDepartures.t()
+  defp sections_data_to_instance_fn(
          sections_data,
          config,
-         slot_ids,
          now,
          fetch_schedules_fn,
          fetch_vehicles_fn
        ) do
+    is_only_section = match?([_], sections_data)
+
     sections =
       Enum.map(
         sections_data,
-        &get_departure_instance_for_section(
-          &1,
-          length(sections_data) == 1,
-          now,
-          fetch_schedules_fn,
-          fetch_vehicles_fn
-        )
+        &get_section_instance(&1, is_only_section, now, fetch_schedules_fn, fetch_vehicles_fn)
       )
 
-    Enum.map(slot_ids, fn slot_id ->
-      if Enum.all?(sections, &is_struct(&1, OvernightSection)) do
-        %OvernightDepartures{
-          screen: config,
-          slot_names: [slot_id],
-          routes: get_route_pills_for_rotation(sections)
-        }
-      else
-        %DeparturesWidget{
-          screen: config,
-          sections: sections,
-          slot_names: [slot_id],
-          now: now
-        }
-      end
-    end)
+    # NB: No slot names provided here (defaults to `[]`) as they will be filled in depending on
+    # whether the widget is placed in the primary or secondary slots.
+    if Enum.any?(sections) and Enum.all?(sections, &is_struct(&1, OvernightSection)) do
+      route_pills = get_route_pills_for_rotation(sections)
+      %OvernightDepartures{screen: config, routes: route_pills}
+    else
+      %DeparturesWidget{screen: config, sections: sections, now: now}
+    end
   end
 
-  defp get_departure_instance_for_section(
+  @spec get_section_instance(
+          section_data(),
+          boolean(),
+          DateTime.t(),
+          Schedule.fetch_with_date(),
+          Vehicle.by_route_and_direction()
+        ) :: DeparturesWidget.section()
+  defp get_section_instance(
          %{type: :no_data_section, route: route},
          _is_only_section,
          _now,
@@ -156,7 +156,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        ),
        do: %NoDataSection{route: route}
 
-  defp get_departure_instance_for_section(
+  defp get_section_instance(
          %{
            departures: departures,
            alert_informed_entities: alert_informed_entities,
@@ -229,6 +229,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     end
   end
 
+  @spec get_sections_data(
+          [Section.t()],
+          Departure.fetch(),
+          Alert.fetch(),
+          Route.fetch(),
+          now :: DateTime.t()
+        ) :: [section_data()]
   defp get_sections_data(
          sections,
          fetch_departures_fn,

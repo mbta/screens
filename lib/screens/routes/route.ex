@@ -47,7 +47,10 @@ defmodule Screens.Routes.Route do
     end
   end
 
-  @callback fetch() :: {:ok, [t()]} | :error
+  @type result :: {:ok, [t()]} | :error
+  @type fetch :: (params() -> result())
+
+  @callback fetch() :: result()
   @callback fetch(params()) :: {:ok, [t()]} | :error
   def fetch(opts \\ %{}, get_json_fn \\ &V3Api.get_json/2) do
     params =

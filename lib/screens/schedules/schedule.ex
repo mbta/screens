@@ -29,9 +29,13 @@ defmodule Screens.Schedules.Schedule do
 
   @includes ~w[route.line stop trip.route_pattern.representative_trip trip.stops]
 
-  @spec fetch(Departure.params()) :: {:ok, list(t())} | :error
-  @spec fetch(Departure.params(), DateTime.t() | Date.t() | String.t() | nil) ::
-          {:ok, list(t())} | :error
+  @type date_param :: DateTime.t() | Date.t() | String.t() | nil
+
+  @type result :: {:ok, [t()]} | :error
+  @type fetch_with_date :: (Departure.params(), date_param() -> result())
+
+  @spec fetch(Departure.params()) :: result()
+  @spec fetch(Departure.params(), date_param()) :: result()
   def fetch(%{} = params, date \\ nil) do
     params = if is_nil(date), do: params, else: Map.put(params, :date, date)
     result = Departure.do_fetch("schedules", Map.put(params, :include, @includes))

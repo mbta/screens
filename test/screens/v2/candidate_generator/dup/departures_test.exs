@@ -640,6 +640,77 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
+    test "returns only primary departures if secondary has no data", %{
+      config: config,
+      fetch_departures_fn: fetch_departures_fn,
+      fetch_alerts_fn: fetch_alerts_fn,
+      fetch_schedules_fn: fetch_schedules_fn,
+      fetch_routes_fn: fetch_routes_fn,
+      fetch_vehicles_fn: fetch_vehicles_fn
+    } do
+      config =
+        config
+        |> put_primary_departures([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}}
+        ])
+        |> put_secondary_departures_sections([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["nonexist"]}}}
+        ])
+
+      now = ~U[2020-04-06T10:00:00Z]
+
+      primary_section = %NormalSection{
+        layout: %Layout{},
+        header: %SectionHeader{},
+        rows: [
+          %Screens.V2.Departure{
+            prediction:
+              struct(Prediction,
+                id: "A",
+                route: %Route{id: "Test"},
+                stop: struct(Stop),
+                trip: struct(Trip)
+              ),
+            schedule: nil
+          }
+        ]
+      }
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          sections: [primary_section],
+          slot_names: [:main_content_zero],
+          now: now
+        },
+        %DeparturesWidget{
+          screen: config,
+          sections: [primary_section],
+          slot_names: [:main_content_one],
+          now: now
+        },
+        %DeparturesWidget{
+          screen: config,
+          sections: [primary_section],
+          slot_names: [:main_content_two],
+          now: now
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_departures_fn,
+          fetch_alerts_fn,
+          fetch_schedules_fn,
+          fetch_routes_fn,
+          fetch_vehicles_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
     test "returns only bidirectional departures if configured for that", %{
       config: config,
       fetch_departures_fn: fetch_departures_fn,
@@ -1131,7 +1202,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
-      expect(@headways, :get_with_route, 2, fn "place-B", "test", ^now -> {12, 16} end)
+      expect(@headways, :get_with_route, fn "place-B", "test", ^now -> {12, 16} end)
 
       fetch_alerts_fn = fn
         [
@@ -1586,7 +1657,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
-      expect(@headways, :get_with_route, 2, fn "place-kencl", "test", ^now -> {7, 13} end)
+      expect(@headways, :get_with_route, fn "place-kencl", "test", ^now -> {7, 13} end)
 
       fetch_alerts_fn = fn
         [
