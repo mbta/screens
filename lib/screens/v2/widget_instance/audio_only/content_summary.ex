@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
   alias Screens.Report
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
+  alias ScreensConfig
   alias ScreensConfig.Header.CurrentStopId
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
@@ -27,8 +28,22 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
   # end up adjacent to each other.
   @audio_sort_key_part [0]
 
+  def audio_serialize(
+        %__MODULE__{
+          screen: %Screen{
+            app_id: :pre_fare_v2,
+            app_params: %PreFare{departures: %ScreensConfig.Departures{sections: [_ | _]}}
+          }
+        } = t
+      ) do
+    %{
+      lines_at_station: t.lines_at_station,
+      has_departures: true
+    }
+  end
+
   def audio_serialize(%__MODULE__{screen: %Screen{app_id: :pre_fare_v2}} = t) do
-    %{lines_at_station: t.lines_at_station}
+    %{lines_at_station: t.lines_at_station, has_departures: false}
   end
 
   def audio_sort_key(%__MODULE__{} = t) do

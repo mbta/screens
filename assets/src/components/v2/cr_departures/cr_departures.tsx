@@ -38,14 +38,14 @@ const CRDepartures: React.ComponentType<CRDeparturesProps> = (props) => {
   const { departures, direction, header_pill, is_free } = props;
 
   return (
-    <div className="departures-container">
-      <div className="departures-card">
+    <div className="cr-departures-container">
+      <div className="cr-departures-card">
         {is_free ? (
           <CRDeparturesHeaderFree headerPill={header_pill} />
         ) : (
           <CRDeparturesHeaderNormal />
         )}
-        <div className="departures-card__body">
+        <div className="cr-departures-card__body">
           <DeparturesTable departures={departures} direction={direction} />
         </div>
       </div>

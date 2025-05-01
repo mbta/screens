@@ -135,7 +135,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     def audio_serialize(t), do: serialize(t)
 
-    def audio_sort_key(_instance), do: [2]
+    def audio_sort_key(_instance), do: [3]
 
     def audio_valid_candidate?(%SubwayStatus{
           screen: %Screen{app_params: %BusShelter{audio: %Audio{interval_enabled: true}}}

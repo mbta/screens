@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias ScreensConfig.Departures.Filters.RouteDirections
   alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
   alias ScreensConfig.Departures.{Filters, Query, Section}
-  alias ScreensConfig.Screen.{BusEink, BusShelter, Busway, GlEink}
+  alias ScreensConfig.Screen.{BusEink, BusShelter, Busway, GlEink, PreFare}
 
   @type options :: [
           departure_fetch_fn: Departure.fetch(),
@@ -29,7 +29,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   @spec departures_instances(Screen.t(), options()) :: [widget()]
   def departures_instances(%Screen{app_params: %app{}} = config, now, options \\ [])
-      when app in [BusEink, BusShelter, Busway, GlEink] do
+      when app in [BusEink, BusShelter, Busway, GlEink, PreFare] do
     disabled_modes =
       Keyword.get(options, :disabled_modes_fn, &Screens.Config.Cache.disabled_modes/0).()
 
@@ -45,6 +45,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         now
       )
     end
+  end
+
+  defp do_departures_instances(%Screen{app_params: %{departures: departures}}, _, _, _, _, _)
+       when is_nil(departures) or departures.sections == [] do
+    []
   end
 
   defp do_departures_instances(
@@ -99,7 +104,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
                 }
             end)
 
-          %DeparturesWidget{screen: config, sections: sections, now: now}
+          slot_names =
+            case config do
+              %Screen{app_params: %PreFare{}} -> [:main_content_left]
+              _ -> []
+            end
+
+          %DeparturesWidget{screen: config, sections: sections, now: now, slot_names: slot_names}
       end
 
     [departures_instance]
