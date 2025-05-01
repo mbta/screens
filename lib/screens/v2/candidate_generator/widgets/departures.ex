@@ -87,7 +87,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         true ->
           sections =
             Enum.map(sections_data, fn
-              %{section: %Section{header: header, layout: layout}, result: result} ->
+              %{
+                section: %Section{header: header, layout: layout},
+                result: result
+              } ->
                 %NormalSection{
                   rows: normal_section_rows(result),
                   layout: layout,
@@ -139,6 +142,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   defp normal_section_rows({:ok, departures}), do: departures
 
+  defp normal_section_rows(:wayfinding_only), do: []
+
   defp normal_section_rows({:no_data, route?}) do
     [
       %FreeTextLine{
@@ -155,14 +160,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @spec fetch_section_departures(Section.t(), [RouteType.t()], Departure.fetch(), DateTime.t()) ::
           Departure.result()
   def fetch_section_departures(
-        %Section{
-          query: %Query{opts: opts, params: params},
-          filters: filters,
-          bidirectional: is_bidirectional
-        },
+        _,
         disabled_route_types \\ [],
         departure_fetch_fn \\ &Departure.fetch/2,
         now \\ DateTime.utc_now()
+      )
+
+  def fetch_section_departures(
+        %Section{
+          query: %Query{opts: opts, params: params},
+          filters: filters,
+          bidirectional: is_bidirectional,
+          wayfinding_only: false
+        },
+        disabled_route_types,
+        departure_fetch_fn,
+        now
       ) do
     fetch_params = Map.from_struct(params)
     fetch_opts = opts |> Map.from_struct() |> Keyword.new()
@@ -174,6 +187,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
        |> filter_departures(filters, now)
        |> make_bidirectional(is_bidirectional)}
     end
+  end
+
+  def fetch_section_departures(_, _, _, _) do
+    # Only get to this pattern match if wayfinding_only_text is not nil, in which case, we fetch no departures
+    :wayfinding_only
   end
 
   defp filter_departures(

@@ -282,6 +282,61 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                  post_process_fn: post_process_fn
                )
     end
+
+    test "returns no departures when wayfinding_only_text is populated" do
+      config = %Screen{
+        app_params: %BusShelter{
+          departures: %DeparturesConfig{
+            sections: [
+              %Section{
+                query: %Query{
+                  params: %Query.Params{route_ids: ["A", "B"]}
+                },
+                wayfinding_only: true
+              }
+            ]
+          },
+          header: nil,
+          layout: nil,
+          footer: nil,
+          alerts: nil
+        },
+        vendor: nil,
+        device_id: nil,
+        name: nil,
+        app_id: :bus_shelter_v2
+      }
+
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}})
+
+      expected_departures_instances = [
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              header: %ScreensConfig.Departures.Header{
+                arrow: nil,
+                read_as: nil,
+                title: nil,
+                wayfinding_text: nil
+              },
+              layout: %ScreensConfig.Departures.Layout{
+                base: nil,
+                include_later: false,
+                max: nil,
+                min: 1
+              },
+              rows: []
+            }
+          ]
+        }
+      ]
+
+      actual_departures_instances =
+        departures_instances(config, departures_fetch_fn: fetch_fn)
+
+      assert expected_departures_instances == actual_departures_instances
+    end
   end
 
   describe "fetch_section_departures/1" do
