@@ -297,7 +297,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
             ]
           },
           header: nil,
-          layout: nil,
           footer: nil,
           alerts: nil
         },
