@@ -71,16 +71,12 @@ config :ex_cldr,
   json_library: Jason
 
 config :screens,
-  gds_dms_username: "mbtadata@gmail.com",
   config_fetcher: Screens.Config.Fetch.S3,
-  pending_config_fetcher: Screens.PendingConfig.Fetch.S3,
   config_s3_bucket: "mbta-ctd-config",
-  audio_psa_s3_bucket: "mbta-dotcom",
-  audio_psa_s3_directory: "/screens/audio_assets/psa/",
-  signs_ui_s3_path: "config.json",
-  signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.S3,
   last_deploy_fetcher: Screens.Util.LastDeploy.S3Fetch,
-  record_sentry: false
+  pending_config_fetcher: Screens.PendingConfig.Fetch.S3,
+  signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.S3,
+  signs_ui_s3_path: "config.json"
 
 config :screens,
   # Maps alert informed entity contents to the appropriate headsign to show for that alert.
