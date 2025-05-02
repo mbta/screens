@@ -139,8 +139,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   defp normal_section_rows({:ok, departures}), do: departures
 
-  defp normal_section_rows(:wayfinding_only), do: []
-
   defp normal_section_rows({:no_data, route?}) do
     [
       %FreeTextLine{
@@ -163,12 +161,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         now \\ DateTime.utc_now()
       )
 
+  def fetch_section_departures(%Section{header_only: true}, _, _, _) do
+    {:ok, []}
+  end
+
   def fetch_section_departures(
         %Section{
           query: %Query{opts: opts, params: params},
           filters: filters,
-          bidirectional: is_bidirectional,
-          wayfinding_only: false
+          bidirectional: is_bidirectional
         },
         disabled_route_types,
         departure_fetch_fn,
@@ -184,11 +185,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
        |> filter_departures(filters, now)
        |> make_bidirectional(is_bidirectional)}
     end
-  end
-
-  def fetch_section_departures(_, _, _, _) do
-    # Only get to this pattern match if wayfinding_only_text is not nil, in which case, we fetch no departures
-    :wayfinding_only
   end
 
   defp filter_departures(
