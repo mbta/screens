@@ -101,20 +101,28 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     [departures_instance]
   end
 
-  # When a section has no departures on a screen with multiple sections, populate it with a "no
-  # data" entry. This may include a "representative" route for the section, used to determine an
-  # icon to display alongside the message.
+  # When a section has no departures on a screen with multiple sections and is not designated as `header_only`,
+  # populate it with a "no data" entry. This may include a "representative" route for the section,
+  # used to determine an icon to display alongside the message.
   #
   # NOTE: Assumes any given section is configured such that it only displays departures from a
   # single route-type-or-subway-line. If there would be more than one route-type-or-subway-line,
   # one is picked arbitrarily.
-  defp post_process_no_data({:ok, []}, section, true = _has_multiple_sections, route_fetch_fn) do
-    %Section{
-      query: %Query{
-        params: %Query.Params{route_ids: route_ids, route_type: route_type, stop_ids: stop_ids}
-      }
-    } = section
-
+  defp post_process_no_data(
+         {:ok, []},
+         %Section{
+           query: %Query{
+             params: %Query.Params{
+               route_ids: route_ids,
+               route_type: route_type,
+               stop_ids: stop_ids
+             }
+           },
+           header_only: false
+         },
+         true = _has_multiple_sections,
+         route_fetch_fn
+       ) do
     fetch_params =
       Map.reject(
         %{

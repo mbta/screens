@@ -283,17 +283,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                )
     end
 
-    test "returns no departures when header_only is true" do
+    test "returns no departures when header_only is true in a given section, returns departures when header_only is unset" do
       config = %Screen{
         app_params: %BusShelter{
           departures: %DeparturesConfig{
             sections: [
               %Section{
-                query: %Query{
-                  params: %Query.Params{route_ids: ["A"]}
-                },
+                query: %Query{params: %Query.Params{route_ids: ["A"]}},
                 header_only: true
-              }
+              },
+              %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
             ]
           },
           header: nil,
@@ -306,36 +305,24 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         app_id: :bus_shelter_v2
       }
 
-      departure_b = build_departure("A", 0)
-      fetch_fn = build_fetch_fn(%{"A" => {:ok, [departure_b]}})
+      departure_b = build_departure("B", 0)
+      departure_fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}})
+      route_fetch_fn = fn %{ids: ["A"]} -> {:ok, [%Route{id: "A", type: :bus}]} end
 
-      expected_departures_instances = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              header: %ScreensConfig.Departures.Header{
-                arrow: nil,
-                read_as: nil,
-                title: nil,
-                subtitle: nil
-              },
-              layout: %ScreensConfig.Departures.Layout{
-                base: nil,
-                include_later: false,
-                max: nil,
-                min: 1
-              },
-              rows: []
-            }
-          ]
-        }
-      ]
-
-      actual_departures_instances =
-        departures_instances(config, departures_fetch_fn: fetch_fn)
-
-      assert expected_departures_instances == actual_departures_instances
+      assert [
+               %DeparturesWidget{
+                 sections: [
+                   %NormalSection{
+                     rows: []
+                   },
+                   %NormalSection{rows: [^departure_b]}
+                 ]
+               }
+             ] =
+               departures_instances(config,
+                 departure_fetch_fn: departure_fetch_fn,
+                 route_fetch_fn: route_fetch_fn
+               )
     end
   end
 
