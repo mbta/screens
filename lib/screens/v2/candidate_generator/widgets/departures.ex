@@ -101,20 +101,28 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     [departures_instance]
   end
 
-  # When a section has no departures on a screen with multiple sections, populate it with a "no
-  # data" entry. This may include a "representative" route for the section, used to determine an
-  # icon to display alongside the message.
+  # When a section has no departures on a screen with multiple sections and is not designated as `header_only`,
+  # populate it with a "no data" entry. This may include a "representative" route for the section,
+  # used to determine an icon to display alongside the message.
   #
   # NOTE: Assumes any given section is configured such that it only displays departures from a
   # single route-type-or-subway-line. If there would be more than one route-type-or-subway-line,
   # one is picked arbitrarily.
-  defp post_process_no_data({:ok, []}, section, true = _has_multiple_sections, route_fetch_fn) do
-    %Section{
-      query: %Query{
-        params: %Query.Params{route_ids: route_ids, route_type: route_type, stop_ids: stop_ids}
-      }
-    } = section
-
+  defp post_process_no_data(
+         {:ok, []},
+         %Section{
+           query: %Query{
+             params: %Query.Params{
+               route_ids: route_ids,
+               route_type: route_type,
+               stop_ids: stop_ids
+             }
+           },
+           header_only: false
+         },
+         true = _has_multiple_sections,
+         route_fetch_fn
+       ) do
     fetch_params =
       Map.reject(
         %{
@@ -155,14 +163,25 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @spec fetch_section_departures(Section.t(), [RouteType.t()], Departure.fetch(), DateTime.t()) ::
           Departure.result()
   def fetch_section_departures(
+        _,
+        disabled_route_types \\ [],
+        departure_fetch_fn \\ &Departure.fetch/2,
+        now \\ DateTime.utc_now()
+      )
+
+  def fetch_section_departures(%Section{header_only: true}, _, _, _) do
+    {:ok, []}
+  end
+
+  def fetch_section_departures(
         %Section{
           query: %Query{opts: opts, params: params},
           filters: filters,
           bidirectional: is_bidirectional
         },
-        disabled_route_types \\ [],
-        departure_fetch_fn \\ &Departure.fetch/2,
-        now \\ DateTime.utc_now()
+        disabled_route_types,
+        departure_fetch_fn,
+        now
       ) do
     fetch_params = Map.from_struct(params)
     fetch_opts = opts |> Map.from_struct() |> Keyword.new()

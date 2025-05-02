@@ -282,6 +282,48 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                  post_process_fn: post_process_fn
                )
     end
+
+    test "returns no departures when header_only is true in a given section, returns departures when header_only is unset" do
+      config = %Screen{
+        app_params: %BusShelter{
+          departures: %DeparturesConfig{
+            sections: [
+              %Section{
+                query: %Query{params: %Query.Params{route_ids: ["A"]}},
+                header_only: true
+              },
+              %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
+            ]
+          },
+          header: nil,
+          footer: nil,
+          alerts: nil
+        },
+        vendor: nil,
+        device_id: nil,
+        name: nil,
+        app_id: :bus_shelter_v2
+      }
+
+      departure_b = build_departure("B", 0)
+      departure_fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}})
+      route_fetch_fn = fn %{ids: ["A"]} -> {:ok, [%Route{id: "A", type: :bus}]} end
+
+      assert [
+               %DeparturesWidget{
+                 sections: [
+                   %NormalSection{
+                     rows: []
+                   },
+                   %NormalSection{rows: [^departure_b]}
+                 ]
+               }
+             ] =
+               departures_instances(config,
+                 departure_fetch_fn: departure_fetch_fn,
+                 route_fetch_fn: route_fetch_fn
+               )
+    end
   end
 
   describe "fetch_section_departures/1" do
