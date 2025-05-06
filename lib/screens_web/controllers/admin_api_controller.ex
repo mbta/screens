@@ -89,24 +89,23 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{success: success})
   end
 
-  def image_filenames(conn, _params) do
-    image_filenames = Image.fetch_image_filenames()
-    json(conn, %{image_filenames: image_filenames})
+  def list_images(conn, _params) do
+    json(conn, %{images: Image.list()})
   end
 
-  def upload_image(conn, %{"image" => %Plug.Upload{} = upload_struct}) do
+  def upload_image(conn, %{"image" => %Plug.Upload{} = upload, "key" => key}) do
     response =
-      case Image.upload_image(upload_struct) do
-        {:ok, uploaded_name} -> %{success: true, uploaded_name: uploaded_name}
+      case Image.upload(key, upload) do
+        :ok -> %{success: true}
         :error -> %{success: false}
       end
 
     json(conn, response)
   end
 
-  def delete_image(conn, %{"filename" => filename}) do
+  def delete_image(conn, %{"key" => key}) do
     response =
-      case Image.delete_image(filename) do
+      case Image.delete(key) do
         :ok -> %{success: true}
         :error -> %{success: false}
       end

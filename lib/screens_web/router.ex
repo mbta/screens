@@ -73,9 +73,9 @@ defmodule ScreensWeb.Router do
     post "/screens/confirm/:id", AdminApiController, :confirm
     post "/refresh", AdminApiController, :refresh
     post "/devops", AdminApiController, :devops
-    get "/image_filenames", AdminApiController, :image_filenames
-    post "/image", AdminApiController, :upload_image
-    delete "/image/:filename", AdminApiController, :delete_image
+    get "/images", AdminApiController, :list_images
+    post "/images", AdminApiController, :upload_image
+    delete "/images/:key", AdminApiController, :delete_image
   end
 
   scope "/v2", ScreensWeb.V2 do
@@ -121,12 +121,6 @@ defmodule ScreensWeb.Router do
       get "/:id/volume", AudioController, :show_volume
       get "/:id/debug", AudioController, :debug
     end
-  end
-
-  scope "/image", ScreensWeb do
-    pipe_through [:redirect_prod_http, :browser]
-
-    get "/:filename", ScreenController, :show_image
   end
 
   scope "/api", ScreensWeb do

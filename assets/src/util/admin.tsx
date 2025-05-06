@@ -39,7 +39,13 @@ const fetch = {
     });
   },
 
-  delete: (path) => doFetch(path, { method: "DELETE" }),
+  delete: (path) =>
+    doFetch(path, {
+      method: "DELETE",
+      headers: {
+        "x-csrf-token": getCsrfToken(),
+      },
+    }),
 
   text: (path) => doFetch(path, {}, (response) => response.text()),
 
