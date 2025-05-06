@@ -181,7 +181,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           min: 2,
           include_later: false
         }),
-      header: Header.to_json(header),
+      header: Header.to_json(serialize_header(header)),
       grouping_type: :destination
     }
   end
@@ -202,7 +202,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :normal_section,
       rows: serialized_rows,
       layout: Layout.to_json(layout),
-      header: Header.to_json(header),
+      header: Header.to_json(serialize_header(header)),
       grouping_type: grouping_type
     }
   end
@@ -536,5 +536,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     service_date_tomorrow = now |> Util.service_date() |> Date.add(1)
     show_am_pm = local_time.day == service_date_tomorrow.day
     %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
+  end
+
+  @spec serialize_header(Header.t()) :: Header.t()
+  defp serialize_header(%Header{subtitle: nil} = header), do: header
+
+  defp serialize_header(%Header{subtitle: subtitle} = header) do
+    # Replaces bolded markdown text of the form **text** with <b>text</b> in the subtitle."
+    updated_subtitle = Regex.replace(~r/\*\*(.+?)\*\*/, subtitle, "<b>\\1</b>")
+    %Header{header | subtitle: updated_subtitle}
   end
 end
