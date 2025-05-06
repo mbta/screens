@@ -130,4 +130,143 @@ describe("trimSections", () => {
       { rows: { aboveFold: [partialRow], belowFold: dropId([trimmedRow]) } },
     ]);
   });
+
+  test("trims by time when destination grouping and only going one direction", () => {
+    const rowsB = departureRow.buildList(5);
+    const [rowB1, rowB2, rowB3, rowB4, ..._] = rowsB;
+
+    const sections = [
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: departureRow.buildList(2),
+      }),
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: rowsB,
+        grouping_type: "destination",
+      }),
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: departureRow.buildList(2),
+      }),
+    ];
+
+    expect(trimSections(sections)).toMatchObject([
+      { ...sections[0] },
+      {
+        ...sections[1],
+        rows: {
+          aboveFold: [rowB1, rowB2, rowB3, rowB4],
+          belowFold: [],
+        },
+      },
+      { ...sections[2] },
+    ]);
+  });
+
+  test("trims the direction_id group with the most when destination grouping", () => {
+    const rowsA = departureRow.buildList(3, { direction_id: 1 });
+    const rowsB = departureRow.buildList(2, { direction_id: 0 });
+    const allRows = [...rowsA, ...rowsB];
+    const [row1, row2, _, row4, row5] = allRows;
+
+    const sections = [
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: departureRow.buildList(2),
+      }),
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: allRows,
+        grouping_type: "destination",
+        direction_time_priority: 0,
+      }),
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: departureRow.buildList(2),
+      }),
+    ];
+
+    expect(trimSections(sections)).toMatchObject([
+      { ...sections[0] },
+      {
+        ...sections[1],
+        rows: {
+          aboveFold: [row1, row2, row4, row5],
+          belowFold: [],
+        },
+      },
+      { ...sections[2] },
+    ]);
+  });
+
+  test("trims the row based on direction_to_trim if the number of different direction_id rows are the same after trimming", () => {
+    const rowsA = departureRow.buildList(4, { direction_id: 1 });
+    const rowsB = departureRow.buildList(3, { direction_id: 0 });
+    const allRows = [...rowsA, ...rowsB];
+    const [row1, row2, row3, _1, row5, row6, _2] = allRows;
+
+    const sections = [
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: departureRow.buildList(2),
+      }),
+      buildFoldedSection({
+        layout: { base: 7, min: 2, max: null, include_later: false },
+        rows: allRows,
+        grouping_type: "destination",
+      }),
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: departureRow.buildList(2),
+      }),
+    ];
+
+    expect(trimSections(trimSections(sections))).toMatchObject([
+      { ...sections[0] },
+      {
+        ...sections[1],
+        rows: {
+          aboveFold: [row1, row2, row3, row5, row6],
+          belowFold: [],
+        },
+      },
+      { ...sections[2] },
+    ]);
+  });
+
+  test("trims the direction_id == 1 rows if direction_ids were initially equal for destination grouping", () => {
+    const rowsA = departureRow.buildList(3, { direction_id: 1 });
+    const rowsB = departureRow.buildList(3, { direction_id: 0 });
+    const allRows = [...rowsA, ...rowsB];
+    const [row1, _1, _2, row4, row5, ..._3] = allRows;
+
+    const sections = [
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: departureRow.buildList(2),
+      }),
+      buildFoldedSection({
+        layout: { base: 7, min: 2, max: null, include_later: false },
+        rows: allRows,
+        grouping_type: "destination",
+      }),
+      buildFoldedSection({
+        layout: { base: 2 },
+        rows: departureRow.buildList(2),
+      }),
+    ];
+
+    expect(trimSections(trimSections(trimSections(sections)))).toMatchObject([
+      { ...sections[0] },
+      {
+        ...sections[1],
+        rows: {
+          aboveFold: [row1, row4, row5],
+          belowFold: [],
+        },
+      },
+      { ...sections[2] },
+    ]);
+  });
 });

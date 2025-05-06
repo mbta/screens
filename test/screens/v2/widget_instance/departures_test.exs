@@ -89,6 +89,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           name: "TEST",
           app_params: nil
         },
+        bus_shelter_screen: %Screen{
+          app_id: :bus_shelter_v2,
+          vendor: :lg_mri,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
+        },
         now: ~U[2020-01-01T00:00:00Z]
       }
     end
@@ -129,7 +136,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                    type: :departure_row
                  }
                ],
-               type: :normal_section
+               type: :normal_section,
+               grouping_type: :time
              } =
                Departures.serialize_section(section, dup_screen, now, true)
     end
@@ -259,6 +267,79 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert %{type: :no_data_section, text: expected_text} ==
                Departures.serialize_section(section, dup_screen, now, true)
+    end
+
+    test "serializes sections with destination grouping", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now
+    } do
+      rows = [
+        %Departure{
+          prediction: %Prediction{
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: %Route{id: "Green-E", type: :subway},
+            trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+            stop: %Stop{}
+          }
+        },
+        %Departure{
+          prediction: %Prediction{
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: %Route{id: "Green-D"},
+            trip: %Trip{headsign: "Government Center", direction_id: 1},
+            stop: %Stop{}
+          }
+        },
+        %Departure{
+          prediction: %Prediction{
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: %Route{id: "Green-C", type: :subway},
+            trip: %Trip{headsign: "Cleveland Circle", direction_id: 0},
+            stop: %Stop{}
+          }
+        },
+        %Departure{
+          prediction: %Prediction{
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: %Route{id: "Green-C", type: :subway},
+            trip: %Trip{headsign: "Cleveland Circle", direction_id: 0},
+            stop: %Stop{}
+          }
+        },
+        %Departure{
+          prediction: %Prediction{
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: %Route{id: "Green-D", type: :subway},
+            trip: %Trip{headsign: "Riverside", direction_id: 0},
+            stop: %Stop{}
+          }
+        }
+      ]
+
+      section = %NormalSection{
+        rows: rows,
+        layout: %Layout{},
+        header: %Header{title: "Section Header"},
+        grouping_type: :destination
+      }
+
+      assert %{
+               type: :normal_section,
+               grouping_type: :destination,
+               layout: %{
+                 max: nil,
+                 min: 2,
+                 base: 4,
+                 include_later: false
+               },
+               rows: [
+                 %{headsign: %{headsign: "Medford/Tufts"}},
+                 %{headsign: %{headsign: "Government Center"}},
+                 %{headsign: %{headsign: "Cleveland Circle"}},
+                 %{headsign: %{headsign: "Riverside"}}
+               ]
+             } =
+               Departures.serialize_section(section, bus_shelter_screen, now, false)
     end
   end
 
@@ -440,6 +521,63 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert %{type: :text, text: "TR7", color: :purple, route_abbrev: "PVD"} ==
                Departures.serialize_route([departure], serializer)
+    end
+  end
+
+  describe "group_by_unique_destination/1" do
+    test "groups by unique destinations on headsign and direction_id" do
+      d1 = %Departure{
+        schedule: %Schedule{
+          route: %Route{id: "22"},
+          trip: %Trip{headsign: "Government Center", direction_id: 1}
+        }
+      }
+
+      d2 = %Departure{
+        prediction: %Prediction{
+          route: %Route{id: "28"},
+          trip: %Trip{headsign: "Medford/Tufts", direction_id: 1}
+        }
+      }
+
+      d3 = %Departure{
+        prediction: %Prediction{
+          route: %Route{id: "22"},
+          trip: %Trip{headsign: "Government Center", direction_id: 1}
+        }
+      }
+
+      d4 = %Departure{
+        prediction: %Prediction{
+          route: %Route{id: "1"},
+          trip: %Trip{headsign: "Cleveland Circle", direction_id: 0}
+        }
+      }
+
+      d5 = %Departure{
+        schedule: %Schedule{
+          route: %Route{id: "22"},
+          trip: %Trip{headsign: "Riverside", direction_id: 0}
+        }
+      }
+
+      d6 = %Departure{
+        prediction: %Prediction{
+          route: %Route{id: "1"},
+          trip: %Trip{headsign: "Cleveland Circle", direction_id: 0}
+        }
+      }
+
+      d7 = %Departure{
+        prediction: %Prediction{
+          route: %Route{id: "22"},
+          trip: %Trip{headsign: "Riverside", direction_id: 0}
+        }
+      }
+
+      departures = [d1, d2, d3, d4, d5, d6, d7]
+      expected = [[d1], [d2], [d4], [d5]]
+      assert expected == Departures.group_by_unique_destination(departures)
     end
   end
 

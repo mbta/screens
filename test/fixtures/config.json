@@ -15,6 +15,7 @@
                 "override": null,
                 "sign_ids": []
               },
+              "grouping_type": "time",
               "query": {
                 "opts": {
                   "include_schedules": false
@@ -58,6 +59,7 @@
                 "override": null,
                 "sign_ids": []
               },
+              "grouping_type": "time",
               "query": {
                 "opts": {
                   "include_schedules": false
@@ -101,6 +103,7 @@
                 "override": null,
                 "sign_ids": []
               },
+              "grouping_type": "time",
               "query": {
                 "opts": {
                   "include_schedules": false
@@ -144,6 +147,7 @@
                 "override": null,
                 "sign_ids": []
               },
+              "grouping_type": "time",
               "query": {
                 "opts": {
                   "include_schedules": false
@@ -196,6 +200,7 @@
                 "max_minutes": null,
                 "route_directions": null
               },
+              "grouping_type": "time",
               "query": {
                 "opts": {
                   "include_schedules": false

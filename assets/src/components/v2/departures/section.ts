@@ -3,17 +3,17 @@ import _ from "lodash";
 import type {
   Layout,
   NormalSection,
-  FoldedNormalSection,
+  FoldedDepartureGroupedSection,
+  BaseFoldedSection,
+  FoldedSection,
 } from "./normal_section";
 
 export type Section = NormalSection & { type: "normal_section" };
 
-type FoldedSection = FoldedNormalSection & { type: "folded_section" };
-
 export const toFoldedSection = (section: Section): FoldedSection => {
   switch (section.type) {
     case "normal_section": {
-      const foldedSection: FoldedSection = {
+      const baseSection: BaseFoldedSection = {
         ...section,
         type: "folded_section",
         rows: {
@@ -22,10 +22,26 @@ export const toFoldedSection = (section: Section): FoldedSection => {
         },
       };
 
-      if (section.layout.max) {
+      const directionCounts = _.countBy(section.rows, "direction_id");
+      const directionPriority =
+        (directionCounts[1] || 0) > (directionCounts[0] || 0) ? 0 : 1;
+
+      const foldedSection: FoldedSection =
+        section.grouping_type == "destination"
+          ? {
+              ...baseSection,
+              grouping_type: "destination",
+              direction_trim_priority: directionPriority,
+            }
+          : {
+              ...baseSection,
+              grouping_type: "time",
+            };
+
+      if (foldedSection.layout.max) {
         const length = sectionLength(foldedSection);
 
-        for (let l = length; l > section.layout.max; l--)
+        for (let l = length; l > foldedSection.layout.max; l--)
           trimSection(foldedSection);
       }
 
@@ -96,7 +112,11 @@ const trimOneBy = (
 ): boolean => {
   for (const { section, length } of sections) {
     if (section.type == "folded_section" && condition(length, section.layout)) {
-      if (trimSection(section)) return true;
+      if (section.grouping_type == "destination") {
+        if (trimSectionForDestinationGrouping(section)) return true;
+      } else {
+        if (trimSection(section)) return true;
+      }
     }
   }
 
@@ -139,4 +159,57 @@ const trimSection = (section: FoldedSection): boolean => {
   }
 
   return false;
+};
+
+const trimSectionForDestinationGrouping = (
+  section: FoldedDepartureGroupedSection,
+): boolean => {
+  const {
+    rows: { aboveFold },
+    direction_trim_priority: directionTrimPriority,
+  } = section;
+
+  let directionZeroCount = 0;
+  let directionOneCount = 0;
+  let lastDirectionZeroRowIndex = -1;
+  let lastDirectionOneRowIndex = -1;
+
+  for (let aboveIndex = aboveFold.length - 1; aboveIndex >= 0; aboveIndex--) {
+    const row = aboveFold[aboveIndex];
+    if (row.type != "departure_row") continue;
+
+    if (row.direction_id == 0) {
+      directionZeroCount++;
+      if (lastDirectionZeroRowIndex == -1) {
+        lastDirectionZeroRowIndex = aboveIndex;
+      }
+    } else {
+      directionOneCount++;
+      if (lastDirectionOneRowIndex == -1) {
+        lastDirectionOneRowIndex = aboveIndex;
+      }
+    }
+  }
+
+  if (directionZeroCount == 0 && directionOneCount == 0) {
+    return false;
+  }
+
+  if (directionZeroCount < directionOneCount) {
+    aboveFold.splice(lastDirectionOneRowIndex, 1);
+    return true;
+  }
+
+  if (directionZeroCount > directionOneCount) {
+    aboveFold.splice(lastDirectionZeroRowIndex, 1);
+    return true;
+  }
+
+  const indexToTrim =
+    directionTrimPriority == 0
+      ? lastDirectionZeroRowIndex
+      : lastDirectionOneRowIndex;
+
+  aboveFold.splice(indexToTrim, 1);
+  return true;
 };

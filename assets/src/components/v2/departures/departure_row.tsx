@@ -9,15 +9,22 @@ type DepartureRow = {
   route: Pill;
   headsign: Destination;
   times_with_crowding: TimeWithCrowding[];
+  direction_id: 0 | 1;
+  isBeforeDirectionSplit: boolean;
 };
 
 const DepartureRow: ComponentType<DepartureRow> = ({
   headsign,
   route,
+  isBeforeDirectionSplit,
   times_with_crowding: timesWithCrowding,
 }) => {
   return (
-    <div className="departure-row">
+    <div
+      className={
+        "departure-row" + (isBeforeDirectionSplit ? " direction-split" : "")
+      }
+    >
       <div // Keep pill aligned to top if there is a variation for the headsign.
         // Always aligning to top shifts destination text.
         className={
