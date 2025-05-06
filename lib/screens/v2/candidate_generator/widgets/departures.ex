@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   @moduledoc false
 
+  alias Screens.V2.CandidateGenerator.DupNew.Header
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.V2.Departure
@@ -10,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
   alias ScreensConfig.Departures.Filters.RouteDirections
   alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
-  alias ScreensConfig.Departures.{Filters, Query, Section}
+  alias ScreensConfig.Departures.{Filters, Header, Query, Section}
   alias ScreensConfig.Screen.{BusEink, BusShelter, Busway, GlEink}
 
   @type options :: [
@@ -91,7 +92,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
                 %NormalSection{
                   rows: normal_section_rows(result),
                   layout: layout,
-                  header: header
+                  header: process_header(header)
                 }
             end)
 
@@ -154,6 +155,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         text: ["No departures currently available"]
       }
     ]
+  end
+
+  @doc "Replaces bolded markdown text of the form **text** with <b>text</b> in the subtitle."
+  @spec process_header(Header.t()) :: Header.t()
+  def process_header(%Header{subtitle: nil} = header), do: header
+
+  def process_header(%Header{subtitle: subtitle} = header) do
+    updated_subtitle = Regex.replace(~r/\*\*(.+?)\*\*/, subtitle, "<b>\\1</b>")
+    %Header{header | subtitle: updated_subtitle}
   end
 
   @spec fetch_section_departures(Section.t()) :: Departure.result()
