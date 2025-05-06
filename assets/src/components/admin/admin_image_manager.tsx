@@ -4,94 +4,55 @@ import _ from "lodash";
 
 import { fetch } from "Util/admin";
 
-interface FileWithPreview extends File {
-  preview: string;
-}
-
-const fetchImageFilenames = async () => {
-  const { image_filenames: imageFilenames } = await fetch.get(
-    "/api/admin/image_filenames",
-  );
-  return _.sortBy(imageFilenames);
+type FileWithUrl = {
+  file: File;
+  url: string;
 };
 
-const ImageFilenameSelect = ({ options, onChange }): JSX.Element => {
-  const handleChange = (e) => {
-    onChange(e.target.value);
-  };
-
-  return (
-    <select onChange={handleChange} defaultValue={undefined}>
-      <option value={undefined}></option>
-      {options.map((opt) => (
-        <option value={opt} key={opt}>
-          {opt}
-        </option>
-      ))}
-    </select>
-  );
+type ImageEntry = {
+  key: string;
+  url: string;
 };
 
-const ImageThumbnail = ({ src, fullSize = false }): JSX.Element => (
-  <div className="admin-image-manager__thumbnail-container">
-    <div
-      className={`admin-image-manager__thumbnail${
-        fullSize ? "--full-size" : ""
-      }`}
-    >
-      <div className="admin-image-manager__thumbnail-inner">
-        <img className="admin-image-manager__thumbnail-image" src={src} />
-      </div>
-    </div>
-  </div>
+const keyPrefix = (key: string) => key.split("/").slice(0, -1).join("/");
+
+const ImageThumbnail = ({ src }): JSX.Element => (
+  <img className="admin-image-manager__thumbnail" src={src} />
 );
 
-const S3ImageThumbnail = ({ filename }): JSX.Element => (
-  <ImageThumbnail src={`/image/${filename}`} fullSize />
-);
-
-const ImageManagerContainer = (): JSX.Element => {
-  const [imageFilenames, setImageFilenames] = useState<string[]>([]);
-
-  const loadState = async () => {
-    setImageFilenames(await fetchImageFilenames());
-  };
-
-  useEffect(() => {
-    loadState();
-    return;
-  }, []);
-
-  return imageFilenames.length > 0 ? (
-    <ImageManager imageFilenames={imageFilenames} />
-  ) : (
-    <div>Loading...</div>
-  );
-};
-
-const ImageUpload = (): JSX.Element => {
-  const [stagedImageUpload, setStagedImageUpload] =
-    useState<FileWithPreview | null>(null);
+const ImageUpload = ({ onUploaded, selectedPrefix }): JSX.Element => {
+  const [uploadKey, setUploadKey] = useState("");
+  const [stagedUpload, setStagedUpload] = useState<FileWithUrl | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
   const handleClickUpload = async () => {
-    if (!stagedImageUpload) return;
+    if (!stagedUpload) return;
+
+    if (
+      keyPrefix(uploadKey) == "" &&
+      !confirm("Really upload this image to the root path?")
+    )
+      return;
+
     setIsUploading(true);
 
     const formData = new FormData();
-    formData.append("image", stagedImageUpload, stagedImageUpload.name);
+    formData.append("key", uploadKey);
+    formData.append("image", stagedUpload.file, stagedUpload.file.name);
 
     try {
-      const result = await fetch.formData("/api/admin/image", formData);
+      const result = await fetch.formData("/api/admin/images", formData);
 
       if (result.success) {
-        alert(`Success. Image has been uploaded as "${result.uploaded_name}".`);
-        location.reload();
+        alert(`Success. Image has been uploaded.`);
+        setStagedUpload(null);
+        onUploaded(uploadKey);
       } else {
         throw new Error();
       }
     } catch {
       alert("Upload failed.");
+    } finally {
       setIsUploading(false);
     }
   };
@@ -99,15 +60,18 @@ const ImageUpload = (): JSX.Element => {
   const onDrop = useCallback(
     ([acceptedFile]) => {
       if (acceptedFile) {
-        const fileWithPreview = Object.assign(acceptedFile, {
-          preview: URL.createObjectURL(acceptedFile),
+        setStagedUpload({
+          file: acceptedFile,
+          url: URL.createObjectURL(acceptedFile),
         });
-        setStagedImageUpload(fileWithPreview);
+        setUploadKey(
+          (selectedPrefix ? selectedPrefix + "/" : "") + acceptedFile.name,
+        );
       } else {
         alert("That file is too large; please try one under 20MB.");
       }
     },
-    [setStagedImageUpload],
+    [selectedPrefix, setStagedUpload],
   );
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -127,47 +91,83 @@ const ImageUpload = (): JSX.Element => {
           <p>Drag and drop, or click to select an image.</p>
         )}
         <p>
-          <strong>
-            PNG, GIF, or XML only. 20MB max. Make sure your image has the name
-            you want to use!
-          </strong>
+          <strong>PNG, GIF, or SVG only. 20MB max.</strong>
         </p>
       </div>
-      {stagedImageUpload != null && (
-        <ImageThumbnail src={stagedImageUpload.preview} />
+      {stagedUpload && (
+        <>
+          <p>
+            <label>
+              Path:
+              <input
+                onChange={(e) => setUploadKey(e.target.value)}
+                size={80}
+                value={uploadKey}
+              />
+            </label>
+            <button
+              className="admin-image-manager__upload-button"
+              disabled={isUploading}
+              onClick={handleClickUpload}
+            >
+              {isUploading ? "Uploading..." : "Upload"}
+            </button>
+          </p>
+          <ImageThumbnail src={stagedUpload.url} />
+        </>
       )}
-      <button
-        className="admin-image-manager__upload-button"
-        disabled={stagedImageUpload == null || isUploading}
-        onClick={handleClickUpload}
-      >
-        {isUploading ? "Uploading..." : "Upload"}
-      </button>
     </>
   );
 };
 
-const ImageManager = ({ imageFilenames }): JSX.Element => {
-  const [selectedFilename, setSelectedFilename] = useState(undefined);
+const ImageManager = (): JSX.Element => {
+  const [images, setImages] = useState<ImageEntry[]>([]);
+  const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined);
   const [isDeleting, setIsDeleting] = useState(false);
 
+  const loadImages = async (selectKey = undefined) => {
+    setImages([]);
+    setSelectedKey(undefined);
+    const { images } = await fetch.get("/api/admin/images");
+    setImages(images);
+    setSelectedKey(selectKey);
+  };
+
+  useEffect(() => {
+    loadImages();
+    return;
+  }, []);
+
+  const imageUrls = Object.fromEntries(
+    images.map(({ key, url }) => [key, url]),
+  );
+
+  const imageGroups = _.groupBy(
+    images.map(({ key }) => key),
+    (key) => {
+      const [first, ...rest] = key.split("/");
+      return rest.length > 0 ? first : "(root)";
+    },
+  );
+
   const handleClickDelete = async () => {
-    if (confirm(`Permanently delete "${selectedFilename}"?`)) {
+    if (selectedKey && confirm(`Permanently delete "${selectedKey}"?`)) {
       setIsDeleting(true);
 
       try {
         const result = await fetch.delete(
-          `/api/admin/image/${selectedFilename}`,
+          `/api/admin/images/${encodeURIComponent(selectedKey)}`,
         );
 
         if (result.success) {
-          alert(`Success. "${selectedFilename}" has been deleted.`);
-          location.reload();
+          alert(`Success. "${selectedKey}" has been deleted.`);
+          loadImages();
         } else {
           throw new Error();
         }
       } catch {
-        alert(`Failed to delete ${selectedFilename}.`);
+        alert(`Failed to delete ${selectedKey}.`);
+      } finally {
         setIsDeleting(false);
       }
     }
@@ -177,27 +177,59 @@ const ImageManager = ({ imageFilenames }): JSX.Element => {
     <div className="admin-image-manager">
       <h2>Manage Images</h2>
       <span>
-        <ImageFilenameSelect
-          options={imageFilenames}
-          onChange={setSelectedFilename}
-        />
+        <select
+          disabled={images.length == 0}
+          onChange={(e) => setSelectedKey(e.target.value)}
+          value={selectedKey}
+        >
+          <option value={undefined}></option>
+          {_.sortBy(Object.keys(imageGroups)).map((group) => (
+            <optgroup key={group} label={group}>
+              {_.sortBy(imageGroups[group]).map((key) => (
+                <option key={key} value={key}>
+                  {key}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
         <button
           className="admin-image-manager__delete-button"
-          disabled={!selectedFilename || isDeleting}
+          disabled={!selectedKey || isDeleting}
           onClick={handleClickDelete}
         >
           {isDeleting ? "Deleting..." : "Delete..."}
         </button>
       </span>
-      {selectedFilename && (
+      {selectedKey && (
         <div className="admin-image-manager__preview-container">
-          <S3ImageThumbnail filename={selectedFilename} />
+          <img
+            className="admin-image-manager__thumbnail"
+            src={imageUrls[selectedKey]}
+          />
+          <p>
+            <a target="_blank" rel="noreferrer" href={imageUrls[selectedKey]}>
+              View at full size
+            </a>
+          </p>
+          <p>
+            <button
+              onClick={() =>
+                navigator.clipboard.writeText(`images/${selectedKey}`)
+              }
+            >
+              Copy path to clipboard
+            </button>
+          </p>
         </div>
       )}
       <h2>Upload New Image</h2>
-      <ImageUpload />
+      <ImageUpload
+        onUploaded={loadImages}
+        selectedPrefix={selectedKey ? keyPrefix(selectedKey) : undefined}
+      />
     </div>
   );
 };
 
-export default ImageManagerContainer;
+export default ImageManager;
