@@ -54,6 +54,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       }
     end
 
+    defp build_config_with_sections(sections) do
+      %Screen{
+        app_params: %BusShelter{
+          departures: %DeparturesConfig{
+            sections: sections
+          },
+          header: nil,
+          footer: nil,
+          alerts: nil
+        },
+        vendor: nil,
+        device_id: nil,
+        name: nil,
+        app_id: :bus_shelter_v2
+      }
+    end
+
     defp build_fetch_fn(route_ids_to_results) do
       fn %{route_ids: [route_id]}, _opts ->
         Map.fetch!(route_ids_to_results, route_id)
@@ -284,26 +301,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     end
 
     test "returns no departures when header_only is true in a given section, returns departures when header_only is unset" do
-      config = %Screen{
-        app_params: %BusShelter{
-          departures: %DeparturesConfig{
-            sections: [
-              %Section{
-                query: %Query{params: %Query.Params{route_ids: ["A"]}},
-                header_only: true
-              },
-              %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
-            ]
+      config =
+        build_config_with_sections([
+          %Section{
+            query: %Query{params: %Query.Params{route_ids: ["A"]}},
+            header_only: true
           },
-          header: nil,
-          footer: nil,
-          alerts: nil
-        },
-        vendor: nil,
-        device_id: nil,
-        name: nil,
-        app_id: :bus_shelter_v2
-      }
+          %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
+        ])
 
       departure_b = build_departure("B", 0)
       departure_fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}})
