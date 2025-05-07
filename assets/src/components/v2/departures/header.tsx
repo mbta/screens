@@ -7,6 +7,7 @@ type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 type Header = {
   title: string | null;
   arrow: CardinalDirection | null;
+  subtitle: string | null;
 };
 
 const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
@@ -23,13 +24,31 @@ const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
   />
 );
 
-const Header = ({ title, arrow }: Header) => {
+const Header = ({ title, arrow, subtitle }: Header) => {
+  const formatted_subtitle = format_subtitle(subtitle);
+
   return (
-    <header className="departures-header">
-      {(title || arrow) && <span>{title}</span>}
-      {arrow && <DirectionArrow arrow={arrow} />}
-    </header>
+    <div>
+      <header className="departures-header">
+        {(title || arrow) && <span>{title}</span>}
+        {arrow && <DirectionArrow arrow={arrow} />}
+      </header>
+      {formatted_subtitle && (
+        <div className="departures-header__subtitle">{formatted_subtitle}</div>
+      )}
+    </div>
   );
+};
+
+const format_subtitle = (subtitle: string | null): JSX.Element[] | null => {
+  return subtitle
+    ? subtitle.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
+        if (/^\*\*[^*]+\*\*$/.test(part)) {
+          return <strong key={i}>{part.slice(2, -2)}</strong>;
+        }
+        return <span key={i}>{part}</span>;
+      })
+    : null;
 };
 
 export default Header;

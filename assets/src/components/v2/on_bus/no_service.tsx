@@ -4,7 +4,7 @@ import Header from "Components/v2/departures/header";
 const DeparturesNoService: ComponentType = () => {
   return (
     <div className="departures-container">
-      <Header title="CONNECTIONS" arrow={null} />`
+      <Header title="CONNECTIONS" arrow={null} subtitle={null} />`
       <div className="departures-no-service">No connections available</div>
     </div>
   );

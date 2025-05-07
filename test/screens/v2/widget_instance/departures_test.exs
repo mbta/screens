@@ -77,57 +77,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{type: :normal_section, rows: [%{type: :notice_row, text: %{icon: nil, text: []}}]} =
                Departures.serialize_section(section, bus_shelter_screen, now)
     end
-
-    test "returns serialized header with subtitles including bolded markdown", %{
-      bus_shelter_screen: bus_shelter_screen,
-      now: now
-    } do
-      section =
-        %NormalSection{
-          rows: [],
-          header: %Header{
-            title: "Test Departures Section Title",
-            subtitle: "Test **Subtitle with multiple** instances of  **BOLDED** **text**"
-          },
-          layout: %Layout{}
-        }
-
-      assert %{
-               rows: [],
-               type: :normal_section,
-               header: %{
-                 title: "Test Departures Section Title",
-                 subtitle:
-                   "Test <b>Subtitle with multiple</b> instances of  <b>BOLDED</b> <b>text</b>"
-               }
-             } =
-               Departures.serialize_section(section, bus_shelter_screen, now)
-    end
-
-    test "returns serialized header with subtitles that do not include bolded markdown", %{
-      bus_shelter_screen: bus_shelter_screen,
-      now: now
-    } do
-      section =
-        %NormalSection{
-          rows: [],
-          header: %Header{
-            title: "Test Departures Section Title",
-            subtitle: "Test Subtitle with no bolded *text* but some asterisks*"
-          },
-          layout: %Layout{}
-        }
-
-      assert %{
-               rows: [],
-               type: :normal_section,
-               header: %{
-                 title: "Test Departures Section Title",
-                 subtitle: "Test Subtitle with no bolded *text* but some asterisks*"
-               }
-             } =
-               Departures.serialize_section(section, bus_shelter_screen, now)
-    end
   end
 
   describe "serialize_section/4" do
