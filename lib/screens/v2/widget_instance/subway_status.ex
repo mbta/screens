@@ -86,6 +86,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
+  @mbta_status_url "mbta.com/status"
+
   defimpl Screens.V2.WidgetInstance do
     alias ScreensConfig.Audio
     alias ScreensConfig.Screen.BusShelter
@@ -426,7 +428,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
                                 other {# stops}}",
             num_informed_platforms: length(informed_platforms)
           ),
-        location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}
+        location: %{full: @mbta_status_url, abbrev: @mbta_status_url}
       }
     else
       # Get closed station names from informed entities
@@ -646,7 +648,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{
       route_pill: route_pill,
       status: "#{alert_count} current alerts",
-      location: "mbta.com/alerts"
+      location: @mbta_status_url
     }
   end
 
@@ -769,7 +771,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       stop_names ->
         {"Bypassing #{length(stop_names)} stops",
-         %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}}
+         %{full: @mbta_status_url, abbrev: @mbta_status_url}}
     end
   end
 

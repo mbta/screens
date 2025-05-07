@@ -229,8 +229,8 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   defp get_location_string(nil), do: ""
 
   # We never read out the alerts URL.
-  defp get_location_string(%{full: "mbta.com/alerts"}), do: ""
-  defp get_location_string("mbta.com/alerts"), do: ""
+  defp get_location_string(%{full: "mbta.com" <> _}), do: ""
+  defp get_location_string("mbta.com" <> _), do: ""
 
   defp get_location_string(%{full: full}), do: full
   defp get_location_string(location_string), do: location_string
