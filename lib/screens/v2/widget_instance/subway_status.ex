@@ -426,7 +426,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
                                 other {# stops}}",
             num_informed_platforms: length(informed_platforms)
           ),
-        location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}
+        location: %{full: "mbta.com/status", abbrev: "mbta.com/status"}
       }
     else
       # Get closed station names from informed entities
@@ -646,7 +646,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{
       route_pill: route_pill,
       status: "#{alert_count} current alerts",
-      location: "mbta.com/alerts"
+      location: "mbta.com/status"
     }
   end
 
@@ -769,7 +769,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       stop_names ->
         {"Bypassing #{length(stop_names)} stops",
-         %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"}}
+         %{full: "mbta.com/status", abbrev: "mbta.com/status"}}
     end
   end
 
