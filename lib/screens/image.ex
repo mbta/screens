@@ -6,6 +6,14 @@ defmodule Screens.Image do
   @bucket "mbta-screens"
   @base_uri "https://#{@bucket}.s3.amazonaws.com/"
 
+  # How long to reuse cached assets before checking whether they're still fresh.
+  @max_age_mins 15
+  # How long after max-age has expired to continue reusing cached assets while checking whether
+  # they're still fresh in the background.
+  @swr_mins 5
+
+  @cache_control "max-age=#{@max_age_mins * 60}, stale-while-revalidate=#{@swr_mins * 60}"
+
   @spec list() :: list(%{key: String.t(), url: String.t()})
   def list do
     @bucket
@@ -27,7 +35,11 @@ defmodule Screens.Image do
     result =
       local_path
       |> S3.Upload.stream_file()
-      |> S3.upload(@bucket, image_path(key), acl: :public_read, content_type: content_type)
+      |> S3.upload(@bucket, image_path(key),
+        acl: :public_read,
+        cache_control: @cache_control,
+        content_type: content_type
+      )
       |> ExAws.request()
 
     case result do
