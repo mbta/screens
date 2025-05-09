@@ -8,7 +8,7 @@ export const normalSection = Factory.define<Section>(() => ({
   type: "normal_section",
   layout: { min: 1, base: null, max: null, include_later: false },
   rows: departureRow.buildList(1),
-  header: { title: null, arrow: null },
+  header: { title: null, arrow: null, subtitle: null },
   grouping_type: "time",
 }));
 

@@ -26,3 +26,17 @@
   height: 8px;
   border: none;
 }
+
+.departures-header__subtitle {
+  @include fonts.paragraph--regular;
+
+  width: 1005px;
+  margin-top: 10px;
+  margin-left: 32px;
+  font-size: 40px;
+  line-height: 54px;
+
+  strong {
+    @include fonts.inter--bold;
+  }
+}
