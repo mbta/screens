@@ -1051,7 +1051,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "can serialize a :normal_section" do
       section = %NormalSection{
         rows: [],
-        header: %Header{title: "Section Header"}
+        header: %Header{title: "Section Header", subtitle: nil}
       }
 
       screen = struct(Screen, %{app_id: :gl_eink_v2})
@@ -1068,7 +1068,11 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "uses the `read_as` header property if available" do
       section = %NormalSection{
         rows: [],
-        header: %Header{title: "Section Header", read_as: "A special audio-only value"}
+        header: %Header{
+          title: "Section Header",
+          read_as: "A special audio-only value",
+          subtitle: "Section Subtitle"
+        }
       }
 
       screen = struct(Screen, %{app_id: :gl_eink_v2})
@@ -1079,6 +1083,28 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                type: :normal_section,
                departure_groups: [],
                header: "A special audio-only value"
+             } =
+               Departures.audio_serialize_section(
+                 section,
+                 screen,
+                 now
+               )
+    end
+
+    test "includes the `subtitle` header property if available, filtering out markdown" do
+      section = %NormalSection{
+        rows: [],
+        header: %Header{title: "Section Header", subtitle: "Section **Subtitle**"}
+      }
+
+      screen = struct(Screen, %{app_id: :gl_eink_v2})
+
+      now = ~U[2020-01-01T00:00:00Z]
+
+      assert %{
+               type: :normal_section,
+               departure_groups: [],
+               header: "Section Header. Section Subtitle"
              } =
                Departures.audio_serialize_section(
                  section,
