@@ -1402,6 +1402,68 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert expected == WidgetInstance.serialize(instance)
     end
 
+    test "handles 1 service change alert" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              effect: :service_change,
+              informed_entities: [
+                %{route: "Red", stop: "place-portr", route_type: 1},
+                %{route: "Red", stop: "70065", route_type: 1}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_station: [
+                %{id: "70065", platform_name: "Ashmont/Braintree"},
+                %{id: "70066", platform_name: "Alewife"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        blue: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              status: "Normal Service"
+            }
+          ]
+        },
+        orange: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "OL", color: :orange},
+              status: "Normal Service"
+            }
+          ]
+        },
+        red: %{
+          type: :extended,
+          alert: %{
+            status: "Service Change",
+            location: %{full: "Porter", abbrev: "Porter"},
+            route_pill: %{type: :text, text: "RL", color: :red}
+          }
+        },
+        green: %{
+          type: :contracted,
+          alerts: [
+            %{
+              route_pill: %{type: :text, text: "GL", color: :green},
+              status: "Normal Service"
+            }
+          ]
+        }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
     test "handles alert closing multiple platforms at one station" do
       instance = %SubwayStatus{
         subway_alerts: [
