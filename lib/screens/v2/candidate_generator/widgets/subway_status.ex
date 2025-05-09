@@ -30,7 +30,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
   defp relevant_effect?(%Alert{effect: :delay, severity: severity}), do: severity >= 3
 
   defp relevant_effect?(%Alert{effect: effect}),
-    do: effect in [:suspension, :shuttle, :station_closure]
+    do: effect in [:suspension, :shuttle, :station_closure, :service_change]
 
   defp suppressed?(_alert), do: false
 

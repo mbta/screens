@@ -32,7 +32,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @automated_override_priority [1, 2]
 
   # Keep these in descending order of priority--highest priority (lowest integer value) first
-  @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
+  @relevant_effects ~w[shuttle stop_closure suspension station_closure detour service_change stop_moved snow_route elevator_closure]a
 
   @effect_priorities Enum.with_index(@relevant_effects, 1)
 
@@ -62,10 +62,18 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @effect_icons Enum.zip(
                   @relevant_effects,
                   Enum.map(@relevant_effects, fn
-                    bus when bus in ~w[shuttle detour]a -> :bus
-                    major when major in ~w[stop_closure suspension station_closure]a -> :x
-                    minor when minor in ~w[stop_moved elevator_closure]a -> :warning
-                    :snow_route -> :snowflake
+                    bus when bus in ~w[shuttle detour]a ->
+                      :bus
+
+                    major
+                    when major in ~w[stop_closure suspension station_closure service_change]a ->
+                      :x
+
+                    minor when minor in ~w[stop_moved elevator_closure]a ->
+                      :warning
+
+                    :snow_route ->
+                      :snowflake
                   end)
                 )
 
