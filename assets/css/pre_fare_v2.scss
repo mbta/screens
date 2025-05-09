@@ -7,6 +7,9 @@
 @use "v2/lcd_common/no_data" as *;
 @use "v2/lcd_common/page_load_no_data";
 @use "v2/lcd_common/route_pill";
+@use "v2/lcd_common/departures" as *;
+@use "v2/lcd_common/departures_no_data" as *;
+@use "v2/lcd_common/departures/header";
 
 @use "v2/pre_fare/alert-banner";
 @use "v2/pre_fare/body/normal" as *;
@@ -22,6 +25,7 @@
 @use "v2/pre_fare/cr_departures/cr_departures_header";
 @use "v2/pre_fare/cr_departures/cr_departures_table";
 @use "v2/pre_fare/cr_departures/overnight_cr_departures";
+@use "v2/pre_fare/departures/departures.scss" as *;
 @use "v2/pre_fare/departure_time";
 @use "v2/pre_fare/disruption_diagram/disruption_diagram";
 @use "v2/pre_fare/elevator_status";

@@ -361,6 +361,7 @@ const PreFareV2ScreensTable = (): JSX.Element => {
       disableFilters: true,
       FormCell: FormTextarea,
     },
+    departuresColumn,
   ];
 
   return <AdminTable columns={columns} dataFilter={dataFilter} />;

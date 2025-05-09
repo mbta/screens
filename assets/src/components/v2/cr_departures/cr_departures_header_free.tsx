@@ -6,9 +6,9 @@ import { getHexColor } from "Util/svg_utils";
 
 const CRDeparturesHeaderFree = ({ headerPill }) => {
   return (
-    <div className="departures-card__header">
+    <div className="cr-departures-card__header">
       <CRPill width="523" height="82" color={getHexColor("purple")} />
-      <div className="departures-card__header-text">
+      <div className="cr-departures-card__header-text">
         <span>Free Commuter Rail during</span>
         <span className="pill-container">
           <RoutePill pill={headerPill} />

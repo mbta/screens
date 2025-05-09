@@ -15,13 +15,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias ScreensConfig.Departures.Header
   alias ScreensConfig.Departures.Layout
   alias ScreensConfig.{FreeTextLine, Screen}
+  alias ScreensConfig.Screen.PreFare
 
   defmodule NormalSection do
     @moduledoc "Section which includes a number of independent 'rows' or items."
-    alias Screens.V2.Departure
-    alias ScreensConfig.Departures.Header
-    alias ScreensConfig.Departures.Layout
-    alias ScreensConfig.FreeTextLine
 
     @type row :: Departure.t() | FreeTextLine.t()
 
@@ -73,6 +70,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @max_rows_per_section 15
 
   defimpl Screens.V2.WidgetInstance do
+    def priority(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [1]
     def priority(_instance), do: [2]
 
     def serialize(%Departures{sections: sections, screen: screen, now: now}) do
@@ -94,6 +92,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def audio_serialize(%Departures{sections: sections, screen: screen, now: now}) do
       %{sections: Enum.map(sections, &Departures.audio_serialize_section(&1, screen, now))}
     end
+
+    def audio_sort_key(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [2]
 
     def audio_sort_key(_instance), do: [1]
 

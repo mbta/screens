@@ -1684,8 +1684,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns [3]", %{one_active_at_home_instance: instance} do
-      assert [3] == WidgetInstance.audio_sort_key(instance)
+    test "returns [4]", %{one_active_at_home_instance: instance} do
+      assert [4] == WidgetInstance.audio_sort_key(instance)
     end
   end
 

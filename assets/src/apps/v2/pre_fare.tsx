@@ -48,6 +48,7 @@ import SimulationScreenPage from "Components/v2/pre_fare/simulation_screen_page"
 import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
 import ShuttleBusInfo from "Components/v2/shuttle_bus_info";
 import PreFareSingleScreenAlert from "Components/v2/pre_fare_single_screen_alert";
+import Departures from "Components/v2/departures";
 
 const TYPE_TO_COMPONENT = {
   // Slots
@@ -79,6 +80,7 @@ const TYPE_TO_COMPONENT = {
   cr_departures: CRDepartures,
   overnight_cr_departures: OvernightCRDepartures,
   shuttle_bus_info: ShuttleBusInfo,
+  departures: Departures,
 };
 
 const DISABLED_LAYOUT = {

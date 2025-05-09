@@ -4,6 +4,7 @@
 
 @use "v2/lcd_common/departures" as *;
 @use "v2/lcd_common/departures_no_data" as *;
+@use "v2/lcd_common/departures/header";
 @use "v2/lcd_common/evergreen";
 @use "v2/lcd_common/free_text";
 @use "v2/lcd_common/no_data";
