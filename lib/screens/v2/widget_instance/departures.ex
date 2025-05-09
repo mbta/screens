@@ -232,9 +232,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
       ) do
     header =
       case header do
-        %{read_as: header} when is_binary(header) -> header
-        %{title: header} when is_binary(header) -> header
-        _ -> nil
+        %{read_as: header} when is_binary(header) ->
+          header
+
+        %{title: title, subtitle: subtitle} when is_binary(title) and is_binary(subtitle) ->
+          "#{title}. #{String.replace(subtitle, "*", "")}"
+
+        %{title: header} when is_binary(header) ->
+          header
+
+        _ ->
+          nil
       end
 
     serialized_departure_groups =
