@@ -25,22 +25,22 @@ const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
 );
 
 const Header = ({ title, arrow, subtitle }: Header) => {
-  const formatted_subtitle = format_subtitle(subtitle);
-
   return (
     <div>
       <header className="departures-header">
         {(title || arrow) && <span>{title}</span>}
         {arrow && <DirectionArrow arrow={arrow} />}
       </header>
-      {formatted_subtitle && (
-        <div className="departures-header__subtitle">{formatted_subtitle}</div>
+      {subtitle && (
+        <div className="departures-header__subtitle">
+          {formatSubtitle(subtitle)}
+        </div>
       )}
     </div>
   );
 };
 
-const format_subtitle = (subtitle: string | null): JSX.Element[] | null => {
+const formatSubtitle = (subtitle: string): JSX.Element[] | null => {
   return subtitle
     ? subtitle.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
         if (/^\*\*[^*]+\*\*$/.test(part)) {
