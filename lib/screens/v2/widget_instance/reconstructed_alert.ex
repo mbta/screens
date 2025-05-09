@@ -12,7 +12,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.{CRDepartures, FreeText, FreeTextLine, Screen}
+  alias ScreensConfig.{CRDepartures, Departures, FreeText, FreeTextLine, Screen}
   alias ScreensConfig.Screen.PreFare
 
   defstruct screen: nil,
@@ -384,14 +384,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp placement(
          %__MODULE__{
            is_terminal_station: is_terminal_station,
-           screen: %Screen{app_params: %PreFare{template: template}}
+           screen: %Screen{app_params: %PreFare{departures: departures, template: template}}
          } = t
        ) do
+    has_departures = match?(%Departures{sections: [_ | _]}, departures)
     location = LocalizedAlert.location(t, is_terminal_station)
-    t |> duo_placement(location) |> adjust_placement(location, template)
+    t |> base_placement(location) |> adjust_placement(location, template, has_departures)
   end
 
-  defp duo_placement(
+  defp base_placement(
          %__MODULE__{
            alert: %Alert{effect: effect} = alert,
            is_priority: true,
@@ -408,15 +409,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        else: :single_screen
   end
 
-  defp duo_placement(%__MODULE__{is_priority: true}, _location), do: :single_screen
-  defp duo_placement(%__MODULE__{}, _location), do: :flex_zone
+  defp base_placement(%__MODULE__{is_priority: true}, _location), do: :single_screen
+  defp base_placement(%__MODULE__{}, _location), do: :flex_zone
 
+  # When departures are enabled, downgrade single-screen takeovers to the flex zone
+  defp adjust_placement(:single_screen, _location, :duo, true), do: :flex_zone
+  defp adjust_placement(placement, _location, :duo, _has_departures), do: placement
   # "Downgrade" placement by one level for solo screens, with some exceptions.
-  defp adjust_placement(placement, _location, :duo), do: placement
-  defp adjust_placement(:dual_screen, _location, :solo), do: :single_screen
-  defp adjust_placement(:single_screen, :inside, :solo), do: :single_screen
-  defp adjust_placement(:single_screen, _location, :solo), do: :flex_zone
-  defp adjust_placement(:flex_zone, _location, :solo), do: :flex_zone
+  defp adjust_placement(:dual_screen, _location, :solo, _), do: :single_screen
+  defp adjust_placement(:single_screen, :inside, :solo, _), do: :single_screen
+  defp adjust_placement(:single_screen, _location, :solo, _), do: :flex_zone
+  defp adjust_placement(:flex_zone, _location, :solo, _), do: :flex_zone
 
   # Two screen alert, suspension
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do

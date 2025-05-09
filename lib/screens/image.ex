@@ -4,79 +4,63 @@ defmodule Screens.Image do
   alias ExAws.S3
 
   @bucket "mbta-screens"
-  @s3_base_url "https://#{@bucket}.s3.amazonaws.com/"
+  @base_uri "https://#{@bucket}.s3.amazonaws.com/"
 
-  # Matches all non-delimiter characters located after the last delimiter.
-  # screens/images/psa/some-image_file-3.png
-  #                    ^^^^^^^^^^^^^^^^^^^^^
-  @image_filename_pattern ~r|([^/]*)$|
+  # How long to reuse cached assets before checking whether they're still fresh.
+  @max_age_mins 15
+  # How long after max-age has expired to continue reusing cached assets while checking whether
+  # they're still fresh in the background.
+  @swr_mins 5
 
-  @typep s3_object :: %{
-           e_tag: String.t(),
-           key: String.t(),
-           last_modified: String.t(),
-           owner: %{display_name: String.t(), id: String.t()},
-           size: String.t(),
-           storage_class: String.t()
-         }
+  @cache_control "max-age=#{@max_age_mins * 60}, stale-while-revalidate=#{@swr_mins * 60}"
 
-  @spec fetch_image_filenames() :: list(String.t())
-  def fetch_image_filenames do
-    list_operation = S3.list_objects(@bucket, prefix: psa_images_prefix())
-
-    list_operation
+  @spec list() :: list(%{key: String.t(), url: String.t()})
+  def list do
+    @bucket
+    |> S3.list_objects_v2(prefix: images_prefix())
     |> ExAws.stream!()
-    |> Stream.reject(&directory?/1)
-    |> Stream.map(&get_image_filename/1)
+    |> Stream.map(& &1.key)
+    |> Stream.reject(&prefix?/1)
+    |> Stream.map(
+      &%{
+        key: String.replace(&1, images_prefix() <> "/", ""),
+        url: @base_uri |> URI.merge(&1) |> URI.to_string()
+      }
+    )
     |> Enum.to_list()
   end
 
-  @spec get_s3_url(String.t()) :: String.t()
-  def get_s3_url(filename), do: @s3_base_url <> get_s3_path(filename)
-
-  @spec upload_image(Plug.Upload.t()) :: {:ok, String.t()} | :error
-  def upload_image(%Plug.Upload{filename: filename, path: local_path, content_type: content_type}) do
-    filename = String.downcase(filename)
-    s3_path = get_s3_path(filename)
-
+  @spec upload(String.t(), Plug.Upload.t()) :: :ok | :error
+  def upload(key, %Plug.Upload{path: local_path, content_type: content_type}) do
     result =
       local_path
       |> S3.Upload.stream_file()
-      |> S3.upload(@bucket, s3_path, acl: :public_read, content_type: content_type)
+      |> S3.upload(@bucket, image_path(key),
+        acl: :public_read,
+        cache_control: @cache_control,
+        content_type: content_type
+      )
       |> ExAws.request()
 
     case result do
-      {:ok, %{status_code: 200}} -> {:ok, filename}
+      {:ok, %{status_code: 200}} -> :ok
       _ -> :error
     end
   end
 
-  @spec delete_image(String.t()) :: :ok | :error
-  def delete_image(filename) do
-    s3_path = psa_images_prefix() <> filename
-    delete_operation = S3.delete_object(@bucket, s3_path)
-
-    case ExAws.request(delete_operation) do
+  @spec delete(String.t()) :: :ok | :error
+  def delete(key) do
+    case @bucket |> S3.delete_object(image_path(key)) |> ExAws.request() do
       {:ok, %{status_code: 204}} -> :ok
       _ -> :error
     end
   end
 
-  @spec get_image_filename(s3_object) :: String.t()
-  defp get_image_filename(obj) do
-    @image_filename_pattern
-    |> Regex.run(obj.key, capture: :all_but_first)
-    |> hd()
+  defp images_prefix do
+    Path.join(Application.get_env(:screens, :environment_name, "screens-dev"), "images")
   end
 
-  @spec directory?(s3_object) :: boolean()
-  defp directory?(obj) do
-    String.ends_with?(obj.key, "/")
-  end
+  defp image_path(key), do: Path.join(images_prefix(), key)
 
-  defp psa_images_prefix do
-    Application.get_env(:screens, :environment_name, "screens-dev") <> "/images/psa/"
-  end
-
-  defp get_s3_path(filename), do: psa_images_prefix() <> filename
+  defp prefix?(key), do: String.ends_with?(key, "/")
 end

@@ -1725,9 +1725,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns [2]" do
+    test "returns [3]" do
       instance = %SubwayStatus{}
-      assert [2] == WidgetInstance.audio_sort_key(instance)
+      assert [3] == WidgetInstance.audio_sort_key(instance)
     end
   end
 

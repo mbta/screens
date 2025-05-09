@@ -5,9 +5,9 @@ import { getHexColor } from "Util/svg_utils";
 
 const CRDeparturesHeaderNormal = () => {
   return (
-    <div className="departures-card__header">
+    <div className="cr-departures-card__header">
       <CRPill width="523" height="82" color={getHexColor("purple")} />
-      <div className="departures-card__header-text">Upcoming departures</div>
+      <div className="cr-departures-card__header-text">Upcoming departures</div>
     </div>
   );
 };

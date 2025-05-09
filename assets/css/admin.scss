@@ -115,39 +115,10 @@
     margin-left: 8px;
   }
 
-  &__thumbnail-container {
-    display: flex;
-    flex-flow: row wrap;
-    margin-top: 16px;
-  }
-
   &__thumbnail {
-    box-sizing: border-box;
-    display: inline-flex;
-    width: 100px;
-    height: 100px;
-    padding: 4px;
-    margin-right: 8px;
+    max-width: 640px;
+    max-height: 480px;
     margin-bottom: 8px;
-    border: 1px solid #eaeaea;
-    border-radius: 2px;
-
-    & &--full-size {
-      width: unset;
-      height: unset;
-    }
-  }
-
-  &__thumbnail-inner {
-    display: flex;
-    min-width: 0;
-    overflow: hidden;
-  }
-
-  &__thumbnail-image {
-    display: block;
-    width: auto;
-    height: 100%;
   }
 
   &__dropzone {
@@ -177,6 +148,6 @@
   }
 
   &__preview-container {
-    margin-top: 8px;
+    padding: 8px;
   }
 }

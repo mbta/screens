@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
 
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
+  alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.MockWidget
   alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
   alias ScreensConfig.Header.CurrentStopId
@@ -15,6 +16,16 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       struct(Screen, %{
         app_id: :pre_fare_v2,
         app_params: struct(PreFare, %{header: %CurrentStopId{stop_id: "place-test"}})
+      })
+
+    departures_config =
+      struct(Screen, %{
+        app_id: :pre_fare_v2,
+        app_params:
+          struct(PreFare, %{
+            header: %CurrentStopId{stop_id: "place-test-departures"},
+            departures: %ScreensConfig.Departures{sections: [%NormalSection{}]}
+          })
       })
 
     other_config = struct(Screen, %{app_id: :bus_e_ink_v2})
@@ -45,6 +56,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
 
     %{
       pre_fare_config: pre_fare_config,
+      departures_config: departures_config,
       other_config: other_config,
       instance_with_header: instance_with_header,
       instance_without_header: instance_without_header,
@@ -72,7 +84,18 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
     } do
       widget = put_config(widget, pre_fare_config)
 
-      expected_result = %{lines_at_station: [:red, :orange]}
+      expected_result = %{lines_at_station: [:red, :orange], has_departures: false}
+
+      assert expected_result == WidgetInstance.audio_serialize(widget)
+    end
+
+    test "returns has_departures true with lines_at_station for pre-fare screens", %{
+      departures_config: departures_config,
+      instance_with_header: widget
+    } do
+      widget = put_config(widget, departures_config)
+
+      expected_result = %{lines_at_station: [:red, :orange], has_departures: true}
 
       assert expected_result == WidgetInstance.audio_serialize(widget)
     end

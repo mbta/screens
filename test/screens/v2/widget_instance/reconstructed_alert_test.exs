@@ -9,7 +9,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
-  alias ScreensConfig.{ContentSummary, CRDepartures, ElevatorStatus, Screen}
+  alias ScreensConfig.{ContentSummary, CRDepartures, Departures, ElevatorStatus, Screen}
+  alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Header.CurrentStopId
   alias ScreensConfig.Screen.PreFare
 
@@ -153,6 +154,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   defp put_partial_closure_platform_names(widget, partial_closure_platform_names) do
     %{widget | partial_closure_platform_names: partial_closure_platform_names}
+  end
+
+  defp put_departures(widget) do
+    departures =
+      struct(%Departures{
+        sections: [%Section{query: %Query{}}]
+      })
+
+    app_params = struct(PreFare, departures: departures)
+
+    %{
+      widget
+      | screen: %Screen{widget.screen | app_params: app_params}
+    }
   end
 
   defp ie(opts) do
@@ -423,9 +438,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert_values(widget, {1, @left_screen}, {1, @flex_zone})
     end
 
+    test "station closure not at this station but departures are showing", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_is_priority(true)
+        |> put_departures()
+
+      assert_values(widget, {1, @flex_zone}, {1, @flex_zone})
+    end
+
     test "suspension that affects all station trips", %{widget: widget} do
       widget =
-        put_informed_entities(widget, [
+        widget
+        |> put_informed_entities([
           ie(route: "Red", route_type: 1, stop: "place-dwnxg"),
           ie(route: "Orange", route_type: 1, stop: "place-dwnxg")
         ])
@@ -462,6 +488,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             ]
           ]
         })
+        |> put_departures()
         |> put_is_terminal_station(true)
         |> put_is_priority(true)
 
@@ -484,6 +511,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             ]
           ]
         })
+        |> put_departures()
         |> put_is_terminal_station(true)
         |> put_is_priority(true)
 
