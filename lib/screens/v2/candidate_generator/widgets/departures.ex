@@ -262,6 +262,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   # "Bidirectional" mode: take only the first departure, and the next departure in the opposite
   # direction from the first, if one exists.
+  defp make_bidirectional([]), do: []
+
   defp make_bidirectional([first | rest]) do
     first_direction = Departure.direction_id(first)
 
