@@ -25,7 +25,7 @@
 @use "v2/pre_fare/cr_departures/cr_departures_header";
 @use "v2/pre_fare/cr_departures/cr_departures_table";
 @use "v2/pre_fare/cr_departures/overnight_cr_departures";
-@use "v2/pre_fare/departures/departures.scss" as *;
+@use "v2/pre_fare/departures/departures" as *;
 @use "v2/pre_fare/departure_time";
 @use "v2/pre_fare/disruption_diagram/disruption_diagram";
 @use "v2/pre_fare/elevator_status";
