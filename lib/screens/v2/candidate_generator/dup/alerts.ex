@@ -35,27 +35,31 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}, header: header_config}} =
       config
 
-    stop_name =
-      case header_config do
-        %{stop_id: stop_id} ->
-          case fetch_stop_name_fn.(stop_id) do
-            nil -> []
-            stop_name -> stop_name
-          end
-
-        %{stop_name: stop_name} ->
-          stop_name
-      end
-
-    with {:ok, location_context} <- fetch_location_context_fn.(Dup, stop_id, now),
-         route_ids <- Route.route_ids(location_context.routes),
-         {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
-      alerts
-      |> relevant_alerts(config, location_context, now)
-      |> alert_special_cases(config)
-      |> create_alert_widgets(config, location_context, stop_name)
+    if is_nil(stop_id) do
+      []
     else
-      :error -> []
+      stop_name =
+        case header_config do
+          %{stop_id: stop_id} ->
+            case fetch_stop_name_fn.(stop_id) do
+              nil -> []
+              stop_name -> stop_name
+            end
+
+          %{stop_name: stop_name} ->
+            stop_name
+        end
+
+      with {:ok, location_context} <- fetch_location_context_fn.(Dup, stop_id, now),
+           route_ids <- Route.route_ids(location_context.routes),
+           {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
+        alerts
+        |> relevant_alerts(config, location_context, now)
+        |> alert_special_cases(config)
+        |> create_alert_widgets(config, location_context, stop_name)
+      else
+        :error -> []
+      end
     end
   end
 
