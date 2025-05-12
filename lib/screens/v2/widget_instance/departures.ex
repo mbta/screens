@@ -225,11 +225,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :overnight_section, text: FreeTextLine.to_json(text)}
   end
 
-  def audio_serialize_section(
-        %NormalSection{rows: rows, header: header},
-        screen,
-        now
-      ) do
+  def audio_serialize_section(%NormalSection{header: header} = section, screen, now) do
     header =
       case header do
         %{read_as: header} when is_binary(header) ->
@@ -246,8 +242,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
       end
 
     serialized_departure_groups =
-      rows
-      |> group_section_rows_for_audio(now, screen.app_id)
+      section
+      |> group_section_rows_for_audio(screen.app_id, now)
       |> Enum.map(&audio_serialize_row_group(&1, screen, now))
 
     %{
@@ -303,22 +299,35 @@ defmodule Screens.V2.WidgetInstance.Departures do
   # The list is ordered by the occurrence of the _first_ departure of each group - later
   # departures can "leapfrog" ahead of other ones of a different route/headsign if there's an
   # earlier departure of the same route/headsign.
-  @spec group_section_rows_for_audio(
-          [NormalSection.row()],
-          DateTime.t(),
-          Screen.app_id()
-        ) ::
+  @spec group_section_rows_for_audio(NormalSection.t(), Screen.app_id(), now :: DateTime.t()) ::
           list({:normal, [Departure.t()]} | {:notice, FreeTextLine.t()})
-  defp group_section_rows_for_audio(rows, now, app_id) do
+  defp group_section_rows_for_audio(
+         %NormalSection{rows: rows, grouping_type: grouping_type} = section,
+         app_id,
+         now
+       ) do
     rows
+    |> take_max_rows_for_audio(section)
     |> Util.group_by_with_order(&row_departure_grouping(&1))
     |> Enum.map(fn
       {ref, [%FreeTextLine{} = text]} when is_reference(ref) ->
         {:notice, text}
 
       {_key, [%Departure{} | _] = departures} ->
-        {:normal, filter_audio_departure_group(departures, app_id, now)}
+        {:normal, filter_audio_departure_group(departures, grouping_type, app_id, now)}
     end)
+  end
+
+  # Don't limit total rows when using destination-based grouping.
+  defp take_max_rows_for_audio(rows, %NormalSection{grouping_type: :destination}), do: rows
+
+  # Try to limit the readout to a reasonable number of departures based on the configured layout.
+  # Assume "Later Departures" fits a certain fixed number of additional departures; this will not
+  # align precisely with the visual presentation.
+  defp take_max_rows_for_audio(rows, %NormalSection{
+         layout: %Layout{base: base, max: max, include_later: include_later}
+       }) do
+    Enum.take(rows, (max || base || @max_rows_per_section) + if(include_later, do: 4, else: 0))
   end
 
   defp row_departure_grouping(%Departure{} = row),
@@ -326,15 +335,25 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp row_departure_grouping(%FreeTextLine{}), do: make_ref()
 
-  defp filter_audio_departure_group([first_departure | _] = departure_group, :busway_v2, now) do
+  # When using destination-based grouping, only read out the "next" departure, in line with the
+  # visual presentation.
+  defp filter_audio_departure_group([first_departure | _], :destination, _app_id, _now) do
+    [first_departure]
+  end
+
+  # On Sectionals using time-based grouping, only read out the "following" departure when the
+  # "next" one is very soon.
+  defp filter_audio_departure_group([first_departure | _] = group, :time, :busway_v2, now) do
     if first_departure |> Departure.time() |> DateTime.diff(now, :minute) <= 2 do
-      Enum.take(departure_group, 2)
+      Enum.take(group, 2)
     else
       [first_departure]
     end
   end
 
-  defp filter_audio_departure_group(departures, _app_id, _now) do
+  # By default, when using time-based grouping, always read out both the "next" and "following"
+  # departure if available.
+  defp filter_audio_departure_group(departures, :time, _app_id, _now) do
     Enum.take(departures, 2)
   end
 
