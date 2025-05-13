@@ -58,36 +58,15 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     end
   end
 
-  @pre_fare_takeover_slots MapSet.new(~w[
-      full_body_duo
-      full_body_left
-      full_body_right
-      full_duo_screen
-      full_left_screen
-      full_right_screen
-    ]a)
-
-  def audio_valid_candidate?(
-        %__MODULE__{
-          screen: %Screen{
-            app_id: :pre_fare_v2,
-            app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}
-          },
-          widgets_snapshot: widgets
-        } = t
-      ) do
+  def audio_valid_candidate?(%__MODULE__{
+        screen: %Screen{
+          app_id: :pre_fare_v2,
+          app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}
+        },
+        widgets_snapshot: widgets
+      }) do
     # Need to skip this readout for Wellington during the OL Surge
-    if has_surge_widgets?(widgets) and stop_id in ["place-welln"] do
-      false
-    else
-      # On pre-fare screens, we only include a content summary when there's no takeover content.
-      Enum.all?(t.widgets_snapshot, fn widget ->
-        widget
-        |> WidgetInstance.slot_names()
-        |> MapSet.new()
-        |> MapSet.disjoint?(@pre_fare_takeover_slots)
-      end)
-    end
+    not (has_surge_widgets?(widgets) and stop_id in ["place-welln"])
   end
 
   def audio_valid_candidate?(_t) do

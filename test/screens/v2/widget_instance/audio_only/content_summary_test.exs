@@ -5,7 +5,6 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
   alias Screens.V2.WidgetInstance.Departures.NormalSection
-  alias Screens.V2.WidgetInstance.MockWidget
   alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
   alias ScreensConfig.Header.CurrentStopId
   alias ScreensConfig.Screen
@@ -48,19 +47,12 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       lines_at_station: []
     }
 
-    instance_with_takeover_content = %ContentSummary{
-      screen: nil,
-      widgets_snapshot: [%MockWidget{slot_names: [:full_body_duo]}],
-      lines_at_station: [:red, :orange]
-    }
-
     %{
       pre_fare_config: pre_fare_config,
       departures_config: departures_config,
       other_config: other_config,
       instance_with_header: instance_with_header,
       instance_without_header: instance_without_header,
-      instance_with_takeover_content: instance_with_takeover_content,
       instance_with_surge_widgets: instance_with_surge_widgets
     }
   end
@@ -135,10 +127,8 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   end
 
   describe "audio_valid_candidate?/1" do
-    test "on pre-fare screens, widget is valid if there is no takeover content", %{
-      pre_fare_config: pre_fare_config,
-      instance_with_header: widget
-    } do
+    test "widget is valid on pre-fare screens",
+         %{pre_fare_config: pre_fare_config, instance_with_header: widget} do
       widget = widget |> put_config(pre_fare_config) |> put_stop_id("place-gover")
 
       assert WidgetInstance.audio_valid_candidate?(widget)
@@ -153,19 +143,8 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       refute WidgetInstance.audio_valid_candidate?(widget)
     end
 
-    test "on pre-fare screens, widget is not valid if there is any takeover content", %{
-      pre_fare_config: pre_fare_config,
-      instance_with_takeover_content: widget
-    } do
-      widget = put_config(widget, pre_fare_config)
-
-      refute WidgetInstance.audio_valid_candidate?(widget)
-    end
-
-    test "widget is not valid on screens other than pre-fare", %{
-      other_config: other_config,
-      instance_with_takeover_content: widget
-    } do
+    test "widget is not valid on screens other than pre-fare",
+         %{other_config: other_config, instance_with_header: widget} do
       widget = put_config(widget, other_config)
 
       refute WidgetInstance.audio_valid_candidate?(widget)
