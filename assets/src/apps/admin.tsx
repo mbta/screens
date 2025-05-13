@@ -19,7 +19,6 @@ import {
   PreFareV2ScreensTable,
   DupV2ScreensTable,
   ElevatorV2ScreensTable,
-  OnBusScreensTable,
 } from "Components/admin/admin_tables";
 import AdminScreenConfigForm from "Components/admin/admin_screen_config_form";
 import ImageManager from "Components/admin/admin_image_manager";
@@ -35,7 +34,6 @@ const routes: [string, string, ComponentType][][] = [
     ["dup-v2-screens", "DUP", DupV2ScreensTable],
     ["elevator-v2-screens", "Elevator", ElevatorV2ScreensTable],
     ["gl-eink-v2-screens", "GL E-ink", GLEinkV2ScreensTable],
-    ["on-bus-v2-screens", "On-Bus", OnBusScreensTable],
     ["pre-fare-v2-screens", "Pre-Fare", PreFareV2ScreensTable],
     ["busway-v2-screens", "Sectional", BuswayV2ScreensTable],
   ],
