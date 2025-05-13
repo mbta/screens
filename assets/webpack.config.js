@@ -25,7 +25,6 @@ const ENTRYPOINTS = {
   dup_v2: "./src/apps/v2/dup.tsx",
   elevator_v2: "./src/apps/v2/elevator.tsx",
   gl_eink_v2: "./src/apps/v2/gl_eink.tsx",
-  on_bus_v2: "./src/apps/v2/on_bus.tsx",
   pre_fare_v2: "./src/apps/v2/pre_fare.tsx",
 };
 
