@@ -20,12 +20,6 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntroTest do
       audio_valid_candidate?: true
     }
 
-    takeover_widget = %MockWidget{
-      slot_names: [:full_body],
-      audio_sort_key: [0],
-      audio_valid_candidate?: true
-    }
-
     audio_sort_key_fn = fn
       %MockWidget{} = mock_widget -> WidgetInstance.audio_sort_key(mock_widget)
       %SubwayStatus{} -> [1]
@@ -53,11 +47,6 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntroTest do
       widgets_snapshot: [subway_status, alert]
     }
 
-    instance_with_takeover_content = %AlertsIntro{
-      screen: nil,
-      widgets_snapshot: [takeover_widget, subway_status, alert, other_widget]
-    }
-
     %{
       pre_fare_config: pre_fare_config,
       other_config: other_config,
@@ -65,8 +54,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntroTest do
       slot_names_fn: slot_names_fn,
       instance_without_service_alert_widgets: instance_without_service_alert_widgets,
       instance_with_subway_status_and_alerts: instance_with_subway_status_and_alerts,
-      instance_with_alert_at_start: instance_with_alert_at_start,
-      instance_with_takeover_content: instance_with_takeover_content
+      instance_with_alert_at_start: instance_with_alert_at_start
     }
   end
 
@@ -119,51 +107,25 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntroTest do
   end
 
   describe "audio_valid_candidate?/1" do
-    # NOTE: need to call `AlertsIntro.audio_valid_candidate?/2` in order to inject a stubbed function
-    # for testing purposes. This is otherwise equivalent to `WidgetInstance.audio_valid_candidate?/1`.
-
-    test "for pre-fare, returns true if there's at least one service alert widget and no takeover content",
-         %{
-           slot_names_fn: slot_names_fn,
-           pre_fare_config: pre_fare_config,
-           instance_with_subway_status_and_alerts: widget
-         } do
+    test "for pre-fare, returns true if there's at least one service alert widget",
+         %{pre_fare_config: pre_fare_config, instance_with_subway_status_and_alerts: widget} do
       widget = put_config(widget, pre_fare_config)
 
-      assert AlertsIntro.audio_valid_candidate?(widget, slot_names_fn)
+      assert AlertsIntro.audio_valid_candidate?(widget)
     end
 
     test "for pre-fare, returns false if there's no service alert widget",
-         %{
-           slot_names_fn: slot_names_fn,
-           pre_fare_config: pre_fare_config,
-           instance_without_service_alert_widgets: widget
-         } do
+         %{pre_fare_config: pre_fare_config, instance_without_service_alert_widgets: widget} do
       widget = put_config(widget, pre_fare_config)
 
-      refute AlertsIntro.audio_valid_candidate?(widget, slot_names_fn)
-    end
-
-    test "for pre-fare, returns false if there's any takeover content",
-         %{
-           slot_names_fn: slot_names_fn,
-           pre_fare_config: pre_fare_config,
-           instance_with_takeover_content: widget
-         } do
-      widget = put_config(widget, pre_fare_config)
-
-      refute AlertsIntro.audio_valid_candidate?(widget, slot_names_fn)
+      refute AlertsIntro.audio_valid_candidate?(widget)
     end
 
     test "returns false for other screen type",
-         %{
-           slot_names_fn: slot_names_fn,
-           other_config: other_config,
-           instance_with_subway_status_and_alerts: widget
-         } do
+         %{other_config: other_config, instance_with_subway_status_and_alerts: widget} do
       widget = put_config(widget, other_config)
 
-      refute AlertsIntro.audio_valid_candidate?(widget, slot_names_fn)
+      refute AlertsIntro.audio_valid_candidate?(widget)
     end
   end
 end
