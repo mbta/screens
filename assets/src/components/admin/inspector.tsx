@@ -19,7 +19,6 @@ import {
   sendMessage,
   useReceiveMessage,
 } from "Util/inspector";
-import { URL_PARAMS_BY_SCREEN_TYPE } from "Util/query_params";
 
 type ScreenWithId = { id: string; config: Screen };
 
@@ -30,7 +29,6 @@ const SCREEN_TYPES = new Set([
   "dup_v2",
   "elevator_v2",
   "gl_eink_v2",
-  "on_bus_v2",
   "pre_fare_v2",
 ]);
 
@@ -48,7 +46,6 @@ const buildIframeUrl = (
   screen: ScreenWithId | null,
   isSimulation: boolean,
   isVariantEnabled: boolean,
-  urlParams: URLSearchParams,
 ) => {
   if (screen) {
     const pathSuffix = isSimulation ? "/simulation" : "";
@@ -58,11 +55,6 @@ const buildIframeUrl = (
     );
 
     if (isVariantEnabled) url.searchParams.append("variant", "all");
-
-    for (const key of URL_PARAMS_BY_SCREEN_TYPE[screen.config.app_id] ?? []) {
-      const value = urlParams.get(key);
-      if (value) url.searchParams.append(key, value);
-    }
 
     return url.toString();
   } else {
@@ -92,12 +84,7 @@ const Inspector: ComponentType = () => {
   const [isSimulation, setIsSimulation] = useState(false);
   const [isVariantEnabled, setIsVariantEnabled] = useState(false);
 
-  const iframeUrl = buildIframeUrl(
-    screen,
-    isSimulation,
-    isVariantEnabled,
-    urlParams,
-  );
+  const iframeUrl = buildIframeUrl(screen, isSimulation, isVariantEnabled);
 
   const frameRef = useRef<HTMLIFrameElement>(null);
 

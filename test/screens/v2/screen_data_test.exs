@@ -17,10 +17,10 @@ defmodule Screens.V2.ScreenDataTest do
 
   require Stub
 
-  Stub.candidate_generator(GrayGenerator, fn _, _ -> [placeholder(:gray)] end)
-  Stub.candidate_generator(GreenGenerator, fn _, _ -> [placeholder(:green)] end)
+  Stub.candidate_generator(GrayGenerator, fn _ -> [placeholder(:gray)] end)
+  Stub.candidate_generator(GreenGenerator, fn _ -> [placeholder(:green)] end)
 
-  Stub.candidate_generator(CrashGenerator, fn %Screen{app_params: %{test_pid: pid}}, _ ->
+  Stub.candidate_generator(CrashGenerator, fn %Screen{app_params: %{test_pid: pid}} ->
     send(pid, {:crash_running, self()})
     raise "oopsie"
   end)

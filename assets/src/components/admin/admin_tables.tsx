@@ -471,16 +471,6 @@ const BuswayV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const OnBusScreensTable = (): JSX.Element => {
-  const dataFilter = ({ app_id }) => {
-    return app_id === "on_bus_v2";
-  };
-
-  const columns = [...v2Columns];
-
-  return <AdminTable columns={columns} dataFilter={dataFilter} />;
-};
-
 export {
   AllScreensTable,
   BusEinkV2ScreensTable,
@@ -489,6 +479,5 @@ export {
   DupV2ScreensTable,
   ElevatorV2ScreensTable,
   GLEinkV2ScreensTable,
-  OnBusScreensTable,
   PreFareV2ScreensTable,
 };

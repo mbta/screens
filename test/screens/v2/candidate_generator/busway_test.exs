@@ -2,7 +2,6 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.CandidateGenerator.Busway
-  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.{DeparturesNoData, NormalHeader}
   alias ScreensConfig, as: Config
   alias ScreensConfig.Screen
@@ -37,7 +36,6 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
 
       assert expected_header in Busway.candidate_instances(
                config,
-               %QueryParams{},
                now,
                _instance_fns = []
              )
@@ -48,7 +46,7 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
       no_data = %DeparturesNoData{screen: @config, show_alternatives?: true}
       instance_fns = [fn @config, ^now -> [no_data] end]
 
-      assert no_data in Busway.candidate_instances(@config, %QueryParams{}, now, instance_fns)
+      assert no_data in Busway.candidate_instances(@config, now, instance_fns)
     end
   end
 end

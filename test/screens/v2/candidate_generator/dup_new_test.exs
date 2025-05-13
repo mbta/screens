@@ -3,7 +3,6 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
 
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator.DupNew
-  alias Screens.V2.ScreenData.QueryParams
   alias Screens.V2.WidgetInstance.{DeparturesNoData, EvergreenContent, NormalHeader}
   alias ScreensConfig.{Alerts, Departures, EvergreenContentItem, Header, Schedule}
   alias ScreensConfig.Screen
@@ -29,12 +28,11 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
       name: "TEST"
     }
     @now ~U[2024-01-15 11:45:30Z]
-    @query_params %QueryParams{}
 
     test "returns expected header instances" do
       expected_header = %NormalHeader{screen: @config, icon: :logo, text: "Test Stop", time: @now}
 
-      instances = DupNew.candidate_instances(@config, @query_params, @now)
+      instances = DupNew.candidate_instances(@config, @now)
 
       assert Enum.filter(instances, &is_struct(&1, NormalHeader)) ==
                List.duplicate(expected_header, 3)
@@ -44,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
       config = put_in(@config.app_params.header, %Header.CurrentStopId{stop_id: "test_id"})
       expect(@stop, :fetch_stop_name, fn "test_id" -> "Test Name" end)
 
-      instances = DupNew.candidate_instances(config, @query_params, @now)
+      instances = DupNew.candidate_instances(config, @now)
 
       assert %NormalHeader{text: "Test Name"} = Enum.find(instances, &is_struct(&1, NormalHeader))
     end
@@ -72,18 +70,17 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
         slot_names: [:bottom_pane_zero]
       }
 
-      assert expected_instance in DupNew.candidate_instances(config, @query_params, now_active)
+      assert expected_instance in DupNew.candidate_instances(config, now_active)
 
       assert expected_instance not in DupNew.candidate_instances(
                config,
-               @query_params,
                now_inactive
              )
     end
 
     test "stub: always returns no-data state for departures" do
       expected_instance = %DeparturesNoData{screen: @config, slot_name: :main_content_zero}
-      assert expected_instance in DupNew.candidate_instances(@config, @query_params, @now)
+      assert expected_instance in DupNew.candidate_instances(@config, @now)
     end
   end
 end

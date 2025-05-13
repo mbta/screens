@@ -77,7 +77,6 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   @impl CandidateGenerator
   def candidate_instances(
         config,
-        _query_params,
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
