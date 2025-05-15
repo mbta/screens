@@ -1,15 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.BusShelter do
   @moduledoc false
 
-  alias Screens.Stops.Stop
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
+  alias Screens.V2.WidgetInstance.LinkFooter
   alias Screens.V2.WidgetInstance.Survey, as: SurveyInstance
   alias ScreensConfig.{Footer, Survey}
-  alias ScreensConfig.Header.{CurrentStopId, CurrentStopName}
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.BusShelter
 
@@ -49,19 +47,19 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
+        header_instances_fn \\ &Widgets.Header.instances/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/2,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/2,
         subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
     [
-      fn -> header_instances(config, now, fetch_stop_name_fn) end,
+      fn -> header_instances_fn.(config, now) end,
       fn -> departures_instances_fn.(config, now) end,
-      fn -> alert_instances_fn.(config) end,
+      fn -> alert_instances_fn.(config, now) end,
       fn -> footer_instances(config) end,
       fn -> subway_status_instances_fn.(config, now) end,
-      fn -> evergreen_content_instances_fn.(config) end,
+      fn -> evergreen_content_instances_fn.(config, now) end,
       fn -> survey_instances(config) end
     ]
     |> Task.async_stream(& &1.(), timeout: 20_000)
@@ -70,21 +68,6 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
 
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
-
-  defp header_instances(config, now, fetch_stop_name_fn) do
-    %Screen{app_params: %BusShelter{header: header_config}} = config
-
-    case header_config do
-      %CurrentStopId{stop_id: stop_id} ->
-        case fetch_stop_name_fn.(stop_id) do
-          nil -> []
-          stop_name -> [%NormalHeader{screen: config, text: stop_name, time: now}]
-        end
-
-      %CurrentStopName{stop_name: stop_name} ->
-        [%NormalHeader{screen: config, text: stop_name, time: now}]
-    end
-  end
 
   defp footer_instances(config) do
     %Screen{app_params: %BusShelter{footer: %Footer{stop_id: stop_id}}} = config

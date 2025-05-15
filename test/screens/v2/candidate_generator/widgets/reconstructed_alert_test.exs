@@ -7,7 +7,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   alias Screens.LocationContext
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
-  alias ScreensConfig.Header.CurrentStopId
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.{Busway, PreFare}
 
@@ -30,9 +29,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         struct(Screen, %{
           app_id: :pre_fare_v2,
           app_params:
-            struct(app, %{
-              reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
-            })
+            struct(app, %{reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: stop_id}})
         })
 
       bad_config = struct(Screen, %{app_params: struct(Busway)})

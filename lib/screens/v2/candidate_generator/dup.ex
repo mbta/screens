@@ -1,16 +1,11 @@
 defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
-  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
   alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesInstances
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
-  alias Screens.V2.WidgetInstance.NormalHeader
-  alias ScreensConfig.Header.{CurrentStopId, CurrentStopName}
-  alias ScreensConfig.Screen
-  alias ScreensConfig.Screen.Dup
 
   @behaviour CandidateGenerator
 
@@ -77,8 +72,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
+        header_instances_fn \\ &Widgets.Header.instances/2,
+        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/2,
         departures_instances_fn \\ &DeparturesInstances.departures_instances/2,
         alerts_instances_fn \\ &AlertsInstances.alert_instances/2
       ) do
@@ -86,13 +81,11 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       ctx = Screens.Telemetry.context()
 
       [
-        span_thunk(:header_instances, ctx, fn ->
-          header_instances(config, now, fetch_stop_name_fn)
-        end),
+        span_thunk(:header_instances, ctx, fn -> header_instances_fn.(config, now) end),
         span_thunk(:alerts_instances, ctx, fn -> alerts_instances_fn.(config, now) end),
         span_thunk(:departures_instances, ctx, fn -> departures_instances_fn.(config, now) end),
         span_thunk(:evergreen_content_instances, ctx, fn ->
-          evergreen_content_instances_fn.(config)
+          evergreen_content_instances_fn.(config, now)
         end)
       ]
       |> Task.async_stream(& &1.(), timeout: 30_000)
@@ -102,28 +95,6 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
-
-  def header_instances(
-        config,
-        now,
-        fetch_stop_name_fn
-      ) do
-    %Screen{app_params: %Dup{header: header_config}} = config
-
-    stop_name =
-      case header_config do
-        %CurrentStopId{stop_id: stop_id} ->
-          case fetch_stop_name_fn.(stop_id) do
-            nil -> []
-            stop_name -> stop_name
-          end
-
-        %CurrentStopName{stop_name: stop_name} ->
-          stop_name
-      end
-
-    List.duplicate(%NormalHeader{screen: config, icon: :logo, text: stop_name, time: now}, 3)
-  end
 
   defp span_thunk(name, meta, fun) when is_atom(name) and is_function(fun, 0) do
     fn ->

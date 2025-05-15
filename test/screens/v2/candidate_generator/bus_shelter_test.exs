@@ -2,7 +2,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.CandidateGenerator.BusShelter
-  alias Screens.V2.WidgetInstance.{LinkFooter, NormalHeader}
+  alias Screens.V2.WidgetInstance.{LinkFooter, Survey}
   alias ScreensConfig, as: Config
   alias ScreensConfig.Screen
 
@@ -10,7 +10,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
     config = %Screen{
       app_params: %Screen.BusShelter{
         departures: %Config.Departures{sections: []},
-        header: %Config.Header.CurrentStopId{stop_id: "1216"},
+        header: %Config.Header.StopId{stop_id: "1216"},
         footer: %Config.Footer{stop_id: "1216"},
         alerts: %Config.Alerts{stop_id: "1216"}
       },
@@ -74,68 +74,27 @@ defmodule Screens.V2.CandidateGenerator.BusShelterTest do
   end
 
   describe "candidate_instances/7" do
-    test "returns expected header and footer", %{config: config} do
-      departures_instances_fn = fn _, _ -> [] end
-      alert_instances_fn = fn _ -> [] end
-      fetch_stop_fn = fn "1216" -> "Columbus Ave @ Dimock St" end
+    test "returns expected instances", %{config: config} do
       now = ~U[2020-04-06T10:00:00Z]
-      evergreen_content_instances_fn = fn _ -> [] end
-      subway_status_instances_fn = fn _, _ -> [] end
-
-      expected_header = %NormalHeader{
-        screen: config,
-        icon: nil,
-        text: "Columbus Ave @ Dimock St",
-        time: ~U[2020-04-06T10:00:00Z]
-      }
-
-      expected_footer = %LinkFooter{screen: config, text: "More at", url: "mbta.com/stops/1216"}
+      header_instances_fn = fn ^config, ^now -> [:header] end
+      departures_instances_fn = fn ^config, ^now -> [:departures] end
+      alert_instances_fn = fn ^config, ^now -> [:alert] end
+      evergreen_content_instances_fn = fn ^config, ^now -> [:evergreen] end
+      subway_status_instances_fn = fn ^config, ^now -> [:status] end
 
       actual_instances =
         BusShelter.candidate_instances(
           config,
           now,
-          fetch_stop_fn,
+          header_instances_fn,
           departures_instances_fn,
           alert_instances_fn,
           evergreen_content_instances_fn,
           subway_status_instances_fn
         )
 
-      assert expected_header in actual_instances
-      assert expected_footer in actual_instances
-    end
-
-    test "supports CurrentStopName header config", %{config: config} do
-      config =
-        put_in(config.app_params.header, %Config.Header.CurrentStopName{stop_name: "Walnut Ave"})
-
-      departures_instances_fn = fn _, _ -> [] end
-      alert_instances_fn = fn _ -> [] end
-      fetch_stop_fn = fn "1216" -> raise "This should not be called!" end
-      now = ~U[2020-04-06T10:00:00Z]
-      evergreen_content_instances_fn = fn _ -> [] end
-      subway_status_instances_fn = fn _, _ -> [] end
-
-      expected_header = %NormalHeader{
-        screen: config,
-        icon: nil,
-        text: "Walnut Ave",
-        time: ~U[2020-04-06T10:00:00Z]
-      }
-
-      actual_instances =
-        BusShelter.candidate_instances(
-          config,
-          now,
-          fetch_stop_fn,
-          departures_instances_fn,
-          alert_instances_fn,
-          evergreen_content_instances_fn,
-          subway_status_instances_fn
-        )
-
-      assert expected_header in actual_instances
+      assert [:alert, :departures, :evergreen, :header, :status, %LinkFooter{}, %Survey{}] =
+               Enum.sort(actual_instances)
     end
   end
 end

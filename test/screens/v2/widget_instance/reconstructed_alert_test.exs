@@ -9,16 +9,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
-  alias ScreensConfig.{ContentSummary, CRDepartures, Departures, ElevatorStatus, Screen}
+  alias ScreensConfig.{ContentSummary, CRDepartures, Departures, ElevatorStatus, Header, Screen}
   alias ScreensConfig.Departures.{Query, Section}
-  alias ScreensConfig.Header.CurrentStopId
   alias ScreensConfig.Screen.PreFare
 
   setup :setup_base
 
   defp setup_base(_context) do
     station_id = "place-xyz"
-    current_stop_id = %CurrentStopId{stop_id: station_id}
 
     %{
       widget: %ReconstructedAlert{
@@ -29,8 +27,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             content_summary: %ContentSummary{parent_station_id: station_id},
             elevator_status: %ElevatorStatus{parent_station_id: station_id, platform_stop_ids: []},
             full_line_map: [],
-            header: current_stop_id,
-            reconstructed_alert_widget: current_stop_id,
+            header: %Header.StopId{stop_id: station_id},
+            reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: station_id},
             template: :duo
           },
           device_id: nil,
@@ -2653,9 +2651,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         struct(Screen, %{
           app_id: :pre_fare_v2,
           app_params:
-            struct(PreFare, %{
-              reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
-            })
+            struct(PreFare, %{reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: stop_id}})
         })
 
       routes_at_stop = [
@@ -2930,9 +2926,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         struct(Screen, %{
           app_id: :pre_fare_v2,
           app_params:
-            struct(PreFare, %{
-              reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
-            })
+            struct(PreFare, %{reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: stop_id}})
         })
 
       routes_at_stop = [

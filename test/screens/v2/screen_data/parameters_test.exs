@@ -31,7 +31,7 @@ defmodule Screens.V2.ScreenData.ParametersTest do
             alerts: %Config.Alerts{stop_id: "1"},
             departures: %Config.Departures{sections: []},
             footer: %Config.Footer{},
-            header: %Config.Header.CurrentStopId{stop_id: "1"},
+            header: %Config.Header.StopId{stop_id: "1"},
             audio: %Config.Audio{
               interval_enabled: true
             }

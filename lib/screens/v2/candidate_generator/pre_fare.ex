@@ -2,15 +2,12 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   @moduledoc false
 
   alias Screens.Routes.Route
-  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
-  alias Screens.V2.WidgetInstance.NormalHeader
   alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
-  alias ScreensConfig.Header.CurrentStopId
   alias ScreensConfig.{Screen, ShuttleBusInfo}
   alias ScreensConfig.Screen.PreFare
 
@@ -73,6 +70,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   def candidate_instances(
         config,
         now \\ DateTime.utc_now(),
+        header_instances_fn \\ &Widgets.Header.instances/2,
         subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/2,
         reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,
         elevator_status_instance_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
@@ -82,7 +80,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         departures_instances_fn \\ &Widgets.Departures.departures_instances/2
       ) do
     [
-      fn -> header_instances(config, now) end,
+      fn -> header_instances_fn.(config, now) end,
       fn -> subway_status_instance_fn.(config, now) end,
       fn -> reconstructed_alert_instances_fn.(config) end,
       fn -> elevator_status_instance_fn.(config, now) end,
@@ -111,14 +109,6 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     (non_takeover_instance_fns ++ [fn -> alerts_outro_instances(widgets, config) end])
     |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
-  end
-
-  def header_instances(config, now, fetch_stop_name_fn \\ &Stop.fetch_stop_name/1) do
-    %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
-
-    stop_name = fetch_stop_name_fn.(stop_id)
-
-    [%NormalHeader{screen: config, text: stop_name, time: now}]
   end
 
   defp shuttle_bus_info_instances(
