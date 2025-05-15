@@ -169,19 +169,8 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     end
   end
 
-  def footer_instances(config) do
-    %Screen{
-      app_params: %GlEink{footer: %Footer{stop_id: stop_id}}
-    } = config
-
-    [
-      %FareInfoFooter{
-        screen: config,
-        mode: :subway,
-        text: "For real-time predictions and fare purchase locations:",
-        url: "mbta.com/stops/#{stop_id}"
-      }
-    ]
+  def footer_instances(%Screen{app_params: %GlEink{footer: %Footer{stop_id: stop_id}}}) do
+    [%FareInfoFooter{mode: :subway, stop_id: stop_id}]
   end
 
   defp bottom_screen_filler_instances(config) do

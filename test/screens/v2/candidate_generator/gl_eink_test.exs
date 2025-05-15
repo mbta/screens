@@ -98,16 +98,9 @@ defmodule Screens.V2.CandidateGenerator.GlEinkTest do
 
   describe "footer_instances/1" do
     test "returns expected footer", %{config: config} do
-      actual_instances = GlEink.footer_instances(config)
+      expected_footer = %FareInfoFooter{mode: :subway, stop_id: "1722"}
 
-      expected_footer = %FareInfoFooter{
-        screen: config,
-        mode: :subway,
-        text: "For real-time predictions and fare purchase locations:",
-        url: "mbta.com/stops/1722"
-      }
-
-      assert expected_footer in actual_instances
+      assert expected_footer in GlEink.footer_instances(config)
     end
   end
 end

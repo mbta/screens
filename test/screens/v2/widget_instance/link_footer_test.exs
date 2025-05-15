@@ -4,12 +4,7 @@ defmodule Screens.V2.WidgetInstance.LinkFooterTest do
   alias Screens.V2.WidgetInstance
 
   setup do
-    %{
-      instance: %WidgetInstance.LinkFooter{
-        text: "For real-time predictions and fare purchase locations:",
-        url: "mbta.com/stops/1722"
-      }
-    }
+    %{instance: %WidgetInstance.LinkFooter{text: "Some text:", stop_id: "1722"}}
   end
 
   describe "priority/1" do
@@ -20,10 +15,12 @@ defmodule Screens.V2.WidgetInstance.LinkFooterTest do
 
   describe "serialize/1" do
     test "returns serialized text and url", %{instance: instance} do
-      assert %{
-               text: "For real-time predictions and fare purchase locations:",
-               url: "mbta.com/stops/1722"
-             } == WidgetInstance.serialize(instance)
+      assert %{text: "Some text:", url: "mbta.com/stops/1722"} ==
+               WidgetInstance.serialize(instance)
+    end
+
+    test "uses mbta.com as the URL with nil stop ID", %{instance: instance} do
+      assert %{url: "mbta.com"} = WidgetInstance.serialize(%{instance | stop_id: nil})
     end
   end
 
