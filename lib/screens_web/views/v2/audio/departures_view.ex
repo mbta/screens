@@ -103,6 +103,12 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   end
 
   defp render_track_number(nil, _), do: ~E""
+
+  defp render_track_number(<<letter, digit>>, :bus)
+       when letter in ?A..?Z and digit in ?0..?9 do
+    ~E|at berth <say-as interpret-as="spell-out"><%= <<letter::utf8>> %></say-as><%= <<digit::utf8>> %><break/>|
+  end
+
   defp render_track_number(track_number, :bus), do: ~E|at berth <%= track_number %><break/>|
   defp render_track_number(track_number, _), do: ~E|on track <%= track_number %><break/>|
 
