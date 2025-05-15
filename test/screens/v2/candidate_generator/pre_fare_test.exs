@@ -2,15 +2,15 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.CandidateGenerator.PreFare
-  alias Screens.V2.WidgetInstance.{MockWidget, NormalHeader}
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
+  alias Screens.V2.WidgetInstance.MockWidget
   alias ScreensConfig, as: Config
   alias ScreensConfig.Screen
 
   setup do
     config = %Screen{
       app_params: %Screen.PreFare{
-        header: %Config.Header.CurrentStopId{stop_id: "place-gover"},
+        header: %Config.Header.StopId{stop_id: "place-gover"},
         elevator_status: %Config.ElevatorStatus{
           parent_station_id: "place-foo",
           platform_stop_ids: []
@@ -20,7 +20,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
             asset_path: "test/path"
           }
         ],
-        reconstructed_alert_widget: %Config.Header.CurrentStopId{stop_id: "place-gover"},
+        reconstructed_alert_widget: %Config.Alerts{stop_id: "place-gover"},
         content_summary: %Config.ContentSummary{
           parent_station_id: "place-foo"
         }
@@ -97,31 +97,6 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                 screen_normal: [:header, {:body, %{body_normal: [body_right: @body_right]}}],
                 screen_split_takeover: [:full_right_screen]
               }} == PreFare.screen_template(put_in(config.app_params.template, :solo))
-    end
-  end
-
-  describe "header_instances/3" do
-    test "returns expected header", %{config: config} do
-      now = ~U[2020-04-06T10:00:00Z]
-      fetch_stop_name_fn = fn _ -> "Test Stop" end
-
-      expected_header = [
-        %NormalHeader{
-          screen: config,
-          icon: nil,
-          text: "Test Stop",
-          time: ~U[2020-04-06T10:00:00Z]
-        }
-      ]
-
-      actual_instances =
-        PreFare.header_instances(
-          config,
-          now,
-          fetch_stop_name_fn
-        )
-
-      assert Enum.all?(expected_header, fn x -> x in actual_instances end)
     end
   end
 

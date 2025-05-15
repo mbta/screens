@@ -7,7 +7,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
-  alias ScreensConfig.Header.CurrentStopId
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 
@@ -56,9 +55,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         fetch_location_context_fn \\ &LocationContext.fetch/3,
         fetch_subway_platforms_for_stop_fn \\ &Stop.fetch_subway_platforms_for_stop/1
       ) do
-    %PreFare{
-      reconstructed_alert_widget: %CurrentStopId{stop_id: stop_id}
-    } = app_params
+    %PreFare{reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: stop_id}} = app_params
 
     # Filtering by subway and light_rail types
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),

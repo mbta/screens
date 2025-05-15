@@ -7,8 +7,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
   alias ScreensConfig
-  alias ScreensConfig.Header.CurrentStopId
-  alias ScreensConfig.Screen
+  alias ScreensConfig.{Header, Screen}
   alias ScreensConfig.Screen.PreFare
 
   @type subway_line :: :red | :orange | :green | :blue
@@ -61,7 +60,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
   def audio_valid_candidate?(%__MODULE__{
         screen: %Screen{
           app_id: :pre_fare_v2,
-          app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}
+          app_params: %PreFare{header: %Header.StopId{stop_id: stop_id}}
         },
         widgets_snapshot: widgets
       }) do

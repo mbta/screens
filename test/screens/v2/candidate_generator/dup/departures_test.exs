@@ -49,7 +49,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   setup do
     config = %Screen{
       app_params: %DupConfig{
-        header: %Header.CurrentStopId{stop_id: "place-test"},
+        header: %Header.StopId{stop_id: "place-test"},
         primary_departures: %Departures{
           sections: []
         },

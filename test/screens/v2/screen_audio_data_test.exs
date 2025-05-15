@@ -13,7 +13,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
           audio: %Config.Audio{interval_enabled: true},
           departures: %Config.Departures{sections: []},
           footer: %Config.Footer{},
-          header: %Config.Header.CurrentStopId{stop_id: "1"},
+          header: %Config.Header.StopId{stop_id: "1"},
           alerts: %Config.Alerts{stop_id: "1"}
         },
         vendor: :lg_mri,
@@ -25,7 +25,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
         app_params: %Screen.Dup{
           primary_departures: %Config.Departures{sections: []},
           secondary_departures: %Config.Departures{sections: []},
-          header: %Config.Header.CurrentStopId{stop_id: "1"},
+          header: %Config.Header.StopId{stop_id: "1"},
           alerts: %Config.Alerts{stop_id: "1"}
         },
         vendor: :outfront,

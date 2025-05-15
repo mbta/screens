@@ -6,15 +6,14 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
-  alias ScreensConfig.Header.CurrentStopId
-  alias ScreensConfig.Screen
+  alias ScreensConfig.{Header, Screen}
   alias ScreensConfig.Screen.PreFare
 
   setup do
     pre_fare_config =
       struct(Screen, %{
         app_id: :pre_fare_v2,
-        app_params: struct(PreFare, %{header: %CurrentStopId{stop_id: "place-test"}})
+        app_params: struct(PreFare, %{header: %Header.StopId{stop_id: "place-test"}})
       })
 
     departures_config =
@@ -22,7 +21,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
         app_id: :pre_fare_v2,
         app_params:
           struct(PreFare, %{
-            header: %CurrentStopId{stop_id: "place-test-departures"},
+            header: %Header.StopId{stop_id: "place-test-departures"},
             departures: %ScreensConfig.Departures{sections: [%NormalSection{}]}
           })
       })
@@ -64,7 +63,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       widget
       | screen: %{
           widget.screen
-          | app_params: %{widget.screen.app_params | header: %CurrentStopId{stop_id: stop_id}}
+          | app_params: %{widget.screen.app_params | header: %Header.StopId{stop_id: stop_id}}
         }
     }
   end

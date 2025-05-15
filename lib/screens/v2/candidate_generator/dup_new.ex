@@ -3,16 +3,17 @@ defmodule Screens.V2.CandidateGenerator.DupNew do
 
   alias Screens.Telemetry
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.CandidateGenerator.Widgets.Evergreen
-  alias __MODULE__.{Departures, Header}
+  alias Screens.V2.CandidateGenerator.Widgets
+
+  alias __MODULE__.Departures
 
   @behaviour CandidateGenerator
 
   @telemetry_name ~w[screens v2 candidate_generator dup_new]a
   @instance_generators [
-                         header_instances: &Header.instances/2,
+                         header_instances: &Widgets.Header.instances/2,
                          departures_instances: &Departures.instances/2,
-                         evergreen_instances: &Evergreen.evergreen_content_instances/2
+                         evergreen_instances: &Widgets.Evergreen.evergreen_content_instances/2
                        ]
                        |> Enum.map(fn {name, func} -> {@telemetry_name ++ [name], func} end)
 
