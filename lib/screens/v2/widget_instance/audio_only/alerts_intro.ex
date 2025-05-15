@@ -54,32 +54,14 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsIntro do
     end
   end
 
-  def audio_valid_candidate?(t, slot_names_fn \\ &WidgetInstance.slot_names/1)
-
-  def audio_valid_candidate?(
-        %__MODULE__{screen: %Screen{app_id: :pre_fare_v2}} = t,
-        slot_names_fn
-      ) do
-    # On pre-fare screens, we only include this widget when
-    # there's no takeover content and at least one service alert widget in the readout queue.
-    takeover_slots = MapSet.new(~w[full_body_left full_body_right full_body full_screen]a)
-
-    no_takeover_content? =
-      Enum.all?(t.widgets_snapshot, fn widget ->
-        widget
-        |> slot_names_fn.()
-        |> MapSet.new()
-        |> MapSet.disjoint?(takeover_slots)
-      end)
-
-    at_least_one_service_alert_widget? = Enum.any?(t.widgets_snapshot, &service_alert_widget?/1)
-
-    no_takeover_content? and at_least_one_service_alert_widget?
+  def audio_valid_candidate?(%__MODULE__{
+        screen: %Screen{app_id: :pre_fare_v2},
+        widgets_snapshot: widgets
+      }) do
+    Enum.any?(widgets, &service_alert_widget?/1)
   end
 
-  def audio_valid_candidate?(_t, _slot_names_fn) do
-    false
-  end
+  def audio_valid_candidate?(_t), do: false
 
   def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertsIntroView
 

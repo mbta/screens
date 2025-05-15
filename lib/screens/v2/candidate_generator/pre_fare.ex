@@ -6,6 +6,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
+  alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias Screens.V2.WidgetInstance.NormalHeader
   alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
@@ -96,25 +97,23 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   @impl CandidateGenerator
-  def audio_only_instances(
-        widgets,
-        config,
-        routes_fetch_fn \\ &Route.fetch/1
-      ) do
-    [
-      fn -> content_summary_instances(widgets, config, routes_fetch_fn) end,
-      fn -> alerts_intro_instances(widgets, config) end,
-      fn -> alerts_outro_instances(widgets, config) end
-    ]
+  def audio_only_instances(widgets, config, routes_fetch_fn \\ &Route.fetch/1) do
+    # If there is any kind of full-screen takeover or evergreen content configured for a full-body
+    # takeover slot, certain audio widgets may not be applicable or would give inaccurate info.
+    non_takeover_instance_fns =
+      if has_takeover?(widgets),
+        do: [],
+        else: [
+          fn -> content_summary_instances(widgets, config, routes_fetch_fn) end,
+          fn -> alerts_intro_instances(widgets, config) end
+        ]
+
+    (non_takeover_instance_fns ++ [fn -> alerts_outro_instances(widgets, config) end])
     |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
-  def header_instances(
-        config,
-        now,
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1
-      ) do
+  def header_instances(config, now, fetch_stop_name_fn \\ &Stop.fetch_stop_name/1) do
     %Screen{app_params: %PreFare{header: %CurrentStopId{stop_id: stop_id}}} = config
 
     stop_name = fetch_stop_name_fn.(stop_id)
@@ -122,27 +121,25 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     [%NormalHeader{screen: config, text: stop_name, time: now}]
   end
 
-  def shuttle_bus_info_instances(
-        %Screen{
-          app_params: %PreFare{
-            shuttle_bus_info: %ShuttleBusInfo{
-              enabled: false
-            }
-          }
-        },
-        _now
-      ) do
+  defp shuttle_bus_info_instances(
+         %Screen{
+           app_params: %PreFare{
+             shuttle_bus_info: %ShuttleBusInfo{
+               enabled: false
+             }
+           }
+         },
+         _now
+       ) do
     []
   end
 
-  def shuttle_bus_info_instances(config, now) do
+  defp shuttle_bus_info_instances(config, now) do
     [%ShuttleBusInfoWidget{screen: config, now: now}]
   end
 
   defp content_summary_instances(widgets, config, routes_fetch_fn) do
-    %{stop_id: config.app_params.content_summary.parent_station_id}
-    |> routes_fetch_fn.()
-    |> case do
+    case routes_fetch_fn.(%{stop_id: config.app_params.content_summary.parent_station_id}) do
       {:ok, routes_at_station} ->
         subway_lines_at_station =
           routes_at_station
@@ -157,16 +154,17 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
           |> Enum.reject(&is_nil/1)
           |> Enum.uniq()
 
-        %ContentSummary{
-          screen: config,
-          widgets_snapshot: widgets,
-          lines_at_station: subway_lines_at_station
-        }
+        [
+          %ContentSummary{
+            screen: config,
+            widgets_snapshot: widgets,
+            lines_at_station: subway_lines_at_station
+          }
+        ]
 
       :error ->
-        nil
+        []
     end
-    |> List.wrap()
   end
 
   defp alerts_intro_instances(widgets, config) do
@@ -175,5 +173,20 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   defp alerts_outro_instances(widgets, config) do
     [%AlertsOutro{screen: config, widgets_snapshot: widgets}]
+  end
+
+  @takeover_slots MapSet.new(~w[
+      full_body_duo
+      full_body_left
+      full_body_right
+      full_duo_screen
+      full_left_screen
+      full_right_screen
+    ]a)
+
+  defp has_takeover?(widgets) do
+    widgets
+    |> Enum.flat_map(&WidgetInstance.slot_names/1)
+    |> Enum.any?(&(&1 in @takeover_slots))
   end
 end

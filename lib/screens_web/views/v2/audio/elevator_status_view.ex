@@ -25,7 +25,7 @@ defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
   end
 
   defp render_cta do
-    ~E|For a full list of elevator alerts, and directions to <w role="amazon:JJ">alternate</w> accessible paths, visit MBTA dot com slash: alerts: slash: access, or call <say-as interpret-as="telephone">617-222-2828</say-as>.|
+    ~E|For a full list of elevator alerts, and directions to <w role="amazon:JJ">alternate</w> accessible paths, visit MBTA dot com slash: elevators, or call <say-as interpret-as="telephone">617-222-2828</say-as>.|
   end
 
   defp render_active_at_home(pages) do

@@ -2,7 +2,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.CandidateGenerator.PreFare
-  alias Screens.V2.WidgetInstance.NormalHeader
+  alias Screens.V2.WidgetInstance.{MockWidget, NormalHeader}
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias ScreensConfig, as: Config
   alias ScreensConfig.Screen
@@ -126,6 +126,12 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
   end
 
   describe "audio_only_instances/3" do
+    @takeover_widget %MockWidget{
+      slot_names: [:full_body_duo],
+      audio_sort_key: [0],
+      audio_valid_candidate?: true
+    }
+
     test "returns list containing a ContentSummary widget if we successfully fetch routes serving the home station",
          %{config: config} do
       widgets = []
@@ -147,12 +153,22 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
              )
     end
 
+    test "does not include content summary when there is a widget in a takeover slot",
+         %{config: config} do
+      widgets = [@takeover_widget]
+      routes_fetch_fn = fn %{stop_id: "place-foo"} -> {:ok, []} end
+
+      refute Enum.any?(
+               PreFare.audio_only_instances(widgets, config, routes_fetch_fn),
+               &match?(%ContentSummary{}, &1)
+             )
+    end
+
     test "returns list without content summary if we fail to fetch routes serving the home station",
          %{
            config: config
          } do
       widgets = []
-
       routes_fetch_fn = fn %{stop_id: "place-foo"} -> :error end
 
       refute Enum.any?(
@@ -161,9 +177,8 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
              )
     end
 
-    test "always returns list containing alerts intro", %{config: config} do
+    test "normally returns list containing alerts intro", %{config: config} do
       widgets = []
-
       routes_fetch_fn = fn %{stop_id: "place-foo"} -> {:ok, []} end
 
       assert Enum.any?(
@@ -172,9 +187,19 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
              )
     end
 
-    test "always returns list containing alerts outro", %{config: config} do
-      widgets = []
+    test "does not include alerts intro when there is a widget in a takeover slot",
+         %{config: config} do
+      widgets = [@takeover_widget]
+      routes_fetch_fn = fn %{stop_id: "place-foo"} -> {:ok, []} end
 
+      refute Enum.any?(
+               PreFare.audio_only_instances(widgets, config, routes_fetch_fn),
+               &match?(%AlertsIntro{}, &1)
+             )
+    end
+
+    test "always returns list containing alerts outro", %{config: config} do
+      widgets = [@takeover_widget]
       routes_fetch_fn = fn %{stop_id: "place-foo"} -> {:ok, []} end
 
       assert Enum.any?(
