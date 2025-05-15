@@ -103,7 +103,18 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   end
 
   defp render_track_number(nil, _), do: ~E""
-  defp render_track_number(track_number, :bus), do: ~E|at berth <%= track_number %><break/>|
+
+  defp render_track_number(track_number, :bus) do
+    track_number =
+      String.replace(
+        track_number,
+        ~r/\D+/,
+        ~S(<break strength="weak"/><say-as interpret-as="spell-out">\0</say-as>)
+      )
+
+    ~E|at berth <%= raw(track_number) %><break/>|
+  end
+
   defp render_track_number(track_number, _), do: ~E|on track <%= track_number %><break/>|
 
   defp render_route(route_text) do

@@ -161,7 +161,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
       }
 
       assert render(assigns) =~
-               "The next <say-as interpret-as=\"address\">73</say-as> bus to Waverley at berth E"
+               "The next <say-as interpret-as=\"address\">73</say-as> bus to Waverley at berth <break strength=\"weak\"/><say-as interpret-as=\"spell-out\">E</say-as>"
 
       assert render(assigns) =~
                "The next Needham Line train to South Station on track 5"
