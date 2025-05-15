@@ -18,7 +18,6 @@ const fields = [
       "dup_v2",
       "elevator_v2",
       "gl_eink_v2",
-      "on_bus_v2",
       "pre_fare_v2",
     ]),
   },
@@ -32,7 +31,6 @@ const fields = [
       "c3ms",
       "outfront",
       "lg_mri",
-      "hanover",
       "mimo",
     ]),
   },
@@ -85,9 +83,6 @@ const defaultAppParamsByAppId = {
     elevator_id: "",
     alternate_direction_text: "",
     accessible_path_image_here_coordinates: { x: 0, y: 0 },
-    evergreen_content: [],
-  },
-  on_bus_v2: {
     evergreen_content: [],
   },
 };

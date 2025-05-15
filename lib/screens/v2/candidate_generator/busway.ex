@@ -31,7 +31,6 @@ defmodule Screens.V2.CandidateGenerator.Busway do
   @impl CandidateGenerator
   def candidate_instances(
         config,
-        _query_params,
         now \\ DateTime.utc_now(),
         instance_fns \\ @instance_fns
       ) do

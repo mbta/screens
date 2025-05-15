@@ -6,7 +6,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias Screens.LogScreenData
   alias Screens.Util
   alias Screens.V2.{ScreenAudioData, ScreenData}
-  alias Screens.V2.ScreenData.QueryParams
   alias ScreensConfig.Screen
 
   @base_response %{data: nil, disabled: false, force_reload: false}
@@ -85,7 +84,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> screen_response(screen, variant, conn,
+          |> screen_response(screen, variant,
             run_all_variants?: true,
             update_visible_alerts?: true
           )
@@ -95,26 +94,25 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
-  defp screen_response(screen_id, _, "all" = variant, conn, opts) do
-    {default, variants} = ScreenData.variants(screen_id, merge_options(variant, conn, opts))
+  defp screen_response(screen_id, _, "all" = variant, opts) do
+    {default, variants} = ScreenData.variants(screen_id, merge_options(variant, opts))
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
-  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, conn, opts) do
+  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, opts) do
     %{full_page: data, flex_zone: flex_zone} =
-      ScreenData.simulation(screen_id, merge_options(variant, conn, opts))
+      ScreenData.simulation(screen_id, merge_options(variant, opts))
 
     Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
   end
 
-  defp screen_response(screen_id, _, variant, conn, opts) do
-    data = ScreenData.get(screen_id, merge_options(variant, conn, opts))
+  defp screen_response(screen_id, _, variant, opts) do
+    data = ScreenData.get(screen_id, merge_options(variant, opts))
     %{@base_response | data: data}
   end
 
-  defp merge_options(variant, conn, opts) do
+  defp merge_options(variant, opts) do
     opts
-    |> Keyword.put(:query_params, QueryParams.get_url_param_map(conn))
     |> Keyword.put(:generator_variant, variant)
   end
 

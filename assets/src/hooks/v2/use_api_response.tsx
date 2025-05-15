@@ -123,11 +123,7 @@ const loggingParams = () => {
   }
 };
 
-const useApiPath = (
-  screenId: string,
-  appendPath?: string,
-  queryParams?: Map<string, string>,
-): string => {
+const useApiPath = (screenId: string, appendPath?: string): string => {
   return useMemo(() => {
     const base = isDup() ? OUTFRONT_BASE_URI : document.baseURI;
     const path = [
@@ -151,12 +147,6 @@ const useApiPath = (
       ...loggingParams(),
     };
 
-    if (queryParams) {
-      queryParams.forEach((value, key) => {
-        url.searchParams.append(key, value);
-      });
-    }
-
     for (const [key, value] of Object.entries(datasetParams)) {
       if (value) url.searchParams.append(key, value);
     }
@@ -168,7 +158,6 @@ const useApiPath = (
 interface UseBaseApiResponseOpts {
   id: string;
   appendPath?: string;
-  queryParams?: Map<string, string>;
 }
 
 interface UseApiResponseReturn {
@@ -180,14 +169,13 @@ interface UseApiResponseReturn {
 const useBaseApiResponse = ({
   id,
   appendPath,
-  queryParams,
 }: UseBaseApiResponseOpts): UseApiResponseReturn => {
   const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
 
-  const apiPath = useApiPath(id, appendPath, queryParams);
+  const apiPath = useApiPath(id, appendPath);
 
   const fetchData = async () => {
     try {
@@ -290,8 +278,8 @@ const useInspectorControls = (
   }, [lastSuccess]);
 };
 
-const useApiResponse = ({ id, queryParams }): UseApiResponseReturn =>
-  useBaseApiResponse({ id, queryParams });
+const useApiResponse = ({ id }): UseApiResponseReturn =>
+  useBaseApiResponse({ id });
 
 const useSimulationApiResponse = ({ id }): UseApiResponseReturn =>
   useBaseApiResponse({ id, appendPath: "simulation" });

@@ -32,7 +32,6 @@ defmodule Screens.V2.CandidateGenerator.Elevator do
   @impl true
   def candidate_instances(
         config,
-        _query_params,
         now \\ DateTime.utc_now(),
         instance_fns \\ @instance_fns
       ) do

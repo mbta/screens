@@ -6,13 +6,11 @@ defmodule ScreensWeb.Router do
     plug :accepts, ["html"]
     plug :fetch_session
     plug :fetch_flash
-    plug :fetch_query_params
   end
 
   pipeline :browser do
     plug :browser_no_csrf
     plug :protect_from_forgery
-    plug :fetch_query_params
   end
 
   pipeline :api do
