@@ -31,6 +31,7 @@
   @include fonts.paragraph--regular;
 
   width: 1005px;
+  padding-bottom: 44px;
   margin-top: 10px;
   margin-left: 32px;
   font-size: 40px;
@@ -39,4 +40,12 @@
   strong {
     @include fonts.inter--bold;
   }
+}
+
+.departures-header__subtitle + .departure-row::before {
+  display: block;
+  height: 4px;
+  margin: 0 32px;
+  content: "";
+  background-color: colors.$true-grey-70;
 }

@@ -1,4 +1,5 @@
 @use "CSS/colors";
+@use "css/lcd_free_text" as freeText;
 
 .free-text__element {
   &:not(:last-child)::after {
@@ -58,4 +59,8 @@
     font-size: 96px;
     line-height: unset;
   }
+}
+
+.departures__notice-row {
+  @include freeText.free-text-styles;
 }

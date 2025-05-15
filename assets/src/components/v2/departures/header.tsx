@@ -26,7 +26,7 @@ const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
 
 const Header = ({ title, arrow, subtitle }: Header) => {
   return (
-    <div>
+    <>
       <header className="departures-header">
         {(title || arrow) && <span>{title}</span>}
         {arrow && <DirectionArrow arrow={arrow} />}
@@ -36,7 +36,7 @@ const Header = ({ title, arrow, subtitle }: Header) => {
           {formatSubtitle(subtitle)}
         </div>
       )}
-    </div>
+    </>
   );
 };
 
