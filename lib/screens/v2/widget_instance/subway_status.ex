@@ -471,6 +471,19 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
+  defp serialize_alert(
+         %{
+           alert: %Alert{
+             effect: :service_change,
+             informed_entities: informed_entities
+           }
+         },
+         route_id
+       ) do
+    location = get_location(informed_entities, route_id)
+    %{status: "Service Change", location: location}
+  end
+
   @spec serialize_green_line_branch_alert(%{alert: Alert.t(), context: %{}}, list(String.t())) ::
           alert()
   defp serialize_green_line_branch_alert(alert, route_ids)
