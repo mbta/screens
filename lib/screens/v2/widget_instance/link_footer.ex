@@ -3,21 +3,16 @@ defmodule Screens.V2.WidgetInstance.LinkFooter do
 
   alias Screens.V2.WidgetInstance.LinkFooter
 
-  defstruct screen: nil,
-            text: nil,
-            url: nil
+  @enforce_keys [:text]
+  defstruct @enforce_keys ++ [stop_id: nil]
 
-  @type t :: %__MODULE__{
-          screen: ScreensConfig.Screen.t(),
-          text: String.t(),
-          url: String.t()
-        }
+  @type t :: %__MODULE__{stop_id: String.t() | nil, text: String.t()}
 
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
 
-    def serialize(%LinkFooter{text: text, url: url}) do
-      %{text: text, url: url}
+    def serialize(%LinkFooter{stop_id: stop_id, text: text}) do
+      %{text: text, url: if(stop_id, do: "mbta.com/stops/#{stop_id}", else: "mbta.com")}
     end
 
     def slot_names(_instance), do: [:footer]

@@ -5,16 +5,8 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooterTest do
 
   setup do
     %{
-      bus_instance: %WidgetInstance.FareInfoFooter{
-        mode: :bus,
-        text: "More at",
-        url: "mbta.com/stops/1722"
-      },
-      subway_instance: %WidgetInstance.FareInfoFooter{
-        mode: :subway,
-        text: "For real-time predictions and fare purchase locations:",
-        url: "mbta.com/stops/place-bland"
-      }
+      bus_instance: %WidgetInstance.FareInfoFooter{mode: :bus, stop_id: "1722"},
+      subway_instance: %WidgetInstance.FareInfoFooter{mode: :subway, stop_id: "place-bland"}
     }
   end
 
@@ -30,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooterTest do
                mode_icon: "bus-negative-black.svg",
                mode_text: "Local Bus",
                mode_cost: "$1.70",
-               text: "More at",
+               text: "For real-time predictions and fare purchase locations:",
                url: "mbta.com/stops/1722"
              } == WidgetInstance.serialize(instance)
     end

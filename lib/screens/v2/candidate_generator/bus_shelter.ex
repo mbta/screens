@@ -69,9 +69,8 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
 
-  defp footer_instances(config) do
-    %Screen{app_params: %BusShelter{footer: %Footer{stop_id: stop_id}}} = config
-    [%LinkFooter{screen: config, text: "More at", url: "mbta.com/stops/#{stop_id}"}]
+  defp footer_instances(%Screen{app_params: %BusShelter{footer: %Footer{stop_id: stop_id}}}) do
+    [%LinkFooter{stop_id: stop_id, text: "More at"}]
   end
 
   defp survey_instances(config) do

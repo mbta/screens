@@ -71,17 +71,8 @@ defmodule Screens.V2.CandidateGenerator.BusEink do
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
 
-  defp footer_instances(config) do
-    %Screen{app_params: %BusEink{footer: %Footer{stop_id: stop_id}}} = config
-
-    [
-      %FareInfoFooter{
-        screen: config,
-        mode: :bus,
-        text: "For real-time predictions and fare purchase locations:",
-        url: "mbta.com/stops/#{stop_id}"
-      }
-    ]
+  defp footer_instances(%Screen{app_params: %BusEink{footer: %Footer{stop_id: stop_id}}}) do
+    [%FareInfoFooter{mode: :bus, stop_id: stop_id}]
   end
 
   defp bottom_screen_filler_instances(config) do
