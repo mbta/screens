@@ -5,7 +5,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary
   alias Screens.V2.WidgetInstance.Departures.NormalSection
-  alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
+  alias Screens.V2.WidgetInstance.NormalHeader
   alias ScreensConfig.{Header, Screen}
   alias ScreensConfig.Screen.PreFare
 
@@ -40,19 +40,12 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       lines_at_station: [:red, :orange]
     }
 
-    instance_with_surge_widgets = %ContentSummary{
-      screen: nil,
-      widgets_snapshot: [struct(NormalHeader), struct(ShuttleBusInfo)],
-      lines_at_station: []
-    }
-
     %{
       pre_fare_config: pre_fare_config,
       departures_config: departures_config,
       other_config: other_config,
       instance_with_header: instance_with_header,
-      instance_without_header: instance_without_header,
-      instance_with_surge_widgets: instance_with_surge_widgets
+      instance_without_header: instance_without_header
     }
   end
 
@@ -133,15 +126,6 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
       assert WidgetInstance.audio_valid_candidate?(widget)
     end
 
-    test "on pre-fare screens, skip Wellington during OL Surge", %{
-      pre_fare_config: pre_fare_config,
-      instance_with_surge_widgets: widget
-    } do
-      widget = widget |> put_config(pre_fare_config) |> put_stop_id("place-welln")
-
-      refute WidgetInstance.audio_valid_candidate?(widget)
-    end
-
     test "widget is not valid on screens other than pre-fare",
          %{other_config: other_config, instance_with_header: widget} do
       widget = put_config(widget, other_config)
@@ -151,16 +135,8 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummaryTest do
   end
 
   describe "audio_view/1" do
-    test "returns ContentSummaryView for instances without surge widgets", %{
-      instance_with_header: widget
-    } do
+    test "returns ContentSummaryView", %{instance_with_header: widget} do
       assert ScreensWeb.V2.Audio.ContentSummaryView == WidgetInstance.audio_view(widget)
-    end
-
-    test "returns SurgeContentSummaryView for instances with surge widgets", %{
-      instance_with_surge_widgets: widget
-    } do
-      assert ScreensWeb.V2.Audio.SurgeContentSummaryView == WidgetInstance.audio_view(widget)
     end
   end
 end

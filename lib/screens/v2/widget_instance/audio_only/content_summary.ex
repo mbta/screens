@@ -5,9 +5,9 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
 
   alias Screens.Report
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.{NormalHeader, ShuttleBusInfo}
+  alias Screens.V2.WidgetInstance.NormalHeader
   alias ScreensConfig
-  alias ScreensConfig.{Header, Screen}
+  alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 
   @type subway_line :: :red | :orange | :green | :blue
@@ -57,32 +57,10 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.ContentSummary do
     end
   end
 
-  def audio_valid_candidate?(%__MODULE__{
-        screen: %Screen{
-          app_id: :pre_fare_v2,
-          app_params: %PreFare{header: %Header.StopId{stop_id: stop_id}}
-        },
-        widgets_snapshot: widgets
-      }) do
-    # Need to skip this readout for Wellington during the OL Surge
-    not (has_surge_widgets?(widgets) and stop_id in ["place-welln"])
-  end
+  def audio_valid_candidate?(%__MODULE__{screen: %Screen{app_id: :pre_fare_v2}}), do: true
+  def audio_valid_candidate?(_t), do: false
 
-  def audio_valid_candidate?(_t) do
-    false
-  end
-
-  def audio_view(%__MODULE__{widgets_snapshot: widgets}) do
-    if has_surge_widgets?(widgets) do
-      ScreensWeb.V2.Audio.SurgeContentSummaryView
-    else
-      ScreensWeb.V2.Audio.ContentSummaryView
-    end
-  end
-
-  defp has_surge_widgets?(widgets) do
-    Enum.any?(widgets, &match?(%ShuttleBusInfo{}, &1))
-  end
+  def audio_view(%__MODULE__{}), do: ScreensWeb.V2.Audio.ContentSummaryView
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.AudioOnly.ContentSummary

@@ -7,8 +7,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
-  alias Screens.V2.WidgetInstance.ShuttleBusInfo, as: ShuttleBusInfoWidget
-  alias ScreensConfig.{Screen, ShuttleBusInfo}
+  alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 
   @behaviour CandidateGenerator
@@ -23,8 +22,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
                           ),
                           :lower_right
                         ],
-                        body_right_takeover: [:full_body_right],
-                        body_right_surge: [:orange_line_surge_upper, :orange_line_surge_lower]
+                        body_right_takeover: [:full_body_right]
                       }}
 
   @impl CandidateGenerator
@@ -87,8 +85,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> departures_instances_fn.(config, now) end,
       fn -> full_line_map_instances_fn.(config) end,
-      fn -> commuter_rail_departures_instance_fn.(config, now) end,
-      fn -> shuttle_bus_info_instances(config, now) end
+      fn -> commuter_rail_departures_instance_fn.(config, now) end
     ]
     |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
@@ -109,23 +106,6 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     (non_takeover_instance_fns ++ [fn -> alerts_outro_instances(widgets, config) end])
     |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
-  end
-
-  defp shuttle_bus_info_instances(
-         %Screen{
-           app_params: %PreFare{
-             shuttle_bus_info: %ShuttleBusInfo{
-               enabled: false
-             }
-           }
-         },
-         _now
-       ) do
-    []
-  end
-
-  defp shuttle_bus_info_instances(config, now) do
-    [%ShuttleBusInfoWidget{screen: config, now: now}]
   end
 
   defp content_summary_instances(widgets, config, routes_fetch_fn) do
