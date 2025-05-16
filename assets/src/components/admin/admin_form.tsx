@@ -12,13 +12,13 @@ const validateJson = (json) => {
 
 const AdminValidateControls = ({
   validatePath,
-  setEditable,
   configRef,
+  onValidated,
 }): JSX.Element => {
   const validateCallback = (resultJson) => {
     if (resultJson.success) {
       configRef.current.value = JSON.stringify(resultJson.config, null, 2);
-      setEditable(false);
+      onValidated(resultJson.config);
     } else if (resultJson.message) {
       alert(`Validation failed with message: ${resultJson.message}`);
     } else {
@@ -45,40 +45,40 @@ const AdminValidateControls = ({
 
 const AdminConfirmControls = ({
   confirmPath,
-  setEditable,
   configRef,
+  onCancel,
+  onError,
+  onSuccess,
 }): JSX.Element => {
-  const backFn = () => {
-    setEditable(true);
-  };
-
-  const confirmCallback = (resultJson) => {
-    if (resultJson.success === true) {
-      alert("Config updated successfully");
-      window.location.reload();
-    } else {
-      alert("Config update failed");
-      setEditable(true);
-    }
-  };
-
   const confirmFn = () => {
     const config = configRef.current.value;
     const dataToSubmit = { config };
-    fetch.post(confirmPath, dataToSubmit).then(confirmCallback);
+    fetch.post(confirmPath, dataToSubmit).then((resultJson) => {
+      if (resultJson.success === true) {
+        onSuccess();
+      } else {
+        onError();
+      }
+    });
   };
 
   return (
     <div>
-      <button onClick={backFn}>Back</button>
+      <button onClick={onCancel}>Back</button>
       <button onClick={confirmFn}>Confirm</button>
     </div>
   );
 };
 
-const AdminForm = ({ fetchConfig, validatePath, confirmPath }): JSX.Element => {
+const AdminForm = ({
+  fetchConfig,
+  validatePath,
+  confirmPath,
+  onUpdated,
+}): JSX.Element => {
   const [editable, setEditable] = useState(true);
   const configRef = useRef<HTMLTextAreaElement>(null);
+  const [validatedConfig, setValidatedConfig] = useState(null);
 
   const setEditorContents = async () => {
     if (configRef.current) {
@@ -103,14 +103,26 @@ const AdminForm = ({ fetchConfig, validatePath, confirmPath }): JSX.Element => {
       {editable ? (
         <AdminValidateControls
           validatePath={validatePath}
-          setEditable={setEditable}
+          onValidated={(config) => {
+            setEditable(false);
+            setValidatedConfig(config);
+          }}
           configRef={configRef}
         />
       ) : (
         <AdminConfirmControls
           confirmPath={confirmPath}
-          setEditable={setEditable}
           configRef={configRef}
+          onCancel={() => setEditable(true)}
+          onError={() => {
+            alert("Config update failed");
+            setEditable(true);
+          }}
+          onSuccess={() => {
+            onUpdated(validatedConfig);
+            setEditable(true);
+            setValidatedConfig(null);
+          }}
         />
       )}
     </div>
