@@ -22,6 +22,7 @@ const AdminScreenConfigForm = (): JSX.Element => (
     fetchConfig={fetchConfig}
     validatePath="/api/admin/screens/validate"
     confirmPath="/api/admin/screens/confirm"
+    onUpdated={() => alert("Config updated successfully")}
   />
 );
 
