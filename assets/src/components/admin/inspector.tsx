@@ -64,6 +64,7 @@ const buildIframeUrl = (
 
 const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
+  const [frameLoadedAt, setFrameLoadedAt] = useState(Date.now());
 
   useEffect(() => {
     fetch
@@ -71,6 +72,15 @@ const Inspector: ComponentType = () => {
       .then((response) => JSON.parse(response.config))
       .then((config) => setConfig(config));
   }, []);
+
+  const onScreenUpdated = (screenId, newConfig) => {
+    if (config) {
+      setConfig({
+        ...config,
+        screens: { ...config.screens, [screenId]: newConfig },
+      });
+    }
+  };
 
   const { search } = useLocation();
   const urlParams = new URLSearchParams(search);
@@ -87,6 +97,8 @@ const Inspector: ComponentType = () => {
   const iframeUrl = buildIframeUrl(screen, isSimulation, isVariantEnabled);
 
   const frameRef = useRef<HTMLIFrameElement>(null);
+
+  const reloadFrame = () => frameRef.current?.contentWindow?.location.reload();
 
   const sendToFrame = (message: Message) => {
     const frameWindow = frameRef.current?.contentWindow;
@@ -107,6 +119,7 @@ const Inspector: ComponentType = () => {
             <ScreenSelector
               config={config}
               screen={screen}
+              reloadFrame={reloadFrame}
               isSimulation={isSimulation}
               setIsSimulation={setIsSimulation}
               isVariantEnabled={isVariantEnabled}
@@ -115,12 +128,15 @@ const Inspector: ComponentType = () => {
 
             {screen && (
               <>
-                <ConfigControls screen={screen} />
+                <ConfigControls
+                  screen={screen}
+                  onUpdated={(config) => onScreenUpdated(screen.id, config)}
+                />
                 <ViewControls zoom={zoom} setZoom={setZoom} />
                 <DataControls
-                  // Reset when the loaded screen changes, since the new screen
-                  // will not be aware of previously-sent inspector messages
-                  key={iframeUrl}
+                  // Reset when the iframe reloads, since the screen will no
+                  // longer be aware of previously-sent inspector messages
+                  key={frameLoadedAt}
                   isVariantEnabled={isVariantEnabled}
                   screen={screen}
                   sendToFrame={sendToFrame}
@@ -137,7 +153,10 @@ const Inspector: ComponentType = () => {
 
         <iframe
           name={INSPECTOR_FRAME_NAME}
-          onLoad={adjustFrame}
+          onLoad={() => {
+            adjustFrame();
+            setFrameLoadedAt(Date.now());
+          }}
           ref={frameRef}
           src={iframeUrl}
         ></iframe>
@@ -149,6 +168,7 @@ const Inspector: ComponentType = () => {
 const ScreenSelector: ComponentType<{
   config: Config;
   screen: ScreenWithId | null;
+  reloadFrame: () => void;
   isSimulation: boolean;
   setIsSimulation: (value: boolean) => void;
   isVariantEnabled: boolean;
@@ -156,6 +176,7 @@ const ScreenSelector: ComponentType<{
 }> = ({
   config,
   screen,
+  reloadFrame,
   isSimulation,
   setIsSimulation,
   isVariantEnabled,
@@ -223,16 +244,24 @@ const ScreenSelector: ComponentType<{
         />
         Enable variant switcher
       </label>
+
+      <button onClick={reloadFrame}>🔄 Reload Screen</button>
     </fieldset>
   );
 };
 
-const ConfigControls: ComponentType<{ screen: ScreenWithId }> = ({
-  screen,
-}) => {
+const ConfigControls: ComponentType<{
+  screen: ScreenWithId;
+  onUpdated: (newConfig: Screen) => void;
+}> = ({ screen, onUpdated }) => {
   const [editableConfig, setEditableConfig] = useState<Screen | null>(null);
   const [isRequestingReload, setIsRequestingReload] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
+
+  const closeDialog = () => {
+    dialogRef.current?.close();
+    setEditableConfig(null);
+  };
 
   return (
     <fieldset>
@@ -265,10 +294,7 @@ const ConfigControls: ComponentType<{ screen: ScreenWithId }> = ({
       <dialog className="inspector__modal" ref={dialogRef}>
         <button
           className="inspector__modal__close-button"
-          onClick={() => {
-            dialogRef.current?.close();
-            setEditableConfig(null);
-          }}
+          onClick={closeDialog}
         >
           × Cancel
         </button>
@@ -282,6 +308,11 @@ const ConfigControls: ComponentType<{ screen: ScreenWithId }> = ({
             fetchConfig={async () => editableConfig}
             validatePath={`/api/admin/screens/validate/${screen.id}`}
             confirmPath={`/api/admin/screens/confirm/${screen.id}`}
+            onUpdated={(newConfig) => {
+              alert("Success. Allow 5 seconds for changes to propagate.");
+              closeDialog();
+              onUpdated(newConfig);
+            }}
           />
         )}
       </dialog>
