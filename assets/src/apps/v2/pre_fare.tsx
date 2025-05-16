@@ -45,8 +45,6 @@ import CRDepartures from "Components/v2/cr_departures/cr_departures";
 import OvernightCRDepartures from "Components/v2/cr_departures/overnight_cr_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/pre_fare/simulation_screen_page";
-import SurgeBodyRight from "Components/v2/pre_fare/surge_body_right";
-import ShuttleBusInfo from "Components/v2/shuttle_bus_info";
 import PreFareSingleScreenAlert from "Components/v2/pre_fare_single_screen_alert";
 import Departures from "Components/v2/departures";
 
@@ -61,7 +59,6 @@ const TYPE_TO_COMPONENT = {
   body_left_takeover: BodyLeftTakeover,
   body_left_flex: BodyLeftFlex,
   body_right_normal: NormalBodyRight,
-  body_right_surge: SurgeBodyRight,
   body_right_takeover: BodyRightTakeover,
   normal_header: NormalHeader,
   one_large: OneLarge,
@@ -79,7 +76,6 @@ const TYPE_TO_COMPONENT = {
   reconstructed_takeover: ReconstructedTakeover,
   cr_departures: CRDepartures,
   overnight_cr_departures: OvernightCRDepartures,
-  shuttle_bus_info: ShuttleBusInfo,
   departures: Departures,
 };
 

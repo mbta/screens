@@ -18,7 +18,6 @@
 @use "v2/pre_fare/body_left/normal" as *;
 @use "v2/pre_fare/body_left/takeover" as *;
 @use "v2/pre_fare/body_right/normal" as *;
-@use "v2/pre_fare/body_right/surge";
 @use "v2/pre_fare/body_right/takeover" as *;
 @use "v2/pre_fare/cr_departures/cr_departure_time";
 @use "v2/pre_fare/cr_departures/cr_departures";
@@ -44,7 +43,6 @@
 @use "v2/pre_fare/screen/split_takeover";
 @use "v2/pre_fare/screen/takeover" as *;
 @use "v2/pre_fare/screen_container";
-@use "v2/pre_fare/shuttle_bus_info";
 @use "v2/pre_fare/simulation";
 @use "v2/pre_fare/subway_status";
 @use "v2/pre_fare/viewport";
