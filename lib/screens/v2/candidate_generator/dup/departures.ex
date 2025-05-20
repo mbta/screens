@@ -194,7 +194,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     cond do
       # All routes in section are overnight
-      departures == [] and overnight_schedules_for_section != [] ->
+      departures == [] and Enum.count(overnight_schedules_for_section) == Enum.count(routes) ->
         %OvernightSection{routes: routes}
 
       # Headway mode
