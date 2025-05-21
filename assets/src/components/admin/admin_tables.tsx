@@ -56,6 +56,13 @@ const AllScreensTable = (): JSX.Element => {
       FormCell: FormTextCell,
     },
     {
+      Header: "Location",
+      accessor: "location",
+      Cell: EditableCell,
+      Filter: DefaultColumnFilter,
+      FormCell: FormTextCell,
+    },
+    {
       Header: "Vendor",
       accessor: "vendor",
       Filter: SelectColumnFilter,
@@ -122,6 +129,13 @@ const v2Columns = [
   {
     Header: "Name",
     accessor: "name",
+    Cell: EditableCell,
+    Filter: DefaultColumnFilter,
+    FormCell: FormTextCell,
+  },
+  {
+    Header: "Location",
+    accessor: "location",
     Cell: EditableCell,
     Filter: DefaultColumnFilter,
     FormCell: FormTextCell,
@@ -377,6 +391,13 @@ const ElevatorV2ScreensTable = (): JSX.Element => {
         {
           Header: "Name",
           accessor: "name",
+          Cell: EditableCell,
+          Filter: DefaultColumnFilter,
+          FormCell: FormTextCell,
+        },
+        {
+          Header: "Location",
+          accessor: "location",
           Cell: EditableCell,
           Filter: DefaultColumnFilter,
           FormCell: FormTextCell,
