@@ -80,7 +80,7 @@ defmodule Screens.MixProject do
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
       {:retry, "~> 0.18.0"},
-      {:screens_config, github: "mbta/screens-config-lib", branch: "pk/add-screen-name"},
+      {:screens_config, github: "mbta/screens-config-lib", branch: "pk/add-screen-location"},
       {:sentry, "~> 10.4"},
       {:sweet_xml, "~> 0.7.0"},
       {:telemetry, "~> 1.2"},
