@@ -267,6 +267,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
           "bus-A" -> [%{id: "Bus A", type: :bus}]
           "bus-B" -> [%{id: "Bus B", type: :bus}]
+          "bus-C" -> [%{id: "Bus C", type: :bus}]
+          "bus-C+D" -> [%{id: "Bus C", type: :bus}, %{id: "Bus D", type: :bus}]
           "place-overnight" -> [%{id: "Red", type: :subway}]
           _ -> [%{id: "test", type: :test}]
         end)
@@ -2589,26 +2591,24 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           }
         ])
         |> put_secondary_departures_sections([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B", "bus-C"]}}
-          }
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["bus-C+D"]}}}
         ])
 
       now = ~U[2020-04-06T10:00:00Z]
 
       fetch_schedules_fn = fn
-        _, nil ->
+        _, now ->
           {:ok,
            [
              %Schedule{
                departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
+               route: %Route{id: "Bus C"},
+               stop: struct(Stop, id: "bus-C+D")
              },
              %Schedule{
                departure_time: ~U[2020-04-06T11:00:00Z],
-               route: %Route{id: "Bus C"},
-               stop: struct(Stop, id: "bus-C")
+               route: %Route{id: "Bus D"},
+               stop: struct(Stop, id: "bus-C+D")
              }
            ]}
 
@@ -2617,13 +2617,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
            [
              %Schedule{
                departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
+               route: %Route{id: "Bus C"},
+               stop: struct(Stop, id: "bus-C+D")
              },
              %Schedule{
                departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Bus C"},
-               stop: struct(Stop, id: "bus-C")
+               route: %Route{id: "Bus D"},
+               stop: struct(Stop, id: "bus-C+D")
              }
            ]}
       end
