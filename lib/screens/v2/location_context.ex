@@ -12,7 +12,6 @@ defmodule Screens.LocationContext do
 
   @enforce_keys [:home_stop]
   defstruct home_stop: "",
-            home_stop_name: "",
             tagged_stop_sequences: %{},
             upstream_stops: MapSet.new(),
             downstream_stops: MapSet.new(),
@@ -21,7 +20,6 @@ defmodule Screens.LocationContext do
 
   @type t :: %__MODULE__{
           home_stop: Stop.id(),
-          home_stop_name: String.t(),
           # Stop sequences through this stop, keyed under their associated routes
           tagged_stop_sequences: %{Route.id() => list(list(Stop.id()))},
           upstream_stops: MapSet.t(Stop.id()),
@@ -48,14 +46,12 @@ defmodule Screens.LocationContext do
                Route.serving_stop_with_active(stop_id, now, alert_route_types),
              {:ok, tagged_stop_sequences} <-
                fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
-          stop_name = Stop.fetch_stop_name(stop_id)
           stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
 
           {
             :ok,
             %__MODULE__{
               home_stop: stop_id,
-              home_stop_name: stop_name,
               tagged_stop_sequences: tagged_stop_sequences,
               upstream_stops: upstream_stop_id_set(stop_id, stop_sequences),
               downstream_stops: downstream_stop_id_set(stop_id, stop_sequences),

@@ -19,7 +19,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             alert: nil,
             now: nil,
             location_context: nil,
-            informed_stations: nil,
+            home_station_name: nil,
+            informed_station_names: [],
             is_terminal_station: false,
             is_priority: false,
             partial_closure_platform_names: []
@@ -33,7 +34,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           alert: Alert.t(),
           now: DateTime.t(),
           location_context: LocationContext.t(),
-          informed_stations: list(String.t()),
+          home_station_name: String.t() | nil,
+          informed_station_names: list(String.t()),
           is_terminal_station: boolean(),
           is_priority: boolean(),
           partial_closure_platform_names: list(String.t())
@@ -483,13 +485,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %__MODULE__{
       alert: %{cause: cause, updated_at: updated_at},
       now: now,
-      location_context: %{home_stop_name: stop_name},
-      informed_stations: informed_stations
+      home_station_name: home_station_name,
+      informed_station_names: informed_station_names
     } = t
 
     # Alert subheaders should not wrap in the middle of a station name
     # so we have to use FreeTextLines to prevent the wrapping
-    informed_stations_free_text = format_station_name_list(informed_stations)
+    informed_stations_free_text = format_station_name_list(informed_station_names)
 
     location_text =
       case LocalizedAlert.consolidated_informed_subway_routes(t) do
@@ -507,7 +509,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           }
       end
 
-    other_closures = List.delete(informed_stations, stop_name)
+    other_closures = List.delete(informed_station_names, home_station_name)
 
     %{
       issue: "Station closed",
@@ -681,10 +683,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %__MODULE__{
       alert: %{cause: cause, updated_at: updated_at},
       now: now,
-      informed_stations: informed_stations
+      informed_station_names: informed_station_names
     } = t
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    informed_stations_string = Util.format_name_list_to_string(informed_station_names)
 
     %{
       issue: "Trains skip #{informed_stations_string}",
@@ -694,7 +696,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :station_closure,
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
-      stations: informed_stations
+      stations: informed_station_names
     }
   end
 
@@ -975,7 +977,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # Partial closure
   defp outside_flex_fields(
          %__MODULE__{
-           informed_stations: [informed_station],
+           informed_station_names: [informed_station],
            partial_closure_platform_names: partial_closure_platform_names
          } = t,
          _location
@@ -1008,10 +1010,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Full closure
   defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, _location) do
-    %__MODULE__{alert: %{cause: cause}, informed_stations: informed_stations} = t
+    %__MODULE__{alert: %{cause: cause}, informed_station_names: informed_station_names} = t
     cause_text = Alert.get_cause_string(cause)
 
-    informed_stations_string = Util.format_name_list_to_string(informed_stations)
+    informed_stations_string = Util.format_name_list_to_string(informed_station_names)
 
     %{
       issue: "Trains will bypass #{informed_stations_string}",
