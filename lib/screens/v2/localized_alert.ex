@@ -132,7 +132,7 @@ defmodule Screens.V2.LocalizedAlert do
 
   # Only route is not nil (route type ignored)
   defp informed_entity_to_zone(%{stop: nil, route: route}, context) do
-    route_ids = Route.route_ids(context.routes)
+    route_ids = LocationContext.route_ids(context)
     if route in route_ids, do: [:upstream, :home_stop, :downstream], else: []
   end
 
@@ -142,7 +142,7 @@ defmodule Screens.V2.LocalizedAlert do
 
   # Both stop and route are not nil (route type ignored)
   defp informed_entity_to_zone(%{stop: _stop, route: route} = informed_entity, context) do
-    route_ids = Route.route_ids(context.routes)
+    route_ids = LocationContext.route_ids(context)
 
     if route in route_ids do
       informed_entity_to_zone(%{informed_entity | route: nil}, context)
@@ -277,11 +277,7 @@ defmodule Screens.V2.LocalizedAlert do
       }) do
     rts = location_context.alert_route_types
     home_stop = location_context.home_stop
-
-    route_set =
-      location_context.routes
-      |> Route.route_ids()
-      |> MapSet.new()
+    route_set = location_context |> LocationContext.route_ids() |> MapSet.new()
 
     # allows us to pattern match against the empty set
     empty_set = MapSet.new()

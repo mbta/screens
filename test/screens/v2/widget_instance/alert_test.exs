@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Audio, Screen}
@@ -54,7 +53,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   defp put_tagged_stop_sequences(widget, tagged_sequences) do
-    sequences = RoutePattern.untag_stop_sequences(tagged_sequences)
+    sequences = LocationContext.untag_stop_sequences(tagged_sequences)
 
     %{
       widget

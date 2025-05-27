@@ -6,7 +6,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
   alias Screens.Report
-  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
@@ -51,7 +50,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         end
 
       with {:ok, location_context} <- fetch_location_context_fn.(Dup, stop_id, now),
-           route_ids <- Route.route_ids(location_context.routes),
+           route_ids <- LocationContext.route_ids(location_context),
            {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
         alerts
         |> relevant_alerts(config, location_context, now)

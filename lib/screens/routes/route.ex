@@ -65,38 +65,6 @@ defmodule Screens.Routes.Route do
     end
   end
 
-  @doc """
-  Fetches routes that serve the given stop, also determining whether each route has any scheduled
-  service at the stop on the current day. Only route IDs and the `active?` flag are returned.
-  """
-  @spec serving_stop_with_active(Stop.id()) ::
-          {:ok, list(%{route_id: id(), active?: boolean()})} | :error
-  def serving_stop_with_active(
-        stop_id,
-        now \\ DateTime.utc_now(),
-        type_filters \\ [],
-        get_json_fn \\ &V3Api.get_json/2,
-        fetch_routes_fn \\ &fetch_routes/3
-      ) do
-    Screens.Telemetry.span(
-      ~w[screens routes route serving_stop_with_active]a,
-      %{stop_id: stop_id, type_filters: type_filters},
-      fn ->
-        with {:ok, routes} <- fetch_routes_fn.(stop_id, get_json_fn, type_filters),
-             {:ok, active_route_ids} <- fetch_active_route_ids(stop_id, now, get_json_fn) do
-          active_set = MapSet.new(active_route_ids)
-
-          routes_at_stop =
-            Enum.map(routes, &%{route_id: &1.id, active?: MapSet.member?(active_set, &1.id)})
-
-          {:ok, routes_at_stop}
-        else
-          :error -> :error
-        end
-      end
-    )
-  end
-
   defp format_query_param({:ids, ids}) when is_list(ids) do
     [{"filter[id]", Enum.join(ids, ",")}]
   end
@@ -130,23 +98,6 @@ defmodule Screens.Routes.Route do
   end
 
   defp format_query_param(_), do: []
-
-  defp fetch_routes(stop_id, get_json_fn, type_filters) do
-    case fetch([stop_id: stop_id, route_types: type_filters], get_json_fn) do
-      {:ok, routes} -> {:ok, routes}
-      :error -> :error
-    end
-  end
-
-  defp fetch_active_route_ids(stop_id, now, get_json_fn) do
-    case fetch([stop_id: stop_id, date: now], get_json_fn) do
-      {:ok, routes} -> {:ok, Enum.map(routes, & &1.id)}
-      :error -> :error
-    end
-  end
-
-  @spec route_ids(list(%{route_id: id(), active?: boolean()})) :: list(id())
-  def route_ids(routes), do: Enum.map(routes, & &1.route_id)
 
   @spec color(id()) :: color()
   @spec color(id(), RouteType.t() | nil) :: color()

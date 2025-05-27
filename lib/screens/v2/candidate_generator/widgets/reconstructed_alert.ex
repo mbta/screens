@@ -3,7 +3,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -59,7 +58,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
     # Filtering by subway and light_rail types
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
-         route_ids <- Route.route_ids(location_context.routes),
+         route_ids <- LocationContext.route_ids(location_context),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       relevant_alerts = relevant_alerts(alerts, location_context, now)
       is_terminal_station = terminal?(stop_id, LocationContext.stop_sequences(location_context))

@@ -3,7 +3,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.Routes.Route
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.Alerts
@@ -26,12 +25,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
       when app in @alert_supporting_screen_types do
     with {:ok, location_context} <- fetch_location_context_fn.(app, stop_id, now),
          reachable_stop_ids = local_and_downstream_stop_ids(location_context, stop_id),
-         route_ids <- Route.route_ids(location_context.routes),
-         {:ok, alerts} <-
-           fetch_alerts_by_stop_and_route_fn.(
-             reachable_stop_ids,
-             route_ids
-           ) do
+         route_ids <- LocationContext.route_ids(location_context),
+         {:ok, alerts} <- fetch_alerts_by_stop_and_route_fn.(reachable_stop_ids, route_ids) do
       alerts
       |> relevant_alerts(reachable_stop_ids, route_ids, now)
       |> Enum.map(fn alert ->
