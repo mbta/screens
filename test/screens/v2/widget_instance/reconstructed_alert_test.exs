@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Subway
   alias Screens.V2.AlertsWidget
   alias Screens.V2.CandidateGenerator
@@ -70,7 +69,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp put_tagged_stop_sequences(widget, tagged_sequences) do
-    sequences = RoutePattern.untag_stop_sequences(tagged_sequences)
+    sequences = LocationContext.untag_stop_sequences(tagged_sequences)
 
     %{
       widget
@@ -2835,7 +2834,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       now = ~U[2022-06-24 12:00:00Z]
       tagged_station_sequences = %{"Orange" => [Subway.route_stop_sequence("Orange")]}
-      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
+      station_sequences = LocationContext.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Wellington" end
@@ -3247,7 +3246,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       now = ~U[2022-06-24 12:00:00Z]
       tagged_station_sequences = %{"Green" => [Subway.route_stop_sequence("Green")]}
-      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
+      station_sequences = LocationContext.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Government Center" end

@@ -5,7 +5,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.{Busway, PreFare}
@@ -93,7 +92,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         "A" => [["place-ogmnl", "place-mlmnl", "place-welln", "place-astao"]]
       }
 
-      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+      stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
 
       fetch_stop_name_fn = fn
         "place-ogmnl" -> "Oak Grove"

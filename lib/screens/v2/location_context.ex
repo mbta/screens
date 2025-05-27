@@ -42,11 +42,11 @@ defmodule Screens.LocationContext do
       %{app: app, stop_id: stop_id},
       fn ->
         with alert_route_types <- route_type_filter(app, stop_id),
-             {:ok, routes_at_stop} <-
-               Route.serving_stop_with_active(stop_id, now, alert_route_types),
+             {:ok, routes_at_stop} <- routes_with_active(stop_id, alert_route_types, now),
+             route_ids_at_stop = Enum.map(routes_at_stop, & &1.route_id),
              {:ok, tagged_stop_sequences} <-
-               fetch_tagged_stop_sequences_by_app(app, stop_id, routes_at_stop) do
-          stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+               fetch_tagged_stop_sequences_by_app(app, stop_id, route_ids_at_stop) do
+          stop_sequences = untag_stop_sequences(tagged_stop_sequences)
 
           {
             :ok,
@@ -68,17 +68,7 @@ defmodule Screens.LocationContext do
     )
   end
 
-  # Returns the route types we care about for the alerts of this screen type / place
-  @spec route_type_filter(screen_type(), String.t()) :: list(RouteType.t())
-  def route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
-  def route_type_filter(GlEink, _), do: [:light_rail]
-  # Ashmont should not show Mattapan alerts for PreFare or Dup
-  def route_type_filter(app, "place-asmnl") when app in [PreFare, Dup], do: [:subway]
-  def route_type_filter(PreFare, _), do: [:light_rail, :subway]
-  # WTC is a special bus-only case
-  def route_type_filter(Dup, "place-wtcst"), do: [:bus]
-  def route_type_filter(Dup, _), do: [:light_rail, :subway]
-
+  # NOTE: only public due to use in tests. Should be treated as private.
   @spec upstream_stop_id_set(String.t(), list(list(Stop.id()))) :: MapSet.t(Stop.id())
   def upstream_stop_id_set(stop_id, stop_sequences) do
     stop_sequences
@@ -86,6 +76,7 @@ defmodule Screens.LocationContext do
     |> MapSet.new()
   end
 
+  # NOTE: only public due to use in tests. Should be treated as private.
   @spec downstream_stop_id_set(String.t(), list(list(Stop.id()))) :: MapSet.t(Stop.id())
   def downstream_stop_id_set(stop_id, stop_sequences) do
     stop_sequences
@@ -97,9 +88,7 @@ defmodule Screens.LocationContext do
   Returns IDs of routes that serve this location.
   """
   @spec route_ids(t()) :: list(Route.id())
-  def route_ids(%__MODULE__{} = t) do
-    Route.route_ids(t.routes)
-  end
+  def route_ids(%__MODULE__{routes: routes}), do: Enum.map(routes, & &1.route_id)
 
   @doc """
   Returns the stop sequences of routes that serve this location.
@@ -107,24 +96,110 @@ defmodule Screens.LocationContext do
   Generally, this means they go from north/east -> south/west.
   """
   @spec stop_sequences(t()) :: list(list(Stop.id()))
-  def stop_sequences(%__MODULE__{} = t) do
-    RoutePattern.untag_stop_sequences(t.tagged_stop_sequences)
+  def stop_sequences(%__MODULE__{} = t), do: untag_stop_sequences(t.tagged_stop_sequences)
+
+  # Returns the route types we care about for the alerts of this screen type / place.
+  # NOTE: only public due to use in tests. Should be treated as private.
+  @spec route_type_filter(screen_type(), String.t()) :: list(RouteType.t())
+  def route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
+  def route_type_filter(GlEink, _), do: [:light_rail]
+  # Ashmont should not show Mattapan alerts for PreFare or Dup
+  def route_type_filter(app, "place-asmnl") when app in [PreFare, Dup], do: [:subway]
+  def route_type_filter(PreFare, _), do: [:light_rail, :subway]
+  # WTC is a special bus-only case
+  def route_type_filter(Dup, "place-wtcst"), do: [:bus]
+  def route_type_filter(Dup, _), do: [:light_rail, :subway]
+
+  defp routes_with_active(stop_id, route_types, now) do
+    params = %{route_types: route_types, stop_id: stop_id}
+
+    with {:ok, routes} <- Route.fetch(params),
+         {:ok, routes_today} <- params |> Map.put(:date, now) |> Route.fetch() do
+      route_ids_today = MapSet.new(routes_today, fn %Route{id: id} -> id end)
+
+      {
+        :ok,
+        Enum.map(routes, fn %Route{id: id} -> %{route_id: id, active?: id in route_ids_today} end)
+      }
+    end
   end
 
-  defp fetch_tagged_stop_sequences_by_app(app, stop_id, _routes_at_stop)
+  defp fetch_tagged_stop_sequences_by_app(app, stop_id, _route_ids)
        when app in [BusEink, BusShelter, GlEink] do
-    RoutePattern.fetch_tagged_stop_sequences_through_stop(stop_id)
+    fetch_tagged_stop_sequences_through_stop(stop_id)
   end
 
-  defp fetch_tagged_stop_sequences_by_app(Dup, stop_id, routes_at_stop) do
-    route_ids = Route.route_ids(routes_at_stop)
-    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids)
+  defp fetch_tagged_stop_sequences_by_app(Dup, stop_id, route_ids) do
+    fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids)
   end
 
-  defp fetch_tagged_stop_sequences_by_app(PreFare, stop_id, routes_at_stop) do
-    route_ids = Route.route_ids(routes_at_stop)
-
+  defp fetch_tagged_stop_sequences_by_app(PreFare, stop_id, route_ids) do
     # We limit results to canonical route patterns only--no stop sequences for nonstandard patterns.
-    RoutePattern.fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, true)
+    fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, true)
+  end
+
+  # Returns a map from route ID to a list of stop sequences of that route, for all routes serving
+  # stop, in all applicable directions.
+  @spec fetch_tagged_stop_sequences_through_stop(Stop.id(), [Route.id()]) ::
+          {:ok, %{Route.id() => [[Stop.id()]]}} | :error
+  defp fetch_tagged_stop_sequences_through_stop(stop_id, route_ids \\ []) do
+    case RoutePattern.fetch(%{stop_ids: [stop_id], route_ids: route_ids}) do
+      {:ok, patterns} -> {:ok, get_tagged_stop_sequences(patterns)}
+      _ -> :error
+    end
+  end
+
+  # Returns a map from route ID to a list of stop sequences of that route. Stop sequences are
+  # described in terms of parent station IDs, not platform IDs.
+  #
+  # If no parent station data exists, platform ID is returned instead. Only stop sequences for
+  # direction ID 0 are returned. Assumes that all stop sequences in result are platforms.
+  @spec fetch_tagged_parent_station_sequences_through_stop(Stop.id(), [Route.id()], boolean()) ::
+          {:ok, %{Route.id() => [[Stop.id()]]}} | :error
+  defp fetch_tagged_parent_station_sequences_through_stop(stop_id, route_ids, canonical? \\ false) do
+    params = %{stop_ids: [stop_id], route_ids: route_ids}
+    params = if(canonical?, do: Map.put(params, :canonical?, true), else: params)
+
+    case RoutePattern.fetch(params) do
+      {:ok, []} -> :error
+      {:ok, patterns} -> {:ok, get_tagged_parent_station_sequences(patterns)}
+      _ -> :error
+    end
+  end
+
+  # NOTE: only public due to use in tests. Should be treated as private.
+  @spec untag_stop_sequences(%{Route.id() => [[Stop.id()]]}) :: [[Stop.id()]]
+  def untag_stop_sequences(tagged_stop_sequences),
+    do: Enum.flat_map(tagged_stop_sequences, &elem(&1, 1))
+
+  defp get_tagged_stop_sequences(route_patterns) do
+    route_patterns
+    |> Enum.map(fn %RoutePattern{route: %Route{id: route_id}, stops: stops} ->
+      {route_id, Enum.map(stops, fn %Stop{id: id} -> id end)}
+    end)
+    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
+  end
+
+  defp get_tagged_parent_station_sequences(route_patterns) do
+    platform_to_station_map =
+      route_patterns
+      |> Enum.flat_map(& &1.stops)
+      |> Enum.map(fn
+        %Stop{id: id, parent_station: nil} -> {id, id}
+        %Stop{id: id, parent_station: parent_id} -> {id, parent_id}
+      end)
+      |> Map.new()
+
+    route_patterns
+    |> get_tagged_stop_sequences()
+    |> Map.new(fn {route_id, stop_sequences} ->
+      station_sequences =
+        stop_sequences
+        |> Enum.map(fn stops -> Enum.map(stops, &Map.fetch!(platform_to_station_map, &1)) end)
+        # Dedup the stop sequences (both directions are listed, but we only need 1)
+        |> Enum.uniq_by(&MapSet.new/1)
+
+      {route_id, station_sequences}
+    end)
   end
 end

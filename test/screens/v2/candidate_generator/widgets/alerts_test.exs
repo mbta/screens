@@ -5,7 +5,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Alerts, Screen}
   alias ScreensConfig.Screen.{BusShelter, Busway}
@@ -42,7 +41,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         "D" => [~w[1260 1262 11531 1265]]
       }
 
-      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+      stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
 
       alerts = [
         %Alert{

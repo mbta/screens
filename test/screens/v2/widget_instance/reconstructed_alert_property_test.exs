@@ -11,7 +11,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Subway
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
@@ -1143,7 +1142,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
       tagged_station_sequences =
         Map.new(route_ids_at_stop, fn id -> {id, [Subway.route_stop_sequence(id)]} end)
 
-      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
+      station_sequences = LocationContext.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, [alert]} end
       fetch_stop_name_fn = fn _ -> "Test" end

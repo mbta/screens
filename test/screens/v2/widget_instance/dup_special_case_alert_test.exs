@@ -2,7 +2,6 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
   alias ScreensConfig.{Alerts, Departures, FreeTextLine, Screen}
@@ -914,7 +913,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         fetch_location_context_fn: fn
           _, stop_id, _ ->
             tagged_stop_sequences = tagged_stop_sequences(stop_id)
-            stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+            stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
 
             {:ok,
              %LocationContext{
