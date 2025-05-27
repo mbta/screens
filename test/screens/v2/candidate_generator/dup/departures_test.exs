@@ -2597,16 +2597,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       now = ~U[2020-04-06T10:00:00Z]
 
       fetch_schedules_fn = fn
-        _, now ->
+        %{direction_id: :both, route_ids: [], route_type: nil, stop_ids: ["bus-C+D"]},
+        ~D[2020-04-07] ->
           {:ok,
            [
              %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
+               departure_time: ~U[2020-04-07T09:00:00Z],
                route: %Route{id: "Bus C"},
                stop: struct(Stop, id: "bus-C+D")
              },
              %Schedule{
-               departure_time: ~U[2020-04-06T11:00:00Z],
+               departure_time: ~U[2020-04-07T09:00:00Z],
                route: %Route{id: "Bus D"},
                stop: struct(Stop, id: "bus-C+D")
              }
@@ -2616,12 +2617,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           {:ok,
            [
              %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
+               departure_time: ~U[2020-04-06T09:00:00Z],
                route: %Route{id: "Bus C"},
                stop: struct(Stop, id: "bus-C+D")
              },
              %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
+               departure_time: ~U[2020-04-06T09:00:00Z],
+               route: %Route{id: "Bus D"},
+               stop: struct(Stop, id: "bus-C+D")
+             },
+             %Schedule{
+               departure_time: ~U[2020-04-06T11:01:00Z],
                route: %Route{id: "Bus D"},
                stop: struct(Stop, id: "bus-C+D")
              }
