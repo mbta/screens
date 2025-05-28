@@ -175,9 +175,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> Enum.uniq()
 
     # Check if there is any room for overnight rows before running the logic.
-    {departure_scheduled_today, overnight_schedules_for_section} =
+    overnight_schedules_for_section =
       if (is_only_section and length(departures) >= 4) or length(departures) >= 2 do
-        {false, []}
+        []
       else
         get_overnight_schedules_for_section(
           routes_with_live_departures,
@@ -194,7 +194,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     cond do
       # All routes in section are overnight
-      departures == [] and overnight_schedules_for_section != [] and !departure_scheduled_today ->
+      departures == [] and overnight_schedules_for_section != [] ->
         %OvernightSection{routes: routes}
 
       # Headway mode
@@ -523,17 +523,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         )
       end)
 
-    departure_scheduled_today = Enum.any?(results, &(&1 == :departure_scheduled_today))
-
-    sorted_departures =
+    # If any routes have a :departure_scheduled_today, then do not return tomorrow's schedules for any route
+    if Enum.any?(results, &(&1 == :departure_scheduled_today)) do
+      []
+    else
       results
-      # Routes not in overnight mode will be nil or :departure_scheduled_today. Can ignore those.
-      |> Enum.reject(&(&1 in [nil, :departure_scheduled_today]))
-      |> Enum.sort_by(fn
-        %Departure{schedule: %Schedule{departure_time: dt}} -> dt
-      end)
-
-    {departure_scheduled_today, sorted_departures}
+      # Routes not in overnight mode will be nil. Can ignore those.
+      |> Enum.reject(&is_nil/1)
+      |> Enum.sort_by(fn %Departure{schedule: %Schedule{departure_time: dt}} -> dt end)
+    end
   end
 
   defp get_overnight_schedules_for_section(
@@ -559,11 +557,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_vehicles_fn
       )
     else
-      {false, []}
+      []
     end
   end
 
-  defp get_overnight_schedules_for_section(_, _, _, _, _, _, _), do: {false, []}
+  defp get_overnight_schedules_for_section(_, _, _, _, _, _, _), do: []
 
   # Verifies we are meeting the timeframe conditions for overnight mode and generates the departure widget
   defp get_overnight_departure_for_route(
@@ -583,8 +581,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     nil
   end
 
-  # If now is after today's last schedule and there are no schedules tomorrow,
-  # we still want a departure row without a time (will show a moon icon)
+  # If there are no schedules for the route tomorrow
   defp get_overnight_departure_for_route(
          first_schedule_today,
          last_schedule_today,
@@ -593,14 +590,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          _direction_id,
          now
        ) do
-    if DateTime.compare(now, last_schedule_today.departure_time) == :gt or
-         DateTime.compare(now, first_schedule_today.departure_time) == :lt do
-      # nil/nil acts as a flag for the serializer to produce an `overnight` departure time
-      %Departure{
-        schedule: %{last_schedule_today | departure_time: nil, arrival_time: nil}
-      }
-    else
-      nil
+    cond do
+      # If current time is in between the first and last schedule of the day, signal that this route is still running
+      # We later use this atom to avoid displaying Overnight mode for this route
+      DateTime.compare(now, first_schedule_today.departure_time) == :gt and
+          DateTime.compare(now, last_schedule_today.departure_time) == :lt ->
+        :departure_scheduled_today
+
+      # If current time is before the first scheduled trip of the day, then return that schedule
+      DateTime.compare(now, first_schedule_today.departure_time) == :lt ->
+        %Departure{
+          schedule: first_schedule_today
+        }
+
+      # Only reach here if time is past all scheduled trips for the day.
+      # Return nil, b/c we do not want to show Overnight mode for a route that is not running more today or tomorrow.
+      true ->
+        nil
     end
   end
 

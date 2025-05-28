@@ -2066,7 +2066,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
-    test "returns normal sections with normal rows and overnight rows with nil scheduled times for routes in overnight mode with no scheduled trips tomorrow",
+    test "returns normal sections with normal rows of primary routes for secondary routes in overnight mode with no scheduled trips tomorrow",
          %{
            config: config,
            fetch_departures_fn: fetch_departures_fn,
@@ -2161,26 +2161,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 %Screens.V2.Departure{
                   prediction:
                     struct(Prediction,
-                      id: "Bus A",
-                      route: %Route{id: "Bus A", type: :bus},
+                      id: "A",
+                      route: %Route{id: "Test"},
                       stop: struct(Stop),
                       trip: struct(Trip)
                     ),
                   schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction: nil,
-                  schedule:
-                    struct(Schedule,
-                      departure_time: nil,
-                      route: %Route{id: "Bus B"},
-                      stop: struct(Stop, id: "bus-B")
-                    )
                 }
               ]
             }
           ],
-          slot_names: [:main_content_two],
+          slot_names: [:main_content_one],
           now: now
         }
       ]
@@ -2630,6 +2621,134 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                departure_time: ~U[2020-04-06T11:01:00Z],
                route: %Route{id: "Bus D"},
                stop: struct(Stop, id: "bus-C+D")
+             }
+           ]}
+      end
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: [
+                %Screens.V2.Departure{
+                  prediction:
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_zero],
+          now: now
+        },
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: [
+                %Screens.V2.Departure{
+                  prediction:
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_one],
+          now: now
+        },
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: [
+                %Screens.V2.Departure{
+                  prediction:
+                    struct(Prediction,
+                      id: "A",
+                      route: %Route{id: "Test"},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          slot_names: [:main_content_two],
+          now: now
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_departures_fn,
+          fetch_alerts_fn,
+          fetch_schedules_fn,
+          fetch_routes_fn,
+          fetch_vehicles_fn
+        )
+
+      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+
+    test "returns primary section Departures if routes in secondary section have no predictions for today or schedules for tomorrow",
+         %{
+           config: config,
+           fetch_departures_fn: fetch_departures_fn,
+           fetch_alerts_fn: fetch_alerts_fn,
+           fetch_routes_fn: fetch_routes_fn,
+           fetch_vehicles_fn: fetch_vehicles_fn
+         } do
+      config =
+        config
+        |> put_primary_departures([
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
+          }
+        ])
+        |> put_secondary_departures_sections([
+          %Section{query: %Query{params: %Query.Params{stop_ids: ["bus-C"]}}}
+        ])
+
+      now = ~U[2020-04-06T10:00:00Z]
+
+      fetch_schedules_fn = fn
+        %{direction_id: :both, route_ids: [], route_type: nil, stop_ids: ["bus-C"]},
+        ~D[2020-04-07] ->
+          {:ok, []}
+
+        _, _ ->
+          {:ok,
+           [
+             %Schedule{
+               departure_time: ~U[2020-04-06T09:00:00Z],
+               route: %Route{id: "Bus C"},
+               stop: struct(Stop, id: "bus-C")
+             },
+             %Schedule{
+               departure_time: ~U[2020-04-06T11:00:00Z],
+               route: %Route{id: "Bus C"},
+               stop: struct(Stop, id: "bus-C")
              }
            ]}
       end
