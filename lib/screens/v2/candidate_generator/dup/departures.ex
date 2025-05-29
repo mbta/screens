@@ -458,8 +458,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
-  # If we are currently overnight, returns the first schedule of the day for each route_id and direction for each stop.
-  # Otherwise, return an empty list.
+  # For sections configured only to show predictions and not schedules,
+  # we will override by returning a list of scheduled Departures from `get_overnight_schedules_for_section`
+  # if one of the following is true for a given route_id/direction_id combo:
+  # 1. Service for the route is done for the day, so we may display the first departure of tomorrow.
+  # 2. Service for the route has not started for the day, so we may display the first departure of today.
+  # 3. Service for the route is done for the day and not scheduled tomorrow
+  #    (possible for CR/buses/routes with interruptions tomorrow), so return a Departure
+  #    with nil departure_time and arrival_time to be handled by the serializer.
+  #
+  # If any routes still have scheduled trips left today, return an empty list, as we are not 'overnight'
+  # and do not want to display scheduled times for tomorrow when there are future scheduled trips today.
   defp get_overnight_schedules_for_section(
          routes_with_live_departures,
          stop_ids,
