@@ -2066,7 +2066,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
-    test "returns normal sections with normal rows and overnight rows with nil scheduled times for routes in overnight mode with no scheduled trips tomorrow",
+    test "returns normal sections with normal rows of primary routes for secondary routes in overnight mode with no scheduled trips tomorrow",
          %{
            config: config,
            fetch_departures_fn: fetch_departures_fn,
@@ -2161,26 +2161,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                 %Screens.V2.Departure{
                   prediction:
                     struct(Prediction,
-                      id: "Bus A",
-                      route: %Route{id: "Bus A", type: :bus},
+                      id: "A",
+                      route: %Route{id: "Test"},
                       stop: struct(Stop),
                       trip: struct(Trip)
                     ),
                   schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction: nil,
-                  schedule:
-                    struct(Schedule,
-                      departure_time: nil,
-                      route: %Route{id: "Bus B"},
-                      stop: struct(Stop, id: "bus-B")
-                    )
                 }
               ]
             }
           ],
-          slot_names: [:main_content_two],
+          slot_names: [:main_content_one],
           now: now
         }
       ]
