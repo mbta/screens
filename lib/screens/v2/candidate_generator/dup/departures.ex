@@ -470,6 +470,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          fetch_vehicles_fn
        )
 
+  # No predictions AND no active alerts for the section
   defp get_overnight_schedules_for_section(
          routes_with_live_departures,
          params,
