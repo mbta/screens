@@ -104,10 +104,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       location_context = %LocationContext{
         home_stop: stop_id,
         tagged_stop_sequences: tagged_stop_sequences,
-        upstream_stops: LocationContext.upstream_stop_id_set(stop_id, stop_sequences),
-        downstream_stops: LocationContext.downstream_stop_id_set(stop_id, stop_sequences),
+        upstream_stops: LocationContext.upstream_stop_id_set([stop_id], stop_sequences),
+        downstream_stops: LocationContext.downstream_stop_id_set([stop_id], stop_sequences),
         routes: routes_at_stop,
-        alert_route_types: LocationContext.route_type_filter(app, stop_id)
+        alert_route_types: LocationContext.route_type_filter(app, [stop_id])
       }
 
       %{

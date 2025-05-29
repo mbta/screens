@@ -84,8 +84,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
     location_context = %LocationContext{
       home_stop: home_station_id,
       tagged_stop_sequences: tagged_stop_sequences,
-      upstream_stops: LocationContext.upstream_stop_id_set(home_station_id, stop_sequences),
-      downstream_stops: LocationContext.downstream_stop_id_set(home_station_id, stop_sequences),
+      upstream_stops: LocationContext.upstream_stop_id_set([home_station_id], stop_sequences),
+      downstream_stops: LocationContext.downstream_stop_id_set([home_station_id], stop_sequences),
       routes: [],
       alert_route_types: []
     }
