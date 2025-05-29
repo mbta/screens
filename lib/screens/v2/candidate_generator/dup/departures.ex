@@ -294,7 +294,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         # For subway, each route will have its own section.
         # If the stop is served by two different subway/light rail routes, route_ids must be populated for each section
         # Otherwise, we only need the first route in the list of routes serving the stop.
+
         primary_route_for_section = List.first(routes)
+
         disabled_modes = Screens.Config.Cache.disabled_modes()
         # If we know the predictions are unreliable, don't even bother fetching them.
         if is_nil(primary_route_for_section) or
@@ -525,6 +527,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.reject(&is_nil/1)
     |> Enum.sort_by(fn %Departure{schedule: schedule} -> schedule.departure_time end)
     |> Enum.split_with(fn
+      # Split up the upcoming departures for each route into a tuple of lists, {todays_schedules, overnight_schedules}
       %{schedule: %{departure_time: nil}} ->
         # If a departure_time is nil, then there are no scheduled trips remaining for today or tomorrow
         # Return as an overnight schedule so it can be displayed with a moon 'overnight' icon if applicable
