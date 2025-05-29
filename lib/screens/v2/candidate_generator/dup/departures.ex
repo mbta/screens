@@ -175,7 +175,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> Enum.uniq()
 
     # Check if there is any room for overnight rows before running the logic.
-    {todays_schedules_for_section, overnight_schedules_for_section} =
+    {todays_schedules_for_section, tomorrow_schedules_for_section} =
       if (is_only_section and length(departures) >= 4) or length(departures) >= 2 do
         {[], []}
       else
@@ -195,7 +195,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     cond do
       # All routes in section are overnight
       departures == [] and todays_schedules_for_section == [] and
-          overnight_schedules_for_section != [] ->
+          tomorrow_schedules_for_section != [] ->
         %OvernightSection{routes: routes}
 
       # Headway mode
@@ -216,7 +216,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       true ->
         # Add trips scheduled for later today and overnight departures to the end.
         # This allows overnight departures to appear as we start to run out of predictions to show.
-        departures = departures ++ todays_schedules_for_section ++ overnight_schedules_for_section
+        departures = departures ++ todays_schedules_for_section ++ tomorrow_schedules_for_section
 
         visible_departures =
           if is_only_section do
@@ -496,10 +496,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.reject(&(&1 in routes_with_live_departures))
     |> Enum.map(fn {route_id, direction_id} ->
       # This variable will be used when now is after 3am.
-      first_schedule_today =
+      next_schedule_today =
         Enum.find(
           today_schedules,
-          &(&1.route.id == route_id and &1.direction_id == direction_id)
+          &(&1.route.id == route_id and &1.direction_id == direction_id and
+              DateTime.compare(now, &1.departure_time) == :lt)
         )
 
       last_schedule_today =
@@ -514,8 +515,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           &(&1.route.id == route_id and &1.direction_id == direction_id)
         )
 
-      get_next_schedule_for_route(
-        first_schedule_today,
+      get_schedule_to_display_for_route(
+        next_schedule_today,
         last_schedule_today,
         first_schedule_tomorrow,
         route_id,
@@ -528,18 +529,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.sort_by(fn %Departure{schedule: schedule} -> schedule.departure_time end)
     |> Enum.split_with(fn
       # Split up the upcoming departures for each route into a tuple of lists, {todays_schedules, overnight_schedules}
-      %{schedule: %{departure_time: nil}} ->
-        # If a departure_time is nil, then there are no scheduled trips remaining for today or tomorrow
+      %Departure{schedule: %Schedule{departure_time: nil, arrival_time: nil}} ->
+        # If departure_time/arrival_time are nil, then there are no scheduled trips remaining for today or tomorrow
         # Return as an overnight schedule so it can be displayed with a moon 'overnight' icon if applicable
         false
 
-      %{schedule: %{departure_time: departure_time}} ->
+      %Departure{schedule: %Schedule{departure_time: departure_time}} ->
         Util.service_date(departure_time) == Util.service_date(now)
-
-      departure ->
-        # Defensive fallback that we should never reach.
-        Report.warning("dup_overnight_schedule_without_departure_time", departure: departure)
-        false
     end)
   end
 
@@ -573,15 +569,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   defp get_next_scheduled_trips_for_section(_, _, _, _, _, _, _), do: {[], []}
 
   # Verifies we are meeting the timeframe conditions for overnight mode and generates the departure widget
-  defp get_next_schedule_for_route(
-         first_schedule_today,
-         last_schedule_today,
+  defp get_schedule_to_display_for_route(
+         nil,
+         nil,
          _first_schedule_tomorrow,
          route_id,
          direction_id,
          _now
-       )
-       when is_nil(first_schedule_today) or is_nil(last_schedule_today) do
+       ) do
     Report.warning("dup_overnight_no_first_last_schedule",
       route_id: route_id,
       direction_id: direction_id
@@ -592,19 +587,18 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   # If now is after today's last schedule and there are no schedules tomorrow,
   # we still want a departure row without a time (will show a moon icon)
-  defp get_next_schedule_for_route(
-         first_schedule_today,
+  defp get_schedule_to_display_for_route(
+         _next_schedule_today,
          last_schedule_today,
          nil,
          _route_id,
          _direction_id,
          now
        ) do
-    if DateTime.compare(now, last_schedule_today.departure_time) == :gt or
-         DateTime.compare(now, first_schedule_today.departure_time) == :lt do
+    if DateTime.compare(now, last_schedule_today.departure_time) == :gt do
       # nil/nil acts as a flag for the serializer to produce an `overnight` departure time
       %Departure{
-        schedule: %{last_schedule_today | departure_time: nil, arrival_time: nil}
+        schedule: %Schedule{last_schedule_today | departure_time: nil, arrival_time: nil}
       }
     else
       nil
@@ -613,8 +607,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   # If now is before any of today's schedules or after any of tomorrow's (should never happen but just in case)
   # we do not display overnight mode.
-  defp get_next_schedule_for_route(
-         first_schedule_today,
+  defp get_schedule_to_display_for_route(
+         next_schedule_today,
          last_schedule_today,
          first_schedule_tomorrow,
          route_id,
@@ -630,19 +624,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
         nil
 
-      # Before 3am and between the `departure_time` for today's last schedule and tomorrow's first schedule
+      # Before 3am, and between the `departure_time` for today's last schedule and tomorrow's first schedule
       DateTime.compare(now, last_schedule_today.departure_time) == :gt and
           DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
         %Departure{schedule: first_schedule_tomorrow}
 
-      # After 3am but before the first scheduled trip of the day.
-      not is_nil(first_schedule_today) and
-          DateTime.compare(now, first_schedule_today.departure_time) == :lt ->
-        %Departure{schedule: first_schedule_today}
+      # After 3am, but before the next scheduled trip
+      not is_nil(next_schedule_today) ->
+        %Departure{schedule: next_schedule_today}
 
-      # Before 3am and before the last scheduled trip of the day.
       true ->
-        %Departure{schedule: last_schedule_today}
+        nil
     end
   end
 
