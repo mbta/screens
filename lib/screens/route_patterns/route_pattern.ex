@@ -1,7 +1,6 @@
 defmodule Screens.RoutePatterns.RoutePattern do
   @moduledoc false
 
-  alias Screens.RoutePatterns.RouteDirectionStops
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
@@ -70,21 +69,4 @@ defmodule Screens.RoutePatterns.RoutePattern do
   defp encode_param({:stop_ids, ids}), do: [{"filter[stop]", Enum.join(ids, ",")}]
   defp encode_param({:canonical?, canonical?}), do: [{"filter[canonical]", to_string(canonical?)}]
   defp encode_param({:date, date}), do: [{"filter[date]", Date.to_iso8601(date)}]
-
-  @spec stops_by_route_and_direction(Route.id(), Trip.direction()) :: {:ok, [Stop.t()]} | :error
-  def stops_by_route_and_direction(route_id, direction_id) do
-    with {:ok, route_patterns} <-
-           V3Api.get_json("route_patterns", %{
-             "filter[route]" => route_id,
-             "filter[direction_id]" => direction_id,
-             "sort" => "typicality",
-             "include" => "representative_trip.stops"
-           }),
-         parsed_result when parsed_result != :error <-
-           RouteDirectionStops.parse_result(route_patterns, route_id) do
-      {:ok, parsed_result}
-    else
-      _ -> :error
-    end
-  end
 end

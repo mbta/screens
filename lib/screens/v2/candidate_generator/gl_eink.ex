@@ -114,11 +114,11 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
            }
          } = config,
          now,
-         stops_by_route_and_direction_fn \\ &RoutePattern.stops_by_route_and_direction/2,
+         fetch_route_patterns_fn \\ &RoutePattern.fetch/1,
          fetch_departures_fn \\ &Screens.V2.Departure.fetch/2
        ) do
-    with {:ok, stops} <- stops_by_route_and_direction_fn.(route_id, direction_id),
-         {:ok, reverse_stops} <- stops_by_route_and_direction_fn.(route_id, 1 - direction_id),
+    with {:ok, stops, reverse_stops} <-
+           fetch_stops(route_id, direction_id, fetch_route_patterns_fn),
          {:ok, departures} <-
            fetch_departures_fn.(%{stop_ids: [station_id]},
              include_schedules: true,
@@ -156,6 +156,25 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
     case fetch_destination_fn.(route_id, direction_id) do
       nil -> []
       destination -> [%NormalHeader{screen: config, text: destination, icon: icon, time: now}]
+    end
+  end
+
+  defp fetch_stops(route_id, direction_id, fetch_route_patterns_fn) do
+    case fetch_route_patterns_fn.(%{canonical?: true, route_ids: [route_id]}) do
+      {:ok, patterns} ->
+        reverse_direction_id = 1 - direction_id
+
+        # Assume exactly two canonical patterns per route, one for each direction (expected for
+        # Green Line routes, but not universal)
+        %{
+          ^direction_id => [%RoutePattern{stops: stops}],
+          ^reverse_direction_id => [%RoutePattern{stops: reverse_stops}]
+        } = Enum.group_by(patterns, & &1.direction_id)
+
+        {:ok, stops, reverse_stops}
+
+      :error ->
+        :error
     end
   end
 
