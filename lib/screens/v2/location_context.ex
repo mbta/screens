@@ -43,7 +43,8 @@ defmodule Screens.LocationContext do
   """
   @spec fetch(screen_type(), Stop.id() | [Stop.id()], DateTime.t()) :: {:ok, t()} | :error
   def fetch(app, stop_id, now) when is_binary(stop_id), do: do_fetch(app, [stop_id], now)
-  def fetch(BusEink = app, stop_ids, now) when is_list(stop_ids), do: do_fetch(app, stop_ids, now)
+  def fetch(app, [_] = stop_ids, now), do: do_fetch(app, stop_ids, now)
+  def fetch(BusEink = app, [_ | _] = stop_ids, now), do: do_fetch(app, stop_ids, now)
 
   defp do_fetch(app, stop_ids, now) do
     Screens.Telemetry.span(
