@@ -175,9 +175,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> Enum.uniq()
 
     # Check if there is any room for overnight rows before running the logic.
-    overnight_schedules_for_section =
+    {section_contains_active_route, overnight_schedules_for_section} =
       if (is_only_section and length(departures) >= 4) or length(departures) >= 2 do
-        []
+        {false, []}
       else
         get_overnight_schedules_for_section(
           routes_with_live_departures,
@@ -193,8 +193,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     headway_mode = get_headway_mode(stop_ids, routes, alert_informed_entities, now)
 
     cond do
-      # All routes in section are overnight
-      departures == [] and overnight_schedules_for_section != [] ->
+      # No remaining departures or active routes, but we do have routes with overnight schedules
+      # Show a takeover Overnight section for the given route types
+      departures == [] and !section_contains_active_route and
+          overnight_schedules_for_section != [] ->
         %OvernightSection{routes: routes}
 
       # Headway mode
@@ -458,8 +460,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
-  # For sections configured only to show predictions and not schedules,
-  # we will override by returning a list of scheduled Departures from `get_overnight_schedules_for_section`
+  # For sections configured only to show predictions and not schedules, we may override
+  # by returning a list of scheduled Departures from `get_overnight_schedules_for_section`
   # if one of the following is true for a given route_id/direction_id combo:
   # 1. Service for the route is done for the day, so we may display the first departure of tomorrow.
   # 2. Service for the route has not started for the day, so we may display the first departure of today.
@@ -467,8 +469,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   #    (possible for CR/buses/routes with interruptions tomorrow), so return a Departure
   #    with nil departure_time and arrival_time to be handled by the serializer.
   #
-  # If any routes still have scheduled trips left today, return an empty list, as we are not 'overnight'
-  # and do not want to display scheduled times for tomorrow when there are future scheduled trips today.
+  # Returns a tuple where:
+  #  - First value is a boolean to track if there are any remaining scheduled trips for the section.
+  #  - Second value is a list of Departure Schedules to potentially show on screen given enough space.
   defp get_overnight_schedules_for_section(
          routes_with_live_departures,
          stop_ids,
@@ -498,7 +501,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       )
 
     # Get schedules for each route_id in config
-    results =
+    overnight_schedules =
       today_schedules
       |> Enum.map(&{&1.route.id, &1.direction_id})
       |> Enum.uniq()
@@ -533,15 +536,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         )
       end)
 
-    # If any routes have a :departure_scheduled_today, then do not return tomorrow's schedules for any route
-    if Enum.any?(results, &(&1 == :departure_scheduled_today)) do
-      []
-    else
-      results
-      # Routes not in overnight mode will be nil. Can ignore those.
-      |> Enum.reject(&is_nil/1)
-      |> Enum.sort_by(fn %Departure{schedule: %Schedule{departure_time: dt}} -> dt end)
-    end
+    # We flag if any routes have a :route_service_ongoing, so the section is not fully overnight
+    is_sections_service_active = Enum.any?(overnight_schedules, &(&1 == :route_service_ongoing))
+
+    {is_sections_service_active,
+     overnight_schedules
+     # Routes not in overnight mode will be nil. Can ignore those.
+     |> Enum.reject(fn elem -> is_nil(elem) or elem == :route_service_ongoing end)
+     |> Enum.sort_by(fn %Departure{schedule: %Schedule{departure_time: dt}} -> dt end)}
   end
 
   defp get_overnight_schedules_for_section(
@@ -567,11 +569,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         fetch_vehicles_fn
       )
     else
-      []
+      {false, []}
     end
   end
 
-  defp get_overnight_schedules_for_section(_, _, _, _, _, _, _), do: []
+  defp get_overnight_schedules_for_section(_, _, _, _, _, _, _), do: {false, []}
 
   # Verifies we are meeting the timeframe conditions for overnight mode and generates the departure widget
   defp get_overnight_departure_for_route(
@@ -609,7 +611,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       }
     else
       # Return an atom so we can track that there is still a departure for this route during today's service.
-      :departure_scheduled_today
+      :route_service_ongoing
     end
   end
 
@@ -645,7 +647,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       # Before 3am and before the last scheduled trip of the day.
       # Return an atom so we can track that there is still a departure for this route during today's service.
       DateTime.compare(now, last_schedule_today.departure_time) == :lt ->
-        :departure_scheduled_today
+        :route_service_ongoing
 
       true ->
         nil
