@@ -460,8 +460,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
-  # For sections configured only to show predictions and not schedules, we may override
-  # by returning a list of scheduled Departures from `get_overnight_schedules_for_section`
+  # Return 'overnight' Departures from `get_overnight_schedules_for_section` to potentially show
   # if one of the following is true for a given route_id/direction_id combo:
   # 1. Service for the route is done for the day, so we may display the first departure of tomorrow.
   # 2. Service for the route has not started for the day, so we may display the first departure of today.
@@ -536,7 +535,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         )
       end)
 
-    # We flag if any routes have a :route_service_ongoing, so the section is not fully overnight
+    # We flag if any routes have service ongoing so the section doesn't show as fully overnight
     is_sections_service_active = Enum.any?(overnight_schedules, &(&1 == :route_service_ongoing))
 
     {is_sections_service_active,
