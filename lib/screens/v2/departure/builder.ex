@@ -9,12 +9,52 @@ defmodule Screens.V2.Departure.Builder do
   alias Screens.V2.Departure
   alias Screens.Vehicles.Vehicle
 
-  @typep predictions_or_schedules :: [Prediction.t() | Schedule.t()]
+  @doc """
+  Merges Predictions and Schedules into Departures, and filters out any which should not be
+  presented to riders.
+  """
+  @spec build([Prediction.t()], [Schedule.t()], now :: DateTime.t()) :: [Departure.t()]
+  def build(predictions, schedules, now) do
+    relevant_predictions = relevant(predictions, now)
+    relevant_schedules = relevant(schedules, now)
 
-  @spec get_relevant_departures(predictions_or_schedules()) :: predictions_or_schedules()
-  @spec get_relevant_departures(predictions_or_schedules(), DateTime.t()) ::
-          predictions_or_schedules()
-  def get_relevant_departures(predictions_or_schedules, now \\ DateTime.utc_now()) do
+    predicted_trip_ids =
+      relevant_predictions
+      |> Enum.reject(&is_nil(&1.trip))
+      |> Enum.map(& &1.trip.id)
+      |> Enum.reject(&is_nil/1)
+      |> Enum.into(MapSet.new())
+
+    schedules_by_trip_id =
+      schedules
+      |> Enum.map(fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
+      |> Enum.into(%{})
+
+    predicted_departures =
+      relevant_predictions
+      |> Enum.map(fn
+        %{trip: %{id: trip_id}} = p when not is_nil(trip_id) ->
+          %Departure{prediction: p, schedule: Map.get(schedules_by_trip_id, trip_id)}
+
+        p ->
+          %Departure{prediction: p}
+      end)
+
+    scheduled_only_departures =
+      relevant_schedules
+      |> Enum.filter(fn
+        %{trip: %{id: trip_id}} when not is_nil(trip_id) -> trip_id not in predicted_trip_ids
+        _ -> false
+      end)
+      |> Enum.map(fn s -> %Departure{schedule: s} end)
+
+    predicted_departures
+    |> Enum.concat(scheduled_only_departures)
+    |> Enum.reject(&cancelled_or_skipped?/1)
+    |> Enum.sort_by(&Departure.time/1, DateTime)
+  end
+
+  defp relevant(predictions_or_schedules, now) do
     predictions_or_schedules
     |> Stream.reject(&in_past_or_nil_time?(&1, now))
     |> Stream.reject(&multi_route_duplicate?/1)
@@ -82,50 +122,6 @@ defmodule Screens.V2.Departure.Builder do
   defp earliest_time(%{arrival_time: time}) when not is_nil(time), do: time
   defp earliest_time(%{departure_time: time}) when not is_nil(time), do: time
   defp earliest_time(_prediction_or_schedule), do: nil
-
-  @spec merge_predictions_and_schedules([Prediction.t()], [Schedule.t()], [Schedule.t()]) :: [
-          Departure.t()
-        ]
-  def merge_predictions_and_schedules(filtered_predictions, filtered_schedules, all_schedules) do
-    predicted_trip_ids =
-      filtered_predictions
-      |> Enum.reject(&is_nil(&1.trip))
-      |> Enum.map(& &1.trip.id)
-      |> Enum.reject(&is_nil/1)
-      |> Enum.into(MapSet.new())
-
-    schedules_by_trip_id =
-      all_schedules
-      |> Enum.map(fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
-      |> Enum.into(%{})
-
-    predicted_departures =
-      filtered_predictions
-      |> Enum.map(fn
-        %{trip: %{id: trip_id}} = p when not is_nil(trip_id) ->
-          %Departure{prediction: p, schedule: Map.get(schedules_by_trip_id, trip_id)}
-
-        p ->
-          %Departure{prediction: p}
-      end)
-
-    unpredicted_departures =
-      filtered_schedules
-      |> Enum.filter(fn
-        %{trip: %{id: trip_id}} when not is_nil(trip_id) ->
-          trip_id not in predicted_trip_ids
-
-        _ ->
-          false
-      end)
-      |> Enum.map(fn s -> %Departure{schedule: s} end)
-
-    departures = predicted_departures ++ unpredicted_departures
-
-    departures
-    |> Enum.reject(&cancelled_or_skipped?/1)
-    |> Enum.sort_by(&Departure.time/1, DateTime)
-  end
 
   defp cancelled_or_skipped?(%Departure{prediction: %Prediction{schedule_relationship: sr}}),
     do: sr in [:cancelled, :skipped]
