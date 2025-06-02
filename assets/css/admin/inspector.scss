@@ -73,5 +73,9 @@
   iframe {
     width: 100%;
     border: 0;
+
+    &.simulation {
+      background-color: #3d5366;
+    }
   }
 }

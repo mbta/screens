@@ -152,6 +152,7 @@ const Inspector: ComponentType = () => {
         <input disabled value={iframeUrl} />
 
         <iframe
+          className={isSimulation ? "simulation" : undefined}
           name={INSPECTOR_FRAME_NAME}
           onLoad={() => {
             adjustFrame();
