@@ -399,7 +399,7 @@ defmodule Screens.V2.DepartureTest do
     end
   end
 
-  describe "fetch_predictions_and_schedules/2" do
+  describe "fetch/1" do
     test "maintains schedules even if they are in the past" do
       now = ~U[2024-08-28 17:13:14.116713Z]
       # The train is _very_ late!!
@@ -422,11 +422,12 @@ defmodule Screens.V2.DepartureTest do
       fetch_schedules_fn = fn _ -> {:ok, [schedule]} end
 
       assert {:ok, [%Departure{schedule: schedule, prediction: prediction}]} ==
-               Departure.fetch_predictions_and_schedules(
-                 [],
-                 now,
-                 fetch_predictions_fn,
-                 fetch_schedules_fn
+               Departure.fetch(
+                 %{},
+                 include_schedules: true,
+                 now: now,
+                 fetch_predictions_fn: fetch_predictions_fn,
+                 fetch_schedules_fn: fetch_schedules_fn
                )
     end
   end
