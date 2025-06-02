@@ -206,7 +206,7 @@ defmodule Screens.LocationContext do
       |> Enum.flat_map(& &1.stops)
       |> Enum.map(fn
         %Stop{id: id, parent_station: nil} -> {id, id}
-        %Stop{id: id, parent_station: parent_id} -> {id, parent_id}
+        %Stop{id: id, parent_station: %Stop{id: parent_id}} -> {id, parent_id}
       end)
       |> Map.new()
 
