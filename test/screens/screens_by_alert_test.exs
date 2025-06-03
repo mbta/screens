@@ -3,7 +3,6 @@ defmodule Screens.ScreensByAlertTest do
   use ExUnit.Case
   alias Screens.ScreensByAlert
 
-  @tag :skip
   describe "get_screens_by_alert/1" do
     setup do
       ScreensByAlert.put_data(1, [1])

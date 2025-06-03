@@ -1,5 +1,5 @@
 # first, get the elixir dependencies within an Elixir + Alpine Linux container
-FROM hexpm/elixir:1.15.7-erlang-26.2.1-alpine-3.18.4 AS elixir-builder
+FROM hexpm/elixir:1.17.3-erlang-27.3.4-alpine-3.21.3 AS elixir-builder
 
 ENV LANG="C.UTF-8" MIX_ENV="prod"
 
@@ -38,7 +38,7 @@ COPY --from=assets-builder /root/priv/static ./priv/static
 RUN mix do compile --force, phx.digest, sentry.package_source_code, release
 
 # finally, use an Alpine container for the runtime environment
-FROM alpine:3.18.4
+FROM alpine:3.21.3
 
 ENV MIX_ENV="prod" TERM="xterm" LANG="C.UTF-8" PORT="4000"
 
@@ -46,8 +46,8 @@ WORKDIR /root
 ADD . .
 
 RUN apk --update add \
-  # erlang-crypto requires system library libssl1.1
-  libssl1.1 \
+  # erlang-crypto requires system library libssl3
+  libssl3 \
   # Erlang/OTP 24+ requires a glibc version that ships with asmjit
   libstdc++ libgcc ncurses-libs \
   # Clean up the package cache after install
