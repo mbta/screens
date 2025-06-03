@@ -1,62 +1,59 @@
-# first, get the elixir dependencies within an Elixir + Alpine Linux container
-FROM hexpm/elixir:1.15.7-erlang-26.2.1-alpine-3.18.4 AS elixir-builder
+ARG ALPINE_VERSION=3.21.3
+ARG ELIXIR_VERSION=1.17.3
+ARG ERLANG_VERSION=27.3.4
+ARG NODE_VERSION=18.20.2
 
-ENV LANG="C.UTF-8" MIX_ENV="prod"
 
+# --- Set up Elixir app builder
+
+FROM hexpm/elixir:${ELIXIR_VERSION}-erlang-${ERLANG_VERSION}-alpine-${ALPINE_VERSION} AS elixir-builder
+
+ENV MIX_ENV="prod"
 WORKDIR /root
 ADD . .
 
-# Install git
-RUN apk --update add git make
+RUN apk add --update git make
 
-# Install Hex+Rebar
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get --only prod
 
-# next, build the frontend assets within a Node.JS container
-FROM node:18 as assets-builder
+
+# --- Build frontend assets
+
+FROM node:${NODE_VERSION} AS assets-builder
 
 WORKDIR /root
 ADD . .
 
-# copy in elixir deps required to build node modules for phoenix
+# copy in elixir deps, required to build node modules for phoenix
 COPY --from=elixir-builder /root/deps ./deps
 
 RUN npm --prefix assets ci
 RUN npm --prefix assets run deploy
 
-# now, build the application back in the Elixir + Alpine container
-FROM elixir-builder as app-builder
 
-ENV LANG="C.UTF-8" MIX_ENV="prod"
+# --- Build final application
 
+FROM elixir-builder AS app-builder
+
+ENV MIX_ENV="prod"
 WORKDIR /root
 
-# add frontend assets compiled in node container, required by phx.digest
+# add frontend assets built earlier, required by phx.digest
 COPY --from=assets-builder /root/priv/static ./priv/static
 
 RUN mix do compile --force, phx.digest, sentry.package_source_code, release
 
-# finally, use an Alpine container for the runtime environment
-FROM alpine:3.18.4
 
-ENV MIX_ENV="prod" TERM="xterm" LANG="C.UTF-8" PORT="4000"
+# --- Set up runtime container and copy built app into it
 
+FROM hexpm/erlang:${ERLANG_VERSION}-alpine-${ALPINE_VERSION}
+
+ENV MIX_ENV="prod" PORT="4000"
 WORKDIR /root
 ADD . .
 
-RUN apk --update add \
-  # erlang-crypto requires system library libssl1.1
-  libssl1.1 \
-  # Erlang/OTP 24+ requires a glibc version that ships with asmjit
-  libstdc++ libgcc ncurses-libs \
-  # Clean up the package cache after install
-  && rm -rf /var/cache/apk
-
-# add frontend assets with manifests from app build container
 COPY --from=app-builder /root/priv/static ./priv/static
-# add application artifact comipled in app build container
 COPY --from=app-builder /root/_build/prod/rel/screens .
 
-# run the application
 CMD ["bin/screens", "start"]

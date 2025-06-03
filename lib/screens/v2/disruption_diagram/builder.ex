@@ -947,7 +947,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   defp gap_indices(builder) do
     home_stop = builder.metadata.home_stop
 
-    closure_left..closure_right = closure_indices(builder)
+    closure_left..closure_right//1 = closure_indices(builder)
 
     cond do
       home_stop < closure_left -> (home_stop + 1)..(closure_left - 1)//1
