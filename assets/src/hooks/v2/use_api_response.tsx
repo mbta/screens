@@ -171,6 +171,7 @@ const useBaseApiResponse = ({
   appendPath,
 }: UseBaseApiResponseOpts): UseApiResponseReturn => {
   const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
+  const adjustedRefreshRateMs = useInspectorRateOverride() ?? refreshRateMs;
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
@@ -217,7 +218,7 @@ const useBaseApiResponse = ({
     () => {
       fetchData();
     },
-    refreshRateMs,
+    adjustedRefreshRateMs,
     refreshRateOffsetMs,
   );
 
@@ -251,6 +252,16 @@ const selectVariant = (
   } else {
     return response;
   }
+};
+
+const useInspectorRateOverride = (): number | null => {
+  const [override, setOverride] = useState<number | null>(null);
+
+  useReceiveFromInspector((message) => {
+    if (message.type == "set_refresh_rate") setOverride(message.ms);
+  });
+
+  return override;
 };
 
 const useInspectorVariant = (): string | null => {

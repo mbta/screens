@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Subway
   alias Screens.V2.AlertsWidget
   alias Screens.V2.CandidateGenerator
@@ -59,7 +58,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       | location_context: %{
           widget.location_context
-          | alert_route_types: LocationContext.route_type_filter(app_config_module, stop_id),
+          | alert_route_types: LocationContext.route_type_filter(app_config_module, [stop_id]),
             home_stop: stop_id
         }
     }
@@ -70,7 +69,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp put_tagged_stop_sequences(widget, tagged_sequences) do
-    sequences = RoutePattern.untag_stop_sequences(tagged_sequences)
+    sequences = LocationContext.untag_stop_sequences(tagged_sequences)
 
     %{
       widget
@@ -78,9 +77,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           widget.location_context
           | tagged_stop_sequences: tagged_sequences,
             upstream_stops:
-              LocationContext.upstream_stop_id_set(widget.location_context.home_stop, sequences),
+              LocationContext.upstream_stop_id_set([widget.location_context.home_stop], sequences),
             downstream_stops:
-              LocationContext.downstream_stop_id_set(widget.location_context.home_stop, sequences)
+              LocationContext.downstream_stop_id_set(
+                [widget.location_context.home_stop],
+                sequences
+              )
         }
     }
   end
@@ -95,8 +97,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     }
   end
 
-  defp put_informed_stations(widget, stations) do
-    %{widget | informed_stations: stations}
+  defp put_informed_station_names(widget, stations) do
+    %{widget | informed_station_names: stations}
   end
 
   defp put_app_id(widget, app_id) do
@@ -230,7 +232,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       |> put_home_stop(PreFare, home_stop)
       |> put_tagged_stop_sequences(tagged_stop_sequences)
-      |> put_informed_stations(["Downtown Crossing"])
+      |> put_informed_station_names(["Downtown Crossing"])
       |> put_routes_at_stop(routes)
 
     %{widget: widget}
@@ -265,7 +267,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget
       |> put_home_stop(PreFare, home_stop)
       |> put_tagged_stop_sequences(tagged_stop_sequences)
-      |> put_informed_stations(["Malden Center"])
+      |> put_informed_station_names(["Malden Center"])
       |> put_routes_at_stop(routes)
 
     %{widget: widget}
@@ -308,7 +310,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp setup_informed_entities_string(%{widget: widget}) do
-    %{widget: put_informed_stations(widget, ["Downtown Crossing"])}
+    %{widget: put_informed_station_names(widget, ["Downtown Crossing"])}
   end
 
   defp setup_location_context(%{widget: widget}) do
@@ -1760,7 +1762,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_informed_stations(["Wellington"])
+        |> put_informed_station_names(["Wellington"])
 
       expected = %{
         issue: "Trains will bypass Wellington",
@@ -1792,7 +1794,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           "Red" => [["place-portr", "place-asmnl"]]
         })
         |> put_cause(:unknown)
-        |> put_informed_stations(["Porter"])
+        |> put_informed_station_names(["Porter"])
         |> put_partial_closure_platform_names(["Ashmont/Braintree"])
 
       expected = %{
@@ -1826,7 +1828,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           "Red" => [["place-jfk", "place-andrw"]]
         })
         |> put_cause(:unknown)
-        |> put_informed_stations(["JFK/UMass"])
+        |> put_informed_station_names(["JFK/UMass"])
         |> put_partial_closure_platform_names(["Ashmont", "Braintree"])
 
       expected = %{
@@ -1879,7 +1881,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop: "place-welln", route: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
-        |> put_informed_stations(["Wellington"])
+        |> put_informed_station_names(["Wellington"])
 
       expected = %{
         issue: "Trains will bypass Wellington",
@@ -2835,7 +2837,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       now = ~U[2022-06-24 12:00:00Z]
       tagged_station_sequences = %{"Orange" => [Subway.route_stop_sequence("Orange")]}
-      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
+      station_sequences = LocationContext.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Wellington" end
@@ -2845,10 +2847,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          %LocationContext{
            home_stop: stop_id,
            tagged_stop_sequences: tagged_station_sequences,
-           upstream_stops: LocationContext.upstream_stop_id_set(stop_id, station_sequences),
-           downstream_stops: LocationContext.downstream_stop_id_set(stop_id, station_sequences),
+           upstream_stops: LocationContext.upstream_stop_id_set([stop_id], station_sequences),
+           downstream_stops: LocationContext.downstream_stop_id_set([stop_id], station_sequences),
            routes: routes_at_stop,
-           alert_route_types: LocationContext.route_type_filter(PreFare, stop_id)
+           alert_route_types: LocationContext.route_type_filter(PreFare, [stop_id])
          }}
       end
 
@@ -3247,7 +3249,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       now = ~U[2022-06-24 12:00:00Z]
       tagged_station_sequences = %{"Green" => [Subway.route_stop_sequence("Green")]}
-      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
+      station_sequences = LocationContext.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, alerts} end
       fetch_stop_name_fn = fn _ -> "Government Center" end
@@ -3257,10 +3259,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          %LocationContext{
            home_stop: stop_id,
            tagged_stop_sequences: tagged_station_sequences,
-           upstream_stops: LocationContext.upstream_stop_id_set(stop_id, station_sequences),
-           downstream_stops: LocationContext.downstream_stop_id_set(stop_id, station_sequences),
+           upstream_stops: LocationContext.upstream_stop_id_set([stop_id], station_sequences),
+           downstream_stops: LocationContext.downstream_stop_id_set([stop_id], station_sequences),
            routes: routes_at_stop,
-           alert_route_types: LocationContext.route_type_filter(PreFare, stop_id)
+           alert_route_types: LocationContext.route_type_filter(PreFare, [stop_id])
          }}
       end
 

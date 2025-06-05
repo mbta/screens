@@ -10,97 +10,99 @@ defmodule Screens.V2.Departure.BuilderTest do
   alias Screens.V2.Departure
   alias Screens.V2.Departure.Builder
 
-  describe "get_relevant_departures/1" do
-    test "filters out departures with both arrival_time and departure_time nil" do
-      d1 = %Prediction{id: "arrival", arrival_time: ~U[2020-02-01T01:00:00Z], departure_time: nil}
+  describe "build/3" do
+    @now ~U[2020-01-01T01:00:00Z]
 
-      d2 = %Prediction{
+    defp to_departures(predictions_or_schedules) do
+      Enum.map(predictions_or_schedules, fn
+        %Prediction{} = p -> %Departure{prediction: p, schedule: nil}
+        %Schedule{} = s -> %Departure{prediction: nil, schedule: s}
+      end)
+    end
+
+    test "filters out departures with both arrival_time and departure_time nil" do
+      p1 = %Prediction{id: "arrival", arrival_time: ~U[2020-02-01T01:00:00Z], departure_time: nil}
+
+      p2 = %Prediction{
         id: "departure",
         arrival_time: nil,
         departure_time: ~U[2020-02-01T01:00:00Z]
       }
 
-      d3 = %Prediction{
+      p3 = %Prediction{
         id: "both",
         arrival_time: ~U[2020-02-01T01:00:00Z],
         departure_time: ~U[2020-02-01T01:00:00Z]
       }
 
-      d4 = %Prediction{id: "neither", arrival_time: nil, departure_time: nil}
-      departures = [d1, d2, d3, d4]
+      p4 = %Prediction{id: "neither", arrival_time: nil, departure_time: nil}
 
-      now = ~U[2020-01-01T01:00:00Z]
+      actual = Builder.build([p1, p2, p3, p4], [], @now)
+      expected = to_departures([p1, p2, p3])
 
-      assert MapSet.new([d1, d2, d3]) ==
-               MapSet.new(Builder.get_relevant_departures(departures, now))
+      assert Enum.sort(actual) == Enum.sort(expected)
     end
 
     test "filters out departures in the past" do
-      d1 = %Schedule{id: "1", arrival_time: ~U[2020-01-01T00:00:00Z]}
+      p1 = %Prediction{id: "1", arrival_time: ~U[2020-01-01T00:00:00Z]}
 
-      d2 = %Schedule{
+      p2 = %Prediction{
         id: "2",
         arrival_time: ~U[2020-01-01T00:00:00Z],
         departure_time: ~U[2020-01-01T02:00:00Z]
       }
 
-      d3 = %Schedule{id: "3", departure_time: ~U[2020-01-01T00:00:00Z]}
-      d4 = %Schedule{id: "4", departure_time: ~U[2020-01-01T02:00:00Z]}
-      d5 = %Schedule{id: "5", arrival_time: ~U[2020-02-01T00:00:00Z]}
-      departures = [d1, d2, d3, d4, d5]
+      p3 = %Prediction{id: "3", departure_time: ~U[2020-01-01T00:00:00Z]}
+      p4 = %Prediction{id: "4", departure_time: ~U[2020-01-01T02:00:00Z]}
+      p5 = %Prediction{id: "5", arrival_time: ~U[2020-02-01T00:00:00Z]}
 
-      now = ~U[2020-01-01T01:00:00Z]
-
-      assert MapSet.new([d2, d4, d5]) ==
-               MapSet.new(Builder.get_relevant_departures(departures, now))
+      assert Builder.build([p1, p2, p3, p4, p5], [], @now) == to_departures([p2, p4, p5])
     end
 
     test "filters out extra departures for multi-route trips" do
-      d1 = %Prediction{
+      p1 = %Prediction{
         id: "1",
         trip: %Trip{id: "47610992", route_id: "214216"},
         route: %Route{id: "214"},
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      d2 = %Prediction{
+      p2 = %Prediction{
         id: "2",
         trip: %Trip{id: "47610992", route_id: "214216"},
         route: %Route{id: "216"},
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      d3 = %Prediction{
+      p3 = %Prediction{
         id: "3",
         trip: %Trip{id: "47610992", route_id: "214216"},
         route: %Route{id: "214216"},
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      d4 = %Prediction{
+      p4 = %Prediction{
         id: "4",
         trip: nil,
         route: %Route{id: "214216"},
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      d5 = %Prediction{
+      p5 = %Prediction{
         id: "5",
         trip: %Trip{id: "47610994", route_id: "214216"},
         route: nil,
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      departures = [d1, d2, d3, d4, d5]
+      actual = Builder.build([p1, p2, p3, p4, p5], [], @now)
+      expected = to_departures([p3, p4, p5])
 
-      now = ~U[2020-01-01T00:00:00Z]
-
-      assert MapSet.new([d3, d4, d5]) ==
-               MapSet.new(Builder.get_relevant_departures(departures, now))
+      assert Enum.sort(actual) == Enum.sort(expected)
     end
 
     test "filters out departures for departed vehicles" do
-      d1 = %Prediction{
+      p1 = %Prediction{
         id: "1",
         stop: %Stop{id: "2"},
         trip: %Trip{id: "t1", stops: ["1", "2", "3"]},
@@ -108,7 +110,7 @@ defmodule Screens.V2.Departure.BuilderTest do
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      d2 = %Prediction{
+      p2 = %Prediction{
         id: "2",
         stop: %Stop{id: "2"},
         trip: %Trip{id: "t11", stops: ["1", "2", "3"]},
@@ -116,7 +118,7 @@ defmodule Screens.V2.Departure.BuilderTest do
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      d3 = %Prediction{
+      p3 = %Prediction{
         id: "3",
         stop: %Stop{id: "2"},
         trip: %Trip{id: "t21", stops: ["3", "2", "1"]},
@@ -124,7 +126,7 @@ defmodule Screens.V2.Departure.BuilderTest do
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      d4 = %Prediction{
+      p4 = %Prediction{
         id: "4",
         stop: %Stop{id: "2"},
         trip: %Trip{id: "t31", stops: []},
@@ -132,7 +134,7 @@ defmodule Screens.V2.Departure.BuilderTest do
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      d5 = %Prediction{
+      p5 = %Prediction{
         id: "5",
         stop: %Stop{id: "2"},
         trip: %Trip{id: "t41", stops: ["1", "2", "3"]},
@@ -140,50 +142,41 @@ defmodule Screens.V2.Departure.BuilderTest do
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
 
-      departures = [d1, d2, d3, d4, d5]
-      now = ~U[2020-01-01T00:00:00Z]
-
-      assert MapSet.new([d2, d3, d4, d5]) ==
-               MapSet.new(Builder.get_relevant_departures(departures, now))
+      assert Builder.build([p1, p2, p3, p4, p5], [], @now) == to_departures([p2, p3, p4, p5])
     end
 
     test "returns only the earliest departure on each trip" do
-      d1 = %Schedule{id: "1", trip: %Trip{id: "t1"}, departure_time: ~U[2020-02-01T00:00:00Z]}
-      d2 = %Schedule{id: "2", trip: %Trip{id: "t1"}, departure_time: ~U[2020-02-01T00:01:00Z]}
-      d3 = %Schedule{id: "3", trip: %Trip{id: "t2"}, departure_time: ~U[2020-02-01T01:01:00Z]}
-      d4 = %Schedule{id: "4", trip: %Trip{id: "t2"}, departure_time: ~U[2020-02-01T01:00:00Z]}
-      d5 = %Schedule{id: "5", trip: %Trip{id: nil}, departure_time: ~U[2020-02-01T00:00:00Z]}
-      d6 = %Schedule{id: "6", trip: nil, departure_time: ~U[2020-02-01T00:00:00Z]}
-      departures = [d1, d2, d3, d4, d5, d6]
+      p1 = %Prediction{id: "1", trip: %Trip{id: "t1"}, departure_time: ~U[2020-02-01T00:00:00Z]}
+      p2 = %Prediction{id: "2", trip: %Trip{id: "t1"}, departure_time: ~U[2020-02-01T00:01:00Z]}
+      p3 = %Prediction{id: "3", trip: %Trip{id: "t2"}, departure_time: ~U[2020-02-01T01:01:00Z]}
+      p4 = %Prediction{id: "4", trip: %Trip{id: "t2"}, departure_time: ~U[2020-02-01T01:00:00Z]}
+      p5 = %Prediction{id: "5", trip: %Trip{id: nil}, departure_time: ~U[2020-02-01T00:00:00Z]}
+      p6 = %Prediction{id: "6", trip: nil, departure_time: ~U[2020-02-01T00:00:00Z]}
 
-      now = ~U[2020-01-01T00:00:00Z]
+      actual = Builder.build([p1, p2, p3, p4, p5, p6], [], @now)
+      expected = to_departures([p1, p4, p5, p6])
 
-      assert MapSet.new([d1, d4, d5, d6]) ==
-               MapSet.new(Builder.get_relevant_departures(departures, now))
+      assert Enum.sort(actual) == Enum.sort(expected)
     end
 
     test "sorts departures by arrival time if present, departure time if not" do
       # arrives earlier, departs later
-      d1 = %Schedule{
+      p1 = %Prediction{
         id: "1",
-        arrival_time: ~U[2020-02-01T00:00:01Z],
-        departure_time: ~U[2020-02-01T00:00:05Z]
+        arrival_time: ~U[2020-02-01T01:00:01Z],
+        departure_time: ~U[2020-02-01T01:00:05Z]
       }
 
       # arrives later, departs earlier
-      d2 = %Schedule{
+      p2 = %Prediction{
         id: "2",
-        arrival_time: ~U[2020-02-01T00:00:02Z],
-        departure_time: ~U[2020-02-01T00:00:03Z]
+        arrival_time: ~U[2020-02-01T01:00:02Z],
+        departure_time: ~U[2020-02-01T01:00:03Z]
       }
 
-      now = ~U[2020-01-01T00:00:00Z]
-
-      assert [d1, d2] == Builder.get_relevant_departures([d2, d1], now)
+      assert Builder.build([p2, p1], [], @now) == to_departures([p1, p2])
     end
-  end
 
-  describe "merge_predictions_and_schedules/2" do
     test "combines predictions and schedules with matching trip_ids" do
       p1 = %Prediction{id: "p1", departure_time: ~U[2020-02-01T00:00:00Z], trip: %Trip{id: "t7"}}
       p2 = %Prediction{id: "p2", departure_time: ~U[2020-02-01T01:00:00Z], trip: %Trip{id: "t3"}}
@@ -198,8 +191,7 @@ defmodule Screens.V2.Departure.BuilderTest do
         %Departure{prediction: p2, schedule: s1}
       ]
 
-      assert expected ==
-               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
+      assert expected == Builder.build(predictions, schedules, @now)
     end
 
     test "returns predictions without matching schedules" do
@@ -215,8 +207,7 @@ defmodule Screens.V2.Departure.BuilderTest do
         %Departure{prediction: p2, schedule: nil}
       ]
 
-      assert expected ==
-               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
+      assert expected == Builder.build(predictions, schedules, @now)
     end
 
     test "returns schedules without matching predictions" do
@@ -232,8 +223,7 @@ defmodule Screens.V2.Departure.BuilderTest do
         %Departure{prediction: nil, schedule: s1}
       ]
 
-      assert expected ==
-               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
+      assert expected == Builder.build(predictions, schedules, @now)
     end
 
     test "returns departures in increasing time order" do
@@ -272,8 +262,7 @@ defmodule Screens.V2.Departure.BuilderTest do
         %Departure{prediction: p3, schedule: nil}
       ]
 
-      assert expected ==
-               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
+      assert expected == Builder.build(predictions, schedules, @now)
     end
 
     test "filters out departures that have been marked cancelled" do
@@ -294,8 +283,7 @@ defmodule Screens.V2.Departure.BuilderTest do
 
       expected = [%Departure{prediction: p1, schedule: s2}]
 
-      assert expected ==
-               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
+      assert expected == Builder.build(predictions, schedules, @now)
     end
 
     test "filters out departures that have been marked skipped" do
@@ -316,8 +304,7 @@ defmodule Screens.V2.Departure.BuilderTest do
 
       expected = [%Departure{prediction: p1, schedule: s2}]
 
-      assert expected ==
-               Builder.merge_predictions_and_schedules(predictions, schedules, schedules)
+      assert expected == Builder.build(predictions, schedules, @now)
     end
   end
 end

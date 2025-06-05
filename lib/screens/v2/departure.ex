@@ -35,64 +35,32 @@ defmodule Screens.V2.Departure do
 
   @type fetch :: (params(), opts() -> result())
 
-  @default_params %{sort: "departure_time"}
-
   @callback fetch(params(), opts()) :: result()
   def fetch(params, opts \\ []) do
     # This is equivalent to an argument with a default value, so it's fine
     # credo:disable-for-next-line Screens.Checks.UntestableDateTime
     now = Keyword.get(opts, :now, DateTime.utc_now())
+    fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
-    if opts[:include_schedules] do
-      fetch_predictions_and_schedules(params, now)
-    else
-      fetch_predictions_only(params, now)
-    end
-  end
-
-  def fetch_predictions_and_schedules(
-        params,
-        now,
-        fetch_predictions_fn \\ &Prediction.fetch/1,
-        fetch_schedules_fn \\ &Schedule.fetch/1
-      ) do
     with {:ok, predictions} <- fetch_predictions_fn.(params),
-         {:ok, schedules} <- fetch_schedules_fn.(params) do
-      relevant_predictions = Builder.get_relevant_departures(predictions, now)
-      relevant_schedules = Builder.get_relevant_departures(schedules, now)
-
-      departures =
-        Builder.merge_predictions_and_schedules(
-          relevant_predictions,
-          relevant_schedules,
-          schedules
-        )
-
-      {:ok, departures}
+         {:ok, schedules} <- fetch_schedules(params, opts) do
+      {:ok, Builder.build(predictions, schedules, now)}
     else
       _ -> :error
     end
   end
 
-  def fetch_predictions_only(params, now) do
-    case Prediction.fetch(params) do
-      {:ok, predictions} ->
-        relevant_predictions = Builder.get_relevant_departures(predictions, now)
-        departures = Enum.map(relevant_predictions, fn p -> %__MODULE__{prediction: p} end)
-        {:ok, departures}
-
-      :error ->
-        :error
+  defp fetch_schedules(params, opts) do
+    if opts[:include_schedules] do
+      fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
+      fetch_fn.(params)
+    else
+      {:ok, []}
     end
   end
 
   def do_fetch(endpoint, params) do
-    encoded_params =
-      @default_params
-      |> Map.merge(params)
-      |> Enum.map(&encode_param/1)
-      |> Enum.reject(&is_nil/1)
-      |> Map.new()
+    encoded_params = params |> Enum.map(&encode_param/1) |> Enum.reject(&is_nil/1) |> Map.new()
 
     case V3Api.get_json(endpoint, encoded_params) do
       {:ok, result} -> {:ok, V3Api.Parser.parse(result)}

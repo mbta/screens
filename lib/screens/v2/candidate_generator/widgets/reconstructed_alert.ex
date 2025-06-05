@@ -3,7 +3,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -59,7 +58,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
     # Filtering by subway and light_rail types
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
-         route_ids <- Route.route_ids(location_context.routes),
+         route_ids <- LocationContext.route_ids(location_context),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       relevant_alerts = relevant_alerts(alerts, location_context, now)
       is_terminal_station = terminal?(stop_id, LocationContext.stop_sequences(location_context))
@@ -168,7 +167,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         alert: alert,
         now: now,
         location_context: location_context,
-        informed_stations: get_stations(alert, fetch_stop_name_fn),
+        home_station_name: fetch_station_name(location_context.home_stop, fetch_stop_name_fn),
+        informed_station_names: get_stations(alert, fetch_stop_name_fn),
         is_terminal_station: is_terminal_station,
         is_priority: is_priority,
         partial_closure_platform_names: all_platforms_names_at_informed_station
@@ -355,17 +355,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         stop_ids
         |> Enum.filter(&String.starts_with?(&1, "place-"))
         |> Enum.uniq()
-        |> Enum.flat_map(
-          &case fetch_stop_name_fn.(&1) do
-            :error -> []
-            "Massachusetts Avenue" -> ["Mass Ave"]
-            name -> [name]
-          end
-        )
+        |> Enum.map(&fetch_station_name(&1, fetch_stop_name_fn))
+        |> Enum.reject(&is_nil/1)
     end
   end
 
   defp get_stations(_alert, _fetch_stop_name_fn), do: []
+
+  defp fetch_station_name(id, fetch_stop_name_fn) do
+    case fetch_stop_name_fn.(id) do
+      "Massachusetts Avenue" -> ["Mass Ave"]
+      name -> name
+    end
+  end
 
   defp terminal?(stop_id, stop_sequences) do
     # Can't use Enum.any, because then Govt Center will be seen as a terminal

@@ -1,24 +1,15 @@
 defmodule Screens.V2.CandidateGenerator.GlEink do
   @moduledoc false
 
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
+  alias Screens.V2.WidgetInstance.{BottomScreenFiller, FareInfoFooter, NormalHeader}
   alias ScreensConfig.{Departures, Footer, Header}
   alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Departures.Query.Params
   alias ScreensConfig.{FreeTextLine, Screen}
   alias ScreensConfig.Screen.GlEink
-
-  alias Screens.V2.WidgetInstance.{
-    BottomScreenFiller,
-    FareInfoFooter,
-    LineMap,
-    NormalHeader
-  }
-
-  @scheduled_terminal_departure_lookback_seconds 180
 
   @behaviour CandidateGenerator
 
@@ -79,6 +70,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         config,
         now \\ DateTime.utc_now(),
         fetch_destination_fn \\ &fetch_destination/2,
+        line_map_instances_fn \\ &__MODULE__.LineMap.instances/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/3,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
@@ -91,7 +83,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
       end,
       fn -> alert_instances_fn.(config) end,
       fn -> footer_instances(config) end,
-      fn -> line_map_instances(config, now) end,
+      fn -> line_map_instances_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> bottom_screen_filler_instances(config) end,
       fn -> subway_status_instances_fn.(config, now) end
@@ -102,40 +94,6 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
 
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
-
-  defp line_map_instances(
-         %Screen{
-           app_params: %GlEink{
-             line_map: %ScreensConfig.LineMap{
-               station_id: station_id,
-               direction_id: direction_id,
-               route_id: route_id
-             }
-           }
-         } = config,
-         now,
-         stops_by_route_and_direction_fn \\ &RoutePattern.stops_by_route_and_direction/2,
-         fetch_departures_fn \\ &Screens.V2.Departure.fetch/2
-       ) do
-    with {:ok, stops} <- stops_by_route_and_direction_fn.(route_id, direction_id),
-         {:ok, reverse_stops} <- stops_by_route_and_direction_fn.(route_id, 1 - direction_id),
-         {:ok, departures} <-
-           fetch_departures_fn.(%{stop_ids: [station_id]},
-             include_schedules: true,
-             now: DateTime.add(now, -@scheduled_terminal_departure_lookback_seconds)
-           ) do
-      [
-        %LineMap{
-          screen: config,
-          stops: stops,
-          reverse_stops: reverse_stops,
-          departures: departures
-        }
-      ]
-    else
-      _ -> []
-    end
-  end
 
   def header_instances(config, now, fetch_destination_fn) do
     %Screen{

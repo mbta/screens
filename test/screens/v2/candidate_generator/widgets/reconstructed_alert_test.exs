@@ -5,7 +5,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.{Busway, PreFare}
@@ -93,7 +92,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         "A" => [["place-ogmnl", "place-mlmnl", "place-welln", "place-astao"]]
       }
 
-      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+      stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
 
       fetch_stop_name_fn = fn
         "place-ogmnl" -> "Oak Grove"
@@ -105,10 +104,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
       location_context = %LocationContext{
         home_stop: stop_id,
         tagged_stop_sequences: tagged_stop_sequences,
-        upstream_stops: LocationContext.upstream_stop_id_set(stop_id, stop_sequences),
-        downstream_stops: LocationContext.downstream_stop_id_set(stop_id, stop_sequences),
+        upstream_stops: LocationContext.upstream_stop_id_set([stop_id], stop_sequences),
+        downstream_stops: LocationContext.downstream_stop_id_set([stop_id], stop_sequences),
         routes: routes_at_stop,
-        alert_route_types: LocationContext.route_type_filter(app, stop_id)
+        alert_route_types: LocationContext.route_type_filter(app, [stop_id])
       }
 
       %{
@@ -123,7 +122,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         fetch_location_context_fn: fn _, _, _ -> {:ok, location_context} end,
         fetch_subway_platforms_for_stop_fn: fn _ -> [] end,
         x_fetch_alerts_fn: fn _ -> :error end,
-        x_fetch_stop_name_fn: fn _ -> :error end,
+        x_fetch_stop_name_fn: fn _ -> nil end,
         x_fetch_location_context_fn: fn _, _, _ -> :error end
       }
     end
@@ -167,6 +166,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         is_terminal_station: true,
+        home_station_name: "Oak Grove",
         all_platforms_at_informed_station: []
       }
 
@@ -180,7 +180,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            informed_stations: ["Oak Grove"]
+            informed_station_names: ["Oak Grove"]
           },
           expected_common_data
         ),
@@ -192,7 +192,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_stations: ["Malden Center"]
+            informed_station_names: ["Malden Center"]
           },
           expected_common_data
         ),
@@ -205,7 +205,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
-            informed_stations: []
+            informed_station_names: []
           },
           expected_common_data
         )
@@ -262,6 +262,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         is_terminal_station: true,
+        home_station_name: "Oak Grove",
         all_platforms_at_informed_station: []
       }
 
@@ -275,7 +276,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            informed_stations: ["Malden Center"]
+            informed_station_names: ["Malden Center"]
           },
           expected_common_data
         ),
@@ -288,7 +289,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            informed_stations: []
+            informed_station_names: []
           },
           expected_common_data
         ),
@@ -300,7 +301,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-astao")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_stations: ["Assembly"]
+            informed_station_names: ["Assembly"]
           },
           expected_common_data
         )
@@ -345,6 +346,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         is_terminal_station: true,
+        home_station_name: "Oak Grove",
         all_platforms_at_informed_station: []
       }
 
@@ -359,7 +361,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            informed_stations: []
+            informed_station_names: []
           },
           expected_common_data
         )
@@ -440,7 +442,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         screen: config,
         location_context: location_context,
         now: now,
-        informed_stations: [],
+        home_station_name: nil,
+        informed_station_names: [],
         all_platforms_at_informed_station: [],
         is_terminal_station: true
       }
@@ -510,6 +513,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         is_terminal_station: true,
         is_priority: true,
+        home_station_name: "Oak Grove",
         all_platforms_at_informed_station: []
       }
 
@@ -522,7 +526,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-ogmnl", direction_id: 0)],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_stations: []
+            informed_station_names: []
           },
           expected_common_data
         ),
@@ -534,7 +538,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_stations: []
+            informed_station_names: []
           },
           expected_common_data
         )

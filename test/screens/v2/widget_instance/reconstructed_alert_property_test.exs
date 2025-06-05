@@ -11,7 +11,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Subway
   alias Screens.Util
   alias Screens.V2.CandidateGenerator
@@ -1143,7 +1142,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
       tagged_station_sequences =
         Map.new(route_ids_at_stop, fn id -> {id, [Subway.route_stop_sequence(id)]} end)
 
-      station_sequences = RoutePattern.untag_stop_sequences(tagged_station_sequences)
+      station_sequences = LocationContext.untag_stop_sequences(tagged_station_sequences)
 
       fetch_alerts_fn = fn _ -> {:ok, [alert]} end
       fetch_stop_name_fn = fn _ -> "Test" end
@@ -1153,10 +1152,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
          %LocationContext{
            home_stop: stop_id,
            tagged_stop_sequences: tagged_station_sequences,
-           upstream_stops: LocationContext.upstream_stop_id_set(stop_id, station_sequences),
-           downstream_stops: LocationContext.downstream_stop_id_set(stop_id, station_sequences),
+           upstream_stops: LocationContext.upstream_stop_id_set([stop_id], station_sequences),
+           downstream_stops: LocationContext.downstream_stop_id_set([stop_id], station_sequences),
            routes: routes_at_stop,
-           alert_route_types: LocationContext.route_type_filter(PreFare, stop_id)
+           alert_route_types: LocationContext.route_type_filter(PreFare, [stop_id])
          }}
       end
 

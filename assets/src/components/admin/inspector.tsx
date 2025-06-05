@@ -105,7 +105,7 @@ const Inspector: ComponentType = () => {
     if (frameWindow) sendMessage(frameWindow, message);
   };
 
-  const [zoom, setZoom] = useState(1.0);
+  const [zoom, setZoom] = useState(0.5);
   const adjustFrame = () => adjustScreenFrame(frameRef, isSimulation, zoom);
   useLayoutEffect(adjustFrame, [zoom]);
 
@@ -132,7 +132,11 @@ const Inspector: ComponentType = () => {
                   screen={screen}
                   onUpdated={(config) => onScreenUpdated(screen.id, config)}
                 />
-                <ViewControls zoom={zoom} setZoom={setZoom} />
+                <ViewControls
+                  zoom={zoom}
+                  setZoom={setZoom}
+                  isSimulation={isSimulation}
+                />
                 <DataControls
                   // Reset when the iframe reloads, since the screen will no
                   // longer be aware of previously-sent inspector messages
@@ -152,6 +156,7 @@ const Inspector: ComponentType = () => {
         <input disabled value={iframeUrl} />
 
         <iframe
+          className={isSimulation ? "simulation" : undefined}
           name={INSPECTOR_FRAME_NAME}
           onLoad={() => {
             adjustFrame();
@@ -323,7 +328,11 @@ const ConfigControls: ComponentType<{
 const ViewControls: ComponentType<{
   zoom: number;
   setZoom: (zoom: number) => void;
-}> = ({ zoom, setZoom }) => {
+  isSimulation: boolean;
+}> = ({ zoom, setZoom, isSimulation }) => {
+  const defaultZoom = isSimulation ? 1.0 : 0.5;
+  useEffect(() => setZoom(defaultZoom), [defaultZoom, setZoom]);
+
   return (
     <fieldset>
       <legend>View</legend>
@@ -333,7 +342,7 @@ const ViewControls: ComponentType<{
           ➖
         </button>
         <button onClick={() => setZoom(zoom + 0.25)}>➕</button>
-        <button onClick={() => setZoom(1.0)}>Reset</button>
+        <button onClick={() => setZoom(defaultZoom)}>Reset</button>
         <div>({zoom}x)</div>
       </div>
     </fieldset>

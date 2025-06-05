@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Audio, Screen}
@@ -43,7 +42,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget
       | location_context: %{
           widget.location_context
-          | alert_route_types: LocationContext.route_type_filter(app_config_module, stop_id),
+          | alert_route_types: LocationContext.route_type_filter(app_config_module, [stop_id]),
             home_stop: stop_id
         }
     }
@@ -54,7 +53,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   defp put_tagged_stop_sequences(widget, tagged_sequences) do
-    sequences = RoutePattern.untag_stop_sequences(tagged_sequences)
+    sequences = LocationContext.untag_stop_sequences(tagged_sequences)
 
     %{
       widget
@@ -62,9 +61,12 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
           widget.location_context
           | tagged_stop_sequences: tagged_sequences,
             upstream_stops:
-              LocationContext.upstream_stop_id_set(widget.location_context.home_stop, sequences),
+              LocationContext.upstream_stop_id_set([widget.location_context.home_stop], sequences),
             downstream_stops:
-              LocationContext.downstream_stop_id_set(widget.location_context.home_stop, sequences)
+              LocationContext.downstream_stop_id_set(
+                [widget.location_context.home_stop],
+                sequences
+              )
         }
     }
   end

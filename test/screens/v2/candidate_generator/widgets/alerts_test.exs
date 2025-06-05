@@ -5,10 +5,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
-  alias ScreensConfig.{Alerts, Screen}
-  alias ScreensConfig.Screen.{BusShelter, Busway}
+  alias ScreensConfig.{Alerts, MultiStopAlerts, Screen}
+  alias ScreensConfig.Screen.{BusEink, BusShelter}
 
   defp ie(opts \\ []) do
     %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
@@ -20,14 +19,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
   describe "alert_instances/4" do
     setup do
       now = ~U[2021-01-01T00:00:00Z]
-
       stop_id = "1265"
-
+      multi_stop_ids = [stop_id, "1260"]
       app = BusShelter
-
+      multi_stop_app = BusEink
       config = struct(Screen, %{app_params: struct(app, %{alerts: %Alerts{stop_id: stop_id}})})
 
-      bad_config = struct(Screen, %{app_params: struct(Busway)})
+      multi_stop_config =
+        struct(Screen, %{
+          app_params:
+            struct(multi_stop_app, %{alerts: %MultiStopAlerts{stop_ids: multi_stop_ids}})
+        })
 
       routes_at_stop = [
         %{route_id: "22", active?: true},
@@ -42,13 +44,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         "D" => [~w[1260 1262 11531 1265]]
       }
 
-      stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+      stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
 
       alerts = [
         %Alert{
           id: "1",
           effect: :stop_closure,
-          informed_entities: [ie(stop: "1265")],
+          informed_entities: [ie(stop: "1265"), ie(stop: "11531")],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -63,25 +65,47 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
           informed_entities: [ie(stop: "1265")],
           active_period: [{now, nil}]
         },
-        %Alert{id: "4", effect: :stop_closure, informed_entities: [], active_period: [{now, nil}]}
+        %Alert{
+          id: "4",
+          effect: :stop_closure,
+          informed_entities: [],
+          active_period: [{now, nil}]
+        },
+        %Alert{
+          id: "5",
+          effect: :stop_closure,
+          informed_entities: [ie(stop: "1262")],
+          active_period: [{now, nil}]
+        }
       ]
 
       location_context = %LocationContext{
         home_stop: stop_id,
         tagged_stop_sequences: tagged_stop_sequences,
-        upstream_stops: LocationContext.upstream_stop_id_set(stop_id, stop_sequences),
-        downstream_stops: LocationContext.downstream_stop_id_set(stop_id, stop_sequences),
+        upstream_stops: LocationContext.upstream_stop_id_set([stop_id], stop_sequences),
+        downstream_stops: LocationContext.downstream_stop_id_set([stop_id], stop_sequences),
         routes: routes_at_stop,
-        alert_route_types: LocationContext.route_type_filter(app, stop_id)
+        alert_route_types: LocationContext.route_type_filter(app, [stop_id])
+      }
+
+      multi_stop_context = %LocationContext{
+        home_stop: nil,
+        tagged_stop_sequences: tagged_stop_sequences,
+        upstream_stops: LocationContext.upstream_stop_id_set(multi_stop_ids, stop_sequences),
+        downstream_stops: LocationContext.downstream_stop_id_set(multi_stop_ids, stop_sequences),
+        routes: routes_at_stop,
+        alert_route_types: LocationContext.route_type_filter(multi_stop_app, multi_stop_ids)
       }
 
       %{
         config: config,
-        bad_config: bad_config,
+        multi_stop_config: multi_stop_config,
         location_context: location_context,
+        multi_stop_context: multi_stop_context,
         now: now,
         fetch_alerts_fn: fn _, _ -> {:ok, alerts} end,
         fetch_location_context_fn: fn _, _, _ -> {:ok, location_context} end,
+        fetch_multi_stop_context_fn: fn _, _, _ -> {:ok, multi_stop_context} end,
         x_fetch_alerts_fn: fn _, _ -> :error end,
         x_fetch_location_context_fn: fn _, _, _ -> :error end
       }
@@ -108,7 +132,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
             alert: %Alert{
               id: "1",
               effect: :stop_closure,
-              informed_entities: [ie(stop: "1265")],
+              informed_entities: [ie(stop: "1265"), ie(stop: "11531")],
               active_period: [{now, nil}]
             }
           },
@@ -136,24 +160,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
                )
     end
 
-    test "fails when passed config for an unsupported screen type", context do
-      %{
-        bad_config: bad_config,
-        now: now,
-        fetch_alerts_fn: fetch_alerts_fn,
-        fetch_location_context_fn: fetch_location_context_fn
-      } = context
-
-      assert_raise FunctionClauseError, fn ->
-        alert_instances(
-          bad_config,
-          now,
-          fetch_alerts_fn,
-          fetch_location_context_fn
-        )
-      end
-    end
-
     test "returns empty list if any query fails", context do
       %{
         config: config,
@@ -179,6 +185,57 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
                  x_fetch_alerts_fn,
                  fetch_location_context_fn
                )
+    end
+
+    test "returns alert widgets for multiple stops", context do
+      %{
+        multi_stop_config: config,
+        multi_stop_context: location_context,
+        now: now,
+        fetch_alerts_fn: fetch_alerts_fn,
+        fetch_multi_stop_context_fn: fetch_location_context_fn
+      } = context
+
+      expected_common_data = %{screen: config, location_context: location_context, now: now}
+
+      expected_widgets = [
+        struct(
+          %AlertWidget{
+            alert: %Alert{
+              id: "1",
+              effect: :stop_closure,
+              informed_entities: [ie(stop: "1265"), ie(stop: "11531")],
+              active_period: [{now, nil}]
+            }
+          },
+          expected_common_data
+        ),
+        struct(
+          %AlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :stop_closure,
+              informed_entities: [ie(route: "22")],
+              active_period: [{now, nil}]
+            }
+          },
+          expected_common_data
+        ),
+        struct(
+          %AlertWidget{
+            alert: %Alert{
+              id: "5",
+              effect: :stop_closure,
+              informed_entities: [ie(stop: "1262")],
+              active_period: [{now, nil}]
+            }
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               alert_instances(config, now, fetch_alerts_fn, fetch_location_context_fn)
     end
   end
 

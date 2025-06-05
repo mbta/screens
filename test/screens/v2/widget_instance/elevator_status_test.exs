@@ -4,7 +4,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   alias Screens.Alerts.Alert
   alias Screens.Facilities.Facility
   alias Screens.LocationContext
-  alias Screens.RoutePatterns.RoutePattern
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.{ElevatorStatus, Screen}
   alias ScreensConfig.Screen.PreFare
@@ -73,7 +72,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       ]
     }
 
-    stop_sequences = RoutePattern.untag_stop_sequences(tagged_stop_sequences)
+    stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
 
     station_id_to_icons = %{
       "place-foo" => [:red],
@@ -85,8 +84,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
     location_context = %LocationContext{
       home_stop: home_station_id,
       tagged_stop_sequences: tagged_stop_sequences,
-      upstream_stops: LocationContext.upstream_stop_id_set(home_station_id, stop_sequences),
-      downstream_stops: LocationContext.downstream_stop_id_set(home_station_id, stop_sequences),
+      upstream_stops: LocationContext.upstream_stop_id_set([home_station_id], stop_sequences),
+      downstream_stops: LocationContext.downstream_stop_id_set([home_station_id], stop_sequences),
       routes: [],
       alert_route_types: []
     }
