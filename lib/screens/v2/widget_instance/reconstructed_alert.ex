@@ -796,18 +796,25 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t, location) do
+  # Boundary presentation of shuttle/suspension alerts is also valid when inside them.
+  defp inside_flex_fields(%__MODULE__{alert: %Alert{effect: effect}} = t)
+       when effect in ~w[shuttle suspension]a,
+       do: boundary_flex_fields(t, :inside)
+
+  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
+       when effect in ~w[shuttle suspension]a do
     %__MODULE__{alert: %{cause: cause, header: header}} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
+    remedy = if(effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route")
 
     if length(affected_routes) > 1 do
       %{
         issue: header,
-        remedy: "Seek alternate route",
+        remedy: remedy,
         location: "",
         cause: "",
         routes: get_route_pills(t),
-        effect: :suspension,
+        effect: effect,
         urgent: true
       }
     else
@@ -817,55 +824,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
       %{
         issue: issue,
-        remedy: "Seek alternate route",
+        remedy: remedy,
         location: "",
         cause: cause_text,
         routes: get_route_pills(t),
-        effect: :suspension,
+        effect: effect,
         urgent: true
       }
     end
   end
-
-  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :shuttle}} = t, location) do
-    %__MODULE__{alert: %{cause: cause, header: header}} = t
-    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
-
-    if length(affected_routes) > 1 do
-      %{
-        issue: header,
-        remedy: "Use shuttle bus",
-        location: "",
-        cause: "",
-        routes: get_route_pills(t),
-        effect: :shuttle,
-        urgent: true
-      }
-    else
-      destination = get_destination(t, location)
-      cause_text = Alert.get_cause_string(cause)
-
-      issue =
-        if is_nil(destination) do
-          "No trains"
-        else
-          "No #{destination} trains"
-        end
-
-      %{
-        issue: issue,
-        remedy: "Use shuttle bus",
-        location: "",
-        cause: cause_text,
-        routes: get_route_pills(t),
-        effect: :shuttle,
-        urgent: true
-      }
-    end
-  end
-
-  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :station_closure}}, _location),
-    do: nil
 
   defp boundary_flex_fields(
          %__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t,
@@ -930,8 +897,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }
     end
   end
-
-  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: :delay}}, _location), do: nil
 
   # Shuttle or suspension
   defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: effect} = alert} = t, location)

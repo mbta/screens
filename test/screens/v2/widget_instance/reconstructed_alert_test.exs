@@ -1518,6 +1518,32 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert expected == ReconstructedAlert.serialize(widget)
       assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
+
+    test "suspension", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-asmnl", route: "Red", direction_id: 1, route_type: 1),
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+        ])
+        |> put_cause(:unknown)
+
+      expected = %{
+        issue: "No Alewife trains",
+        location: "",
+        cause: "",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :suspension,
+        urgent: true,
+        region: :inside,
+        remedy: "Seek alternate route"
+      }
+
+      # Force placement in the flex zone by enabling departures.
+      assert expected == widget |> put_departures() |> ReconstructedAlert.serialize()
+    end
   end
 
   describe "boundary flex" do
