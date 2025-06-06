@@ -37,9 +37,11 @@ const routes: [string, string, ComponentType][][] = [
     ["pre-fare-v2-screens", "Pre-Fare", PreFareV2ScreensTable],
     ["busway-v2-screens", "Sectional", BuswayV2ScreensTable],
   ],
-  [["screens-json-editor", "Config Editor", AdminScreenConfigForm]],
-  [["image-manager", "Image Manager", ImageManager]],
-  [["devops", "Devops", Devops]],
+  [
+    ["screens-json-editor", "Config Editor", AdminScreenConfigForm],
+    ["image-manager", "Image Manager", ImageManager],
+    ["devops", "Devops", Devops],
+  ],
 ];
 
 const App = (): JSX.Element => {

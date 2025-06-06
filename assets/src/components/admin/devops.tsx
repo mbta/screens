@@ -52,39 +52,47 @@ const Devops = () => {
   ];
 
   return (
-    <table>
-      <thead>
-        <tr>
-          <td>
-            <strong>Mode</strong>
-          </td>
-          <td>
-            <strong>Disabled?</strong>
-          </td>
-        </tr>
-      </thead>
-      <tbody>
-        {modes.map(({ name, id }) => {
-          const onChange = (e) => {
-            const disabled = e.target.checked;
-            if (disabled) {
-              setDisabledModes((ms) => [id, ...ms]);
-            } else {
-              setDisabledModes((ms) => ms.filter((m) => m !== id));
-            }
-          };
+    <main>
+      <h2>Devops Flags</h2>
+      <p>
+        Disabling a mode here prevents any departures from being displayed for
+        that mode.
+      </p>
+      <p>⚠️ Changes are applied immediately.</p>
+      <table>
+        <thead>
+          <tr>
+            <td>
+              <strong>Mode</strong>
+            </td>
+            <td>
+              <strong>Disabled?</strong>
+            </td>
+          </tr>
+        </thead>
+        <tbody>
+          {modes.map(({ name, id }) => {
+            const onChange = (e) => {
+              const disabled = e.target.checked;
+              if (disabled) {
+                setDisabledModes((ms) => [id, ...ms]);
+              } else {
+                setDisabledModes((ms) => ms.filter((m) => m !== id));
+              }
+            };
 
-          return (
-            <DisableModeRow
-              mode={name}
-              key={id}
-              modeDisabled={disabledModes.includes(id)}
-              onChange={onChange}
-            />
-          );
-        })}
-      </tbody>
-    </table>
+            return (
+              <DisableModeRow
+                mode={name}
+                key={id}
+                modeDisabled={disabledModes.includes(id)}
+                onChange={onChange}
+              />
+            );
+          })}
+        </tbody>
+      </table>
+    </main>
   );
 };
 
