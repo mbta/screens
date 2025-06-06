@@ -1,7 +1,6 @@
 defmodule ScreensWeb.AdminApiController do
   use ScreensWeb, :controller
 
-  alias Screens.Config.Cache, as: ConfigCache
   alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.Image
   alias ScreensConfig.{Config, Devops, Screen}
@@ -24,69 +23,28 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def confirm(conn, %{"id" => id, "config" => screen_json}) do
-    {:ok, config_json, _version} = ConfigFetch.fetch_config()
-    config = config_json |> Jason.decode!() |> Config.from_json()
-    %Screen{app_id: app_id} = screen = screen_json |> Jason.decode!() |> Screen.from_json()
+    screen = screen_json |> Jason.decode!() |> Screen.from_json()
+    %Config{screens: screens} = config = fetch_config()
 
-    new_config = %Config{
-      config
-      | screens: Map.update!(config.screens, id, fn %Screen{app_id: ^app_id} -> screen end)
-    }
-
-    new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
-
-    success =
-      case ConfigFetch.put_config(new_config_json) do
-        :ok -> true
-        :error -> false
-      end
-
-    json(conn, %{success: success})
+    %Config{config | screens: Map.put(screens, id, screen)}
+    |> put_config()
+    |> to_success_response(conn)
   end
 
   def confirm(conn, %{"config" => config}) do
-    current_devops_config = ConfigCache.devops()
-    %Config{screens: new_screens_config} = config |> Jason.decode!() |> Config.from_json()
-    new_config = %Config{screens: new_screens_config, devops: current_devops_config}
-    new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
-
-    success =
-      case ConfigFetch.put_config(new_config_json) do
-        :ok -> true
-        :error -> false
-      end
-
-    json(conn, %{success: success})
+    config |> Jason.decode!() |> Config.from_json() |> put_config() |> to_success_response(conn)
   end
 
   def devops(conn, %{"disabled_modes" => _disabled_modes} = json) do
-    current_screens_config = ConfigCache.screens()
-    new_devops_config = Devops.from_json(json)
-    new_config = %Config{screens: current_screens_config, devops: new_devops_config}
-    new_config_json = new_config |> Config.to_json() |> Jason.encode!(pretty: true)
-
-    success =
-      case ConfigFetch.put_config(new_config_json) do
-        :ok -> true
-        :error -> false
-      end
-
-    json(conn, %{success: success})
+    new_devops = Devops.from_json(json)
+    fetch_config() |> struct!(devops: new_devops) |> put_config() |> to_success_response(conn)
   end
 
   def refresh(conn, %{"screen_ids" => screen_ids}) do
-    %Config{} = current_config = ConfigCache.config()
-
-    new_config = Config.schedule_refresh_for_screen_ids(current_config, screen_ids)
-    {:ok, new_config_json} = Jason.encode(Config.to_json(new_config), pretty: true)
-
-    success =
-      case ConfigFetch.put_config(new_config_json) do
-        :ok -> true
-        :error -> false
-      end
-
-    json(conn, %{success: success})
+    fetch_config()
+    |> Config.schedule_refresh_for_screen_ids(screen_ids)
+    |> put_config()
+    |> to_success_response(conn)
   end
 
   def list_images(conn, _params) do
@@ -94,22 +52,35 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def upload_image(conn, %{"image" => %Plug.Upload{} = upload, "key" => key}) do
-    response =
-      case Image.upload(key, upload) do
-        :ok -> %{success: true}
-        :error -> %{success: false}
-      end
-
-    json(conn, response)
+    key |> Image.upload(upload) |> to_success_response(conn)
   end
 
   def delete_image(conn, %{"key" => key}) do
-    response =
-      case Image.delete(key) do
-        :ok -> %{success: true}
-        :error -> %{success: false}
+    key |> Image.delete() |> to_success_response(conn)
+  end
+
+  @spec fetch_config() :: Config.t()
+  defp fetch_config do
+    {:ok, config_json, _version} = ConfigFetch.fetch_config()
+    config_json |> Jason.decode!() |> Config.from_json()
+  end
+
+  @spec put_config(Config.t()) :: :ok | :error
+  defp put_config(%Config{} = config) do
+    config
+    |> Config.to_json()
+    |> Jason.encode!(pretty: true)
+    |> ConfigFetch.put_config()
+  end
+
+  @spec to_success_response(:ok | :error, Plug.Conn.t()) :: Plug.Conn.t()
+  defp to_success_response(result, conn) do
+    success =
+      case result do
+        :ok -> true
+        :error -> false
       end
 
-    json(conn, response)
+    json(conn, %{success: success})
   end
 end
