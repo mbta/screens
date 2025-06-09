@@ -3,7 +3,7 @@ defmodule ScreensWeb.AdminApiController do
 
   alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.Image
-  alias ScreensConfig.{Config, Devops, Screen}
+  alias ScreensConfig.{Config, Devops, EvergreenContentItem, RecurrentSchedule, Schedule, Screen}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
@@ -59,6 +59,15 @@ defmodule ScreensWeb.AdminApiController do
     key |> Image.delete() |> to_success_response(conn)
   end
 
+  def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date}) do
+    before_date = Date.from_iso8601!(iso_date)
+
+    fetch_config()
+    |> transform_screens(&cleanup_evergreen_content(&1, before_date))
+    |> put_config()
+    |> to_success_response(conn)
+  end
+
   @spec fetch_config() :: Config.t()
   defp fetch_config do
     {:ok, config_json, _version} = ConfigFetch.fetch_config()
@@ -71,6 +80,42 @@ defmodule ScreensWeb.AdminApiController do
     |> Config.to_json()
     |> Jason.encode!(pretty: true)
     |> ConfigFetch.put_config()
+  end
+
+  @spec transform_screens(Config.t(), (Screen.t() -> Screen.t())) :: Config.t()
+  defp transform_screens(%Config{screens: screens} = config, func) do
+    new_screens = screens |> Enum.map(fn {id, screen} -> {id, func.(screen)} end) |> Map.new()
+    %Config{config | screens: new_screens}
+  end
+
+  defp cleanup_evergreen_content(
+         %Screen{app_params: %_app{evergreen_content: _}} = screen,
+         before_date
+       ) do
+    update_in(screen.app_params.evergreen_content, fn items ->
+      Enum.reject(items, &should_cleanup_evergreen_item?(&1, before_date))
+    end)
+  end
+
+  defp cleanup_evergreen_content(screen, _before_date), do: screen
+
+  defp should_cleanup_evergreen_item?(
+         %EvergreenContentItem{schedule: schedule_items},
+         before_date
+       ) do
+    Enum.all?(schedule_items, fn
+      %Schedule{end_dt: nil} ->
+        false
+
+      %Schedule{end_dt: datetime} ->
+        Date.compare(datetime, before_date) == :lt
+
+      %RecurrentSchedule{dates: date_ranges} ->
+        Enum.all?(date_ranges, fn
+          %{end_date: nil} -> false
+          %{end_date: end_date} -> Date.compare(end_date, before_date) == :lt
+        end)
+    end)
   end
 
   @spec to_success_response(:ok | :error, Plug.Conn.t()) :: Plug.Conn.t()

@@ -24,6 +24,7 @@ import AdminScreenConfigForm from "Components/admin/admin_screen_config_form";
 import ImageManager from "Components/admin/admin_image_manager";
 import Devops from "Components/admin/devops";
 import Inspector from "Components/admin/inspector";
+import MaintenanceTools from "Components/admin/maintenance_tools";
 
 const routes: [string, string, ComponentType][][] = [
   [["inspector", "🔍", Inspector]],
@@ -41,6 +42,7 @@ const routes: [string, string, ComponentType][][] = [
     ["screens-json-editor", "Config Editor", AdminScreenConfigForm],
     ["image-manager", "Image Manager", ImageManager],
     ["devops", "Devops", Devops],
+    ["maintenance", "Maintenance", MaintenanceTools],
   ],
 ];
 
