@@ -3,7 +3,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   require Logger
 
-  alias Screens.V2.WidgetInstance.DupAlert
   alias Screens.Alerts.{Alert, InformedEntity}
   alias Screens.Report
   alias Screens.Routes.Route
@@ -238,17 +237,26 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   # Determines if the active alerts for a section apply to all routes that are enabled in the section
+  @spec section_routes_disabled?(Params.t(), [InformedEntity.t()]) :: boolean()
   defp section_routes_disabled?(params, alert_informed_entities) do
     case alert_informed_entities do
       [] ->
         false
 
       _ ->
-        InformedEntity.all_routes_represented?(
-          params.route_ids,
-          params.direction_id,
-          alert_informed_entities
-        )
+        # Normalize direction_id. Typically `nil` in Informed Entity represents both directions
+        direction_id =
+          case params.direction_id do
+            :both -> nil
+            _ -> params.direction_id
+          end
+
+        # For each route, verify if there is an associated Informed Entity
+        Enum.all?(params.route_ids, fn route_id ->
+          Enum.any?(alert_informed_entities, fn entity ->
+            InformedEntity.present_alert_for_route?(entity, route_id, direction_id)
+          end)
+        end)
     end
   end
 

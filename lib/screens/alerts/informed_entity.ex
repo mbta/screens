@@ -32,21 +32,13 @@ defmodule Screens.Alerts.InformedEntity do
     match?(%{stop: "place-" <> _}, ie)
   end
 
-  @spec all_routes_represented?([Route.id()], Trip.direction() | :both | nil, [t()]) :: boolean()
-  def all_routes_represented?(route_ids, direction_id, informed_entities) do
-    Enum.all?(route_ids, fn route_id ->
-      Enum.any?(informed_entities, fn entity ->
-        entity_matches?(entity, route_id, direction_id)
-      end)
-    end)
-  end
-
-  defp entity_matches?(
-         %{route: entity_route, direction_id: entity_direction},
-         route_id,
-         direction_id
-       )
-       when entity_route.id == route_id do
+  @spec present_alert_for_route?(t(), Route.id(), Trip.direction() | nil) :: boolean()
+  def present_alert_for_route?(
+        %{route: entity_route, direction_id: entity_direction},
+        route_id,
+        direction_id
+      )
+      when entity_route.id == route_id do
     case entity_direction do
       ^direction_id -> true
       nil -> true
@@ -54,5 +46,5 @@ defmodule Screens.Alerts.InformedEntity do
     end
   end
 
-  defp entity_matches?(_, _, _), do: false
+  def present_alert_for_route?(_, _, _), do: false
 end
