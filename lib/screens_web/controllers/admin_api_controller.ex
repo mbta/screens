@@ -2,7 +2,7 @@ defmodule ScreensWeb.AdminApiController do
   use ScreensWeb, :controller
 
   alias Screens.Config.Fetch, as: ConfigFetch
-  alias Screens.Image
+  alias Screens.{Image, Util}
   alias ScreensConfig.{Config, Devops, Screen}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
@@ -57,6 +57,34 @@ defmodule ScreensWeb.AdminApiController do
 
   def delete_image(conn, %{"key" => key}) do
     key |> Image.delete() |> to_success_response(conn)
+  end
+
+  def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date, "dry_run" => _}) do
+    before_date = Date.from_iso8601!(iso_date)
+    %Config{screens: screens} = fetch_config()
+
+    affected =
+      Enum.count(screens, fn {_id, screen} ->
+        screen != Util.Admin.cleanup_evergreen_content(screen, before_date)
+      end)
+
+    json(conn, %{affected: affected})
+  end
+
+  def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date}) do
+    before_date = Date.from_iso8601!(iso_date)
+    %Config{screens: screens} = config = fetch_config()
+
+    new_screens =
+      screens
+      |> Enum.map(fn {id, screen} ->
+        {id, Util.Admin.cleanup_evergreen_content(screen, before_date)}
+      end)
+      |> Map.new()
+
+    %Config{config | screens: new_screens}
+    |> put_config()
+    |> to_success_response(conn)
   end
 
   @spec fetch_config() :: Config.t()
