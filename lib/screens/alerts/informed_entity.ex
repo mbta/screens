@@ -3,9 +3,9 @@ defmodule Screens.Alerts.InformedEntity do
   Functions to query alert informed entities.
   """
 
-  alias Screens.Trips.Trip
-  alias Screens.Routes.Route
   alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
+  alias Screens.Trips.Trip
 
   @type t :: Alert.informed_entity()
 
