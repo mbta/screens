@@ -9,7 +9,6 @@
 @use "v2/lcd_common/route_pill";
 @use "v2/lcd_common/departures" as *;
 @use "v2/lcd_common/departures_no_data" as *;
-@use "v2/lcd_common/departures/header";
 
 @use "v2/pre_fare/alert-banner";
 @use "v2/pre_fare/body/normal" as *;
