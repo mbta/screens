@@ -3,6 +3,8 @@ defmodule Screens.Alerts.InformedEntity do
   Functions to query alert informed entities.
   """
 
+  alias Screens.Trips.Trip
+  alias Screens.Routes.Route
   alias Screens.Alerts.Alert
 
   @type t :: Alert.informed_entity()
@@ -29,4 +31,28 @@ defmodule Screens.Alerts.InformedEntity do
   def parent_station?(ie) do
     match?(%{stop: "place-" <> _}, ie)
   end
+
+  @spec all_routes_represented?([Route.id()], Trip.direction() | :both | nil, [t()]) :: boolean()
+  def all_routes_represented?(route_ids, direction_id, informed_entities) do
+    Enum.all?(route_ids, fn route_id ->
+      Enum.any?(informed_entities, fn entity ->
+        entity_matches?(entity, route_id, direction_id)
+      end)
+    end)
+  end
+
+  defp entity_matches?(
+         %{route: entity_route, direction_id: entity_direction},
+         route_id,
+         direction_id
+       )
+       when entity_route.id == route_id do
+    case entity_direction do
+      ^direction_id -> true
+      nil -> true
+      _ -> false
+    end
+  end
+
+  defp entity_matches?(_, _, _), do: false
 end

@@ -10,7 +10,7 @@
 
 Our DUP app requires a unique approach to alerts and how they are displayed. DUPs contain one screen with three different pages (rotations). When an alert affecting the stops serving the DUP is active, each page displays the alert in a different way depending on how impactful the alert is to the screen.
 
-[DUP alert spec](https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-a82acff850ed4f2eb98a04e5f3e0fe52)
+[DUP alert spec](https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-17cf5d8d11ea80399a7fe3c4f13a511f)
 
 # Motivation
 

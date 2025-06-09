@@ -270,6 +270,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           "bus-C" -> [%{id: "Bus C", type: :bus}]
           "bus-C+D" -> [%{id: "Bus C", type: :bus}, %{id: "Bus D", type: :bus}]
           "place-overnight" -> [%{id: "Red", type: :subway}]
+          "place-closed" -> [%{id: "Red", type: :subway}, %{id: "Bus A", type: :bus}]
           _ -> [%{id: "test", type: :test}]
         end)
         |> Enum.uniq()
@@ -2846,6 +2847,250 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         )
 
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+    end
+  end
+
+  describe "departures_instances/4 alert handling" do
+    test "returns no departures for a section when alerts indicate that all routes are expected to be closed",
+         %{
+           config: config,
+           fetch_departures_fn: fetch_departures_fn,
+           fetch_routes_fn: fetch_routes_fn
+         } do
+      config =
+        config
+        |> put_primary_departures([
+          %Section{
+            query: %Query{
+              params: %Query.Params{stop_ids: ["place-closed"], route_ids: ["Red"]}
+            }
+          },
+          %Section{
+            query: %Query{
+              params: %Query.Params{stop_ids: ["bus-A", "bus-B"], route_ids: ["Bus A"]}
+            }
+          }
+        ])
+
+      now = ~U[2020-04-06T18:00:00Z]
+
+      fetch_schedules_fn = fn
+        _, ~D[2020-04-07] ->
+          {:ok,
+           [
+             %Schedule{
+               departure_time: ~U[2020-04-07T09:00:00Z],
+               route: %Route{id: "Red"},
+               stop: struct(Stop, id: "place-closed")
+             }
+           ]}
+
+        _, ^now ->
+          {:ok,
+           [
+             %Schedule{
+               departure_time: ~U[2020-04-06T09:00:00Z],
+               route: %Route{id: "Red"},
+               stop: struct(Stop, id: "place-closed")
+             },
+             %Schedule{
+               departure_time: ~U[2020-04-07T03:00:00Z],
+               route: %Route{id: "Red"},
+               stop: struct(Stop, id: "place-closed")
+             }
+           ]}
+      end
+
+      fetch_alerts_fn = fn
+        [
+          direction_id: :both,
+          route_ids: ["Red"],
+          stop_ids: ["place-closed"],
+          route_types: [:light_rail, :subway]
+        ] ->
+          [
+            struct(Alert,
+              effect: :suspension,
+              informed_entities: [
+                %{
+                  route: %{id: "Red"},
+                  route_type: 0,
+                  stop: "place-closed",
+                  direction_id: nil
+                }
+              ],
+              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
+            )
+          ]
+
+        _ ->
+          []
+      end
+
+      fetch_vehicles_fn = fn _, _ -> [] end
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: []
+            },
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: [
+                %Screens.V2.Departure{
+                  prediction:
+                    struct(Prediction,
+                      id: "Bus A",
+                      route: %Route{id: "Bus A", type: :bus},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          now: now,
+          slot_names: [:main_content_reduced_two]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_departures_fn,
+          fetch_alerts_fn,
+          fetch_schedules_fn,
+          fetch_routes_fn,
+          fetch_vehicles_fn
+        )
+
+      assert(Enum.all?(expected_departures, &Enum.member?(actual_instances, &1)))
+    end
+
+    test "returns NoDataSection when alerts do not cover all directions for which we are missing departures",
+         %{
+           config: config,
+           fetch_departures_fn: fetch_departures_fn,
+           fetch_routes_fn: fetch_routes_fn
+         } do
+      config =
+        config
+        |> put_primary_departures([
+          %Section{
+            query: %Query{
+              params: %Query.Params{stop_ids: ["place-closed"], route_ids: ["Red"]}
+            }
+          },
+          %Section{
+            query: %Query{
+              params: %Query.Params{stop_ids: ["bus-A", "bus-B"], route_ids: ["Bus A"]}
+            }
+          }
+        ])
+
+      now = ~U[2020-04-06T18:00:00Z]
+
+      fetch_schedules_fn = fn
+        _, ~D[2020-04-07] ->
+          {:ok,
+           [
+             %Schedule{
+               departure_time: ~U[2020-04-07T09:00:00Z],
+               route: %Route{id: "Red"},
+               stop: struct(Stop, id: "place-closed")
+             }
+           ]}
+
+        _, ^now ->
+          {:ok,
+           [
+             %Schedule{
+               departure_time: ~U[2020-04-06T09:00:00Z],
+               route: %Route{id: "Red"},
+               stop: struct(Stop, id: "place-closed")
+             },
+             %Schedule{
+               departure_time: ~U[2020-04-07T03:00:00Z],
+               route: %Route{id: "Red"},
+               stop: struct(Stop, id: "place-closed")
+             }
+           ]}
+      end
+
+      fetch_alerts_fn = fn
+        [
+          direction_id: :both,
+          route_ids: ["Red"],
+          stop_ids: ["place-closed"],
+          route_types: [:light_rail, :subway]
+        ] ->
+          [
+            struct(Alert,
+              effect: :suspension,
+              informed_entities: [
+                %{
+                  route: %{id: "Red"},
+                  route_type: 0,
+                  stop: "place-closed",
+                  direction_id: 0
+                }
+              ],
+              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
+            )
+          ]
+
+        _ ->
+          []
+      end
+
+      fetch_vehicles_fn = fn _, _ -> [] end
+
+      expected_departures = [
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NoDataSection{route: %{id: "Red", type: :subway}},
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: [
+                %Screens.V2.Departure{
+                  prediction:
+                    struct(Prediction,
+                      id: "Bus A",
+                      route: %Route{id: "Bus A", type: :bus},
+                      stop: struct(Stop),
+                      trip: struct(Trip)
+                    ),
+                  schedule: nil
+                }
+              ]
+            }
+          ],
+          now: now,
+          slot_names: [:main_content_zero]
+        }
+      ]
+
+      actual_instances =
+        Dup.Departures.departures_instances(
+          config,
+          now,
+          fetch_departures_fn,
+          fetch_alerts_fn,
+          fetch_schedules_fn,
+          fetch_routes_fn,
+          fetch_vehicles_fn
+        )
+
+      assert(Enum.all?(expected_departures, &Enum.member?(actual_instances, &1)))
     end
   end
 end
