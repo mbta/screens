@@ -71,6 +71,7 @@ defmodule ScreensWeb.Router do
     post "/screens/confirm/:id", AdminApiController, :confirm
     post "/refresh", AdminApiController, :refresh
     post "/devops", AdminApiController, :devops
+    post "/maintenance", AdminApiController, :maintenance
     get "/images", AdminApiController, :list_images
     post "/images", AdminApiController, :upload_image
     delete "/images/:key", AdminApiController, :delete_image
