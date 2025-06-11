@@ -210,8 +210,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         }
 
       # No departures, but no routes in the section are running, so no departures are expected.
-      # In this case, the alerts widget will display info on the closure, so we return an empty row.
-      departures == [] and section_routes_disabled?(params, alert_informed_entities) ->
+      # In this case, the alerts widget will display info on the closure, so we return an empty section.
+      departures == [] and
+          section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
         %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
 
       # No departures to show and no headway mode
@@ -237,8 +238,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   # Determines if the active alerts for a section apply to all routes that are enabled in the section
-  @spec section_routes_disabled?(Params.t(), [InformedEntity.t()]) :: boolean()
-  defp section_routes_disabled?(params, alert_informed_entities) do
+  @spec section_routes_disabled?([Route.t()], 0 | 1 | :both, [InformedEntity.t()]) :: boolean()
+  defp section_routes_disabled?(routes, direction_id, alert_informed_entities) do
     case alert_informed_entities do
       [] ->
         false
@@ -246,13 +247,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       _ ->
         # Normalize direction_id. Typically `nil` in Informed Entity represents both directions
         direction_id =
-          case params.direction_id do
+          case direction_id do
             :both -> nil
-            _ -> params.direction_id
+            _ -> direction_id
           end
 
         # For each route, verify if there is an associated Informed Entity
-        Enum.all?(params.route_ids, fn route_id ->
+        routes
+        |> Enum.map(& &1.id)
+        |> Enum.all?(fn route_id ->
           Enum.any?(alert_informed_entities, fn entity ->
             InformedEntity.present_alert_for_route?(entity, route_id, direction_id)
           end)
