@@ -180,6 +180,19 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
     end
   end
 
+  # Fallback for Dual Screen
+  def render_alert(%{
+        issue: issue,
+        remedy: remedy,
+        location: location
+      }) do
+    if is_nil(location) do
+      ~E|<%= issue %>. <%= remedy %>|
+    else
+      ~E|<%= location %>.|
+    end
+  end
+
   defp get_line_name([%{color: _color, text: _text, type: _type} | _tail] = routes) do
     routes
     |> Enum.map(fn route -> route.text end)
