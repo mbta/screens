@@ -209,6 +209,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           headsign: headsign
         }
 
+      # No departures, but no routes in the section are running, so no departures are expected.
+      # In this case, the alerts widget will display info on the closure, so we return an empty section.
+      departures == [] and
+          section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
+        %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
+
       # No departures to show and no headway mode
       departures == [] ->
         %NoDataSection{route: hd(routes)}
@@ -228,6 +234,32 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
         # DUPs don't support Layout or Header for now
         %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
+    end
+  end
+
+  # Determines if the active alerts for a section apply to all routes that are enabled in the section
+  @spec section_routes_disabled?([Route.t()], 0 | 1 | :both, [InformedEntity.t()]) :: boolean()
+  defp section_routes_disabled?(routes, direction_id, alert_informed_entities) do
+    case alert_informed_entities do
+      [] ->
+        false
+
+      _ ->
+        # Normalize direction_id. Typically `nil` in Informed Entity represents both directions
+        direction_id =
+          case direction_id do
+            :both -> nil
+            _ -> direction_id
+          end
+
+        # For each route, verify if there is an associated Informed Entity
+        routes
+        |> Enum.map(& &1.id)
+        |> Enum.all?(fn route_id ->
+          Enum.any?(alert_informed_entities, fn entity ->
+            InformedEntity.present_alert_for_route?(entity, route_id, direction_id)
+          end)
+        end)
     end
   end
 
@@ -357,6 +389,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     ]
 
     # This section gets alert entities, which are used to decide whether we should be in headway mode or overnight mode
+    # Also used to check if no departures are expected for a section because of closures to all routes/directions
     alert_fetch_params
     |> fetch_alerts_fn.()
     |> Enum.filter(fn

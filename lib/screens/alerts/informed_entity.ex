@@ -4,6 +4,8 @@ defmodule Screens.Alerts.InformedEntity do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
+  alias Screens.Trips.Trip
 
   @type t :: Alert.informed_entity()
 
@@ -29,4 +31,20 @@ defmodule Screens.Alerts.InformedEntity do
   def parent_station?(ie) do
     match?(%{stop: "place-" <> _}, ie)
   end
+
+  @spec present_alert_for_route?(t(), Route.id(), Trip.direction() | nil) :: boolean()
+  def present_alert_for_route?(
+        %{route: entity_route, direction_id: entity_direction},
+        route_id,
+        direction_id
+      )
+      when entity_route.id == route_id do
+    case entity_direction do
+      ^direction_id -> true
+      nil -> true
+      _ -> false
+    end
+  end
+
+  def present_alert_for_route?(_, _, _), do: false
 end
