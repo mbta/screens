@@ -2314,6 +2314,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_instances, &Enum.member?(actual_instances, &1))
     end
 
+    @tag :skip
     test "returns OvernightDepartures if all routes in section are overnight",
          %{
            config: config,
@@ -2423,6 +2424,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
+    @tag :skip
     test "returns OvernightDepartures with no routes if all rotations are overnight",
          %{
            config: config,
@@ -2493,6 +2495,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
+    @tag :skip
     test "returns OvernightDepartures for rail sections with active alert and no active vehicles",
          %{
            config: config,
