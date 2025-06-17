@@ -197,7 +197,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       # Show a takeover Overnight section for the given route types
       departures == [] and !section_contains_active_route and
           overnight_schedules_for_section != [] ->
-        %OvernightSection{routes: routes}
+        # Temporarily return a no data section here b/c of an edge case with prediction suppression
+        %NoDataSection{route: hd(routes)}
 
       # Headway mode
       headway_mode != :inactive ->
