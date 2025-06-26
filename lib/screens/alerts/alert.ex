@@ -167,8 +167,14 @@ defmodule Screens.Alerts.Alert do
         |> Map.put("include", Enum.join(includes, ","))
 
       case get_json_fn.("alerts", params) do
-        {:ok, response} -> {:ok, V3Api.Parser.parse(response)}
-        _ -> :error
+        {:ok, response} ->
+          {:ok,
+           response
+           |> V3Api.Parser.parse()
+           |> normalize_informed_entities_for_direction_id()}
+
+        _ ->
+          :error
       end
     end)
   end
@@ -376,5 +382,37 @@ defmodule Screens.Alerts.Alert do
   @spec informs_stop_id?(t(), Stop.id()) :: boolean()
   def informs_stop_id?(%__MODULE__{informed_entities: informed_entities}, stop_id) do
     Enum.any?(informed_entities, &(&1.stop == stop_id))
+  end
+
+  @spec normalize_informed_entities_for_direction_id([t()]) :: [t()]
+  defp normalize_informed_entities_for_direction_id(alerts) do
+    Enum.map(alerts, fn alert ->
+      %__MODULE__{
+        alert
+        | informed_entities:
+            alert.informed_entities
+            |> Enum.reduce(%{}, fn entity, acc ->
+              key = Map.drop(entity, [:direction_id])
+
+              if entity.direction_id == nil do
+                Map.put(acc, key, entity)
+              else
+                case Map.fetch(acc, key) do
+                  :error ->
+                    Map.put(acc, key, entity)
+
+                  {:ok, matching_entity} ->
+                    if matching_entity.direction_id != nil and
+                         matching_entity.direction_id == 1 - entity.direction_id do
+                      Map.put(acc, key, %{entity | direction_id: nil})
+                    else
+                      acc
+                    end
+                end
+              end
+            end)
+            |> Map.values()
+      }
+    end)
   end
 end

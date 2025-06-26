@@ -98,6 +98,130 @@ defmodule Screens.Alerts.AlertTest do
       assert %Alert{informed_entities: [%{facility: %Facility{id: "870", type: :elevator}}]} =
                alert
     end
+
+    test "combine informed entities by direction_id" do
+      attributes = %{
+        @minimal_attributes
+        | "informed_entity" => [
+            %{
+              "activities" => ~w[BOARD EXIT RIDE],
+              "route" => "1",
+              "stop" => "stop_one",
+              "direction_id" => 1
+            },
+            %{
+              "activities" => ~w[BOARD EXIT RIDE],
+              "route" => "2",
+              "stop" => "stop_two",
+              "direction_id" => 1
+            },
+            %{
+              "activities" => ~w[BOARD EXIT RIDE],
+              "route" => "2",
+              "stop" => "stop_two",
+              "direction_id" => 0
+            }
+          ]
+      }
+
+      get_json_fn = fn "alerts", %{"filter[route]" => "1"} ->
+        {
+          :ok,
+          %{"data" => [%{"id" => "999", "type" => "alert", "attributes" => attributes}]}
+        }
+      end
+
+      {:ok, [alert]} = Alert.fetch([route_ids: ["1"]], get_json_fn)
+
+      assert %Alert{
+               informed_entities: [
+                 %{
+                   stop: "stop_one",
+                   route: "1",
+                   direction_id: 1,
+                   route_type: nil,
+                   activities: ~w[board exit ride]a,
+                   facility: nil
+                 },
+                 %{
+                   stop: "stop_two",
+                   route: "2",
+                   direction_id: nil,
+                   route_type: nil,
+                   activities: ~w[board exit ride]a,
+                   facility: nil
+                 }
+               ]
+             } = alert
+    end
+
+    test "combine informed entities by direction_id while handling nil direction_ids" do
+      attributes = %{
+        @minimal_attributes
+        | "informed_entity" => [
+            %{
+              "activities" => ~w[BOARD EXIT RIDE],
+              "route" => "1",
+              "stop" => "stop_one",
+              "direction_id" => nil
+            },
+            %{
+              "activities" => ~w[BOARD EXIT RIDE],
+              "route" => "1",
+              "stop" => "stop_one",
+              "direction_id" => 0
+            },
+            %{
+              "activities" => ~w[BOARD EXIT RIDE],
+              "route" => "2",
+              "stop" => "stop_two",
+              "direction_id" => nil
+            },
+            %{
+              "activities" => ~w[BOARD EXIT RIDE],
+              "route" => "2",
+              "stop" => "stop_two",
+              "direction_id" => 1
+            },
+            %{
+              "activities" => ~w[BOARD EXIT RIDE],
+              "route" => "2",
+              "stop" => "stop_two",
+              "direction_id" => 0
+            }
+          ]
+      }
+
+      get_json_fn = fn "alerts", %{"filter[route]" => "1"} ->
+        {
+          :ok,
+          %{"data" => [%{"id" => "999", "type" => "alert", "attributes" => attributes}]}
+        }
+      end
+
+      {:ok, [alert]} = Alert.fetch([route_ids: ["1"]], get_json_fn)
+
+      assert %Alert{
+               informed_entities: [
+                 %{
+                   stop: "stop_one",
+                   route: "1",
+                   direction_id: nil,
+                   route_type: nil,
+                   activities: ~w[board exit ride]a,
+                   facility: nil
+                 },
+                 %{
+                   stop: "stop_two",
+                   route: "2",
+                   direction_id: nil,
+                   route_type: nil,
+                   activities: ~w[board exit ride]a,
+                   facility: nil
+                 }
+               ]
+             } = alert
+    end
   end
 
   describe "fetch_by_stop_and_route/3" do
