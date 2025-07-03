@@ -28,14 +28,6 @@ const ICON_TO_SRC: Record<Icon, string> = {
   logo_negative: "logo-black.svg",
 };
 
-const abbreviateText = (text: string) => {
-  if (text === "Government Center") {
-    return "Government Ctr";
-  }
-
-  return text;
-};
-
 interface NormalHeaderIconProps {
   icon: Icon;
 }
@@ -56,12 +48,10 @@ interface NormalHeaderTitleProps {
   text: string;
   size: TitleSize;
   showTo: boolean;
-  fullName: boolean;
 }
 
 const NormalHeaderTitle = forwardRef<HTMLDivElement, NormalHeaderTitleProps>(
-  ({ icon, text, size, showTo, fullName }, ref) => {
-    const abbreviatedText = fullName ? text : abbreviateText(text);
+  ({ icon, text, size, showTo }, ref) => {
     const environmentName = getDatasetValue("environmentName") || "";
 
     return (
@@ -78,7 +68,7 @@ const NormalHeaderTitle = forwardRef<HTMLDivElement, NormalHeaderTitleProps>(
           {icon && <NormalHeaderIcon icon={icon} />}
           <div className="normal-header-title__text" ref={ref}>
             {showTo && <div className="normal-header-to__text">TO</div>}
-            {abbreviatedText}
+            {text}
           </div>
         </div>
       </>
@@ -143,7 +133,6 @@ interface Props {
   version?: string;
   maxHeight: number;
   showTo?: boolean;
-  fullName?: boolean;
   classModifier?: string;
   accentPattern?: string;
   variant?: string | null;
@@ -157,7 +146,6 @@ const NormalHeader: ComponentType<Props> = ({
   version,
   maxHeight,
   showTo = false,
-  fullName = false,
   classModifier,
   accentPattern,
   variant,
@@ -177,7 +165,6 @@ const NormalHeader: ComponentType<Props> = ({
         size={headerSize as TitleSize}
         ref={headerRef}
         showTo={showTo}
-        fullName={fullName}
       />
       {time && <NormalHeaderTime time={time} />}
       {version && <NormalHeaderVersion version={version} />}
