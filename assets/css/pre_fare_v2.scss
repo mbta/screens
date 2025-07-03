@@ -4,11 +4,12 @@
 @use "v2/placeholder";
 @use "v2/simulation_common";
 
-@use "v2/lcd_common/no_data" as *;
-@use "v2/lcd_common/page_load_no_data";
-@use "v2/lcd_common/route_pill";
 @use "v2/lcd_common/departures" as *;
 @use "v2/lcd_common/departures_no_data" as *;
+@use "v2/lcd_common/no_data" as *;
+@use "v2/lcd_common/normal_header";
+@use "v2/lcd_common/page_load_no_data";
+@use "v2/lcd_common/route_pill";
 
 @use "v2/pre_fare/alert-banner";
 @use "v2/pre_fare/body/normal" as *;
@@ -35,7 +36,6 @@
 @use "v2/pre_fare/free_text";
 @use "v2/pre_fare/full_line_map";
 @use "v2/pre_fare/no_data" as *;
-@use "v2/pre_fare/normal_header";
 @use "v2/pre_fare/prefare_single_screen_alert";
 @use "v2/pre_fare/reconstructed_alert";
 @use "v2/pre_fare/screen/normal" as *;
