@@ -1,7 +1,9 @@
 .departures-section.headway-section {
-  height: 208px;
+  &--row {
+    height: 208px;
+  }
 
-  &.headway-section--full_screen {
+  &--full_screen {
     height: 416px;
     padding-top: 72px;
     padding-right: 64px;

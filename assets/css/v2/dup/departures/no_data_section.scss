@@ -1,6 +1,10 @@
 .departures-section.no-data-section {
   width: 1920px;
-  height: auto;
+  height: 416px;
+
+  .body-split__main-content-reduced & {
+    height: 208px;
+  }
 
   .no-data-section__icon-container {
     display: inline-block;
@@ -18,8 +22,4 @@
   .no-data-section__row {
     height: 208px;
   }
-}
-
-.body-split__main-content-reduced .no-data-section {
-  height: 208px;
 }
