@@ -38,12 +38,9 @@ if config_env() == :prod do
 
   config :screens, ScreensWeb.AuthManager, secret_key: System.get_env("SCREENS_AUTH_SECRET")
 
-  config :screens, Screens.ScreensByAlert.Memcache,
-    connection_opts: [
-      namespace: System.get_env("HOST"),
-      hostname: System.get_env("MEMCACHED_HOST"),
-      coder: Screens.ScreensByAlert.Memcache.SafeErlangCoder
-    ]
+  config :screens, Screens.Memcache,
+    namespace: System.fetch_env!("HOST"),
+    hostname: System.fetch_env!("MEMCACHED_HOST")
 
   config :ueberauth_oidcc,
     issuers: [
