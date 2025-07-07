@@ -2916,7 +2916,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
               effect: :suspension,
               informed_entities: [
                 %{
-                  route: %{id: "Red"},
+                  route: "Red",
                   route_type: 0,
                   stop: "place-closed",
                   direction_id: nil
