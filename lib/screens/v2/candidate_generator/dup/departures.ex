@@ -174,14 +174,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> Enum.map(&{Departure.route(&1).id, Departure.direction_id(&1)})
       |> Enum.uniq()
 
-    # TODO: Here for testing
-    departures =
-      departures
-      |> Enum.reject(
-        &(&1.prediction != nil and
-            (&1.prediction.route.id == "Orange" or &1.prediction.route.id == "Red"))
-      )
-
     # Check if there is any room for overnight rows before running the logic.
     {section_contains_active_route, overnight_schedules_for_section} =
       if (is_only_section and length(departures) >= 4) or length(departures) >= 2 do
