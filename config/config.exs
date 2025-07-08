@@ -471,6 +471,8 @@ config :screens, :screens_by_alert,
   screens_last_updated_ttl_seconds: 3600,
   screens_ttl_seconds: 40
 
+config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
+
 config :screens, Screens.LastTrip,
   trip_updates_adapter: Screens.LastTrip.TripUpdates.GTFS,
   vehicle_positions_adapter: Screens.LastTrip.VehiclePositions.GTFS
