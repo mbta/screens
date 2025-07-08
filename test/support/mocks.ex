@@ -14,3 +14,5 @@ injected_modules = [
 for module <- injected_modules do
   module |> Module.concat("Mock") |> Mox.defmock(for: module)
 end
+
+Mox.defmock(Screens.DeviceMonitor.MockVendor, for: Screens.DeviceMonitor.Vendor)
