@@ -145,7 +145,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   defp directional_shuttle_or_suspension?(alert) do
     directional =
       alert.effect in [:shuttle, :suspension] and
-        Enum.any?(alert.informed_entities, &(&1.direction_id in 0..1))
+        not Enum.any?(alert.informed_entities, &is_nil(&1.direction_id))
 
     if directional do
       Report.warning(

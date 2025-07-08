@@ -193,6 +193,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     headway_mode = get_headway_mode(stop_ids, routes, alert_informed_entities, now)
 
     cond do
+      # All routes in the section are disabled, so no departures are expected.
+      # In this case, the alerts widget will display info on the closure, so we return an empty section.
+      departures == [] and
+          section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
+        %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
+
       # No remaining departures or active routes, but we do have routes with overnight schedules
       # Show a takeover Overnight section for the given route types
       departures == [] and !section_contains_active_route and
@@ -209,12 +215,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           time_range: time_range,
           headsign: headsign
         }
-
-      # No departures, but no routes in the section are running, so no departures are expected.
-      # In this case, the alerts widget will display info on the closure, so we return an empty section.
-      departures == [] and
-          section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
-        %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
 
       # No departures to show and no headway mode
       departures == [] ->
