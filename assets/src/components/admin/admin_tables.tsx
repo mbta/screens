@@ -186,6 +186,15 @@ const alertsColumn = {
   FormCell: FormTextarea,
 };
 
+const includeLogoColumn = {
+  Header: "Logo?",
+  accessor: buildAppParamAccessor("include_logo_in_header"),
+  mutator: buildAppParamMutator("include_logo_in_header"),
+  Cell: EditableCheckbox,
+  disableFilters: true,
+  FormCell: FormBoolean,
+};
+
 const DupV2ScreensTable = (): JSX.Element => {
   const columns = [
     ...v2Columns,
@@ -479,7 +488,12 @@ const BuswayV2ScreensTable = (): JSX.Element => {
     return app_id === "busway_v2";
   };
 
-  const columns = [...v2Columns, headerColumn, departuresColumn];
+  const columns = [
+    ...v2Columns,
+    headerColumn,
+    departuresColumn,
+    includeLogoColumn,
+  ];
 
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
