@@ -48,5 +48,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.HeaderTest do
       assert [%NormalHeader{icon: :logo}] = Generator.instances(busway, @now)
       assert [%NormalHeader{icon: :logo} | _] = Generator.instances(dup, @now)
     end
+
+    test "hides logo on Busway or Dup when we set hide_logo field to true" do
+      header = %Header.StopName{stop_name: "", hide_logo: true}
+      bus_shelter = build_screen(Screen.BusShelter, header)
+      busway = build_screen(Screen.Busway, header)
+      dup = build_screen(Screen.Dup, header)
+
+      assert [%NormalHeader{icon: nil}] = Generator.instances(busway, @now)
+      assert [%NormalHeader{icon: nil} | _] = Generator.instances(dup, @now)
+    end
   end
 end

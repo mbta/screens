@@ -16,7 +16,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Header do
 
       text ->
         List.duplicate(
-          %NormalHeader{icon: icon(app), screen: screen, text: text, time: time},
+          %NormalHeader{icon: icon(app, header), screen: screen, text: text, time: time},
           copies(app)
         )
     end
@@ -25,8 +25,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Header do
   defp copies(Dup), do: 3
   defp copies(_app), do: 1
 
-  defp icon(app) when app in [Busway, Dup], do: :logo
-  defp icon(_app), do: nil
+  defp icon(app, %{hide_logo: false}) when app in [Busway, Dup], do: :logo
+  defp icon(_app, _header), do: nil
 
   defp text(%Header.StopName{stop_name: name}), do: name
   defp text(%Header.StopId{stop_id: stop_id}), do: @stop.fetch_stop_name(stop_id)
