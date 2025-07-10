@@ -25,9 +25,7 @@ defmodule Screens.Application do
       {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner},
       # Task supervisor for parallel running of candidate generator variants
       {Task.Supervisor, name: Screens.V2.ScreenData.ParallelRunSupervisor},
-      Screens.DeviceMonitor.Cache,
-      Screens.DeviceMonitor.Gds,
-      Screens.DeviceMonitor.Mercury,
+      Screens.DeviceMonitor,
       Screens.LastTrip,
       Screens.Telemetry,
       {Phoenix.PubSub, name: ScreensWeb.PubSub},

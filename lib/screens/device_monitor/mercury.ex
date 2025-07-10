@@ -1,52 +1,55 @@
 defmodule Screens.DeviceMonitor.Mercury do
   @moduledoc false
 
-  use Screens.DeviceMonitor.Server
+  @behaviour Screens.DeviceMonitor.Vendor
 
+  require Logger
   alias Screens.DeviceMonitor.Fetch
 
   @api_url_base "https://api.nexus.mercuryinnovation.com.au/API/mbta"
-  # use `mercury_v2` for compatibility with existing reports/alerts, which were created when there
-  # were two distinct Mercury APIs
+  # use `mercury_v2` for compatibility with existing reports; there were previously two distinct
+  # Mercury APIs
   @vendor_name :mercury_v2
-  @vendor_request_opts [hackney: [pool: :mercury_api_pool]]
 
-  def log(dt_range) do
+  @impl true
+  def log(log_range) do
     Screens.DeviceMonitor.Logger.log_data(
-      fn -> fetch(dt_range) end,
+      fn -> fetch(log_range) end,
       @vendor_name,
       "MERCURY_API_KEY"
     )
   end
 
-  defp fetch(dt_range) do
+  defp fetch(log_range) do
     headers = [{"apiKey", get_api_key()}]
 
-    case Fetch.make_and_parse_request(
-           @api_url_base <> "/devices",
-           headers,
-           &Jason.decode/1,
-           @vendor_name,
-           @vendor_request_opts
-         ) do
-      {:ok, parsed} ->
-        prod_screens =
-          Enum.filter(parsed, &match?(%{"stop" => %{"agency_id" => "mbta_prod"}}, &1))
+    with {:ok, parsed} <-
+           Fetch.make_and_parse_request(
+             @api_url_base <> "/devices",
+             headers,
+             &Jason.decode/1,
+             @vendor_name
+           ) do
+      prod_screens =
+        Enum.filter(parsed, &match?(%{"stop" => %{"agency_id" => "mbta_prod"}}, &1))
 
-        button_press_event_counts = fetch_button_press_events(prod_screens, dt_range)
+      button_press_event_counts = fetch_button_press_events(prod_screens, log_range)
 
-        {:ok,
-         Enum.map(
-           prod_screens,
-           &fetch_device_info(&1, Map.get(button_press_event_counts, &1["device_id"], 0))
-         )}
+      # the API has somewhat slow response times and N+1 requests are needed to gather all the
+      # device data, so do them in parallel
+      results =
+        Task.async_stream(
+          prod_screens,
+          &fetch_device_info(&1, Map.get(button_press_event_counts, &1["device_id"], 0)),
+          timeout: 10_000
+        )
 
-      :error ->
-        :error
+      {:ok, Enum.map(results, fn {:ok, data} -> data end)}
     end
   end
 
   defp fetch_device_info(device, num_button_presses) do
+    Logger.warning("fetching device info for #{device["device_id"]}")
     device_id = device["device_id"]
     headers = [{"apiKey", get_api_key()}]
 
@@ -55,8 +58,7 @@ defmodule Screens.DeviceMonitor.Mercury do
              @api_url_base <> "/devices/#{device_id}",
              headers,
              &Jason.decode/1,
-             @vendor_name,
-             @vendor_request_opts
+             @vendor_name
            ) do
         {:ok, parsed} -> fetch_relevant_fields(parsed)
         :error -> %{device_id: device_id, state: :error}
@@ -112,8 +114,7 @@ defmodule Screens.DeviceMonitor.Mercury do
            @api_url_base <> "/allEvents/#{device_ids}/#{from_unix}/#{to_unix}",
            [{"apiKey", get_api_key()}],
            &Jason.decode/1,
-           @vendor_name,
-           @vendor_request_opts
+           @vendor_name
          ) do
       {:ok, parsed} ->
         for {device_id, events_map} <- parsed, into: %{} do

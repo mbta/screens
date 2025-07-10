@@ -2,6 +2,7 @@ defmodule Screens.LogScreenData do
   @moduledoc false
   require Logger
   alias Screens.Config.Cache
+  alias Screens.Util
   alias ScreensConfig.Screen
 
   def log_page_load(screen_id, is_screen, screen_side \\ nil) do
@@ -111,24 +112,10 @@ defmodule Screens.LogScreenData do
 
   def log_message(message, data) do
     data
-    |> Enum.map_join(" ", &format_log_value/1)
+    |> Enum.map_join(" ", &Util.format_log_value/1)
     |> then(fn data_str ->
       Logger.info("#{message} #{data_str}")
     end)
-  end
-
-  defp format_log_value({key, value}) do
-    value_str =
-      case value do
-        nil -> "null"
-        _ -> "#{value}"
-      end
-
-    if String.contains?(value_str, " ") do
-      "#{key}=\"#{value_str}\""
-    else
-      "#{key}=#{value_str}"
-    end
   end
 
   defp screen_name_for_id(screen_id) do

@@ -1,5 +1,7 @@
 defmodule Screens.DeviceMonitor.Logger do
-  @moduledoc "Shared logging functions for device monitor servers."
+  @moduledoc "Shared logging functions for device monitor modules."
+
+  alias Screens.Util
 
   require Logger
 
@@ -20,21 +22,7 @@ defmodule Screens.DeviceMonitor.Logger do
   end
 
   def log_message(message, data) do
-    data_str = data |> Enum.map(&format_log_value/1) |> Enum.join(" ")
+    data_str = data |> Enum.map_join(" ", &Util.format_log_value/1)
     Logger.info("#{message} #{data_str}")
-  end
-
-  defp format_log_value({key, value}) do
-    value_str =
-      case value do
-        nil -> "null"
-        _ -> "#{value}"
-      end
-
-    if String.contains?(value_str, " ") do
-      "#{key}=\"#{value_str}\""
-    else
-      "#{key}=#{value_str}"
-    end
   end
 end

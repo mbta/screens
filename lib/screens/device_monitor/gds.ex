@@ -1,9 +1,10 @@
 defmodule Screens.DeviceMonitor.Gds do
   @moduledoc false
 
-  use Screens.DeviceMonitor.Server
+  @behaviour Screens.DeviceMonitor.Vendor
 
   alias Screens.DeviceMonitor.Fetch
+  alias Screens.Report
   alias SweetXml, as: Xml
 
   import SweetXml, only: [sigil_x: 2]
@@ -12,11 +13,10 @@ defmodule Screens.DeviceMonitor.Gds do
   @api_url_base "https://dmsmbta.gds.com/DMSService.asmx"
   @device_list_url_base "#{@api_url_base}/GetDevicesList"
   @token_url_base "#{@api_url_base}/GetToken"
-
   @vendor_name :gds
-  @vendor_request_opts []
 
-  def log(_dt_range) do
+  @impl true
+  def log(_log_range) do
     Screens.DeviceMonitor.Logger.log_data(&fetch/0, :gds, "GDS_DMS_PASSWORD")
   end
 
@@ -33,7 +33,7 @@ defmodule Screens.DeviceMonitor.Gds do
       {:ok, merge_device_and_sn_data(sns, devices_data)}
     else
       {step, :error} ->
-        _ = Logger.info("gds_fetch_error #{step}")
+        Report.error("gds_fetch_error", step: step)
         :error
     end
   end
@@ -56,7 +56,7 @@ defmodule Screens.DeviceMonitor.Gds do
 
     @token_url_base
     |> build_url(params)
-    |> Fetch.make_and_parse_request(&parse_token/1, @vendor_name, @vendor_request_opts)
+    |> Fetch.make_and_parse_request(&parse_token/1, @vendor_name)
   end
 
   defp parse_token(xml) do
@@ -75,7 +75,7 @@ defmodule Screens.DeviceMonitor.Gds do
 
     @device_list_url_base
     |> build_url(params)
-    |> Fetch.make_and_parse_request(&parse_devices_data/1, @vendor_name, @vendor_request_opts)
+    |> Fetch.make_and_parse_request(&parse_devices_data/1, @vendor_name)
   end
 
   defp parse_devices_data(xml) do
