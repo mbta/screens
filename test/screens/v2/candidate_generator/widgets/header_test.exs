@@ -49,7 +49,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.HeaderTest do
       assert [%NormalHeader{icon: :logo} | _] = Generator.instances(dup, @now)
     end
 
-    test "shows logo on Busway when we set include_logo_in_header field to false" do
+    test "shows logo on Busway when we set include_logo_in_header field to true" do
       header = %Header.StopName{stop_name: ""}
 
       busway =
