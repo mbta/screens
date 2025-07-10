@@ -38,25 +38,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.HeaderTest do
                Generator.instances(screen, @now)
     end
 
-    test "includes logo when app is Busway or Dup" do
+    test "includes logo when app is Dup" do
       header = %Header.StopName{stop_name: ""}
       bus_shelter = build_screen(Screen.BusShelter, header)
       busway = build_screen(Screen.Busway, header)
       dup = build_screen(Screen.Dup, header)
 
       assert [%NormalHeader{icon: nil}] = Generator.instances(bus_shelter, @now)
-      assert [%NormalHeader{icon: :logo}] = Generator.instances(busway, @now)
+      assert [%NormalHeader{icon: nil}] = Generator.instances(busway, @now)
       assert [%NormalHeader{icon: :logo} | _] = Generator.instances(dup, @now)
     end
 
-    test "hides logo on Busway or Dup when we set hide_logo field to true" do
-      header = %Header.StopName{stop_name: "", hide_logo: true}
-      bus_shelter = build_screen(Screen.BusShelter, header)
-      busway = build_screen(Screen.Busway, header)
-      dup = build_screen(Screen.Dup, header)
+    test "shows logo on Busway when we set include_logo_in_header field to false" do
+      header = %Header.StopName{stop_name: ""}
 
-      assert [%NormalHeader{icon: nil}] = Generator.instances(busway, @now)
-      assert [%NormalHeader{icon: nil} | _] = Generator.instances(dup, @now)
+      busway =
+        struct(Screen,
+          app_params: struct(Screen.Busway, header: header, include_logo_in_header: true)
+        )
+
+      assert [%NormalHeader{icon: :logo}] = Generator.instances(busway, @now)
     end
   end
 end
