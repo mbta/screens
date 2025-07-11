@@ -5,16 +5,17 @@ defmodule Screens.DeviceMonitor do
 
   defmodule State do
     @moduledoc false
+
+    @vendor_mods [Screens.DeviceMonitor.Gds, Screens.DeviceMonitor.Mercury]
+
     @enforce_keys [:store]
-    defstruct @enforce_keys
+    defstruct @enforce_keys ++ [now_fn: &DateTime.utc_now/0, vendor_mods: @vendor_mods]
   end
 
   defmodule Vendor do
     @moduledoc "Behaviour for vendor-specific logging modules."
     @callback log(report_range :: {DateTime.t(), DateTime.t()}) :: any()
   end
-
-  @vendor_modules [__MODULE__.Gds, __MODULE__.Mercury]
 
   use GenServer
   require Logger
@@ -28,13 +29,13 @@ defmodule Screens.DeviceMonitor do
 
   @impl true
   def init(state) do
-    send(self(), :log)
+    send(self(), :run)
     {:ok, state}
   end
 
   @impl true
-  def handle_info(:log, %State{store: store} = state) do
-    now = DateTime.utc_now()
+  def handle_info(:run, %State{now_fn: now_fn, store: store, vendor_mods: vendor_mods} = state) do
+    now = now_fn.()
 
     log_fields =
       case Store.get_and_update(store, now) do
@@ -44,18 +45,24 @@ defmodule Screens.DeviceMonitor do
         {:ok, last_update} ->
           {from, to} = {truncate_seconds(last_update), truncate_seconds(now)}
 
-          if DateTime.compare(from, to) == :lt do
-            Enum.each(@vendor_modules, fn module ->
-              Task.start(fn -> module.log({from, to}) end)
-            end)
+          case DateTime.compare(from, to) do
+            :lt ->
+              Enum.each(vendor_mods, fn module ->
+                Task.start(fn -> module.log({from, to}) end)
+              end)
 
-            [result: :ok]
-          else
-            [result: :skip, reason: :invalid_time_range, from: from, to: to]
+              [result: :ok]
+
+            :eq ->
+              # expected and will usually mean another instance won the race
+              [result: :skip, reason: :empty_time_range]
+
+            :gt ->
+              [result: :error, reason: :invalid_time_range, from: from, to: to]
           end
 
         {:error, error} ->
-          [result: :error, error: error]
+          [result: :error, reason: error]
       end
 
     Logger.info(
@@ -63,22 +70,15 @@ defmodule Screens.DeviceMonitor do
         Enum.map_join(log_fields, " ", fn {key, value} -> "#{key}=#{inspect(value)}" end)
     )
 
-    schedule_next_run()
+    schedule_next_run(now)
 
     {:noreply, state}
   end
 
-  # Handle leaked :ssl_closed messages from Hackney.
-  # Workaround for this issue: https://github.com/benoitc/hackney/issues/464
-  def handle_info({:ssl_closed, _}, state) do
-    {:noreply, state}
-  end
-
-  defp schedule_next_run do
-    # Run at the top of the next minute, plus a second to ensure we've cleared the boundary
-    now = DateTime.utc_now()
+  defp schedule_next_run(now) do
+    # run at the top of the next minute, plus a second to ensure we've cleared the boundary
     next = now |> truncate_seconds() |> DateTime.add(1, :minute) |> DateTime.add(1, :second)
-    Process.send_after(self(), :log, DateTime.diff(next, now, :millisecond))
+    Process.send_after(self(), :run, DateTime.diff(next, now, :millisecond))
   end
 
   defp truncate_seconds(dt),
