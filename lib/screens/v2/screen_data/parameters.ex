@@ -62,7 +62,7 @@ defmodule Screens.V2.ScreenData.Parameters do
         false
 
       %Static{audio_active_time: {start_time, end_time}} ->
-        Util.time_in_range?(now, start_time, end_time)
+        now |> Util.to_eastern() |> Util.time_in_range?(start_time, end_time)
     end
   end
 
