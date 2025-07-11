@@ -13,7 +13,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.HeaderTest do
 
   @now ~U[2025-01-01 12:00:00Z]
 
-  defp build_screen(app, header), do: struct(Screen, app_params: struct(app, header: header))
+  defp build_screen(app, header, include_logo_in_header \\ false)
+
+  defp build_screen(Screen.Busway = app, header, true) do
+    struct(Screen, app_params: struct(app, header: header, include_logo_in_header: true))
+  end
+
+  defp build_screen(app, header, _include_logo_in_header),
+    do: struct(Screen, app_params: struct(app, header: header))
 
   describe "instances/2" do
     test "generates a header with stop name and time" do
