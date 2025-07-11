@@ -81,12 +81,6 @@ defmodule Screens.Cache.Owner do
     {:noreply, do_update(state)}
   end
 
-  # Handle leaked :ssl_closed messages from Hackney.
-  # Workaround for this issue: https://github.com/benoitc/hackney/issues/464
-  def handle_info({:ssl_closed, _}, state) do
-    {:noreply, state}
-  end
-
   defp schedule_update(update_interval_ms) do
     unless update_interval_ms == 0, do: Process.send_after(self(), :update, update_interval_ms)
   end
