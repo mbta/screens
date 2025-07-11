@@ -44,7 +44,9 @@ defmodule Screens.V2.ScreenData.ParametersTest do
     }
   end
 
-  defp local_time(time), do: DateTime.new!(~D[2024-01-01], time, "America/New_York")
+  # actual "now" passed into these functions may not already be in the Eastern time zone
+  defp local_time(time),
+    do: DateTime.new!(~D[2024-01-01], time, "America/New_York") |> DateTime.shift_zone!("Etc/UTC")
 
   describe "audio_enabled?/2" do
     test "is false for a screen type with no audio schedule" do
