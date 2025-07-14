@@ -9,14 +9,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Header do
   @stop injected(Screens.Stops.Stop)
 
   @spec instances(Screen.t(), DateTime.t()) :: [NormalHeader.t()]
-  def instances(%Screen{app_params: %app{header: header}} = screen, time) do
+  def instances(%Screen{app_params: %app{header: header} = app_params} = screen, time) do
     case text(header) do
       nil ->
         []
 
       text ->
         List.duplicate(
-          %NormalHeader{icon: icon(app), screen: screen, text: text, time: time},
+          %NormalHeader{icon: icon(app_params), screen: screen, text: text, time: time},
           copies(app)
         )
     end
@@ -25,8 +25,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Header do
   defp copies(Dup), do: 3
   defp copies(_app), do: 1
 
-  defp icon(app) when app in [Busway, Dup], do: :logo
-  defp icon(_app), do: nil
+  defp icon(%Busway{include_logo_in_header: true}), do: :logo
+  defp icon(%Dup{}), do: :logo
+  defp icon(_app_params), do: nil
 
   defp text(%Header.StopName{stop_name: name}), do: name
   defp text(%Header.StopId{stop_id: stop_id}), do: @stop.fetch_stop_name(stop_id)
