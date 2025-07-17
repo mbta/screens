@@ -54,35 +54,24 @@ defmodule Screens.DeviceMonitor do
     now = now_fn.()
 
     log_fields =
-      case Store.get_and_update(store, now) do
-        {:ok, nil} ->
-          [result: :skipped, reason: :store_initialized]
+      with {:ok, prev, version} <- get_or_initialize(store, now),
+           [from, to] = Enum.map([prev, now], &truncate_to_interval(&1, @log_interval_minutes)),
+           {:diff, true} <- {:diff, DateTime.diff(to, from, :minute) >= @log_interval_minutes},
+           :ok <- Store.set(store, now, version) do
+        Enum.each(vendor_mods, fn vendor_mod ->
+          Task.Supervisor.async_nolink(
+            __MODULE__.Supervisor,
+            fn -> vendor_mod.log({from, to}) end,
+            timeout: @vendor_mod_timeout_ms
+          )
+        end)
 
-        {:ok, last_update} ->
-          {from, to} = {truncate_seconds(last_update), truncate_seconds(now)}
-
-          case DateTime.compare(from, to) do
-            :lt ->
-              Enum.each(vendor_mods, fn vendor_mod ->
-                Task.Supervisor.async_nolink(
-                  __MODULE__.Supervisor,
-                  fn -> vendor_mod.log({from, to}) end,
-                  timeout: @vendor_mod_timeout_ms
-                )
-              end)
-
-              [result: :started, from: from, to: to]
-
-            :eq ->
-              # expected and will usually mean another instance won the race
-              [result: :skipped, reason: :empty_time_range, from: from, to: to]
-
-            :gt ->
-              [result: :error, reason: :invalid_time_range, from: from, to: to]
-          end
-
-        {:error, error} ->
-          [result: :error, reason: error]
+        [result: :started, from: from, to: to]
+      else
+        :initialized -> [result: :skipped, reason: :store_initialized]
+        :conflict -> [result: :skipped, reason: :store_conflict]
+        {:diff, false} -> [result: :skipped, reason: :interval_not_elapsed]
+        {:error, error} -> [result: :error, reason: error]
       end
 
     Logger.info(
@@ -91,20 +80,31 @@ defmodule Screens.DeviceMonitor do
     )
   end
 
+  defp get_or_initialize(store, value) do
+    with {:ok, nil, version} <- Store.get(store),
+         :ok <- Store.set(store, value, version),
+         do: :initialized
+  end
+
   defp schedule_next_run(%State{now_fn: now_fn}) do
     now = now_fn.()
 
     # run at a consistent time past the top of the minute
     send_after =
       now
-      |> truncate_seconds()
-      |> DateTime.add(@log_interval_minutes, :minute)
+      |> truncate_to_interval(1)
+      |> DateTime.add(1, :minute)
       |> DateTime.add(1, :second)
       |> DateTime.diff(now, :millisecond)
 
     Process.send_after(self(), :run, send_after)
   end
 
-  defp truncate_seconds(dt),
-    do: dt |> DateTime.truncate(:second) |> then(&%DateTime{&1 | second: 0})
+  # Truncate a datetime to the given interval size in minutes. For example, when the size is 5,
+  # the resulting datetime will have a minute of 0, 5, 10, 15, etc.
+  defp truncate_to_interval(%DateTime{minute: minute} = dt, interval_size)
+       when is_integer(interval_size) and interval_size in 1..60 do
+    %DateTime{dt | minute: div(minute, interval_size) * interval_size, second: 0}
+    |> DateTime.truncate(:second)
+  end
 end

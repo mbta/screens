@@ -9,22 +9,24 @@ defmodule Screens.DeviceMonitorTest do
 
   setup do
     {:ok, store} = Store.start_link()
+    {:ok, nil, version} = Store.get(store)
 
     state = %State{
-      now_fn: fn -> ~U[2025-01-01 12:02:01Z] end,
+      now_fn: fn -> ~U[2025-01-01 12:31:01Z] end,
       store: store,
       vendor_mods: [MockVendor]
     }
 
-    {:ok, %{state: state, store: store}}
+    {:ok, %{state: state, store: store, version: version}}
   end
 
   defp run(state), do: DeviceMonitor.handle_info(:run, state)
 
-  test "calls vendor log functions with the correct time range", %{state: state, store: store} do
-    {:ok, nil} = Store.get_and_update(store, ~U[2025-01-01 12:00:02Z])
+  test "calls vendor log functions with the correct time range",
+       %{state: state, store: store, version: version} do
+    :ok = Store.set(store, ~U[2025-01-01 12:25:02Z], version)
 
-    expect(MockVendor, :log, fn {~U[2025-01-01 12:00:00Z], ~U[2025-01-01 12:02:00Z]} ->
+    expect(MockVendor, :log, fn {~U[2025-01-01 12:25:00Z], ~U[2025-01-01 12:30:00Z]} ->
       :mock_log_done
     end)
 
@@ -40,8 +42,9 @@ defmodule Screens.DeviceMonitorTest do
     refute_receive {:DOWN, _, _, _, _}
   end
 
-  test "does not log within the same minute as the previous log", %{state: state, store: store} do
-    {:ok, nil} = Store.get_and_update(store, ~U[2025-01-01 12:02:00Z])
+  test "does not log again within the previous log interval",
+       %{state: state, store: store, version: version} do
+    :ok = Store.set(store, ~U[2025-01-01 12:30:03Z], version)
 
     assert {:noreply, ^state} = run(state)
 
