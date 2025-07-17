@@ -72,7 +72,7 @@ defmodule Screens.DeviceMonitor.Store do
 
         {:error, "Key not found"} ->
           case Memcache.add(server, @key, value) do
-            {:ok, _version} -> {:ok, nil}
+            {:ok} -> {:ok, nil}
             # someone else created it between the `get` and the `add`
             {:error, "Key exists"} -> get_and_update(server, value, retries_left - 1)
             {:error, _} = error -> error
