@@ -16,10 +16,10 @@ defmodule Screens.DeviceMonitor.Gds do
 
   @impl true
   def log({_from_dt, to_dt}) do
-    Screens.DeviceMonitor.Logger.log_data(fn -> fetch(to_dt) end, :gds, "GDS_DMS_PASSWORD")
+    Screens.DeviceMonitor.Logger.log_data(fn -> do_log(to_dt) end, :gds, "GDS_DMS_PASSWORD")
   end
 
-  defp fetch(now) do
+  defp do_log(now) do
     with {:ok, token} <- get_token(),
          {:ok, devices_data} <- fetch_devices_data(token, now) do
       sns = Map.keys(devices_data)
@@ -45,7 +45,7 @@ defmodule Screens.DeviceMonitor.Gds do
 
     @token_url_base
     |> build_url(params)
-    |> Fetch.make_and_parse_request(&parse_token/1, @vendor_name)
+    |> Fetch.make_and_parse_request([], [], &parse_token/1, @vendor_name)
   end
 
   defp parse_token(xml) do
@@ -68,7 +68,7 @@ defmodule Screens.DeviceMonitor.Gds do
 
     @device_list_url_base
     |> build_url(params)
-    |> Fetch.make_and_parse_request(&parse_devices_data(&1, now), @vendor_name)
+    |> Fetch.make_and_parse_request([], [], &parse_devices_data(&1, now), @vendor_name)
   end
 
   defp parse_devices_data(xml, now) do

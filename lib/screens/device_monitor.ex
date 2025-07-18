@@ -22,10 +22,6 @@ defmodule Screens.DeviceMonitor do
 
   alias __MODULE__.Store
 
-  @log_interval_minutes 5
-  # ensure logging functions don't run for longer than the log interval
-  @vendor_mod_timeout_ms 4 * 60 * 1000
-
   def start_link(opts \\ []) do
     with {:ok, store} <- Store.start_link(),
          do: GenServer.start_link(__MODULE__, %State{store: store}, opts)
@@ -55,15 +51,11 @@ defmodule Screens.DeviceMonitor do
 
     log_fields =
       with {:ok, prev, version} <- get_or_initialize(store, now),
-           [from, to] = Enum.map([prev, now], &truncate_to_interval(&1, @log_interval_minutes)),
-           {:diff, true} <- {:diff, DateTime.diff(to, from, :minute) >= @log_interval_minutes},
+           [from, to] = Enum.map([prev, now], &truncate_seconds/1),
+           {:diff, true} <- {:diff, DateTime.diff(to, from, :minute) >= 1},
            :ok <- Store.set(store, now, version) do
         Enum.each(vendor_mods, fn vendor_mod ->
-          Task.Supervisor.async_nolink(
-            __MODULE__.Supervisor,
-            fn -> vendor_mod.log({from, to}) end,
-            timeout: @vendor_mod_timeout_ms
-          )
+          Task.Supervisor.async_nolink(__MODULE__.Supervisor, fn -> vendor_mod.log({from, to}) end)
         end)
 
         [result: :started, from: from, to: to]
@@ -92,7 +84,7 @@ defmodule Screens.DeviceMonitor do
     # run at a consistent time past the top of the minute
     send_after =
       now
-      |> truncate_to_interval(1)
+      |> truncate_seconds()
       |> DateTime.add(1, :minute)
       |> DateTime.add(1, :second)
       |> DateTime.diff(now, :millisecond)
@@ -100,11 +92,5 @@ defmodule Screens.DeviceMonitor do
     Process.send_after(self(), :run, send_after)
   end
 
-  # Truncate a datetime to the given interval size in minutes. For example, when the size is 5,
-  # the resulting datetime will have a minute of 0, 5, 10, 15, etc.
-  defp truncate_to_interval(%DateTime{minute: minute} = dt, interval_size)
-       when is_integer(interval_size) and interval_size in 1..60 do
-    %DateTime{dt | minute: div(minute, interval_size) * interval_size, second: 0}
-    |> DateTime.truncate(:second)
-  end
+  defp truncate_seconds(dt), do: DateTime.truncate(%DateTime{dt | second: 0}, :second)
 end
