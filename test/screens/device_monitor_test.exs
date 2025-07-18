@@ -24,9 +24,9 @@ defmodule Screens.DeviceMonitorTest do
 
   test "calls vendor log functions with the correct time range",
        %{state: state, store: store, version: version} do
-    :ok = Store.set(store, ~U[2025-01-01 12:25:02Z], version)
+    :ok = Store.set(store, ~U[2025-01-01 12:29:02Z], version)
 
-    expect(MockVendor, :log, fn {~U[2025-01-01 12:25:00Z], ~U[2025-01-01 12:30:00Z]} ->
+    expect(MockVendor, :log, fn {~U[2025-01-01 12:29:00Z], ~U[2025-01-01 12:31:00Z]} ->
       :mock_log_done
     end)
 
@@ -44,7 +44,7 @@ defmodule Screens.DeviceMonitorTest do
 
   test "does not log again within the previous log interval",
        %{state: state, store: store, version: version} do
-    :ok = Store.set(store, ~U[2025-01-01 12:30:03Z], version)
+    :ok = Store.set(store, ~U[2025-01-01 12:31:03Z], version)
 
     assert {:noreply, ^state} = run(state)
 
