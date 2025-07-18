@@ -15,7 +15,6 @@
 
 .normal-header-title {
   position: absolute;
-  bottom: 40px;
   left: 40px;
   display: flex;
   align-content: end;
@@ -40,10 +39,12 @@
   }
 
   &--large {
+    bottom: 40px;
     font-size: 104px;
   }
 
   &--small {
+    bottom: 24px;
     font-size: 72px;
   }
 }
