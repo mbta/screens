@@ -273,7 +273,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           alert: %{
             route_pill: %{type: :text, text: "BL", color: :blue},
             status: "Suspension",
-            location: %{abbrev: "Airport to Aquarium", full: "Airport to Aquarium"}
+            location: %{abbrev: "Airport ↔ Aquarium", full: "Airport ↔ Aquarium"}
           }
         },
         orange: %{
@@ -340,7 +340,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             },
             %{
               status: "Delays up to 20 minutes",
-              location: %{abbrev: "Airport to Aquarium", full: "Airport to Aquarium"}
+              location: %{abbrev: "Airport ↔ Aquarium", full: "Airport ↔ Aquarium"}
             }
           ]
         },
@@ -507,12 +507,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
           type: :contracted,
           alerts: [
             %{
-              location: %{abbrev: "Oak Grove to Wellington", full: "Oak Grove to Wellington"},
+              location: %{abbrev: "Oak Grove ↔ Wellington", full: "Oak Grove ↔ Wellington"},
               route_pill: %{color: :orange, text: "OL", type: :text},
               status: "Suspension"
             },
             %{
-              location: %{abbrev: "Oak Grove to Wellington", full: "Oak Grove to Wellington"},
+              location: %{abbrev: "Oak Grove ↔ Wellington", full: "Oak Grove ↔ Wellington"},
               status: "Delays up to 20 minutes"
             }
           ]
@@ -604,8 +604,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             },
             %{
               location: %{
-                abbrev: "Hawes St to St. Paul St",
-                full: "Hawes Street to Saint Paul Street"
+                abbrev: "Hawes St ↔ St. Paul St",
+                full: "Hawes Street ↔ Saint Paul Street"
               },
               route_pill: %{branches: [:c], color: :green, text: "GL", type: :text},
               status: "Suspension"
@@ -759,8 +759,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             },
             %{
               location: %{
-                abbrev: "Gov't Ctr to Park St",
-                full: "Government Center to Park Street"
+                abbrev: "Gov't Ctr ↔ Park St",
+                full: "Government Center ↔ Park Street"
               },
               route_pill: %{color: :green, text: "GL", type: :text},
               status: "Suspension"
@@ -1739,7 +1739,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         green: %{
           type: :extended,
           alert: %{
-            location: %{abbrev: "Kenmore to Kent St", full: "Kenmore to Kent Street"},
+            location: %{abbrev: "Kenmore ↔ Kent St", full: "Kenmore ↔ Kent Street"},
             route_pill: %{color: :green, text: "GL", type: :text, branches: [:c]},
             status: "Shuttle Bus"
           }

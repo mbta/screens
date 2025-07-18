@@ -342,8 +342,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           }
         else
           %{
-            full: "#{min_full_name} to #{max_full_name}",
-            abbrev: "#{min_abbreviated_name} to #{max_abbreviated_name}"
+            full: "#{min_full_name} ↔ #{max_full_name}",
+            abbrev: "#{min_abbreviated_name} ↔ #{max_abbreviated_name}"
           }
         end
     end
