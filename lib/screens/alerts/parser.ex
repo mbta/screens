@@ -84,52 +84,20 @@ defmodule Screens.Alerts.Parser do
     time
   end
 
-  defp parse_effect("AMBER_ALERT"), do: :amber_alert
-  defp parse_effect("CANCELLATION"), do: :cancellation
-  defp parse_effect("DELAY"), do: :delay
-  defp parse_effect("SUSPENSION"), do: :suspension
-  defp parse_effect("TRACK_CHANGE"), do: :track_change
-  defp parse_effect("DETOUR"), do: :detour
-  defp parse_effect("SHUTTLE"), do: :shuttle
-  defp parse_effect("STOP_CLOSURE"), do: :stop_closure
-  defp parse_effect("DOCK_CLOSURE"), do: :dock_closure
-  defp parse_effect("STATION_CLOSURE"), do: :station_closure
-  defp parse_effect("STOP_MOVE"), do: :stop_moved
-  defp parse_effect("STOP_MOVED"), do: :stop_moved
-  defp parse_effect("EXTRA_SERVICE"), do: :extra_service
-  defp parse_effect("SCHEDULE_CHANGE"), do: :schedule_change
-  defp parse_effect("SERVICE_CHANGE"), do: :service_change
-  defp parse_effect("SNOW_ROUTE"), do: :snow_route
-  defp parse_effect("STATION_ISSUE"), do: :station_issue
-  defp parse_effect("DOCK_ISSUE"), do: :dock_issue
-  defp parse_effect("ACCESS_ISSUE"), do: :access_issue
-  defp parse_effect("FACILITY_ISSUE"), do: :facility_issue
-  defp parse_effect("BIKE_ISSUE"), do: :bike_issue
-  defp parse_effect("PARKING_ISSUE"), do: :parking_issue
-  defp parse_effect("PARKING_CLOSURE"), do: :parking_closure
-  defp parse_effect("ELEVATOR_CLOSURE"), do: :elevator_closure
-  defp parse_effect("ESCALATOR_CLOSURE"), do: :escalator_closure
-  defp parse_effect("POLICY_CHANGE"), do: :policy_change
-  defp parse_effect("STOP_SHOVELING"), do: :stop_shoveling
-  defp parse_effect("SUMMARY"), do: :summary
-  defp parse_effect(_), do: :unknown
-
   @causes %{
     "ACCIDENT" => :accident,
-    "AMTRAK" => :amtrak,
-    "AN_EARLIER_MECHANICAL_PROBLEM" => :an_earlier_mechanical_problem,
-    "AN_EARLIER_SIGNAL_PROBLEM" => :an_earlier_signal_problem,
-    "AUTOS_IMPEDING_SERVICE" => :autos_impeding_service,
+    "AMTRAK_TRAIN_TRAFFIC" => :amtrak_train_traffic,
     "COAST_GUARD_RESTRICTION" => :coast_guard_restriction,
-    "CONGESTION" => :congestion,
     "CONSTRUCTION" => :construction,
-    "CROSSING_MALFUNCTION" => :crossing_malfunction,
+    "CROSSING_ISSUE" => :crossing_issue,
     "DEMONSTRATION" => :demonstration,
     "DISABLED_BUS" => :disabled_bus,
     "DISABLED_TRAIN" => :disabled_train,
     "DRAWBRIDGE_BEING_RAISED" => :drawbridge_being_raised,
     "ELECTRICAL_WORK" => :electrical_work,
     "FIRE" => :fire,
+    "FIRE_DEPARTMENT_ACTIVITY" => :fire_department_activity,
+    "FLOODING" => :flooding,
     "FOG" => :fog,
     "FREIGHT_TRAIN_INTERFERENCE" => :freight_train_interference,
     "HAZMAT_CONDITION" => :hazmat_condition,
@@ -139,27 +107,67 @@ defmodule Screens.Alerts.Parser do
     "HURRICANE" => :hurricane,
     "ICE_IN_HARBOR" => :ice_in_harbor,
     "MAINTENANCE" => :maintenance,
+    "MECHANICAL_ISSUE" => :mechanical_issue,
     "MECHANICAL_PROBLEM" => :mechanical_problem,
     "MEDICAL_EMERGENCY" => :medical_emergency,
     "PARADE" => :parade,
     "POLICE_ACTION" => :police_action,
+    "POLICE_ACTIVITY" => :police_activity,
     "POWER_PROBLEM" => :power_problem,
+    "RAIL_DEFECT" => :rail_defect,
     "SEVERE_WEATHER" => :severe_weather,
+    "SIGNAL_ISSUE" => :signal_issue,
     "SIGNAL_PROBLEM" => :signal_problem,
+    "SINGLE_TRACKING" => :single_tracking,
     "SLIPPERY_RAIL" => :slippery_rail,
     "SNOW" => :snow,
     "SPECIAL_EVENT" => :special_event,
     "SPEED_RESTRICTION" => :speed_restriction,
+    "SWITCH_ISSUE" => :switch_issue,
     "SWITCH_PROBLEM" => :switch_problem,
     "TIE_REPLACEMENT" => :tie_replacement,
     "TRACK_PROBLEM" => :track_problem,
     "TRACK_WORK" => :track_work,
     "TRAFFIC" => :traffic,
+    "TRAIN_TRAFFIC" => :train_traffic,
     "UNRULY_PASSENGER" => :unruly_passenger,
     "WEATHER" => :weather
   }
 
-  defp parse_cause(cause) do
-    Map.get(@causes, cause, :unknown)
-  end
+  @effects %{
+    "ACCESS_ISSUE" => :access_issue,
+    "ADDITIONAL_SERVICE" => :additional_service,
+    "AMBER_ALERT" => :amber_alert,
+    "BIKE_ISSUE" => :bike_issue,
+    "CANCELLATION" => :cancellation,
+    "DELAY" => :delay,
+    "DETOUR" => :detour,
+    "DOCK_CLOSURE" => :dock_closure,
+    "DOCK_ISSUE" => :dock_issue,
+    "ELEVATOR_CLOSURE" => :elevator_closure,
+    "ESCALATOR_CLOSURE" => :escalator_closure,
+    "EXTRA_SERVICE" => :extra_service,
+    "FACILITY_ISSUE" => :facility_issue,
+    "MODIFIED_SERVICE" => :modified_service,
+    "NO_SERVICE" => :no_service,
+    "OTHER_EFFECT" => :other_effect,
+    "PARKING_CLOSURE" => :parking_closure,
+    "PARKING_ISSUE" => :parking_issue,
+    "POLICY_CHANGE" => :policy_change,
+    "SCHEDULE_CHANGE" => :schedule_change,
+    "SERVICE_CHANGE" => :service_change,
+    "SHUTTLE" => :shuttle,
+    "SNOW_ROUTE" => :snow_route,
+    "STATION_CLOSURE" => :station_closure,
+    "STATION_ISSUE" => :station_issue,
+    "STOP_CLOSURE" => :stop_closure,
+    "STOP_MOVE" => :stop_move,
+    "STOP_MOVED" => :stop_moved,
+    "SUMMARY" => :summary,
+    "SUSPENSION" => :suspension,
+    "TRACK_CHANGE" => :track_change
+  }
+
+  defp parse_cause(cause), do: Map.get(@causes, cause, :unknown)
+  defp parse_effect(effect), do: Map.get(@effects, effect, :unknown)
 end
