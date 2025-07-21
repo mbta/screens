@@ -35,20 +35,18 @@ defmodule Screens.Alerts.Alert do
 
   @type cause ::
           :accident
-          | :amtrak
-          | :an_earlier_mechanical_problem
-          | :an_earlier_signal_problem
-          | :autos_impeding_service
+          | :amtrak_train_traffic
           | :coast_guard_restriction
-          | :congestion
           | :construction
-          | :crossing_malfunction
+          | :crossing_issue
           | :demonstration
           | :disabled_bus
           | :disabled_train
           | :drawbridge_being_raised
           | :electrical_work
           | :fire
+          | :fire_department_activity
+          | :flooding
           | :fog
           | :freight_train_interference
           | :hazmat_condition
@@ -58,56 +56,63 @@ defmodule Screens.Alerts.Alert do
           | :hurricane
           | :ice_in_harbor
           | :maintenance
+          | :mechanical_issue
           | :mechanical_problem
           | :medical_emergency
           | :parade
           | :police_action
+          | :police_activity
           | :power_problem
+          | :rail_defect
           | :severe_weather
+          | :signal_issue
           | :signal_problem
+          | :single_tracking
           | :slippery_rail
           | :snow
           | :special_event
           | :speed_restriction
+          | :switch_issue
           | :switch_problem
           | :tie_replacement
           | :track_problem
           | :track_work
           | :traffic
+          | :train_traffic
           | :unruly_passenger
           | :weather
-          | :unknown
 
   @type effect ::
           :access_issue
+          | :additional_service
           | :amber_alert
           | :bike_issue
           | :cancellation
           | :delay
           | :detour
-          | :dock_issue
           | :dock_closure
+          | :dock_issue
           | :elevator_closure
           | :escalator_closure
           | :extra_service
           | :facility_issue
+          | :modified_service
           | :no_service
           | :parking_closure
           | :parking_issue
           | :policy_change
+          | :schedule_change
           | :service_change
           | :shuttle
-          | :suspension
-          | :station_closure
-          | :stop_closure
-          | :stop_moved
-          | :schedule_change
           | :snow_route
+          | :station_closure
           | :station_issue
-          | :stop_shoveling
+          | :stop_closure
+          | :stop_move
+          | :stop_moved
           | :summary
+          | :suspension
           | :track_change
-          | :unknown
 
   @type active_period :: {DateTime.t(), DateTime.t() | nil}
 
@@ -122,8 +127,8 @@ defmodule Screens.Alerts.Alert do
 
   @type t :: %__MODULE__{
           id: String.t(),
-          cause: cause,
-          effect: effect,
+          cause: cause() | :unknown,
+          effect: effect() | :unknown,
           severity: integer,
           header: String.t(),
           informed_entities: list(informed_entity()),
