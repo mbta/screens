@@ -366,7 +366,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     Map.merge(%{route_pill: serialize_route_pill(route_id)}, serialize_alert(alert, route_id))
   end
 
-  @spec serialize_alert(Alert.t() | nil, Route.id()) :: alert()
+  @spec serialize_alert(SubwayStatusAlert.t() | nil, Route.id()) :: alert()
   defp serialize_alert(alert, route_id)
 
   defp serialize_alert(nil, _route_id) do
@@ -422,23 +422,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp serialize_alert(
-         %{
-           alert: %Alert{
-             effect: :delay,
-             severity: severity,
-             informed_entities: informed_entities
-           }
-         },
+         %{alert: %Alert{effect: :delay, informed_entities: informed_entities} = alert},
          route_id
        ) do
-    {delay_description, delay_minutes} = Alert.interpret_severity(severity)
-
-    duration_text =
-      case delay_description do
-        :up_to -> "up to #{delay_minutes} minutes"
-        :more_than -> "over #{delay_minutes} minutes"
-      end
-
     location =
       case get_location(informed_entities, route_id) do
         # Most delays apply to the whole line. It's not necessary to specify it.
@@ -447,7 +433,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       end
 
     %{
-      status: "Delays #{duration_text}",
+      status: "Delays #{Alert.delay_description(alert)}",
       location: location
     }
   end
