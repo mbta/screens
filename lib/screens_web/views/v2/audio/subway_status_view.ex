@@ -159,10 +159,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     #
     # alert.status                   ||| possible values of location_string
     # -------------------------------|||-----------------------------------
-    # Shuttle Bus                    ||| "" | Xbound | $STATION | $STATION to $STATION | Entire line
+    # Shuttle Bus                    ||| "" | Xbound | $STATION | $STATION ↔ $STATION | Entire line
     # SERVICE SUSPENDED              ||| Entire line
-    # Suspension                     ||| "" | Xbound | $STATION | $STATION to $STATION
-    # Delays (up to|over) $N minutes ||| "" | Xbound | $STATION | $STATION to $STATION
+    # Suspension                     ||| "" | Xbound | $STATION | $STATION ↔ $STATION
+    # Delays (up to|over) $N minutes ||| "" | Xbound | $STATION | $STATION ↔ $STATION
     # Bypassing                      ||| "" | $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
     # Bypassing $N stops             ||| ""
     # $N current alerts              ||| ""
@@ -204,10 +204,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
         # E.g. "Southbound Shuttle bus", "Northbound Suspension", "Eastbound Delays up to 20 minutes"
         ~E|<%= location_string %> <%= status %>|
 
-      # Shuttle Bus/Suspension/Delays + $STATION to $STATION
-      String.contains?(location_string, " to ") ->
-        # E.g. "Suspension from Back Bay to North Station", "Shuttle Bus from Ashmont to JFK/UMass"
-        ~E|<%= status %> from <%= location_string %>|
+      # Shuttle Bus/Suspension/Delays + $STATION ↔ $STATION
+      String.contains?(location_string, " ↔ ") ->
+        # E.g. "Suspension between Back Bay and North Station", "Shuttle Bus between Ashmont and JFK/UMass"
+        ~E|<%= status %> between <%= String.replace(location_string, " ↔ ", " and ") %>|
 
       # Shuttle Bus/SERVICE SUSPENDED + Entire line
       location_string == "Entire line" ->
