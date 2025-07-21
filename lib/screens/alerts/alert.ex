@@ -129,7 +129,7 @@ defmodule Screens.Alerts.Alert do
           id: String.t(),
           cause: cause() | :unknown,
           effect: effect() | :unknown,
-          severity: integer,
+          severity: pos_integer(),
           header: String.t(),
           informed_entities: list(informed_entity()),
           active_period: list(active_period()),
@@ -298,50 +298,91 @@ defmodule Screens.Alerts.Alert do
     DateTime.compare(t, start_t) in [:gt, :eq] && DateTime.compare(t, end_t) in [:lt, :eq]
   end
 
-  @alert_cause_mapping %{
-    accident: "an accident",
-    construction: "construction",
-    disabled_train: "a disabled train",
-    fire: "a fire",
-    holiday: "the holiday",
-    maintenance: "maintenance",
-    medical_emergency: "a medical emergency",
-    police_action: "police action",
-    power_problem: "a power issue",
-    signal_problem: "a signal problem",
+  # Rules for grammatically describing alert causes.
+  @cause_description_rules %{
+    accident: :an,
+    amtrak_train_traffic: nil,
+    coast_guard_restriction: :a,
+    construction: nil,
+    crossing_issue: :a,
+    demonstration: :a,
+    disabled_bus: :a,
+    disabled_train: :a,
+    drawbridge_being_raised: :a,
+    electrical_work: nil,
+    fire: :a,
+    fire_department_activity: nil,
+    flooding: nil,
+    fog: nil,
+    freight_train_interference: nil,
+    hazmat_condition: :a,
+    heavy_ridership: nil,
+    high_winds: nil,
+    holiday: :the,
+    hurricane: nil,
+    ice_in_harbor: "ice in the harbor",
+    maintenance: nil,
+    mechanical_issue: :a,
+    mechanical_problem: :a,
+    medical_emergency: :a,
+    parade: :a,
+    police_action: nil,
+    police_activity: nil,
+    power_problem: :a,
+    rail_defect: :a,
+    severe_weather: nil,
+    signal_issue: :a,
+    signal_problem: :a,
+    single_tracking: nil,
+    slippery_rail: nil,
     snow: "snow conditions",
-    special_event: "a special event",
-    switch_problem: "a switch problem",
-    track_problem: "a track problem",
-    traffic: "traffic",
+    special_event: :a,
+    speed_restriction: :a,
+    switch_issue: :a,
+    switch_problem: :a,
+    tie_replacement: nil,
+    track_problem: :a,
+    track_work: nil,
+    traffic: nil,
+    train_traffic: nil,
+    unruly_passenger: :an,
     weather: "weather conditions"
   }
 
-  for {cause, cause_text} <- @alert_cause_mapping do
-    def get_cause_string(unquote(cause)) do
-      "due to #{unquote(cause_text)}"
+  @doc """
+  Describes the cause of an alert, e.g. "a signal problem". Returns empty string when the cause is
+  unknown.
+  """
+  @spec cause_description(t()) :: String.t()
+  def cause_description(%__MODULE__{cause: :unknown}), do: ""
+
+  def cause_description(%__MODULE__{cause: cause}) do
+    case Map.get(@cause_description_rules, cause) do
+      nil -> stringify_cause(cause)
+      prefix when is_atom(prefix) -> "#{prefix} #{stringify_cause(cause)}"
+      other when is_binary(other) -> other
     end
   end
 
-  def get_cause_string(_), do: ""
+  defp stringify_cause(cause), do: cause |> to_string() |> String.replace("_", " ")
 
-  # information -> 1
-  # up to 10 minutes -> 3
-  # up to 15 minutes -> 4
-  # up to 20 minutes -> 5
-  # up to 25 minutes -> 6
-  # up to 30 minutes -> 7
-  # more than 30 minutes -> 8
-  # more than an hour -> 9
-  # High priority (deliver to T-Alert subscribers immediately) -> 10
-  def interpret_severity(severity) do
-    cond do
-      severity < 3 -> {:up_to, 10}
-      severity > 9 -> {:more_than, 60}
-      severity >= 8 -> {:more_than, 30 * (severity - 7)}
-      true -> {:up_to, 5 * (severity - 1)}
-    end
-  end
+  @doc """
+  Describes the impact of an alert on trip times. Mirrors how severity values are labeled in the
+  UI used to create alerts. Returns empty string when there is no expected delay ("informational"
+  alerts).
+  """
+  @spec delay_description(t()) :: String.t()
+  def delay_description(%__MODULE__{severity: 1}), do: ""
+  # 2 currently cannot be selected, but is a technically allowed value
+  def delay_description(%__MODULE__{severity: sev}) when sev in 2..3, do: "up to 10 minutes"
+  def delay_description(%__MODULE__{severity: 4}), do: "up to 15 minutes"
+  def delay_description(%__MODULE__{severity: 5}), do: "up to 20 minutes"
+  def delay_description(%__MODULE__{severity: 6}), do: "up to 25 minutes"
+  def delay_description(%__MODULE__{severity: 7}), do: "up to 30 minutes"
+  def delay_description(%__MODULE__{severity: 8}), do: "over 30 minutes"
+  # 10 is essentially a signal for urgent notification delivery; its label does not describe any
+  # particular impact on trip times
+  def delay_description(%__MODULE__{severity: sev}) when sev in 9..10, do: "over 60 minutes"
 
   @doc "Returns IDs of all subway routes affected by the alert. Green Line routes are not consolidated."
   def informed_subway_routes(%__MODULE__{} = alert) do

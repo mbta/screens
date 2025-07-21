@@ -702,18 +702,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :delay}} = t, location) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, severity: severity, header: header},
+      alert: %Alert{cause: cause, updated_at: updated_at, header: header} = alert,
       now: now
     } = t
 
-    {delay_description, delay_minutes} = Alert.interpret_severity(severity)
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
-
-    duration_text =
-      case delay_description do
-        :up_to -> "up to #{delay_minutes} minutes"
-        :more_than -> "over #{delay_minutes} minutes"
-      end
 
     routes =
       if length(affected_routes) > 1 do
@@ -723,7 +716,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
-      issue: "Trains may be delayed #{duration_text}",
+      issue: "Trains may be delayed #{Alert.delay_description(alert)}",
       remedy: header,
       cause: get_cause(cause),
       routes: routes,
@@ -765,16 +758,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp inside_flex_fields(%__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t)
        when severity >= 7 do
-    %__MODULE__{alert: %{cause: cause}} = t
-    cause_text = Alert.get_cause_string(cause)
-    {delay_description, delay_minutes} = Alert.interpret_severity(severity)
+    %__MODULE__{alert: alert} = t
     destination = get_destination(t, :inside)
-
-    duration_text =
-      case delay_description do
-        :up_to -> "up to #{delay_minutes} minutes"
-        :more_than -> "over #{delay_minutes} minutes"
-      end
+    duration_text = Alert.delay_description(alert)
 
     # Even if the screen is "inside" the alert range, the alert itself can
     # still be one-directional. (Only westbound / eastbound is impacted)
@@ -789,7 +775,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: issue,
       remedy: "",
       location: "",
-      cause: cause_text,
+      cause: cause_description(alert),
       routes: get_route_pills(t),
       effect: :severe_delay,
       urgent: true
@@ -803,7 +789,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
        when effect in ~w[shuttle suspension]a do
-    %__MODULE__{alert: %{cause: cause, header: header}} = t
+    %__MODULE__{alert: %Alert{header: header} = alert} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
     remedy = if(effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route")
 
@@ -819,14 +805,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       }
     else
       destination = get_destination(t, location)
-      cause_text = Alert.get_cause_string(cause)
       issue = if is_nil(destination), do: "No trains", else: "No #{destination} trains"
 
       %{
         issue: issue,
         remedy: remedy,
         location: "",
-        cause: cause_text,
+        cause: cause_description(alert),
         routes: get_route_pills(t),
         effect: effect,
         urgent: true
@@ -857,7 +842,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          location
        )
        when severity >= 7 do
-    %__MODULE__{alert: %{cause: cause, header: header}} = t
+    %__MODULE__{alert: %Alert{header: header} = alert} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
@@ -871,15 +856,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: true
       }
     else
-      cause_text = Alert.get_cause_string(cause)
-      {delay_description, delay_minutes} = Alert.interpret_severity(severity)
       destination = get_destination(t, location)
-
-      duration_text =
-        case delay_description do
-          :up_to -> "up to #{delay_minutes} minutes"
-          :more_than -> "over #{delay_minutes} minutes"
-        end
+      duration_text = Alert.delay_description(alert)
 
       issue =
         if is_nil(destination),
@@ -890,7 +868,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         issue: issue,
         remedy: "",
         location: "",
-        cause: cause_text,
+        cause: cause_description(alert),
         routes: get_route_pills(t),
         effect: :severe_delay,
         urgent: true
@@ -899,11 +877,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Shuttle or suspension
-  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: effect} = alert} = t, location)
+  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
        when effect in ~w[shuttle suspension]a do
-    %__MODULE__{
-      alert: %Alert{cause: cause, header: header, informed_entities: informed_entities}
-    } = t
+    %__MODULE__{alert: %Alert{header: header, informed_entities: informed_entities} = alert} = t
 
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
@@ -931,7 +907,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           ),
         remedy: if(effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
         location: location_text,
-        cause: Alert.get_cause_string(cause),
+        cause: cause_description(alert),
         routes: get_route_pills(t),
         effect: effect,
         urgent: false
@@ -975,8 +951,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Full closure
   defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, _location) do
-    %__MODULE__{alert: %{cause: cause}, informed_station_names: informed_station_names} = t
-    cause_text = Alert.get_cause_string(cause)
+    %__MODULE__{alert: alert, informed_station_names: informed_station_names} = t
 
     informed_stations_string = Util.format_name_list_to_string(informed_station_names)
 
@@ -984,7 +959,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       issue: "Trains will bypass #{informed_stations_string}",
       remedy: "Seek alternate route",
       location: "",
-      cause: cause_text,
+      cause: cause_description(alert),
       routes: get_route_pills(t),
       effect: :station_closure,
       urgent: false
@@ -1017,6 +992,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp abbreviate_station_name("Massachusetts Avenue"), do: "Mass Ave"
   defp abbreviate_station_name(full_name), do: full_name
+
+  defp cause_description(%Alert{cause: :unknown}), do: ""
+  defp cause_description(alert), do: "due to " <> Alert.cause_description(alert)
 
   @spec get_endpoints(list(Alert.informed_entity()), Route.id(), Stop.id()) ::
           {String.t(), String.t()} | nil
