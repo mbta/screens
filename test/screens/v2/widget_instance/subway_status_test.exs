@@ -936,6 +936,72 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert expected == WidgetInstance.serialize(instance)
     end
 
+    test "handles an informational single-tracking alert" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              cause: :single_tracking,
+              effect: :delay,
+              severity: 1,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"},
+                %{route: "Orange", stop: "place-mlmnl"},
+                %{route: "Orange", stop: "place-welln"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | orange: %{
+            type: :extended,
+            alert: %{
+              status: "Single Tracking",
+              location: %{full: "Oak Grove ↔ Wellington", abbrev: "Oak Grove ↔ Wellington"},
+              route_pill: @ol_pill
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles a non-informational single-tracking alert" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              cause: :single_tracking,
+              effect: :delay,
+              severity: 4,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"},
+                %{route: "Orange", stop: "place-mlmnl"},
+                %{route: "Orange", stop: "place-welln"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | orange: %{
+            type: :extended,
+            alert: %{
+              status: "Delays up to 15 minutes",
+              location: %{full: "Due to Single Tracking", abbrev: "Single Tracking"},
+              route_pill: @ol_pill
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
     test "handles alert closing multiple platforms at one station" do
       instance = %SubwayStatus{
         subway_alerts: [
