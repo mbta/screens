@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   require Logger
 
   alias Screens.Alerts.{Alert, InformedEntity}
+  alias Screens.LogScreenData
   alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -127,7 +128,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     sections =
       Enum.map(
         sections_data,
-        &get_section_instance(&1, is_only_section, now, fetch_schedules_fn, fetch_vehicles_fn)
+        &get_section_instance(
+          &1,
+          is_only_section,
+          now,
+          fetch_schedules_fn,
+          fetch_vehicles_fn,
+          config.name
+        )
       )
 
     # NB: No slot names provided here (defaults to `[]`) as they will be filled in depending on
@@ -145,14 +153,16 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           boolean(),
           DateTime.t(),
           Schedule.fetch_with_date(),
-          Vehicle.by_route_and_direction()
+          Vehicle.by_route_and_direction(),
+          String.t()
         ) :: DeparturesWidget.section()
   defp get_section_instance(
          %{type: :no_data_section, route: route},
          _is_only_section,
          _now,
          _fetch_schedules_fn,
-         _fetch_vehicles_fn
+         _fetch_vehicles_fn,
+         _screen_name
        ),
        do: %NoDataSection{route: route}
 
@@ -167,16 +177,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          is_only_section,
          now,
          fetch_schedules_fn,
-         fetch_vehicles_fn
+         fetch_vehicles_fn,
+         screen_name
        ) do
     routes_with_live_departures =
       departures
       |> Enum.map(&{Departure.route(&1).id, Departure.direction_id(&1)})
       |> Enum.uniq()
 
+    max_visible_departures = if is_only_section, do: 2, else: 4
+
     # Check if there is any room for overnight rows before running the logic.
     {section_contains_active_route, overnight_schedules_for_section} =
-      if (is_only_section and length(departures) >= 4) or length(departures) >= 2 do
+      if length(departures) >= max_visible_departures do
         {false, []}
       else
         get_overnight_schedules_for_section(
@@ -224,14 +237,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       true ->
         # Add overnight departures to the end.
         # This allows overnight departures to appear as we start to run out of predictions to show.
-        departures = departures ++ overnight_schedules_for_section
-
-        visible_departures =
-          if is_only_section do
-            Enum.take(departures, 4)
+        departures =
+          if length(departures) < max_visible_departures and overnight_schedules_for_section != [] do
+            # Temporary logs for insight into a bug with incorrect departure for next day being shown
+            # https://app.asana.com/1/15492006741476/project/1185117109217413/task/1210559658847355
+            LogScreenData.log_dup_data(screen_name, departures, overnight_schedules_for_section)
+            departures ++ overnight_schedules_for_section
           else
-            Enum.take(departures, 2)
+            departures
           end
+
+        visible_departures = Enum.take(departures, max_visible_departures)
 
         # DUPs don't support Layout or Header for now
         %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
