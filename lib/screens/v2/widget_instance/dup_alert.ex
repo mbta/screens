@@ -83,14 +83,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   end
 
   @spec valid_candidate?(t()) :: boolean()
-  def valid_candidate?(%__MODULE__{} = t) do
-    # Suppress alerts 519314 and 529291, at all stations served by the Red Line.
-    suppressed =
-      t.alert.id in ["519314", "529291"] and
-        Enum.any?(t.location_context.routes, &(&1[:route_id] == "Red"))
-
-    not suppressed and alert_layout(t) != :no_render
-  end
+  def valid_candidate?(%__MODULE__{} = t), do: alert_layout(t) != :no_render
 
   # Inputs/output are stored as a table for readability.
   # Table is adapted from the one in the product spec: https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-a82acff850ed4f2eb98a04e5f3e0fe52
