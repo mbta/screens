@@ -133,13 +133,16 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
           no_trains ++ [bold("to #{headsign}")]
         else
-          no_trains ++ [Alert.get_cause_string(t.alert.cause)]
+          no_trains ++ cause_description(t.alert)
         end
 
       [line_pill1, line_pill2] ->
         ["No", line_pill1, "or", line_pill2, "trains"]
     end
   end
+
+  defp cause_description(%Alert{cause: :unknown}), do: []
+  defp cause_description(alert), do: ["due to", Alert.cause_description(alert)]
 
   defp remedy_free_text_line(t) do
     icon = remedy_icon(t)

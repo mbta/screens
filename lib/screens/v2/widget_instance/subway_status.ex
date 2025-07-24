@@ -366,7 +366,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     Map.merge(%{route_pill: serialize_route_pill(route_id)}, serialize_alert(alert, route_id))
   end
 
-  @spec serialize_alert(Alert.t() | nil, Route.id()) :: alert()
+  @spec serialize_alert(SubwayStatusAlert.t() | nil, Route.id()) :: alert()
   defp serialize_alert(alert, route_id)
 
   defp serialize_alert(nil, _route_id) do
@@ -384,11 +384,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          %{alert: %Alert{effect: :suspension, informed_entities: informed_entities}},
          route_id
        ) do
-    location = get_location(informed_entities, route_id)
+    status =
+      if alert_is_whole_route?(informed_entities), do: "SERVICE SUSPENDED", else: "Suspension"
 
-    status = if location == "Entire line", do: "SERVICE SUSPENDED", else: "Suspension"
-
-    %{status: status, location: location}
+    %{status: status, location: get_location(informed_entities, route_id)}
   end
 
   defp serialize_alert(
@@ -425,29 +424,48 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          %{
            alert: %Alert{
              effect: :delay,
-             severity: severity,
+             cause: :single_tracking,
+             severity: 1,
              informed_entities: informed_entities
            }
          },
          route_id
        ) do
-    {delay_description, delay_minutes} = Alert.interpret_severity(severity)
+    %{
+      # Would normally be the effect (delays), but in this case the alert is informational i.e.
+      # has no expected impact on trip times.
+      status: "Single Tracking",
+      location: get_location(informed_entities, route_id)
+    }
+  end
 
-    duration_text =
-      case delay_description do
-        :up_to -> "up to #{delay_minutes} minutes"
-        :more_than -> "over #{delay_minutes} minutes"
-      end
-
+  defp serialize_alert(
+         %{
+           alert:
+             %Alert{
+               effect: :delay,
+               cause: cause,
+               informed_entities: informed_entities
+             } = alert
+         },
+         route_id
+       ) do
     location =
-      case get_location(informed_entities, route_id) do
-        # Most delays apply to the whole line. It's not necessary to specify it.
-        "Entire line" -> nil
-        other -> other
+      cond do
+        # It's expected that delays apply to the "entire line" unless otherwise specified, so we
+        # can omit that.
+        alert_is_whole_route?(informed_entities) -> nil
+        # N.B. this is somewhat outside the original purpose of the `location` field since it
+        # explains the *cause* of the alert instead; what we'd normally display as the location
+        # (e.g. "Oak Grove ↔ North Station") is intentionally omitted, to align with how we're
+        # presenting single-tracking alerts in other apps. Reconsider the name "location" if we
+        # start doing more of this sort of thing.
+        cause == :single_tracking -> %{full: "Due to Single Tracking", abbrev: "Single Tracking"}
+        true -> get_location(informed_entities, route_id)
       end
 
     %{
-      status: "Delays #{duration_text}",
+      status: "Delays #{Alert.delay_description(alert)}",
       location: location
     }
   end

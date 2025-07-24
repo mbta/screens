@@ -159,13 +159,15 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     #
     # alert.status                   ||| possible values of location_string
     # -------------------------------|||-----------------------------------
-    # Shuttle Bus                    ||| "" | Xbound | $STATION | $STATION to $STATION | Entire line
     # SERVICE SUSPENDED              ||| Entire line
-    # Suspension                     ||| "" | Xbound | $STATION | $STATION to $STATION
-    # Delays (up to|over) $N minutes ||| "" | Xbound | $STATION | $STATION to $STATION
+    # Suspension                     ||| "" | Xbound | $STATION | $STATION ↔ $STATION
+    # Service Change                 ||| "" | Xbound | $STATION | $STATION ↔ $STATION | Entire line
+    # Shuttle Bus                    ||| "" | Xbound | $STATION | $STATION ↔ $STATION | Entire line
+    # Delays (up to|over) $N minutes ||| "" | Xbound | $STATION | $STATION ↔ $STATION | Due to $CAUSE
     # Bypassing                      ||| "" | $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
     # Bypassing $N stops             ||| ""
     # $N current alerts              ||| ""
+    # Single Tracking                ||| Due to $CAUSE
     verb_atom = get_verb_atom(status)
     article = get_article(status, location_string)
     content = get_content(status, location_string)
@@ -173,9 +175,9 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     {verb_atom, ~E|<%= article %><%= content %>|}
   end
 
-  defp get_verb_atom(status) do
-    if String.starts_with?(status, "Bypassing"), do: :is, else: :has
-  end
+  defp get_verb_atom("Bypassing" <> _), do: :is
+  defp get_verb_atom("Single Tracking" <> _), do: :is
+  defp get_verb_atom(_other), do: :has
 
   defp conjugate(verb_atom, multi_branch_alert?)
 
@@ -188,7 +190,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   defp get_article(status, location_string) do
     cond do
       location_string == "Eastbound" -> "an "
-      status =~ ~r/^(?:Delays|Bypassing|SERVICE SUSPENDED|\d)/ -> ""
+      status =~ ~r/^(?:Delays|Bypassing|Single Tracking|SERVICE SUSPENDED|\d)/ -> ""
       true -> "a "
     end
   end
@@ -199,17 +201,21 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
         # E.g. "3 current alerts", "Bypassing 5 stops", "Suspension"
         ~E|<%= status %>|
 
+      # Location is actually a cause (single tracking)
+      String.starts_with?(location_string, "Due to") ->
+        ~E|<%= status %> <%= location_string %>|
+
       # Shuttle Bus/Suspension/Delays + Xbound
       location_string =~ ~r/^(?:North|East|South|West)bound$/ ->
         # E.g. "Southbound Shuttle bus", "Northbound Suspension", "Eastbound Delays up to 20 minutes"
         ~E|<%= location_string %> <%= status %>|
 
-      # Shuttle Bus/Suspension/Delays + $STATION to $STATION
-      String.contains?(location_string, " to ") ->
-        # E.g. "Suspension from Back Bay to North Station", "Shuttle Bus from Ashmont to JFK/UMass"
-        ~E|<%= status %> from <%= location_string %>|
+      # Shuttle Bus/Suspension/Delays/Single Tracking + $STATION ↔ $STATION
+      String.contains?(location_string, " ↔ ") ->
+        # E.g. "Suspension between Back Bay and North Station", "Shuttle Bus between Ashmont and JFK/UMass"
+        ~E|<%= status %> between <%= String.replace(location_string, " ↔ ", " and ") %>|
 
-      # Shuttle Bus/SERVICE SUSPENDED + Entire line
+      # Shuttle Bus/Service Change/SERVICE SUSPENDED + Entire line
       location_string == "Entire line" ->
         # "SERVICE SUSPENDED on the Entire line"
         ~E|<%= status %> on the <%= location_string %>|

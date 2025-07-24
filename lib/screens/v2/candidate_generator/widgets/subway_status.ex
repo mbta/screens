@@ -16,25 +16,24 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
 
     relevant_alerts =
       alerts
-      |> Enum.filter(&relevant?(&1, now))
+      |> Enum.filter(&(relevant_alert?(&1) and Alert.happening_now?(&1, now)))
       |> Enum.map(&append_context(&1, fetch_subway_platforms_for_stop_fn))
 
     [%SubwayStatus{screen: config, subway_alerts: relevant_alerts}]
   end
 
-  def relevant?(alert, now) do
-    relevant_effect?(alert) and Alert.happening_now?(alert, now) and not suppressed?(alert)
-  end
+  defp relevant_alert?(%Alert{effect: effect})
+       when effect in ~w[suspension shuttle station_closure]a,
+       do: true
 
-  # Omit up to 10 minute delays.
-  defp relevant_effect?(%Alert{effect: :delay, severity: severity}), do: severity >= 3
+  # Always include single-tracking alerts even at informational severity.
+  defp relevant_alert?(%Alert{effect: :delay, cause: :single_tracking}), do: true
 
-  defp relevant_effect?(%Alert{effect: :service_change, severity: severity}), do: severity >= 3
+  defp relevant_alert?(%Alert{effect: effect, severity: severity})
+       when effect in ~w[delay service_change]a and severity > 1,
+       do: true
 
-  defp relevant_effect?(%Alert{effect: effect}),
-    do: effect in [:suspension, :shuttle, :station_closure]
-
-  defp suppressed?(_alert), do: false
+  defp relevant_alert?(%Alert{}), do: false
 
   defp append_context(
          %Alert{effect: :station_closure} = alert,

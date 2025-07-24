@@ -18,51 +18,24 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   end
 
   describe "serialize/1" do
+    @bl_pill %{type: :text, text: "BL", color: :blue}
+    @gl_pill %{type: :text, text: "GL", color: :green}
+    @ol_pill %{type: :text, text: "OL", color: :orange}
+    @rl_pill %{type: :text, text: "RL", color: :red}
+
+    @normal_service %{
+      blue: %{type: :contracted, alerts: [%{route_pill: @bl_pill, status: "Normal Service"}]},
+      green: %{type: :contracted, alerts: [%{route_pill: @gl_pill, status: "Normal Service"}]},
+      orange: %{type: :contracted, alerts: [%{route_pill: @ol_pill, status: "Normal Service"}]},
+      red: %{type: :contracted, alerts: [%{route_pill: @rl_pill, status: "Normal Service"}]}
+    }
+
+    defp gl_pill(branches), do: Map.put(@gl_pill, :branches, branches)
+
     test "returns normal service when there are no alerts" do
-      instance = %SubwayStatus{
-        subway_alerts: []
-      }
+      instance = %SubwayStatus{subway_alerts: []}
 
-      expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
-      }
-
-      assert expected == WidgetInstance.serialize(instance)
+      assert @normal_service == WidgetInstance.serialize(instance)
     end
 
     test "handles station closure alert with 4+ stops" do
@@ -82,45 +55,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "BL", color: :blue},
-            status: "Bypassing 4 stops",
-            location: %{
-              abbrev: "mbta.com/status",
-              full: "mbta.com/status"
-            },
-            station_count: 4
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{
+              route_pill: @bl_pill,
+              status: "Bypassing 4 stops",
+              location: %{abbrev: "mbta.com/status", full: "mbta.com/status"},
+              station_count: 4
+            }
           }
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -142,45 +86,19 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "BL", color: :blue},
-            status: "Bypassing",
-            location: %{
-              abbrev: "Airport, Maverick & Aquarium",
-              full: "Airport, Maverick & Aquarium"
-            },
-            station_count: 3
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{
+              route_pill: @bl_pill,
+              status: "Bypassing",
+              location: %{
+                abbrev: "Airport, Maverick & Aquarium",
+                full: "Airport, Maverick & Aquarium"
+              },
+              station_count: 3
+            }
           }
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -201,42 +119,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "BL", color: :blue},
-            status: "Bypassing",
-            location: %{abbrev: "Airport and Maverick", full: "Airport and Maverick"},
-            station_count: 2
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{
+              route_pill: @bl_pill,
+              status: "Bypassing",
+              location: %{abbrev: "Airport and Maverick", full: "Airport and Maverick"},
+              station_count: 2
+            }
           }
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -268,40 +160,19 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "BL", color: :blue},
-            status: "Suspension",
-            location: %{abbrev: "Airport ↔ Aquarium", full: "Airport ↔ Aquarium"}
-          }
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{
+              route_pill: @bl_pill,
+              status: "Suspension",
+              location: %{abbrev: "Airport ↔ Aquarium", full: "Airport ↔ Aquarium"}
             }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "GL", color: :green},
-            status: "Delays up to 20 minutes",
-            location: nil
+          },
+          green: %{
+            type: :extended,
+            alert: %{route_pill: @gl_pill, status: "Delays up to 20 minutes", location: nil}
           }
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -330,47 +201,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Suspension",
-              location: %{abbrev: "Airport", full: "Airport"}
-            },
-            %{
-              status: "Delays up to 20 minutes",
-              location: %{abbrev: "Airport ↔ Aquarium", full: "Airport ↔ Aquarium"}
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
+        @normal_service
+        | blue: %{
+            type: :contracted,
+            alerts: [
+              %{
+                route_pill: @bl_pill,
+                status: "Suspension",
+                location: %{abbrev: "Airport", full: "Airport"}
+              },
+              %{
+                status: "Delays up to 20 minutes",
+                location: %{abbrev: "Airport ↔ Aquarium", full: "Airport ↔ Aquarium"}
+              }
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -418,44 +263,19 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "2 current alerts",
-              location: "mbta.com/status"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "2 current alerts",
-              location: "mbta.com/status"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
+        @normal_service
+        | blue: %{
+            type: :contracted,
+            alerts: [
+              %{route_pill: @bl_pill, status: "2 current alerts", location: "mbta.com/status"}
+            ]
+          },
+          orange: %{
+            type: :contracted,
+            alerts: [
+              %{route_pill: @ol_pill, status: "2 current alerts", location: "mbta.com/status"}
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -492,49 +312,32 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Bypassing",
-              location: %{abbrev: "Airport", full: "Airport"},
-              station_count: 1
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              location: %{abbrev: "Oak Grove ↔ Wellington", full: "Oak Grove ↔ Wellington"},
-              route_pill: %{color: :orange, text: "OL", type: :text},
-              status: "Suspension"
-            },
-            %{
-              location: %{abbrev: "Oak Grove ↔ Wellington", full: "Oak Grove ↔ Wellington"},
-              status: "Delays up to 20 minutes"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
+        @normal_service
+        | blue: %{
+            type: :contracted,
+            alerts: [
+              %{
+                route_pill: @bl_pill,
+                status: "Bypassing",
+                location: %{abbrev: "Airport", full: "Airport"},
+                station_count: 1
+              }
+            ]
+          },
+          orange: %{
+            type: :contracted,
+            alerts: [
+              %{
+                location: %{abbrev: "Oak Grove ↔ Wellington", full: "Oak Grove ↔ Wellington"},
+                route_pill: @ol_pill,
+                status: "Suspension"
+              },
+              %{
+                location: %{abbrev: "Oak Grove ↔ Wellington", full: "Oak Grove ↔ Wellington"},
+                status: "Delays up to 20 minutes"
+              }
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -563,55 +366,29 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              location: %{
-                abbrev: "Gov't Ctr and Riverside",
-                full: "Government Center and Riverside"
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{
+                location: %{
+                  abbrev: "Gov't Ctr and Riverside",
+                  full: "Government Center and Riverside"
+                },
+                route_pill: @gl_pill,
+                station_count: 2,
+                status: "Bypassing"
               },
-              route_pill: %{color: :green, text: "GL", type: :text},
-              station_count: 2,
-              status: "Bypassing"
-            },
-            %{
-              location: %{
-                abbrev: "Hawes St ↔ St. Paul St",
-                full: "Hawes Street ↔ Saint Paul Street"
-              },
-              route_pill: %{branches: [:c], color: :green, text: "GL", type: :text},
-              status: "Suspension"
-            }
-          ]
-        }
+              %{
+                location: %{
+                  abbrev: "Hawes St ↔ St. Paul St",
+                  full: "Hawes Street ↔ Saint Paul Street"
+                },
+                route_pill: gl_pill([:c]),
+                status: "Suspension"
+              }
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -650,48 +427,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              location: nil,
-              route_pill: %{color: :green, text: "GL", type: :text},
-              status: "Delays up to 25 minutes"
-            },
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :c]},
-              status: "2 current alerts",
-              location: "mbta.com/status"
-            }
-          ]
-        }
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{location: nil, route_pill: @gl_pill, status: "Delays up to 25 minutes"},
+              %{
+                route_pill: gl_pill([:b, :c]),
+                status: "2 current alerts",
+                location: "mbta.com/status"
+              }
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -722,51 +469,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              location: nil,
-              route_pill: %{color: :green, text: "GL", type: :text},
-              status: "Delays up to 20 minutes"
-            },
-            %{
-              location: %{
-                abbrev: "Gov't Ctr ↔ Park St",
-                full: "Government Center ↔ Park Street"
-              },
-              route_pill: %{color: :green, text: "GL", type: :text},
-              status: "Suspension"
-            }
-          ]
-        }
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{location: nil, route_pill: @gl_pill, status: "Delays up to 20 minutes"},
+              %{
+                location: %{
+                  abbrev: "Gov't Ctr ↔ Park St",
+                  full: "Government Center ↔ Park Street"
+                },
+                route_pill: @gl_pill,
+                status: "Suspension"
+              }
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -794,48 +511,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
-              status: "Delays up to 20 minutes",
-              location: nil
-            },
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
-              status: "Delays over 60 minutes",
-              location: nil
-            }
-          ]
-        }
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{route_pill: gl_pill([:b]), status: "Delays up to 20 minutes", location: nil},
+              %{route_pill: gl_pill([:c]), status: "Delays over 60 minutes", location: nil}
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -870,43 +553,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b, :c, :e]},
-              status: "3 current alerts",
-              location: "mbta.com/status"
-            }
-          ]
-        }
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{
+                route_pill: gl_pill([:b, :c, :e]),
+                status: "3 current alerts",
+                location: "mbta.com/status"
+              }
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -940,50 +597,25 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Bypassing",
-              location: %{abbrev: "Oak Grove", full: "Oak Grove"},
-              station_count: 1
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
-              status: "Delays up to 20 minutes",
-              location: nil
-            },
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
-              status: "Delays over 60 minutes",
-              location: nil
-            }
-          ]
-        }
+        @normal_service
+        | orange: %{
+            type: :contracted,
+            alerts: [
+              %{
+                route_pill: @ol_pill,
+                status: "Bypassing",
+                location: %{abbrev: "Oak Grove", full: "Oak Grove"},
+                station_count: 1
+              }
+            ]
+          },
+          green: %{
+            type: :contracted,
+            alerts: [
+              %{route_pill: gl_pill([:b]), status: "Delays up to 20 minutes", location: nil},
+              %{route_pill: gl_pill([:c]), status: "Delays over 60 minutes", location: nil}
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1020,43 +652,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "3 current alerts",
-              location: "mbta.com/status"
-            }
-          ]
-        }
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{route_pill: @gl_pill, status: "3 current alerts", location: "mbta.com/status"}
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1097,49 +699,24 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "2 current alerts",
-              location: "mbta.com/status"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:b]},
-              status: "Delays up to 20 minutes",
-              location: nil
-            },
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
-              status: "Delays over 60 minutes",
-              location: nil
-            }
-          ]
-        }
+        @normal_service
+        | orange: %{
+            type: :contracted,
+            alerts: [
+              %{
+                route_pill: @ol_pill,
+                status: "2 current alerts",
+                location: "mbta.com/status"
+              }
+            ]
+          },
+          green: %{
+            type: :contracted,
+            alerts: [
+              %{route_pill: gl_pill([:b]), status: "Delays up to 20 minutes", location: nil},
+              %{route_pill: gl_pill([:c]), status: "Delays over 60 minutes", location: nil}
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1172,47 +749,39 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          alerts: [
-            %{
-              route_pill: %{color: :blue, text: "BL", type: :text},
-              status: "Suspension",
-              location: %{abbrev: "Beachmont", full: "Beachmont"}
-            }
-          ],
-          type: :contracted
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              location: %{abbrev: "Oak Grove", full: "Oak Grove"},
-              route_pill: %{color: :orange, text: "OL", type: :text},
-              station_count: 1,
-              status: "Bypassing"
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              location: %{abbrev: "Lechmere", full: "Lechmere"},
-              route_pill: %{color: :green, text: "GL", type: :text},
-              status: "Bypassing",
-              station_count: 1
-            }
-          ]
-        }
+        @normal_service
+        | blue: %{
+            alerts: [
+              %{
+                route_pill: @bl_pill,
+                status: "Suspension",
+                location: %{abbrev: "Beachmont", full: "Beachmont"}
+              }
+            ],
+            type: :contracted
+          },
+          orange: %{
+            type: :contracted,
+            alerts: [
+              %{
+                location: %{abbrev: "Oak Grove", full: "Oak Grove"},
+                route_pill: @ol_pill,
+                station_count: 1,
+                status: "Bypassing"
+              }
+            ]
+          },
+          green: %{
+            type: :contracted,
+            alerts: [
+              %{
+                location: %{abbrev: "Lechmere", full: "Lechmere"},
+                route_pill: @gl_pill,
+                status: "Bypassing",
+                station_count: 1
+              }
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1239,41 +808,20 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
+        @normal_service
+        | orange: %{
+            type: :extended,
+            alert: %{
+              route_pill: @ol_pill,
+              status: "Bypassing",
+              location: %{abbrev: "Oak Grove", full: "Oak Grove"},
+              station_count: 1
             }
-          ]
-        },
-        orange: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "OL", color: :orange},
-            status: "Bypassing",
-            location: %{abbrev: "Oak Grove", full: "Oak Grove"},
-            station_count: 1
+          },
+          green: %{
+            type: :extended,
+            alert: %{route_pill: gl_pill([:c]), status: "Delays over 60 minutes", location: nil}
           }
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
-            status: "Delays over 60 minutes",
-            location: nil
-          }
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1296,45 +844,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Delays over 60 minutes",
-              location: nil
-            }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Delays over 60 minutes",
-              location: nil
-            }
-          ]
-        },
-        red: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "RL", color: :red},
-              status: "Normal Service"
-            }
-          ]
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
-              status: "Delays over 60 minutes",
-              location: nil
-            }
-          ]
-        }
+        @normal_service
+        | blue: %{
+            type: :contracted,
+            alerts: [%{route_pill: @bl_pill, status: "Delays over 60 minutes", location: nil}]
+          },
+          orange: %{
+            type: :contracted,
+            alerts: [%{route_pill: @ol_pill, status: "Delays over 60 minutes", location: nil}]
+          },
+          green: %{
+            type: :contracted,
+            alerts: [
+              %{route_pill: gl_pill([:c]), status: "Delays over 60 minutes", location: nil}
+            ]
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1362,41 +886,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
+        @normal_service
+        | red: %{
+            type: :extended,
+            alert: %{
+              status: "Bypassing 1 stop",
+              location: %{full: "mbta.com/status", abbrev: "mbta.com/status"},
+              route_pill: @rl_pill
             }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :extended,
-          alert: %{
-            status: "Bypassing 1 stop",
-            location: %{full: "mbta.com/status", abbrev: "mbta.com/status"},
-            route_pill: %{type: :text, text: "RL", color: :red}
           }
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1424,41 +922,81 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
+        @normal_service
+        | red: %{
+            type: :extended,
+            alert: %{
+              status: "Service Change",
+              location: %{full: "Porter", abbrev: "Porter"},
+              route_pill: @rl_pill
             }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :extended,
-          alert: %{
-            status: "Service Change",
-            location: %{full: "Porter", abbrev: "Porter"},
-            route_pill: %{type: :text, text: "RL", color: :red}
           }
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles an informational single-tracking alert" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              cause: :single_tracking,
+              effect: :delay,
+              severity: 1,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"},
+                %{route: "Orange", stop: "place-mlmnl"},
+                %{route: "Orange", stop: "place-welln"}
+              ]
             }
-          ]
-        }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | orange: %{
+            type: :extended,
+            alert: %{
+              status: "Single Tracking",
+              location: %{full: "Oak Grove ↔ Wellington", abbrev: "Oak Grove ↔ Wellington"},
+              route_pill: @ol_pill
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles a non-informational single-tracking alert" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              cause: :single_tracking,
+              effect: :delay,
+              severity: 4,
+              informed_entities: [
+                %{route: "Orange", stop: "place-ogmnl"},
+                %{route: "Orange", stop: "place-mlmnl"},
+                %{route: "Orange", stop: "place-welln"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | orange: %{
+            type: :extended,
+            alert: %{
+              status: "Delays up to 15 minutes",
+              location: %{full: "Due to Single Tracking", abbrev: "Single Tracking"},
+              route_pill: @ol_pill
+            }
+          }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1489,41 +1027,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "BL", color: :blue},
-              status: "Normal Service"
+        @normal_service
+        | red: %{
+            type: :extended,
+            alert: %{
+              status: "Bypassing 2 stops",
+              location: %{full: "mbta.com/status", abbrev: "mbta.com/status"},
+              route_pill: @rl_pill
             }
-          ]
-        },
-        orange: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "OL", color: :orange},
-              status: "Normal Service"
-            }
-          ]
-        },
-        red: %{
-          type: :extended,
-          alert: %{
-            status: "Bypassing 2 stops",
-            location: %{full: "mbta.com/status", abbrev: "mbta.com/status"},
-            route_pill: %{type: :text, text: "RL", color: :red}
           }
-        },
-        green: %{
-          type: :contracted,
-          alerts: [
-            %{
-              route_pill: %{type: :text, text: "GL", color: :green},
-              status: "Normal Service"
-            }
-          ]
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1543,32 +1055,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "BL", color: :blue},
-            status: "Shuttle Bus",
-            location: "Entire line"
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{route_pill: @bl_pill, status: "Shuttle Bus", location: "Entire line"}
           }
-        },
-        green: %{
-          alerts: [
-            %{route_pill: %{color: :green, text: "GL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        orange: %{
-          alerts: [
-            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        red: %{
-          alerts: [
-            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1588,32 +1079,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "BL", color: :blue},
-            status: "SERVICE SUSPENDED",
-            location: "Entire line"
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{route_pill: @bl_pill, status: "SERVICE SUSPENDED", location: "Entire line"}
           }
-        },
-        green: %{
-          alerts: [
-            %{route_pill: %{color: :green, text: "GL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        orange: %{
-          alerts: [
-            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        red: %{
-          alerts: [
-            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1636,32 +1106,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          alerts: [
-            %{route_pill: %{color: :blue, text: "BL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        green: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "GL", color: :green},
-            status: "SERVICE SUSPENDED",
-            location: "Entire line"
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{route_pill: @gl_pill, status: "SERVICE SUSPENDED", location: "Entire line"}
           }
-        },
-        orange: %{
-          alerts: [
-            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        red: %{
-          alerts: [
-            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1682,32 +1131,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          type: :extended,
-          alert: %{
-            route_pill: %{type: :text, text: "BL", color: :blue},
-            status: "Delays over 60 minutes",
-            location: nil
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{route_pill: @bl_pill, status: "Delays over 60 minutes", location: nil}
           }
-        },
-        green: %{
-          alerts: [
-            %{route_pill: %{color: :green, text: "GL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        orange: %{
-          alerts: [
-            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        red: %{
-          alerts: [
-            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
@@ -1730,32 +1158,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       }
 
       expected = %{
-        blue: %{
-          alerts: [
-            %{route_pill: %{color: :blue, text: "BL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        green: %{
-          type: :extended,
-          alert: %{
-            location: %{abbrev: "Kenmore ↔ Kent St", full: "Kenmore ↔ Kent Street"},
-            route_pill: %{color: :green, text: "GL", type: :text, branches: [:c]},
-            status: "Shuttle Bus"
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{
+              location: %{abbrev: "Kenmore ↔ Kent St", full: "Kenmore ↔ Kent Street"},
+              route_pill: gl_pill([:c]),
+              status: "Shuttle Bus"
+            }
           }
-        },
-        orange: %{
-          alerts: [
-            %{route_pill: %{color: :orange, text: "OL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        },
-        red: %{
-          alerts: [
-            %{route_pill: %{color: :red, text: "RL", type: :text}, status: "Normal Service"}
-          ],
-          type: :contracted
-        }
       }
 
       assert expected == WidgetInstance.serialize(instance)
