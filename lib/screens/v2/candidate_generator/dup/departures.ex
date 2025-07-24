@@ -237,15 +237,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       true ->
         # Add overnight departures to the end.
         # This allows overnight departures to appear as we start to run out of predictions to show.
-
-        if(
-          length(departures) < max_visible_departures and overnight_schedules_for_section != []
-        ) do
-          # Temporary logging to give insight into a bug with incorrect departure for next day being shown
-          # https://app.asana.com/1/15492006741476/project/1185117109217413/task/1210559658847355?focus=true
-          LogScreenData.log_dup_data(screen_name, departures, overnight_schedules_for_section)
-          departures = departures ++ overnight_schedules_for_section
-        end
+        departures =
+          if length(departures) < max_visible_departures and overnight_schedules_for_section != [] do
+            # Temporary logs for insight into a bug with incorrect departure for next day being shown
+            # https://app.asana.com/1/15492006741476/project/1185117109217413/task/1210559658847355
+            LogScreenData.log_dup_data(screen_name, departures, overnight_schedules_for_section)
+            departures ++ overnight_schedules_for_section
+          else
+            departures
+          end
 
         visible_departures = Enum.take(departures, max_visible_departures)
 
