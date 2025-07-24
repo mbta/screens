@@ -110,6 +110,14 @@ defmodule Screens.LogScreenData do
 
   def log_departures(_screen_id, true, {:ok, _}), do: nil
 
+  def log_dup_data(screen_name, departures, overnight_departures) do
+    log_message("[screen dup data]", %{
+      screen_name: screen_name,
+      departures: departures,
+      overnight_departures: overnight_departures
+    })
+  end
+
   def log_message(message, data) do
     data
     |> Enum.map_join(" ", &Util.format_log_value/1)
