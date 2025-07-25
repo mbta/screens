@@ -113,8 +113,8 @@ defmodule Screens.LogScreenData do
   def log_dup_data(screen_name, departures, overnight_departures) do
     log_message("[screen dup data]", %{
       screen_name: screen_name,
-      departures: departures,
-      overnight_departures: overnight_departures
+      departures: inspect(departures),
+      overnight_departures: inspect(overnight_departures)
     })
   end
 

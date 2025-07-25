@@ -185,7 +185,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> Enum.map(&{Departure.route(&1).id, Departure.direction_id(&1)})
       |> Enum.uniq()
 
-    max_visible_departures = if is_only_section, do: 2, else: 4
+    max_visible_departures = if is_only_section, do: 4, else: 2
 
     # Check if there is any room for overnight rows before running the logic.
     {section_contains_active_route, overnight_schedules_for_section} =
