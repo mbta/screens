@@ -10,21 +10,13 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
   alias ScreensConfig.Screen
 
-  @enforce_keys [
-    :screen,
-    :alert,
-    :location_context,
-    :primary_section_count,
-    :rotation_index,
-    :stop_name
-  ]
+  @enforce_keys [:screen, :alert, :location_context, :rotation_index, :stop_name]
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alert: Alert.t(),
           location_context: LocationContext.t(),
-          primary_section_count: pos_integer(),
           rotation_index: rotation_index,
           stop_name: String.t()
         }
@@ -155,7 +147,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
       effect: t.alert.effect,
       location: LocalizedAlert.location(t),
       affected_line_count: length(get_affected_lines(t)),
-      primary_section_count: t.primary_section_count
+      primary_section_count: length(t.screen.app_params.primary_departures.sections)
     }
   end
 

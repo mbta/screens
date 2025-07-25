@@ -94,12 +94,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   defp create_alert_widgets({:special, widgets}, _, _, _), do: widgets
 
-  defp create_alert_widgets(
-         {:normal, alerts},
-         %Screen{app_params: %Dup{primary_departures: %{sections: sections}}} = config,
-         location_context,
-         stop_name
-       ) do
+  defp create_alert_widgets({:normal, alerts}, config, location_context, stop_name) do
     alert = choose_alert(alerts)
 
     if is_nil(alert) do
@@ -110,7 +105,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           screen: config,
           alert: alert,
           location_context: location_context,
-          primary_section_count: length(sections),
           rotation_index: rotation_index,
           stop_name: stop_name
         }
