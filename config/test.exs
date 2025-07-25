@@ -92,6 +92,14 @@ config :screens,
     ]
   },
   dup_alert_headsign_matchers: %{
+    "place-r1" => [
+      %{
+        informed: "place-r2",
+        not_informed: "N/A",
+        alert_headsign: "Test R1",
+        headway_headsign: "N/A"
+      }
+    ],
     "place-B" => [
       %{
         informed: "place-A",
