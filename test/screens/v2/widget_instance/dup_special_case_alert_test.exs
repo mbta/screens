@@ -9,59 +9,17 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
 
   defp routes("place-kencl") do
     [
-      %{
-        active?: true,
-        direction_destinations: ["Boston College", "Government Center"],
-        long_name: "Green Line B",
-        route_id: "Green-B",
-        short_name: "B",
-        type: :light_rail
-      },
-      %{
-        active?: true,
-        direction_destinations: ["Cleveland Circle", "Government Center"],
-        long_name: "Green Line C",
-        route_id: "Green-C",
-        short_name: "C",
-        type: :light_rail
-      },
-      %{
-        active?: true,
-        direction_destinations: ["Riverside", "Union Square"],
-        long_name: "Green Line D",
-        route_id: "Green-D",
-        short_name: "D",
-        type: :light_rail
-      }
+      %{active?: true, route_id: "Green-B"},
+      %{active?: true, route_id: "Green-C"},
+      %{active?: true, route_id: "Green-D"}
     ]
   end
 
   defp routes("place-wtcst") do
     [
-      %{
-        active?: true,
-        direction_destinations: ["Logan Airport Terminals", "South Station"],
-        long_name: "Logan Airport Terminals - South Station",
-        route_id: "741",
-        short_name: "SL1",
-        type: :bus
-      },
-      %{
-        active?: true,
-        direction_destinations: ["Drydock Avenue", "South Station"],
-        long_name: "Drydock Avenue - South Station",
-        route_id: "742",
-        short_name: "SL2",
-        type: :bus
-      },
-      %{
-        active?: true,
-        direction_destinations: ["Chelsea Station", "South Station"],
-        long_name: "Chelsea Station - South Station",
-        route_id: "743",
-        short_name: "SL3",
-        type: :bus
-      }
+      %{active?: true, route_id: "741"},
+      %{active?: true, route_id: "742"},
+      %{active?: true, route_id: "743"}
     ]
   end
 
