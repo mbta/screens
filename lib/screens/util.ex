@@ -154,11 +154,6 @@ defmodule Screens.Util do
     end
   end
 
-  def to_set(nil), do: MapSet.new([])
-  def to_set(id) when is_binary(id), do: MapSet.new([id])
-  def to_set(ids) when is_list(ids), do: MapSet.new(ids)
-  def to_set(%MapSet{} = already_a_set), do: already_a_set
-
   @doc "Shifts a datetime into Eastern time."
   @spec to_eastern(DateTime.t()) :: DateTime.t()
   def to_eastern(datetime), do: DateTime.shift_zone!(datetime, "America/New_York")

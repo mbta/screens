@@ -4,10 +4,10 @@ defmodule Screens.V2.LocalizedAlert do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.HeadsignMatchers
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.RouteType
-  alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
   alias ScreensConfig.Screen
@@ -36,17 +36,6 @@ defmodule Screens.V2.LocalizedAlert do
           | :inside
           | :upstream
 
-  @typedoc """
-  A headsign indicating the direction a vehicle is headed in.
-
-  In rare cases, an adjective form is used, e.g. "westbound".
-  For these cases, the headsign is wrapped in a tagged `{:adj, headsign}` tuple
-  to indicate that the headsign may need to be rendered differently.
-
-  See the `*_headsign_matchers` values in config.exs for examples.
-  """
-  @type headsign :: String.t() | {:adj, String.t()}
-
   defguard is_localized_alert(value)
            when is_map(value) and
                   is_struct(value.alert, Alert) and
@@ -56,41 +45,24 @@ defmodule Screens.V2.LocalizedAlert do
   Determines the headsign of the affected direction of an alert using
   stop IDs in its informed entities.
   """
-  @spec get_headsign_from_informed_entities(t()) :: headsign
-  def get_headsign_from_informed_entities(
-        %{
-          screen: %Screen{app_id: app_id},
-          location_context: location_context,
-          alert: %Alert{informed_entities: informed_entities}
-        } = t
-      )
+  @spec get_headsign_from_informed_entities(t()) :: HeadsignMatchers.headsign() | nil
+  def get_headsign_from_informed_entities(%{
+        screen: %Screen{app_id: app_id},
+        location_context: %LocationContext{home_stop: home_stop},
+        alert: %Alert{informed_entities: informed_entities}
+      })
       when app_id in [:dup_v2, :pre_fare_v2] do
-    with headsign_matchers when is_map(headsign_matchers) <- headsign_matchers(t) do
-      informed_stop_ids = MapSet.new(informed_entities, & &1.stop)
+    informed_stop_ids = MapSet.new(informed_entities, & &1.stop)
 
-      headsign_matchers
-      |> Map.get(location_context.home_stop)
-      |> Enum.find_value(fn %{
-                              informed: informed,
-                              not_informed: not_informed,
-                              alert_headsign: headsign
-                            } ->
-        if alert_region_match?(
-             Util.to_set(informed),
-             Util.to_set(not_informed),
-             informed_stop_ids
-           ),
-           do: headsign,
-           else: false
-      end)
-    end
+    Enum.find_value(
+      HeadsignMatchers.get(app_id, home_stop),
+      fn %{informed: informed, not_informed: not_informed, alert_headsign: headsign} ->
+        if alert_region_match?(informed, not_informed, informed_stop_ids),
+          do: headsign,
+          else: false
+      end
+    )
   end
-
-  defp headsign_matchers(%{screen: %Screen{app_id: :dup_v2}}),
-    do: Application.get_env(:screens, :dup_alert_headsign_matchers)
-
-  defp headsign_matchers(%{screen: %Screen{app_id: :pre_fare_v2}}),
-    do: Application.get_env(:screens, :prefare_alert_headsign_matchers)
 
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
     MapSet.subset?(informed, informed_stop_ids) and

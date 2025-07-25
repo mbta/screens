@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   require Logger
 
   alias Screens.Alerts.{Alert, InformedEntity}
+  alias Screens.HeadsignMatchers
   alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -462,31 +463,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     parent_stop_id = List.first(parent_stop_ids)
 
     {region, headsign} =
-      :screens
-      |> Application.get_env(:dup_alert_headsign_matchers)
-      |> Map.get(parent_stop_id, [])
+      :dup_v2
+      |> HeadsignMatchers.get(parent_stop_id)
       |> Enum.find_value({:inside, nil}, fn
-        %{
-          informed: informed,
-          not_informed: not_informed,
-          headway_headsign: headsign
-        } ->
-          if alert_region_match?(
-               Util.to_set(informed),
-               Util.to_set(not_informed),
-               informed_stop_ids
-             ),
-             do: {:boundary, headsign},
-             else: false
+        %{informed: informed, not_informed: not_informed, headway_headsign: headsign} ->
+          if alert_region_match?(informed, not_informed, informed_stop_ids),
+            do: {:boundary, headsign},
+            else: false
 
         _ ->
           false
       end)
 
-    %{
-      region: region,
-      headsign: headsign
-    }
+    %{region: region, headsign: headsign}
   end
 
   defp alert_region_match?(informed, not_informed, informed_stop_ids) do
