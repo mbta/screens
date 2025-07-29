@@ -189,6 +189,61 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
       assert serialized(screen, context, alert) == [banner, banner, banner]
     end
 
+    test "inside non-severe single-tracking" do
+      screen = build_screen()
+      context = build_location_context("place-r2")
+
+      alert =
+        build_alert(
+          cause: :single_tracking,
+          effect: :delay,
+          severity: 4,
+          informed_entities: route_informed_entities(~w[Red])
+        )
+
+      banner = %{
+        color: :red,
+        text: %FreeTextLine{icon: :delay, text: [bold("Red Line"), "delays"]}
+      }
+
+      assert serialized(screen, context, alert) == [banner, banner, banner]
+    end
+
+    test "inside severe single-tracking" do
+      screen = build_screen()
+      context = build_location_context("place-r2")
+
+      alert =
+        build_alert(
+          cause: :single_tracking,
+          effect: :delay,
+          severity: 5,
+          informed_entities: stop_informed_entities("Red", ~w[place-r1 place-r2 place-r3])
+        )
+
+      banner = %{
+        color: :red,
+        text: %FreeTextLine{icon: :delay, text: [bold("Red Line"), "delays"]}
+      }
+
+      takeover = %{
+        header: %{color: :red, text: "Test Stop"},
+        text: %FreeTextLine{
+          icon: :delay,
+          text: [
+            pill(:red),
+            bold("delays"),
+            bold("up to 20 minutes"),
+            "due to",
+            "single tracking"
+          ]
+        },
+        remedy: %FreeTextLine{icon: nil, text: []}
+      }
+
+      assert serialized(screen, context, alert) == [banner, takeover, banner]
+    end
+
     test "single-line inside shuttle" do
       screen = build_screen()
       context = build_location_context("place-r2")

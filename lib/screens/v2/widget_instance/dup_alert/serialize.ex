@@ -25,7 +25,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   @spec serialize_full_screen(DupAlert.t()) :: full_screen_alert_map
   def serialize_full_screen(t) do
     %{
-      text: %FreeTextLine{icon: :warning, text: issue_free_text(t)},
+      text: %FreeTextLine{icon: issue_icon(t), text: issue_free_text(t)},
       remedy: remedy_free_text_line(t),
       header: %{
         text: t.stop_name,
@@ -121,6 +121,14 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   defp partial_alert_icon(t),
     do: if(line_color(t) == :yellow, do: :warning_negative, else: :warning)
 
+  defp issue_icon(t) when t.alert.effect == :delay, do: :delay
+  defp issue_icon(_t), do: :warning
+
+  defp issue_free_text(%DupAlert{alert: %Alert{effect: :delay} = alert} = t) do
+    get_affected_lines_as_pills(t) ++
+      [bold("delays"), alert |> Alert.delay_description() |> bold()] ++ cause_description(alert)
+  end
+
   defp issue_free_text(t) do
     affected_lines = get_affected_lines_as_pills(t)
 
@@ -159,9 +167,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   end
 
   defp remedy_free_text(t) do
-    case t.alert.effect do
-      :shuttle -> [bold("Use shuttle bus")]
-      _ -> ["Seek alternate route"]
+    cond do
+      t.alert.effect == :shuttle -> [bold("Use shuttle bus")]
+      t.alert.cause == :single_tracking -> []
+      true -> ["Seek alternate route"]
     end
   end
 

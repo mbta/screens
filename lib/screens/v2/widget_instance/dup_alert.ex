@@ -113,6 +113,18 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
        else: :some
   end
 
+  # Treat being inside a "severe" single-tracking disruption the same as "some" service being
+  # eliminated, even though service is still running. We expect live predictions to not be fully
+  # available within single-tracked segments, so it's okay for this message to take up more space
+  # when the severity warrants it.
+  defp eliminated_service_type(
+         %__MODULE__{alert: %Alert{cause: :single_tracking, effect: :delay, severity: severity}} =
+           t
+       )
+       when severity >= 5 do
+    if LocalizedAlert.location(t) == :inside, do: :some, else: :none
+  end
+
   defp eliminated_service_type(_other), do: :none
 
   def get_affected_lines(t) do
