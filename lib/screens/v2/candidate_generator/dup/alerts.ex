@@ -112,19 +112,22 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     end
   end
 
-  defp relevant_effect?(%{effect: :delay, severity: severity}, _) do
+  # Always include single-tracking alerts regardless of severity.
+  defp relevant_effect?(%Alert{effect: :delay, cause: :single_tracking}, _screen), do: true
+
+  defp relevant_effect?(%Alert{effect: :delay, severity: severity}, _screen) do
     severity >= 5
   end
 
   # WTC special case
-  defp relevant_effect?(%{effect: effect}, %Screen{
+  defp relevant_effect?(%Alert{effect: effect}, %Screen{
          app_params: %Dup{alerts: %AlertsConfig{stop_id: "place-wtcst"}}
        }) do
     effect in [:detour]
   end
 
-  defp relevant_effect?(%{effect: effect}, _) do
-    effect in [:station_closure, :shuttle, :suspension]
+  defp relevant_effect?(%Alert{effect: effect}, _screen) do
+    effect in [:station_closure, :shuttle, :suspension, :delay]
   end
 
   @spec relevant_location?(Alert.t(), LocationContext.t()) :: boolean()
