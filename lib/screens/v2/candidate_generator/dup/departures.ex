@@ -174,9 +174,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> Enum.map(&{Departure.route(&1).id, Departure.direction_id(&1)})
       |> Enum.uniq()
 
+    max_visible_departures = if is_only_section, do: 4, else: 2
     # Check if there is any room for overnight rows before running the logic.
     {section_contains_active_route, overnight_schedules_for_section} =
-      if (is_only_section and length(departures) >= 4) or length(departures) >= 2 do
+      if length(departures) >= max_visible_departures do
         {false, []}
       else
         get_overnight_schedules_for_section(
@@ -224,15 +225,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       true ->
         # Add overnight departures to the end.
         # This allows overnight departures to appear as we start to run out of predictions to show.
-        departures = departures ++ overnight_schedules_for_section
-
-        visible_departures =
-          if is_only_section do
-            Enum.take(departures, 4)
+        all_departures =
+          if length(departures) < max_visible_departures and overnight_schedules_for_section != [] do
+            departures ++ overnight_schedules_for_section
           else
-            Enum.take(departures, 2)
+            departures
           end
 
+        visible_departures = Enum.take(all_departures, max_visible_departures)
         # DUPs don't support Layout or Header for now
         %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
     end
