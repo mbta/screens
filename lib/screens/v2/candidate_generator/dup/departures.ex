@@ -522,7 +522,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        ) do
     {today_schedules, tomorrow_schedules} =
       get_today_tomorrow_schedules(
-        Map.from_struct(params) |> Map.put(:sort, "departure_time"),
+        params |> Map.from_struct() |> Map.put(:sort, "departure_time"),
         fetch_schedules_fn,
         now,
         Enum.map(routes, & &1.id)
