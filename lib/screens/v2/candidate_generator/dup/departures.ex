@@ -182,7 +182,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       else
         get_overnight_schedules_for_section(
           routes_with_live_departures,
-          Map.put(params, :sort, "departure_time"),
+          params,
           routes,
           alert_informed_entities,
           now,
@@ -527,7 +527,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
        ) do
     {today_schedules, tomorrow_schedules} =
       get_today_tomorrow_schedules(
-        Map.from_struct(params),
+        Map.from_struct(params) |> Map.put(:sort, "departure_time"),
         fetch_schedules_fn,
         now,
         Enum.map(routes, & &1.id)
