@@ -225,14 +225,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       true ->
         # Add overnight departures to the end.
         # This allows overnight departures to appear as we start to run out of predictions to show.
-        all_departures =
-          if length(departures) < max_visible_departures and overnight_schedules_for_section != [] do
-            departures ++ overnight_schedules_for_section
-          else
-            departures
-          end
+        visible_departures =
+          Enum.take(departures ++ overnight_schedules_for_section, max_visible_departures)
 
-        visible_departures = Enum.take(all_departures, max_visible_departures)
         # DUPs don't support Layout or Header for now
         %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
     end
