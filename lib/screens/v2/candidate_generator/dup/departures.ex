@@ -182,7 +182,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       else
         get_overnight_schedules_for_section(
           routes_with_live_departures,
-          params,
+          Map.put(params, :sort, "departure_time"),
           routes,
           alert_informed_entities,
           now,
