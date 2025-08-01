@@ -97,5 +97,9 @@ defmodule Screens.DeviceMonitor.Mercury do
     }
   end
 
+  defp device_info(%{"device_id" => device_id, "stop" => %{"stop_id" => stop_id}}, _count) do
+    %{device_id: device_id, state: "error", stop_id: stop_id}
+  end
+
   defp get_api_key, do: System.fetch_env!("MERCURY_API_KEY")
 end
