@@ -33,7 +33,9 @@ defmodule Screens.Headways do
     orange_trunk: [70001..70036, 70278..70279],
     red_ashmont: [70085..70094],
     red_braintree: [70095..70105],
-    red_trunk: [70061..70061, 70063..70084]
+    red_trunk: [70061..70061, 70063..70084],
+    silver_seaport: [247..247, 17_091..17_095, 27_092..27_092, 30_249..30_251, 31_255..31_259],
+    silver_chelsea: [7096..7097, 74_630..74_637]
   }
 
   # Mapping of parent station IDs and route IDs to headway keys. For brevity, omits the "place-"
@@ -114,7 +116,17 @@ defmodule Screens.Headways do
       ~w[alfcl davis portr harsq cntsq knncl chmnl pktrm dwnxg sstat brdwy andrw jfk]
     },
     red_ashmont: {~w[Red], ~w[shmnl fldcr smmnl asmnl]},
-    red_braintree: {~w[Red], ~w[nqncy wlsta qnctr qamnl brntn]}
+    red_braintree: {~w[Red], ~w[nqncy wlsta qnctr qamnl brntn]},
+    silver_seaport: {~w[741 742 746], ~w[conrd wtcst crtst sstat]},
+    silver_chelsea: {~w[743], ~w[conrd wtcst crtst sstat aport estav boxdt belsq chels]}
+  }
+
+  # Mapping of stops and route IDs to headway keys for the Silver Line,
+  # for stops which serve more than one route.
+  @sl_stops %{
+    # congress_st_at_wtc 17_096
+    silver_seaport: {~w[741 742 746], ~w[17096]},
+    silver_chelsea: {~w[743], ~w[17096]}
   }
 
   @type range :: {low :: pos_integer(), high :: pos_integer()}
@@ -158,6 +170,12 @@ defmodule Screens.Headways do
       route_id <- route_ids,
       station <- stations do
     defp headway_key("place-" <> unquote(station), unquote(route_id)), do: unquote(to_string(key))
+  end
+
+  for {key, {route_ids, stations}} <- @sl_stops,
+      route_id <- route_ids,
+      station <- stations do
+    defp headway_key(unquote(station), unquote(route_id)), do: unquote(to_string(key))
   end
 
   defp headway_key(_stop_id), do: nil
