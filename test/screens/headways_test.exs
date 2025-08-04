@@ -17,6 +17,7 @@ defmodule Screens.HeadwaysTest do
     @blue_trunk "70042"
     @green_d "70160"
     @red_ashmont "70088"
+    @silver_line_way "74624"
 
     test "returns nil for a stop with no defined headways" do
       assert Headways.get("nonexistent", local_dt()) == nil
@@ -44,6 +45,17 @@ defmodule Screens.HeadwaysTest do
     test "returns the correct value for a combination of parent station and route" do
       assert Headways.get_with_route("place-north", "Green-D", local_dt()) == {7, 13}
       assert Headways.get_with_route("place-north", "Orange", local_dt()) == {9, 11}
+      assert Headways.get_with_route("place-chels", "743", local_dt()) == {5, 7}
+      assert Headways.get_with_route("place-crtst", "741", local_dt()) == {1, 3}
+      assert Headways.get_with_route("place-crtst", "742", local_dt()) == {3, 5}
+      assert Headways.get_with_route("place-crtst", "743", local_dt()) == {5, 7}
+    end
+
+    test "returns the correct value for a combination of station id and route for the Silver Line" do
+      assert Headways.get_with_route(@silver_line_way, "741", local_dt()) == {1, 3}
+      assert Headways.get_with_route(@silver_line_way, "742", local_dt()) == {3, 5}
+      assert Headways.get_with_route(@silver_line_way, "743", local_dt()) == {5, 7}
+      assert Headways.get_with_route(@silver_line_way, "751", local_dt()) == nil
     end
   end
 end

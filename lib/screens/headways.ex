@@ -12,34 +12,41 @@ defmodule Screens.Headways do
   # Compact mapping of stop IDs to headway keys, leaning on the fact that subway stop IDs happen
   # to be numeric and often contiguous as we "traverse" the line in a given direction.
   @stops %{
-    blue_trunk: [70038..70060],
-    glx_medford: [70505..70514],
-    glx_union: [70503..70504],
+    blue_trunk: [70_038..70_060],
+    glx_medford: [70_505..70_514],
+    glx_union: [70_503..70_504],
     green_b: [
-      70106..70107,
-      70110..70117,
-      70120..70121,
-      70124..70131,
-      70134..70135,
-      70144..70149,
+      70_106..70_107,
+      70_110..70_117,
+      70_120..70_121,
+      70_124..70_131,
+      70_134..70_135,
+      70_144..70_149,
       170_136..170_137,
       170_140..170_141
     ],
-    green_c: [70211..70220, 70223..70238],
-    green_d: [70160..70183, 70186..70187],
-    green_e: [70239..70258, 70260..70260],
-    green_trunk: [70151..70159, 70196..70208, 70501..70502, 71150..71151],
-    mattapan_trunk: [70261..70261, 70263..70276],
-    orange_trunk: [70001..70036, 70278..70279],
-    red_ashmont: [70085..70094],
-    red_braintree: [70095..70105],
-    red_trunk: [70061..70061, 70063..70084]
+    green_c: [70_211..70_220, 70_223..70_238],
+    green_d: [70_160..70_183, 70_186..70_187],
+    green_e: [70_239..70_258, 70_260..70_260],
+    green_trunk: [70_151..70_159, 70_196..70_208, 70_501..70_502, 71_150..71_151],
+    mattapan_trunk: [70_261..70_261, 70_263..70_276],
+    orange_trunk: [70_001..70_036, 70_278..70_279],
+    red_ashmont: [70_085..70_094],
+    red_braintree: [70_095..70_105],
+    red_trunk: [70_061..70_061, 70_063..70_084]
+  }
+
+  @sl_stops %{
+    sl_common: [17_096..17_096, 74_611..74_617, 74_624..74_624],
+    sl_one: [17_091..17_095, 27_092..27_092],
+    sl_two: [30_250..30_251, 31_255..31_259],
+    sl_three: [7096..7097, 74_630..74_637]
   }
 
   # Mapping of parent station IDs to headway keys, for stations with a single unambiguous key.
   # For brevity, omits the "place-" prefix which is currently common to all parent station IDs.
   @stations %{
-    blue_trunk: ~w[wondl rbmnl bmmnl sdmnl orhte wimnl aport mvbcl aqucl bomnl],
+    blue_trunk: ~w[wondl rbmnl bmmnl sdmnl orhte wimnl mvbcl aqucl bomnl],
     glx_medford: ~w[mdftf balsq mgngl gilmn esomr],
     glx_union: ~w[unsqu],
     green_b: ~w[
@@ -124,16 +131,20 @@ defmodule Screens.Headways do
     ],
     red_ashmont: ~w[shmnl fldcr smmnl asmnl],
     red_braintree: ~w[nqncy wlsta qnctr qamnl brntn],
-    red_trunk: ~w[alfcl davis portr harsq cntsq knncl chmnl sstat brdwy andrw jfk]
+    red_trunk: ~w[alfcl davis portr harsq cntsq knncl chmnl sstat brdwy andrw jfk],
+    sl_three: ~w[estav boxdt belsq chels]
   }
 
   # Mapping of parent station and route IDs to headway keys, for parent stations which serve more
   # than one line.
   @multi_stations %{
-    blue_trunk: {~w[Blue], ~w[state gover]},
+    blue_trunk: {~w[Blue], ~w[state gover aport]},
     green_trunk: {~w[Green-B Green-C Green-D Green-E], ~w[north haecl gover pktrm]},
     orange_trunk: {~w[Orange], ~w[north haecl state dwnxg]},
-    red_trunk: {~w[Red], ~w[pktrm dwnxg]}
+    red_trunk: {~w[Red], ~w[pktrm dwnxg]},
+    sl_one: {~w[741], ~w[conrd wtcst crtst sstat]},
+    sl_two: {~w[742], ~w[conrd wtcst crtst sstat]},
+    sl_three: {~w[743], ~w[conrd wtcst crtst sstat aport]}
   }
 
   @type range :: {low :: pos_integer(), high :: pos_integer()}
@@ -173,14 +184,19 @@ defmodule Screens.Headways do
     defp headway_key(unquote(to_string(stop_id)), _route_id), do: unquote(to_string(key))
   end
 
-  for {key, stations} <- @stations, station <- stations do
-    defp headway_key("place-" <> unquote(station), _route_id), do: unquote(to_string(key))
+  for {_, ranges} <- @sl_stops, range <- ranges, stop_id <- range do
+    defp headway_key(unquote(to_string(stop_id)), route_id),
+      do: silver_line_route_headway_key(route_id)
   end
 
   for {key, {route_ids, stations}} <- @multi_stations,
       route_id <- route_ids,
       station <- stations do
     defp headway_key("place-" <> unquote(station), unquote(route_id)), do: unquote(to_string(key))
+  end
+
+  for {key, stations} <- @stations, station <- stations do
+    defp headway_key("place-" <> unquote(station), _route_id), do: unquote(to_string(key))
   end
 
   defp headway_key(_stop_id), do: nil
@@ -203,4 +219,9 @@ defmodule Screens.Headways do
       {_, false} -> :off_peak
     end
   end
+
+  defp silver_line_route_headway_key("741"), do: "sl_one"
+  defp silver_line_route_headway_key("742"), do: "sl_two"
+  defp silver_line_route_headway_key("743"), do: "sl_three"
+  defp silver_line_route_headway_key(_), do: nil
 end
