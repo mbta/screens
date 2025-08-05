@@ -62,6 +62,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "3",
           effect: :delay,
+          severity: 5,
           informed_entities: [ie(stop: "place-ogmnl")],
           active_period: happening_now_active_period
         }
@@ -71,18 +72,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "1",
           effect: :delay,
+          severity: 5,
           informed_entities: [ie(stop: "place-ogmnl", direction_id: 0)],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :delay,
+          severity: 5,
           informed_entities: [ie(stop: "place-ogmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "3",
           effect: :delay,
+          severity: 5,
           informed_entities: [ie(stop: "place-ogmnl", direction_id: 1)],
           active_period: happening_now_active_period
         }
@@ -154,6 +158,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "3",
           effect: :delay,
+          severity: 5,
           informed_entities: [ie(stop: "place-ogmnl")],
           active_period: happening_now_active_period
         }
@@ -192,6 +197,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
+            is_priority: false,
             informed_station_names: ["Malden Center"]
           },
           expected_common_data
@@ -201,6 +207,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "3",
               effect: :delay,
+              severity: 5,
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
@@ -477,6 +484,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "3",
               effect: :delay,
+              severity: 5,
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
@@ -523,6 +531,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :delay,
+              severity: 5,
               informed_entities: [ie(stop: "place-ogmnl", direction_id: 0)],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
@@ -535,6 +544,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :delay,
+              severity: 5,
               informed_entities: [ie(stop: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
