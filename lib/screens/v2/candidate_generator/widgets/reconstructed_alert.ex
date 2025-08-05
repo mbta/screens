@@ -9,8 +9,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 
-  @relevant_effects ~w[shuttle suspension station_closure delay]a
-
   @gl_eastbound_split_stops [
     "place-mdftf",
     "place-balsq",
@@ -47,134 +45,106 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   Given the routes, fetch all alerts for the route
   """
   def reconstructed_alert_instances(
-        %Screen{app_params: %PreFare{} = app_params} = config,
+        %Screen{
+          app_params: %PreFare{
+            reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: stop_id}
+          }
+        } = config,
         now \\ DateTime.utc_now(),
         fetch_alerts_fn \\ &Alert.fetch/1,
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
         fetch_location_context_fn \\ &LocationContext.fetch/3,
         fetch_subway_platforms_for_stop_fn \\ &Stop.fetch_subway_platforms_for_stop/1
       ) do
-    %PreFare{reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: stop_id}} = app_params
-
-    # Filtering by subway and light_rail types
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
-         route_ids <- LocationContext.route_ids(location_context),
+         route_ids = LocationContext.route_ids(location_context),
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
-      relevant_alerts = relevant_alerts(alerts, location_context, now)
-      is_terminal_station = terminal?(stop_id, LocationContext.stop_sequences(location_context))
+      stop_sequences = LocationContext.stop_sequences(location_context)
+      distance_map = build_distance_map(stop_id, stop_sequences)
+      is_terminal_station = terminal?(stop_id, stop_sequences)
 
-      immediate_disruptions = get_immediate_disruptions(relevant_alerts, location_context)
-      downstream_disruptions = get_downstream_disruptions(relevant_alerts, location_context)
-      moderate_delays = get_moderate_disruptions(relevant_alerts)
+      # Assign alerts to groups (or no group) based on "relevance". The group with the highest
+      # relevance will have the `is_priority` flag set on the corresponding alert widgets, giving
+      # them more prominent placement.
+      {priority_alert_groups, other_alert_groups} =
+        alerts
+        |> Enum.filter(
+          &(Alert.happening_now?(&1, now) and relevant_direction?(&1, stop_id, stop_sequences))
+        )
+        |> Enum.group_by(fn alert ->
+          relevance(
+            alert,
+            LocalizedAlert.location(
+              %{alert: alert, location_context: location_context},
+              is_terminal_station
+            ),
+            distance_from_home(alert, stop_id, distance_map)
+          )
+        end)
+        |> Map.delete(nil)
+        |> Enum.sort_by(&elem(&1, 0))
+        |> Enum.map(&elem(&1, 1))
+        |> Enum.split(1)
 
-      common_parameters = [
-        config: config,
-        location_context: location_context,
-        fetch_stop_name_fn: fetch_stop_name_fn,
-        is_terminal_station: is_terminal_station,
-        now: now,
-        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
-      ]
+      Enum.flat_map(
+        [{priority_alert_groups, true}, {other_alert_groups, false}],
+        fn {alert_groups, is_priority} ->
+          alert_groups
+          |> List.flatten()
+          |> Enum.map(fn alert ->
+            all_platforms_names_at_informed_station =
+              get_platform_names_at_informed_station(alert, fetch_subway_platforms_for_stop_fn)
 
-      cond do
-        Enum.any?(immediate_disruptions) ->
-          create_alert_instances(
-            immediate_disruptions,
-            true,
-            common_parameters
-          ) ++
-            create_alert_instances(downstream_disruptions, false, common_parameters) ++
-            create_alert_instances(moderate_delays, false, common_parameters)
-
-        Enum.any?(downstream_disruptions) ->
-          closest_downstream =
-            find_closest_downstream_alerts(
-              downstream_disruptions,
-              stop_id,
-              LocationContext.stop_sequences(location_context)
-            )
-
-          other_downstream = downstream_disruptions -- closest_downstream
-
-          create_alert_instances(closest_downstream, true, common_parameters) ++
-            create_alert_instances(other_downstream, false, common_parameters) ++
-            create_alert_instances(moderate_delays, false, common_parameters)
-
-        true ->
-          create_alert_instances(moderate_delays, true, common_parameters)
-      end
+            %ReconstructedAlert{
+              screen: config,
+              alert: alert,
+              now: now,
+              location_context: location_context,
+              home_station_name:
+                fetch_station_name(location_context.home_stop, fetch_stop_name_fn),
+              informed_station_names: get_stations(alert, fetch_stop_name_fn),
+              is_terminal_station: is_terminal_station,
+              is_priority: is_priority,
+              partial_closure_platform_names: all_platforms_names_at_informed_station
+            }
+          end)
+        end
+      )
     else
       :error -> []
     end
   end
 
-  defp get_immediate_disruptions(relevant_alerts, location_context) do
-    Enum.filter(
-      relevant_alerts,
-      fn
-        %{effect: :delay} ->
-          false
+  @inside_locations ~w[inside boundary_upstream boundary_downstream]a
+  @service_eliminating_effects ~w[shuttle station_closure suspension]a
 
-        alert ->
-          LocalizedAlert.location(%{alert: alert, location_context: location_context}) in [
-            :inside,
-            :boundary_upstream,
-            :boundary_downstream
-          ]
-      end
-    )
-  end
+  # Filter out `elsewhere` alerts (should never happen).
+  defp relevance(_alert, :elsewhere, _distance), do: nil
 
-  defp get_downstream_disruptions(relevant_alerts, location_context) do
-    Enum.filter(
-      relevant_alerts,
-      fn
-        %{effect: :delay} = alert ->
-          get_severity_level(alert.severity) == :severe
+  # "Immediate disruptions": Service is eliminated in at least one direction at the home stop.
+  # Riders may need to take immediate action to continue their trip.
+  defp relevance(%Alert{effect: effect}, location, _distance)
+       when effect in @service_eliminating_effects and location in @inside_locations,
+       do: {0, nil}
 
-        alert ->
-          LocalizedAlert.location(%{alert: alert, location_context: location_context}) in [
-            :downstream,
-            :upstream
-          ]
-      end
-    )
-  end
+  # "Downstream disruptions": Service is eliminated starting somewhere downstream of the home
+  # stop. Riders may need to take action later to continue their trip. Split into sub-categories
+  # based on how close to the home stop the disruption begins (only the closest get "priority").
+  defp relevance(%Alert{effect: effect}, _location, distance)
+       when effect in @service_eliminating_effects,
+       do: {1, distance}
 
-  defp get_moderate_disruptions(relevant_alerts) do
-    Enum.filter(
-      relevant_alerts,
-      &(&1.effect == :delay and get_severity_level(&1.severity) == :moderate)
-    )
-  end
+  # Severe delays are also considered "downstream disruptions".
+  defp relevance(%Alert{effect: :delay, severity: severity}, _location, distance)
+       when severity >= 7,
+       do: {1, distance}
 
-  defp create_alert_instances(
-         alerts,
-         is_priority,
-         config: config,
-         location_context: location_context,
-         fetch_stop_name_fn: fetch_stop_name_fn,
-         is_terminal_station: is_terminal_station,
-         now: now,
-         fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
-       ) do
-    Enum.map(alerts, fn alert ->
-      all_platforms_names_at_informed_station =
-        get_platform_names_at_informed_station(alert, fetch_subway_platforms_for_stop_fn)
+  # "Moderate delays": still important enough to present, but less relevant.
+  defp relevance(%Alert{effect: :delay, severity: severity}, _location, _distance)
+       when severity >= 5,
+       do: {2, nil}
 
-      %ReconstructedAlert{
-        screen: config,
-        alert: alert,
-        now: now,
-        location_context: location_context,
-        home_station_name: fetch_station_name(location_context.home_stop, fetch_stop_name_fn),
-        informed_station_names: get_stations(alert, fetch_stop_name_fn),
-        is_terminal_station: is_terminal_station,
-        is_priority: is_priority,
-        partial_closure_platform_names: all_platforms_names_at_informed_station
-      }
-    end)
-  end
+  defp relevance(_alert, _location, _distance), do: nil
 
   defp get_platform_names_at_informed_station(
          %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
@@ -192,30 +162,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp get_platform_names_at_informed_station(_, _), do: []
 
-  defp find_closest_downstream_alerts(alerts, stop_id, stop_sequences) do
-    home_stop_distance_map = build_distance_map(stop_id, stop_sequences)
-    # Map each alert with its distance from home.
-    alerts
-    |> Enum.map(fn %{informed_entities: ies} = alert ->
-      distance =
-        ies
-        |> Enum.filter(fn
-          # Alert affects entire line
-          %{stop: nil, route: route} -> is_binary(route)
-          ie -> String.starts_with?(ie.stop, "place-")
-        end)
-        |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
-        |> Enum.min()
-
-      {alert, distance}
-    end)
-    |> Enum.group_by(&elem(&1, 1), &elem(&1, 0))
-    |> Enum.sort_by(&elem(&1, 0))
-    # The first item will be all alerts with the shortest distance.
-    |> List.first()
-    |> elem(1)
-  end
-
   defp build_distance_map(home_stop_id, stop_sequences) do
     Enum.reduce(stop_sequences, %{}, fn stop_sequence, distances_by_stop ->
       stop_sequence
@@ -227,6 +173,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       # If a stop already has a distance recorded, the distances should be the same. Use the first one.
       |> Map.merge(distances_by_stop, fn _stop, d1, _d2 -> d1 end)
     end)
+  end
+
+  defp distance_from_home(%Alert{informed_entities: ies}, stop_id, home_stop_distance_map) do
+    ies
+    |> Enum.filter(fn
+      # Alert affects entire line
+      %{stop: nil, route: route} -> is_binary(route)
+      %{stop: stop} -> String.starts_with?(stop, "place-")
+    end)
+    |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
+    |> Enum.min()
   end
 
   # Default to 99 if stop_id is not in distance map.
@@ -248,60 +205,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   defp get_distance(_, home_stop_distance_map, %{stop: stop_id}),
     do: Map.get(home_stop_distance_map, stop_id, @default_distance)
 
-  defp relevant_alerts(alerts, location_context, now) do
-    Enum.filter(alerts, fn %Alert{effect: effect} = alert ->
-      reconstructed_alert = %{alert: alert, location_context: location_context}
-
-      relevant_effect?(effect) and relevant_location?(reconstructed_alert) and
-        Alert.happening_now?(alert, now)
-    end)
-  end
-
-  defp relevant_effect?(effect) do
-    Enum.member?(@relevant_effects, effect)
-  end
-
-  defp relevant_location?(reconstructed_alert) do
-    case LocalizedAlert.location(reconstructed_alert) do
-      location when location in [:downstream, :upstream] ->
-        true
-
-      :inside ->
-        relevant_inside_alert?(reconstructed_alert)
-
-      location when location in [:boundary_upstream, :boundary_downstream] ->
-        relevant_boundary_alert?(reconstructed_alert)
-
-      _ ->
-        false
-    end
-  end
-
-  defp relevant_inside_alert?(%{alert: %Alert{effect: :delay}} = reconstructed_alert),
-    do: relevant_delay?(reconstructed_alert)
-
-  defp relevant_inside_alert?(_), do: true
-
-  defp relevant_boundary_alert?(%{alert: %Alert{effect: :station_closure}}),
-    do: false
-
-  defp relevant_boundary_alert?(%{alert: %Alert{effect: :delay}} = reconstructed_alert),
-    do: relevant_delay?(reconstructed_alert)
-
-  defp relevant_boundary_alert?(_), do: true
-
-  defp relevant_delay?(%{alert: %Alert{severity: severity}} = reconstructed_alert) do
-    get_severity_level(severity) != :low and relevant_direction?(reconstructed_alert)
-  end
-
-  # If the current station's stop_id is the first or last entry in all stop_sequences,
-  # it is a terminal station. Delay alerts heading in the direction of the station are not relevant.
-  defp relevant_direction?(%{
-         alert: %Alert{informed_entities: informed_entities},
-         location_context: location_context
-       }) do
-    stop_sequences = LocationContext.stop_sequences(location_context)
-
+  # If the current station's stop_id is the first or last entry in all stop_sequences, it is a
+  # terminal station. "Directional" delay alerts heading towards the station are not relevant.
+  defp relevant_direction?(
+         %Alert{effect: :delay, informed_entities: informed_entities},
+         home_stop_id,
+         stop_sequences
+       ) do
     direction_id =
       informed_entities
       |> Enum.map(fn %{direction_id: direction_id} -> direction_id end)
@@ -310,30 +220,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     relevant_direction_for_terminal =
       cond do
         # Alert affects both directions
-        is_nil(direction_id) ->
-          nil
-
+        is_nil(direction_id) -> nil
         # North/East side terminal stations
-        Enum.all?(
-          stop_sequences,
-          fn stop_sequence -> location_context.home_stop == List.first(stop_sequence) end
-        ) ->
-          0
-
+        Enum.all?(stop_sequences, fn sequence -> home_stop_id == List.first(sequence) end) -> 0
         # South/West side terminal stations
-        Enum.all?(
-          stop_sequences,
-          fn stop_sequence -> location_context.home_stop == List.last(stop_sequence) end
-        ) ->
-          1
-
+        Enum.all?(stop_sequences, fn sequence -> home_stop_id == List.last(sequence) end) -> 1
         # Single line stations that are not terminal stations
-        true ->
-          nil
+        true -> nil
       end
 
     relevant_direction_for_terminal == nil or relevant_direction_for_terminal == direction_id
   end
+
+  # Direction filtering doesn't apply to other kinds of alerts.
+  defp relevant_direction?(_alert, _home_stop_id, _stop_sequences), do: true
 
   defp get_stations(
          %{effect: :station_closure, informed_entities: informed_entities},
@@ -376,13 +276,5 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     Enum.all?(stop_sequences, fn stop_sequence ->
       List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
     end)
-  end
-
-  defp get_severity_level(severity) do
-    cond do
-      severity < 5 -> :low
-      severity < 7 -> :moderate
-      true -> :severe
-    end
   end
 end
