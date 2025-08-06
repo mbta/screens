@@ -86,6 +86,7 @@ const STRING_TO_COLOR: { [key: string]: string } = {
   red: "#DA291C",
   green: "#00843D",
   purple: "#80276C",
+  cape_blue: "#006595"
 };
 
 export const getHexColor = (color: string) => STRING_TO_COLOR[color];
