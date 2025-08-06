@@ -37,7 +37,6 @@ defmodule Screens.Headways do
   }
 
   @sl_stops %{
-    sl_common: [17_096..17_096, 74_611..74_617, 74_624..74_624],
     sl_one: [17_091..17_095, 27_092..27_092],
     sl_two: [30_250..30_251, 31_255..31_259],
     sl_three: [7096..7097, 74_630..74_637]
@@ -144,7 +143,8 @@ defmodule Screens.Headways do
     red_trunk: {~w[Red], ~w[pktrm dwnxg]},
     sl_one: {~w[741], ~w[conrd wtcst crtst sstat]},
     sl_two: {~w[742], ~w[conrd wtcst crtst sstat]},
-    sl_three: {~w[743], ~w[conrd wtcst crtst sstat aport]}
+    sl_three: {~w[743], ~w[conrd wtcst crtst sstat aport]},
+    sl_way: {~w[746], ~w[conrd wtcst crtst sstat]}
   }
 
   @type range :: {low :: pos_integer(), high :: pos_integer()}

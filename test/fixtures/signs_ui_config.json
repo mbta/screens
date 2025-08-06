@@ -127,6 +127,16 @@
         "range_high": 8,
         "range_low": 6
       }
+    },
+    "sl_way": {
+      "off_peak": {
+        "range_high": 9,
+        "range_low": 7
+      },
+      "peak": {
+        "range_high": 10,
+        "range_low": 8
+      }
     }
   }
 }
