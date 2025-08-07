@@ -10,17 +10,17 @@ interface AlertCardProps {
   children: React.ReactNode;
 }
 
-const isPIOAlert = (effect: string, urgent: boolean, routes: any[]) => {
-  return (
-    (effect === "delay" && !urgent) ||
-    (effect !== "station_closure" && routes.length > 1)
-  );
+// Corresponds to cases where on the server this widget is generated with an
+// `issue` consisting of the raw alert text (and empty cause/location/remedy),
+// which should be displayed as-is.
+const isTextFallback = ({ cause, location, remedy }: ReconAlertProps) => {
+  return [cause, location, remedy].every((value) => value === "");
 };
 
 const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
   const { cause, effect, issue, location, remedy, routes, urgent } = alert;
 
-  const BODY_SIZES = isPIOAlert(effect, urgent, routes)
+  const BODY_SIZES = isTextFallback(alert)
     ? ["extra-small", "small", "large"]
     : ["small", "large", "extra-large"];
   const { ref: descriptionRef, size: descriptionSize } = useTextResizer({
@@ -46,7 +46,7 @@ const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
                 <RoutePill pill={pill} key={routePillKey(pill)} />
               ))}
             </div>
-            {effect === "delay" && (
+            {isTextFallback(alert) && effect === "delay" && (
               <div className={"alert-card__body__delay-notice"}>Delay</div>
             )}
             <div className="alert-card__body__icon">
@@ -63,7 +63,7 @@ const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
               ref={descriptionRef}
             >
               <div className="alert-card__body__issue">
-                {isPIOAlert(effect, urgent, routes) ? (
+                {isTextFallback(alert) ? (
                   <span className="medium-bold">{issue}</span>
                 ) : (
                   <>
