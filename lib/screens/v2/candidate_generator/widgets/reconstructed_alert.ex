@@ -144,6 +144,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
        when severity >= 5,
        do: {2, nil}
 
+  # Low-severity (including "informational") delays are only included when the cause is
+  # single-tracking. Relevance is higher when inside the single-tracked segment.
+  defp relevance(%Alert{effect: :delay, cause: :single_tracking}, location, _distance)
+       when location in @inside_locations,
+       do: {2, nil}
+
+  defp relevance(%Alert{effect: :delay, cause: :single_tracking}, _location, _distance),
+    do: {3, nil}
+
   defp relevance(_alert, _location, _distance), do: nil
 
   defp get_platform_names_at_informed_station(
