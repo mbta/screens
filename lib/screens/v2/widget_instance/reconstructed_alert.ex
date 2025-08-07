@@ -64,6 +64,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           svg_name: String.t()
         }
 
+  @type effect :: :suspension | :shuttle | :station_closure | :delay
+  @type region :: :here | :boundary | :outside
+
   @type single_screen_serialized_response :: %{
           optional(:disruption_diagram) => DisruptionDiagram.serialized_response(),
           # Unique to station closures
@@ -81,19 +84,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           cause: Alert.cause() | nil,
           # List of SVG filenames
           routes: list(enriched_route()),
-          effect: :suspension | :shuttle | :station_closure | :delay,
+          effect: effect(),
           updated_at: String.t(),
-          region: :here | :boundary | :outside
+          region: region()
         }
 
   @type flex_serialized_response :: %{
-          region: :boundary | :inside | :outside,
+          region: region(),
           issue: String.t(),
           remedy: String.t(),
           location: String.t(),
           cause: String.t(),
           routes: list(map() | String.t()),
-          effect: :suspension | :shuttle | :station_closure | :delay | :severe_delay,
+          effect: effect(),
           urgent: boolean()
         }
 
@@ -741,108 +744,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  defp inside_flex_fields(%__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t)
-       when severity > 3 and severity < 7 do
-    %__MODULE__{alert: %{header: header}} = t
-
-    %{
-      issue: header,
-      remedy: "",
-      location: "",
-      cause: "",
-      routes: get_route_pills(t),
-      effect: :delay,
-      urgent: false
-    }
-  end
-
-  defp inside_flex_fields(%__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t)
-       when severity >= 7 do
-    %__MODULE__{alert: alert} = t
-    destination = get_destination(t, :inside)
-    duration_text = Alert.delay_description(alert)
-
-    # Even if the screen is "inside" the alert range, the alert itself can
-    # still be one-directional. (Only westbound / eastbound is impacted)
-    issue =
-      if is_nil(destination) do
-        "Trains may be delayed #{duration_text}"
-      else
-        "#{destination} trains may be delayed #{duration_text}"
-      end
-
-    %{
-      issue: issue,
-      remedy: "",
-      location: "",
-      cause: cause_description(alert),
-      routes: get_route_pills(t),
-      effect: :severe_delay,
-      urgent: true
-    }
-  end
-
-  # Boundary presentation of shuttle/suspension alerts is also valid when inside them.
-  defp inside_flex_fields(%__MODULE__{alert: %Alert{effect: effect}} = t)
-       when effect in ~w[shuttle suspension]a,
-       do: boundary_flex_fields(t, :inside)
-
-  defp boundary_flex_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
-       when effect in ~w[shuttle suspension]a do
-    %__MODULE__{alert: %Alert{header: header} = alert} = t
-    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
-    remedy = if(effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route")
-
-    if length(affected_routes) > 1 do
-      %{
-        issue: header,
-        remedy: remedy,
-        location: "",
-        cause: "",
-        routes: get_route_pills(t),
-        effect: effect,
-        urgent: true
-      }
-    else
-      destination = get_destination(t, location)
-      issue = if is_nil(destination), do: "No trains", else: "No #{destination} trains"
-
-      %{
-        issue: issue,
-        remedy: remedy,
-        location: "",
-        cause: cause_description(alert),
-        routes: get_route_pills(t),
-        effect: effect,
-        urgent: true
-      }
-    end
-  end
-
-  defp boundary_flex_fields(
-         %__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t,
-         _location
-       )
-       when severity > 3 and severity < 7 do
-    %__MODULE__{alert: %{header: header}} = t
-
-    %{
-      issue: header,
-      remedy: "",
-      location: "",
-      cause: "",
-      routes: get_route_pills(t),
-      effect: :delay,
-      urgent: false
-    }
-  end
-
-  defp boundary_flex_fields(
-         %__MODULE__{alert: %Alert{effect: :delay, severity: severity}} = t,
-         location
-       )
-       when severity >= 7 do
-    %__MODULE__{alert: %Alert{header: header} = alert} = t
+  defp flex_zone_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
+       when location in ~w[inside boundary_upstream boundary_downstream]a and
+              effect in ~w[delay shuttle suspension]a do
+    %__MODULE__{alert: %Alert{header: header, severity: severity} = alert} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
@@ -852,40 +757,57 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         location: "",
         cause: "",
         routes: get_route_pills(t),
-        effect: :severe_delay,
-        urgent: true
+        effect: effect,
+        urgent: effect != :delay or severity >= 7
       }
     else
       destination = get_destination(t, location)
-      duration_text = Alert.delay_description(alert)
 
       issue =
-        if is_nil(destination),
-          do: "Trains may be delayed #{duration_text}",
-          else: "#{destination} trains may be delayed #{duration_text}"
+        case effect do
+          :delay ->
+            delay_description = Alert.delay_description(alert)
+
+            if is_nil(destination),
+              do: "Trains may be delayed #{delay_description}",
+              else: "#{destination} trains may be delayed #{delay_description}"
+
+          _other ->
+            if is_nil(destination), do: "No trains", else: "No #{destination} trains"
+        end
+
+      remedy =
+        case effect do
+          :delay -> ""
+          :shuttle -> "Use shuttle bus"
+          :suspension -> "Seek alternate route"
+        end
 
       %{
         issue: issue,
-        remedy: "",
+        remedy: remedy,
         location: "",
         cause: cause_description(alert),
         routes: get_route_pills(t),
-        effect: :severe_delay,
-        urgent: true
+        effect: effect,
+        urgent: effect != :delay or severity >= 7,
+        region: get_region_from_location(location)
       }
     end
   end
 
-  # Shuttle or suspension
-  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
-       when effect in ~w[shuttle suspension]a do
-    %__MODULE__{alert: %Alert{header: header, informed_entities: informed_entities} = alert} = t
+  defp flex_zone_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
+       when location in ~w[upstream downstream]a and effect in ~w[delay shuttle suspension]a do
+    %__MODULE__{
+      alert: %Alert{header: header, informed_entities: informed_entities} = alert,
+      location_context: %LocationContext{home_stop: home_stop}
+    } = t
 
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     location_text =
       informed_entities
-      |> get_endpoints(hd(affected_routes), t.location_context.home_stop)
+      |> get_endpoints(hd(affected_routes), home_stop)
       |> format_endpoint_string()
 
     if is_nil(location_text) or length(affected_routes) > 1 do
@@ -899,29 +821,49 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         urgent: false
       }
     else
+      issue =
+        case effect do
+          :delay ->
+            delay_description = Alert.delay_description(alert)
+
+            if Alert.direction_id(alert),
+              do: "#{get_destination(t, location)} trains may be delayed #{delay_description}",
+              else: "Trains may be delayed #{delay_description}"
+
+          _other ->
+            if Alert.direction_id(alert),
+              do: "No #{get_destination(t, location)} trains",
+              else: "No trains"
+        end
+
+      remedy =
+        case effect do
+          :delay -> ""
+          :shuttle -> "Use shuttle bus"
+          :suspension -> "Seek alternate route"
+        end
+
       %{
-        issue:
-          if(is_nil(Alert.direction_id(alert)),
-            do: "No trains",
-            else: "No #{get_destination(t, location)} trains"
-          ),
-        remedy: if(effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
+        issue: issue,
+        remedy: remedy,
         location: location_text,
         cause: cause_description(alert),
         routes: get_route_pills(t),
         effect: effect,
-        urgent: false
+        urgent: false,
+        region: get_region_from_location(location)
       }
     end
   end
 
   # Partial closure
-  defp outside_flex_fields(
+  defp flex_zone_fields(
          %__MODULE__{
+           alert: %Alert{effect: :station_closure},
            informed_station_names: [informed_station],
            partial_closure_platform_names: partial_closure_platform_names
          } = t,
-         _location
+         location
        )
        when partial_closure_platform_names != [] do
     issue =
@@ -945,12 +887,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: nil,
       routes: get_route_pills(t),
       effect: :station_closure,
-      urgent: false
+      urgent: false,
+      region: get_region_from_location(location)
     }
   end
 
   # Full closure
-  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, _location) do
+  defp flex_zone_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, location) do
     %__MODULE__{alert: alert, informed_station_names: informed_station_names} = t
 
     informed_stations_string = Util.format_name_list_to_string(informed_station_names)
@@ -962,21 +905,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_description(alert),
       routes: get_route_pills(t),
       effect: :station_closure,
-      urgent: false
-    }
-  end
-
-  defp outside_flex_fields(%__MODULE__{alert: %Alert{effect: :delay}} = t, _location) do
-    %__MODULE__{alert: %{header: header}} = t
-
-    %{
-      issue: header,
-      remedy: "",
-      location: "",
-      cause: "",
-      routes: get_route_pills(t),
-      effect: :delay,
-      urgent: false
+      urgent: false,
+      region: get_region_from_location(location)
     }
   end
 
@@ -1123,18 +1053,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_single_screen(t, location), do: single_screen_fallback_fields(t, location)
 
   @spec serialize_flex_zone(t(), LocalizedAlert.location()) :: flex_serialized_response()
-  defp serialize_flex_zone(t, location) do
-    case location do
-      :inside ->
-        t |> inside_flex_fields() |> Map.put(:region, :inside)
-
-      l when l in [:boundary_upstream, :boundary_downstream] ->
-        t |> boundary_flex_fields(location) |> Map.put(:region, :boundary)
-
-      l when l in [:downstream, :upstream] ->
-        t |> outside_flex_fields(location) |> Map.put(:region, :outside)
-    end
-  end
+  defp serialize_flex_zone(t, location), do: flex_zone_fields(t, location)
 
   defp report_diagram_error(%__MODULE__{} = t, reason) do
     Report.warning("disruption_diagram_error",
