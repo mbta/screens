@@ -35,6 +35,7 @@ type Color =
   | "purple"
   | "yellow"
   | "teal"
+  | "ocean_blue"
   | "silver";
 
 type PillIcon = "bus" | "light_rail" | "rail" | "boat";

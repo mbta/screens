@@ -167,6 +167,9 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       :silver ->
         %{type: :text, text: "SL", color: :silver}
 
+      :capeflyer ->
+        %{type: :icon, icon: :rail, color: :ocean_blue}
+
       route_color ->
         pill = route_color |> to_string |> String.capitalize() |> do_serialize(%{})
         Map.merge(pill, %{color: route_color})
@@ -224,6 +227,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   defp do_serialize("Boat-" <> _line, _) do
     %{type: :icon, icon: :boat}
   end
+
+  defp do_serialize("CapeFlyer", _), do: %{type: :icon, icon: :rail}
 
   for {route_id, name} <- @special_bus_route_names do
     defp do_serialize(unquote(route_id), _) do
