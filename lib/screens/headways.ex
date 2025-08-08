@@ -33,10 +33,7 @@ defmodule Screens.Headways do
     orange_trunk: [70_001..70_036, 70_278..70_279],
     red_ashmont: [70_085..70_094],
     red_braintree: [70_095..70_105],
-    red_trunk: [70_061..70_061, 70_063..70_084]
-  }
-
-  @sl_stops %{
+    red_trunk: [70_061..70_061, 70_063..70_084],
     sl_one: [17_091..17_095, 27_092..27_092],
     sl_two: [30_250..30_251, 31_255..31_259],
     sl_three: [7096..7097, 74_630..74_637]
@@ -184,11 +181,6 @@ defmodule Screens.Headways do
     defp headway_key(unquote(to_string(stop_id)), _route_id), do: unquote(to_string(key))
   end
 
-  for {_, ranges} <- @sl_stops, range <- ranges, stop_id <- range do
-    defp headway_key(unquote(to_string(stop_id)), route_id),
-      do: silver_line_route_headway_key(route_id)
-  end
-
   for {key, {route_ids, stations}} <- @multi_stations,
       route_id <- route_ids,
       station <- stations do
@@ -219,9 +211,4 @@ defmodule Screens.Headways do
       {_, false} -> :off_peak
     end
   end
-
-  defp silver_line_route_headway_key("741"), do: "sl_one"
-  defp silver_line_route_headway_key("742"), do: "sl_two"
-  defp silver_line_route_headway_key("743"), do: "sl_three"
-  defp silver_line_route_headway_key(_), do: nil
 end

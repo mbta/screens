@@ -17,10 +17,10 @@ defmodule Screens.HeadwaysTest do
     @blue_trunk "70042"
     @green_d "70160"
     @red_ashmont "70088"
-    @sl_one_terminal_a "17091"
+    @sl_one_terminal_a "17092"
     @sl_two_drydock_ave "31259"
     @sl_three_airport "7096"
-    @silver_line_way "74624"
+    @silver_line_way "place-conrd"
 
     test "returns nil for a stop with no defined headways" do
       assert Headways.get("nonexistent", local_dt()) == nil
@@ -34,6 +34,9 @@ defmodule Screens.HeadwaysTest do
       assert Headways.get(@blue_trunk, local_dt()) == {9, 13}
       assert Headways.get(@green_d, local_dt()) == {7, 13}
       assert Headways.get(@red_ashmont, local_dt()) == {24, 32}
+      assert Headways.get(@sl_one_terminal_a, local_dt()) == {1, 3}
+      assert Headways.get(@sl_two_drydock_ave, local_dt()) == {3, 5}
+      assert Headways.get(@sl_three_airport, local_dt()) == {5, 7}
     end
 
     test "returns the correct value for a given time period" do
@@ -56,10 +59,10 @@ defmodule Screens.HeadwaysTest do
     end
 
     test "returns the correct value for a combination of station id and route for the Silver Line" do
-      assert Headways.get_with_route(@sl_one_terminal_a, "741", local_dt()) == {1, 3}
-      assert Headways.get_with_route(@sl_two_drydock_ave, "742", local_dt()) == {3, 5}
-      assert Headways.get_with_route(@sl_three_airport, "743", local_dt()) == {5, 7}
-      assert Headways.get_with_route(@sl_three_airport, "746", local_dt()) == nil
+      assert Headways.get_with_route(@silver_line_way, "741", local_dt()) == {1, 3}
+      assert Headways.get_with_route(@silver_line_way, "742", local_dt()) == {3, 5}
+      assert Headways.get_with_route(@silver_line_way, "743", local_dt()) == {5, 7}
+      assert Headways.get_with_route(@silver_line_way, "746", local_dt()) == {7, 9}
       assert Headways.get_with_route(@silver_line_way, "751", local_dt()) == nil
     end
   end
