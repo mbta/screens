@@ -177,6 +177,12 @@ const filenameForFlexZoneIcon = (effect: string, urgent: boolean) => {
         : "alert-widget-icon-bus--color.svg";
     case "delay":
       return urgent ? "clock-with-border-urgent.svg" : "clock-with-border.svg";
+    case "information":
+      // as strange as the concept of an "urgent informational alert" sounds, we
+      // have the icon, so include it for completeness
+      return urgent
+        ? "alert-widget-icon-info--color-urgent.svg"
+        : "alert-widget-icon-info--color.svg";
     default:
       return urgent
         ? "alert-widget-icon-x--color-urgent.svg"
