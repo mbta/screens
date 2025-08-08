@@ -22,7 +22,12 @@ interface PreFareSingleScreenAlertProps {
   routes: EnrichedRoute[];
   unaffected_routes: EnrichedRoute[];
   endpoints: [string, string];
-  effect: "suspension" | "shuttle" | "station_closure" | "delay";
+  effect:
+    | "suspension"
+    | "shuttle"
+    | "station_closure"
+    | "delay"
+    | "information";
   region: "here" | "boundary" | "outside";
   updated_at: string;
   disruption_diagram?: DisruptionDiagramData;
@@ -168,6 +173,12 @@ interface FallbackLayoutProps {
   effect: string;
 }
 
+const fallbackLayoutIcons = {
+  delay: ClockIcon,
+  information: InfoIcon,
+  shuttle: ShuttleBusIcon,
+};
+
 const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
   issue,
   remedy,
@@ -180,18 +191,11 @@ const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
     resetDependencies: [issue, remedy],
   });
 
-  const icon =
-    effect === "delay" ? (
-      <ClockIcon className="alert-card__fallback__icon" />
-    ) : effect === "shuttle" ? (
-      <ShuttleBusIcon className="alert-card__fallback__icon" />
-    ) : (
-      <NoServiceIcon className="alert-card__fallback__icon" />
-    );
+  const Icon = fallbackLayoutIcons[effect] ?? NoServiceIcon;
 
   return (
     <div className="alert-card__fallback">
-      {icon}
+      <Icon className="alert-card__fallback__icon" />
       {issue && <div className="alert-card__fallback__issue-text">{issue}</div>}
       {remedy && (
         <div

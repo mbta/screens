@@ -934,6 +934,35 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
+    test "informational", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-astao", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:single_tracking)
+        |> put_severity(1)
+        |> put_alert_header("Single-tracking is happening")
+        |> put_is_priority(true)
+
+      expected = %{
+        issue: "Single tracking",
+        cause: nil,
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        effect: :information,
+        remedy: "Single-tracking is happening",
+        updated_at: "Friday, 5:00 am",
+        region: :boundary
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Single tracking"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+    end
+
     test "moderate delay", %{widget: widget} do
       widget =
         widget
@@ -1542,6 +1571,33 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Force placement in the flex zone by enabling departures.
       assert expected == widget |> put_departures() |> ReconstructedAlert.serialize()
+    end
+
+    test "informational", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_cause(:single_tracking)
+        |> put_severity(1)
+        |> put_informed_entities([
+          ie(stop: "place-asmnl", route: "Red", direction_id: 1, route_type: 1),
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+        ])
+
+      expected = %{
+        issue: "Single tracking",
+        location: "",
+        cause: "between Park Street and Ashmont",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :information,
+        urgent: false,
+        region: :here,
+        remedy: ""
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
