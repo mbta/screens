@@ -98,7 +98,7 @@
         "range_low": 9
       }
     },
-    "sl_one": {
+    "silver_seaport": {
       "off_peak": {
         "range_high": 3,
         "range_low": 1
@@ -108,27 +108,7 @@
         "range_low": 2
       }
     },
-    "sl_two": {
-      "off_peak": {
-        "range_high": 5,
-        "range_low": 3
-      },
-      "peak": {
-        "range_high": 6,
-        "range_low": 4
-      }
-    },
-    "sl_three": {
-      "off_peak": {
-        "range_high": 7,
-        "range_low": 5
-      },
-      "peak": {
-        "range_high": 8,
-        "range_low": 6
-      }
-    },
-    "sl_way": {
+    "silver_chelsea": {
       "off_peak": {
         "range_high": 9,
         "range_low": 7
