@@ -141,6 +141,8 @@ defmodule Screens.Headways do
     silver_chelsea: {~w[743], ~w[conrd wtcst crtst sstat aport]}
   }
 
+  # Mapping of parent stops and route IDs to headway keys for the Silver Line,
+  # for parent stops which serve more than one route.
   @sl_multi_stops %{
     # congress_st_at_wtc 17_096
     silver_seaport: {~w[741 742 746], ~w[17096]},
