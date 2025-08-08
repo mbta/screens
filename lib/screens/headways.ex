@@ -12,28 +12,28 @@ defmodule Screens.Headways do
   # Compact mapping of stop IDs to headway keys, leaning on the fact that subway stop IDs happen
   # to be numeric and often contiguous as we "traverse" the line in a given direction.
   @stops %{
-    blue_trunk: [70_038..70_060],
-    glx_medford: [70_505..70_514],
-    glx_union: [70_503..70_504],
+    blue_trunk: [70038..70060],
+    glx_medford: [70505..70514],
+    glx_union: [70503..70504],
     green_b: [
-      70_106..70_107,
-      70_110..70_117,
-      70_120..70_121,
-      70_124..70_131,
-      70_134..70_135,
-      70_144..70_149,
+      70106..70107,
+      70110..70117,
+      70120..70121,
+      70124..70131,
+      70134..70135,
+      70144..70149,
       170_136..170_137,
       170_140..170_141
     ],
-    green_c: [70_211..70_220, 70_223..70_238],
-    green_d: [70_160..70_183, 70_186..70_187],
-    green_e: [70_239..70_258, 70_260..70_260],
-    green_trunk: [70_151..70_159, 70_196..70_208, 70_501..70_502, 71_150..71_151],
-    mattapan_trunk: [70_261..70_261, 70_263..70_276],
-    orange_trunk: [70_001..70_036, 70_278..70_279],
-    red_ashmont: [70_085..70_094],
-    red_braintree: [70_095..70_105],
-    red_trunk: [70_061..70_061, 70_063..70_084],
+    green_c: [70211..70220, 70223..70238],
+    green_d: [70160..70183, 70186..70187],
+    green_e: [70239..70258, 70260..70260],
+    green_trunk: [70151..70159, 70196..70208, 70501..70502, 71150..71151],
+    mattapan_trunk: [70261..70261, 70263..70276],
+    orange_trunk: [70001..70036, 70278..70279],
+    red_ashmont: [70085..70094],
+    red_braintree: [70095..70105],
+    red_trunk: [70061..70061, 70063..70084],
     silver_seaport: [247..247, 17_091..17_095, 27_092..27_092, 30_249..30_251, 31_255..31_259],
     silver_chelsea: [7096..7097, 74_630..74_637]
   }
@@ -126,7 +126,7 @@ defmodule Screens.Headways do
     ],
     red_ashmont: ~w[shmnl fldcr smmnl asmnl],
     red_braintree: ~w[nqncy wlsta qnctr qamnl brntn],
-    red_trunk: ~w[alfcl davis portr harsq cntsq knncl chmnl sstat brdwy andrw jfk],
+    red_trunk: ~w[alfcl davis portr harsq cntsq knncl chmnl brdwy andrw jfk],
     silver_chelsea: ~w[estav boxdt belsq chels]
   }
 
@@ -136,12 +136,12 @@ defmodule Screens.Headways do
     blue_trunk: {~w[Blue], ~w[state gover aport]},
     green_trunk: {~w[Green-B Green-C Green-D Green-E], ~w[north haecl gover pktrm]},
     orange_trunk: {~w[Orange], ~w[north haecl state dwnxg]},
-    red_trunk: {~w[Red], ~w[pktrm dwnxg]},
+    red_trunk: {~w[Red], ~w[pktrm dwnxg sstat]},
     silver_seaport: {~w[741 742 746], ~w[conrd wtcst crtst sstat]},
     silver_chelsea: {~w[743], ~w[conrd wtcst crtst sstat aport]}
   }
 
-  @sl_multi_stations %{
+  @sl_multi_stops %{
     # congress_st_at_wtc 17_096
     silver_seaport: {~w[741 742 746], ~w[17096]},
     silver_chelsea: {~w[743], ~w[17096]}
@@ -184,20 +184,20 @@ defmodule Screens.Headways do
     defp headway_key(unquote(to_string(stop_id)), _route_id), do: unquote(to_string(key))
   end
 
+  for {key, stations} <- @stations, station <- stations do
+    defp headway_key("place-" <> unquote(station), _route_id), do: unquote(to_string(key))
+  end
+
   for {key, {route_ids, stations}} <- @multi_stations,
       route_id <- route_ids,
       station <- stations do
     defp headway_key("place-" <> unquote(station), unquote(route_id)), do: unquote(to_string(key))
   end
 
-  for {key, {route_ids, stations}} <- @sl_multi_stations,
+  for {key, {route_ids, stations}} <- @sl_multi_stops,
       route_id <- route_ids,
       station <- stations do
     defp headway_key(unquote(station), unquote(route_id)), do: unquote(to_string(key))
-  end
-
-  for {key, stations} <- @stations, station <- stations do
-    defp headway_key("place-" <> unquote(station), _route_id), do: unquote(to_string(key))
   end
 
   defp headway_key(_stop_id), do: nil
