@@ -34,6 +34,10 @@
     background-color: colors.$line-ferry;
   }
 
+  &--ocean_blue {
+    background-color: colors.$line-capeflyer;
+  }
+
   &--yellow {
     background-color: colors.$line-bus;
     box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
