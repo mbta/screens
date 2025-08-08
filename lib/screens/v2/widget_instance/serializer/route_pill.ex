@@ -221,6 +221,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       else: Map.merge(base, %{type: :icon, icon: :rail})
   end
 
+  defp do_serialize("CapeFlyer", _), do: %{type: :icon, icon: :rail}
+
   defp do_serialize("Boat-" <> _line, _) do
     %{type: :icon, icon: :boat}
   end

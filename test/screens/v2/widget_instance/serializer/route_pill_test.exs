@@ -30,6 +30,11 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                serialize_for_departure("Boat-F1", "", :ferry, nil)
     end
 
+    test "Returns purple rail icon for CapeFlyer" do
+      assert %{type: :icon, icon: :rail, color: :purple} ==
+               serialize_for_departure("CapeFlyer", "", :rail, nil)
+    end
+
     test "Returns slashed route pill if route name contains `/`" do
       assert %{type: :slashed, part1: "34", part2: "35", color: :yellow} ==
                serialize_for_departure("3435", "34/35", :bus, nil)
