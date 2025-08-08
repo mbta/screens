@@ -566,7 +566,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_home_stop(PreFare, "place-forhl")
         |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
-        |> put_effect(:severe_delay)
+        |> put_effect(:delay)
         |> put_tagged_stop_sequences(%{
           "Orange" => [
             [
@@ -934,6 +934,35 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
+    test "informational", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-astao", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:single_tracking)
+        |> put_severity(1)
+        |> put_alert_header("Single-tracking is happening")
+        |> put_is_priority(true)
+
+      expected = %{
+        issue: "Single tracking",
+        cause: nil,
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        effect: :information,
+        remedy: "Single-tracking is happening",
+        updated_at: "Friday, 5:00 am",
+        region: :boundary
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Single tracking"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+    end
+
     test "moderate delay", %{widget: widget} do
       widget =
         widget
@@ -1070,7 +1099,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected == ReconstructedAlert.serialize(widget)
 
-      assert %{issue: "Delays are happening"} =
+      assert %{issue: "Trains may be delayed over 60 minutes"} =
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
@@ -1477,16 +1506,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
-        |> put_alert_header("Test Alert")
 
       expected = %{
-        issue: "Test Alert",
+        issue: "Trains may be delayed up to 20 minutes",
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :delay,
         urgent: false,
-        region: :inside,
+        region: :here,
         remedy: ""
       }
 
@@ -1509,9 +1537,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
-        effect: :severe_delay,
+        effect: :delay,
         urgent: true,
-        region: :inside,
+        region: :here,
         remedy: ""
       }
 
@@ -1537,12 +1565,39 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{color: :red, text: "RED LINE", type: :text}],
         effect: :suspension,
         urgent: true,
-        region: :inside,
+        region: :here,
         remedy: "Seek alternate route"
       }
 
       # Force placement in the flex zone by enabling departures.
       assert expected == widget |> put_departures() |> ReconstructedAlert.serialize()
+    end
+
+    test "informational", %{widget: widget} do
+      widget =
+        widget
+        |> put_effect(:delay)
+        |> put_cause(:single_tracking)
+        |> put_severity(1)
+        |> put_informed_entities([
+          ie(stop: "place-asmnl", route: "Red", direction_id: 1, route_type: 1),
+          ie(stop: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
+          ie(stop: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+        ])
+
+      expected = %{
+        issue: "Single tracking",
+        location: "",
+        cause: "between Park Street and Ashmont",
+        routes: [%{color: :red, text: "RED LINE", type: :text}],
+        effect: :information,
+        urgent: false,
+        region: :here,
+        remedy: ""
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
@@ -1609,10 +1664,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
-        |> put_alert_header("Test Alert")
 
       expected = %{
-        issue: "Test Alert",
+        issue: "Alewife trains may be delayed up to 20 minutes",
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
@@ -1642,7 +1696,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: "",
         cause: "",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
-        effect: :severe_delay,
+        effect: :delay,
         urgent: true,
         region: :boundary,
         remedy: ""
@@ -1668,7 +1722,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: "",
         cause: "due to construction",
         routes: [%{color: :red, text: "RED LINE", type: :text}],
-        effect: :severe_delay,
+        effect: :delay,
         urgent: true,
         region: :boundary,
         remedy: ""
@@ -1878,15 +1932,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget =
         widget
         |> put_effect(:delay)
+        |> put_severity(5)
         |> put_informed_entities([
-          ie(stop: "place-welln", route: "Orange", route_type: 1)
+          ie(stop: "place-welln", route: "Orange", route_type: 1),
+          ie(stop: "place-astao", route: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_alert_header("Test Alert")
 
       expected = %{
-        issue: "Test Alert",
-        location: "",
+        issue: "Trains may be delayed up to 20 minutes",
+        location: "between Wellington and Assembly",
         cause: "",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
         effect: :delay,
@@ -2643,11 +2698,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget =
         widget
         |> put_effect(:delay)
+        |> put_severity(5)
         |> put_informed_entities([
           ie(stop: "place-alfcl", route: "Red", route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_alert_header("Test Alert")
 
       assert [1, 1] == WidgetInstance.audio_sort_key(widget)
     end
