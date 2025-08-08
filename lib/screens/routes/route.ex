@@ -123,6 +123,7 @@ defmodule Screens.Routes.Route do
   @spec icon(t()) :: icon()
   def icon(%{id: "Blue"}), do: :blue
   def icon(%{id: "Boat-" <> _}), do: :ferry
+  def icon(%{id: "CapeFlyer"}), do: :capeflyer
   def icon(%{id: "CR-" <> _}), do: :cr
   def icon(%{id: "Green" <> _}), do: :green
   def icon(%{id: "Mattapan"}), do: :mattapan

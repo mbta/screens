@@ -155,6 +155,9 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       :bus ->
         %{type: :icon, icon: :bus, color: :yellow}
 
+      :capeflyer ->
+        %{type: :icon, icon: :rail, color: :purple}
+
       :cr ->
         %{type: :icon, icon: :rail, color: :purple}
 
@@ -220,6 +223,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       do: Map.merge(base, %{type: :text, text: "TR#{track_number}"}),
       else: Map.merge(base, %{type: :icon, icon: :rail})
   end
+
+  defp do_serialize("CapeFlyer", _), do: %{type: :icon, icon: :rail}
 
   defp do_serialize("Boat-" <> _line, _) do
     %{type: :icon, icon: :boat}
