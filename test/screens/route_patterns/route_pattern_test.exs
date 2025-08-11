@@ -52,6 +52,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                   "type" => "route",
                   "attributes" => %{
                     "direction_destinations" => ["Bowdoin", "Wonderland"],
+                    "direction_names" => ["South", "North"],
                     "long_name" => "Blue Line",
                     "short_name" => "",
                     "type" => 1
@@ -147,6 +148,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
         id: "Blue",
         short_name: "",
         long_name: "Blue Line",
+        direction_names: ["South", "North"],
         direction_destinations: ["Bowdoin", "Wonderland"],
         type: :subway,
         line: blue_line
@@ -254,6 +256,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                   "type" => "route",
                   "attributes" => %{
                     "direction_destinations" => ["Bowdoin", "Wonderland"],
+                    "direction_names" => ["South", "North"],
                     "long_name" => "Blue Line",
                     "short_name" => "",
                     "type" => 1
@@ -276,6 +279,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
                   "type" => "route",
                   "attributes" => %{
                     "direction_destinations" => ["Harvard Square", "Nubian Station"],
+                    "direction_names" => ["Outbound", "Inbound"],
                     "long_name" => "Harvard Square - Nubian Station",
                     "short_name" => "1",
                     "type" => 3

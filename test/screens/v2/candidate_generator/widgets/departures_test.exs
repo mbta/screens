@@ -33,15 +33,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   end
 
   describe "departures_instances/3" do
-    defp build_config(section_route_ids) do
+    defp build_config(sections_or_route_ids) do
       %Screen{
         app_params: %BusShelter{
           departures: %DeparturesConfig{
             sections:
-              Enum.map(
-                section_route_ids,
-                &%Section{query: %Query{params: %Query.Params{route_ids: [&1]}}}
-              )
+              case sections_or_route_ids do
+                [%Section{} | _] = sections ->
+                  sections
+
+                route_ids ->
+                  Enum.map(
+                    route_ids,
+                    &%Section{query: %Query{params: %Query.Params{route_ids: [&1]}}}
+                  )
+              end
           },
           header: nil,
           footer: nil,
@@ -121,10 +127,25 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     end
 
     test "with multiple sections, returns DeparturesWidget with notice rows in empty sections" do
-      config = build_config(["A", "B"])
+      config =
+        build_config([
+          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}},
+          %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}},
+          %Section{query: %Query{params: %Query.Params{route_ids: ["C"], direction_id: 1}}}
+        ])
+
       departure_b = build_departure("B", 0)
-      departure_fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}})
-      route_fetch_fn = fn %{ids: ["A"]} -> {:ok, [%Route{id: "A", type: :bus}]} end
+
+      departure_fetch_fn =
+        build_fetch_fn(%{"A" => {:ok, []}, "B" => {:ok, [departure_b]}, "C" => {:ok, []}})
+
+      route_fetch_fn = fn
+        %{ids: ["A"]} ->
+          {:ok, [%Route{id: "A", type: :bus}]}
+
+        %{ids: ["C"]} ->
+          {:ok, [%Route{id: "C", type: :rail, direction_names: ["North", "South"]}]}
+      end
 
       assert [
                %DeparturesWidget{
@@ -137,7 +158,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                        }
                      ]
                    },
-                   %NormalSection{rows: [^departure_b]}
+                   %NormalSection{rows: [^departure_b]},
+                   %NormalSection{
+                     rows: [
+                       %FreeTextLine{
+                         icon: :cr,
+                         text: ["No Southbound departures available"]
+                       }
+                     ]
+                   }
                  ]
                }
              ] =

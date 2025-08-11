@@ -11,6 +11,7 @@ defmodule Screens.Routes.Route do
   defstruct id: nil,
             short_name: nil,
             long_name: nil,
+            direction_names: nil,
             direction_destinations: nil,
             type: nil,
             line: nil
@@ -21,7 +22,8 @@ defmodule Screens.Routes.Route do
           id: id,
           short_name: String.t(),
           long_name: String.t(),
-          direction_destinations: list(String.t()),
+          direction_names: [String.t()],
+          direction_destinations: [String.t()],
           type: RouteType.t(),
           line: Line.t()
         }
@@ -139,4 +141,15 @@ defmodule Screens.Routes.Route do
   @spec name(t()) :: String.t()
   def name(%__MODULE__{type: :bus, short_name: short_name}), do: short_name
   def name(%__MODULE__{long_name: long_name}), do: long_name
+
+  @doc """
+  Normalizes direction names to include the "bound" suffix (e.g. "Northbound" instead of "North").
+  """
+  @spec normalized_direction_names(t()) :: [String.t()]
+  def normalized_direction_names(%__MODULE__{direction_names: direction_names}) do
+    Enum.map(direction_names, fn
+      name when name in ~w[North South East West] -> name <> "bound"
+      other -> other
+    end)
+  end
 end
