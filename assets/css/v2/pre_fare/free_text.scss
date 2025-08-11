@@ -55,6 +55,23 @@
     background: colors.$line-cr;
   }
 
+  &--bus,
+  &--yellow {
+    color: black;
+    background: colors.$line-bus;
+    box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
+  }
+
+  &--ferry,
+  &--teal {
+    background-color: colors.$line-ferry;
+  }
+
+  &--capeflyer,
+  &--ocean_blue {
+    background: colors.$line-capeflyer;
+  }
+
   .free-text__route-pill_text {
     font-size: 96px;
     line-height: unset;

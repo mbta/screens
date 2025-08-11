@@ -90,6 +90,11 @@
     &--teal {
       background-color: colors.$line-ferry;
     }
+
+    &--capeflyer,
+    &--ocean_blue {
+      background: colors.$line-capeflyer;
+    }
   }
 
   .free-text__icon-image {
