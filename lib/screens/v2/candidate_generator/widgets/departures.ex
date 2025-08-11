@@ -116,9 +116,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     [departures_instance]
   end
 
-  # When a section has no departures on a screen with multiple sections and is not designated as `header_only`,
-  # populate it with a "no data" entry. This may include a "representative" route for the section,
-  # used to determine an icon to display alongside the message.
+  # When a section has no departures on a screen with multiple sections and is not designated as
+  # `header_only`, populate it with a "no data" entry. This may include a "representative" route
+  # for the section, used to determine an icon to display alongside the message.
   #
   # NOTE: Assumes any given section is configured such that it only displays departures from a
   # single route-type-or-subway-line. If there would be more than one route-type-or-subway-line,
@@ -128,6 +128,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
          %Section{
            query: %Query{
              params: %Query.Params{
+               direction_id: direction_id,
                route_ids: route_ids,
                route_type: route_type,
                stop_ids: stop_ids
@@ -149,27 +150,40 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         fn {_key, value} -> value == [] end
       )
 
-    route =
-      case route_fetch_fn.(fetch_params) do
-        {:ok, [route | _]} -> route
-        _ -> nil
-      end
-
-    {:no_data, route}
+    case route_fetch_fn.(fetch_params) do
+      {:ok, [route | _]} -> {:no_data, route, direction_id}
+      _ -> :no_data
+    end
   end
 
   defp post_process_no_data(fetch_result, _, _, _), do: fetch_result
 
   defp normal_section_rows({:ok, departures}), do: departures
 
-  defp normal_section_rows({:no_data, route?}) do
+  defp normal_section_rows({:no_data, route, :both}) do
+    [%FreeTextLine{icon: Route.icon(route), text: [no_departures_message()]}]
+  end
+
+  defp normal_section_rows({:no_data, route, direction_id}) do
     [
       %FreeTextLine{
-        icon: if(route?, do: Route.icon(route?), else: nil),
-        text: ["No departures currently available"]
+        icon: Route.icon(route),
+        text: [
+          route
+          |> Route.normalized_direction_names()
+          |> Enum.at(direction_id, "")
+          |> no_departures_message()
+        ]
       }
     ]
   end
+
+  defp normal_section_rows(:no_data) do
+    [%FreeTextLine{icon: nil, text: [no_departures_message()]}]
+  end
+
+  defp no_departures_message, do: "No departures currently available"
+  defp no_departures_message(direction_name), do: "No #{direction_name} departures available"
 
   @spec fetch_section_departures(Section.t()) :: Departure.result()
   @spec fetch_section_departures(Section.t(), [RouteType.t()]) :: Departure.result()

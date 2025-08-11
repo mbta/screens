@@ -9,6 +9,7 @@ defmodule Screens.Routes.Parser do
           "attributes" => %{
             "short_name" => short_name,
             "long_name" => long_name,
+            "direction_names" => direction_names,
             "direction_destinations" => direction_destinations,
             "type" => route_type
           },
@@ -20,6 +21,7 @@ defmodule Screens.Routes.Parser do
       id: id,
       short_name: short_name,
       long_name: long_name,
+      direction_names: direction_names,
       direction_destinations: direction_destinations,
       type: RouteType.from_id(route_type),
       line: V3Api.Parser.included!(line, included)

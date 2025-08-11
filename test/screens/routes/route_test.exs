@@ -14,6 +14,7 @@ defmodule Screens.Routes.RouteTest do
             "attributes" => %{
               "short_name" => nil,
               "long_name" => nil,
+              "direction_names" => nil,
               "direction_destinations" => nil,
               "type" => 1
             },
