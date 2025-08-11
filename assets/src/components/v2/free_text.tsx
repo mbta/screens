@@ -1,5 +1,5 @@
 import React from "react";
-import _ from "lodash";
+import _, { zip } from "lodash";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 
@@ -15,7 +15,7 @@ const textPills = [
   "green_e",
   "mattapan",
 ];
-const iconPills = ["cr", "bus", "ferry"];
+const iconPills = ["cr", "bus", "ferry", "capeflyer"];
 
 const iconPaths: { [key: string]: string } = _.mapValues(
   {
@@ -26,6 +26,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     subway: "subway-white.svg",
     "subway-negative-black": "subway-negative-black.svg",
     cr: "commuter-rail.svg",
+    capeflyer: "commuter-rail.svg",
     walk: "nearby-white.svg",
     green_b: "gl-b-color.svg",
     green_c: "gl-c-color.svg",
