@@ -258,23 +258,40 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     fetch_vehicles_fn = fn _, _ -> [struct(Vehicle)] end
 
-    fetch_routes_fn = fn %{stop_ids: stop_ids} ->
-      {
-        :ok,
-        stop_ids
-        |> Enum.flat_map(fn
-          "Boat" -> [%{id: "Ferry", type: :ferry}]
-          "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
-          "bus-A" -> [%{id: "Bus A", type: :bus}]
-          "bus-B" -> [%{id: "Bus B", type: :bus}]
-          "bus-C" -> [%{id: "Bus C", type: :bus}]
-          "bus-C+D" -> [%{id: "Bus C", type: :bus}, %{id: "Bus D", type: :bus}]
-          "place-overnight" -> [%{id: "Red", type: :subway}]
-          "place-closed" -> [%{id: "Red", type: :subway}, %{id: "Bus A", type: :bus}]
-          _ -> [%{id: "test", type: :test}]
-        end)
-        |> Enum.uniq()
-      }
+    fetch_routes_fn = fn
+      %{ids: ids} ->
+        {
+          :ok,
+          ids
+          |> Enum.flat_map(fn
+            "Ferry" -> [%{id: "Ferry", type: :ferry}]
+            "Orange" -> [%{id: "Orange", type: :subway}]
+            "Green" -> [%{id: "Green", type: :light_rail}]
+            "Bus A" -> [%{id: "Bus A", type: :bus}]
+            "Bus B" -> [%{id: "Bus B", type: :bus}]
+            "Bus C" -> [%{id: "Bus C", type: :bus}]
+            "Red" -> [%{id: "Red", type: :subway}]
+          end)
+          |> Enum.uniq()
+        }
+
+      %{stop_ids: stop_ids} ->
+        {
+          :ok,
+          stop_ids
+          |> Enum.flat_map(fn
+            "Boat" -> [%{id: "Ferry", type: :ferry}]
+            "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
+            "bus-A" -> [%{id: "Bus A", type: :bus}]
+            "bus-B" -> [%{id: "Bus B", type: :bus}]
+            "bus-C" -> [%{id: "Bus C", type: :bus}]
+            "bus-C+D" -> [%{id: "Bus C", type: :bus}, %{id: "Bus D", type: :bus}]
+            "place-overnight" -> [%{id: "Red", type: :subway}]
+            "place-closed" -> [%{id: "Red", type: :subway}, %{id: "Bus A", type: :bus}]
+            _ -> [%{id: "test", type: :test}]
+          end)
+          |> Enum.uniq()
+        }
     end
 
     %{

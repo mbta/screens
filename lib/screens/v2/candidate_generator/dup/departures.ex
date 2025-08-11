@@ -712,19 +712,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp get_routes_serving_section(
-         %{route_ids: route_ids, stop_ids: stop_ids},
+         %Params{route_ids: route_ids, route_type: route_type, stop_ids: stop_ids},
          fetch_routes_fn
        ) do
-    routes =
-      case fetch_routes_fn.(%{stop_ids: stop_ids}) do
-        {:ok, routes} -> routes
-        :error -> []
-      end
+    params =
+      %{stop_ids: stop_ids}
+      |> then(&if route_ids == [], do: &1, else: Map.put(&1, :ids, route_ids))
+      |> then(&if is_nil(route_type), do: &1, else: Map.put(&1, :route_types, [route_type]))
 
-    if route_ids == [] do
-      routes
-    else
-      Enum.filter(routes, &(&1.id in route_ids))
+    case fetch_routes_fn.(params) do
+      {:ok, routes} -> routes
+      :error -> []
     end
   end
 
