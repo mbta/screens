@@ -36,7 +36,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     alias Screens.Headways
 
     @type t :: %__MODULE__{
-            headsign: String.t(),
+            headsign: String.t() | nil,
             route: :red | :orange | :green | :blue,
             time_range: Headways.range()
           }
@@ -114,7 +114,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %HeadwaySection{route: route, time_range: {lo, hi}, headsign: headsign},
+        %HeadwaySection{route: route, time_range: time_range, headsign: headsign},
         _screen,
         _now,
         is_only_section
@@ -128,33 +128,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         route -> route
       end
 
-    text =
-      if is_only_section do
-        time_range =
-          if headsign == "Ashmont/Braintree" do
-            [%{format: :bold, text: "#{lo}-#{hi}m"}]
-          else
-            [%{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
-          end
-
-        %FreeTextLine{
-          icon: "subway-negative-black",
-          text:
-            [
-              %{
-                color: pill_color,
-                text: "#{String.upcase(formatted_route)} LINE"
-              },
-              %{special: :break},
-              "#{headsign} trains every"
-            ] ++ time_range
-        }
-      else
-        %FreeTextLine{
-          icon: pill_color,
-          text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
-        }
-      end
+    text = get_headway_text(headsign, time_range, pill_color, formatted_route, is_only_section)
 
     %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end
@@ -563,5 +537,59 @@ defmodule Screens.V2.WidgetInstance.Departures do
     service_date_tomorrow = now |> Util.service_date() |> Date.add(1)
     show_am_pm = local_time.day == service_date_tomorrow.day
     %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
+  end
+
+  defp get_headway_text(
+         headsign,
+         {lo, hi},
+         pill_color,
+         formatted_route,
+         true = _is_only_section
+       ) do
+    time_range =
+      if headsign == "Ashmont/Braintree" do
+        [%{format: :bold, text: "#{lo}-#{hi}m"}]
+      else
+        [%{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+      end
+
+    %FreeTextLine{
+      icon: "subway-negative-black",
+      text:
+        [
+          %{
+            color: pill_color,
+            text: "#{String.upcase(formatted_route)} LINE"
+          },
+          %{special: :break},
+          "#{headsign} trains every"
+        ] ++ time_range
+    }
+  end
+
+  defp get_headway_text(
+         nil,
+         {lo, hi},
+         pill_color,
+         _formatted_route,
+         false = _is_only_section
+       ) do
+    %FreeTextLine{
+      icon: pill_color,
+      text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+    }
+  end
+
+  defp get_headway_text(
+         headsign,
+         {lo, hi},
+         pill_color,
+         _formatted_route,
+         false = _is_only_section
+       ) do
+    %FreeTextLine{
+      icon: pill_color,
+      text: [%{format: :bold, text: headsign}, %{format: :small, text: "every #{lo}-#{hi}m"}]
+    }
   end
 end

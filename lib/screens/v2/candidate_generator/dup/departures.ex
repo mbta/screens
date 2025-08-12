@@ -191,7 +191,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         )
       end
 
-    headway_mode = get_headway_mode(stop_ids, routes, alert_informed_entities, now)
+    use_headway_for_alert = use_headway_for_alert?(alert_informed_entities, stop_ids)
+
+    overnight_period =
+      departures == [] and
+        !section_contains_active_route and
+        overnight_schedules_for_section != []
+
+    headway_time_range = headway_time_range(stop_ids, routes, now)
 
     cond do
       # All routes in the section are disabled, so no departures are expected.
@@ -200,22 +207,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
         %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
 
-      # No remaining departures or active routes, but we do have routes with overnight schedules
-      # Show a takeover Overnight section for the given route types
-      departures == [] and !section_contains_active_route and
-          overnight_schedules_for_section != [] ->
-        # Temporarily return a no data section here b/c of an edge case with prediction suppression
-        %NoDataSection{route: hd(routes)}
-
       # Headway mode
-      headway_mode != :inactive ->
-        {:active, time_range, headsign} = headway_mode
+      use_headway_for_alert or
+          (headway_time_range != nil and departures == [] and alert_informed_entities == [] and
+             !overnight_period) ->
+        route = hd(routes)
 
         %HeadwaySection{
-          route: get_section_route_from_entities(stop_ids, alert_informed_entities),
-          time_range: time_range,
-          headsign: headsign
+          route: route,
+          time_range: headway_time_range,
+          headsign: direction_name(route, params.direction_id)
         }
+
+      # No remaining departures or active routes, but we do have routes with overnight schedules
+      # Show a takeover Overnight section for the given route types
+      overnight_period ->
+        # Temporarily return a no data section here b/c of an edge case with prediction suppression
+        %NoDataSection{route: hd(routes)}
 
       # No departures to show and no headway mode
       departures == [] ->
@@ -402,34 +410,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     # if there are two alerts that could be in different directions.
     |> Enum.reduce([], fn alert, acc -> acc ++ alert.informed_entities end)
     |> Enum.uniq()
-  end
-
-  defp get_headway_mode(_, _, [], _), do: :inactive
-
-  defp get_headway_mode(stop_ids, routes, informed_entities, current_time) do
-    # Use all informed_entities from relevant alerts to decide whether there's
-    # any reason to go into headway mode.
-    # For example, a NB suspension and SB shuttle from Aquarium shouldn't use headway mode
-    # but if all the WB branches are shuttling at Kenmore, there should be a headway
-    interpreted_alert = interpret_entities(informed_entities, stop_ids)
-
-    headway_mode? =
-      temporary_terminal?(interpreted_alert) and
-        not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
-
-    if headway_mode? do
-      all_headways =
-        for stop_id <- stop_ids, %{id: route_id} <- routes do
-          @headways.get_with_route(stop_id, route_id, current_time)
-        end
-
-      case Enum.uniq(all_headways) do
-        [{lo, hi}] -> {:active, {lo, hi}, interpreted_alert.headsign}
-        _ -> :inactive
-      end
-    else
-      :inactive
-    end
   end
 
   # NB: There aren't currently any DUPs at permanent terminals, so we assume all
@@ -734,5 +714,36 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp to_log(map) do
     Enum.map_join(map, " ", fn {k, v} -> "#{k}=#{v}" end)
+  end
+
+  defp use_headway_for_alert?(informed_entities, stop_ids) do
+    # Use all informed_entities from relevant alerts to decide whether there's
+    # any reason to go into headway mode.
+    # For example, a NB suspension and SB shuttle from Aquarium shouldn't use headway mode
+    # but if all the WB branches are shuttling at Kenmore, there should be a headway
+    interpreted_alert = interpret_entities(informed_entities, stop_ids)
+
+    temporary_terminal?(interpreted_alert) and
+      not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
+  end
+
+  defp headway_time_range(stop_ids, routes, now) do
+    all_headways =
+      for stop_id <- stop_ids, %{id: route_id} <- routes do
+        @headways.get_with_route(stop_id, route_id, now)
+      end
+
+    case Enum.uniq(all_headways) do
+      [{lo, hi}] -> {lo, hi}
+      _ -> nil
+    end
+  end
+
+  defp direction_name(_, :both), do: nil
+
+  defp direction_name(route, direction_id) do
+    route
+    |> Route.normalized_direction_names()
+    |> Enum.at(direction_id, nil)
   end
 end
