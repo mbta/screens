@@ -36,8 +36,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     alias Screens.Headways
 
     @type t :: %__MODULE__{
-            headsign: String.t(),
-            route: :red | :orange | :green | :blue,
+            headsign: String.t() | nil,
+            route: Route.id(),
             time_range: Headways.range()
           }
     defstruct ~w[headsign route time_range]a
@@ -68,6 +68,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
+  @sl_route_ids ~w[741 742 743 746 749 751]
 
   defimpl Screens.V2.WidgetInstance do
     def priority(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [1]
@@ -114,7 +115,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %HeadwaySection{route: route, time_range: {lo, hi}, headsign: headsign},
+        %HeadwaySection{route: route, time_range: time_range, headsign: headsign},
         _screen,
         _now,
         is_only_section
@@ -122,39 +123,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     pill_color = Route.color(route)
     layout = if is_only_section, do: :full_screen, else: :row
 
-    formatted_route =
-      case route do
-        "Green" <> _ -> "Green"
-        route -> route
-      end
-
-    text =
-      if is_only_section do
-        time_range =
-          if headsign == "Ashmont/Braintree" do
-            [%{format: :bold, text: "#{lo}-#{hi}m"}]
-          else
-            [%{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
-          end
-
-        %FreeTextLine{
-          icon: "subway-negative-black",
-          text:
-            [
-              %{
-                color: pill_color,
-                text: "#{String.upcase(formatted_route)} LINE"
-              },
-              %{special: :break},
-              "#{headsign} trains every"
-            ] ++ time_range
-        }
-      else
-        %FreeTextLine{
-          icon: pill_color,
-          text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
-        }
-      end
+    text = get_headway_text(headsign, time_range, pill_color, route, is_only_section)
 
     %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end
@@ -563,5 +532,66 @@ defmodule Screens.V2.WidgetInstance.Departures do
     service_date_tomorrow = now |> Util.service_date() |> Date.add(1)
     show_am_pm = local_time.day == service_date_tomorrow.day
     %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
+  end
+
+  defp get_headway_text(
+         headsign,
+         {lo, hi},
+         pill_color,
+         route,
+         true = _is_only_section
+       ) do
+    time_range =
+      if headsign == "Ashmont/Braintree" do
+        [%{format: :bold, text: "#{lo}-#{hi}m"}]
+      else
+        [%{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+      end
+
+    {formatted_route, vehicle} =
+      cond do
+        String.starts_with?(route, "Green") -> {"Green", "trains"}
+        route in @sl_route_ids -> {"Silver", "buses"}
+        true -> {route, "trains"}
+      end
+
+    %FreeTextLine{
+      icon: "subway-negative-black",
+      text:
+        [
+          %{
+            color: pill_color,
+            text: "#{String.upcase(formatted_route)} LINE"
+          },
+          %{special: :break},
+          "#{headsign} #{vehicle} every"
+        ] ++ time_range
+    }
+  end
+
+  defp get_headway_text(
+         nil,
+         {lo, hi},
+         pill_color,
+         _formatted_route,
+         false = _is_only_section
+       ) do
+    %FreeTextLine{
+      icon: pill_color,
+      text: ["every", %{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
+    }
+  end
+
+  defp get_headway_text(
+         headsign,
+         {lo, hi},
+         pill_color,
+         _formatted_route,
+         false = _is_only_section
+       ) do
+    %FreeTextLine{
+      icon: pill_color,
+      text: [%{format: :bold, text: headsign}, %{format: :small, text: "every #{lo}-#{hi}m"}]
+    }
   end
 end

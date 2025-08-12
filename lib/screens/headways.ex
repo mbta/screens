@@ -117,16 +117,17 @@ defmodule Screens.Headways do
     },
     red_ashmont: {~w[Red], ~w[shmnl fldcr smmnl asmnl]},
     red_braintree: {~w[Red], ~w[nqncy wlsta qnctr qamnl brntn]},
-    silver_seaport: {~w[741 742 746], ~w[conrd wtcst crtst sstat]},
-    silver_chelsea: {~w[743], ~w[conrd wtcst crtst sstat aport estav boxdt belsq chels]}
+    # combining 743 with the other three for the common stops
+    silver_seaport: {~w[741 742 743 746], ~w[conrd wtcst crtst sstat]},
+    silver_chelsea: {~w[743], ~w[aport estav boxdt belsq chels]}
   }
 
   # Mapping of stops and route IDs to headway keys for the Silver Line,
   # for stops which serve more than one route.
   @sl_stops %{
     # congress_st_at_wtc 17_096
-    silver_seaport: {~w[741 742 746], ~w[17096]},
-    silver_chelsea: {~w[743], ~w[17096]}
+    # combining 743 with the other three for the common stops
+    silver_seaport: {~w[741 742 743 746], ~w[17096]}
   }
 
   @type range :: {low :: pos_integer(), high :: pos_integer()}
