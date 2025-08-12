@@ -36,104 +36,85 @@ defmodule Screens.Headways do
     red_trunk: [70061..70061, 70063..70084]
   }
 
-  # Mapping of parent station IDs to headway keys, for stations with a single unambiguous key.
-  # For brevity, omits the "place-" prefix which is currently common to all parent station IDs.
+  # Mapping of parent station IDs and route IDs to headway keys. For brevity, omits the "place-"
+  # prefix which is currently common to all parent station IDs.
   @stations %{
-    blue_trunk: ~w[wondl rbmnl bmmnl sdmnl orhte wimnl aport mvbcl aqucl bomnl],
-    glx_medford: ~w[mdftf balsq mgngl gilmn esomr],
-    glx_union: ~w[unsqu],
-    green_b: ~w[
-      bland
-      buest
-      bucen
-      amory
-      babck
-      brico
-      harvd
-      grigg
-      alsgr
-      wrnst
-      wascm
-      sthld
-      chswk
-      chill
-      sougr
-      lake
-    ],
-    green_c: ~w[
-      smary
-      hwsst
-      kntst
-      stpul
-      cool
-      sumav
-      bndhl
-      fbkst
-      bcnwa
-      tapst
-      denrd
-      engav
-      clmnl
-    ],
-    green_d: ~w[
-      fenwy
-      longw
-      bvmnl
-      brkhl
-      bcnfd
-      rsmnl
-      chhil
-      newto
-      newtn
-      eliot
-      waban
-      woodl
-      river
-    ],
-    green_e: ~w[
-      prmnl
-      symcl
-      nuniv
-      mfa
-      lngmd
-      brmnl
-      fenwd
-      mispk
-      rvrwy
-      bckhl
-      hsmnl
-    ],
-    green_trunk: ~w[lech spmnl boyls armnl coecl hymnl kencl],
-    orange_trunk: ~w[
-      ogmnl
-      mlmnl
-      welln
-      astao
-      sull
-      ccmnl
-      chncl
-      tumnl
-      bbsta
-      masta
-      rugg
-      rcmnl
-      jaksn
-      sbmnl
-      grnst
-      forhl
-    ],
-    red_ashmont: ~w[shmnl fldcr smmnl asmnl],
-    red_braintree: ~w[nqncy wlsta qnctr qamnl brntn],
-    red_trunk: ~w[alfcl davis portr harsq cntsq knncl chmnl sstat brdwy andrw jfk]
-  }
-
-  # Mapping of parent station and route IDs to headway keys, for parent stations which serve more
-  # than one line.
-  @multi_stations %{
-    blue_trunk: {~w[Blue], ~w[state gover]},
-    green_trunk: {~w[Green-B Green-C Green-D Green-E], ~w[north haecl gover pktrm]},
-    orange_trunk: {~w[Orange], ~w[north haecl state dwnxg]},
-    red_trunk: {~w[Red], ~w[pktrm dwnxg]}
+    blue_trunk: {
+      ~w[Blue],
+      ~w[wondl rbmnl bmmnl sdmnl orhte wimnl aport mvbcl aqucl state gover bomnl]
+    },
+    glx_medford: {~w[Green-E], ~w[mdftf balsq mgngl gilmn esomr]},
+    glx_union: {~w[Green-D], ~w[unsqu]},
+    green_b: {
+      ~w[Green-B],
+      ~w[
+        bland
+        buest
+        bucen
+        amory
+        babck
+        brico
+        harvd
+        grigg
+        alsgr
+        wrnst
+        wascm
+        sthld
+        chswk
+        chill
+        sougr
+        lake
+      ]
+    },
+    green_c: {
+      ~w[Green-C],
+      ~w[smary hwsst kntst stpul cool sumav bndhl fbkst bcnwa tapst denrd engav clmnl]
+    },
+    green_d: {
+      ~w[Green-D],
+      ~w[fenwy longw bvmnl brkhl bcnfd rsmnl chhil newto newtn eliot waban woodl river]
+    },
+    green_e: {
+      ~w[Green-E],
+      ~w[prmnl symcl nuniv mfa lngmd brmnl fenwd mispk rvrwy bckhl hsmnl]
+    },
+    # Not all of these stations are served by all Green Line branches, but "trunk" is the most
+    # granular division of the Green Line we have to work with
+    green_trunk: {
+      ~w[Green-B Green-C Green-D Green-E],
+      ~w[lech spmnl north haecl gover pktrm boyls armnl coecl hymnl kencl]
+    },
+    orange_trunk: {
+      ~w[Orange],
+      ~w[
+        ogmnl
+        mlmnl
+        welln
+        astao
+        sull
+        ccmnl
+        north
+        haecl
+        state
+        dwnxg
+        chncl
+        tumnl
+        bbsta
+        masta
+        rugg
+        rcmnl
+        jaksn
+        sbmnl
+        grnst
+        forhl
+      ]
+    },
+    red_trunk: {
+      ~w[Red],
+      ~w[alfcl davis portr harsq cntsq knncl chmnl pktrm dwnxg sstat brdwy andrw jfk]
+    },
+    red_ashmont: {~w[Red], ~w[shmnl fldcr smmnl asmnl]},
+    red_braintree: {~w[Red], ~w[nqncy wlsta qnctr qamnl brntn]}
   }
 
   @type range :: {low :: pos_integer(), high :: pos_integer()}
@@ -173,11 +154,7 @@ defmodule Screens.Headways do
     defp headway_key(unquote(to_string(stop_id)), _route_id), do: unquote(to_string(key))
   end
 
-  for {key, stations} <- @stations, station <- stations do
-    defp headway_key("place-" <> unquote(station), _route_id), do: unquote(to_string(key))
-  end
-
-  for {key, {route_ids, stations}} <- @multi_stations,
+  for {key, {route_ids, stations}} <- @stations,
       route_id <- route_ids,
       station <- stations do
     defp headway_key("place-" <> unquote(station), unquote(route_id)), do: unquote(to_string(key))
