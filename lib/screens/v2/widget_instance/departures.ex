@@ -37,7 +37,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     @type t :: %__MODULE__{
             headsign: String.t() | nil,
-            route: :red | :orange | :green | :blue,
+            route: Route.id(),
             time_range: Headways.range()
           }
     defstruct ~w[headsign route time_range]a
@@ -68,6 +68,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
+  @sl_route_ids ~w[741 742 743 746 749 751]
 
   defimpl Screens.V2.WidgetInstance do
     def priority(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [1]
@@ -123,9 +124,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
     layout = if is_only_section, do: :full_screen, else: :row
 
     formatted_route =
-      case route do
-        "Green" <> _ -> "Green"
-        route -> route
+      cond do
+        String.starts_with?(route, "Green") -> "Green"
+        route in @sl_route_ids -> "Silver"
+        true -> route
       end
 
     text = get_headway_text(headsign, time_range, pill_color, formatted_route, is_only_section)
@@ -553,6 +555,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
         [%{format: :bold, text: "#{lo}-#{hi}"}, "minutes"]
       end
 
+    vehicle =
+      if formatted_route == "Silver" do
+        "buses"
+      else
+        "trains"
+      end
+
     %FreeTextLine{
       icon: "subway-negative-black",
       text:
@@ -562,7 +571,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
             text: "#{String.upcase(formatted_route)} LINE"
           },
           %{special: :break},
-          "#{headsign} trains every"
+          "#{headsign} #{vehicle} every"
         ] ++ time_range
     }
   end

@@ -233,7 +233,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       headway_time_range &&
           (alert_informed_entities == [] && !overnight_period) ->
         %HeadwaySection{
-          route: route,
+          route: route.id,
           time_range: headway_time_range,
           headsign: direction_name(route, params.direction_id)
         }
