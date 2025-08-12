@@ -42,6 +42,7 @@ defmodule Screens.HeadwaysTest do
 
   describe "get_with_route/3" do
     test "returns the correct value for a combination of parent station and route" do
+      assert Headways.get_with_route("place-aport", "Blue", local_dt()) == {9, 13}
       assert Headways.get_with_route("place-north", "Green-D", local_dt()) == {7, 13}
       assert Headways.get_with_route("place-north", "Orange", local_dt()) == {9, 11}
     end
