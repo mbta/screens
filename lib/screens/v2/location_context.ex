@@ -55,7 +55,7 @@ defmodule Screens.LocationContext do
              {:ok, routes_at_stops} <- routes_with_active(stop_ids, alert_route_types, now),
              route_ids_at_stop = Enum.map(routes_at_stops, & &1.route_id),
              {:ok, tagged_stop_sequences} <-
-               fetch_tagged_stop_sequences_by_app(app, stop_ids, route_ids_at_stop) do
+               fetch_tagged_stop_sequences(app, stop_ids, route_ids_at_stop, alert_route_types) do
           stop_sequences = untag_stop_sequences(tagged_stop_sequences)
 
           {
@@ -140,18 +140,14 @@ defmodule Screens.LocationContext do
     end
   end
 
-  defp fetch_tagged_stop_sequences_by_app(app, stop_ids, _route_ids)
+  defp fetch_tagged_stop_sequences(app, stop_ids, _route_ids, _route_types)
        when app in [BusEink, BusShelter, GlEink] do
     fetch_tagged_stop_sequences_through_stops(stop_ids)
   end
 
-  defp fetch_tagged_stop_sequences_by_app(Dup, stop_ids, route_ids) do
-    fetch_tagged_parent_station_sequences_through_stops(stop_ids, route_ids)
-  end
-
-  defp fetch_tagged_stop_sequences_by_app(PreFare, stop_ids, route_ids) do
-    # We limit results to canonical route patterns only--no stop sequences for nonstandard patterns.
-    fetch_tagged_parent_station_sequences_through_stops(stop_ids, route_ids, true)
+  defp fetch_tagged_stop_sequences(app, stop_ids, route_ids, route_types)
+       when app in [Dup, PreFare] do
+    fetch_tagged_parent_station_sequences_through_stops(stop_ids, route_ids, route_types)
   end
 
   # Returns a map from route ID to a list of stop sequences of that route, for all routes serving
@@ -165,20 +161,26 @@ defmodule Screens.LocationContext do
     end
   end
 
+  @route_types_with_canonical_patterns ~w[light_rail subway rail]a
+
   # Returns a map from route ID to a list of stop sequences of that route. Stop sequences are
   # described in terms of parent station IDs, not platform IDs.
   #
   # If no parent station data exists, platform ID is returned instead. Only stop sequences for
   # direction ID 0 are returned. Assumes that all stop sequences in result are platforms.
-  @spec fetch_tagged_parent_station_sequences_through_stops([Stop.id()], [Route.id()], boolean()) ::
-          {:ok, %{Route.id() => [[Stop.id()]]}} | :error
-  defp fetch_tagged_parent_station_sequences_through_stops(
-         stop_ids,
-         route_ids,
-         canonical? \\ false
-       ) do
+  @spec fetch_tagged_parent_station_sequences_through_stops(
+          [Stop.id()],
+          [Route.id()],
+          [RouteType.t()]
+        ) :: {:ok, %{Route.id() => [[Stop.id()]]}} | :error
+  defp fetch_tagged_parent_station_sequences_through_stops(stop_ids, route_ids, route_types) do
     params = %{stop_ids: stop_ids, route_ids: route_ids}
-    params = if(canonical?, do: Map.put(params, :canonical?, true), else: params)
+
+    # Some route types don't have any canonical patterns defined; in that case, use most typical
+    params =
+      if Enum.all?(route_types, &(&1 in @route_types_with_canonical_patterns)),
+        do: Map.put(params, :canonical?, true),
+        else: Map.put(params, :typicality, 1)
 
     case RoutePattern.fetch(params) do
       {:ok, []} -> :error
