@@ -196,7 +196,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     cond do
       # All routes in the section are disabled, so no departures are expected.
       # In this case, the alerts widget will display info on the closure, so we return an empty section.
-      departures == [] and
+      departures == [] and headway_mode == :inactive and
           section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
         %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
 
