@@ -191,28 +191,47 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         )
       end
 
-    use_headway_for_alert = use_headway_for_alert?(alert_informed_entities, stop_ids)
+    route = hd(routes)
 
-    overnight_period =
-      departures == [] and
-        !section_contains_active_route and
-        overnight_schedules_for_section != []
+    alert_headsign =
+      headsign_for_alert(alert_informed_entities, stop_ids)
 
     headway_time_range = headway_time_range(stop_ids, routes, now)
 
+    overnight_period =
+      !section_contains_active_route and
+        overnight_schedules_for_section != []
+
     cond do
-      # All routes in the section are disabled, so no departures are expected.
+      # Normal departures mode
+      departures != [] ->
+        # Add overnight departures to the end.
+        # This allows overnight departures to appear as we start to run out of predictions to show.
+        visible_departures =
+          Enum.take(departures ++ overnight_schedules_for_section, max_visible_departures)
+
+        # DUPs don't support Layout or Header for now
+        %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
+
+      # If we have no departures, go through the other options
+
+      # In cases of temporary terminals, we want to show headways with directional headsigns
+      alert_headsign && headway_time_range ->
+        %HeadwaySection{
+          route: get_section_route_from_entities(stop_ids, alert_informed_entities),
+          time_range: headway_time_range,
+          headsign: alert_headsign
+        }
+
+      # If we're not showing a headway for alerts, and all routes in the section are disabled, so no departures are expected.
       # In this case, the alerts widget will display info on the closure, so we return an empty section.
-      departures == [] and headway_mode == :inactive and
+      !(alert_headsign && headway_time_range) &&
           section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
         %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
 
-      # Headway mode
-      use_headway_for_alert or
-          (headway_time_range != nil and departures == [] and alert_informed_entities == [] and
-             !overnight_period) ->
-        route = hd(routes)
-
+      # If no departures, no alerts, and not in the overnight period, we show Headways
+      headway_time_range &&
+          (alert_informed_entities == [] && !overnight_period) ->
         %HeadwaySection{
           route: route,
           time_range: headway_time_range,
@@ -223,21 +242,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       # Show a takeover Overnight section for the given route types
       overnight_period ->
         # Temporarily return a no data section here b/c of an edge case with prediction suppression
-        %NoDataSection{route: hd(routes)}
+        %NoDataSection{route: route}
 
       # No departures to show and no headway mode
-      departures == [] ->
-        %NoDataSection{route: hd(routes)}
-
-      # Normal departures mode
       true ->
-        # Add overnight departures to the end.
-        # This allows overnight departures to appear as we start to run out of predictions to show.
-        visible_departures =
-          Enum.take(departures ++ overnight_schedules_for_section, max_visible_departures)
-
-        # DUPs don't support Layout or Header for now
-        %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
+        %NoDataSection{route: route}
     end
   end
 
@@ -410,6 +419,23 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     # if there are two alerts that could be in different directions.
     |> Enum.reduce([], fn alert, acc -> acc ++ alert.informed_entities end)
     |> Enum.uniq()
+  end
+
+  defp headsign_for_alert([], _), do: nil
+
+  defp headsign_for_alert(informed_entities, stop_ids) do
+    # Use all informed_entities from relevant alerts to decide whether there's
+    # any reason to go into headway mode.
+    # For example, a NB suspension and SB shuttle from Aquarium shouldn't use headway mode
+    # but if all the WB branches are shuttling at Kenmore, there should be a headway
+    interpreted_alert = interpret_entities(informed_entities, stop_ids)
+
+    if temporary_terminal?(interpreted_alert) and
+         not (branch_station?(stop_ids) and branch_alert?(interpreted_alert)) do
+      interpreted_alert.headsign
+    else
+      nil
+    end
   end
 
   # NB: There aren't currently any DUPs at permanent terminals, so we assume all
@@ -714,17 +740,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp to_log(map) do
     Enum.map_join(map, " ", fn {k, v} -> "#{k}=#{v}" end)
-  end
-
-  defp use_headway_for_alert?(informed_entities, stop_ids) do
-    # Use all informed_entities from relevant alerts to decide whether there's
-    # any reason to go into headway mode.
-    # For example, a NB suspension and SB shuttle from Aquarium shouldn't use headway mode
-    # but if all the WB branches are shuttling at Kenmore, there should be a headway
-    interpreted_alert = interpret_entities(informed_entities, stop_ids)
-
-    temporary_terminal?(interpreted_alert) and
-      not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
   end
 
   defp headway_time_range(stop_ids, routes, now) do
