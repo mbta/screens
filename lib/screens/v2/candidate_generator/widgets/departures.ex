@@ -160,11 +160,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   defp normal_section_rows({:ok, departures}), do: departures
 
-  defp normal_section_rows({:no_data, route, :both}) do
-    [%FreeTextLine{icon: Route.icon(route), text: [no_departures_message()]}]
-  end
-
-  defp normal_section_rows({:no_data, route, direction_id}) do
+  defp normal_section_rows({:no_data, route, direction_id}) when direction_id in [0, 1] do
     [
       %FreeTextLine{
         icon: Route.icon(route),
@@ -176,6 +172,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         ]
       }
     ]
+  end
+
+  defp normal_section_rows({:no_data, route, _both}) do
+    [%FreeTextLine{icon: Route.icon(route), text: [no_departures_message()]}]
   end
 
   defp normal_section_rows(:no_data) do
