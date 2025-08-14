@@ -97,6 +97,26 @@
         "range_high": 11,
         "range_low": 9
       }
+    },
+    "silver_seaport": {
+      "off_peak": {
+        "range_high": 3,
+        "range_low": 1
+      },
+      "peak": {
+        "range_high": 4,
+        "range_low": 2
+      }
+    },
+    "silver_chelsea": {
+      "off_peak": {
+        "range_high": 9,
+        "range_low": 7
+      },
+      "peak": {
+        "range_high": 10,
+        "range_low": 8
+      }
     }
   }
 }
