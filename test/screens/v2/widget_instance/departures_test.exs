@@ -188,11 +188,26 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %HeadwaySection{route: "Red", time_range: {1, 2}, headsign: "Test"}
+      section = %HeadwaySection{route: "Red", time_range: {1, 2}, headsign: nil}
 
       expected_text = %{
         icon: :red,
         text: ["every", %{format: :bold, text: "1-2"}, "minutes"]
+      }
+
+      assert %{type: :headway_section, text: expected_text, layout: :row} ==
+               Departures.serialize_section(section, dup_screen, now, false)
+    end
+
+    test "returns serialized headway_section for multiple configured sections with headsign", %{
+      dup_screen: dup_screen,
+      now: now
+    } do
+      section = %HeadwaySection{route: "Red", time_range: {12, 15}, headsign: "Alewife"}
+
+      expected_text = %{
+        icon: :red,
+        text: [%{format: :bold, text: "Alewife"}, %{format: :small, text: "every 12-15m"}]
       }
 
       assert %{type: :headway_section, text: expected_text, layout: :row} ==
