@@ -473,10 +473,6 @@ config :screens, :screens_by_alert,
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
 
-config :screens, Screens.LastTrip,
-  trip_updates_adapter: Screens.LastTrip.TripUpdates.GTFS,
-  vehicle_positions_adapter: Screens.LastTrip.VehiclePositions.GTFS
-
 # Memory limits for V3 API response caches are based on ETS table memory usage measurements in a
 # deployed environment. To avoid thrashing and overloading the HTTP connection pool, these can and
 # should be tweaked as the V3 API usage patterns and requirements of the app change over time.
