@@ -535,7 +535,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       |> Enum.uniq()
       |> Enum.reject(&(&1 in routes_with_live_departures))
       |> Enum.map(fn {route_id, direction_id} ->
-        # This variable will be used when now is after 3am.
+        # This variable will be used when now is after the start-of-service time.
         first_schedule_today =
           Enum.find(
             today_schedules,
@@ -662,17 +662,17 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
         nil
 
-      # Before 3am and between the `departure_time` for today's last schedule and tomorrow's first schedule
+      # Before 4am and between the `departure_time` for today's last schedule and tomorrow's first schedule
       DateTime.compare(now, last_schedule_today.departure_time) == :gt and
           DateTime.compare(now, first_schedule_tomorrow.departure_time) == :lt ->
         %Departure{schedule: first_schedule_tomorrow}
 
-      # After 3am but before the first scheduled trip of the day.
+      # After 4am but before the first scheduled trip of the day.
       not is_nil(first_schedule_today) and
           DateTime.compare(now, first_schedule_today.departure_time) == :lt ->
         %Departure{schedule: first_schedule_today}
 
-      # Before 3am and before the last scheduled trip of the day.
+      # Before 4am and before the last scheduled trip of the day.
       # Return an atom so we can track that there is still a departure for this route during today's service.
       DateTime.compare(now, last_schedule_today.departure_time) == :lt ->
         :route_service_ongoing

@@ -567,8 +567,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         alerts = [
           build_facility_alert("111", "place-test",
             active_period: [
-              {dt(~D[2025-01-05], ~T[03:00:00]), dt(~D[2025-01-07], ~T[02:59:00])},
-              {dt(~D[2025-02-01], ~T[03:00:00]), dt(~D[2025-02-02], ~T[02:59:00])}
+              {dt(~D[2025-01-05], ~T[04:00:00]), dt(~D[2025-01-07], ~T[03:59:59])},
+              {dt(~D[2025-02-01], ~T[04:00:00]), dt(~D[2025-02-02], ~T[03:59:59])}
             ]
           )
         ]
