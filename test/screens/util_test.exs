@@ -103,18 +103,18 @@ defmodule Screens.UtilTest do
   end
 
   describe "service_date/1" do
-    test "returns the current date if after 3am" do
+    test "returns the current date if after 4am" do
       now_eastern = DateTime.new!(~D[2022-01-01], ~T[09:00:00], "America/New_York")
       now = DateTime.shift_zone!(now_eastern, "Etc/UTC")
-      expected = ~D[2022-01-01]
-      assert(expected == service_date(now))
+
+      assert ~D[2022-01-01] == service_date(now)
     end
 
-    test "returns the yesterday's date if between 12am and 3am" do
-      now_eastern = DateTime.new!(~D[2022-01-01], ~T[00:00:00], "America/New_York")
+    test "returns yesterday's date if between 12am and 4am" do
+      now_eastern = DateTime.new!(~D[2022-01-01], ~T[03:00:00], "America/New_York")
       now = DateTime.shift_zone!(now_eastern, "Etc/UTC")
-      expected = ~D[2021-12-31]
-      assert expected == service_date(now)
+
+      assert ~D[2021-12-31] == service_date(now)
     end
   end
 end

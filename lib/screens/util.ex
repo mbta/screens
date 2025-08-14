@@ -166,13 +166,13 @@ defmodule Screens.Util do
   @doc """
   Determines the MBTA service date at a given moment in time.
 
-  The boundary between service dates is 3:00am local time. In the period between midnight and
-  3:00am, the calendar date is one day ahead of the service date.
+  The boundary between service dates is 4:00am local time. In the period between midnight and
+  4:00am, the calendar date is one day ahead of the service date.
   """
   @spec service_date(DateTime.t()) :: Date.t()
   def service_date(datetime) do
     dt = to_eastern(datetime)
-    if dt.hour >= 3, do: DateTime.to_date(dt), else: Date.add(dt, -1)
+    if dt.hour >= 4, do: DateTime.to_date(dt), else: Date.add(dt, -1)
   end
 
   @doc """
