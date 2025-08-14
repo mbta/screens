@@ -163,7 +163,3 @@ config :screens, :screens_by_alert,
   screens_by_alert_ttl_seconds: 2,
   screens_last_updated_ttl_seconds: 2,
   screens_ttl_seconds: 1
-
-config :screens, Screens.LastTrip,
-  trip_updates_adapter: Screens.LastTrip.TripUpdates.Noop,
-  vehicle_positions_adapter: Screens.LastTrip.VehiclePositions.Noop

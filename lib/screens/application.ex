@@ -27,7 +27,6 @@ defmodule Screens.Application do
       {Task.Supervisor, name: Screens.V2.ScreenData.ParallelRunSupervisor},
       {Task.Supervisor, name: Screens.DeviceMonitor.Supervisor},
       Screens.DeviceMonitor,
-      Screens.LastTrip,
       Screens.Telemetry,
       {Phoenix.PubSub, name: ScreensWeb.PubSub},
       ScreensWeb.Endpoint,
