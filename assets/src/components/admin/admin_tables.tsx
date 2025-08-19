@@ -368,14 +368,6 @@ const PreFareV2ScreensTable = (): JSX.Element => {
       disableFilters: true,
       FormCell: FormTextarea,
     },
-    {
-      Header: "Commuter Rail",
-      accessor: buildAppParamAccessor("cr_departures"),
-      mutator: buildAppParamMutator("cr_departures"),
-      Cell: EditableTextarea,
-      disableFilters: true,
-      FormCell: FormTextarea,
-    },
     departuresColumn,
   ];
 

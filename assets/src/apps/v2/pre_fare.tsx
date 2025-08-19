@@ -41,8 +41,6 @@ import ReconstructedAlert from "Components/v2/reconstructed_alert";
 import NoData from "Components/v2/pre_fare/no_data";
 import PageLoadNoData from "Components/v2/pre_fare/page_load_no_data";
 import ReconstructedTakeover from "Components/v2/reconstructed_takeover";
-import CRDepartures from "Components/v2/cr_departures/cr_departures";
-import OvernightCRDepartures from "Components/v2/cr_departures/overnight_cr_departures";
 import MultiScreenPage from "Components/v2/multi_screen_page";
 import SimulationScreenPage from "Components/v2/pre_fare/simulation_screen_page";
 import PreFareSingleScreenAlert from "Components/v2/pre_fare_single_screen_alert";
@@ -74,8 +72,6 @@ const TYPE_TO_COMPONENT = {
   reconstructed_large_alert: ReconstructedAlert,
   single_screen_alert: PreFareSingleScreenAlert,
   reconstructed_takeover: ReconstructedTakeover,
-  cr_departures: CRDepartures,
-  overnight_cr_departures: OvernightCRDepartures,
   departures: Departures,
 };
 

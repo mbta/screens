@@ -8,7 +8,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
-  alias ScreensConfig.{ContentSummary, CRDepartures, Departures, ElevatorStatus, Header, Screen}
+  alias ScreensConfig.{ContentSummary, Departures, ElevatorStatus, Header, Screen}
   alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Screen.PreFare
 
@@ -135,21 +135,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   defp put_is_priority(widget, is_priority) do
     %{widget | is_priority: is_priority}
-  end
-
-  defp put_pair_with_cr_widget(widget, pair_with_alert_widget) do
-    cr_departures =
-      struct(CRDepartures,
-        enabled: pair_with_alert_widget,
-        pair_with_alert_widget: pair_with_alert_widget
-      )
-
-    app_params = struct(PreFare, cr_departures: cr_departures)
-
-    %{
-      widget
-      | screen: %Screen{widget.screen | app_params: app_params}
-    }
   end
 
   defp put_partial_closure_platform_names(widget, partial_closure_platform_names) do
@@ -516,29 +501,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       assert_values(widget, {1, @dual_screen}, {1, @right_screen})
-    end
-
-    test "dual-screen reduces to single-screen when paired with CR widget", %{widget: widget} do
-      widget =
-        widget
-        |> put_home_stop(PreFare, "place-forhl")
-        |> put_informed_entities([ie(stop: "place-chncl"), ie(stop: "place-forhl")])
-        |> put_effect(:shuttle)
-        |> put_tagged_stop_sequences(%{
-          "Orange" => [
-            [
-              "place-ogmnl",
-              "place-dwnxg",
-              "place-chncl",
-              "place-forhl"
-            ]
-          ]
-        })
-        |> put_is_terminal_station(true)
-        |> put_is_priority(true)
-        |> put_pair_with_cr_widget(true)
-
-      assert_values(widget, {1, @left_screen}, {1, @right_screen})
     end
 
     test "severe delay", %{widget: widget} do
