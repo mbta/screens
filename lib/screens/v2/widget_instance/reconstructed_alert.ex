@@ -12,7 +12,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.{CRDepartures, Departures, FreeText, FreeTextLine, Screen}
+  alias ScreensConfig.{Departures, FreeText, FreeTextLine, Screen}
   alias ScreensConfig.Screen.PreFare
 
   defstruct screen: nil,
@@ -372,21 +372,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp get_cause(:unknown), do: nil
   defp get_cause(cause), do: cause
-
-  # Special case for CR Departures; only supported on duo screens.
-  defp placement(%__MODULE__{
-         is_priority: true,
-         screen: %Screen{
-           app_params: %PreFare{
-             cr_departures: %CRDepartures{
-               enabled: true,
-               pair_with_alert_widget: true
-             },
-             template: :duo
-           }
-         }
-       }),
-       do: :single_screen
 
   defp placement(
          %__MODULE__{

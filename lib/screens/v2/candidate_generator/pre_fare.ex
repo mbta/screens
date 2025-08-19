@@ -74,7 +74,6 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
         elevator_status_instance_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
         full_line_map_instances_fn \\ &Widgets.FullLineMap.full_line_map_instances/1,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
-        commuter_rail_departures_instance_fn \\ &Widgets.CRDepartures.departures_instances/2,
         departures_instances_fn \\ &Widgets.Departures.departures_instances/2
       ) do
     [
@@ -84,8 +83,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
       fn -> elevator_status_instance_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config) end,
       fn -> departures_instances_fn.(config, now) end,
-      fn -> full_line_map_instances_fn.(config) end,
-      fn -> commuter_rail_departures_instance_fn.(config, now) end
+      fn -> full_line_map_instances_fn.(config) end
     ]
     |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
