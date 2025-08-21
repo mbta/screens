@@ -1,0 +1,18 @@
+# Ensure compatibility with reasonably modern desktop browsers (viewing screens
+# in admin UI, Screenplay, etc.)
+defaults
+
+# Outfront DUPs
+Chrome 51
+
+# MIMO Elevator Tablets
+Chrome 83
+
+# GDS CIDs (current gen)
+Chrome >= 126
+
+# GDS CIDs (previous gen)
+Firefox 90
+
+# LG-MRI Bus Shelter CIDs
+Firefox >= 126
