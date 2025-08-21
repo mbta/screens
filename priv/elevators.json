@@ -329,6 +329,40 @@
       "743"
     ]
   },
+  "747": {
+    "exiting": "3B",
+    "entering": "3B",
+    "summary": "Exit at North Station. Request shuttle bus back to Winchester Center.",
+    "alternate_ids": []
+  },
+  "748": {
+    "exiting": "1",
+    "entering": "1",
+    "summary": "Alternative elevator available at station",
+    "alternate_ids": [
+      "749"
+    ]
+  },
+  "749": {
+    "exiting": "1",
+    "entering": "1",
+    "summary": "Alternative elevator available at station",
+    "alternate_ids": [
+      "748"
+    ]
+  },
+  "750": {
+    "exiting": "2",
+    "entering": "2",
+    "summary": "Accessible route available",
+    "alternate_ids": []
+  },
+  "751": {
+    "exiting": "2",
+    "entering": "2",
+    "summary": "Accessible route available",
+    "alternate_ids": []
+  },
   "756": {
     "exiting": "1",
     "entering": "1",
@@ -441,6 +475,18 @@
     "alternate_ids": [
       "770"
     ]
+  },
+  "778": {
+    "exiting": "?",
+    "entering": "?",
+    "summary": "Request assistance from conductor.",
+    "alternate_ids": []
+  },
+  "779": {
+    "exiting": "?",
+    "entering": "?",
+    "summary": "Request assistance from conductor.",
+    "alternate_ids": []
   },
   "780": {
     "exiting": "",
@@ -1800,7 +1846,7 @@
   "980": {
     "exiting": "3A",
     "entering": "3A",
-    "summary": "Exit at North Station Station. Take a Lechmere & North train back to Science Park/West End.",
+    "summary": "Exit at North Station. Take a Lechmere & North train back to Science Park/West End.",
     "alternate_ids": [
       "981"
     ]
