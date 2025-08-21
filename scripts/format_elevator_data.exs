@@ -13,39 +13,39 @@ Mix.install([{:jason, "~> 1.4"}, {:csv, "~> 3.2"}])
   System.argv()
   |> OptionParser.parse(strict: [path: :string])
 
-formatted_data =
-  path
-  |> File.stream!()
-  |> CSV.decode(headers: true)
-  |> Enum.map(fn
-    {:ok, %{"elevator_id" => ""}} ->
-      nil
+path
+|> File.stream!()
+|> CSV.decode(headers: true)
+|> Enum.map(fn
+  {:ok, %{"elevator_id" => ""}} ->
+    nil
 
-    {:ok,
-     %{
-       "elevator_id" => id,
-       "alternate_elevator_ids" => alternate,
-       "Entering System Categorization" => entering,
-       "Exiting System Categorization" => exiting,
-       "Short Text" => summary
-     }} ->
-      alternate_ids =
-        case String.split(alternate, ~r/(\s|,)+/) do
-          [""] -> []
-          ids -> ids
-        end
+  {:ok,
+   %{
+     "elevator_id" => id,
+     "alternate_elevator_ids" => alternate,
+     "Entering System Categorization" => entering,
+     "Exiting System Categorization" => exiting,
+     "Short Text" => summary
+   }} ->
+    alternate_ids =
+      case String.split(alternate, ~r/(\s|,)+/) do
+        [""] -> []
+        ids -> ids
+      end
 
-      {
-        id,
-        %{
-          alternate_ids: alternate_ids,
-          entering: entering |> String.split("-", parts: 2) |> hd() |> String.trim(),
-          exiting: exiting |> String.split("-", parts: 2) |> hd() |> String.trim(),
-          summary: summary
-        }
+    {
+      id,
+      %{
+        alternate_ids: alternate_ids,
+        entering: entering |> String.split("-", parts: 2) |> hd() |> String.trim(),
+        exiting: exiting |> String.split("-", parts: 2) |> hd() |> String.trim(),
+        summary: summary
       }
-  end)
-  |> Enum.reject(&is_nil/1)
-  |> Map.new()
-
-File.write("priv/elevators.json", Jason.encode!(formatted_data, pretty: true))
+    }
+end)
+|> Enum.reject(&is_nil/1)
+|> Enum.sort_by(&elem(&1, 0))
+|> Jason.OrderedObject.new()
+|> Jason.encode!(pretty: true)
+|> then(&File.write("priv/elevators.json", &1))
