@@ -99,7 +99,8 @@ defmodule Screens.V2.ScreenDataTest do
         receive do
           {:crash_running, pid} ->
             ref = Process.monitor(pid)
-            assert_receive({:DOWN, ^ref, :process, _pid, _reason})
+            # Wait a bit longer than the default 100ms to avoid occasional timeouts
+            assert_receive({:DOWN, ^ref, :process, _pid, _reason}, 200)
         end
       end)
     end
