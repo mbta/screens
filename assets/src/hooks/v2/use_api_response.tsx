@@ -192,6 +192,9 @@ const useBaseApiResponse = ({
         SentryLogger.info("Request failed.", { json });
         doFailureBuffer(lastSuccess, setApiResponse, response);
       } else {
+        if (!isSuccess(response)) {
+          SentryLogger.info("Non-success API response", { json });
+        }
         setApiResponse((prevApiResponse) => {
           if (!isSuccess(prevApiResponse)) {
             SentryLogger.info("Exiting no-data state.");
