@@ -191,38 +191,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         )
       end
 
-    headway_mode = get_headway_mode(stop_ids, routes, alert_informed_entities, now)
+    representative_route = hd(routes)
+
+    alert_headsign =
+      headsign_for_alert(alert_informed_entities, stop_ids)
+
+    headway_time_range = headway_time_range(stop_ids, routes, now)
+
+    in_overnight_period =
+      !section_contains_active_route and
+        overnight_schedules_for_section != []
 
     cond do
-      # All routes in the section are disabled, so no departures are expected.
-      # In this case, the alerts widget will display info on the closure, so we return an empty section.
-      departures == [] and headway_mode == :inactive and
-          section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
-        %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
-
-      # No remaining departures or active routes, but we do have routes with overnight schedules
-      # Show a takeover Overnight section for the given route types
-      departures == [] and !section_contains_active_route and
-          overnight_schedules_for_section != [] ->
-        # Temporarily return a no data section here b/c of an edge case with prediction suppression
-        %NoDataSection{route: hd(routes)}
-
-      # Headway mode
-      headway_mode != :inactive ->
-        {:active, time_range, headsign} = headway_mode
-
-        %HeadwaySection{
-          route: get_section_route_from_entities(stop_ids, alert_informed_entities),
-          time_range: time_range,
-          headsign: headsign
-        }
-
-      # No departures to show and no headway mode
-      departures == [] ->
-        %NoDataSection{route: hd(routes)}
-
       # Normal departures mode
-      true ->
+      departures != [] ->
         # Add overnight departures to the end.
         # This allows overnight departures to appear as we start to run out of predictions to show.
         visible_departures =
@@ -230,6 +212,45 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
         # DUPs don't support Layout or Header for now
         %NormalSection{rows: visible_departures, layout: %Layout{}, header: %Header{}}
+
+      # If we have no departures, go through the other options
+
+      # In cases of temporary terminals, we want to show headways with directional headsigns
+      alert_headsign && headway_time_range ->
+        %HeadwaySection{
+          route: get_section_route_from_entities(stop_ids, alert_informed_entities),
+          time_range: headway_time_range,
+          headsign:
+            if is_only_section do
+              alert_headsign
+            else
+              direction_name(representative_route, params.direction_id)
+            end
+        }
+
+      # If we're not showing a headway for alerts, and all routes in the section are disabled, so no departures are expected.
+      # In this case, the alerts widget will display info on the closure, so we return an empty section.
+      section_routes_disabled?(routes, params.direction_id, alert_informed_entities) ->
+        %NormalSection{rows: departures, layout: %Layout{}, header: %Header{}}
+
+      # If no departures, no alerts, and not in the overnight period, we show Headways
+      headway_time_range &&
+          (alert_informed_entities == [] && !in_overnight_period) ->
+        %HeadwaySection{
+          route: representative_route.id,
+          time_range: headway_time_range,
+          headsign: direction_name(representative_route, params.direction_id)
+        }
+
+      # No remaining departures or active routes, but we do have routes with overnight schedules
+      # Show a takeover Overnight section for the given route types
+      in_overnight_period ->
+        # Temporarily return a no data section here b/c of an edge case with prediction suppression
+        %NoDataSection{route: representative_route}
+
+      # No departures to show and no headway mode
+      true ->
+        %NoDataSection{route: representative_route}
     end
   end
 
@@ -404,31 +425,20 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     |> Enum.uniq()
   end
 
-  defp get_headway_mode(_, _, [], _), do: :inactive
+  defp headsign_for_alert([], _), do: nil
 
-  defp get_headway_mode(stop_ids, routes, informed_entities, current_time) do
+  defp headsign_for_alert(informed_entities, stop_ids) do
     # Use all informed_entities from relevant alerts to decide whether there's
-    # any reason to go into headway mode.
+    # a reason to go into headway mode for an alert
     # For example, a NB suspension and SB shuttle from Aquarium shouldn't use headway mode
-    # but if all the WB branches are shuttling at Kenmore, there should be a headway
+    # but if all the WB branches are shuttling at Kenmore, there should be a headway for the alert
     interpreted_alert = interpret_entities(informed_entities, stop_ids)
 
-    headway_mode? =
-      temporary_terminal?(interpreted_alert) and
-        not (branch_station?(stop_ids) and branch_alert?(interpreted_alert))
-
-    if headway_mode? do
-      all_headways =
-        for stop_id <- stop_ids, %{id: route_id} <- routes do
-          @headways.get_with_route(stop_id, route_id, current_time)
-        end
-
-      case Enum.uniq(all_headways) do
-        [{lo, hi}] -> {:active, {lo, hi}, interpreted_alert.headsign}
-        _ -> :inactive
-      end
+    if temporary_terminal?(interpreted_alert) and
+         not (branch_station?(stop_ids) and branch_alert?(interpreted_alert)) do
+      interpreted_alert.headsign
     else
-      :inactive
+      nil
     end
   end
 
@@ -734,5 +744,25 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp to_log(map) do
     Enum.map_join(map, " ", fn {k, v} -> "#{k}=#{v}" end)
+  end
+
+  defp headway_time_range(stop_ids, routes, now) do
+    all_headways =
+      for stop_id <- stop_ids, %{id: route_id} <- routes do
+        @headways.get_with_route(stop_id, route_id, now)
+      end
+
+    case Enum.uniq(all_headways) do
+      [{lo, hi}] -> {lo, hi}
+      _ -> nil
+    end
+  end
+
+  defp direction_name(_, :both), do: nil
+
+  defp direction_name(route, direction_id) do
+    route
+    |> Route.normalized_direction_names()
+    |> Enum.at(direction_id, nil)
   end
 end
