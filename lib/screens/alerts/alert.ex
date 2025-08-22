@@ -159,29 +159,27 @@ defmodule Screens.Alerts.Alert do
 
   @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
-    Screens.Telemetry.span([:screens, :alerts, :alert, :fetch], fn ->
-      includes =
-        if Keyword.get(opts, :include_all?, false),
-          do: @all_includes,
-          else: @base_includes
+    includes =
+      if Keyword.get(opts, :include_all?, false),
+        do: @all_includes,
+        else: @base_includes
 
-      params =
-        opts
-        |> Enum.flat_map(&format_query_param/1)
-        |> Map.new()
-        |> Map.put("include", Enum.join(includes, ","))
+    params =
+      opts
+      |> Enum.flat_map(&format_query_param/1)
+      |> Map.new()
+      |> Map.put("include", Enum.join(includes, ","))
 
-      case get_json_fn.("alerts", params) do
-        {:ok, response} ->
-          {:ok,
-           response
-           |> V3Api.Parser.parse()
-           |> normalize_informed_entities_for_direction_id()}
+    case get_json_fn.("alerts", params) do
+      {:ok, response} ->
+        {:ok,
+         response
+         |> V3Api.Parser.parse()
+         |> normalize_informed_entities_for_direction_id()}
 
-        _ ->
-          :error
-      end
-    end)
+      _ ->
+        :error
+    end
   end
 
   @doc """

@@ -11,31 +11,11 @@ defmodule Screens.Telemetry do
   @impl Supervisor
   def init(_) do
     handlers = [
-      # V3 API
-      log_span(~w[screens v3_api get_json]a, metadata: ~w[path query cache]a),
-      # Stops
-      log_span(~w[screens stops stop fetch_stop_name]a, metadata: ~w[stop_id]),
-      # Location Context
-      log_span(~w[screens location_context fetch]a, metadata: ~w[app stop_id]),
-      # Alerts
-      log_span(~w[screens alerts alert fetch]a),
-      # Routes
-      log_span(~w[screens routes route fetch_routes_by_stop]a,
-        metadata: ~w[stop_id type_filters]a
-      ),
-      # DUP Candidate Generator
-      log_span(~w[screens v2 candidate_generator dup]a),
-      log_span(~w[screens v2 candidate_generator dup departures_instances]a),
-      log_span(~w[screens v2 candidate_generator dup departures get_section_data]a),
-      log_span(~w[screens v2 candidate_generator dup departures get_sections_data]a),
-      log_span(~w[screens v2 candidate_generator dup header_instances]a),
-      log_span(~w[screens v2 candidate_generator dup alerts_instances]a),
-      log_span(~w[screens v2 candidate_generator dup evergreen_content_instances]a),
-      # New DUP Candidate Generator
-      log_span(~w[screens v2 candidate_generator dup_new]a),
-      log_span(~w[screens v2 candidate_generator dup_new departures_instances]a),
-      log_span(~w[screens v2 candidate_generator dup_new evergreen_instances]a),
-      log_span(~w[screens v2 candidate_generator dup_new header_instances]a),
+      # example span to avoid unused function warnings; nothing emits this
+      log_span(~w[screens example_event]a),
+
+      # enable V3 API span logging (WARNING: high log volume)
+      # log_span(~w[screens v3_api get_json]a, metadata: ~w[path query cache]a),
 
       # events
       log_event(~w[hackney_pool]a,
@@ -59,7 +39,8 @@ defmodule Screens.Telemetry do
         measurements: [
           {Screens.V3Api.Cache.Realtime, :dispatch_stats, []},
           {Screens.V3Api.Cache.Static, :dispatch_stats, []}
-        ]
+        ],
+        period: 10_000
       }
     ]
 

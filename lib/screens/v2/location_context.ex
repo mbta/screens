@@ -47,39 +47,33 @@ defmodule Screens.LocationContext do
   def fetch(BusEink = app, [_ | _] = stop_ids, now), do: do_fetch(app, stop_ids, now)
 
   defp do_fetch(app, stop_ids, now) do
-    Screens.Telemetry.span(
-      ~w[screens location_context fetch]a,
-      %{app: app, stop_ids: stop_ids},
-      fn ->
-        with alert_route_types <- route_type_filter(app, stop_ids),
-             {:ok, routes_at_stops} <- routes_with_active(stop_ids, alert_route_types, now),
-             route_ids_at_stop = Enum.map(routes_at_stops, & &1.route_id),
-             {:ok, tagged_stop_sequences} <-
-               fetch_tagged_stop_sequences(app, stop_ids, route_ids_at_stop, alert_route_types) do
-          stop_sequences = untag_stop_sequences(tagged_stop_sequences)
+    with alert_route_types <- route_type_filter(app, stop_ids),
+         {:ok, routes_at_stops} <- routes_with_active(stop_ids, alert_route_types, now),
+         route_ids_at_stop = Enum.map(routes_at_stops, & &1.route_id),
+         {:ok, tagged_stop_sequences} <-
+           fetch_tagged_stop_sequences(app, stop_ids, route_ids_at_stop, alert_route_types) do
+      stop_sequences = untag_stop_sequences(tagged_stop_sequences)
 
-          {
-            :ok,
-            %__MODULE__{
-              home_stop:
-                case stop_ids do
-                  [single] -> single
-                  _multiple -> nil
-                end,
-              tagged_stop_sequences: tagged_stop_sequences,
-              upstream_stops: upstream_stop_id_set(stop_ids, stop_sequences),
-              downstream_stops: downstream_stop_id_set(stop_ids, stop_sequences),
-              routes: routes_at_stops,
-              alert_route_types: alert_route_types
-            }
-          }
-        else
-          :error ->
-            Report.error("location_context_fetch_error", stop_ids: stop_ids)
-            :error
-        end
-      end
-    )
+      {
+        :ok,
+        %__MODULE__{
+          home_stop:
+            case stop_ids do
+              [single] -> single
+              _multiple -> nil
+            end,
+          tagged_stop_sequences: tagged_stop_sequences,
+          upstream_stops: upstream_stop_id_set(stop_ids, stop_sequences),
+          downstream_stops: downstream_stop_id_set(stop_ids, stop_sequences),
+          routes: routes_at_stops,
+          alert_route_types: alert_route_types
+        }
+      }
+    else
+      :error ->
+        Report.error("location_context_fetch_error", stop_ids: stop_ids)
+        :error
+    end
   end
 
   # NOTE: only public due to use in tests. Should be treated as private.
