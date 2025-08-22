@@ -83,12 +83,10 @@ defmodule Screens.Stops.Stop do
 
   @callback fetch_stop_name(id()) :: String.t() | nil
   def fetch_stop_name(stop_id) do
-    Screens.Telemetry.span(~w[screens stops stop fetch_stop_name]a, %{stop_id: stop_id}, fn ->
-      case fetch(%{ids: [stop_id]}) do
-        {:ok, [%__MODULE__{name: name}]} -> name
-        _ -> nil
-      end
-    end)
+    case fetch(%{ids: [stop_id]}) do
+      {:ok, [%__MODULE__{name: name}]} -> name
+      _ -> nil
+    end
   end
 
   @spec fetch_subway_platforms_for_stop(id()) :: [t()]

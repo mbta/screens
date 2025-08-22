@@ -77,28 +77,16 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         departures_instances_fn \\ &DeparturesInstances.departures_instances/2,
         alerts_instances_fn \\ &AlertsInstances.alert_instances/2
       ) do
-    Screens.Telemetry.span([:screens, :v2, :candidate_generator, :dup], fn ->
-      ctx = Screens.Telemetry.context()
-
-      [
-        span_thunk(:header_instances, ctx, fn -> header_instances_fn.(config, now) end),
-        span_thunk(:alerts_instances, ctx, fn -> alerts_instances_fn.(config, now) end),
-        span_thunk(:departures_instances, ctx, fn -> departures_instances_fn.(config, now) end),
-        span_thunk(:evergreen_content_instances, ctx, fn ->
-          evergreen_content_instances_fn.(config, now)
-        end)
-      ]
-      |> Task.async_stream(& &1.(), timeout: 30_000)
-      |> Enum.flat_map(fn {:ok, instances} -> instances end)
-    end)
+    [
+      fn -> header_instances_fn.(config, now) end,
+      fn -> alerts_instances_fn.(config, now) end,
+      fn -> departures_instances_fn.(config, now) end,
+      fn -> evergreen_content_instances_fn.(config, now) end
+    ]
+    |> Task.async_stream(& &1.(), timeout: 30_000)
+    |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
   @impl CandidateGenerator
   def audio_only_instances(_widgets, _config), do: []
-
-  defp span_thunk(name, meta, fun) when is_atom(name) and is_function(fun, 0) do
-    fn ->
-      Screens.Telemetry.span([:screens, :v2, :candidate_generator, :dup, name], meta, fun)
-    end
-  end
 end
