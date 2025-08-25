@@ -1,5 +1,5 @@
 @use "CSS/colors";
-@use "css/lcd_free_text" as freeText;
+@use "CSS/lcd_free_text" as freeText;
 
 .free-text__element {
   &:not(:last-child)::after {
