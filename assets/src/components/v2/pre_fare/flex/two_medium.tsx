@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -7,7 +6,7 @@ interface Props {
   medium_right: WidgetData;
 }
 
-const TwoMedium: React.ComponentType<Props> = ({
+const TwoMedium: ComponentType<Props> = ({
   medium_left: mediumLeft,
   medium_right: mediumRight,
 }) => {

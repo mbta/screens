@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -7,7 +6,7 @@ interface Props {
   full_body_bottom_screen: WidgetData;
 }
 
-const TakeoverBody: React.ComponentType<Props> = ({
+const TakeoverBody: ComponentType<Props> = ({
   full_body_top_screen: fullBodyTopScreen,
   full_body_bottom_screen: fullBodyBottomScreen,
 }) => {

@@ -1,6 +1,6 @@
 import useTextResizer from "Hooks/v2/use_text_resizer";
 import moment from "moment";
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import { classWithModifier, imagePath } from "Util/utils";
 import FlexZonePageIndicator from "./flex/page_indicator";
 import makePersistentCarousel, {

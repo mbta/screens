@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -7,7 +6,7 @@ interface Props {
   main_content: WidgetData;
 }
 
-const NormalScreen: React.ComponentType<Props> = ({
+const NormalScreen: ComponentType<Props> = ({
   header: header,
   main_content: mainContent,
 }) => {

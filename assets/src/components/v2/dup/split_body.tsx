@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -9,7 +8,7 @@ interface Props {
   rotation: string;
 }
 
-const SplitBody: React.ComponentType<Props> = ({
+const SplitBody: ComponentType<Props> = ({
   main_content_reduced: mainContentReduced,
   bottom_pane: bottomPane,
 }) => {

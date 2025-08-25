@@ -1,4 +1,5 @@
-import React, {
+import {
+  type CSSProperties,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -83,7 +84,7 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
         style={
           {
             "--later-departures-offset": currentDepartureIdx,
-          } as React.CSSProperties
+          } as CSSProperties
         }
       >
         {departures.map((departure) => (

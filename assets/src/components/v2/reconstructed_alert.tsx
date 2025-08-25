@@ -1,13 +1,13 @@
-import React, { ComponentType } from "react";
-import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
+import type { ComponentType, ReactNode } from "react";
 
+import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
 import { ReconAlertProps } from "./reconstructed_takeover";
 import useTextResizer from "Hooks/v2/use_text_resizer";
 
 interface AlertCardProps {
   urgent: boolean;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 // Corresponds to cases where on the server this widget is generated with an

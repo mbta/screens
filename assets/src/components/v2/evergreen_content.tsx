@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 import LoopingVideoPlayer from "Components/v2/looping_video_player";
 

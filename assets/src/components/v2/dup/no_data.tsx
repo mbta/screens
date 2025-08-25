@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import NormalHeader from "./normal_header";
 import DeparturesNoData from "./departures_no_data";
 import { useStationName } from "Hooks/outfront";

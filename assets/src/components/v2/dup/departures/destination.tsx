@@ -1,4 +1,4 @@
-import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
+import { type ComponentType, useLayoutEffect, useRef, useState } from "react";
 
 import type DestinationBase from "Components/v2/departures/destination";
 

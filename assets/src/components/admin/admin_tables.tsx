@@ -1,5 +1,3 @@
-import React from "react";
-
 import AdminTable from "Components/admin/admin_table";
 
 import {

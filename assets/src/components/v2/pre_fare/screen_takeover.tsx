@@ -1,12 +1,11 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
   full_duo_screen: WidgetData;
 }
 
-const ScreenTakeover: React.ComponentType<Props> = ({
+const ScreenTakeover: ComponentType<Props> = ({
   full_duo_screen: fullDuoScreen,
 }) => {
   return (

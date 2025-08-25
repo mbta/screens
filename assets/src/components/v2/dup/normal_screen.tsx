@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -8,7 +7,7 @@ interface Props {
   rotation_two: WidgetData;
 }
 
-const NormalScreen: React.ComponentType<Props> = ({
+const NormalScreen: ComponentType<Props> = ({
   rotation_zero: rotationZero,
   rotation_one: rotationOne,
   rotation_two: rotationTwo,
@@ -22,7 +21,7 @@ const NormalScreen: React.ComponentType<Props> = ({
   );
 };
 
-export const NormalSimulation: React.ComponentType<Props> = ({
+export const NormalSimulation: ComponentType<Props> = ({
   rotation_zero: rotationZero,
   rotation_one: rotationOne,
   rotation_two: rotationTwo,

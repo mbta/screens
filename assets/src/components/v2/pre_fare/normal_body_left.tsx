@@ -1,12 +1,11 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
   main_content_left: WidgetData;
 }
 
-const NormalBodyLeft: React.ComponentType<Props> = ({
+const NormalBodyLeft: ComponentType<Props> = ({
   main_content_left: mainContentLeft,
 }) => {
   return (

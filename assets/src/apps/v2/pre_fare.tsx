@@ -6,7 +6,6 @@ initFullstory();
 
 import "../../../css/pre_fare_v2.scss";
 
-import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";

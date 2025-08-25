@@ -1,4 +1,4 @@
-import React, { ComponentType, useState } from "react";
+import { type ComponentType, useState } from "react";
 
 interface WrappedComponentProps {
   updateVisibleData: () => void;

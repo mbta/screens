@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 import FlexZonePageIndicator from "Components/v2/flex/page_indicator";
 
@@ -9,7 +8,7 @@ interface Props {
   num_pages: number;
 }
 
-const OneMedium: React.ComponentType<Props> = ({
+const OneMedium: ComponentType<Props> = ({
   medium,
   num_pages: numPages,
   page_index: pageIndex,

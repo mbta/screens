@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import LinkArrow from "../bundled_svg/link_arrow";
 import Loading from "Images/loading.svg";
 import NormalHeader from "./normal_header";

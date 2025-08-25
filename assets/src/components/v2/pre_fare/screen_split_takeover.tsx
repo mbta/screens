@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -7,7 +6,7 @@ interface Props {
   full_right_screen: WidgetData;
 }
 
-const ScreenSplitTakeover: React.ComponentType<Props> = ({
+const ScreenSplitTakeover: ComponentType<Props> = ({
   full_left_screen: fullLeftScreen,
   full_right_screen: fullRightScreen,
 }) => {

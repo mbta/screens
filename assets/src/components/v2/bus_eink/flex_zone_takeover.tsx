@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -8,7 +7,7 @@ interface Props {
   footer: WidgetData;
 }
 
-const FlexZoneTakeoverBody: React.ComponentType<Props> = ({
+const FlexZoneTakeoverBody: ComponentType<Props> = ({
   footer,
   main_content: mainContent,
   flex_zone_takeover: flexZoneTakeover,

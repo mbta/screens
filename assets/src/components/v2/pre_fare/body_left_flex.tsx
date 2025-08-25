@@ -1,12 +1,11 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
   paged_main_content_left: WidgetData;
 }
 
-const BodyLeftFlex: React.ComponentType<Props> = ({
+const BodyLeftFlex: ComponentType<Props> = ({
   paged_main_content_left: pagedMainContentLeft,
 }) => {
   return (

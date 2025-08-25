@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import HandWithPhone from "Images/hand-with-phone.svg";
 
 const BottomScreenFiller: ComponentType = () => (

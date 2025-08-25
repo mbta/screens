@@ -1,6 +1,13 @@
+import {
+  type Dispatch,
+  type SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+
 import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
-import React, { useEffect, useMemo, useState } from "react";
 import { getDatasetValue } from "Util/dataset";
 import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
 import { isDup } from "Util/outfront";
@@ -82,7 +89,7 @@ const parseSimulationResponse = ({
 
 const doFailureBuffer = (
   lastSuccess: number | null,
-  setApiResponse: React.Dispatch<React.SetStateAction<ApiResponse>>,
+  setApiResponse: Dispatch<SetStateAction<ApiResponse>>,
   apiResponse: ApiResponse = FAILURE_RESPONSE,
 ) => {
   if (lastSuccess == null) {
