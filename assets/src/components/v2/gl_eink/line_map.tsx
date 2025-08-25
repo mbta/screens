@@ -1,4 +1,4 @@
-import React from "react";
+import { Fragment } from "react";
 
 import { classWithModifier } from "Util/utils";
 
@@ -204,10 +204,10 @@ const BaseMapStops = ({ stops }) => {
         }
 
         return (
-          <React.Fragment key={i}>
+          <Fragment key={i}>
             {stopIcon}
             {stopLabel}
-          </React.Fragment>
+          </Fragment>
         );
       })}
     </>

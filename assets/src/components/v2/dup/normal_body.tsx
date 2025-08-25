@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -8,9 +7,7 @@ interface Props {
   rotation: string;
 }
 
-const NormalBody: React.ComponentType<Props> = ({
-  main_content: mainContent,
-}) => {
+const NormalBody: ComponentType<Props> = ({ main_content: mainContent }) => {
   return (
     <div className="body-normal">
       <div className="widget-slot body-normal__main-content">

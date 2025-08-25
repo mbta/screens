@@ -1,8 +1,8 @@
 import _ from "lodash";
-import React from "react";
+import type { ElementType } from "react";
 
 export const splitRotationFromPropNames = (
-  WrappedComponent: React.ElementType,
+  WrappedComponent: ElementType,
   rotation: string,
 ) => {
   return (props: any) => {

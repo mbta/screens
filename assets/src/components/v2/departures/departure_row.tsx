@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 import RoutePill, { Pill } from "./route_pill";
 import Destination from "./destination";

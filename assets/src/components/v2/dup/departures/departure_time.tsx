@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 
 import type DepartureTimeBase from "Components/v2/departures/departure_time";

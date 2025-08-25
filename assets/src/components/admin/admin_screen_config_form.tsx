@@ -1,4 +1,3 @@
-import React from "react";
 import _ from "lodash";
 
 import AdminForm from "Components/admin/admin_form";

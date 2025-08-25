@@ -1,5 +1,4 @@
 import { getDatasetValue } from "Util/dataset";
-import React from "react";
 import Widget from "./widget";
 
 const WidgetPage = () => {

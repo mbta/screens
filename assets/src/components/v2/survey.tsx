@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import EvergreenContent from "Components/v2/evergreen_content";
 
 interface Props {

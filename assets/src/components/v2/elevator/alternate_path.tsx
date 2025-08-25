@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import cx from "classnames";
 import Arrow, { Direction, LineWeight } from "Components/v2/arrow";
 import makePersistent, {

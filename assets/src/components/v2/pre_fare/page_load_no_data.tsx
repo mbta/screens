@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import LcdPageLoadNoData from "Components/v2/lcd/page_load_no_data";
 
 const PageLoadNoData: ComponentType = () => {

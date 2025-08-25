@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import { classWithModifiers, imagePath } from "Util/utils";
 import DisruptionDiagram, {
   DisruptionDiagramData,
@@ -18,7 +17,7 @@ interface ReconAlertProps {
   urgent: boolean;
 }
 
-const ReconstructedTakeover: React.ComponentType<ReconAlertProps> = (alert) => {
+const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
   const {
     cause,
     effect,

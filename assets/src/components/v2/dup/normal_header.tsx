@@ -1,5 +1,3 @@
-import React from "react";
-
 import DefaultNormalHeader, { Icon } from "Components/v2/normal_header";
 import { DUP_VERSION } from "./version";
 import { usePlayerName } from "Hooks/outfront";

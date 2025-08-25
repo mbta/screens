@@ -1,6 +1,6 @@
 import "../../css/admin.scss";
 
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import ReactDOM from "react-dom";
 import {
   BrowserRouter as Router,

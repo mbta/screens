@@ -1,7 +1,7 @@
 import makePersistentCarousel, {
   PageRendererProps,
 } from "Components/v2/persistent_carousel";
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 interface Page {
   asset_url: string;

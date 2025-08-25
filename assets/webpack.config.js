@@ -59,7 +59,8 @@ module.exports = (env, argv) => {
                     corejs: require("core-js/package.json").version,
                   },
                 ],
-                "@babel/preset-react",
+                // "automatic" will be the default in Babel 8
+                ["@babel/preset-react", { runtime: "automatic" }],
                 "@babel/preset-typescript",
               ],
             },

@@ -1,4 +1,4 @@
-import React, {
+import {
   type ComponentType,
   type RefObject,
   useEffect,

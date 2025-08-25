@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 const abbreviate = (headsign: string): string => {
   if (headsign === "Government Center") return "Government Ctr";

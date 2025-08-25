@@ -1,5 +1,3 @@
-import React from "react";
-
 import DefaultNormalHeader from "Components/v2/normal_header";
 import { getScreenSide } from "Util/utils";
 

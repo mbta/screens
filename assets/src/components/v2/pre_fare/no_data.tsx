@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import LcdNoData from "Components/v2/lcd/no_data";
 
 interface Props {

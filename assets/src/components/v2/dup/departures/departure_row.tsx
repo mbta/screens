@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 import type DepartureRowBase from "Components/v2/departures/departure_row";
 import RoutePill from "Components/v2/departures/route_pill";

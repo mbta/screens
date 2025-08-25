@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import weakKey from "weak-key";
 
 import DepartureRow from "./departure_row";

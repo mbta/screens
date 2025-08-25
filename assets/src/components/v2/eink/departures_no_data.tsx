@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import NoConnection from "Images/live-data-none.svg";
 
 interface Props {

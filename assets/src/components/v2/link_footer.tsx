@@ -1,5 +1,3 @@
-import React from "react";
-
 import { imagePath } from "Util/utils";
 
 const LinkFooter = ({ text, url, logoPath }) => {

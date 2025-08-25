@@ -6,7 +6,6 @@ initFullstory();
 
 import "../../../css/elevator_v2.scss";
 
-import React from "react";
 import ReactDOM from "react-dom";
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import NormalScreen from "Components/v2/elevator/normal_screen";
