@@ -10,7 +10,7 @@ import weakKey from "weak-key";
 import NormalSection from "./departures/normal_section";
 import { Section, trimSections, toFoldedSection } from "./departures/section";
 
-import { warn } from "Util/sentry";
+import { report } from "Util/sentry";
 import { hasOverflowY } from "Util/utils";
 
 type Departures = {
@@ -36,7 +36,7 @@ const Departures: ComponentType<Departures> = ({ sections }) => {
       if (foldedSections != newSections) {
         setFoldedSections(newSections);
       } else {
-        warn("layout failed: departures will overflow");
+        report("warning", "layout failed: departures will overflow");
       }
     }
   }, [foldedSections]);

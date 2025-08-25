@@ -5,6 +5,7 @@ import {
   useMemo,
   useState,
 } from "react";
+import { captureException } from "@sentry/react";
 
 import { WidgetData } from "Components/v2/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
@@ -12,7 +13,7 @@ import { getDatasetValue } from "Util/dataset";
 import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
 import { isDup } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/utils";
-import * as SentryLogger from "Util/sentry";
+import { report } from "Util/sentry";
 import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
 import { DUP_VERSION } from "Components/v2/dup/version";
 import useRefreshRate from "./use_refresh_rate";
@@ -106,7 +107,7 @@ const doFailureBuffer = (
       // This will trigger until a success API response is received.
       setApiResponse((prevApiResponse) => {
         if (isSuccess(prevApiResponse)) {
-          SentryLogger.info("Entering no-data state.");
+          report("info", "Entering no-data state.");
         }
         return apiResponse;
       });
@@ -196,19 +197,19 @@ const useBaseApiResponse = ({
       const response = parseRawResponse(json);
 
       if (response.state == "failure") {
-        SentryLogger.info("Request failed.", { json });
+        report("info", "Request failed.", { json });
         doFailureBuffer(lastSuccess, setApiResponse, response);
       } else {
         setApiResponse((prevApiResponse) => {
           if (!isSuccess(prevApiResponse)) {
-            SentryLogger.info("Exiting no-data state.");
+            report("info", "Exiting no-data state.");
           }
           return response;
         });
         setLastSuccess(now);
       }
     } catch (err) {
-      SentryLogger.captureException(err);
+      captureException(err);
       doFailureBuffer(lastSuccess, setApiResponse);
     }
 
