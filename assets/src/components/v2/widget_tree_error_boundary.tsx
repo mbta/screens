@@ -1,5 +1,7 @@
 import { type ComponentType, Component, ErrorInfo, useContext } from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
+import { captureReactException } from "@sentry/react";
+
 import getCsrfToken from "Util/csrf";
 import { getDataset } from "Util/dataset";
 import { isRealScreen } from "Util/utils";
@@ -8,7 +10,6 @@ import {
   LastFetchContext,
 } from "Components/v2/screen_container";
 import Widget, { WidgetData } from "Components/v2/widget";
-import * as SentryLogger from "Util/sentry";
 
 // The component uses the `match` prop supplied by withRouter for error logging.
 interface Props extends RouteComponentProps<any> {
@@ -82,9 +83,7 @@ class WidgetTreeErrorBoundary extends Component<Props, State> {
       });
     } else {
       // Log directly to Sentry.
-      SentryLogger.captureException(error, {
-        extra: { componentStacktrace: errorInfo.componentStack },
-      });
+      captureReactException(error, errorInfo);
     }
   }
 
