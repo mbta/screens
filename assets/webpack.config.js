@@ -4,7 +4,7 @@
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
-const OptimizeCSSAssetsPlugin = require("optimize-css-assets-webpack-plugin");
+const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
 
@@ -40,13 +40,13 @@ module.exports = (env, argv) => {
       ? { packaged_dup_v2: "./src/apps/v2/dup.tsx" }
       : ENTRYPOINTS,
     optimization: {
-      minimizer: [new TerserPlugin(), new OptimizeCSSAssetsPlugin()],
+      minimizer: [new CssMinimizerPlugin(), new TerserPlugin()],
     },
     output: { filename: "js/[name].js", path: STATIC_PATH },
     module: {
       rules: [
         {
-          test: /\.ts(x?)$/,
+          test: /\.[jt]sx?$/,
           exclude: /node_modules/,
           use: {
             loader: "babel-loader",
@@ -85,19 +85,15 @@ module.exports = (env, argv) => {
         },
         {
           test: /\.(woff(2)?|ttf|eot)(\?v=\d+\.\d+\.\d+)?$/,
-          use: [
-            {
-              loader: "file-loader",
-              options: {
-                name: "[name].[ext]",
-                outputPath: "fonts/",
-                // The DUP app packaging process moves the bundled CSS up a
-                // directory level, which would break references to font files;
-                // this compensates for that. See also `utils.imagePath`.
-                publicPath: isOutfrontPackage ? "fonts/" : "../fonts/",
-              },
-            },
-          ],
+          type: "asset/resource",
+          generator: {
+            filename: "[base]",
+            outputPath: "fonts/",
+            // The DUP app packaging process moves the bundled CSS up a
+            // directory level, which would break references to font files;
+            // this compensates for that. See also `utils.imagePath`.
+            publicPath: isOutfrontPackage ? "fonts/" : "../fonts/",
+          },
         },
       ],
     },
