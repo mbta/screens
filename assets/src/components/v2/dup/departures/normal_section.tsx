@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 import { type NormalSection as Props } from "Components/v2/departures/normal_section";
 import DepartureRow from "./departure_row";

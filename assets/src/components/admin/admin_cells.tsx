@@ -1,4 +1,4 @@
-import React, { useRef, useMemo, useEffect } from "react";
+import { useRef, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import _ from "lodash";
 

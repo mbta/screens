@@ -32,6 +32,8 @@ export default [
       "no-empty": ["error", { allowEmptyCatch: true }],
       "react/display-name": "warn",
       "react/prop-types": "warn",
+      // not valid when using the "automatic" JSX transform
+      "react/react-in-jsx-scope": "off",
       "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [

@@ -1,4 +1,10 @@
-import React, { ComponentType, useLayoutEffect, useRef, useState } from "react";
+import {
+  type ComponentType,
+  type CSSProperties,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import cx from "classnames";
 import _ from "lodash";
 import RoutePill, {
@@ -314,7 +320,7 @@ const Closures = ({
 
   const listOffsetStyle = {
     "--closure-list-offset": listPageIndex,
-  } as React.CSSProperties;
+  } as CSSProperties;
 
   const numRowsOffPage = pageRowCounts
     .filter((_, index) => index != listPageIndex)

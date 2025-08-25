@@ -1,4 +1,3 @@
-import React from "react";
 import cx from "classnames";
 import Arrow45 from "Images/Arrow-45-no-padding.svg";
 

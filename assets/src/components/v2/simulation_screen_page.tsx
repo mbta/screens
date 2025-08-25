@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router-dom";
 import SimulationScreenContainer from "./simulation_screen_container";
 

@@ -1,5 +1,3 @@
-import React from "react";
-
 import { imagePath } from "Util/utils";
 import LinkFooter from "Components/v2/eink/link_footer";
 

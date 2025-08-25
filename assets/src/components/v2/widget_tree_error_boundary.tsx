@@ -1,4 +1,4 @@
-import React, { ErrorInfo, useContext } from "react";
+import { type ComponentType, Component, ErrorInfo, useContext } from "react";
 import { RouteComponentProps, withRouter } from "react-router-dom";
 import getCsrfToken from "Util/csrf";
 import { getDataset } from "Util/dataset";
@@ -41,7 +41,7 @@ interface State {
  * Whenever we receive new data from the backend, this component gives the
  * normal render another try, even if an error was previously thrown.
  */
-class WidgetTreeErrorBoundary extends React.Component<Props, State> {
+class WidgetTreeErrorBoundary extends Component<Props, State> {
   state = { hasError: false, prevLastFetch: this.props.lastFetch };
 
   // When an error is thrown during render, log it.
@@ -122,7 +122,7 @@ class WidgetTreeErrorBoundary extends React.Component<Props, State> {
  * The component renders whatever layout is configured for the screen type
  * when it fails to fetch API data.
  */
-const FallbackLayout: React.ComponentType = () => {
+const FallbackLayout: ComponentType = () => {
   const responseMapper = useContext(ResponseMapperContext);
 
   return <Widget data={responseMapper({ state: "failure" }) as WidgetData} />;
@@ -155,7 +155,7 @@ const LogTimeRecorder = (() => {
 // It's necessary to get the context separately and pass it to the component
 // as a prop because we need this value in getDerivedStateFromProps, which
 // does not receive context as an argument.
-const WrappedWithLastFetch: React.ComponentType<Omit<Props, "lastFetch">> = (
+const WrappedWithLastFetch: ComponentType<Omit<Props, "lastFetch">> = (
   props,
 ) => {
   const lastFetch = useContext(LastFetchContext);

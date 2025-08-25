@@ -1,12 +1,11 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
   full_body_left: WidgetData;
 }
 
-const BodyLeftTakeover: React.ComponentType<Props> = ({
+const BodyLeftTakeover: ComponentType<Props> = ({
   full_body_left: fullBodyLeft,
 }) => {
   return (

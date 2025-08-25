@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 import { type Section as SectionBase } from "Components/v2/departures/section";
 import NormalSection from "./departures/normal_section";

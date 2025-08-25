@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import { imagePath } from "Util/utils";
 
 const DeparturesNoService: ComponentType = () => {

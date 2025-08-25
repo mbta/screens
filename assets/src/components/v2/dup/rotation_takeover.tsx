@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -7,7 +6,7 @@ interface Props {
   rotation: string;
 }
 
-const RotationTakeover: React.ComponentType<Props> = ({
+const RotationTakeover: ComponentType<Props> = ({
   full_rotation: fullRotation,
   rotation: rotation,
 }) => {

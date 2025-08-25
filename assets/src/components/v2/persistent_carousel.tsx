@@ -1,4 +1,4 @@
-import React, { ComponentType, ReactNode } from "react";
+import { type ComponentType, ReactNode } from "react";
 import makePersistent, { WrappedComponentProps } from "./persistent_wrapper";
 import useRefreshPaging from "Hooks/v2/use_refresh_paging";
 

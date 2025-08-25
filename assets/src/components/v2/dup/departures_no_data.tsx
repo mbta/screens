@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import { imagePath } from "Util/utils";
 import LinkArrow from "../bundled_svg/link_arrow";
 

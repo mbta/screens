@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import Loading from "Images/loading.svg";
 
 const coolBlack = "#171F26";

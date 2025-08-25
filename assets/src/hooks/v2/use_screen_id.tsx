@@ -1,13 +1,13 @@
-import React, { useContext } from "react";
+import { type ReactNode, createContext, useContext } from "react";
 
-const ScreenIDContext = React.createContext<string>("");
+const ScreenIDContext = createContext<string>("");
 
 export const ScreenIDProvider = ({
   id,
   children,
 }: {
   id: string;
-  children: React.ReactNode;
+  children: ReactNode;
 }) => (
   <ScreenIDContext.Provider value={id}>{children}</ScreenIDContext.Provider>
 );
