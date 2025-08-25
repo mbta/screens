@@ -37,14 +37,8 @@ module.exports = (env, argv) => {
   return {
     devtool: "source-map",
     entry: isOutfrontPackage
-      ? {
-          packaged_dup_polyfills: "./src/polyfills.js",
-          packaged_dup_v2: "./src/apps/v2/dup.tsx",
-        }
-      : {
-          polyfills: "./src/polyfills.js",
-          ...ENTRYPOINTS,
-        },
+      ? { packaged_dup_v2: "./src/apps/v2/dup.tsx" }
+      : ENTRYPOINTS,
     optimization: {
       minimizer: [new TerserPlugin(), new OptimizeCSSAssetsPlugin()],
     },
@@ -60,7 +54,10 @@ module.exports = (env, argv) => {
               presets: [
                 [
                   "@babel/preset-env",
-                  { targets: isOutfrontPackage ? undefined : "> 0.25%" },
+                  {
+                    useBuiltIns: "usage",
+                    corejs: require("core-js/package.json").version,
+                  },
                 ],
                 "@babel/preset-react",
                 "@babel/preset-typescript",
