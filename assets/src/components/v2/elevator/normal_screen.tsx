@@ -1,5 +1,3 @@
-import React from "react";
-
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {

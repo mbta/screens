@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import { imagePath } from "Util/utils";
 import BottomScreenFiller from "Components/v2/eink/bottom_screen_filler";
 import Loading from "Images/loading.svg";

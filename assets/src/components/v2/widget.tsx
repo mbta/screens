@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import { type ComponentType, createContext, useContext } from "react";
 
 type WidgetData = { type: string } & Record<string, any>;
 
@@ -6,9 +6,9 @@ interface Props {
   data: WidgetData;
 }
 
-const MappingContext = React.createContext({});
+const MappingContext = createContext({});
 
-const Widget: React.ComponentType<Props> = ({ data }) => {
+const Widget: ComponentType<Props> = ({ data }) => {
   if (data == null) {
     return null;
   }

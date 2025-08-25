@@ -1,4 +1,3 @@
-import React from "react";
 import { useParams } from "react-router-dom";
 import ScreenContainer from "Components/v2/screen_container";
 import { ScreenIDProvider } from "Hooks/v2/use_screen_id";

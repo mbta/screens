@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 import DepartureTime from "./departure_time";
 import DepartureCrowding, { CrowdingLevel } from "./departure_crowding";

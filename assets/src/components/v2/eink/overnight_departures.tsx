@@ -1,5 +1,5 @@
 import moment from "moment";
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 import { imagePath } from "Util/utils";
 
 const OvernightDepartures: ComponentType = () => {

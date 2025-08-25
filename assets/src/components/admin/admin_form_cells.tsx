@@ -1,5 +1,3 @@
-import React from "react";
-
 const FormStaticCell = ({ value }) => {
   return <input defaultValue={value} disabled={true} />;
 };

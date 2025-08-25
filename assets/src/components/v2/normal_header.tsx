@@ -1,4 +1,4 @@
-import React, { forwardRef, ComponentType } from "react";
+import { type ComponentType, forwardRef } from "react";
 
 import LiveDataSvg from "Images/live-data-small.svg";
 import { getDatasetValue } from "Util/dataset";

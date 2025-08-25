@@ -1,4 +1,4 @@
-import React, { ComponentType, useContext } from "react";
+import { type ComponentType, useContext } from "react";
 import {
   LastFetchContext,
   ResponseMapperContext,

@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 import { type TimeWithCrowding } from "Components/v2/departures/departure_times";
 import DepartureTime from "./departure_time";

@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import { classWithModifier } from "Util/utils";
 
 interface Props {
@@ -7,7 +6,7 @@ interface Props {
   text?: string;
 }
 
-const Placeholder: React.ComponentType<Props> = ({ color, text }) => {
+const Placeholder: ComponentType<Props> = ({ color, text }) => {
   return (
     <div className={classWithModifier("placeholder", color)}>
       <div className="placeholder__text">

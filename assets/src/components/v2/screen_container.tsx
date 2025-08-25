@@ -1,11 +1,12 @@
-import React, {
+import {
+  type ComponentType,
   createContext,
+  Fragment,
   useContext,
-  ComponentType,
   useState,
   useEffect,
-  Fragment,
 } from "react";
+
 import useApiResponse, {
   ApiResponse,
   SimulationData,

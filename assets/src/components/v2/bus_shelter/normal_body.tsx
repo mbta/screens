@@ -1,5 +1,4 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
@@ -8,7 +7,7 @@ interface Props {
   footer: WidgetData;
 }
 
-const NormalBody: React.ComponentType<Props> = ({
+const NormalBody: ComponentType<Props> = ({
   main_content: mainContent,
   flex_zone: flexZone,
   footer,

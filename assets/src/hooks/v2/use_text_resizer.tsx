@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { type RefObject, useEffect, useRef, useState } from "react";
 
 interface UseTextResizerArgs<T> {
   sizes: T[];
@@ -7,7 +7,7 @@ interface UseTextResizerArgs<T> {
 }
 
 interface UseTextResizerReturn<T> {
-  ref: React.RefObject<HTMLDivElement>;
+  ref: RefObject<HTMLDivElement>;
   size: T;
   isDone: boolean;
 }

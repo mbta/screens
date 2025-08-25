@@ -1,4 +1,3 @@
-import React from "react";
 import LinkArrow from "../bundled_svg/link_arrow";
 import FreeText, { FreeTextType } from "Components/v2/free_text";
 

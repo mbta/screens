@@ -1,7 +1,7 @@
 // SPECIFICATION: https://www.notion.so/mbta-downtown-crossing/Disruption-Diagram-Specification-a779027385b545abbff6fb4b4fd0adc1
 
-import React, {
-  ComponentType,
+import {
+  type ComponentType,
   useCallback,
   useEffect,
   useRef,

@@ -1,4 +1,11 @@
-import React, { ComponentType, useState, useLayoutEffect, useRef } from "react";
+import {
+  type ComponentType,
+  type ReactNode,
+  useState,
+  useLayoutEffect,
+  useRef,
+} from "react";
+
 import { classWithModifier, imagePath } from "Util/utils";
 
 import RoutePill, {
@@ -24,7 +31,7 @@ interface BaseAlertProps {
 }
 
 interface AlertCardProps {
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 type AlertIcon = "bus" | "x" | "warning" | "snowflake";

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { useTable, useFilters, useRowSelect } from "react-table";
 import _ from "lodash";
 import weakKey from "weak-key";

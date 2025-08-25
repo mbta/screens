@@ -1,12 +1,11 @@
-import React from "react";
-
+import type { ComponentType } from "react";
 import Widget, { WidgetData } from "Components/v2/widget";
 
 interface Props {
   full_body: WidgetData;
 }
 
-const TakeoverBody: React.ComponentType<Props> = ({ full_body: fullBody }) => {
+const TakeoverBody: ComponentType<Props> = ({ full_body: fullBody }) => {
   return (
     <div className="body-takeover">
       <div className="body-takeover__full-body">

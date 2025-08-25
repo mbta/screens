@@ -1,5 +1,6 @@
+import type { ComponentType } from "react";
+
 import useTextResizer from "Hooks/v2/use_text_resizer";
-import React from "react";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import DisruptionDiagram, {
   DisruptionDiagramData,
@@ -51,7 +52,7 @@ interface StandardLayoutProps {
 // - issue font is size large
 // - "Seek alternate route" remedy is medium
 // - "Use shuttle bus" remedy is large
-const StandardLayout: React.ComponentType<StandardLayoutProps> = ({
+const StandardLayout: ComponentType<StandardLayoutProps> = ({
   issue,
   remedy,
   effect,
@@ -98,7 +99,7 @@ interface DownstreamLayoutProps {
 }
 
 // In the downstream layout, the map is at the top, and the font size stays constant
-const DownstreamLayout: React.ComponentType<DownstreamLayoutProps> = ({
+const DownstreamLayout: ComponentType<DownstreamLayoutProps> = ({
   endpoints,
   effect,
   remedy,
@@ -120,7 +121,7 @@ interface PartialClosureLayoutProps {
 // Covers the case where a station_closure only affects one line at a transfer station.
 // In the even rarer case that there are multiple branches in the routes list or unaffected routes list
 // the font size may need to shrink to accommodate.
-const PartialClosureLayout: React.ComponentType<PartialClosureLayoutProps> = ({
+const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
   routes,
   unaffected_routes,
   disruptionDiagram,
@@ -179,7 +180,7 @@ const fallbackLayoutIcons = {
   shuttle: ShuttleBusIcon,
 };
 
-const FallbackLayout: React.ComponentType<FallbackLayoutProps> = ({
+const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   issue,
   remedy,
   remedyBold,
@@ -223,7 +224,7 @@ interface StandardIssueSectionProps {
   contentTextSize: string;
 }
 
-const StandardIssueSection: React.ComponentType<StandardIssueSectionProps> = ({
+const StandardIssueSection: ComponentType<StandardIssueSectionProps> = ({
   issue,
   location,
   contentTextSize,
@@ -250,9 +251,9 @@ interface DownstreamIssueSectionProps {
   endpoints: [string, string];
 }
 
-const DownstreamIssueSection: React.ComponentType<
-  DownstreamIssueSectionProps
-> = ({ endpoints }) => (
+const DownstreamIssueSection: ComponentType<DownstreamIssueSectionProps> = ({
+  endpoints,
+}) => (
   <div className="alert-card__issue">
     <div
       className={classWithModifier("alert-card__content-block__text", "medium")}
@@ -267,7 +268,7 @@ interface RemedySectionProps {
   remedy: string | null;
   contentTextSize: string;
 }
-const RemedySection: React.ComponentType<RemedySectionProps> = ({
+const RemedySection: ComponentType<RemedySectionProps> = ({
   effect,
   remedy,
   contentTextSize,
@@ -306,9 +307,7 @@ interface MapSectionProps {
   disruptionDiagram: DisruptionDiagramData;
 }
 
-const MapSection: React.ComponentType<MapSectionProps> = ({
-  disruptionDiagram,
-}) => {
+const MapSection: ComponentType<MapSectionProps> = ({ disruptionDiagram }) => {
   return (
     <div
       id="disruption-diagram-container"
@@ -328,9 +327,9 @@ const isPartialClosure = ({
   region === "here" &&
   unaffected_routes.length > 0;
 
-const PreFareSingleScreenAlert: React.ComponentType<
-  PreFareSingleScreenAlertProps
-> = (alert) => {
+const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
+  alert,
+) => {
   const {
     cause,
     region,
@@ -496,7 +495,7 @@ const getAlertColor = (routes: EnrichedRoute[]) => {
   return uniqueColors == 1 ? colors[0] : "yellow";
 };
 
-const PreFareAlertBanner: React.ComponentType<{ routes: EnrichedRoute[] }> = ({
+const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
   routes,
 }) => {
   let banner;

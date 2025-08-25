@@ -1,4 +1,4 @@
-import React, { ComponentType } from "react";
+import type { ComponentType } from "react";
 
 import DefaultNormalHeader, { Icon } from "Components/v2/normal_header";
 

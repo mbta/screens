@@ -1,4 +1,4 @@
-import React, { ComponentType, useEffect, useRef, useState } from "react";
+import { type ComponentType, useEffect, useRef, useState } from "react";
 
 interface Props {
   src: string;
