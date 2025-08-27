@@ -25,7 +25,11 @@ defmodule Screens.DeviceMonitor.Mercury do
     from_unix = DateTime.to_unix(from_dt)
     to_unix = DateTime.to_unix(to_dt)
 
-    with {:ok, devices} <- fetch("/devices?verbose=true"),
+    # `/devices?verbose=true` sometimes takes longer than the default receive timeout of 5s, and
+    # occasionally even longer than 10s, to send a response. Temporarily increased timeout to 30s
+    # on the advice of Mercury engineers while they look into the performance of this endpoint.
+
+    with {:ok, devices} <- fetch("/devices?verbose=true", recv_timeout: 30_000),
          {:ok, events} <- fetch("/allEvents/#{from_unix}/#{to_unix}") do
       button_press_counts_by_device =
         for {device_id, device_events} <- events, into: %{} do
@@ -46,12 +50,11 @@ defmodule Screens.DeviceMonitor.Mercury do
     end
   end
 
-  defp fetch(path) do
+  defp fetch(path, opts \\ []) do
     Fetch.make_and_parse_request(
       @api_url_base <> path,
       [{"apiKey", get_api_key()}],
-      # devices API sometimes takes longer to respond than the default timeout of 5 seconds
-      [recv_timeout: 10_000],
+      opts,
       &Jason.decode/1,
       @vendor_name
     )
