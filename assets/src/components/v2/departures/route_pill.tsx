@@ -56,7 +56,11 @@ const TextRoutePill: ComponentType<TextPill & { outline?: boolean }> = ({
     modifiers.push(size);
   } else {
     const routeNum = Number(text);
-    modifiers.push(isNaN(routeNum) || routeNum > 199 ? "small" : "large");
+    if (isNaN(routeNum)) {
+      modifiers.push(text.length > 3 ? "small" : "large");
+    } else {
+      modifiers.push(routeNum > 199 ? "small" : "large");
+    }
   }
 
   return (
