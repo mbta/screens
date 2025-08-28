@@ -33,7 +33,7 @@ updates:
       eslint:
         patterns:
           - "eslint*"
-          - "@typescript-eslint*"
+          - "*-eslint"
           - "@eslint*"
       react:
         patterns:
