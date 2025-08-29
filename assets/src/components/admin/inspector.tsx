@@ -42,6 +42,9 @@ const AUDIO_SCREEN_TYPES = new Set([
 
 const SCREEN_TYPE_VARIANTS = { dup_v2: ["new_departures"] };
 
+const MAX_SSML_BILLED_CHARS = 3000;
+const MAX_SSML_TOTAL_CHARS = 6000;
+
 const buildIframeUrl = (
   screen: ScreenWithId | null,
   isSimulation: boolean,
@@ -460,6 +463,12 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
     ? `/v2/audio/${screen.id}`
     : null;
 
+  const ssmlTotalChars = ssml ? ssml.length : 0;
+  const ssmlBilledChars = ssml
+    ? new DOMParser().parseFromString(ssml, "text/xml").documentElement
+        .textContent!.length
+    : 0;
+
   return (
     <fieldset>
       <legend>Audio</legend>
@@ -492,6 +501,13 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
             >
               × Close
             </button>
+            <p>
+              {ssmlBilledChars > MAX_SSML_BILLED_CHARS ? "⚠️ " : "✅ "}
+              <b>{ssmlBilledChars}</b> / {MAX_SSML_BILLED_CHARS} billed chars
+              <br />
+              {ssmlTotalChars > MAX_SSML_TOTAL_CHARS ? "⚠️ " : "✅ "}
+              <b>{ssmlTotalChars}</b> / {MAX_SSML_TOTAL_CHARS} total chars
+            </p>
             <div className="inspector__modal__ssml">{ssml}</div>
           </dialog>
 
