@@ -17,12 +17,15 @@ const fetchConfig = async () => {
 };
 
 const AdminScreenConfigForm = (): JSX.Element => (
-  <AdminForm
-    fetchConfig={fetchConfig}
-    validatePath="/api/admin/screens/validate"
-    confirmPath="/api/admin/screens/confirm"
-    onUpdated={() => alert("Config updated successfully")}
-  />
+  <main>
+    <h2>Config Editor</h2>
+    <AdminForm
+      fetchConfig={fetchConfig}
+      validatePath="/api/admin/screens/validate"
+      confirmPath="/api/admin/screens/confirm"
+      onUpdated={() => alert("Config updated successfully")}
+    />
+  </main>
 );
 
 export default AdminScreenConfigForm;
