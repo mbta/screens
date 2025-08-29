@@ -42,6 +42,9 @@ const AUDIO_SCREEN_TYPES = new Set([
 
 const SCREEN_TYPE_VARIANTS = { dup_v2: ["new_departures"] };
 
+const MAX_SSML_BILLED_CHARS = 3000;
+const MAX_SSML_TOTAL_CHARS = 6000;
+
 const buildIframeUrl = (
   screen: ScreenWithId | null,
   isSimulation: boolean,
@@ -140,12 +143,16 @@ const Inspector: ComponentType = () => {
                 <DataControls
                   // Reset when the iframe reloads, since the screen will no
                   // longer be aware of previously-sent inspector messages
-                  key={frameLoadedAt}
+                  key={"data-controls-" + frameLoadedAt}
                   isVariantEnabled={isVariantEnabled}
                   screen={screen}
                   sendToFrame={sendToFrame}
                 />
-                <AudioControls screen={screen} />
+                <AudioControls
+                  // Reset any active audio playback when a new screen loads
+                  key={"audio-controls-" + frameLoadedAt}
+                  screen={screen}
+                />
               </>
             )}
           </>
@@ -460,6 +467,12 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
     ? `/v2/audio/${screen.id}`
     : null;
 
+  const ssmlTotalChars = ssml ? ssml.length : 0;
+  const ssmlBilledChars = ssml
+    ? new DOMParser().parseFromString(ssml, "text/xml").documentElement
+        .textContent!.length
+    : 0;
+
   return (
     <fieldset>
       <legend>Audio</legend>
@@ -476,13 +489,9 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
               Show SSML
             </button>
 
-            {playingAt ? (
-              <button onClick={() => setPlayingAt(null)}>⏹️ Stop Audio</button>
-            ) : (
-              <button onClick={() => setPlayingAt(new Date())}>
-                ▶️ Play Audio
-              </button>
-            )}
+            <button onClick={() => setPlayingAt(new Date())}>
+              {playingAt ? "🔄 Refresh Audio" : "▶️ Play Audio"}
+            </button>
           </div>
 
           <dialog className="inspector__modal" ref={dialogRef}>
@@ -492,11 +501,19 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
             >
               × Close
             </button>
+            <p>
+              {ssmlBilledChars > MAX_SSML_BILLED_CHARS ? "⚠️ " : "✅ "}
+              <b>{ssmlBilledChars}</b> / {MAX_SSML_BILLED_CHARS} billed chars
+              <br />
+              {ssmlTotalChars > MAX_SSML_TOTAL_CHARS ? "⚠️ " : "✅ "}
+              <b>{ssmlTotalChars}</b> / {MAX_SSML_TOTAL_CHARS} total chars
+            </p>
             <div className="inspector__modal__ssml">{ssml}</div>
           </dialog>
 
           {playingAt && (
             <audio
+              controls
               autoPlay={true}
               onEnded={() => setPlayingAt(null)}
               src={`${audioPath}/readout.mp3?at=${playingAt.getTime()}`}
