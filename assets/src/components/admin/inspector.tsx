@@ -143,12 +143,16 @@ const Inspector: ComponentType = () => {
                 <DataControls
                   // Reset when the iframe reloads, since the screen will no
                   // longer be aware of previously-sent inspector messages
-                  key={frameLoadedAt}
+                  key={"data-controls-" + frameLoadedAt}
                   isVariantEnabled={isVariantEnabled}
                   screen={screen}
                   sendToFrame={sendToFrame}
                 />
-                <AudioControls screen={screen} />
+                <AudioControls
+                  // Reset any active audio playback when a new screen loads
+                  key={"audio-controls-" + frameLoadedAt}
+                  screen={screen}
+                />
               </>
             )}
           </>
@@ -485,13 +489,9 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
               Show SSML
             </button>
 
-            {playingAt ? (
-              <button onClick={() => setPlayingAt(null)}>⏹️ Stop Audio</button>
-            ) : (
-              <button onClick={() => setPlayingAt(new Date())}>
-                ▶️ Play Audio
-              </button>
-            )}
+            <button onClick={() => setPlayingAt(new Date())}>
+              {playingAt ? "🔄 Refresh Audio" : "▶️ Play Audio"}
+            </button>
           </div>
 
           <dialog className="inspector__modal" ref={dialogRef}>
@@ -513,6 +513,7 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
 
           {playingAt && (
             <audio
+              controls
               autoPlay={true}
               onEnded={() => setPlayingAt(null)}
               src={`${audioPath}/readout.mp3?at=${playingAt.getTime()}`}
