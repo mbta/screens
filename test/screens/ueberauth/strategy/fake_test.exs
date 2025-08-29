@@ -1,6 +1,7 @@
 defmodule Screens.Ueberauth.Strategy.FakeTest do
-  use ExUnit.Case
-  use Plug.Test
+  use ExUnit.Case, async: true
+
+  import Plug.Test
   import Screens.Ueberauth.Strategy.Fake
 
   describe "implements all the callbacks" do
