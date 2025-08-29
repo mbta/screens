@@ -80,7 +80,7 @@ defmodule Screens.MixProject do
       {:remote_ip, "~> 1.2"},
       {:retry, "~> 0.18.0"},
       {:screens_config, github: "mbta/screens-config-lib"},
-      {:sentry, "~> 10.4"},
+      {:sentry, "~> 11.0"},
       {:sweet_xml, "~> 0.7.0"},
       {:telemetry, "~> 1.2"},
       {:telemetry_metrics, "~> 1.0"},
