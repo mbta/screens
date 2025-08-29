@@ -78,7 +78,7 @@ defmodule Screens.MixProject do
       {:plug_cowboy, "~> 2.6"},
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
-      {:retry, "~> 0.18.0"},
+      {:retry, "~> 0.19.0"},
       {:screens_config, github: "mbta/screens-config-lib"},
       {:sentry, "~> 10.4"},
       {:sweet_xml, "~> 0.7.0"},
