@@ -122,7 +122,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
            t
        )
        when severity >= 5 do
-    if LocalizedAlert.location(t) == :inside, do: :some, else: :none
+    if LocalizedAlert.location(t) in [:inside, :boundary_downstream, :boundary_upstream],
+      do: :some,
+      else: :none
   end
 
   defp eliminated_service_type(_other), do: :none
