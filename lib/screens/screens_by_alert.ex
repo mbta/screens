@@ -15,8 +15,7 @@ defmodule Screens.ScreensByAlert do
   """
 
   @behaviour Screens.ScreensByAlert.Behaviour
-  @config Application.compile_env(:screens, :screens_by_alert)
-  @cache_module @config[:cache_module]
+  @cache_module Application.compile_env!(:screens, [:screens_by_alert, :cache_module])
 
   # Need to define a child_spec since this module does not itself use GenServer or Supervisor,
   # but is a simple wrapper for @cache_module
@@ -28,30 +27,8 @@ defmodule Screens.ScreensByAlert do
     }
   end
 
-  @impl true
-  def start_link(_opts) do
-    @cache_module.start_link(
-      screens_by_alert_ttl_seconds: @config[:screens_by_alert_ttl_seconds],
-      screens_last_updated_ttl_seconds: @config[:screens_last_updated_ttl_seconds],
-      screens_ttl_seconds: @config[:screens_ttl_seconds]
-    )
-  end
-
-  @impl true
-  def put_data(screen_id, alert_ids) do
-    @cache_module.put_data(
-      screen_id,
-      alert_ids
-    )
-  end
-
-  @impl true
-  def get_screens_by_alert(alert_ids) do
-    @cache_module.get_screens_by_alert(alert_ids)
-  end
-
-  @impl true
-  def get_screens_last_updated(screen_ids) do
-    @cache_module.get_screens_last_updated(screen_ids)
-  end
+  defdelegate start_link(opts), to: @cache_module
+  defdelegate put_data(screen_id, alert_ids), to: @cache_module
+  defdelegate get_screens_by_alert(alert_ids), to: @cache_module
+  defdelegate get_screens_last_updated(screen_ids), to: @cache_module
 end

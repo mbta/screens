@@ -2,6 +2,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   use ScreensWeb.ConnCase
 
   alias ScreensConfig.Screen
+  alias Screens.ScreensByAlert
   alias Screens.TestSupport.CandidateGeneratorStub, as: Stub
 
   import Screens.Inject
@@ -16,6 +17,13 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   Stub.candidate_generator(MercuryGenerator, fn _ -> [placeholder(:green)] end)
   Stub.candidate_generator(LgMriGenerator, fn _ -> [placeholder(:red)] end)
 
+  setup do
+    stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
+    stub(@parameters, :variants, fn _ -> [nil] end)
+    stub(ScreensByAlert.Mock, :put_data, fn _screen_id, _alert_ids -> :ok end)
+    :ok
+  end
+
   describe "show/2" do
     test "only returns flex_zone for Mercury screens", %{conn: conn} do
       expect(@cache, :screen, fn
@@ -23,15 +31,11 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
           struct(Screen, app_id: :gl_eink_v2, vendor: :mercury)
       end)
 
-      expect(@parameters, :variants, fn _ -> [nil] end)
-
       stub(
         @parameters,
         :candidate_generator,
         fn %Screen{vendor: :mercury}, nil -> MercuryGenerator end
       )
-
-      stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
 
       conn = get(conn, "/v2/api/screen/EIG-604?last_refresh=2024-12-02T00:00:00Z")
 
@@ -54,15 +58,11 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
           struct(Screen, app_id: :bus_shelter_v2, vendor: :lg_mri)
       end)
 
-      expect(@parameters, :variants, fn _ -> [nil] end)
-
       stub(
         @parameters,
         :candidate_generator,
         fn %Screen{vendor: :lg_mri}, nil -> LgMriGenerator end
       )
-
-      stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
 
       conn = get(conn, "/v2/api/screen/1401?last_refresh=2024-12-02T00:00:00Z")
 

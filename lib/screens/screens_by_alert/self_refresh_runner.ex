@@ -1,17 +1,19 @@
 defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   @moduledoc """
-  A stateless "job-runner" GenServer that routinely checks for out-of-date
-  screen data, and simulates data requests for any that it finds.
+  Simulates regular data requests for screens that are not issuing requests normally.
+
+  The main purpose of this is to ensure `ScreensByAlert` data consumed by Screenplay remains
+  accurate in non-production environments (where there are no "real" screens making requests) or
+  when real screen hardware is temporarily offline.
   """
 
-  alias Screens.ScreensByAlert
-  alias Screens.Util
+  alias __MODULE__.TaskSupervisor
   alias ScreensConfig.Screen
 
-  # (Not a real module--just a name assigned to the Task.Supervisor process that supervises each simulated data request run)
-  alias Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor
-
   require Logger
+
+  import Screens.Inject
+
   use GenServer
 
   ### Client
@@ -22,73 +24,93 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   ### Server
 
-  # Maximum number of screen updates that can happen per run
-  @max_screen_updates_per_run 30
+  @batch_size Application.compile_env!(:screens, [__MODULE__, :batch_size])
+  @max_concurrency Application.compile_env!(:screens, [__MODULE__, :concurrency])
+  @screens_by_alert injected(Screens.ScreensByAlert)
+  @screen_data injected(Screens.V2.ScreenData)
 
-  # The job should run a bit slower than the slowest screen client refresh rate (e-ink, 30 sec)
-  @job_run_interval_ms 35_000
+  # aim to refresh screens a few seconds before their alert info is deemed stale
+  @outdated_threshold_secs Application.compile_env!(:screens, [
+                             :screens_by_alert,
+                             :screens_by_alert_ttl_seconds
+                           ]) - 5
 
-  @data_ttl_seconds 30
-
-  @screen_data_fn Application.compile_env!(:screens, [:screens_by_alert, :screen_data_fn])
+  @empty_set MapSet.new()
 
   @impl true
   def init(:ok) do
-    schedule_run()
-
-    {:ok, nil}
+    schedule_check()
+    {:ok, @empty_set}
   end
 
   @impl true
-  def handle_info(:run, state) do
-    schedule_run()
-
+  def handle_info(:check, refreshing_ids) when refreshing_ids == @empty_set do
     now = System.system_time(:second)
 
-    {screen_ids_to_refresh, overflow} =
-      watched_screen_ids()
-      # get a mapping from each ID to its last updated time
-      |> ScreensByAlert.get_screens_last_updated()
-      # filter to outdated IDs
-      |> Enum.filter(fn {_screen_id, timestamp} -> now - timestamp > @data_ttl_seconds end)
-      # sort by age, oldest first
+    # Select the N "most outdated" screen IDs, sorted by how outdated they are, for refreshing
+    {ids_to_refresh, rest_ids} =
+      relevant_screen_ids()
+      |> @screens_by_alert.get_screens_last_updated()
+      |> Enum.filter(fn {_screen_id, timestamp} -> now - timestamp > @outdated_threshold_secs end)
       |> Enum.sort_by(fn {_screen_id, timestamp} -> timestamp end)
       |> Enum.map(fn {screen_id, _timestamp} -> screen_id end)
-      |> Enum.split(@max_screen_updates_per_run)
+      |> Enum.split(@batch_size)
 
-    Logger.info(
-      "[running screens_by_alert self refresh] screen_ids_being_refreshed_now=#{Enum.join(screen_ids_to_refresh, ",")} count_of_remaining_screen_ids_to_refresh=#{length(overflow)}"
-    )
+    _ = start_refresh(ids_to_refresh, rest_ids)
+    schedule_check()
 
-    # We don't care about the result of the work, just its side-effect
-    # of updating the relevant cached data.
-    # In fact, we don't even care if the function call succeeds.
-    #
-    # Task.Supervisor.start_child/3 lets us run each update concurrently without
-    # using the return value, while also providing graceful handling of shutdowns.
-    #
-    # Doing the work in a separate, unlinked task process protects this GenServer
-    # process from going down if screen data fetching raises an exception.
-    Enum.each(screen_ids_to_refresh, fn screen_id ->
-      Task.Supervisor.start_child(
-        TaskSupervisor,
-        Util.fn_with_timeout(
-          fn -> @screen_data_fn.(screen_id, update_visible_alerts?: true) end,
-          10_000
-        )
-      )
-    end)
-
-    {:noreply, state}
+    # Keep track of which screens we have queued for a refresh
+    {:noreply, MapSet.new(ids_to_refresh)}
   end
 
-  defp watched_screen_ids do
+  def handle_info(:check, refreshing_ids) do
+    # Set is non-empty; still waiting for some refreshes in progress
+    schedule_check()
+    {:noreply, refreshing_ids}
+  end
+
+  # Screen refresh completed or crashed
+  def handle_info({:done, id}, refreshing_ids), do: {:noreply, MapSet.delete(refreshing_ids, id)}
+
+  defp start_refresh([], _rest_ids), do: :ignore
+
+  defp start_refresh(ids, rest_ids) do
+    Logger.info(
+      "self_refresh_running screen_ids=#{Enum.join(ids, ",")} remaining_count=#{length(rest_ids)}"
+    )
+
+    runner = self()
+
+    # Simulate a screen data request (and discard the result) for each ID. Using `async_stream`
+    # for the built-in concurrency and timeout controls, within a separate unlinked task so this
+    # server doesn't have to wait for all requests to be started before it returns from message
+    # handling.
+    {:ok, _pid} =
+      Task.Supervisor.start_child(TaskSupervisor, fn ->
+        TaskSupervisor
+        |> Task.Supervisor.async_stream_nolink(
+          ids,
+          fn id -> tap(id, &@screen_data.get(&1, update_visible_alerts?: true)) end,
+          max_concurrency: @max_concurrency,
+          on_timeout: :kill_task,
+          ordered: false,
+          timeout: 10_000,
+          zip_input_on_exit: true
+        )
+        |> Enum.each(fn
+          # We don't care whether the simulated request succeeds, crashes, or times out, just that
+          # the relevant screen ID is now eligible for another refresh
+          {:ok, id} -> send(runner, {:done, id})
+          {:exit, {id, _reason}} -> send(runner, {:done, id})
+        end)
+      end)
+  end
+
+  defp relevant_screen_ids do
     Screens.Config.Cache.screen_ids(fn {_id, %Screen{hidden_from_screenplay: hidden}} ->
       not hidden
     end)
   end
 
-  defp schedule_run do
-    Process.send_after(self(), :run, @job_run_interval_ms)
-  end
+  defp schedule_check, do: Process.send_after(self(), :check, 1_000)
 end

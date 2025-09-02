@@ -44,7 +44,7 @@ defmodule Screens.ScreensByAlert.Memcache do
   @screens_ttl Keyword.fetch!(@config, :screens_ttl_seconds)
 
   @impl true
-  def start_link(_opts) do
+  def start_link(_opts \\ []) do
     Screens.Memcache.start_link(name: @server)
   end
 
