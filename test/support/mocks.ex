@@ -8,6 +8,7 @@ injected_modules = [
   Screens.Routes.Route,
   Screens.Stops.Stop,
   Screens.V2.Departure,
+  Screens.V2.ScreenData,
   Screens.V2.ScreenData.Parameters
 ]
 
@@ -16,3 +17,4 @@ for module <- injected_modules do
 end
 
 Mox.defmock(Screens.DeviceMonitor.MockVendor, for: Screens.DeviceMonitor.Vendor)
+Mox.defmock(Screens.ScreensByAlert.Mock, for: Screens.ScreensByAlert.Behaviour)
