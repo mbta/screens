@@ -209,9 +209,10 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
       assert serialized(screen, context, alert) == [banner, banner, banner]
     end
 
-    test "inside severe single-tracking" do
+    test "inside or on the boundary of severe single-tracking" do
       screen = build_screen()
-      context = build_location_context("place-r2")
+      inside_context = build_location_context("place-r2")
+      outside_context = build_location_context("place-r3")
 
       alert =
         build_alert(
@@ -241,7 +242,8 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
         remedy: %FreeTextLine{icon: nil, text: []}
       }
 
-      assert serialized(screen, context, alert) == [banner, takeover, banner]
+      assert serialized(screen, inside_context, alert) == [banner, takeover, banner]
+      assert serialized(screen, outside_context, alert) == [banner, takeover, banner]
     end
 
     test "single-line inside shuttle" do
