@@ -35,7 +35,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
 
   # Delay
   def render_alert(%{cause: cause, effect: :delay, issue: issue}) do
-    ~E|<%= issue %> <%= cause %>.|
+    ~E|<%= issue %><%= due_to(cause) %>.|
   end
 
   # Downstream closure
@@ -46,7 +46,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         cause: cause,
         stations: stations
       }) do
-    ~E|<%= get_line_name(route_svg_names) %> trains are skipping <%= Util.format_name_list_to_string_audio(stations) %> <%= cause %>. Please seek an alternate route.|
+    ~E|<%= get_line_name(route_svg_names) %> trains are skipping <%= Util.format_name_list_to_string_audio(stations) %><%= due_to(cause) %>. Please seek an alternate route.|
   end
 
   # Downstream shuttle
@@ -57,7 +57,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|Shuttle buses replace <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %> <%= cause %>. All shuttle buses are accessible.|
+    ~E|Shuttle buses replace <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= due_to(cause) %>. All shuttle buses are accessible.|
   end
 
   # Downstream suspension
@@ -68,7 +68,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|There are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %> <%= cause %>. Please seek an alternate route.|
+    ~E|There are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= due_to(cause) %>. Please seek an alternate route.|
   end
 
   # Boundary shuttle
@@ -80,7 +80,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|There are <%= issue %>. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %> <%= cause %>. All shuttle buses are accessible.|
+    ~E|There are <%= issue %>. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= due_to(cause) %>. All shuttle buses are accessible.|
   end
 
   # Boundary suspension
@@ -92,7 +92,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         endpoints: {left_endpoint, right_endpoint},
         cause: cause
       }) do
-    ~E|There are <%= issue %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %> <%= cause %>.|
+    ~E|There are <%= issue %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= due_to(cause) %>.|
   end
 
   # Closure here - three cases
@@ -105,7 +105,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         other_closures: other_closures
       })
       when other_closures != [] do
-    ~E|This station is closed <%= cause %>. Please seek an alternate route. <%= get_line_name(route_svg_names) %> trains are skipping this station and <%= Util.format_name_list_to_string_audio(other_closures) %>.|
+    ~E|This station is closed<%= due_to(cause) %>. Please seek an alternate route. <%= get_line_name(route_svg_names) %> trains are skipping this station and <%= Util.format_name_list_to_string_audio(other_closures) %>.|
   end
 
   # Case 2: Single line impacted at transfer station
@@ -115,7 +115,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         cause: cause,
         unaffected_routes: [_ | _] = unaffected_routes
       }) do
-    ~E|<%= get_line_name(route_svg_names) %> trains are skipping this station <%= cause %>. Please seek an alternate route. <%= get_line_name(unaffected_routes) %> trains are stopping here as usual.|
+    ~E|<%= get_line_name(route_svg_names) %> trains are skipping this station<%= due_to(cause) %>. Please seek an alternate route. <%= get_line_name(unaffected_routes) %> trains are stopping here as usual.|
   end
 
   # Case 3: Single station, single line impacted
@@ -126,7 +126,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         routes: route_svg_names,
         cause: cause
       }) do
-    ~E|This station is closed <%= cause %>. Please seek an alternate route. <%= get_line_name(route_svg_names) %> trains are skipping this station.|
+    ~E|This station is closed<%= due_to(cause) %>. Please seek an alternate route. <%= get_line_name(route_svg_names) %> trains are skipping this station.|
   end
 
   # Shuttle here
@@ -139,9 +139,9 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         } = alert
       ) do
     if Map.has_key?(alert, :is_transfer_station) do
-      ~E|There are no <%= get_line_name(route_svg_names) %> trains. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %> <%= cause %>. All shuttle buses are accessible.|
+      ~E|There are no <%= get_line_name(route_svg_names) %> trains. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= due_to(cause) %>. All shuttle buses are accessible.|
     else
-      ~E|This station is closed. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %> <%= cause %>. All shuttle buses are accessible.|
+      ~E|This station is closed. Please use the shuttle bus. Shuttle buses are replacing <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %><%= due_to(cause) %>. All shuttle buses are accessible.|
     end
   end
 
@@ -155,9 +155,9 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         } = alert
       ) do
     if Map.has_key?(alert, :is_transfer_station) do
-      ~E|There are no <%= get_line_name(route_svg_names) %> trains <%= cause %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %>.|
+      ~E|There are no <%= get_line_name(route_svg_names) %> trains<%= due_to(cause) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %>.|
     else
-      ~E|This station is closed <%= cause %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %>.|
+      ~E|This station is closed<%= due_to(cause) %>. Please seek an alternate route. Please note that there are no <%= get_line_name(route_svg_names) %> trains between <%= left_endpoint %> and <%= right_endpoint %>.|
     end
   end
 
@@ -221,4 +221,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
 
     ~E|<%= list_of_lines %>|
   end
+
+  defp due_to(nil), do: ""
+  defp due_to(cause), do: " due to #{cause}"
 end
