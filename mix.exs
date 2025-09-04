@@ -97,7 +97,6 @@ defmodule Screens.MixProject do
       {:credo, "~> 1.7.7", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
-      {:mix_test_watch, "~> 1.0", only: :dev, runtime: false},
       {:mox, "~> 1.0", only: :test},
       {:phoenix_live_reload, "~> 1.3", only: :dev},
       {:stream_data, "~> 1.1", only: :test}
