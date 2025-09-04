@@ -1,6 +1,16 @@
 defmodule ScreensWeb.ScreensByAlertControllerTest do
   use ScreensWeb.ConnCase
 
+  alias Screens.ScreensByAlert
+
+  import Mox
+  setup :verify_on_exit!
+
+  setup do
+    stub(ScreensByAlert.Mock, :get_screens_by_alert, fn _alert_ids -> %{} end)
+    :ok
+  end
+
   describe "index/2" do
     test "returns status code 200 and empty object in resp_body when empty query param is provided",
          %{

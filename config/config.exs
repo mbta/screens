@@ -466,10 +466,11 @@ config :screens,
 
 config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,
-  screen_data_fn: &Screens.V2.ScreenData.get/2,
   screens_by_alert_ttl_seconds: 40,
   screens_last_updated_ttl_seconds: 3600,
   screens_ttl_seconds: 40
+
+config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 1
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
 

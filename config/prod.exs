@@ -28,11 +28,9 @@ config :ehmon, :report_mf, {:ehmon, :info_report}
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Memcached
 
-config :screens, :screens_by_alert,
-  cache_module: Screens.ScreensByAlert.Memcache,
-  screens_by_alert_ttl_seconds: 40,
-  screens_last_updated_ttl_seconds: 3600,
-  screens_ttl_seconds: 40
+config :screens, :screens_by_alert, cache_module: Screens.ScreensByAlert.Memcache
+
+config :screens, Screens.ScreensByAlert.SelfRefreshRunner, concurrency: 2
 
 # ## SSL Support
 #

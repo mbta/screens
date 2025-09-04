@@ -157,9 +157,4 @@ config :ueberauth_oidcc,
 # Print only warnings and errors during test
 config :logger, level: :warning
 
-config :screens, :screens_by_alert,
-  cache_module: Screens.ScreensByAlert.GenServer,
-  screen_data_fn: &Screens.V2.MockScreenData.get/2,
-  screens_by_alert_ttl_seconds: 2,
-  screens_last_updated_ttl_seconds: 2,
-  screens_ttl_seconds: 1
+config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 2

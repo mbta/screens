@@ -16,7 +16,7 @@ defmodule Screens.ScreensByAlert.Behaviour do
   @doc """
   Starts the process that interfaces with the screens-by-alert cache.
   """
-  @callback start_link(Keyword.t()) :: {:ok, pid()}
+  @callback start_link(GenServer.options()) :: GenServer.on_start()
 
   @doc """
   Takes a screen ID and a list of alert IDs as parameters. With these, it will get an existing object
@@ -40,4 +40,6 @@ defmodule Screens.ScreensByAlert.Behaviour do
   If a cache item is missing for some screen, its timestamp value will default to 0.
   """
   @callback get_screens_last_updated(list(screen_id())) :: %{screen_id() => timestamp()}
+
+  @optional_callbacks start_link: 1
 end

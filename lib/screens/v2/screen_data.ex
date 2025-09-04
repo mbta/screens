@@ -25,8 +25,8 @@ defmodule Screens.V2.ScreenData do
           update_visible_alerts?: boolean()
         ]
 
-  @spec get(screen_id()) :: t()
-  @spec get(screen_id(), options()) :: t()
+  @callback get(screen_id()) :: t()
+  @callback get(screen_id(), options()) :: t()
   def get(screen_id, opts \\ []) do
     select_variant(screen_id, opts, &layout_to_data/2)
   end
