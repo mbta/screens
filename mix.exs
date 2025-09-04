@@ -62,7 +62,7 @@ defmodule Screens.MixProject do
       {:ex_cldr_messages, "~> 1.0"},
       {:gettext, "~> 0.26.1"},
       {:guardian, "~> 2.4.0"},
-      {:hackney, "~> 1.24.1"},
+      {:hackney, "~> 1.25.0"},
       {:hackney_telemetry, "~> 0.2.0"},
       {:httpoison, "~> 2.2.1"},
       {:jason, "~> 1.0"},
