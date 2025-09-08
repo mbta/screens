@@ -15,11 +15,8 @@ defmodule Screens.V2.Departure.Builder do
   """
   @spec build([Prediction.t()], [Schedule.t()], now :: DateTime.t()) :: [Departure.t()]
   def build(predictions, schedules, now) do
-    relevant_predictions = relevant(predictions, now)
-    relevant_schedules = relevant(schedules, now)
-
     predicted_trip_ids =
-      relevant_predictions
+      predictions
       |> Enum.reject(&is_nil(&1.trip))
       |> Enum.map(& &1.trip.id)
       |> Enum.reject(&is_nil/1)
@@ -30,37 +27,40 @@ defmodule Screens.V2.Departure.Builder do
       |> Enum.map(fn %{trip: %{id: trip_id}} = s -> {trip_id, s} end)
       |> Enum.into(%{})
 
-    predicted_departures =
-      relevant_predictions
-      |> Enum.map(fn
-        %{trip: %{id: trip_id}} = p when not is_nil(trip_id) ->
-          %Departure{prediction: p, schedule: Map.get(schedules_by_trip_id, trip_id)}
-
-        p ->
-          %Departure{prediction: p}
-      end)
-
-    scheduled_only_departures =
-      relevant_schedules
+    scheduled_only =
+      schedules
       |> Enum.filter(fn
         %{trip: %{id: trip_id}} when not is_nil(trip_id) -> trip_id not in predicted_trip_ids
         _ -> false
       end)
-      |> Enum.map(fn s -> %Departure{schedule: s} end)
 
-    predicted_departures
-    |> Enum.concat(scheduled_only_departures)
-    |> Enum.reject(&cancelled_or_skipped?/1)
+    (predictions ++ scheduled_only)
+    |> relevant_predictions_and_scheduled(now)
+    |> Enum.map(&map_to_departures(&1, schedules_by_trip_id))
     |> Enum.sort_by(&Departure.time/1, DateTime)
   end
 
-  defp relevant(predictions_or_schedules, now) do
+  defp relevant_predictions_and_scheduled(predictions_or_schedules, now) do
     predictions_or_schedules
+    |> Stream.reject(&cancelled_or_skipped?/1)
     |> Stream.reject(&in_past_or_nil_time?(&1, now))
     |> Stream.reject(&multi_route_duplicate?/1)
     |> Stream.reject(&vehicle_already_departed?/1)
     |> choose_earliest_arrival_per_trip()
   end
+
+  defp map_to_departures(%Schedule{} = schedule, _schedules_by_trip_id),
+    do: %Departure{schedule: schedule}
+
+  defp map_to_departures(%Prediction{trip: %{id: trip_id}} = prediction, schedules_by_trip_id)
+       when not is_nil(trip_id),
+       do: %Departure{
+         prediction: prediction,
+         schedule: Map.get(schedules_by_trip_id, trip_id)
+       }
+
+  defp map_to_departures(%Prediction{} = prediction, _schedules_by_trip_id),
+    do: %Departure{prediction: prediction}
 
   defp in_past_or_nil_time?(%{arrival_time: nil, departure_time: nil}, _), do: true
 
@@ -123,7 +123,7 @@ defmodule Screens.V2.Departure.Builder do
   defp earliest_time(%{departure_time: time}) when not is_nil(time), do: time
   defp earliest_time(_prediction_or_schedule), do: nil
 
-  defp cancelled_or_skipped?(%Departure{prediction: %Prediction{schedule_relationship: sr}}),
+  defp cancelled_or_skipped?(%Prediction{schedule_relationship: sr}),
     do: sr in [:cancelled, :skipped]
 
   defp cancelled_or_skipped?(_), do: false

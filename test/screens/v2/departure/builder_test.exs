@@ -270,7 +270,7 @@ defmodule Screens.V2.Departure.BuilderTest do
 
       p2 = %Prediction{
         id: "p2",
-        departure_time: ~U[2020-02-01T01:00:00Z],
+        departure_time: nil,
         trip: %Trip{id: "t3"},
         schedule_relationship: :cancelled
       }
