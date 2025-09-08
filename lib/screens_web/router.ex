@@ -79,6 +79,7 @@ defmodule ScreensWeb.Router do
 
   scope "/v2", ScreensWeb.V2 do
     scope "/widget" do
+      # See `docs/mercury_api.md`
       pipe_through [:redirect_prod_http, :browser_no_csrf]
       post "/:app_id", ScreenController, :widget
       get "/:app_id", ScreenController, :widget
