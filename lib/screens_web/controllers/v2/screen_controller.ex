@@ -140,8 +140,6 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   # Handles widget page GET requests with widget data as a query param.
-  # Primarily used by Mercury so not all requests need to run through the framework.
-  # https://app.asana.com/0/1185117109217413/1205234924224431/f
   def widget(conn, %{"app_id" => app_id, "widget" => json_data}) when is_binary(json_data) do
     # Phoenix does not automatically decode JSON received in query params.
     case Jason.decode(json_data) do

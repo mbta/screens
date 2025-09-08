@@ -99,6 +99,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
+  # See `docs/mercury_api.md`
   defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, opts) do
     %{full_page: data, flex_zone: flex_zone} =
       ScreenData.simulation(screen_id, merge_options(variant, opts))
@@ -116,14 +117,10 @@ defmodule ScreensWeb.V2.ScreenApiController do
     |> Keyword.put(:generator_variant, variant)
   end
 
-  # Add extra fields used by the Mercury E-ink client
+  # See `docs/mercury_api.md`
   defp put_extra_fields(response, screen_id, %Screen{vendor: :mercury}) do
     response
-    # Used to enable audio readout without additional network requests
-    # https://app.asana.com/0/1176097567827729/1205748798471858/f
     |> Map.put(:audio_data, fetch_ssml(screen_id))
-    # Used to help optimize data refreshes
-    # https://app.asana.com/0/1185117109217413/1205234924224431/f
     |> Map.put(:last_deploy_timestamp, Cache.last_deploy_timestamp())
   end
 

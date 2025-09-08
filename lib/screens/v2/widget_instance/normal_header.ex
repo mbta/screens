@@ -20,8 +20,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
           variant: atom() | nil
         }
 
-  # Mercury adds their own time so we omit the time in the response.
-  # https://app.asana.com/0/1185117109217413/1206070378353406/f
+  # See `docs/mercury_api.md`
   def serialize(%__MODULE__{screen: %Screen{vendor: :mercury}, icon: icon, text: text} = t) do
     %{icon: icon, text: text, show_to: showing_destination?(t)}
   end

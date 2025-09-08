@@ -240,8 +240,7 @@ defmodule Screens.V2.WidgetInstance.LineMap do
       if index < 0 do
         []
       else
-        # time_in_epoch is used by Mercury so they can calculate times on their own.
-        # https://app.asana.com/0/1176097567827729/1205730972991228/f
+        # See `docs/mercury_api.md`
         departure_time_epoch = d |> Departure.time() |> DateTime.to_unix()
         [%{id: vehicle_id, index: index, label: label, time_in_epoch: departure_time_epoch}]
       end
