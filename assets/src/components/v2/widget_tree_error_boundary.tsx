@@ -1,5 +1,11 @@
-import { type ComponentType, Component, ErrorInfo, useContext } from "react";
-import { RouteComponentProps, withRouter } from "react-router-dom";
+import {
+  type ComponentType,
+  type PropsWithChildren,
+  Component,
+  ErrorInfo,
+  useContext,
+} from "react";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { captureReactException } from "@sentry/react";
 
 import getCsrfToken from "Util/csrf";
@@ -12,13 +18,14 @@ import {
 import Widget, { WidgetData } from "Components/v2/widget";
 
 // The component uses the `match` prop supplied by withRouter for error logging.
-interface Props extends RouteComponentProps<any> {
+interface Props extends PropsWithChildren {
   // Whether to show the fallback component when an error is caught.
   // If false, the component will render nothing on error.
   // Defaults to true.
   showFallbackOnError?: boolean;
   // Supplied by withLastFetchContext
   lastFetch: number | null;
+  match?: { params?: { id?: string } };
 }
 
 interface State {
@@ -76,7 +83,7 @@ class WidgetTreeErrorBoundary extends Component<Props, State> {
         },
         credentials: "include",
         body: JSON.stringify({
-          id: this.props.match.params.id,
+          id: this.props.match?.params?.id,
           stacktrace: errorInfo.componentStack,
           errorMessage: error.message,
         }),
@@ -161,5 +168,18 @@ const WrappedWithLastFetch: ComponentType<Omit<Props, "lastFetch">> = (
 
   return <WidgetTreeErrorBoundary {...props} lastFetch={lastFetch} />;
 };
+
+// https://reactrouter.com/en/main/start/faq#what-happened-to-withrouter-i-need-it
+function withRouter<ComponentProps>(Component: ComponentType<ComponentProps>) {
+  function ComponentWithRouterProp(props: ComponentProps) {
+    const location = useLocation();
+    const navigate = useNavigate();
+    const params = useParams();
+
+    return <Component {...props} router={{ location, navigate, params }} />;
+  }
+
+  return ComponentWithRouterProp;
+}
 
 export default withRouter(WrappedWithLastFetch);
