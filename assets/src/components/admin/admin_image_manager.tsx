@@ -58,15 +58,12 @@ const ImageUpload = ({ onUploaded, selectedPrefix }): JSX.Element => {
   };
 
   const onDrop = useCallback(
-    ([acceptedFile]) => {
-      if (acceptedFile) {
-        setStagedUpload({
-          file: acceptedFile,
-          url: URL.createObjectURL(acceptedFile),
-        });
-        setUploadKey(
-          (selectedPrefix ? selectedPrefix + "/" : "") + acceptedFile.name,
-        );
+    (acceptedFiles) => {
+      const [file] = acceptedFiles;
+
+      if (file) {
+        setStagedUpload({ file, url: URL.createObjectURL(file) });
+        setUploadKey((selectedPrefix ? selectedPrefix + "/" : "") + file.name);
       } else {
         alert("That file is too large; please try one under 20MB.");
       }
@@ -76,7 +73,11 @@ const ImageUpload = ({ onUploaded, selectedPrefix }): JSX.Element => {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: ["image/png", "image/gif", "image/svg+xml"],
+    accept: {
+      "image/png": [".png"],
+      "image/gif": [".gif"],
+      "image/svg+xml": [".svg", ".xml"],
+    },
     multiple: false,
     maxSize: 20000000,
   });

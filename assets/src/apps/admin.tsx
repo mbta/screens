@@ -1,12 +1,12 @@
 import "../../css/admin.scss";
 
 import type { ComponentType } from "react";
-import ReactDOM from "react-dom";
+import { createRoot } from "react-dom/client";
 import {
   BrowserRouter as Router,
   NavLink,
   Route,
-  Switch,
+  Routes,
 } from "react-router-dom";
 import weakKey from "weak-key";
 
@@ -48,12 +48,12 @@ const routes: [string, string, ComponentType][][] = [
 
 const App = (): JSX.Element => {
   return (
-    <Router basename="/admin">
+    <Router basename="admin">
       <div className="admin-navbar">
         {routes.map((group) => (
           <div key={weakKey(group)} className="admin-navbar__group">
             {group.map(([path, label]) => (
-              <NavLink exact to={"/" + path} key={path}>
+              <NavLink to={path} key={path}>
                 {label}
               </NavLink>
             ))}
@@ -61,17 +61,15 @@ const App = (): JSX.Element => {
         ))}
       </div>
 
-      <Switch>
+      <Routes>
         {routes.map((group) =>
           group.map(([path, , Component]) => (
-            <Route exact path={"/" + path} key={path}>
-              <Component />
-            </Route>
+            <Route path={path} key={path} element={<Component />} />
           )),
         )}
-      </Switch>
+      </Routes>
     </Router>
   );
 };
 
-ReactDOM.render(<App />, document.getElementById("app"));
+createRoot(document.getElementById("app")!).render(<App />);

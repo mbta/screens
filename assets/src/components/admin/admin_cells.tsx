@@ -120,7 +120,6 @@ const EditableSelect = ({
       disabled={!editable}
     >
       {options.map((opt) => (
-        // @ts-expect-error
         <option value={opt} key={opt}>
           {opt}
         </option>
