@@ -290,4 +290,64 @@ defmodule Screens.Alerts.AlertTest do
       assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn2)
     end
   end
+
+  describe "direction_id/1" do
+    test "returns nil when all informed parent stations are affected in both directions" do
+      alert = %Alert{
+        informed_entities: [
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: 0,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "12345"
+          },
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: nil,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "place-a"
+          }
+        ]
+      }
+
+      assert Alert.direction_id(alert) == nil
+    end
+
+    test "returns the direction ID of the first directionally-informed parent station" do
+      alert = %Alert{
+        informed_entities: [
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: 0,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "12345"
+          },
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: 1,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "place-a"
+          },
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: 0,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "place-b"
+          }
+        ]
+      }
+
+      assert Alert.direction_id(alert) == 1
+    end
+  end
 end
