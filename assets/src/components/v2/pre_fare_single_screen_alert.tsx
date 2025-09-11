@@ -21,7 +21,7 @@ interface PreFareSingleScreenAlertProps {
   remedy: string;
   remedy_bold?: string;
   routes: EnrichedRoute[];
-  unaffected_routes: EnrichedRoute[];
+  unaffected_routes?: EnrichedRoute[];
   endpoints: [string, string];
   effect:
     | "suspension"
@@ -325,6 +325,7 @@ const isPartialClosure = ({
 }: PreFareSingleScreenAlertProps): boolean =>
   effect === "station_closure" &&
   region === "here" &&
+  unaffected_routes !== undefined &&
   unaffected_routes.length > 0;
 
 const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
@@ -369,10 +370,12 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
       );
       break;
     case isPartialClosure(alert):
+      // By definition if `isPartialClosure` is true then `unaffected_routes` is
+      // present, so it's okay to use a non-null assertion here.
       layout = (
         <PartialClosureLayout
           routes={routes}
-          unaffected_routes={unaffected_routes}
+          unaffected_routes={unaffected_routes!}
           disruptionDiagram={disruption_diagram}
         />
       );
