@@ -389,8 +389,13 @@ defmodule Screens.Alerts.Alert do
     )
   end
 
-  def direction_id(%__MODULE__{informed_entities: informed_entities}),
-    do: List.first(informed_entities).direction_id
+  @doc """
+  Very imperfectly determine whether an alert only affects one direction of service. Assumes this
+  is the case if any affected parent station is only affected in one direction.
+  """
+  @spec direction_id(t()) :: Trip.direction() | nil
+  def direction_id(%__MODULE__{informed_entities: entities}),
+    do: Enum.find(entities, &InformedEntity.parent_station?/1).direction_id
 
   def informed_parent_stations(%__MODULE__{
         informed_entities: informed_entities
