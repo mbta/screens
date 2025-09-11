@@ -97,50 +97,23 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 
 const App = (): JSX.Element => {
   return (
-    <Router basename="v2">
-      <Routes>
-        <Route
-          path="screen/gl_eink_v2"
-          element={
-            <MultiScreenPage
-              components={TYPE_TO_COMPONENT}
-              responseMapper={responseMapper}
+    <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+      <ResponseMapperContext.Provider value={responseMapper}>
+        <Router basename="v2">
+          <Routes>
+            <Route path="screen/gl_eink_v2" element={<MultiScreenPage />} />
+            <Route path="screen/pending?/:id" element={<ScreenPage />} />
+
+            <Route
+              path="screen/pending?/:id/simulation"
+              element={<SimulationScreenPage />}
             />
-          }
-        />
 
-        <Route
-          path="screen/pending?/:id"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <ScreenPage />
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          }
-        />
-
-        <Route
-          path="screen/pending?/:id/simulation"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <SimulationScreenPage />
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          }
-        />
-
-        <Route
-          path="widget/gl_eink_v2"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <WidgetPage />
-            </MappingContext.Provider>
-          }
-        />
-      </Routes>
-    </Router>
+            <Route path="widget/gl_eink_v2" element={<WidgetPage />} />
+          </Routes>
+        </Router>
+      </ResponseMapperContext.Provider>
+    </MappingContext.Provider>
   );
 };
 

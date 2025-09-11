@@ -117,45 +117,31 @@ const getAudioConfig = (): AudioConfig | null => {
 
 const App = (): JSX.Element => {
   return (
-    <Router basename="v2/screen">
-      <Routes>
-        <Route
-          path="bus_shelter_v2"
-          element={
-            <MultiScreenPage
-              components={TYPE_TO_COMPONENT}
-              responseMapper={responseMapper}
-            />
-          }
-        />
+    <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+      <ResponseMapperContext.Provider value={responseMapper}>
+        <BlinkConfigContext.Provider value={blinkConfig}>
+          <Router basename="v2/screen">
+            <Routes>
+              <Route path="bus_shelter_v2" element={<MultiScreenPage />} />
 
-        <Route
-          path="pending?/:id"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <BlinkConfigContext.Provider value={blinkConfig}>
+              <Route
+                path="pending?/:id"
+                element={
                   <AudioConfigContext.Provider value={getAudioConfig()}>
                     <ScreenPage />
                   </AudioConfigContext.Provider>
-                </BlinkConfigContext.Provider>
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          }
-        />
+                }
+              />
 
-        <Route
-          path="pending?/:id/simulation"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <SimulationScreenPage />
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          }
-        />
-      </Routes>
-    </Router>
+              <Route
+                path="pending?/:id/simulation"
+                element={<SimulationScreenPage />}
+              />
+            </Routes>
+          </Router>
+        </BlinkConfigContext.Provider>
+      </ResponseMapperContext.Provider>
+    </MappingContext.Provider>
   );
 };
 

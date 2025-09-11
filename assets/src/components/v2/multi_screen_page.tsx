@@ -1,19 +1,8 @@
-import ScreenContainer, {
-  defaultResponseMapper,
-  ResponseMapper,
-  ResponseMapperContext,
-} from "Components/v2/screen_container";
-import { MappingContext } from "Components/v2/widget";
+import ScreenContainer from "Components/v2/screen_container";
 import { fetchDatasetValue } from "Util/dataset";
 import { ScreenIDProvider } from "Hooks/v2/use_screen_id";
 
-const MultiScreenPage = ({
-  components,
-  responseMapper = defaultResponseMapper,
-}: {
-  components: any;
-  responseMapper?: ResponseMapper;
-}) => {
+const MultiScreenPage = () => {
   const screenIds = JSON.parse(fetchDatasetValue("screenIdsWithOffsetMap"));
 
   return (
@@ -21,11 +10,7 @@ const MultiScreenPage = ({
       {screenIds.map((screen) => (
         <div key={screen.id}>
           <ScreenIDProvider id={screen.id}>
-            <MappingContext.Provider value={components}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <ScreenContainer id={screen.id} />
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
+            <ScreenContainer id={screen.id} />
           </ScreenIDProvider>
         </div>
       ))}
