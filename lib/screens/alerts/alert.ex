@@ -172,10 +172,7 @@ defmodule Screens.Alerts.Alert do
 
     case get_json_fn.("alerts", params) do
       {:ok, response} ->
-        {:ok,
-         response
-         |> V3Api.Parser.parse()
-         |> normalize_informed_entities_for_direction_id()}
+        {:ok, response |> V3Api.Parser.parse() |> Enum.map(&normalize_informed_entities/1)}
 
       _ ->
         :error
@@ -428,35 +425,17 @@ defmodule Screens.Alerts.Alert do
     Enum.any?(informed_entities, &(&1.stop == stop_id))
   end
 
-  @spec normalize_informed_entities_for_direction_id([t()]) :: [t()]
-  defp normalize_informed_entities_for_direction_id(alerts) do
-    Enum.map(alerts, fn alert ->
-      %__MODULE__{
-        alert
-        | informed_entities:
-            alert.informed_entities
-            |> Enum.reduce(%{}, fn entity, acc ->
-              key = Map.drop(entity, [:direction_id])
+  @spec normalize_informed_entities(t()) :: t()
+  defp normalize_informed_entities(%__MODULE__{informed_entities: entities} = alert) do
+    %__MODULE__{alert | informed_entities: do_normalize_informed_entities(entities)}
+  end
 
-              if entity.direction_id == nil do
-                Map.put(acc, key, entity)
-              else
-                case Map.fetch(acc, key) do
-                  :error ->
-                    Map.put(acc, key, entity)
-
-                  {:ok, matching_entity} ->
-                    if matching_entity.direction_id != nil and
-                         matching_entity.direction_id == 1 - entity.direction_id do
-                      Map.put(acc, key, %{entity | direction_id: nil})
-                    else
-                      acc
-                    end
-                end
-              end
-            end)
-            |> Map.values()
-      }
+  defp do_normalize_informed_entities(entities) do
+    entities
+    |> Enum.group_by(&Map.put(&1, :direction_id, nil))
+    |> Enum.map(fn
+      {_directionless_entity, [entity]} -> entity
+      {directionless_entity, _multiple} -> directionless_entity
     end)
   end
 end
