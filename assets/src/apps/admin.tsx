@@ -1,6 +1,6 @@
 import "../../css/admin.scss";
 
-import type { ComponentType } from "react";
+import { type ComponentType, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import {
   BrowserRouter as Router,
@@ -72,4 +72,9 @@ const App = (): JSX.Element => {
   );
 };
 
-createRoot(document.getElementById("app")!).render(<App />);
+const root = createRoot(document.getElementById("app")!);
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
