@@ -6,6 +6,7 @@ initFullstory();
 
 import "../../../css/elevator_v2.scss";
 
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import NormalScreen from "Components/v2/elevator/normal_screen";
@@ -64,4 +65,9 @@ const App = (): JSX.Element => {
   );
 };
 
-createRoot(document.getElementById("app")!).render(<App />);
+const root = createRoot(document.getElementById("app")!);
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);

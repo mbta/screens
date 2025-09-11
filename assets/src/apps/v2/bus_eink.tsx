@@ -6,6 +6,7 @@ initFullstory();
 
 import "../../../css/bus_eink_v2.scss";
 
+import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import ScreenPage from "Components/v2/screen_page";
@@ -138,4 +139,9 @@ const App = (): JSX.Element => {
   );
 };
 
-createRoot(document.getElementById("app")!).render(<App />);
+const root = createRoot(document.getElementById("app")!);
+root.render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);
