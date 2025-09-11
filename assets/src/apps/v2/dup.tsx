@@ -130,43 +130,29 @@ const App = (): JSX.Element => {
   }
 
   return (
-    <Router basename="v2/screen">
-      <Routes>
-        <Route
-          path="dup_v2"
-          element={
-            <MultiScreenPage
-              components={TYPE_TO_COMPONENT}
-              responseMapper={responseMapper}
-            />
-          }
-        />
+    <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+      <ResponseMapperContext.Provider value={responseMapper}>
+        <Router basename="v2/screen">
+          <Routes>
+            <Route path="dup_v2" element={<MultiScreenPage />} />
 
-        <Route
-          path="pending?/:id"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
+            <Route
+              path="pending?/:id"
+              element={
                 <Viewport>
                   <ScreenPage />
                 </Viewport>
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          }
-        />
+              }
+            />
 
-        <Route
-          path="pending?/:id/simulation"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ResponseMapperContext.Provider value={responseMapper}>
-                <SimulationScreenPage opts={{ alternateView: true }} />
-              </ResponseMapperContext.Provider>
-            </MappingContext.Provider>
-          }
-        />
-      </Routes>
-    </Router>
+            <Route
+              path="pending?/:id/simulation"
+              element={<SimulationScreenPage opts={{ alternateView: true }} />}
+            />
+          </Routes>
+        </Router>
+      </ResponseMapperContext.Provider>
+    </MappingContext.Provider>
   );
 };
 

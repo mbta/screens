@@ -36,32 +36,19 @@ const TYPE_TO_COMPONENT = {
 
 const App = (): JSX.Element => {
   return (
-    <Router basename="v2/screen">
-      <Routes>
-        <Route
-          path="elevator_v2"
-          element={<MultiScreenPage components={TYPE_TO_COMPONENT} />}
-        />
+    <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+      <Router basename="v2/screen">
+        <Routes>
+          <Route path="elevator_v2" element={<MultiScreenPage />} />
+          <Route path="pending?/:id" element={<ScreenPage />} />
 
-        <Route
-          path="pending?/:id"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <ScreenPage />
-            </MappingContext.Provider>
-          }
-        />
-
-        <Route
-          path="pending?/:id/simulation"
-          element={
-            <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-              <SimulationScreenPage />
-            </MappingContext.Provider>
-          }
-        />
-      </Routes>
-    </Router>
+          <Route
+            path="pending?/:id/simulation"
+            element={<SimulationScreenPage />}
+          />
+        </Routes>
+      </Router>
+    </MappingContext.Provider>
   );
 };
 
