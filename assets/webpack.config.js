@@ -30,6 +30,22 @@ const ENTRYPOINTS = {
 
 const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 
+// Though this is normally not recommended, we transpile the dependencies we
+// ship to screens, because many libraries no longer support the old browser
+// versions we have to support. This should be reevaluated with future shifts
+// in the screens browser landscape.
+
+// Transpile all prod deps, except for polyfills which are part of transpiling.
+const BABEL_INCLUDED_DEPS = Object.keys(
+  require("./package.json").dependencies,
+).filter((name) => name !== "core-js");
+
+// Build a pattern that matches module paths which should *not* be transpiled.
+// Looks like: /node_modules\/(?!dep-one|dep-two|...)/
+const BABEL_EXCLUDE_PATTERN = new RegExp(
+  `node_modules/(?!${BABEL_INCLUDED_DEPS.join("|")})`,
+);
+
 module.exports = (env, argv) => {
   const isOutfrontPackage = env.package == "dup";
   const isProduction = argv.mode == "production";
@@ -47,7 +63,7 @@ module.exports = (env, argv) => {
       rules: [
         {
           test: /\.[jt]sx?$/,
-          exclude: /node_modules/,
+          exclude: BABEL_EXCLUDE_PATTERN,
           use: {
             loader: "babel-loader",
             options: {
@@ -63,6 +79,8 @@ module.exports = (env, argv) => {
                 ["@babel/preset-react", { runtime: "automatic" }],
                 "@babel/preset-typescript",
               ],
+              // only needed as long as we are transpiling dependencies
+              sourceType: "unambiguous",
             },
           },
         },
