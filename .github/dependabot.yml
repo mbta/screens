@@ -37,8 +37,10 @@ updates:
           - "@eslint*"
       react:
         patterns:
-          - "react*"
-          - "@types/react*"
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
       testing-tools:
         patterns:
           - "ts-jest"
