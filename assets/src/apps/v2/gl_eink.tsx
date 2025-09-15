@@ -21,7 +21,7 @@ import BottomTakeoverBody from "Components/v2/gl_eink/bottom_takeover_body";
 import OneMedium from "Components/v2/eink/flex/one_medium";
 import Placeholder from "Components/v2/placeholder";
 import FareInfoFooter from "Components/v2/eink/fare_info_footer";
-import NormalHeader from "Components/v2/eink/gl_normal_header";
+import NormalHeader from "Components/v2/eink/normal_header";
 import Departures from "Components/v2/departures";
 import LineMap from "Components/v2/gl_eink/line_map";
 import EvergreenContent from "Components/v2/evergreen_content";

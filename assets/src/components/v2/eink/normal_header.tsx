@@ -21,7 +21,6 @@ const NormalHeader: ComponentType<Props> = ({
       text={text}
       time={time}
       showUpdated
-      maxHeight={192}
       showTo={showTo}
     />
   );

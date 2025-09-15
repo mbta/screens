@@ -97,22 +97,17 @@
     }
   }
 
-  // While resizing, we aim to have the text stop before the right edge of the
-  // rule.
-  // Once we're done resizing (whether because content fits, or because it
-  // still overflows after all attempts), we remove this limitation and allow
-  // the text to go right up to the edge of the widget "card".
-  .subway-status_alert-sizer:not(.subway-status_alert-sizer--hide-overflow) {
-    // 976px
-    width: $pill-width + $status-left-padding + $rule-width;
-  }
-
-  // Prevents text-container from wrapping to a second line below the pill
-  // if it's too long.
-  .subway-status_alert-sizer--hide-overflow {
+  .subway-status_alert-sizer {
     overflow: hidden;
-    text-overflow: clip;
     white-space: nowrap;
+
+    // When we have resizing options remaining, make it so the text will be
+    // downsized if it goes past the right edge of the rule. Otherwise allow
+    // the text to go right up to the edge of the widget "card".
+    &:not(&--hide-overflow) {
+      // 976px
+      width: $pill-width + $status-left-padding + $rule-width;
+    }
   }
 
   .subway-status_alert_route-pill-container {
@@ -138,19 +133,10 @@
     &--3-branches {
       max-width: 605px;
     }
-  }
 
-  .subway-status_status--contracted
-    .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
-    height: $pill-height;
-  }
-
-  // Prevents location text from wrapping to a second line below the status
-  // if it's too long.
-  .subway-status_alert_text-container.subway-status_alert_text-container--hide-overflow {
-    overflow: hidden;
-    text-overflow: clip;
-    white-space: nowrap;
+    .subway-status_status--contracted & {
+      height: $pill-height;
+    }
   }
 
   span.subway-status_alert_status-text {

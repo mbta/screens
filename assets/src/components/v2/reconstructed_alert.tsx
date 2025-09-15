@@ -1,9 +1,10 @@
 import type { ComponentType, ReactNode } from "react";
 
-import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 import RoutePill, { routePillKey } from "Components/v2/departures/route_pill";
+import useAutoSize from "Hooks/use_auto_size";
+import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
+
 import { ReconAlertProps } from "./reconstructed_takeover";
-import useTextResizer from "Hooks/v2/use_text_resizer";
 
 interface AlertCardProps {
   urgent: boolean;
@@ -20,14 +21,12 @@ const isTextFallback = ({ cause, location, remedy }: ReconAlertProps) => {
 const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
   const { cause, effect, issue, location, remedy, routes, urgent } = alert;
 
-  const BODY_SIZES = isTextFallback(alert)
-    ? ["extra-small", "small", "large"]
-    : ["small", "large", "extra-large"];
-  const { ref: descriptionRef, size: descriptionSize } = useTextResizer({
-    sizes: BODY_SIZES,
-    maxHeight: 360,
-    resetDependencies: [issue, cause],
-  });
+  const { ref: contentRef, step: contentSize } = useAutoSize(
+    isTextFallback(alert)
+      ? ["large", "small", "extra-small"]
+      : ["extra-large", "large", "small"],
+    issue + cause,
+  );
 
   const modifiers = [
     "large-flex",
@@ -58,9 +57,9 @@ const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
             <div
               className={classWithModifier(
                 "alert-card__body__content",
-                descriptionSize,
+                contentSize,
               )}
-              ref={descriptionRef}
+              ref={contentRef}
             >
               <div className="alert-card__body__issue">
                 {isTextFallback(alert) ? (

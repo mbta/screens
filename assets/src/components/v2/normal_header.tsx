@@ -1,9 +1,9 @@
-import { type ComponentType, forwardRef } from "react";
+import { type ComponentType } from "react";
 
+import useAutoSize from "Hooks/use_auto_size";
 import LiveDataSvg from "Images/live-data-small.svg";
 import { getDatasetValue } from "Util/dataset";
 import { classWithModifiers, formatTimeString, imagePath } from "Util/utils";
-import useTextResizer from "Hooks/v2/use_text_resizer";
 
 enum Icon {
   green_b = "green_b",
@@ -12,11 +12,6 @@ enum Icon {
   green_e = "green_e",
   logo = "logo",
   logo_negative = "logo_negative",
-}
-
-enum TitleSize {
-  small = "small",
-  large = "large",
 }
 
 const ICON_TO_SRC: Record<Icon, string> = {
@@ -46,35 +41,38 @@ const NormalHeaderIcon: ComponentType<NormalHeaderIconProps> = ({ icon }) => {
 interface NormalHeaderTitleProps {
   icon?: Icon;
   text: string;
-  size: TitleSize;
   showTo: boolean;
 }
 
-const NormalHeaderTitle = forwardRef<HTMLDivElement, NormalHeaderTitleProps>(
-  ({ icon, text, size, showTo }, ref) => {
-    const environmentName = getDatasetValue("environmentName") || "";
+const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
+  icon,
+  text,
+  showTo,
+}) => {
+  const environmentName = getDatasetValue("environmentName") || "";
+  const { ref, step: size } = useAutoSize(["large", "small"], text);
 
-    return (
-      <>
-        {["screens-dev", "screens-dev-green"].includes(environmentName) && (
-          <div className="normal-header__environment">{environmentName}</div>
-        )}
-        <div
-          className={classWithModifiers("normal-header-title", [
-            size,
-            icon ? "with-icon" : "no-icon",
-          ])}
-        >
-          {icon && <NormalHeaderIcon icon={icon} />}
-          <div className="normal-header-title__text" ref={ref}>
-            {showTo && <div className="normal-header-to__text">TO</div>}
-            {text}
-          </div>
+  return (
+    <>
+      {["screens-dev", "screens-dev-green"].includes(environmentName) && (
+        <div className="normal-header__environment">{environmentName}</div>
+      )}
+      <div
+        className={classWithModifiers("normal-header-title", [
+          size,
+          icon ? "with-icon" : "no-icon",
+        ])}
+        ref={ref}
+      >
+        {icon && <NormalHeaderIcon icon={icon} />}
+        <div className="normal-header-title__text">
+          {showTo && <div className="normal-header-to__text">TO</div>}
+          {text}
         </div>
-      </>
-    );
-  },
-);
+      </div>
+    </>
+  );
+};
 
 interface NormalHeaderTimeProps {
   time: string;
@@ -131,7 +129,6 @@ interface Props {
   time?: string;
   showUpdated?: boolean;
   version?: string;
-  maxHeight: number;
   showTo?: boolean;
   classModifier?: string;
   accentPattern?: string;
@@ -144,28 +141,16 @@ const NormalHeader: ComponentType<Props> = ({
   time,
   showUpdated = false,
   version,
-  maxHeight,
   showTo = false,
   classModifier,
   accentPattern,
   variant,
 }) => {
-  const { ref: headerRef, size: headerSize } = useTextResizer({
-    sizes: Object.keys(TitleSize),
-    maxHeight: maxHeight,
-    resetDependencies: [text],
-  });
   return (
     <div
       className={classWithModifiers("normal-header", [classModifier, variant])}
     >
-      <NormalHeaderTitle
-        icon={icon}
-        text={text}
-        size={headerSize as TitleSize}
-        ref={headerRef}
-        showTo={showTo}
-      />
+      <NormalHeaderTitle icon={icon} text={text} showTo={showTo} />
       {time && <NormalHeaderTime time={time} />}
       {version && <NormalHeaderVersion version={version} />}
       {showUpdated && <NormalHeaderUpdated />}

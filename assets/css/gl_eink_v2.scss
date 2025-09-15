@@ -18,7 +18,7 @@
 @use "v2/eink/free_text";
 @use "v2/eink/link_footer";
 @use "v2/eink/no_data";
-@use "v2/eink/normal_header";
+@use "v2/eink/normal_header" as *;
 @use "v2/eink/page_load_no_data";
 @use "v2/eink/route_pill" as *;
 @use "v2/eink/screen/takeover" as *;
@@ -31,6 +31,7 @@
 @use "v2/gl_eink/departures/time";
 @use "v2/gl_eink/evergreen/image";
 @use "v2/gl_eink/line_map";
+@use "v2/gl_eink/normal_header" as *;
 @use "v2/gl_eink/route_pill" as *;
 @use "v2/gl_eink/screen/normal" as *;
 @use "v2/gl_eink/simulation";

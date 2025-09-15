@@ -36,7 +36,7 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
   const [currentDepartureIdx, setCurrentDepartureIdx] = useState(0);
 
   useLayoutEffect(() => {
-    if (hasOverflowX(ref)) {
+    if (ref.current && hasOverflowX(ref.current)) {
       setLimit(Math.max(0, limit - 1));
     }
   }, [limit]);

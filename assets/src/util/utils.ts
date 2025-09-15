@@ -1,6 +1,5 @@
 import moment from "moment";
 import "moment-timezone";
-import { RefObject } from "react";
 import cx from "classnames";
 
 import { getDatasetValue } from "Util/dataset";
@@ -28,11 +27,14 @@ export const classWithModifiers = (baseClass, modifiers) => {
 export const formatTimeString = (timeString: string) =>
   moment(timeString).tz("America/New_York").format("h:mm");
 
-export const hasOverflowY = (ref: RefObject<Element>): boolean =>
-  !!ref.current && ref.current.scrollHeight > ref.current.clientHeight;
+export const hasOverflowX = (elem: Element): boolean =>
+  elem.scrollWidth > elem.clientWidth;
 
-export const hasOverflowX = (ref: RefObject<Element>): boolean =>
-  !!ref.current && ref.current.scrollWidth > ref.current.clientWidth;
+export const hasOverflowY = (elem: Element): boolean =>
+  elem.scrollHeight > elem.clientHeight;
+
+export const hasOverflow = (elem: Element): boolean =>
+  hasOverflowX(elem) || hasOverflowY(elem);
 
 export const imagePath = (fileName: string): string =>
   isDup() ? `images/${fileName}` : `/images/${fileName}`;

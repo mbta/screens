@@ -1,7 +1,9 @@
-import useTextResizer from "Hooks/v2/use_text_resizer";
 import moment from "moment";
 import type { ComponentType } from "react";
+
+import useAutoSize from "Hooks/use_auto_size";
 import { classWithModifier, imagePath } from "Util/utils";
+
 import FlexZonePageIndicator from "./flex/page_indicator";
 import makePersistentCarousel, {
   PageRendererProps,
@@ -198,19 +200,14 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
     ],
   },
 }) => {
-  const DESCRIPTION_SIZES = ["extra-small", "small", "large", "extra-large"];
-  const HEADER_SIZES = ["small", "large"];
-  const { ref: descriptionRef, size: descriptionSize } = useTextResizer({
-    sizes: DESCRIPTION_SIZES,
-    maxHeight: 425,
-    resetDependencies: [description],
-  });
-
-  const { ref: headerRef, size: headerSize } = useTextResizer({
-    sizes: HEADER_SIZES,
-    maxHeight: 144,
-    resetDependencies: [headerText],
-  });
+  const { ref: descRef, step: descSize } = useAutoSize(
+    ["extra-large", "large", "small", "extra-small"],
+    description,
+  );
+  const { ref: headerRef, step: headerSize } = useAutoSize(
+    ["large", "small"],
+    headerText,
+  );
 
   return (
     <div className="detail-page">
@@ -252,11 +249,8 @@ const DetailPageComponent: ComponentType<DetailPage> = ({
           </div>
         </div>
         <div
-          className={classWithModifier(
-            "detail-page__description",
-            descriptionSize,
-          )}
-          ref={descriptionRef}
+          className={classWithModifier("detail-page__description", descSize)}
+          ref={descRef}
         >
           {description}
         </div>

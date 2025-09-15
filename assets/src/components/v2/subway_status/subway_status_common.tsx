@@ -1,9 +1,9 @@
+import useAutoSize from "Hooks/use_auto_size";
+import { firstWord } from "Util/utils";
+
 ///////////////////////
 // SERVER DATA TYPES //
 ///////////////////////
-
-import useTextResizer from "Hooks/v2/use_text_resizer";
-import { firstWord } from "Util/utils";
 
 export interface SubwayStatusData {
   blue: Section;
@@ -136,28 +136,19 @@ export const isContractedWith1Alert = (
 ): section is ContractedSection =>
   isContracted(section) && section.alerts.length === 1;
 
-// Ordered from "smallest" to "largest"
+// Ordered from "largest" to "smallest"
 export enum FittingStep {
-  PerAlertEffect = "PerAlertEffect",
-  Abbrev = "Abbrev",
   FullSize = "FullSize",
+  Abbrev = "Abbrev",
+  PerAlertEffect = "PerAlertEffect",
 }
 
 export const useSubwayStatusTextResizer = (
-  rowHeight: number,
   steps: FittingStep[],
   id: string,
   status: string,
 ) => {
-  const {
-    ref,
-    size: fittingStep,
-    isDone,
-  } = useTextResizer({
-    sizes: steps,
-    maxHeight: rowHeight,
-    resetDependencies: [id],
-  });
+  const { ref, step: fittingStep } = useAutoSize(steps, id);
 
   let [abbrev, truncateStatus, replaceLocationWithUrl] = [false, false, false];
   switch (fittingStep) {
@@ -191,6 +182,5 @@ export const useSubwayStatusTextResizer = (
     truncateStatus,
     replaceLocationWithUrl,
     fittingStep,
-    isDone,
   };
 };

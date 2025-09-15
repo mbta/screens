@@ -99,9 +99,9 @@ interface AlertRowProps extends Alert {
 
 const STATUS_URL = "mbta.com/status";
 const ALERT_FITTING_STEPS = [
-  FittingStep.PerAlertEffect,
-  FittingStep.Abbrev,
   FittingStep.FullSize,
+  FittingStep.Abbrev,
+  FittingStep.PerAlertEffect,
 ];
 
 const AlertRow: ComponentType<AlertRowProps> = ({
@@ -112,10 +112,8 @@ const AlertRow: ComponentType<AlertRowProps> = ({
   id,
   showInlineBranches,
 }) => {
-  // row height is a little taller when there is an inline GL branch pill
-  const rowHeight = showInlineBranches ? 70 : 65;
   const { ref, abbrev, truncateStatus, replaceLocationWithUrl } =
-    useSubwayStatusTextResizer(rowHeight, ALERT_FITTING_STEPS, id, status);
+    useSubwayStatusTextResizer(ALERT_FITTING_STEPS, id, status);
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
@@ -155,23 +153,19 @@ interface BasicAlertProps extends Omit<Alert, "route_pill"> {
 
 const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
   ({ routePill, status, location, showInlineBranches }, ref) => {
-    let textContainerClassName = "subway-status_alert_text-container";
-
-    if (status === NORMAL_STATUS) {
-      textContainerClassName = classWithModifier(
-        textContainerClassName,
-        "normal-service",
-      );
-    }
+    const textContainerClassName = classWithModifier(
+      "subway-status_alert_text-container",
+      status === NORMAL_STATUS && "normal-service",
+    );
 
     return (
-      <div className="subway-status_alert">
+      <div className="subway-status_alert" ref={ref}>
         {showInlineBranches && routePill?.branches && (
           <div className="subway-status_alert_route-pill-container">
             <SubwayStatusRoutePill routePill={routePill} showInlineBranches />
           </div>
         )}
-        <div className={textContainerClassName} ref={ref}>
+        <div className={textContainerClassName}>
           {status && <span>{status}</span>}
           {location && (
             <span className="subway-status_alert_location-text">
