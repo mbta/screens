@@ -30,7 +30,7 @@ const Departures: ComponentType<Departures> = ({ sections }) => {
 
   // Iteratively trim sections until the container doesn't overflow.
   useLayoutEffect(() => {
-    if (hasOverflowY(ref)) {
+    if (ref.current && hasOverflowY(ref.current)) {
       const newSections = trimSections(foldedSections);
 
       if (foldedSections != newSections) {

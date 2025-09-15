@@ -18,7 +18,6 @@ const NormalHeader = ({ icon, text, time }) => {
       icon={icon}
       text={text}
       time={time}
-      maxHeight={104}
       classModifier={classModifier}
     />
   );

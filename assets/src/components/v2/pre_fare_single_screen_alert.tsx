@@ -1,11 +1,12 @@
 import type { ComponentType } from "react";
 
-import useTextResizer from "Hooks/v2/use_text_resizer";
+import useAutoSize from "Hooks/use_auto_size";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
+import { classWithModifier, classWithModifiers, formatCause } from "Util/utils";
+
 import DisruptionDiagram, {
   DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";
-import { classWithModifier, classWithModifiers, formatCause } from "Util/utils";
 
 import ClockIcon from "Images/clock-negative.svg";
 import NoServiceIcon from "Images/no-service.svg";
@@ -47,11 +48,6 @@ interface StandardLayoutProps {
   disruptionDiagram?: DisruptionDiagramData;
 }
 
-// Bypassed station alerts can have resizing font based on how many stations are affected
-// Other alerts have static font sizes:
-// - issue font is size large
-// - "Seek alternate route" remedy is medium
-// - "Use shuttle bus" remedy is large
 const StandardLayout: ComponentType<StandardLayoutProps> = ({
   issue,
   remedy,
@@ -59,24 +55,20 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
   location,
   disruptionDiagram,
 }) => {
-  const maxTextHeight = 772;
-
-  const { ref: contentBlockRef, size: contentTextSize } = useTextResizer({
-    sizes: ["medium", "large"],
-    // the 32 is padding on the text object
-    maxHeight: maxTextHeight + 32,
-    resetDependencies: [issue, remedy],
-  });
+  // For station closure alerts, content may need to be sized down depending on
+  // how many stations are affected
+  const { ref: textRef, step: issueTextSize } = useAutoSize(
+    effect === "station_closure" ? ["large", "medium"] : ["large"],
+    issue + remedy,
+  );
 
   return (
     <div className="alert-card__content-block">
-      <div ref={contentBlockRef}>
+      <div className="alert-card__content-block__text-sections" ref={textRef}>
         <StandardIssueSection
           issue={issue}
           location={location}
-          contentTextSize={
-            effect === "station_closure" ? contentTextSize : "large"
-          }
+          contentTextSize={issueTextSize}
         />
         <RemedySection
           effect={effect}
@@ -186,11 +178,10 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   remedyBold,
   effect,
 }) => {
-  const { ref: pioTextBlockRef, size: pioSecondaryTextSize } = useTextResizer({
-    sizes: ["small", "medium"],
-    maxHeight: 460,
-    resetDependencies: [issue, remedy],
-  });
+  const { ref: alertTextRef, step: alertTextSize } = useAutoSize(
+    ["medium", "small"],
+    remedy,
+  );
 
   const Icon = fallbackLayoutIcons[effect] ?? NoServiceIcon;
 
@@ -201,16 +192,16 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
       {remedy && (
         <div
           className={classWithModifier(
-            "alert-card__fallback__pio-text",
-            pioSecondaryTextSize,
+            "alert-card__fallback__alert-text",
+            alertTextSize,
           )}
-          ref={pioTextBlockRef}
+          ref={alertTextRef}
         >
           {remedy}
         </div>
       )}
       {remedyBold && (
-        <div className="alert-card__fallback__pio-text alert-card__fallback__pio-text--bold">
+        <div className="alert-card__fallback__alert-text alert-card__fallback__alert-text--bold">
           {remedyBold}
         </div>
       )}

@@ -100,20 +100,12 @@ interface AlertWithID extends Alert {
   id: string;
 }
 
-/**
- * Max pixel height of each alert type's "subway-status_alert-sizer" div element when content doesn't wrap.
- *
- * When the text wraps to a second line it's more than that, which is all we care about to detect overflows.
- */
-const CONTRACTED_ALERT_MAX_HEIGHT = 82;
-const EXTENDED_ALERT_MAX_HEIGHT = 120;
-
 const CONTRACTED_ALERT_FITTING_STEPS = [
-  FittingStep.PerAlertEffect,
-  FittingStep.Abbrev,
   FittingStep.FullSize,
+  FittingStep.Abbrev,
+  FittingStep.PerAlertEffect,
 ];
-const EXTENDED_ALERT_FITTING_STEPS = [FittingStep.Abbrev, FittingStep.FullSize];
+const EXTENDED_ALERT_FITTING_STEPS = [FittingStep.FullSize, FittingStep.Abbrev];
 
 const STATUS_URL = "mbta.com/status";
 
@@ -124,13 +116,8 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   station_count: stationCount,
   id,
 }) => {
-  const { ref, abbrev, truncateStatus, replaceLocationWithUrl, isDone } =
-    useSubwayStatusTextResizer(
-      CONTRACTED_ALERT_MAX_HEIGHT,
-      CONTRACTED_ALERT_FITTING_STEPS,
-      id,
-      status,
-    );
+  const { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep } =
+    useSubwayStatusTextResizer(CONTRACTED_ALERT_FITTING_STEPS, id, status);
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
@@ -154,7 +141,7 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
       routePill={routePill}
       status={status}
       location={locationText}
-      hideOverflow={isDone}
+      hideOverflow={fittingStep === CONTRACTED_ALERT_FITTING_STEPS.at(-1)}
       ref={ref}
     />
   );
@@ -166,8 +153,7 @@ const ExtendedAlert: ComponentType<AlertWithID> = ({
   location,
   id,
 }) => {
-  const { ref, abbrev, isDone } = useSubwayStatusTextResizer(
-    EXTENDED_ALERT_MAX_HEIGHT,
+  const { ref, abbrev, fittingStep } = useSubwayStatusTextResizer(
     EXTENDED_ALERT_FITTING_STEPS,
     id,
     status,
@@ -185,7 +171,7 @@ const ExtendedAlert: ComponentType<AlertWithID> = ({
       routePill={routePill}
       status={status}
       location={locationText}
-      hideOverflow={isDone}
+      hideOverflow={fittingStep === EXTENDED_ALERT_FITTING_STEPS.at(-1)}
       ref={ref}
     />
   );
@@ -201,39 +187,28 @@ interface BasicAlertProps extends Omit<Alert, "route_pill"> {
 
 const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
   ({ routePill, status, location, hideOverflow = false }, ref) => {
-    let containerClassName = "subway-status_alert";
-    containerClassName = classWithModifier(
-      containerClassName,
+    const containerClassName = classWithModifier(
+      "subway-status_alert",
       routePill ? "has-pill" : "no-pill",
     );
 
-    let sizerClassName = "subway-status_alert-sizer";
-    if (hideOverflow) {
-      sizerClassName = classWithModifier(sizerClassName, "hide-overflow");
-    }
-
-    let textContainerClassName = "subway-status_alert_text-container";
-    const textContainerModifiers: string[] = [];
-    if (hideOverflow) {
-      textContainerModifiers.push("hide-overflow");
-    }
-
-    if (routePill?.branches) {
-      textContainerModifiers.push(`${routePill.branches.length}-branches`);
-    }
-
-    textContainerClassName = classWithModifiers(
-      textContainerClassName,
-      textContainerModifiers,
+    const sizerClassName = classWithModifier(
+      "subway-status_alert-sizer",
+      hideOverflow && "hide-overflow",
     );
 
-    let statusTextClassName = "subway-status_alert_status-text";
-    if (status === NORMAL_STATUS) {
-      statusTextClassName = classWithModifier(
-        statusTextClassName,
-        "normal-service",
-      );
-    }
+    const textContainerClassName = classWithModifiers(
+      "subway-status_alert_text-container",
+      [
+        hideOverflow && "hide-overflow",
+        routePill?.branches && `${routePill.branches.length}-branches`,
+      ],
+    );
+
+    const statusTextClassName = classWithModifier(
+      "subway-status_alert_status-text",
+      status === NORMAL_STATUS && "normal-service",
+    );
 
     return (
       <div className={containerClassName}>

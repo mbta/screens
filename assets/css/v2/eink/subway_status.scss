@@ -25,6 +25,7 @@
     position: relative;
     min-height: 230px;
     max-height: 320px;
+    overflow: hidden;
 
     &--multi {
       height: 320px;
@@ -67,8 +68,12 @@
   margin-left: 36px;
   overflow: hidden;
 
-  .subway-status_alert:not(:first-child) {
-    margin-top: 24px;
+  .subway-status_alert {
+    max-height: 70px;
+
+    &:not(:first-child) {
+      margin-top: 24px;
+    }
   }
 
   .subway-status_alert_route-pill-container {
@@ -81,20 +86,17 @@
     font-family: Inter, sans-serif;
     font-size: 56px;
     font-weight: 800;
-    line-height: 65px;
     vertical-align: top;
 
     &--normal-service {
       font-size: 48px;
       font-weight: 500;
-      line-height: 43px;
     }
 
     .subway-status_alert_location-text {
       margin-left: 24px;
       font-size: 40px;
       font-weight: 500;
-      line-height: 40px;
     }
   }
 }

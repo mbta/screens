@@ -121,6 +121,10 @@
     color: colors.$cool-black-15;
   }
 
+  .alert-card__content-block__text-sections {
+    max-height: 772px;
+  }
+
   .alert-card__content-block__text {
     font-weight: 700;
 
@@ -153,10 +157,15 @@
     line-height: 105.6px;
   }
 
-  .alert-card__fallback__pio-text {
+  .alert-card__fallback__alert-text {
     font-size: 68px;
     font-weight: 500;
     line-height: 81px;
+
+    &--medium,
+    &--small {
+      max-height: 460px;
+    }
 
     &--small {
       font-size: 55.1px;

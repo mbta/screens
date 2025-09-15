@@ -59,6 +59,7 @@ $alert-card-footer-height: 80px;
   }
 
   .alert-card__body__content {
+    max-height: 360px;
     padding: 56px 0 0 8px;
 
     &--extra-small {

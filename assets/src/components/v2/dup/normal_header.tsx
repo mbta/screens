@@ -27,7 +27,6 @@ const NormalHeader = ({
       text={text}
       time={time}
       version={version}
-      maxHeight={208}
       showTo={false}
       classModifier={color}
       accentPattern={accentPattern}

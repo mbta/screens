@@ -6,7 +6,7 @@ import makePersistent, {
 } from "Components/v2/persistent_wrapper";
 import PagingIndicators from "Components/v2/elevator/paging_indicators";
 import useIntervalPaging from "Hooks/v2/use_interval_paging";
-import useTextResizer from "Hooks/v2/use_text_resizer";
+import useAutoSize from "Hooks/use_auto_size";
 import CurrentLocationMarker from "Images/current-location-marker.svg";
 import CurrentLocationBackground from "Images/current-location-background.svg";
 import NoService from "Images/no-service-black.svg";
@@ -49,11 +49,10 @@ const AlternatePath = ({
     updateVisibleData,
   });
 
-  const { ref, size } = useTextResizer({
-    sizes: ["small", "medium", "large"],
-    maxHeight: 746,
-    resetDependencies: [alternateDirectionText],
-  });
+  const { ref: textRef, step: textSize } = useAutoSize(
+    ["large", "medium", "small"],
+    alternateDirectionText,
+  );
 
   return (
     <div className="elevator-alternate-path">
@@ -82,7 +81,10 @@ const AlternatePath = ({
           </div>
         </div>
         {pageIndex === 0 ? (
-          <div ref={ref} className={cx("alternate-direction-text", size)}>
+          <div
+            className={cx("alternate-direction-text", textSize)}
+            ref={textRef}
+          >
             {alternateDirectionText}
           </div>
         ) : (
