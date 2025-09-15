@@ -193,6 +193,18 @@ defmodule Screens.V2.Departure do
 
   def track_number(_), do: nil
 
+  def trip_id(%__MODULE__{prediction: %Prediction{trip: %Trip{id: trip_id}}})
+      when not is_nil(trip_id) do
+    trip_id
+  end
+
+  def trip_id(%__MODULE__{schedule: %Schedule{trip: %Trip{id: trip_id}}})
+      when not is_nil(trip_id) do
+    trip_id
+  end
+
+  def trip_id(_), do: nil
+
   def vehicle_status(%__MODULE__{
         prediction: %Prediction{vehicle: %Vehicle{current_status: current_status}}
       }) do
