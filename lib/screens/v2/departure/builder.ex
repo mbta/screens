@@ -65,11 +65,6 @@ defmodule Screens.V2.Departure.Builder do
   defp map_to_departures(%Prediction{} = prediction, _schedules_by_trip_id),
     do: %Departure{prediction: prediction}
 
-  defp cancelled_or_skipped?(%Prediction{schedule_relationship: sr}),
-    do: sr in [:cancelled, :skipped]
-
-  defp cancelled_or_skipped?(_), do: false
-
   defp in_past_or_nil_time?(%{arrival_time: nil, departure_time: nil}, _), do: true
 
   defp in_past_or_nil_time?(%{arrival_time: t, departure_time: nil}, now) do
@@ -132,4 +127,9 @@ defmodule Screens.V2.Departure.Builder do
   defp earliest_time(%{arrival_time: time}) when not is_nil(time), do: time
   defp earliest_time(%{departure_time: time}) when not is_nil(time), do: time
   defp earliest_time(_prediction_or_schedule), do: nil
+
+  defp cancelled_or_skipped?(%Prediction{schedule_relationship: sr}),
+    do: sr in [:cancelled, :skipped]
+
+  defp cancelled_or_skipped?(_), do: false
 end
