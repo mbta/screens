@@ -21,21 +21,33 @@ defmodule Screens.V2.Departure.BuilderTest do
     end
 
     test "filters out departures with both arrival_time and departure_time nil" do
-      p1 = %Prediction{id: "arrival", arrival_time: ~U[2020-02-01T01:00:00Z], departure_time: nil}
+      p1 = %Prediction{
+        id: "arrival",
+        trip: %Trip{id: "t1", stops: ["1", "2", "3"]},
+        arrival_time: ~U[2020-02-01T01:00:00Z],
+        departure_time: nil
+      }
 
       p2 = %Prediction{
         id: "departure",
+        trip: %Trip{id: "t2", stops: ["1", "2", "3"]},
         arrival_time: nil,
         departure_time: ~U[2020-02-01T01:00:00Z]
       }
 
       p3 = %Prediction{
         id: "both",
+        trip: %Trip{id: "t3", stops: ["1", "2", "3"]},
         arrival_time: ~U[2020-02-01T01:00:00Z],
         departure_time: ~U[2020-02-01T01:00:00Z]
       }
 
-      p4 = %Prediction{id: "neither", arrival_time: nil, departure_time: nil}
+      p4 = %Prediction{
+        id: "neither",
+        trip: %Trip{id: "t4", stops: ["1", "2", "3"]},
+        arrival_time: nil,
+        departure_time: nil
+      }
 
       actual = Builder.build([p1, p2, p3, p4], [], @now)
       expected = to_departures([p1, p2, p3])
@@ -44,17 +56,36 @@ defmodule Screens.V2.Departure.BuilderTest do
     end
 
     test "filters out departures in the past" do
-      p1 = %Prediction{id: "1", arrival_time: ~U[2020-01-01T00:00:00Z]}
+      p1 = %Prediction{
+        id: "1",
+        trip: %Trip{id: "t1", stops: ["1", "2", "3"]},
+        arrival_time: ~U[2020-01-01T00:00:00Z]
+      }
 
       p2 = %Prediction{
         id: "2",
+        trip: %Trip{id: "t2", stops: ["1", "2", "3"]},
         arrival_time: ~U[2020-01-01T00:00:00Z],
         departure_time: ~U[2020-01-01T02:00:00Z]
       }
 
-      p3 = %Prediction{id: "3", departure_time: ~U[2020-01-01T00:00:00Z]}
-      p4 = %Prediction{id: "4", departure_time: ~U[2020-01-01T02:00:00Z]}
-      p5 = %Prediction{id: "5", arrival_time: ~U[2020-02-01T00:00:00Z]}
+      p3 = %Prediction{
+        id: "3",
+        trip: %Trip{id: "t3", stops: ["1", "2", "3"]},
+        departure_time: ~U[2020-01-01T00:00:00Z]
+      }
+
+      p4 = %Prediction{
+        id: "4",
+        trip: %Trip{id: "t4", stops: ["1", "2", "3"]},
+        departure_time: ~U[2020-01-01T02:00:00Z]
+      }
+
+      p5 = %Prediction{
+        id: "5",
+        trip: %Trip{id: "t5", stops: ["1", "2", "3"]},
+        arrival_time: ~U[2020-02-01T00:00:00Z]
+      }
 
       assert Builder.build([p1, p2, p3, p4, p5], [], @now) == to_departures([p2, p4, p5])
     end
@@ -83,7 +114,7 @@ defmodule Screens.V2.Departure.BuilderTest do
 
       p4 = %Prediction{
         id: "4",
-        trip: nil,
+        trip: %Trip{id: "47610993", route_id: "214216"},
         route: %Route{id: "214216"},
         departure_time: ~U[2020-01-01T01:00:00Z]
       }
@@ -150,8 +181,8 @@ defmodule Screens.V2.Departure.BuilderTest do
       p2 = %Prediction{id: "2", trip: %Trip{id: "t1"}, departure_time: ~U[2020-02-01T00:01:00Z]}
       p3 = %Prediction{id: "3", trip: %Trip{id: "t2"}, departure_time: ~U[2020-02-01T01:01:00Z]}
       p4 = %Prediction{id: "4", trip: %Trip{id: "t2"}, departure_time: ~U[2020-02-01T01:00:00Z]}
-      p5 = %Prediction{id: "5", trip: %Trip{id: nil}, departure_time: ~U[2020-02-01T00:00:00Z]}
-      p6 = %Prediction{id: "6", trip: nil, departure_time: ~U[2020-02-01T00:00:00Z]}
+      p5 = %Prediction{id: "5", trip: %Trip{id: "t3"}, departure_time: ~U[2020-02-01T00:00:00Z]}
+      p6 = %Prediction{id: "6", trip: %Trip{id: "t4"}, departure_time: ~U[2020-02-01T00:00:00Z]}
 
       actual = Builder.build([p1, p2, p3, p4, p5, p6], [], @now)
       expected = to_departures([p1, p4, p5, p6])
@@ -163,6 +194,7 @@ defmodule Screens.V2.Departure.BuilderTest do
       # arrives earlier, departs later
       p1 = %Prediction{
         id: "1",
+        trip: %Trip{id: "t1", stops: ["1", "2", "3"]},
         arrival_time: ~U[2020-02-01T01:00:01Z],
         departure_time: ~U[2020-02-01T01:00:05Z]
       }
@@ -170,6 +202,7 @@ defmodule Screens.V2.Departure.BuilderTest do
       # arrives later, departs earlier
       p2 = %Prediction{
         id: "2",
+        trip: %Trip{id: "t2", stops: ["1", "2", "3"]},
         arrival_time: ~U[2020-02-01T01:00:02Z],
         departure_time: ~U[2020-02-01T01:00:03Z]
       }
@@ -270,7 +303,7 @@ defmodule Screens.V2.Departure.BuilderTest do
 
       p2 = %Prediction{
         id: "p2",
-        departure_time: ~U[2020-02-01T01:00:00Z],
+        departure_time: nil,
         trip: %Trip{id: "t3"},
         schedule_relationship: :cancelled
       }

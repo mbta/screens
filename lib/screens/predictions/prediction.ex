@@ -32,14 +32,8 @@ defmodule Screens.Predictions.Prediction do
   @includes ~w[route.line stop trip.route_pattern.representative_trip trip.stops vehicle]
 
   @spec fetch(Departure.params()) :: {:ok, list(t())} | :error
-  def fetch(%{} = params) do
-    result = Departure.do_fetch("predictions", Map.put(params, :include, @includes))
-
-    case result do
-      {:ok, predictions} -> {:ok, Enum.reject(predictions, &is_nil(&1.departure_time))}
-      :error -> :error
-    end
-  end
+  def fetch(%{} = params),
+    do: Departure.do_fetch("predictions", Map.put(params, :include, @includes))
 
   def stop_for_vehicle(%__MODULE__{vehicle: %Vehicle{stop_id: stop_id}}), do: stop_id
   def stop_for_vehicle(_), do: nil
