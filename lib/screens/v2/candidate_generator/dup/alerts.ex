@@ -112,8 +112,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     end
   end
 
-  # Always include single-tracking alerts regardless of severity.
-  defp relevant_effect?(%Alert{effect: :delay, cause: :single_tracking}, _screen), do: true
+  defp relevant_effect?(
+         %Alert{effect: :delay, cause: :single_tracking, severity: severity},
+         _screen
+       ) do
+    severity > 1
+  end
 
   defp relevant_effect?(%Alert{effect: :delay, severity: severity}, _screen) do
     severity >= 5
