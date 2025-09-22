@@ -34,10 +34,6 @@
     width: 800px;
   }
 
-  &--with-icon {
-    bottom: 15px;
-  }
-
   &--large {
     bottom: 40px;
     font-size: 104px;
@@ -47,6 +43,10 @@
   &--small {
     bottom: 24px;
     font-size: 72px;
+  }
+
+  &--with-icon {
+    bottom: 15px;
   }
 }
 
