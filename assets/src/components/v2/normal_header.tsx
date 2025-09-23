@@ -23,21 +23,6 @@ const ICON_TO_SRC: Record<Icon, string> = {
   logo_negative: "logo-black.svg",
 };
 
-interface NormalHeaderIconProps {
-  icon: Icon;
-}
-
-const NormalHeaderIcon: ComponentType<NormalHeaderIconProps> = ({ icon }) => {
-  return (
-    <div className="normal-header-icon">
-      <img
-        className="normal-header-icon__image"
-        src={imagePath(ICON_TO_SRC[icon])}
-      />
-    </div>
-  );
-};
-
 interface NormalHeaderTitleProps {
   icon?: Icon;
   text: string;
@@ -64,7 +49,12 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
         ])}
         ref={ref}
       >
-        {icon && <NormalHeaderIcon icon={icon} />}
+        {icon && (
+          <img
+            className="normal-header-title__icon"
+            src={imagePath(ICON_TO_SRC[icon])}
+          />
+        )}
         <div className="normal-header-title__text">
           {showTo && <div className="normal-header-to__text">TO</div>}
           {text}
