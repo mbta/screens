@@ -1,6 +1,7 @@
 @use "fonts/inter_font_face";
 @use "fonts/helvetica_font_face";
 
+@use "v2/base";
 @use "v2/common/widget";
 @use "v2/multi_screen_page";
 @use "v2/outfront_common/debug" as *;
@@ -31,10 +32,6 @@
 @use "v2/dup/screen/normal" as *;
 @use "v2/dup/simulation";
 @use "v2/dup/viewport";
-
-body {
-  margin: 0;
-}
 
 .multi-screen-page {
   grid-auto-rows: 1080px;

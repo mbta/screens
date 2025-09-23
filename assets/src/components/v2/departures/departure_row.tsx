@@ -25,12 +25,7 @@ const DepartureRow: ComponentType<DepartureRow> = ({
         "departure-row" + (isBeforeDirectionSplit ? " direction-split" : "")
       }
     >
-      <div // Keep pill aligned to top if there is a variation for the headsign.
-        // Always aligning to top shifts destination text.
-        className={
-          "departure-row__route" + (headsign.variation ? "" : " center")
-        }
-      >
+      <div className="departure-row__route">
         <RoutePill pill={route} />
       </div>
       <div className="departure-row__destination">

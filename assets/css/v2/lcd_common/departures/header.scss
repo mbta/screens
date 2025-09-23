@@ -1,15 +1,13 @@
 @use "CSS/colors";
-@use "CSS/fonts";
 
 .departures-header {
-  @include fonts.inter--bold;
-
   box-sizing: border-box;
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
   font-size: 48px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 3px;
   white-space: pre-line; // Allow using embedded line breaks to control wrapping
@@ -28,18 +26,12 @@
 }
 
 .departures-header__subtitle {
-  @include fonts.inter--regular;
-
   width: 1005px;
   padding-bottom: 44px;
   margin-top: 10px;
   margin-left: 32px;
   font-size: 40px;
   line-height: 54px;
-
-  strong {
-    @include fonts.inter--bold;
-  }
 }
 
 .departures-header__subtitle + .departure-row::before {

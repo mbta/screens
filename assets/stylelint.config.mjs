@@ -9,11 +9,6 @@ export default {
     // We use blank lines to separate "groups" of imports.
     "at-rule-empty-line-before": null,
 
-    // Disabled for now since adding generic fallbacks caused issues with some
-    // devices, where the display incorrectly settles on the generic font rather
-    // than the intended one.
-    "font-family-no-missing-generic-family-keyword": null,
-
     // Docs: "We recommend turning this rule off if you use a lot of nesting."
     "no-descending-specificity": null,
 

@@ -1,4 +1,5 @@
 @use "v2/arrow";
+@use "v2/base";
 @use "v2/clock_icon";
 @use "v2/multi_screen_page";
 @use "v2/placeholder";
@@ -42,10 +43,6 @@
 @use "v2/pre_fare/viewport";
 
 @import "https://rsms.me/inter/inter.css";
-
-body {
-  margin: 0;
-}
 
 .multi-screen-page {
   grid-auto-rows: 1920px;

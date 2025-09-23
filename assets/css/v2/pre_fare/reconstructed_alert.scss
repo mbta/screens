@@ -8,7 +8,6 @@ $alert-card-footer-height: 80px;
 
 .alert-container {
   // Takeover fonts
-  font-family: Inter, sans-serif;
   color: colors.$cool-black-15;
 
   .x-large-text {
@@ -120,7 +119,6 @@ $alert-card-footer-height: 80px;
       position: relative;
       width: fit-content;
       padding: 0 40px;
-      font-family: neue-haas-grotesk-text;
       font-size: 60px;
       line-height: 80px;
       text-transform: uppercase;
@@ -213,7 +211,6 @@ $alert-card-footer-height: 80px;
       box-sizing: border-box;
       height: $takeover-card-height - $takeover-card-footer-height;
       padding: 0 56px;
-      font-family: Inter, sans-serif;
       font-size: 200px;
       font-weight: 800;
 
