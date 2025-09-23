@@ -39,21 +39,18 @@
   }
 }
 
-.normal-header-icon {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.normal-header-icon__image {
-  width: 184px;
-  height: 184px;
-  margin-right: 64px;
-}
-
 .normal-header-title {
   position: absolute;
   top: 32px;
   left: 64px;
+}
+
+.normal-header-title__icon {
+  display: inline-block;
+  width: 184px;
+  height: 184px;
+  margin-right: 64px;
+  vertical-align: middle;
 }
 
 .normal-header-title__text {
