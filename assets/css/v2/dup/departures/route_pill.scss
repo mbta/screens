@@ -65,7 +65,6 @@
   letter-spacing: 0.0277em;
 
   &--yellow {
-    font-family: Inter, sans-serif;
     font-size: 128px;
     line-height: 168px;
     color: black;
@@ -91,7 +90,7 @@
 .route-pill__slashed-text {
   position: absolute;
   width: 100%;
-  font-family: neue-haas-grotesk-text;
+  font-family: Helvetica, sans-serif;
   font-size: 32px;
   font-weight: 700;
   line-height: 74px;

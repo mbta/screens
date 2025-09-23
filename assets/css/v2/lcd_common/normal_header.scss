@@ -1,5 +1,3 @@
-@use "CSS/fonts";
-
 .normal-header {
   position: relative;
   width: 100%;
@@ -20,7 +18,6 @@
   align-content: end;
   align-items: center;
   width: 824px;
-  font-family: Helvetica, sans-serif;
   font-weight: 700;
   line-height: 1;
   color: #fff;
@@ -54,7 +51,6 @@
   position: absolute;
   top: 40px;
   right: 40px;
-  font-family: Inter, sans-serif;
   font-size: 56px;
   font-weight: 600;
   line-height: 56px;
@@ -62,12 +58,11 @@
 }
 
 .normal-header__environment {
-  @include fonts.text--75bold;
-
   position: absolute;
   padding-top: 10px;
   padding-left: 40px;
   font-size: 36px;
+  font-weight: 700;
   line-height: 48px;
   color: #fff;
   letter-spacing: 0;

@@ -2,7 +2,6 @@
 
 @mixin free-text-styles {
   .free-text {
-    font-family: Inter, sans-serif;
     font-size: 48px;
   }
 
@@ -41,7 +40,6 @@
     display: inline-block;
     width: 144px;
     height: 74px;
-    font-family: neue-haas-grotesk-text;
     font-size: 48px;
     font-weight: 700;
     line-height: 74px;
