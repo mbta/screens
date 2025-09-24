@@ -107,7 +107,7 @@ const CONTRACTED_ALERT_FITTING_STEPS = [
 ];
 const EXTENDED_ALERT_FITTING_STEPS = [FittingStep.FullSize, FittingStep.Abbrev];
 
-const STATUS_URL = "mbta.com/status";
+const ALERTS_URL = "mbta.com/alerts";
 
 const ContractedAlert: ComponentType<AlertWithID> = ({
   route_pill: routePill,
@@ -121,7 +121,7 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
-    locationText = STATUS_URL;
+    locationText = ALERTS_URL;
   } else if (isAlertLocationMap(location)) {
     locationText = abbrev ? location.abbrev : location.full;
   } else {

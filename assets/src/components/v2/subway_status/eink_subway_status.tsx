@@ -97,7 +97,7 @@ interface AlertRowProps extends Alert {
   showInlineBranches: boolean;
 }
 
-const STATUS_URL = "mbta.com/status";
+const ALERTS_URL = "mbta.com/alerts";
 const ALERT_FITTING_STEPS = [
   FittingStep.FullSize,
   FittingStep.Abbrev,
@@ -117,7 +117,7 @@ const AlertRow: ComponentType<AlertRowProps> = ({
 
   let locationText: string | null;
   if (replaceLocationWithUrl) {
-    locationText = STATUS_URL;
+    locationText = ALERTS_URL;
   } else if (isAlertLocationMap(location)) {
     locationText = abbrev ? location.abbrev : location.full;
   } else {

@@ -61,7 +61,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %{
               route_pill: @bl_pill,
               status: "Bypassing 4 stops",
-              location: %{abbrev: "mbta.com/status", full: "mbta.com/status"},
+              location: %{abbrev: "mbta.com/alerts", full: "mbta.com/alerts"},
               station_count: 4
             }
           }
@@ -267,13 +267,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | blue: %{
             type: :contracted,
             alerts: [
-              %{route_pill: @bl_pill, status: "2 current alerts", location: "mbta.com/status"}
+              %{route_pill: @bl_pill, status: "2 current alerts", location: "mbta.com/alerts"}
             ]
           },
           orange: %{
             type: :contracted,
             alerts: [
-              %{route_pill: @ol_pill, status: "2 current alerts", location: "mbta.com/status"}
+              %{route_pill: @ol_pill, status: "2 current alerts", location: "mbta.com/alerts"}
             ]
           }
       }
@@ -435,7 +435,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               %{
                 route_pill: gl_pill([:b, :c]),
                 status: "2 current alerts",
-                location: "mbta.com/status"
+                location: "mbta.com/alerts"
               }
             ]
           }
@@ -560,7 +560,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               %{
                 route_pill: gl_pill([:b, :c, :e]),
                 status: "3 current alerts",
-                location: "mbta.com/status"
+                location: "mbta.com/alerts"
               }
             ]
           }
@@ -656,7 +656,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | green: %{
             type: :contracted,
             alerts: [
-              %{route_pill: @gl_pill, status: "3 current alerts", location: "mbta.com/status"}
+              %{route_pill: @gl_pill, status: "3 current alerts", location: "mbta.com/alerts"}
             ]
           }
       }
@@ -706,7 +706,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               %{
                 route_pill: @ol_pill,
                 status: "2 current alerts",
-                location: "mbta.com/status"
+                location: "mbta.com/alerts"
               }
             ]
           },
@@ -891,7 +891,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             type: :extended,
             alert: %{
               status: "Bypassing 1 stop",
-              location: %{full: "mbta.com/status", abbrev: "mbta.com/status"},
+              location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
               route_pill: @rl_pill
             }
           }
@@ -1032,7 +1032,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             type: :extended,
             alert: %{
               status: "Bypassing 2 stops",
-              location: %{full: "mbta.com/status", abbrev: "mbta.com/status"},
+              location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
               route_pill: @rl_pill
             }
           }
