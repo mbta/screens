@@ -9,17 +9,14 @@ interface Props {
 const MappingContext = createContext({});
 
 const Widget: ComponentType<Props> = ({ data }) => {
-  if (data == null) {
-    return null;
-  }
+  const typeToComponent = useContext(MappingContext);
+
+  if (data == null) return null;
 
   const { type, ...props } = data;
-  const typeToComponent = useContext(MappingContext);
   const Component = typeToComponent[type];
 
-  if (Component) {
-    return <Component {...props} />;
-  }
+  if (Component) return <Component {...props} />;
 
   return <>{type}</>;
 };

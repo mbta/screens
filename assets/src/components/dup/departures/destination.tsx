@@ -63,6 +63,10 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
     parts = parts.map((p) => ABBREVIATIONS[p] || p);
   }
 
+  /* eslint-disable-next-line react-hooks/exhaustive-deps --
+   * TODO: Replace this with `useAutoSize`. For now, we know this logic cannot
+   * cause infinite update loops, so we don't need to be warned that it might.
+   */
   useLayoutEffect(() => {
     if (firstLineRef.current && secondLineRef.current) {
       const firstLines = Math.round(

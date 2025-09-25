@@ -2,13 +2,11 @@ import { useParams } from "react-router-dom";
 import ScreenContainer from "Components/screen_container";
 import { ScreenIDProvider } from "Hooks/use_screen_id";
 
-interface ScreenPageProps {
-  id?: string;
-  paramKeys?: string[];
-}
+const ScreenPage = ({ id }: { id?: string }) => {
+  const params = useParams();
+  const screenId = id ?? params.id;
 
-const ScreenPage = ({ id }: ScreenPageProps) => {
-  const screenId = id ?? (useParams() as { id: string }).id;
+  if (!screenId) return null;
 
   return (
     <ScreenIDProvider id={screenId}>
