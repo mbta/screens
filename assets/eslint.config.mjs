@@ -17,7 +17,7 @@ export default [
     ...jestPlugin.configs["flat/style"],
   },
   {
-    files: ["**/*.{ts, tsx}"],
+    files: ["**/*.{ts,tsx}"],
     plugins: {
       "react-hooks": pluginReactHooks,
     },

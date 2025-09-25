@@ -609,6 +609,14 @@ Client is responsible for:
 - sizing, spacing, positioning of edges/end arrows/shuttle dashes/the diagram as a whole within its container
 */
 
+/* eslint-disable react-hooks/exhaustive-deps --
+ * TODO: There are many places where this component breaks the Rules of Hooks.
+ * We know it (mostly) works in its current form and have no pressing need to
+ * change it, so this lint warning is disabled for now. Trying to change this
+ * logic without fully understanding and extensively testing everything going
+ * on here is likely to break something.
+ */
+
 const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const { slots, current_station_slot_index, line, effect } = props;
   const [doAbbreviate, setDoAbbreviate] = useState(false);
@@ -860,6 +868,8 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
     </div>
   );
 };
+
+/* eslint-enable react-hooks/exhaustive-deps */
 
 export { DisruptionDiagramData };
 
