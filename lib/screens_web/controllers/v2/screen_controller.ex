@@ -7,14 +7,12 @@ defmodule ScreensWeb.V2.ScreenController do
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 
-  @default_app_id :bus_eink_v2
   @recognized_app_ids ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 elevator_v2 gl_eink_v2 pre_fare_v2]a
   @app_id_strings Enum.map(@recognized_app_ids, &Atom.to_string/1)
 
   plug(:check_config)
   plug(:environment_name)
   plug(:last_refresh)
-  plug(:v2_layout)
 
   defp check_config(conn, _) do
     if Cache.ok?() do
@@ -34,10 +32,6 @@ defmodule ScreensWeb.V2.ScreenController do
   defp environment_name(conn, _) do
     environment_name = Application.get_env(:screens, :environment_name)
     assign(conn, :environment_name, environment_name)
-  end
-
-  defp v2_layout(conn, _) do
-    put_layout(conn, html: {ScreensWeb.V2.LayoutView, :app})
   end
 
   defp screen_side(%PreFare{template: :duo}, %{"screen_side" => "left"}), do: "left"
@@ -61,7 +55,7 @@ defmodule ScreensWeb.V2.ScreenController do
     refresh_rate = Parameters.refresh_rate(app_id)
 
     conn
-    |> assign(:app_id, app_id)
+    |> assign(:app_id, strip_v2(app_id))
     |> assign(:refresh_rate, refresh_rate)
     |> assign(:screen_ids_with_offset_map, screen_ids(app_id, refresh_rate))
     |> render("index_multi.html")
@@ -124,7 +118,7 @@ defmodule ScreensWeb.V2.ScreenController do
     refresh_rate = Parameters.refresh_rate(app_id)
 
     [
-      app_id: app_id,
+      app_id: strip_v2(app_id),
       refresh_rate: refresh_rate,
       audio_readout_interval: Parameters.audio_interval_minutes(config),
       audio_interval_offset_seconds: Parameters.audio_interval_offset_seconds(config),
@@ -163,7 +157,7 @@ defmodule ScreensWeb.V2.ScreenController do
     app_id = String.to_existing_atom(app_id)
 
     conn
-    |> assign(:app_id, app_id)
+    |> assign(:app_id, strip_v2(app_id))
     |> assign(:widget_data, Jason.encode!(widget_data))
     |> render("index_widget.html")
   end
@@ -197,8 +191,8 @@ defmodule ScreensWeb.V2.ScreenController do
 
   defp render_not_found(conn) do
     conn
-    |> assign(:app_id, @default_app_id)
     |> put_status(:not_found)
+    |> put_layout(html: :error)
     |> put_view(ScreensWeb.ErrorView)
     |> render("404.html")
   end
@@ -229,4 +223,8 @@ defmodule ScreensWeb.V2.ScreenController do
         a <= b
     end
   end
+
+  # While app IDs in configuration still have the "_v2" suffix, but this suffix has been removed
+  # from JS/CSS entrypoints, we temporarily need to translate from one to the other.
+  defp strip_v2(app_id), do: app_id |> to_string() |> String.replace("_v2", "")
 end

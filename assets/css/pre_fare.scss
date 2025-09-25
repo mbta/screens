@@ -1,0 +1,47 @@
+@use "common/arrow";
+@use "common/base";
+@use "common/multi_screen_page";
+@use "common/placeholder";
+@use "common/simulation" as *;
+
+@use "lcd/departures" as *;
+@use "lcd/departures_no_data" as *;
+@use "lcd/no_data" as *;
+@use "lcd/normal_header";
+@use "lcd/page_load_no_data";
+@use "lcd/route_pill";
+
+@use "pre_fare/alert-banner";
+@use "pre_fare/body/normal" as *;
+@use "pre_fare/body/takeover" as *;
+@use "pre_fare/body_left/flex";
+@use "pre_fare/body_left/normal" as *;
+@use "pre_fare/body_left/takeover" as *;
+@use "pre_fare/body_right/normal" as *;
+@use "pre_fare/body_right/takeover" as *;
+@use "pre_fare/departures/departures" as *;
+@use "pre_fare/disruption_diagram/disruption_diagram";
+@use "pre_fare/elevator_status";
+@use "pre_fare/evergreen/image";
+@use "pre_fare/evergreen/video";
+@use "pre_fare/flex/one_large";
+@use "pre_fare/flex/paging_indicator";
+@use "pre_fare/flex/two_medium";
+@use "pre_fare/free_text";
+@use "pre_fare/full_line_map";
+@use "pre_fare/no_data" as *;
+@use "pre_fare/prefare_single_screen_alert";
+@use "pre_fare/reconstructed_alert";
+@use "pre_fare/screen/normal" as *;
+@use "pre_fare/screen/split_takeover";
+@use "pre_fare/screen/takeover" as *;
+@use "pre_fare/screen_container";
+@use "pre_fare/simulation" as *;
+@use "pre_fare/subway_status";
+@use "pre_fare/viewport";
+
+@import "https://rsms.me/inter/inter.css";
+
+.multi-screen-page {
+  grid-auto-rows: 1920px;
+}

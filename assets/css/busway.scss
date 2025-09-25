@@ -1,0 +1,28 @@
+@use "common/base";
+@use "common/multi_screen_page";
+@use "common/placeholder";
+@use "common/simulation" as *;
+
+@use "lcd/departures" as *;
+@use "lcd/departures_no_data" as *;
+@use "lcd/departures/header";
+@use "lcd/evergreen";
+@use "lcd/free_text";
+@use "lcd/no_data";
+@use "lcd/normal_header";
+@use "lcd/page_load_no_data";
+@use "lcd/route_pill";
+@use "lcd/screen_container";
+@use "lcd/simulation" as *;
+@use "lcd/subway_status";
+
+@use "busway/departures" as *;
+@use "busway/departures_no_data" as *;
+@use "busway/screen/normal";
+@use "busway/screen/takeover";
+
+@import "https://rsms.me/inter/inter.css";
+
+.multi-screen-page {
+  grid-auto-rows: 1920px;
+}

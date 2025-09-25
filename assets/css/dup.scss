@@ -1,0 +1,37 @@
+@use "fonts/inter_font_face";
+@use "fonts/helvetica_font_face";
+
+@use "common/base";
+@use "common/multi_screen_page";
+@use "common/placeholder";
+@use "common/simulation" as *;
+@use "common/widget";
+
+@use "dup/alert/full_screen_alert";
+@use "dup/alert/partial_alert";
+@use "dup/body/normal" as *;
+@use "dup/body/split";
+@use "dup/debug";
+@use "dup/departures";
+@use "dup/departures/crowding";
+@use "dup/departures/destination";
+@use "dup/departures/headway_section";
+@use "dup/departures/no_data_section";
+@use "dup/departures/overnight";
+@use "dup/departures/route_pill";
+@use "dup/departures/row";
+@use "dup/departures/section";
+@use "dup/departures/time";
+@use "dup/empty_state";
+@use "dup/evergreen";
+@use "dup/free_text";
+@use "dup/normal_header";
+@use "dup/rotation/normal" as *;
+@use "dup/rotation/takeover";
+@use "dup/screen/normal" as *;
+@use "dup/simulation" as *;
+@use "dup/viewport";
+
+.multi-screen-page {
+  grid-auto-rows: 1080px;
+}

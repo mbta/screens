@@ -1,0 +1,38 @@
+@use "common/base";
+@use "common/multi_screen_page";
+@use "common/placeholder";
+@use "common/simulation" as *;
+
+@use "lcd/departures" as *;
+@use "lcd/departures_no_data" as *;
+@use "lcd/evergreen" as *;
+@use "lcd/free_text";
+@use "lcd/no_data";
+@use "lcd/normal_header";
+@use "lcd/page_load_no_data";
+@use "lcd/route_pill";
+@use "lcd/screen_container";
+@use "lcd/simulation" as *;
+@use "lcd/subway_status";
+
+@use "bus_shelter/alert";
+@use "bus_shelter/body/normal" as *;
+@use "bus_shelter/body/takeover" as *;
+@use "bus_shelter/departures" as *;
+@use "bus_shelter/departures_no_data" as *;
+@use "bus_shelter/evergreen" as *;
+@use "bus_shelter/flex/one_large";
+@use "bus_shelter/flex/one_medium_two_small";
+@use "bus_shelter/flex/page_indicator";
+@use "bus_shelter/flex/two_medium";
+@use "bus_shelter/link_footer";
+@use "bus_shelter/screen/normal" as *;
+@use "bus_shelter/screen/takeover" as *;
+@use "bus_shelter/simulation" as *;
+@use "bus_shelter/survey";
+
+@import "https://rsms.me/inter/inter.css";
+
+.multi-screen-page {
+  grid-auto-rows: 1920px;
+}

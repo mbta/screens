@@ -1,0 +1,40 @@
+@use "fonts/inter_font_face";
+@use "fonts/helvetica_font_face";
+
+@use "common/base";
+@use "common/multi_screen_page";
+@use "common/placeholder";
+@use "common/simulation" as *;
+
+@use "eink/alert";
+@use "eink/body/takeover" as *;
+@use "eink/bottom_screen_filler";
+@use "eink/departures";
+@use "eink/departures_no_data";
+@use "eink/departures_no_service";
+@use "eink/fare_info_footer";
+@use "eink/flex/one_medium";
+@use "eink/flex/page_indicator";
+@use "eink/free_text";
+@use "eink/link_footer";
+@use "eink/no_data";
+@use "eink/normal_header";
+@use "eink/page_load_no_data";
+@use "eink/route_pill";
+@use "eink/screen/takeover" as *;
+@use "eink/subway_status";
+
+@use "bus_eink/body/bottom_takeover";
+@use "bus_eink/body/flex_zone_takeover";
+@use "bus_eink/body/normal" as *;
+@use "bus_eink/departures/crowding";
+@use "bus_eink/departures/destination";
+@use "bus_eink/departures/row";
+@use "bus_eink/departures/time";
+@use "bus_eink/evergreen/image";
+@use "bus_eink/screen/normal" as *;
+@use "bus_eink/simulation" as *;
+
+.multi-screen-page {
+  grid-auto-rows: 3200px;
+}

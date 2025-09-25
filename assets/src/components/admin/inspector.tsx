@@ -10,7 +10,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import AdminForm from "./admin_form";
 
-import { type AudioConfig } from "Components/v2/screen_container";
+import { type AudioConfig } from "Components/screen_container";
 
 import { fetch, type Config, type Screen } from "Util/admin";
 import {

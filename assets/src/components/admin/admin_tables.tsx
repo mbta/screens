@@ -116,7 +116,7 @@ const AllScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const v2Columns = [
+const sharedColumns = [
   {
     Header: "Screen ID",
     accessor: "id",
@@ -193,9 +193,9 @@ const includeLogoColumn = {
   FormCell: FormBoolean,
 };
 
-const DupV2ScreensTable = (): JSX.Element => {
+const DupScreensTable = (): JSX.Element => {
   const columns = [
-    ...v2Columns,
+    ...sharedColumns,
     headerColumn,
     {
       Header: "Primary Departures",
@@ -222,13 +222,13 @@ const DupV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const BusEinkV2ScreensTable = (): JSX.Element => {
+const BusEinkScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "bus_eink_v2";
   };
 
   const columns = [
-    ...v2Columns,
+    ...sharedColumns,
     headerColumn,
     departuresColumn,
     footerColumn,
@@ -238,9 +238,9 @@ const BusEinkV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const GLEinkV2ScreensTable = (): JSX.Element => {
+const GLEinkScreensTable = (): JSX.Element => {
   const columns = [
-    ...v2Columns,
+    ...sharedColumns,
     headerColumn,
     {
       Header: "Line Map",
@@ -270,13 +270,13 @@ const GLEinkV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const BusShelterV2ScreensTable = (): JSX.Element => {
+const BusShelterScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "bus_shelter_v2";
   };
 
   const columns = [
-    ...v2Columns,
+    ...sharedColumns,
     headerColumn,
     {
       Header: "Audio Offset",
@@ -318,13 +318,13 @@ const BusShelterV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const PreFareV2ScreensTable = (): JSX.Element => {
+const PreFareScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "pre_fare_v2";
   };
 
   const columns = [
-    ...v2Columns,
+    ...sharedColumns,
     {
       Header: "Template",
       accessor: buildAppParamAccessor("template"),
@@ -372,7 +372,7 @@ const PreFareV2ScreensTable = (): JSX.Element => {
   return <AdminTable columns={columns} dataFilter={dataFilter} />;
 };
 
-const ElevatorV2ScreensTable = (): JSX.Element => {
+const ElevatorScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "elevator_v2";
   };
@@ -473,13 +473,13 @@ const ElevatorV2ScreensTable = (): JSX.Element => {
   );
 };
 
-const BuswayV2ScreensTable = (): JSX.Element => {
+const BuswayScreensTable = (): JSX.Element => {
   const dataFilter = ({ app_id }) => {
     return app_id === "busway_v2";
   };
 
   const columns = [
-    ...v2Columns,
+    ...sharedColumns,
     headerColumn,
     departuresColumn,
     includeLogoColumn,
@@ -490,11 +490,11 @@ const BuswayV2ScreensTable = (): JSX.Element => {
 
 export {
   AllScreensTable,
-  BusEinkV2ScreensTable,
-  BusShelterV2ScreensTable,
-  BuswayV2ScreensTable,
-  DupV2ScreensTable,
-  ElevatorV2ScreensTable,
-  GLEinkV2ScreensTable,
-  PreFareV2ScreensTable,
+  BusEinkScreensTable,
+  BusShelterScreensTable,
+  BuswayScreensTable,
+  DupScreensTable,
+  ElevatorScreensTable,
+  GLEinkScreensTable,
+  PreFareScreensTable,
 };
