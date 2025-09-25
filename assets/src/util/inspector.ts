@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { type AudioConfig } from "Components/v2/screen_container";
+import { type AudioConfig } from "Components/screen_container";
 
 /**
  * Defines a protocol the "Inspector" admin UI can use to communicate with

@@ -12,13 +12,13 @@ import weakKey from "weak-key";
 
 import {
   AllScreensTable,
-  BusEinkV2ScreensTable,
-  GLEinkV2ScreensTable,
-  BuswayV2ScreensTable,
-  BusShelterV2ScreensTable,
-  PreFareV2ScreensTable,
-  DupV2ScreensTable,
-  ElevatorV2ScreensTable,
+  BusEinkScreensTable,
+  GLEinkScreensTable,
+  BuswayScreensTable,
+  BusShelterScreensTable,
+  PreFareScreensTable,
+  DupScreensTable,
+  ElevatorScreensTable,
 } from "Components/admin/admin_tables";
 import AdminScreenConfigForm from "Components/admin/admin_screen_config_form";
 import ImageManager from "Components/admin/admin_image_manager";
@@ -30,13 +30,13 @@ const routes: [string, string, ComponentType][][] = [
   [["inspector", "🔍", Inspector]],
   [["", "All Screens", AllScreensTable]],
   [
-    ["bus-eink-v2-screens", "Bus E-ink", BusEinkV2ScreensTable],
-    ["bus-shelter-v2-screens", "Bus Shelter", BusShelterV2ScreensTable],
-    ["dup-v2-screens", "DUP", DupV2ScreensTable],
-    ["elevator-v2-screens", "Elevator", ElevatorV2ScreensTable],
-    ["gl-eink-v2-screens", "GL E-ink", GLEinkV2ScreensTable],
-    ["pre-fare-v2-screens", "Pre-Fare", PreFareV2ScreensTable],
-    ["busway-v2-screens", "Sectional", BuswayV2ScreensTable],
+    ["bus-eink-screens", "Bus E-ink", BusEinkScreensTable],
+    ["bus-shelter-screens", "Bus Shelter", BusShelterScreensTable],
+    ["dup-screens", "DUP", DupScreensTable],
+    ["elevator-screens", "Elevator", ElevatorScreensTable],
+    ["gl-eink-screens", "GL E-ink", GLEinkScreensTable],
+    ["pre-fare-screens", "Pre-Fare", PreFareScreensTable],
+    ["busway-screens", "Sectional", BuswayScreensTable],
   ],
   [
     ["screens-json-editor", "Config Editor", AdminScreenConfigForm],

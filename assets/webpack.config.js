@@ -19,13 +19,13 @@ const ALIASES = {
 
 const ENTRYPOINTS = {
   admin: "./src/apps/admin.tsx",
-  bus_eink_v2: "./src/apps/v2/bus_eink.tsx",
-  bus_shelter_v2: "./src/apps/v2/bus_shelter.tsx",
-  busway_v2: "./src/apps/v2/busway.tsx",
-  dup_v2: "./src/apps/v2/dup.tsx",
-  elevator_v2: "./src/apps/v2/elevator.tsx",
-  gl_eink_v2: "./src/apps/v2/gl_eink.tsx",
-  pre_fare_v2: "./src/apps/v2/pre_fare.tsx",
+  bus_eink: "./src/apps/bus_eink.tsx",
+  bus_shelter: "./src/apps/bus_shelter.tsx",
+  busway: "./src/apps/busway.tsx",
+  dup: "./src/apps/dup.tsx",
+  elevator: "./src/apps/elevator.tsx",
+  gl_eink: "./src/apps/gl_eink.tsx",
+  pre_fare: "./src/apps/pre_fare.tsx",
 };
 
 const STATIC_PATH = path.resolve(__dirname, "../priv/static");
@@ -37,7 +37,7 @@ module.exports = (env, argv) => {
   return {
     devtool: "source-map",
     entry: isOutfrontPackage
-      ? { packaged_dup_v2: "./src/apps/v2/dup.tsx" }
+      ? { packaged_dup: "./src/apps/dup.tsx" }
       : ENTRYPOINTS,
     optimization: {
       minimizer: [new CssMinimizerPlugin(), new TerserPlugin()],

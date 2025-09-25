@@ -1,0 +1,72 @@
+// Our Mimo elevator screens run Webview 83.
+// When writing styles for widgets on these screens,
+// verify browser compatibility in the MDN web docs.
+
+@use "colors";
+
+@use "common/arrow";
+@use "common/base";
+@use "common/simulation" as *;
+
+@use "lcd/route_pill";
+@use "lcd/screen_container";
+@use "lcd/simulation" as *;
+
+@use "elevator/alternate_path";
+@use "elevator/closures";
+@use "elevator/footer";
+@use "elevator/header";
+@use "elevator/normal";
+@use "elevator/screen/takeover";
+
+@import "https://rsms.me/inter/inter.css";
+
+.evergreen-content-image__container,
+.evergreen-content-image__image {
+  width: 100%;
+  height: 100%;
+}
+
+.multi-screen-page {
+  grid-auto-rows: 1920px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+.normal-header,
+.footer {
+  &--closed {
+    color: white;
+    background-color: colors.$accessibility-blue;
+  }
+}
+
+.elevator-alternate-path,
+.elevator-closures {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  color: colors.$cool-black-15;
+  background-color: colors.$warm-neutral-90;
+
+  .subheading {
+    font-size: 80px;
+    font-weight: 700;
+    line-height: 80px;
+  }
+}
+
+.paging-indicators {
+  display: flex;
+  align-items: center;
+  margin-right: 39px;
+
+  .paging-indicator {
+    margin-right: 27px;
+  }
+}

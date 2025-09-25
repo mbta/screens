@@ -1,0 +1,22 @@
+#debug {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10000;
+  display: flex;
+  flex-flow: column wrap;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden hidden;
+  font-family: monospace;
+  font-size: 1.5em;
+  color: #fff;
+  background: rgb(0 0 0 / 50%);
+}
+
+#debug .line {
+  box-sizing: border-box;
+  width: 640px;
+  padding-left: 8px;
+  overflow-wrap: break-word;
+}

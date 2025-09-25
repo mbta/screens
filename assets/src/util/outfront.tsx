@@ -1,4 +1,4 @@
-import { ROTATION_INDEX } from "Components/v2/dup/rotation_index";
+import { ROTATION_INDEX } from "Components/dup/rotation_index";
 import { getDatasetValue } from "Util/dataset";
 
 /**

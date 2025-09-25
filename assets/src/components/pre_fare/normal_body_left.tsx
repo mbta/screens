@@ -1,0 +1,20 @@
+import type { ComponentType } from "react";
+import Widget, { WidgetData } from "Components/widget";
+
+interface Props {
+  main_content_left: WidgetData;
+}
+
+const NormalBodyLeft: ComponentType<Props> = ({
+  main_content_left: mainContentLeft,
+}) => {
+  return (
+    <div className="body-left-normal">
+      <div className="body-left-normal__main-content">
+        <Widget data={mainContentLeft} />
+      </div>
+    </div>
+  );
+};
+
+export default NormalBodyLeft;
