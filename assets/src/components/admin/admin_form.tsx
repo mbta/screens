@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { fetch } from "Util/admin";
+import { AUTOLESS_ATTRIBUTES, fetch } from "Util/admin";
 
 const validateJson = (json) => {
   try {
@@ -95,6 +95,7 @@ const AdminForm = ({
   return (
     <div className="admin-form">
       <textarea
+        {...AUTOLESS_ATTRIBUTES}
         ref={configRef}
         id="config"
         disabled={!editable}
