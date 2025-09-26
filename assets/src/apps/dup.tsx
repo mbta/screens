@@ -112,9 +112,10 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
+  const playerName = usePlayerName();
+
   if (isDup()) {
-    const playerName = usePlayerName()!;
-    const id = `DUP-${playerName.trim()}`;
+    const id = `DUP-${playerName!.trim()}`;
     return (
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>
         <ResponseMapperContext.Provider value={responseMapper}>

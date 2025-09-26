@@ -110,7 +110,7 @@ const Inspector: ComponentType = () => {
 
   const [zoom, setZoom] = useState(0.5);
   const adjustFrame = () => adjustScreenFrame(frameRef, isSimulation, zoom);
-  useLayoutEffect(adjustFrame, [zoom]);
+  useLayoutEffect(adjustFrame, [isSimulation, zoom]);
 
   return (
     <div className="inspector">
@@ -382,13 +382,15 @@ const DataControls: ComponentType<{
     return () => clearInterval(interval);
   }, [dataTimestamp]);
 
-  useEffect(() => {
-    sendToFrame({ type: "set_refresh_rate", ms: isRefreshEnabled ? null : 0 });
-  }, [isRefreshEnabled]);
+  const updateIsRefreshEnabled = (isEnabled) => {
+    setIsRefreshEnabled(isEnabled);
+    sendToFrame({ type: "set_refresh_rate", ms: isEnabled ? null : 0 });
+  };
 
-  useEffect(() => {
-    sendToFrame({ type: "set_data_variant", variant: variant });
-  }, [variant]);
+  const updateVariant = (newVariant) => {
+    setVariant(newVariant);
+    sendToFrame({ type: "set_data_variant", variant: newVariant });
+  };
 
   return (
     <>
@@ -409,7 +411,7 @@ const DataControls: ComponentType<{
           <input
             type="checkbox"
             checked={isRefreshEnabled}
-            onChange={() => setIsRefreshEnabled(!isRefreshEnabled)}
+            onChange={(event) => updateIsRefreshEnabled(event.target.checked)}
           />
           Enable refresh interval
         </label>
@@ -424,7 +426,7 @@ const DataControls: ComponentType<{
               type="radio"
               name="variant"
               checked={variant === null}
-              onChange={() => setVariant(null)}
+              onChange={() => updateVariant(null)}
             />
             Default
           </label>
@@ -435,7 +437,7 @@ const DataControls: ComponentType<{
                 type="radio"
                 name="variant"
                 checked={variant === v}
-                onChange={() => setVariant(v)}
+                onChange={() => updateVariant(v)}
               />
               <code>{v}</code>
             </label>

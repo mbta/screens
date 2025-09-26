@@ -52,7 +52,7 @@ function useIntervalPaging({
       updateVisibleData();
       setIsCycleFinished(false);
     }
-  }, [isCycleFinished]);
+  }, [isCycleFinished, updateVisibleData]);
   return pageIndex;
 }
 

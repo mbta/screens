@@ -80,17 +80,16 @@ const AdminForm = ({
   const configRef = useRef<HTMLTextAreaElement>(null);
   const [validatedConfig, setValidatedConfig] = useState(null);
 
-  const setEditorContents = async () => {
-    if (configRef.current) {
-      const config = await fetchConfig();
-      configRef.current.value = JSON.stringify(config, null, 2);
-    }
-  };
-
   useEffect(() => {
+    const setEditorContents = async () => {
+      if (configRef.current) {
+        const config = await fetchConfig();
+        configRef.current.value = JSON.stringify(config, null, 2);
+      }
+    };
+
     setEditorContents();
-    return;
-  }, []);
+  }, [fetchConfig]);
 
   return (
     <div className="admin-form">

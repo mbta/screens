@@ -141,7 +141,7 @@ const ScreenContainer = ({ id }) => {
         setShowBlink(false);
       }, blinkConfig.durationMs);
     }
-  }, [requestCount]);
+  }, [blinkConfig, requestCount]);
 
   return (
     <LastFetchContext.Provider value={lastSuccess}>

@@ -13,19 +13,8 @@ const updateDisabledModes = async (disabledModes) => {
   }
 };
 
-const DisableModeRow = ({ mode, modeDisabled, onChange }) => {
-  return (
-    <tr>
-      <td>{mode}</td>
-      <td>
-        <input type="checkbox" checked={modeDisabled} onChange={onChange} />
-      </td>
-    </tr>
-  );
-};
-
 const Devops = () => {
-  const [disabledModes, setDisabledModes] = useState<any[]>([]);
+  const [disabledModes, setDisabledModes] = useState<string[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -38,11 +27,14 @@ const Devops = () => {
       .catch((_) => alert("Failed to load config!"));
   }, []);
 
-  useEffect(() => {
-    if (loaded) {
-      updateDisabledModes(disabledModes);
-    }
-  }, [disabledModes]);
+  const changeMode = async (id, isChecked) => {
+    const newModes = isChecked
+      ? [id, ...disabledModes]
+      : disabledModes.filter((mode) => mode !== id);
+
+    await updateDisabledModes(newModes);
+    setDisabledModes(newModes);
+  };
 
   const modes = [
     { name: "Bus", id: "bus" },
@@ -59,39 +51,35 @@ const Devops = () => {
         that mode.
       </p>
       <p>⚠️ Changes are applied immediately.</p>
-      <table>
-        <thead>
-          <tr>
-            <td>
-              <strong>Mode</strong>
-            </td>
-            <td>
-              <strong>Disabled?</strong>
-            </td>
-          </tr>
-        </thead>
-        <tbody>
-          {modes.map(({ name, id }) => {
-            const onChange = (e) => {
-              const disabled = e.target.checked;
-              if (disabled) {
-                setDisabledModes((ms) => [id, ...ms]);
-              } else {
-                setDisabledModes((ms) => ms.filter((m) => m !== id));
-              }
-            };
 
-            return (
-              <DisableModeRow
-                mode={name}
-                key={id}
-                modeDisabled={disabledModes.includes(id)}
-                onChange={onChange}
-              />
-            );
-          })}
-        </tbody>
-      </table>
+      {loaded && (
+        <table>
+          <thead>
+            <tr>
+              <td>
+                <strong>Mode</strong>
+              </td>
+              <td>
+                <strong>Disabled?</strong>
+              </td>
+            </tr>
+          </thead>
+          <tbody>
+            {modes.map(({ name, id }) => (
+              <tr key={id}>
+                <td>{name}</td>
+                <td>
+                  <input
+                    type="checkbox"
+                    checked={disabledModes.includes(id)}
+                    onChange={(ev) => changeMode(id, ev.target.checked)}
+                  />
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </main>
   );
 };

@@ -6,9 +6,9 @@ import NoticeRow from "Components/departures/notice_row";
 import useCurrentPage from "Hooks/use_current_dup_page";
 
 const NormalSection: ComponentType<Props> = ({ rows }) => {
-  if (rows.length == 0) return null;
-
   const currentPage = useCurrentPage();
+
+  if (rows.length == 0) return null;
 
   return (
     <div className="departures-section">

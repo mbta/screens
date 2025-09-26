@@ -104,6 +104,10 @@ const BodyTextSizer: ComponentType<BodyTextSizerProps> = ({
   const [isSmall, setSmall] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
+  /* eslint-disable-next-line react-hooks/exhaustive-deps --
+   * TODO: Replace this with `useAutoSize`. For now, we know this logic cannot
+   * cause infinite update loops, so we don't need to be warned that it might.
+   */
   useLayoutEffect(() => {
     if (ref.current && !isSmall && ref.current.clientHeight > maxHeight) {
       setSmall(true);

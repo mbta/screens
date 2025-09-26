@@ -1,6 +1,7 @@
 import {
   type Dispatch,
   type SetStateAction,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -183,10 +184,11 @@ const useBaseApiResponse = ({
   const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
 
   const apiPath = useApiPath(id, appendPath);
 
-  const fetchData = async () => {
+  const fetchData = useCallback(async () => {
     try {
       const now = Date.now();
       const result = await fetch(apiPath);
@@ -214,12 +216,15 @@ const useBaseApiResponse = ({
     }
 
     setRequestCount((count) => count + 1);
-  };
+  }, [apiPath, lastSuccess]);
 
-  // Fetch data once, immediately, on page load
+  // Fetch data once, immediately, on first render
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (!initialFetchDone) {
+      fetchData();
+      setInitialFetchDone(true);
+    }
+  }, [fetchData, initialFetchDone]);
 
   // Schedule subsequent data fetches, if we need to
   useDriftlessInterval(

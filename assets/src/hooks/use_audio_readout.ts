@@ -27,28 +27,34 @@ const fetchAudio = async (id: string) => {
   }
 };
 
+const DISABLED_CONFIG = { intervalOffsetSeconds: 0, readoutIntervalMinutes: 0 };
+
+const makeConfig = (config: AudioConfig | null): AudioConfig => {
+  if (!config) {
+    return DISABLED_CONFIG;
+  } else if (isFramed()) {
+    // Don't read out periodic audio in the inspector, since there's otherwise
+    // no way to turn it off. Just report the config that would have been used.
+    sendToInspector({ type: "audio_config", config: config });
+    return DISABLED_CONFIG;
+  } else {
+    return config;
+  }
+};
+
 interface UseAudioReadoutArgs {
   id: string;
   config: AudioConfig | null;
 }
 
 const useAudioReadout = ({ id, config }: UseAudioReadoutArgs): void => {
-  if (isFramed()) {
-    // Don't read out periodic audio in the inspector, since there's otherwise
-    // no way to turn it off. Just report the config that would have been used.
-    sendToInspector({ type: "audio_config", config: config });
-    return;
-  }
+  const { intervalOffsetSeconds, readoutIntervalMinutes } = makeConfig(config);
 
-  if (config == null || config.readoutIntervalMinutes === 0) {
-    return;
-  }
-
-  const intervalPeriodMs = config.readoutIntervalMinutes * 60000;
+  const intervalPeriodMs = readoutIntervalMinutes * 60000;
 
   const refreshRateOffsetMs =
     parseInt(fetchDatasetValue("refreshRateOffset"), 10) * 1000;
-  const intervalOffsetSeconds = config.intervalOffsetSeconds;
+
   const intervalOffsetMs = refreshRateOffsetMs + intervalOffsetSeconds * 1000;
 
   useDriftlessInterval(
