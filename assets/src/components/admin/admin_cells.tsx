@@ -2,7 +2,7 @@ import { useRef, useMemo, useEffect } from "react";
 import { Link } from "react-router-dom";
 import _ from "lodash";
 
-import { gatherSelectOptions } from "Util/admin";
+import { AUTOLESS_ATTRIBUTES, gatherSelectOptions } from "Util/admin";
 
 const EditableCell = ({
   value: initialValue,
@@ -18,6 +18,7 @@ const EditableCell = ({
 
   return (
     <input
+      {...AUTOLESS_ATTRIBUTES}
       defaultValue={initialValue}
       className={`admin-table__column--${id}`}
       onBlur={onBlur}
@@ -40,6 +41,7 @@ const EditableList = ({
 
   return (
     <input
+      {...AUTOLESS_ATTRIBUTES}
       defaultValue={initialValue}
       className={`admin-table__column--${id}`}
       onBlur={onBlur}
@@ -66,6 +68,7 @@ const EditableNumberInput = ({
 
   return (
     <input
+      {...AUTOLESS_ATTRIBUTES}
       defaultValue={initialValue}
       className={`admin-table__column--${id}`}
       onBlur={onBlur}
@@ -146,6 +149,7 @@ const EditableTextarea = ({
 
   return (
     <textarea
+      {...AUTOLESS_ATTRIBUTES}
       className="admin-table__textarea"
       defaultValue={JSON.stringify(initialValue, null, 2)}
       onBlur={onBlur}

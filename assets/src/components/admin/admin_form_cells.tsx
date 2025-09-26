@@ -1,3 +1,5 @@
+import { AUTOLESS_ATTRIBUTES } from "Util/admin";
+
 const FormStaticCell = ({ value }) => {
   return <input defaultValue={value} disabled={true} />;
 };
@@ -11,7 +13,9 @@ const FormTextCell = ({ value, header, setFormValues }) => {
     }));
   };
 
-  return <input defaultValue={value} onBlur={onBlur} />;
+  return (
+    <input {...AUTOLESS_ATTRIBUTES} defaultValue={value} onBlur={onBlur} />
+  );
 };
 
 const buildFormSelect = (options, isNumber?) => {
@@ -82,7 +86,11 @@ const FormTextarea = ({ value, header, setFormValues }) => {
   };
 
   return (
-    <textarea onBlur={onBlur} defaultValue={JSON.stringify(value, null, 2)} />
+    <textarea
+      {...AUTOLESS_ATTRIBUTES}
+      onBlur={onBlur}
+      defaultValue={JSON.stringify(value, null, 2)}
+    />
   );
 };
 

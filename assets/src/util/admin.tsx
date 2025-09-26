@@ -19,6 +19,17 @@ export type Screen = {
   vendor: string;
 };
 
+/**
+ * Set of attributes for forms and form elements which disable "auto" browser
+ * behaviors like autocomplete and spell check.
+ */
+const AUTOLESS_ATTRIBUTES = {
+  autoCapitalize: "off",
+  autoComplete: "off",
+  autoCorrect: "off",
+  spellCheck: false,
+} as const;
+
 const gatherSelectOptions = (rows, columnId) => {
   const options = rows.map((row) => row.values[columnId]);
   const uniqueOptions = new Set(options);
@@ -80,4 +91,4 @@ const doFetch = async (
   }
 };
 
-export { fetch, gatherSelectOptions };
+export { AUTOLESS_ATTRIBUTES, fetch, gatherSelectOptions };
