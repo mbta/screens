@@ -8,7 +8,7 @@ import "../../css/dup.scss";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router";
 import ScreenPage from "Components/screen_page";
 import { MappingContext } from "Components/widget";
 import NormalScreen, { NormalSimulation } from "Components/dup/normal_screen";

@@ -1,5 +1,5 @@
 import { useRef, useMemo, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import _ from "lodash";
 
 import { AUTOLESS_ATTRIBUTES, gatherSelectOptions } from "Util/admin";

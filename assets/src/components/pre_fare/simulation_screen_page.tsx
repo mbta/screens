@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import SimulationScreenContainer from "Components/pre_fare/simulation_screen_container";
 
 const SimulationScreenPage = ({ opts = {} }) => {
