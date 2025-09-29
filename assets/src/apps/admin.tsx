@@ -2,12 +2,7 @@ import "../../css/admin.scss";
 
 import { type ComponentType, StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import {
-  BrowserRouter as Router,
-  NavLink,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter as Router, NavLink, Route, Routes } from "react-router";
 import weakKey from "weak-key";
 
 import {

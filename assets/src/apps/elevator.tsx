@@ -8,7 +8,7 @@ import "../../css/elevator.scss";
 
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router";
 import NormalScreen from "Components/elevator/normal_screen";
 import TakeoverScreen from "Components/takeover_screen";
 import EvergreenContent from "Components/evergreen_content";
