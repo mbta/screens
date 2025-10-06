@@ -317,7 +317,9 @@ defmodule Screens.Alerts.AlertTest do
       assert Alert.direction_id(alert) == nil
     end
 
-    test "returns the direction ID of the first directionally-informed parent station" do
+    test "returns nil when informed parent stations have a mix of directions" do
+      # Typical disruption with "endpoints" where only one direction of service is affected and
+      # a "middle" where both directions are
       alert = %Alert{
         informed_entities: [
           %{
@@ -326,11 +328,70 @@ defmodule Screens.Alerts.AlertTest do
             facility: nil,
             route: "1",
             route_type: nil,
-            stop: "12345"
+            stop: "place-a"
+          },
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: nil,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "place-b"
           },
           %{
             activities: ~w[board exit ride]a,
             direction_id: 1,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "place-c"
+          }
+        ]
+      }
+
+      assert Alert.direction_id(alert) == nil
+    end
+
+    test "returns nil when informed parent stations all have different non-nil directions" do
+      # Scenario where the disruption has "endpoints" but they're adjacent stations
+      alert = %Alert{
+        informed_entities: [
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: 0,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "place-a"
+          },
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: 1,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "place-b"
+          }
+        ]
+      }
+
+      assert Alert.direction_id(alert) == nil
+    end
+
+    test "returns the direction ID when all parent stations are affected in the same direction" do
+      alert = %Alert{
+        informed_entities: [
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: nil,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: "12345"
+          },
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: 0,
             facility: nil,
             route: "1",
             route_type: nil,
@@ -343,6 +404,40 @@ defmodule Screens.Alerts.AlertTest do
             route: "1",
             route_type: nil,
             stop: "place-b"
+          }
+        ]
+      }
+
+      assert Alert.direction_id(alert) == 0
+    end
+
+    test "returns nil when there are no specific affected stops and no affected direction" do
+      alert = %Alert{
+        informed_entities: [
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: nil,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: nil
+          }
+        ]
+      }
+
+      assert Alert.direction_id(alert) == nil
+    end
+
+    test "returns the direction ID when a whole direction is affected" do
+      alert = %Alert{
+        informed_entities: [
+          %{
+            activities: ~w[board exit ride]a,
+            direction_id: 1,
+            facility: nil,
+            route: "1",
+            route_type: nil,
+            stop: nil
           }
         ]
       }

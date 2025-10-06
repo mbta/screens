@@ -391,11 +391,27 @@ defmodule Screens.Alerts.Alert do
 
   @doc """
   Very imperfectly determine whether an alert only affects one direction of service. Assumes this
-  is the case if any affected parent station is only affected in one direction.
+  is the case if the alert affects a whole direction of some route, or it affects parent stations
+  all in the same direction.
   """
   @spec direction_id(t()) :: Trip.direction() | nil
-  def direction_id(%__MODULE__{informed_entities: entities}),
-    do: Enum.find(entities, &InformedEntity.parent_station?/1).direction_id
+  def direction_id(%__MODULE__{informed_entities: entities}) do
+    direction_from_whole_direction_entities =
+      Enum.find_value(entities, fn %{direction_id: direction_id} = entity ->
+        if InformedEntity.whole_direction?(entity), do: direction_id
+      end)
+
+    direction_from_parent_station_entities =
+      case entities
+           |> Enum.filter(&InformedEntity.parent_station?/1)
+           |> Enum.map(& &1.direction_id)
+           |> Enum.uniq() do
+        [direction_id] when not is_nil(direction_id) -> direction_id
+        _other -> nil
+      end
+
+    direction_from_whole_direction_entities || direction_from_parent_station_entities
+  end
 
   def informed_parent_stations(%__MODULE__{
         informed_entities: informed_entities
