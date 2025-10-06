@@ -12,22 +12,12 @@
 
 .admin-navbar {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   row-gap: 0.5em;
   padding: 1em;
   margin-bottom: 0.5em;
   background-color: #eee;
-}
-
-.admin-navbar__group {
-  display: flex;
-  align-items: center;
-
-  &:not(:first-child) {
-    padding-left: 1em;
-    margin-left: 1em;
-    border-left: 1px solid gray;
-  }
 }
 
 .admin-navbar a {
