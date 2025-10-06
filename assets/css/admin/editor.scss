@@ -1,0 +1,161 @@
+.admin-editor {
+  display: flex;
+  flex-direction: column;
+  overflow: auto;
+  background-color: #eee;
+
+  &__table {
+    flex-grow: 1;
+    padding: 0 1em;
+    overflow: auto;
+
+    &__stats {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+
+      & > *:not(button) {
+        padding-right: 1em;
+        margin-right: 1em;
+        border-right: 1px solid gray;
+      }
+
+      & > button {
+        padding: 2px 5px;
+        margin-right: 0.5em;
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    padding: 1em;
+  }
+
+  &__dialog {
+    width: 80%;
+    max-width: 1024px;
+
+    table {
+      margin-bottom: 1.25em;
+
+      th {
+        text-align: left;
+      }
+    }
+
+    button {
+      margin-right: 0.5em;
+    }
+  }
+
+  table {
+    white-space: nowrap;
+    border-spacing: 0;
+  }
+
+  thead {
+    position: sticky;
+    top: 0;
+    background-color: #eee;
+
+    tr:first-child th {
+      padding: 0 0.5em;
+    }
+
+    input,
+    select {
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    input {
+      min-width: 15ch;
+    }
+  }
+
+  tbody {
+    tr:nth-child(odd) {
+      background-color: white;
+    }
+
+    tr:nth-child(even) {
+      background-color: #eee;
+    }
+
+    input,
+    select {
+      box-sizing: border-box;
+      width: 100%;
+      padding: 0;
+      margin: 0;
+      background-color: inherit;
+      border: 0;
+    }
+
+    input[type="number"] {
+      appearance: textfield;
+    }
+  }
+
+  tr.changed {
+    border-radius: 6px;
+    outline: 2px solid goldenrod;
+    outline-offset: -1px;
+  }
+
+  tr.selected {
+    &:nth-child(odd) {
+      background-color: color-mix(in oklab, lightskyblue, white 15%);
+    }
+
+    &:nth-child(even) {
+      background-color: lightskyblue;
+    }
+  }
+
+  td {
+    padding: 4px;
+    border-radius: 6px;
+  }
+
+  td.changed {
+    background-color: lightgoldenrodyellow;
+
+    input,
+    select {
+      background-color: revert;
+      border: revert;
+    }
+  }
+
+  td.select {
+    min-width: 2em;
+  }
+}
+
+.admin-editor__inspector-link {
+  color: unset;
+  text-decoration: none;
+  border-bottom: 1px dotted;
+}
+
+.admin-editor__json-filter {
+  font-family: monospace;
+}
+
+.admin-editor__textarea {
+  width: 40ch;
+  height: 40px;
+  transition: height 0.2s;
+
+  &:focus {
+    height: 400px;
+  }
+
+  &__status {
+    white-space: wrap;
+  }
+}

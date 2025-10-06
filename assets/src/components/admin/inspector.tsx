@@ -12,7 +12,14 @@ import AdminForm from "./admin_form";
 
 import { type AudioConfig } from "Components/screen_container";
 
-import { fetch, type Config, type Screen } from "Util/admin";
+import {
+  fetch,
+  SCREEN_APPS,
+  type Config,
+  type Screen,
+  type ScreenWithId,
+} from "Util/admin";
+
 import {
   type Message,
   INSPECTOR_FRAME_NAME,
@@ -20,29 +27,7 @@ import {
   useReceiveMessage,
 } from "Util/inspector";
 
-type ScreenWithId = { id: string; config: Screen };
-
-const SCREEN_TYPES = new Set([
-  "bus_eink_v2",
-  "bus_shelter_v2",
-  "busway_v2",
-  "dup_v2",
-  "elevator_v2",
-  "gl_eink_v2",
-  "pre_fare_v2",
-]);
-
-const AUDIO_SCREEN_TYPES = new Set([
-  "bus_eink_v2",
-  "bus_shelter_v2",
-  "busway_v2",
-  "gl_eink_v2",
-  "pre_fare_v2",
-]);
-
-const SCREEN_TYPE_VARIANTS = {
-  dup_v2: ["new_departures"],
-};
+const APP_IDS = new Set(Object.keys(SCREEN_APPS));
 
 const MAX_SSML_BILLED_CHARS = 3000;
 const MAX_SSML_TOTAL_CHARS = 6000;
@@ -115,7 +100,7 @@ const Inspector: ComponentType = () => {
   useLayoutEffect(adjustFrame, [isSimulation, zoom]);
 
   return (
-    <div className="inspector">
+    <main className="inspector">
       <div className="inspector__controls">
         <h1>Inspector</h1>
 
@@ -175,7 +160,7 @@ const Inspector: ComponentType = () => {
           src={iframeUrl}
         ></iframe>
       </div>
-    </div>
+    </main>
   );
 };
 
@@ -208,7 +193,7 @@ const ScreenSelector: ComponentType<{
   const screensByType: Record<string, ScreenWithId[]> = Object.entries(
     config.screens,
   )
-    .filter(([, { app_id }]) => SCREEN_TYPES.has(app_id))
+    .filter(([, { app_id }]) => APP_IDS.has(app_id))
     .sort(([idA], [idB]) => idA.localeCompare(idB))
     .reduce((groups, [id, config]) => {
       groups[config.app_id] ||= [];
@@ -433,7 +418,7 @@ const DataControls: ComponentType<{
             Default
           </label>
 
-          {(SCREEN_TYPE_VARIANTS[screen.config.app_id] ?? []).map((v) => (
+          {SCREEN_APPS[screen.config.app_id].variants.map((v) => (
             <label key={v}>
               <input
                 type="radio"
@@ -467,7 +452,7 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
     if (message.type === "audio_config") setConfig(message.config);
   });
 
-  const audioPath = AUDIO_SCREEN_TYPES.has(screen.config.app_id)
+  const audioPath = SCREEN_APPS[screen.config.app_id].hasAudio
     ? `/v2/audio/${screen.id}`
     : null;
 
