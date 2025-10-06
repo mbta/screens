@@ -5,7 +5,7 @@ const API_PATH = "/api/admin/maintenance";
 
 const Tools = () => {
   return (
-    <main>
+    <main className="admin-page">
       <EvergreenContentCleanup />
     </main>
   );
