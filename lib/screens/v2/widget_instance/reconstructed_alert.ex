@@ -874,10 +874,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     issue =
       case partial_closure_platform_names do
         [informed_platform_name] ->
-          "Bypassing #{informed_platform_name} platform at #{informed_station}"
+          "Skipping #{informed_platform_name} platform at #{informed_station}"
 
         informed_subway_platforms ->
-          Cldr.Message.format!("Bypassing {num_platforms, plural,
+          Cldr.Message.format!("Skipping {num_platforms, plural,
             =1 {1 platform}
             other {# platforms}} at {informed_station}",
             num_platforms: length(informed_subway_platforms),
@@ -904,7 +904,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_stations_string = Util.format_name_list_to_string(informed_station_names)
 
     %{
-      issue: "Trains will bypass #{informed_stations_string}",
+      issue: "Trains will skip #{informed_stations_string}",
       remedy: "Seek alternate route",
       location: "",
       cause: cause_description(alert),

@@ -18,6 +18,7 @@ import {
   isGLMultiPill,
   useSubwayStatusTextResizer,
   FittingStep,
+  LineColor,
 } from "./subway_status_common";
 
 ////////////////
@@ -113,7 +114,6 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   route_pill: routePill,
   status,
   location,
-  station_count: stationCount,
   id,
 }) => {
   const { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep } =
@@ -127,13 +127,13 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   } else {
     locationText = location;
   }
+  if (routePill?.color === LineColor.Orange) {
+  console.log(locationText);
+  console.log(status)
+  }
 
   if (truncateStatus) {
-    const effect = firstWord(status);
-    status =
-      effect === "Bypassing"
-        ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}`
-        : effect;
+    status = firstWord(status);
   }
 
   return (

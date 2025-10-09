@@ -164,10 +164,11 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     # Service Change                 ||| "" | Xbound | $STATION | $STATION ↔ $STATION | Entire line
     # Shuttle Bus                    ||| "" | Xbound | $STATION | $STATION ↔ $STATION | Entire line
     # Delays (up to|over) $N minutes ||| "" | Xbound | $STATION | $STATION ↔ $STATION | Due to $CAUSE
-    # Bypassing                      ||| "" | $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
-    # Bypassing $N stops             ||| ""
+    # Stop Skipped                   ||| "" | $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
+    # $N Stops Skipped               ||| ""
     # $N current alerts              ||| ""
     # Single Tracking                ||| Due to $CAUSE
+    IO.inspect(status, label: "status")
     verb_atom = get_verb_atom(status)
     article = get_article(status, location_string)
     content = get_content(status, location_string)
@@ -175,9 +176,15 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     {verb_atom, ~E|<%= article %><%= content %>|}
   end
 
-  defp get_verb_atom("Bypassing" <> _), do: :is
+  defp get_verb_atom("Stop Skipped" <> _), do: :is
   defp get_verb_atom("Single Tracking" <> _), do: :is
-  defp get_verb_atom(_other), do: :has
+
+  defp get_verb_atom(status) do
+    cond do
+      String.ends_with?(status, "Stops Skipped") -> :is
+      true -> :has
+    end
+  end
 
   defp conjugate(verb_atom, multi_branch_alert?)
 
@@ -190,15 +197,27 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   defp get_article(status, location_string) do
     cond do
       location_string == "Eastbound" -> "an "
-      status =~ ~r/^(?:Delays|Bypassing|Single Tracking|SERVICE SUSPENDED|\d)/ -> ""
+      status =~ ~r/^(?:Delays|Stop Skipped|Single Tracking|SERVICE SUSPENDED|\d)/ -> ""
       true -> "a "
     end
   end
 
+  defp get_content("Stop Skipped", ""), do: ~E|skipping 1 stop|
+
   defp get_content(status, location_string) do
+    stops_skipped_match = Regex.run(~r/^(?:(\d+)\s)?Stops? Skipped$/, status)
+
     cond do
+      location_string == "" and stops_skipped_match ->
+        # E.g. "2 Stops Skipped", "5 Stops Skipped",
+        [_, num_stops_skipped] = stops_skipped_match
+
+        stops = String.to_integer(num_stops_skipped)
+        stop_word = if stops == 1, do: "stop", else: "stops"
+        ~E|skipping <%= stops %> <%= stop_word %>|
+
       location_string == "" ->
-        # E.g. "3 current alerts", "Bypassing 5 stops", "Suspension"
+        # E.g. "3 current alerts", "Suspension"
         ~E|<%= status %>|
 
       # Location is actually a cause (single tracking)
@@ -225,10 +244,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
         # E.g. "Suspension at Quincy Center"
         ~E|<%= status %> at <%= location_string %>|
 
-      # Bypassing + $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
+      # Skipping + $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
       true ->
-        # E.g. "Bypassing Park Street, Downtown Crossing, and South Station"
-        ~E|<%= status %> <%= location_string %>|
+        # E.g. "Skipping Park Street, Downtown Crossing, and South Station"
+        ~E|skipping <%= location_string %>|
     end
   end
 
