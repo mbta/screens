@@ -84,8 +84,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @subway_routes Map.keys(@route_directions)
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
+  @green_line_route_ids ["Green" | @green_line_branches]
 
   @mbta_alerts_url "mbta.com/alerts"
+  @normal_service_status "Normal Service"
 
   defimpl Screens.V2.WidgetInstance do
     alias ScreensConfig.Audio
@@ -131,12 +133,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def get_multi_alert_routes(grouped_alerts) do
-    initial_acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
+    acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
 
     # Treat all GL branch alerts the same.
     grouped_alerts
-    |> Enum.reduce(initial_acc, fn
-      {"Green" <> _, alerts}, %{"Green" => gl_alerts} = acc ->
+    |> Enum.reduce(acc, fn
+      {route, alerts}, %{"Green" => gl_alerts} when route in @green_line_route_ids ->
         Map.put(acc, "Green", Enum.uniq(gl_alerts ++ alerts))
 
       {route, alerts}, acc ->
@@ -165,15 +167,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Enum.reject(&is_nil/1)
     |> Enum.filter(&(&1 in @subway_routes))
     |> Enum.uniq()
-  end
-
-  def serialize_one_row_for_all_routes(grouped_alerts, total_alert_count) do
-    %{
-      blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
-      orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
-      red: serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count),
-      green: serialize_green_line(grouped_alerts, total_alert_count)
-    }
   end
 
   # At most 1 alert on any route
@@ -215,12 +208,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
             green: serialize_green_line(grouped_alerts, total_alert_count)
           }
         else
-          serialize_one_row_for_all_routes(grouped_alerts, total_alert_count)
+          serialize_routes_zero_or_one_alert(grouped_alerts, total_alert_count)
         end
 
       # Collapse all routes
       true ->
-        serialize_one_row_for_all_routes(grouped_alerts, total_alert_count)
+        serialize_routes_zero_or_one_alert(grouped_alerts, total_alert_count)
     end
   end
 
@@ -265,7 +258,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           serialize_alert_summary(length(alerts), serialize_route_pill(route_id))
       end
 
-    if total_alert_count in 1..2 and data.status != "Normal Service" do
+    if total_alert_count in 1..2 and data.status != @normal_service_status do
       %{
         type: :extended,
         alert: data
@@ -290,7 +283,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_gl_pill_with_branches(route_ids) do
     branches =
       route_ids
-      |> Enum.filter(&String.contains?(&1, "Green-"))
+      |> Enum.filter(&(&1 in @green_line_branches))
       |> Enum.map(fn "Green-" <> branch ->
         branch |> String.downcase() |> String.to_existing_atom()
       end)
@@ -370,7 +363,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_alert(alert, route_id)
 
   defp serialize_alert(nil, _route_id) do
-    %{status: "Normal Service"}
+    %{status: @normal_service_status}
   end
 
   defp serialize_alert(
@@ -408,7 +401,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
                                 other {# Stops}} Skipped",
             num_informed_platforms: length(informed_platforms)
           ),
-        location: %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
+        location:
+          case get_stop_name_with_platform(
+                 informed_entities,
+                 route_id
+               ) do
+            nil -> %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
+            stop_with_platform -> stop_with_platform
+          end
       }
     else
       # Get closed station names from informed entities
@@ -530,10 +530,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alert_whole_line_stops =
       informed_entities
       |> Enum.map(fn e -> Map.get(e, :route) end)
-      |> Enum.filter(fn
-        "Green-" <> _ -> true
-        _ -> false
-      end)
+      |> Enum.filter(&(&1 in @green_line_branches))
       |> Enum.uniq()
       |> Enum.sort()
 
@@ -562,8 +559,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alert_stops =
       informed_entities
       |> Enum.filter(fn
-        %{stop: nil} -> false
-        ie -> String.starts_with?(ie.stop, "place-") and String.starts_with?(ie.route, "Green-")
+        %{stop: nil} ->
+          false
+
+        %{stop: stop, route: route} ->
+          String.starts_with?(stop, "place-") and route in @green_line_branches
       end)
       |> Enum.map(& &1.stop)
       |> MapSet.new()
@@ -730,12 +730,34 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
+  defp get_stop_name_with_platform(informed_entities, route_id) do
+    # Although it is possible to create a closure alert for multiple partial stations,
+    # that should never happen. So we can assume that any partial platform closure
+    # only applies to a single station. If this assumption doesn't hold, we will set
+    # an informational URL as the location name to display to the user
+    stop_names = Subway.route_stop_names(route_id)
+
+    relevant_entities = filter_entities_by_route(informed_entities, route_id)
+
+    # Find parent station (one pass)
+    parent_station_id =
+      Enum.find_value(relevant_entities, fn %{stop: stop_id} ->
+        if Map.has_key?(stop_names, stop_id), do: stop_id
+      end)
+
+    # Find platform name (reuse filtered list)
+    with %{platform_name: platform_name} when not is_nil(platform_name) <-
+           Enum.find(relevant_entities, &(not is_nil(&1[:platform_name]))),
+         {full, abbrev} <- Map.get(stop_names, parent_station_id) do
+      %{full: "#{full} - #{platform_name}", abbrev: "#{abbrev} - #{platform_name}"}
+    else
+      _ -> nil
+    end
+  end
+
   defp get_stop_names_from_informed_entities(informed_entities, route_id) do
     informed_entities
-    |> Enum.filter(fn
-      %{route: "Green-" <> _} when route_id == "Green" -> true
-      %{route: route} -> route == route_id
-    end)
+    |> filter_entities_by_route(route_id)
     |> Enum.flat_map(fn
       %{stop: stop_id, route: route_id} ->
         stop_names = Subway.route_stop_names(route_id)
@@ -827,4 +849,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     length(affected_routes)
   end
+
+  defp filter_entities_by_route(informed_entities, route_id) do
+    Enum.filter(informed_entities, fn
+      %{route: entity_route} -> matches_route?(entity_route, route_id)
+      _ -> false
+    end)
+  end
+
+  defp matches_route?(entity_route, route_id)
+       when route_id == "Green" and entity_route in @green_line_route_ids,
+       do: true
+
+  defp matches_route?(entity_route, route_id), do: entity_route == route_id
 end

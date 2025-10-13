@@ -50,7 +50,8 @@ defmodule Screens.Alerts.AlertTest do
             direction_id: nil,
             route_type: nil,
             activities: ~w[board exit ride]a,
-            facility: nil
+            facility: nil,
+            platform_name: nil
           }
         ],
         lifecycle: "ONGOING",

@@ -122,7 +122,8 @@ defmodule Screens.Alerts.Alert do
           facility: Facility.t() | nil,
           route: Route.id() | nil,
           route_type: non_neg_integer() | nil,
-          stop: Stop.id() | nil
+          stop: Stop.id() | nil,
+          platform_name: String.t() | nil
         }
 
   @type t :: %__MODULE__{
@@ -144,6 +145,7 @@ defmodule Screens.Alerts.Alert do
           activities: [activity()] | :all,
           fields: [String.t()],
           include_all?: boolean(),
+          include_stops_platform_name?: boolean(),
           route_id: Route.id(),
           route_ids: [Route.id()],
           route_types: RouteType.t() | [RouteType.t()],
@@ -156,13 +158,21 @@ defmodule Screens.Alerts.Alert do
 
   @base_includes ~w[facilities]
   @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops]
+  @stops_includes ~w[stops]
 
   @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     includes =
-      if Keyword.get(opts, :include_all?, false),
-        do: @all_includes,
-        else: @base_includes
+      cond do
+        Keyword.get(opts, :include_stops_platform_name?, false) ->
+          @base_includes ++ @stops_includes
+
+        Keyword.get(opts, :include_all?, false) ->
+          @all_includes
+
+        true ->
+          @base_includes
+      end
 
     params =
       opts
