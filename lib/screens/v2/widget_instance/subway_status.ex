@@ -87,7 +87,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   @green_line_route_ids ["Green" | @green_line_branches]
 
   @mbta_alerts_url "mbta.com/alerts"
-  @normal_service_status
+  @normal_service_status "Normal Service"
 
   defimpl Screens.V2.WidgetInstance do
     alias ScreensConfig.Audio
@@ -133,12 +133,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def get_multi_alert_routes(grouped_alerts) do
-    initial_acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
+    acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
 
     # Treat all GL branch alerts the same.
     grouped_alerts
-    |> Enum.reduce(initial_acc, fn
-      {route, alerts}, %{"Green" => gl_alerts} when is_green_line_route?(route) ->
+    |> Enum.reduce(acc, fn
+      {route, alerts}, %{"Green" => gl_alerts} when route in @green_line_route_ids ->
         Map.put(acc, "Green", Enum.uniq(gl_alerts ++ alerts))
 
       {route, alerts}, acc ->
@@ -559,8 +559,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alert_stops =
       informed_entities
       |> Enum.filter(fn
-        %{stop: nil} -> false
-        ie -> String.starts_with?(ie.stop, "place-") and route in @green_line_branches
+        %{stop: nil} ->
+          false
+
+        %{stop: stop, route: route} ->
+          String.starts_with?(stop, "place-") and route in @green_line_branches
       end)
       |> Enum.map(& &1.stop)
       |> MapSet.new()
@@ -847,8 +850,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     length(affected_routes)
   end
 
-  @spec filter_entities_by_route(list(Alert.informed_entity()), route_id()) ::
-          list(Alert.informed_entity())
   defp filter_entities_by_route(informed_entities, route_id) do
     Enum.filter(informed_entities, fn
       %{route: entity_route} -> matches_route?(entity_route, route_id)
@@ -856,7 +857,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end)
   end
 
-  @spec matches_route?(route_id(), route_id()) :: boolean()
   defp matches_route?(entity_route, route_id)
        when route_id == "Green" and entity_route in @green_line_route_ids,
        do: true
