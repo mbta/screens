@@ -2,7 +2,7 @@ import getCsrfToken from "Util/csrf";
 
 type JSONArray = Array<JSON>;
 type JSONObject = { [key: string]: JSON };
-type JSON = null | string | number | boolean | JSONArray | JSONObject;
+export type JSON = null | string | number | boolean | JSONArray | JSONObject;
 
 export type Config = {
   screens: { [id: string]: Screen };
