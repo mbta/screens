@@ -133,12 +133,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def get_multi_alert_routes(grouped_alerts) do
-    acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
+    initial_acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
 
     # Treat all GL branch alerts the same.
     grouped_alerts
-    |> Enum.reduce(acc, fn
-      {route, alerts}, %{"Green" => gl_alerts} when route in @green_line_route_ids ->
+    |> Enum.reduce(initial_acc, fn
+      {"Green" <> _, alerts}, %{"Green" => gl_alerts} = acc ->
         Map.put(acc, "Green", Enum.uniq(gl_alerts ++ alerts))
 
       {route, alerts}, acc ->
@@ -562,8 +562,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         %{stop: nil} ->
           false
 
-        %{stop: stop, route: route} ->
-          String.starts_with?(stop, "place-") and route in @green_line_branches
+        ie ->
+          InformedEntity.parent_station?(ie) and ie.route in @green_line_branches
       end)
       |> Enum.map(& &1.stop)
       |> MapSet.new()

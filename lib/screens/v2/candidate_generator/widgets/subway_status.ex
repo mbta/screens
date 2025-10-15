@@ -13,7 +13,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
     route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E"]
 
     {:ok, alerts} =
-      Screens.Alerts.Alert.fetch(route_ids: route_ids, include_stops_platform_name?: true)
+      Screens.Alerts.Alert.fetch(route_ids: route_ids)
 
     relevant_alerts =
       alerts
