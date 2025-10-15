@@ -634,6 +634,57 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  # Partial closure - single platform, single direction
+  defp single_screen_fields(
+         %__MODULE__{
+           alert: %Alert{
+             effect: :station_closure
+           },
+           partial_closure_platform_names: [informed_platform_name]
+         } = t,
+         location
+       ) do
+    %__MODULE__{
+      alert: %{cause: cause, updated_at: updated_at, header: header},
+      now: now,
+      informed_station_names: informed_station_names
+    } = t
+
+    region = get_region_from_location(location)
+
+    issue =
+      if region == :here do
+        "#{informed_platform_name} platform closed"
+      else
+        "#{Util.format_name_list_to_string(informed_station_names)}: Trains skip #{informed_platform_name} platform"
+      end
+
+    %{
+      issue: issue,
+      remedy: header,
+      cause: get_cause(cause),
+      routes: get_route_pills(t, location),
+      effect: :station_closure,
+      updated_at: format_updated_at(updated_at, now),
+      region: region,
+      stations: informed_station_names
+    }
+  end
+
+  # Partial closure, but multiple platforms - use fallback fields
+  defp single_screen_fields(
+         %__MODULE__{
+           alert: %Alert{
+             effect: :station_closure
+           },
+           partial_closure_platform_names: informed_platform_names
+         } = t,
+         location
+       )
+       when informed_platform_names != [] do
+    single_screen_fallback_fields(t, location)
+  end
+
   # This station closed for entire/only route
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, :inside) do
     %__MODULE__{alert: %{cause: cause, updated_at: updated_at}, now: now} = t
@@ -874,7 +925,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     issue =
       case partial_closure_platform_names do
         [informed_platform_name] ->
-          "Skipping #{informed_platform_name} platform at #{informed_station}"
+          "#{informed_station}: Trains skip #{informed_platform_name} platform"
 
         informed_subway_platforms ->
           Cldr.Message.format!("Skipping {num_platforms, plural,
@@ -892,7 +943,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: nil,
       routes: get_route_pills(t),
       effect: :station_closure,
-      urgent: false,
+      urgent: location == :inside,
       region: get_region_from_location(location)
     }
   end
@@ -1071,8 +1122,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  # Use diagram-less fallback presentation for partial station closures
-  defp serialize_single_screen(t, location), do: single_screen_fallback_fields(t, location)
+  # Use diagram-less presentation for partial station closures
+  defp serialize_single_screen(t, location), do: single_screen_fields(t, location)
 
   @spec serialize_flex_zone(t(), LocalizedAlert.location()) :: flex_serialized_response()
   defp serialize_flex_zone(t, location), do: flex_zone_fields(t, location)

@@ -179,7 +179,7 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   effect,
 }) => {
   const { ref: alertTextRef, step: alertTextSize } = useAutoSize(
-    ["medium", "small"],
+    ["text-body-1", "text-body-2", "text-body-3", "text-body-4"],
     remedy,
   );
 
@@ -191,10 +191,7 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
       {issue && <div className="alert-card__fallback__issue-text">{issue}</div>}
       {remedy && (
         <div
-          className={classWithModifier(
-            "alert-card__fallback__alert-text",
-            alertTextSize,
-          )}
+          className={`alert-card__fallback__alert-text ${alertTextSize}`}
           ref={alertTextRef}
         >
           {remedy}
