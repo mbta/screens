@@ -749,7 +749,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     with %{platform_name: platform_name} when not is_nil(platform_name) <-
            Enum.find(relevant_entities, &(not is_nil(&1[:platform_name]))),
          {full, abbrev} <- Map.get(stop_names, parent_station_id) do
-      %{full: "#{full} - #{platform_name}", abbrev: "#{abbrev} - #{platform_name}"}
+      %{full: "#{full}: {platform_name} platform closed", abbrev: "#{full} (1 side only)"}
     else
       _ -> nil
     end
