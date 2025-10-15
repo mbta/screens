@@ -1,5 +1,29 @@
 @use "CSS/colors";
 
+@mixin body-one {
+  font-size: 66px;
+  font-weight: 400;
+  line-height: 83px;
+}
+
+@mixin body-two {
+  font-size: 53px;
+  font-weight: 400;
+  line-height: 68px;
+}
+
+@mixin body-three {
+  font-size: 42px;
+  font-weight: 400;
+  line-height: 54px;
+}
+
+@mixin body-four {
+  font-size: 34px;
+  font-weight: 400;
+  line-height: 49px;
+}
+
 @mixin large-text {
   font-size: 112px;
   font-weight: 700;
@@ -151,24 +175,26 @@
 
   .alert-card__fallback__issue-text {
     margin-bottom: 54px;
-    font-size: 88px;
+    font-size: 104px;
     font-weight: 700;
-    line-height: 105.6px;
+    line-height: 116px;
   }
 
   .alert-card__fallback__alert-text {
-    font-size: 68px;
-    font-weight: 500;
-    line-height: 81px;
+    @include body-one;
 
-    &--medium,
-    &--small {
-      max-height: 460px;
+    max-height: 460px;
+
+    &--body-two {
+      @include body-two;
     }
 
-    &--small {
-      font-size: 55.1px;
-      line-height: 65.63px;
+    &--body-three {
+      @include body-three;
+    }
+
+    &--body-four {
+      @include body-four;
     }
 
     &--bold {
