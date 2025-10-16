@@ -9,7 +9,7 @@ defmodule Screens.V2.WidgetInstance.Placeholder do
             slot_names: [],
             priority: [100]
 
-  @type color :: :grey | :blue | :green | :red
+  @type color :: :blue | :green | :red | :orange | :gray | :grey | :black
   @type t :: %__MODULE__{
           color: color(),
           text: String.t(),
