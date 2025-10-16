@@ -400,23 +400,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         |> Enum.filter(&(&1.id in informed_stop_ids))
         |> Enum.map(& &1.platform_name)
 
-      get_stop_name_with_platform(
-        informed_entities,
-        platform_names,
-        route_id
-      )
-
       %{
         status: "Bypassing 1 stop",
         location:
-          case get_stop_name_with_platform(
-                 informed_entities,
-                 platform_names,
-                 route_id
-               ) do
-            nil -> %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
-            stop_with_platform -> stop_with_platform
-          end,
+          get_stop_name_with_platform(
+            informed_entities,
+            platform_names,
+            route_id
+          ),
         station_count: 1
       }
     else
@@ -760,7 +751,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         }
 
       nil ->
-        nil
+        %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
     end
   end
 

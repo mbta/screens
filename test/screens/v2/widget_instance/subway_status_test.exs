@@ -904,6 +904,90 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert expected == WidgetInstance.serialize(instance)
     end
 
+    test "handles 1 platform closure alert on Green Line" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-D", stop: "place-eliot", route_type: 1},
+                %{route: "Green-D", stop: "70166", route_type: 1}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_station: [
+                %{id: "70166", platform_name: "Park Street & North"},
+                %{id: "70167", platform_name: "Riverside"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{
+              status: "Bypassing 1 stop",
+              location: %{
+                full: "Eliot: Park Street & North platform closed",
+                abbrev: "Eliot (1 side only)"
+              },
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:d]},
+              station_count: 1
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles single platform closure alert at multiple stops" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Red", stop: "place-portr", route_type: 1},
+                %{route: "Red", stop: "70065", route_type: 1},
+                %{route: "Red", stop: "place-davis", route_type: 1},
+                %{route: "Red", stop: "70063", route_type: 1}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_station: [
+                %{id: "70063", platform_name: "Ashmont/Braintree"},
+                %{id: "70064", platform_name: "Alewife"},
+                %{id: "70065", platform_name: "Ashmont/Braintree"},
+                %{id: "70066", platform_name: "Alewife"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | red: %{
+            type: :extended,
+            alert: %{
+              status: "Bypassing",
+              location: %{
+                full: "Porter and Davis",
+                abbrev: "Porter and Davis"
+              },
+              route_pill: @rl_pill,
+              station_count: 2
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
     test "handles 1 service change alert" do
       instance = %SubwayStatus{
         subway_alerts: [
