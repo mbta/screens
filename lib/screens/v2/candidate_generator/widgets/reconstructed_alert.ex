@@ -158,6 +158,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp relevance(_alert, _location, _distance), do: nil
 
+  @spec get_platform_names_at_informed_station(t(), (String.t() -> [Stop.t()])) :: [String.t()]
+  defp get_platform_names_at_informed_station(
+         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
+         fetch_subway_platforms_for_stop_fn
+       ) do
+    # Given informed entities representing an alert at a single station,
+    # finds the corresponding platform names for those child stops included.
+    with [informed_parent_station] <- informed_parent_stations(alert),
+         platforms <- fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop),
+         true <- partial_station_closure?(alert, platforms) do
+      informed_stop_ids = Enum.map(informed_entities, & &1.stop)
+
+      platforms |> Enum.filter(&(&1.id in informed_stop_ids)) |> Enum.map(& &1.platform_name)
+    else
+      _ -> []
+    end
+  end
+
+  defp get_platform_names_at_informed_station(_, _), do: []
+
   defp build_distance_map(home_stop_id, stop_sequences) do
     Enum.reduce(stop_sequences, %{}, fn stop_sequence, distances_by_stop ->
       stop_sequence

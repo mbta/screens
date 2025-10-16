@@ -459,24 +459,4 @@ defmodule Screens.Alerts.Alert do
       {directionless_entity, _multiple} -> directionless_entity
     end)
   end
-
-  @spec get_platform_names_at_informed_station(t(), (String.t() -> [Stop.t()])) :: [String.t()]
-  def get_platform_names_at_informed_station(
-        %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
-        fetch_subway_platforms_for_stop_fn
-      ) do
-    # Given informed entities representing an alert at a single station,
-    # finds the corresponding platform names for those child stops included.
-    with [informed_parent_station] <- informed_parent_stations(alert),
-         platforms <- fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop),
-         true <- partial_station_closure?(alert, platforms) do
-      informed_stop_ids = Enum.map(informed_entities, & &1.stop)
-
-      platforms |> Enum.filter(&(&1.id in informed_stop_ids)) |> Enum.map(& &1.platform_name)
-    else
-      _ -> []
-    end
-  end
-
-  def get_platform_names_at_informed_station(_, _), do: []
 end
