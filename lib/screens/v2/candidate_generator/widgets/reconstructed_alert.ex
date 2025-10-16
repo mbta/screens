@@ -93,10 +93,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           |> List.flatten()
           |> Enum.map(fn alert ->
             all_platforms_names_at_informed_station =
-              Alert.get_platform_names_at_informed_station(
-                alert,
-                fetch_subway_platforms_for_stop_fn
-              )
+              get_platform_names_at_informed_station(alert, fetch_subway_platforms_for_stop_fn)
 
             %ReconstructedAlert{
               screen: config,
@@ -158,16 +155,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp relevance(_alert, _location, _distance), do: nil
 
-  @spec get_platform_names_at_informed_station(t(), (String.t() -> [Stop.t()])) :: [String.t()]
+  @spec get_platform_names_at_informed_station(Alert.t(), (String.t() -> [Stop.t()])) :: [
+          String.t()
+        ]
   defp get_platform_names_at_informed_station(
-         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
+         %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
          fetch_subway_platforms_for_stop_fn
        ) do
     # Given informed entities representing an alert at a single station,
     # finds the corresponding platform names for those child stops included.
-    with [informed_parent_station] <- informed_parent_stations(alert),
+    with [informed_parent_station] <- Alert.informed_parent_stations(alert),
          platforms <- fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop),
-         true <- partial_station_closure?(alert, platforms) do
+         true <- Alert.partial_station_closure?(alert, platforms) do
       informed_stop_ids = Enum.map(informed_entities, & &1.stop)
 
       platforms |> Enum.filter(&(&1.id in informed_stop_ids)) |> Enum.map(& &1.platform_name)
