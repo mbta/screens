@@ -391,25 +391,33 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          route_id
        ) do
     if Alert.partial_station_closure?(alert, all_platforms_at_informed_station) do
-      platform_ids = Enum.map(all_platforms_at_informed_station, & &1.id)
-      informed_platforms = Enum.filter(informed_entities, &(&1.stop in platform_ids))
+      # Logic for partial_station_closure will remove any alerts that apply to more than
+      # a single parent platform.
+      informed_stop_ids = Enum.map(informed_entities, & &1.stop)
+
+      platform_names =
+        all_platforms_at_informed_station
+        |> Enum.filter(&(&1.id in informed_stop_ids))
+        |> Enum.map(& &1.platform_name)
+
+      get_stop_name_with_platform(
+        informed_entities,
+        platform_names,
+        route_id
+      )
 
       %{
-        status:
-          Cldr.Message.format!("Bypassing {num_informed_platforms, plural,
-                                =1 {1 stop}
-                                other {# stops}}",
-            num_informed_platforms: length(informed_platforms)
-          ),
+        status: "Bypassing 1 stop",
         location:
           case get_stop_name_with_platform(
                  informed_entities,
+                 platform_names,
                  route_id
                ) do
             nil -> %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
             stop_with_platform -> stop_with_platform
           end,
-        station_count: length(informed_platforms)
+        station_count: 1
       }
     else
       # Get closed station names from informed entities
@@ -731,29 +739,26 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp get_stop_name_with_platform(informed_entities, route_id) do
+  defp get_stop_name_with_platform(informed_entities, [platform_name], route_id) do
     # Although it is possible to create a closure alert for multiple partial stations,
-    # that should never happen. So we can assume that any partial platform closure
-    # only applies to a single station. If this assumption doesn't hold, we will set
-    # an informational URL as the location name to display to the user
+    # that is unlikely. We consider closures as partial only if they apply to a single station,
+    # and only pass along platform info if a single platform is closed at that station.
+    # Otherwise we will set an informational URL as the location name to display to the user
     stop_names = Subway.route_stop_names(route_id)
-
     relevant_entities = filter_entities_by_route(informed_entities, route_id)
 
-    # Find parent station (one pass)
     parent_station_id =
       Enum.find_value(relevant_entities, fn %{stop: stop_id} ->
         if Map.has_key?(stop_names, stop_id), do: stop_id
       end)
 
-    # Find platform name (reuse filtered list)
-    with %{platform_name: platform_name} when not is_nil(platform_name) <-
-           Enum.find(relevant_entities, &(not is_nil(&1[:platform_name]))),
-         {full, _abbrev} <- Map.get(stop_names, parent_station_id) do
-      %{full: "#{full}: #{platform_name} platform closed", abbrev: "#{full} (1 side only)"}
-    else
-      _ -> nil
-    end
+    {full, _abbrev} = Map.get(stop_names, parent_station_id)
+    %{full: "#{full}: #{platform_name} platform closed", abbrev: "#{full} (1 side only)"}
+  end
+
+  defp get_stop_name_with_platform(_informed_entities, _platform_names, _route_id) do
+    # If there are multiple platforms or no platforms closed, then use fallback alerts URL
+    %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
   end
 
   defp get_stop_names_from_informed_entities(informed_entities, route_id) do

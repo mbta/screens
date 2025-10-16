@@ -891,8 +891,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             type: :extended,
             alert: %{
               status: "Bypassing 1 stop",
-              location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
-              route_pill: @rl_pill
+              location: %{
+                full: "Porter: Ashmont/Braintree platform closed",
+                abbrev: "Porter (1 side only)"
+              },
+              route_pill: @rl_pill,
+              station_count: 1
             }
           }
       }
@@ -1031,9 +1035,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | red: %{
             type: :extended,
             alert: %{
-              status: "Bypassing 2 stops",
+              status: "Bypassing 1 stop",
               location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
-              route_pill: @rl_pill
+              route_pill: @rl_pill,
+              station_count: 1
             }
           }
       }
