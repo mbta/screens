@@ -752,8 +752,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         if Map.has_key?(stop_names, stop_id), do: stop_id
       end)
 
-    {full, _abbrev} = Map.get(stop_names, parent_station_id)
-    %{full: "#{full}: #{platform_name} platform closed", abbrev: "#{full} (1 side only)"}
+    case Map.get(stop_names, parent_station_id) do
+      {full, _abbrev} ->
+        %{
+          full: "#{full}: #{platform_name} platform closed",
+          abbrev: "#{full} (1 side only)"
+        }
+
+      nil ->
+        nil
+    end
   end
 
   defp get_stop_name_with_platform(_informed_entities, _platform_names, _route_id) do
