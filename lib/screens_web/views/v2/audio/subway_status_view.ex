@@ -168,7 +168,6 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
     # $N Stops Skipped               ||| ""
     # $N current alerts              ||| ""
     # Single Tracking                ||| Due to $CAUSE
-    IO.inspect(status, label: "status")
     verb_atom = get_verb_atom(status)
     article = get_article(status, location_string)
     content = get_content(status, location_string)
