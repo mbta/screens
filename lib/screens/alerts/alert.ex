@@ -154,6 +154,9 @@ defmodule Screens.Alerts.Alert do
   @type result :: {:ok, [t()]} | :error
   @type fetch :: (options() -> result())
 
+  # Internally used type for distinguishing different station closures we handle differently
+  @type closure_type :: :partial_closure | :full_station_closure | :partial_closure_multiple_stops
+
   @base_includes ~w[facilities]
   @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops]
 
@@ -419,27 +422,46 @@ defmodule Screens.Alerts.Alert do
     Enum.filter(informed_entities, &InformedEntity.parent_station?/1)
   end
 
-  # Although Alerts UI allows you to create partial closures affecting multiple stations,
-  # we are assuming that will never happen.
-  @spec partial_station_closure?(__MODULE__.t(), list(Stop.t())) :: boolean()
-  def partial_station_closure?(
-        %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
-        all_platforms_at_informed_station
-      ) do
+  @spec station_closure_type(__MODULE__.t(), list(Stop.t())) :: closure_type
+  def(
+    station_closure_type(
+      %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
+      all_platforms_at_informed_stations
+    )
+  ) do
+    # Alerts UI allows you to create partial closures affecting multiple stations.
+    # Typically, these partial closures affecting child stops will only affect a single station.
+    # However, we do want to consider the case in which multiple stations have closures,
+    # but not every child stop at those parent stations are closed.
     informed_parent_stations = informed_parent_stations(alert)
 
-    case informed_parent_stations do
-      [_] ->
-        platform_ids = Enum.map(all_platforms_at_informed_station, & &1.id)
-        informed_platforms = Enum.filter(informed_entities, &(&1.stop in platform_ids))
-        length(informed_platforms) != length(all_platforms_at_informed_station)
+    informed_platforms =
+      get_informed_platforms_from_entities(
+        informed_entities,
+        all_platforms_at_informed_stations
+      )
 
-      _ ->
-        false
+    case informed_parent_stations do
+      [_single_parent_station] ->
+        if length(informed_platforms) != length(all_platforms_at_informed_stations) do
+          :partial_closure
+        else
+          :full_station_closure
+        end
+
+      _multiple_parent_stations ->
+        if length(informed_platforms) != length(all_platforms_at_informed_stations) do
+          :partial_closure_multiple_stops
+        else
+          :full_station_closure
+        end
     end
   end
 
-  def partial_station_closure?(_, _), do: false
+  def get_informed_platforms_from_entities(informed_entities, all_platforms_at_informed_stations) do
+    platform_ids = Enum.map(all_platforms_at_informed_stations, & &1.id)
+    Enum.filter(informed_entities, &(&1.stop in platform_ids))
+  end
 
   @spec informs_stop_id?(t(), Stop.id()) :: boolean()
   def informs_stop_id?(%__MODULE__{informed_entities: informed_entities}, stop_id) do

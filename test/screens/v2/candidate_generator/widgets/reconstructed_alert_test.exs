@@ -172,7 +172,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         is_terminal_station: true,
         home_station_name: "Oak Grove",
-        all_platforms_at_informed_station: []
+        all_platforms_at_informed_stations: []
       }
 
       expected_widgets = [
@@ -270,7 +270,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         is_terminal_station: true,
         home_station_name: "Oak Grove",
-        all_platforms_at_informed_station: []
+        all_platforms_at_informed_stations: []
       }
 
       expected_widgets = [
@@ -354,7 +354,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         is_terminal_station: true,
         home_station_name: "Oak Grove",
-        all_platforms_at_informed_station: []
+        all_platforms_at_informed_stations: []
       }
 
       expected_widgets = [
@@ -451,7 +451,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         home_station_name: nil,
         informed_station_names: [],
-        all_platforms_at_informed_station: [],
+        all_platforms_at_informed_stations: [],
         is_terminal_station: true
       }
 
@@ -522,7 +522,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         is_terminal_station: true,
         is_priority: true,
         home_station_name: "Oak Grove",
-        all_platforms_at_informed_station: []
+        all_platforms_at_informed_stations: []
       }
 
       expected_widgets = [

@@ -166,7 +166,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     # finds the corresponding platform names for those child stops included.
     with [informed_parent_station] <- Alert.informed_parent_stations(alert),
          platforms <- fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop),
-         true <- Alert.partial_station_closure?(alert, platforms) do
+         :partial_closure <- Alert.station_closure_type(alert, platforms) do
       informed_stop_ids = Enum.map(informed_entities, & &1.stop)
 
       platforms |> Enum.filter(&(&1.id in informed_stop_ids)) |> Enum.map(& &1.platform_name)

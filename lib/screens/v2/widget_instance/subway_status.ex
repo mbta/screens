@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     defstruct @enforce_keys ++ [context: %{}]
 
     @type context :: %{
-            optional(:all_platforms_at_informed_station) => list(String.t())
+            optional(:all_platforms_at_informed_stations) => list(String.t())
           }
   end
 
@@ -386,37 +386,55 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_alert(
          %{
            alert: %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
-           context: %{all_platforms_at_informed_station: all_platforms_at_informed_station}
+           context: %{all_platforms_at_informed_stations: all_platforms_at_informed_stations}
          },
          route_id
        ) do
-    if Alert.partial_station_closure?(alert, all_platforms_at_informed_station) do
+    case Alert.station_closure_type(alert, all_platforms_at_informed_stations) do
       # Logic for partial_station_closure will remove any alerts that apply to more than
       # a single parent platform.
-      informed_stop_ids = Enum.map(informed_entities, & &1.stop)
+      :partial_closure ->
+        informed_stop_ids = Enum.map(informed_entities, & &1.stop)
 
-      platform_names =
-        all_platforms_at_informed_station
-        |> Enum.filter(&(&1.id in informed_stop_ids))
-        |> Enum.map(& &1.platform_name)
+        platform_names =
+          all_platforms_at_informed_stations
+          |> Enum.filter(&(&1.id in informed_stop_ids))
+          |> Enum.map(& &1.platform_name)
 
-      %{
-        status: "Bypassing 1 stop",
-        location:
-          get_stop_name_with_platform(
-            informed_entities,
-            platform_names,
-            route_id
-          ),
-        station_count: 1
-      }
-    else
-      # Get closed station names from informed entities
-      stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
+        %{
+          status: "Bypassing 1 stop",
+          location:
+            get_stop_name_with_platform(
+              informed_entities,
+              platform_names,
+              route_id
+            )
+        }
 
-      {status, location} = format_station_closure(stop_names)
+      :partial_closure_multiple_stops ->
+        # If there are multiple stations closed without all of their platforms closed,
+        # display the fallback url. This case should not happen frequently, so
+        # we default to not providing incorrect information and direct users to the website.
+        num_parent_stations = length(Alert.informed_parent_stations(alert))
 
-      %{status: status, location: location, station_count: length(stop_names)}
+        %{
+          status:
+            Cldr.Message.format!("Bypassing {num_parent_stations, plural,
+                                =1 {1 stop}
+                                other {# stops}}",
+              num_parent_stations: num_parent_stations
+            ),
+          location: %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url},
+          station_count: num_parent_stations
+        }
+
+      :full_station_closure ->
+        # Get closed station names from informed entities
+        stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
+
+        {status, location} = format_station_closure(stop_names)
+
+        %{status: status, location: location, station_count: length(stop_names)}
     end
   end
 
@@ -732,8 +750,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   defp get_stop_name_with_platform(informed_entities, [platform_name], route_id) do
     # Although it is possible to create a closure alert for multiple partial stations,
-    # that is unlikely. We consider closures as partial only if they apply to a single station,
-    # and only pass along platform info if a single platform is closed at that station.
+    # we pass along platform info only if a single platform is closed at that station.
     # Otherwise we will set an informational URL as the location name to display to the user
     stop_names = Subway.route_stop_names(route_id)
     relevant_entities = filter_entities_by_route(informed_entities, route_id)

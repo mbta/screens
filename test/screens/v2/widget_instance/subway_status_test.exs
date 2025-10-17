@@ -8,7 +8,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   alias ScreensConfig.Screen.BusShelter
 
   defp subway_alerts(alerts),
-    do: Enum.map(alerts, &%{alert: &1, context: %{all_platforms_at_informed_station: []}})
+    do: Enum.map(alerts, &%{alert: &1, context: %{all_platforms_at_informed_stations: []}})
 
   describe "priority/1" do
     test "returns high priority for a flex zone widget" do
@@ -876,7 +876,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             context: %{
-              all_platforms_at_informed_station: [
+              all_platforms_at_informed_stations: [
                 %{id: "70065", platform_name: "Ashmont/Braintree"},
                 %{id: "70066", platform_name: "Alewife"}
               ]
@@ -895,8 +895,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                 full: "Porter: Ashmont/Braintree platform closed",
                 abbrev: "Porter (1 side only)"
               },
-              route_pill: @rl_pill,
-              station_count: 1
+              route_pill: @rl_pill
             }
           }
       }
@@ -916,7 +915,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             context: %{
-              all_platforms_at_informed_station: [
+              all_platforms_at_informed_stations: [
                 %{id: "70166", platform_name: "Park Street & North"},
                 %{id: "70167", platform_name: "Riverside"}
               ]
@@ -935,8 +934,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                 full: "Eliot: Park Street & North platform closed",
                 abbrev: "Eliot (1 side only)"
               },
-              route_pill: %{type: :text, text: "GL", color: :green, branches: [:d]},
-              station_count: 1
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:d]}
             }
           }
       }
@@ -958,7 +956,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             context: %{
-              all_platforms_at_informed_station: [
+              all_platforms_at_informed_stations: [
                 %{id: "70063", platform_name: "Ashmont/Braintree"},
                 %{id: "70064", platform_name: "Alewife"},
                 %{id: "70065", platform_name: "Ashmont/Braintree"},
@@ -974,10 +972,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | red: %{
             type: :extended,
             alert: %{
-              status: "Bypassing",
+              status: "Bypassing 2 stops",
               location: %{
-                full: "Porter and Davis",
-                abbrev: "Porter and Davis"
+                full: "mbta.com/alerts",
+                abbrev: "mbta.com/alerts"
               },
               route_pill: @rl_pill,
               station_count: 2
@@ -1000,7 +998,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             context: %{
-              all_platforms_at_informed_station: [
+              all_platforms_at_informed_stations: [
                 %{id: "70065", platform_name: "Ashmont/Braintree"},
                 %{id: "70066", platform_name: "Alewife"}
               ]
@@ -1103,7 +1101,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             context: %{
-              all_platforms_at_informed_station: [
+              all_platforms_at_informed_stations: [
                 %{id: "70085", platform_name: "Ashmont"},
                 %{id: "70086", platform_name: "Alewife (from Ashmont)"},
                 %{id: "70095", platform_name: "Braintree"},
@@ -1121,8 +1119,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %{
               status: "Bypassing 1 stop",
               location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
-              route_pill: @rl_pill,
-              station_count: 1
+              route_pill: @rl_pill
             }
           }
       }
