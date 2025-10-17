@@ -4,7 +4,7 @@ import { STRING_TO_SVG } from "Util/svg_utils";
 import {
   Alert,
   ContractedSection,
-  GLMultiPill,
+  MultiPill,
   LineColor,
   Section,
   SubwayStatusData,
@@ -15,7 +15,7 @@ import {
   isContracted,
   isContractedWith1Alert,
   isExtended,
-  isGLMultiPill,
+  isMultiPill,
   useSubwayStatusTextResizer,
   FittingStep,
 } from "./subway_status_common";
@@ -183,10 +183,11 @@ const SubwayStatusRoutePill: ComponentType<{
   showInlineBranches?: boolean;
 }> = ({ routePill, showInlineBranches }) => {
   // If there are branches, return a pill group with each branch icon.
-  if (isGLMultiPill(routePill)) {
+  if (isMultiPill(routePill)) {
     const sortedUniqueBranches = Array.from(new Set(routePill.branches)).sort();
     return (
-      <GLBranchPillGroup
+      <BranchPillGroup
+        color={routePill.color}
         branches={sortedUniqueBranches}
         showInlineBranches={showInlineBranches}
       />
@@ -198,16 +199,16 @@ const SubwayStatusRoutePill: ComponentType<{
   return <LinePill height="65" />;
 };
 
-const GLBranchPillGroup: ComponentType<
-  Pick<GLMultiPill, "branches"> & { showInlineBranches?: boolean }
-> = ({ branches, showInlineBranches }) => {
+const BranchPillGroup: ComponentType<
+  Pick<MultiPill, "branches" | "color"> & { showInlineBranches?: boolean }
+> = ({ color, branches, showInlineBranches }) => {
   // We only inline route pills for GL branches.
   // Otherwise, we show a single route pill above alerts in each section.
   if (showInlineBranches) {
     return (
       <>
         {branches.map((branch) => {
-          const LinePill = STRING_TO_SVG[`green-${branch}-circle`];
+          const LinePill = STRING_TO_SVG[`${color}-${branch}-circle`];
           return (
             <LinePill
               width="64"
@@ -223,12 +224,12 @@ const GLBranchPillGroup: ComponentType<
 
   const [firstBranch, ...rest] = branches;
 
-  const ComboLinePill = STRING_TO_SVG[`green-line-${firstBranch}`];
+  const ComboLinePill = STRING_TO_SVG[`${color}-line-${firstBranch}`];
   return (
     <>
       <ComboLinePill width="404" height="64" className="branch-icon" />
       {rest.map((branch) => {
-        const BranchLinePill = STRING_TO_SVG[`green-${branch}-circle`];
+        const BranchLinePill = STRING_TO_SVG[`${color}-${branch}-circle`];
         return (
           <BranchLinePill
             width="64"
@@ -257,9 +258,9 @@ const getRoutePillObject = (
   section: Section,
   color: LineColor,
 ): SubwayStatusPill => {
-  // If the current section is `green` and there is only one alert, see if there are any branches
-  // that can be added to the route pill. If no branches exist, the GL pill will be rendered with no branches.
-  if (color === "green") {
+  // If the current section is `green` or `red` and there is only one alert, see if there are any branches
+  // that can be added to the route pill. If no branches exist, the pill will be rendered with no branches.
+  if (color === "green" || color === "red") {
     if (isContractedWith1Alert(section)) {
       return {
         color: color,
