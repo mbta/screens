@@ -89,9 +89,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       %Elevator{
         id: id,
         alternate_ids: [],
-        entering_redundancy: :in_station,
-        exiting_redundancy: :in_station,
-        exiting_summary: "Accessible route available"
+        exiting_summary: "Accessible route available",
+        redundancy: :in_station
       },
       fields
     )
@@ -254,7 +253,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     test "uses :nearby_redundancy when all closed elevators have nearby redundancy", %{now: now} do
       stub(@elevator, :get, fn
         "111" -> build_elevator("111")
-        "222" -> build_elevator("222", exiting_redundancy: :nearby)
+        "222" -> build_elevator("222", redundancy: :nearby)
       end)
 
       expect(@alert, :fetch, fn @alert_opts ->
@@ -289,13 +288,13 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
       assert logs =~ "elevator_closure_affects_multiple"
     end
 
-    test "filters out alerts at other stations with nearby exiting redundancy", %{now: now} do
+    test "filters out alerts at other stations with nearby redundancy", %{now: now} do
       stub(@route, :fetch, fn _ -> {:ok, [%Route{id: "Red", type: :subway}]} end)
 
       stub(@elevator, :get, fn
-        "112" -> build_elevator("112", exiting_redundancy: :nearby)
-        "222" -> build_elevator("222", exiting_redundancy: :nearby)
-        "333" -> build_elevator("333", exiting_redundancy: :in_station)
+        "112" -> build_elevator("112", redundancy: :nearby)
+        "222" -> build_elevator("222", redundancy: :nearby)
+        "333" -> build_elevator("333", redundancy: :in_station)
       end)
 
       expect(@alert, :fetch, fn @alert_opts ->
@@ -327,11 +326,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
              ] = Generator.elevator_status_instances(@screen, now)
     end
 
-    test "generates backup route summaries based on exiting redundancy", %{now: now} do
+    test "generates backup route summaries based on redundancy category", %{now: now} do
       stub(@elevator, :get, fn
-        "1" -> build_elevator("1", exiting_redundancy: :in_station, exiting_summary: "es1")
-        "2" -> build_elevator("2", alternate_ids: ["alt"], exiting_redundancy: :nearby)
-        "alt" -> build_elevator("alt", exiting_redundancy: :nearby)
+        "1" -> build_elevator("1", redundancy: :in_station, exiting_summary: "es1")
+        "2" -> build_elevator("2", alternate_ids: ["alt"], redundancy: :nearby)
+        "alt" -> build_elevator("alt", redundancy: :nearby)
       end)
 
       expect(@alert, :fetch, fn @alert_opts ->
@@ -370,14 +369,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
     test "uses a different summary when the screen's elevator is the backup", %{now: now} do
       stub(@elevator, :get, fn
         "1" ->
-          build_elevator("1",
-            alternate_ids: ["alt"],
-            exiting_redundancy: :nearby,
-            exiting_summary: "es1"
-          )
+          build_elevator("1", alternate_ids: ["alt"], exiting_summary: "es1", redundancy: :nearby)
 
         "2" ->
-          build_elevator("2", alternate_ids: ["alt"], exiting_redundancy: :other)
+          build_elevator("2", alternate_ids: ["alt"], redundancy: :other)
 
         "alt" ->
           build_elevator("alt")
@@ -420,17 +415,10 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
 
     test "uses custom summaries for closures downstream of the screen's station", %{now: now} do
       stub(@elevator, :get, fn
-        "upstream" ->
-          build_elevator("upstream", exiting_redundancy: :other)
-
-        "here" ->
-          build_elevator("here", exiting_redundancy: :other)
-
-        "downstream" ->
-          build_elevator("downstream", exiting_redundancy: :other, exiting_summary: "es1")
-
-        "elsewhere" ->
-          build_elevator("elsewhere", exiting_redundancy: :other)
+        "upstream" -> build_elevator("upstream", redundancy: :other)
+        "here" -> build_elevator("here", redundancy: :other)
+        "downstream" -> build_elevator("downstream", redundancy: :other, exiting_summary: "es1")
+        "elsewhere" -> build_elevator("elsewhere", redundancy: :other)
       end)
 
       expect(
@@ -527,7 +515,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         {:ok, [build_facility_alert("f1", "place-1")]}
       end)
 
-      expect(@elevator, :get, fn "f1" -> build_elevator("f1", exiting_redundancy: :other) end)
+      expect(@elevator, :get, fn "f1" -> build_elevator("f1", redundancy: :other) end)
 
       assert [
                %ElevatorClosures{
@@ -576,9 +564,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         {:ok, alerts}
       end)
 
-      expect(@elevator, :get, fn "111" ->
-        build_elevator("111", entering_redundancy: :in_station)
-      end)
+      expect(@elevator, :get, fn "111" -> build_elevator("111", redundancy: :in_station) end)
 
       assert [
                %ElevatorClosures{
@@ -604,7 +590,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         {:ok, alerts}
       end)
 
-      expect(@elevator, :get, fn "111" -> build_elevator("111", entering_redundancy: :nearby) end)
+      expect(@elevator, :get, fn "111" -> build_elevator("111", redundancy: :nearby) end)
 
       assert [%ElevatorClosures{upcoming_closure: nil} | _] =
                Generator.elevator_status_instances(@screen, now)
