@@ -23,6 +23,37 @@ const ICON_TO_SRC: Record<Icon, string> = {
   logo_negative: "logo-black.svg",
 };
 
+// When the header text is a stop name consisting of two street names with a
+// separator like "@" between them, if the text has to wrap, we prefer the line
+// break to fall immediately before or after the separator. Define a pattern to
+// look for this and some possible replacements.
+const BREAK_PATTERN = / (@|opp) /;
+const BREAK_AFTER = " $1\n";
+const BREAK_BEFORE = "\n$1 ";
+const BREAK_NONE = "$&";
+
+const SIZING_RULES = {
+  largeAfter: { classes: ["large"], replacement: BREAK_AFTER },
+  largeBefore: { classes: ["large"], replacement: BREAK_BEFORE },
+  largeWrap: { classes: ["large", "wrap"], replacement: BREAK_NONE },
+  smallAfter: { classes: ["small"], replacement: BREAK_AFTER },
+  smallBefore: { classes: ["small"], replacement: BREAK_BEFORE },
+  smallWrap: { classes: ["small", "wrap"], replacement: BREAK_NONE },
+};
+
+const sizingSteps = (text: string): (keyof typeof SIZING_RULES)[] =>
+  BREAK_PATTERN.test(text)
+    ? [
+        "largeAfter",
+        "largeBefore",
+        // Intentionally omit largeWrap so we prefer reducing the text size over
+        // allowing an "awkward" line break.
+        "smallAfter",
+        "smallBefore",
+        "smallWrap",
+      ]
+    : ["largeWrap", "smallWrap"];
+
 interface NormalHeaderTitleProps {
   icon?: Icon;
   text: string;
@@ -35,7 +66,8 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
   showTo,
 }) => {
   const environmentName = getDatasetValue("environmentName") || "";
-  const { ref, step: size } = useAutoSize(["large", "small"], text);
+  const { ref, step } = useAutoSize(sizingSteps(text), text);
+  const { classes, replacement } = SIZING_RULES[step];
 
   return (
     <>
@@ -44,7 +76,7 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
       )}
       <div
         className={classWithModifiers("normal-header-title", [
-          size,
+          ...classes,
           icon ? "with-icon" : "no-icon",
         ])}
         ref={ref}
@@ -57,7 +89,7 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
         )}
         <div className="normal-header-title__text">
           {showTo && <div className="normal-header-to__text">TO</div>}
-          {text}
+          {text.replace(BREAK_PATTERN, replacement)}
         </div>
       </div>
     </>
