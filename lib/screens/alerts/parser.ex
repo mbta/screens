@@ -53,32 +53,14 @@ defmodule Screens.Alerts.Parser do
   }
 
   defp parse_informed_entity(ie, included) do
-    platform_name = parse_platform_name_from_stop(ie["stop"], included)
-
     %{
       activities: Enum.map(ie["activities"], &Map.fetch!(@activities, &1)),
       direction_id: ie["direction_id"],
       facility: parse_informed_facility(ie["facility"], included),
       route: ie["route"],
       route_type: ie["route_type"],
-      stop: ie["stop"],
-      platform_name: platform_name
+      stop: ie["stop"]
     }
-  end
-
-  defp parse_platform_name_from_stop(nil, _included), do: nil
-
-  defp parse_platform_name_from_stop(stop_id, included) do
-    case Map.get(included, {stop_id, "stop"}) do
-      nil ->
-        nil
-
-      %{"attributes" => %{"platform_name" => platform_name}} ->
-        platform_name
-
-      _stop ->
-        nil
-    end
   end
 
   defp parse_informed_facility(nil, _included), do: nil

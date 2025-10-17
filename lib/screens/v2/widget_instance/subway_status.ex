@@ -22,7 +22,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     defstruct @enforce_keys ++ [context: %{}]
 
     @type context :: %{
-            optional(:all_platforms_at_informed_station) => list(String.t())
+            optional(:all_platforms_at_informed_stations) => list(String.t())
           }
   end
 
@@ -133,12 +133,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   def get_multi_alert_routes(grouped_alerts) do
-    acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
+    initial_acc = %{"Orange" => [], "Red" => [], "Blue" => [], "Green" => []}
 
     # Treat all GL branch alerts the same.
     grouped_alerts
-    |> Enum.reduce(acc, fn
-      {route, alerts}, %{"Green" => gl_alerts} when route in @green_line_route_ids ->
+    |> Enum.reduce(initial_acc, fn
+      {"Green" <> _, alerts}, %{"Green" => gl_alerts} = acc ->
         Map.put(acc, "Green", Enum.uniq(gl_alerts ++ alerts))
 
       {route, alerts}, acc ->
@@ -386,37 +386,55 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_alert(
          %{
            alert: %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
-           context: %{all_platforms_at_informed_station: all_platforms_at_informed_station}
+           context: %{all_platforms_at_informed_stations: all_platforms_at_informed_stations}
          },
          route_id
        ) do
-    if Alert.partial_station_closure?(alert, all_platforms_at_informed_station) do
-      platform_ids = Enum.map(all_platforms_at_informed_station, & &1.id)
-      informed_platforms = Enum.filter(informed_entities, &(&1.stop in platform_ids))
+    case Alert.station_closure_type(alert, all_platforms_at_informed_stations) do
+      # Logic for partial_station_closure will remove any alerts that apply to more than
+      # a single parent platform.
+      :partial_closure ->
+        informed_stop_ids = Enum.map(informed_entities, & &1.stop)
 
-      %{
-        status:
-          Cldr.Message.format!("{num_informed_platforms, plural,
+        platform_names =
+          all_platforms_at_informed_stations
+          |> Enum.filter(&(&1.id in informed_stop_ids))
+          |> Enum.map(& &1.platform_name)
+
+        %{
+          status: "Stop Skipped",
+          location:
+            get_stop_name_with_platform(
+              informed_entities,
+              platform_names,
+              route_id
+            )
+        }
+
+      :partial_closure_multiple_stops ->
+        # If there are multiple stations closed without all of their platforms closed,
+        # display the fallback url. This case should not happen frequently, so
+        # we default to not providing incorrect information and direct users to the website.
+        num_parent_stations = length(Alert.informed_parent_stations(alert))
+
+        %{
+          status:
+            Cldr.Message.format!("{num_parent_stations, plural,
                                 =1 {Stop}
                                 other {# Stops}} Skipped",
-            num_informed_platforms: length(informed_platforms)
-          ),
-        location:
-          case get_stop_name_with_platform(
-                 informed_entities,
-                 route_id
-               ) do
-            nil -> %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
-            stop_with_platform -> stop_with_platform
-          end
-      }
-    else
-      # Get closed station names from informed entities
-      stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
+              num_parent_stations: num_parent_stations
+            ),
+          location: %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url},
+          station_count: num_parent_stations
+        }
 
-      {status, location} = format_station_closure(stop_names)
+      :full_station_closure ->
+        # Get closed station names from informed entities
+        stop_names = get_stop_names_from_informed_entities(informed_entities, route_id)
 
-      %{status: status, location: location, station_count: length(stop_names)}
+        {status, location} = format_station_closure(stop_names)
+
+        %{status: status, location: location, station_count: length(stop_names)}
     end
   end
 
@@ -487,6 +505,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           alert()
   defp serialize_green_line_branch_alert(alert, route_ids)
 
+  # If only one branch is affected, we can still determine a stop
+  # range to show, for applicable alert types
+  defp serialize_green_line_branch_alert(alert, [route_id]) do
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches([route_id])},
+      serialize_alert(alert, route_id)
+    )
+  end
+
   defp serialize_green_line_branch_alert(
          %{
            alert: %Alert{
@@ -507,15 +534,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       location: location,
       station_count: length(stop_names)
     }
-  end
-
-  # If only one branch is affected, we can still determine a stop
-  # range to show, for applicable alert types
-  defp serialize_green_line_branch_alert(alert, [route_id]) do
-    Map.merge(
-      %{route_pill: serialize_gl_pill_with_branches([route_id])},
-      serialize_alert(alert, route_id)
-    )
   end
 
   # Otherwise, give up on determining a stop range.
@@ -562,8 +580,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         %{stop: nil} ->
           false
 
-        %{stop: stop, route: route} ->
-          String.starts_with?(stop, "place-") and route in @green_line_branches
+        ie ->
+          InformedEntity.parent_station?(ie) and ie.route in @green_line_branches
       end)
       |> Enum.map(& &1.stop)
       |> MapSet.new()
@@ -730,29 +748,33 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp get_stop_name_with_platform(informed_entities, route_id) do
+  defp get_stop_name_with_platform(informed_entities, [platform_name], route_id) do
     # Although it is possible to create a closure alert for multiple partial stations,
-    # that should never happen. So we can assume that any partial platform closure
-    # only applies to a single station. If this assumption doesn't hold, we will set
-    # an informational URL as the location name to display to the user
+    # we pass along platform info only if a single platform is closed at that station.
+    # Otherwise we will set an informational URL as the location name to display to the user
     stop_names = Subway.route_stop_names(route_id)
-
     relevant_entities = filter_entities_by_route(informed_entities, route_id)
 
-    # Find parent station (one pass)
     parent_station_id =
       Enum.find_value(relevant_entities, fn %{stop: stop_id} ->
         if Map.has_key?(stop_names, stop_id), do: stop_id
       end)
 
-    # Find platform name (reuse filtered list)
-    with %{platform_name: platform_name} when not is_nil(platform_name) <-
-           Enum.find(relevant_entities, &(not is_nil(&1[:platform_name]))),
-         {full, abbrev} <- Map.get(stop_names, parent_station_id) do
-      %{full: "#{full} - #{platform_name}", abbrev: "#{abbrev} - #{platform_name}"}
-    else
-      _ -> nil
+    case Map.get(stop_names, parent_station_id) do
+      {full, _abbrev} ->
+        %{
+          full: "#{full}: #{platform_name} platform closed",
+          abbrev: "#{full} (1 side only)"
+        }
+
+      nil ->
+        %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
     end
+  end
+
+  defp get_stop_name_with_platform(_informed_entities, _platform_names, _route_id) do
+    # If there are multiple platforms or no platforms closed, then use fallback alerts URL
+    %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}
   end
 
   defp get_stop_names_from_informed_entities(informed_entities, route_id) do
