@@ -150,7 +150,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosures do
   defp relevant_closure?(
          %Closure{
            station_id: station_id,
-           elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: redundancy}
+           elevator: %Elevator{alternate_ids: alternate_ids, redundancy: redundancy}
          },
          closures,
          parent_station_id

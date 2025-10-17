@@ -24,8 +24,7 @@ path
    %{
      "elevator_id" => id,
      "alternate_elevator_ids" => alternate,
-     "Entering System Categorization" => entering,
-     "Exiting System Categorization" => exiting,
+     "Elevator Category (Disregarding Entering/Exiting)" => category,
      "Short Text" => summary
    }} ->
     alternate_ids =
@@ -38,8 +37,7 @@ path
       id,
       Jason.OrderedObject.new([
         alternate_ids: alternate_ids,
-        entering: entering |> String.split("-", parts: 2) |> hd() |> String.trim(),
-        exiting: exiting |> String.split("-", parts: 2) |> hd() |> String.trim(),
+        category: category |> String.trim() |> String.to_integer(),
         summary: summary
       ])
     }
