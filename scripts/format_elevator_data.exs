@@ -1,7 +1,7 @@
 #!/usr/bin/env -S ERL_FLAGS=+B elixir
 
 # Script used to format the spreadsheet found at
-# https://docs.google.com/spreadsheets/d/1lHogme-2SuDSgjrRK52k7yVgSFK-v_LMmUfkYgBJjIU/edit?gid=179933470#gid=179933470
+# https://docs.google.com/spreadsheets/d/1lHogme-2SuDSgjrRK52k7yVgSFK-v_LMmUfkYgBJjIU/edit?gid=59591443
 
 # To use this script:
 # 1. Download the spreadsheet above to a temporary directory

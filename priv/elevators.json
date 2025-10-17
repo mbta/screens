@@ -506,26 +506,6 @@
     "summary": "Request assistance from conductor.",
     "alternate_ids": []
   },
-  "800": {
-    "exiting": "2",
-    "entering": "2",
-    "summary": "Accessible route available",
-    "alternate_ids": [
-      "744",
-      "945",
-      "745"
-    ]
-  },
-  "801": {
-    "exiting": "3B",
-    "entering": "3B",
-    "summary": "Exit at Malden Center Station. Request shuttle bus back to Oak Grove.",
-    "alternate_ids": [
-      "744",
-      "800",
-      "945"
-    ]
-  },
   "802": {
     "exiting": "1",
     "entering": "1",
