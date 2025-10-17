@@ -12,6 +12,16 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   @behaviour CandidateGenerator
 
+  @instance_fns [
+    &Widgets.Header.instances/2,
+    &Widgets.SubwayStatus.subway_status_instances/2,
+    &Widgets.ReconstructedAlert.reconstructed_alert_instances/2,
+    &Widgets.ElevatorClosures.elevator_status_instances/2,
+    &Widgets.FullLineMap.full_line_map_instances/2,
+    &Widgets.Evergreen.evergreen_content_instances/2,
+    &Widgets.Departures.departures_instances/2
+  ]
+
   @body_right_layout {:body_right,
                       %{
                         body_right_normal: [
@@ -63,29 +73,9 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   end
 
   @impl CandidateGenerator
-  # Error of "arity is too high"
-  # credo:disable-for-next-line
-  def candidate_instances(
-        config,
-        now \\ DateTime.utc_now(),
-        header_instances_fn \\ &Widgets.Header.instances/2,
-        subway_status_instance_fn \\ &Widgets.SubwayStatus.subway_status_instances/2,
-        reconstructed_alert_instances_fn \\ &Widgets.ReconstructedAlert.reconstructed_alert_instances/1,
-        elevator_status_instance_fn \\ &Widgets.ElevatorClosures.elevator_status_instances/2,
-        full_line_map_instances_fn \\ &Widgets.FullLineMap.full_line_map_instances/1,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
-        departures_instances_fn \\ &Widgets.Departures.departures_instances/2
-      ) do
-    [
-      fn -> header_instances_fn.(config, now) end,
-      fn -> subway_status_instance_fn.(config, now) end,
-      fn -> reconstructed_alert_instances_fn.(config) end,
-      fn -> elevator_status_instance_fn.(config, now) end,
-      fn -> evergreen_content_instances_fn.(config) end,
-      fn -> departures_instances_fn.(config, now) end,
-      fn -> full_line_map_instances_fn.(config) end
-    ]
-    |> Task.async_stream(& &1.(), timeout: 20_000)
+  def candidate_instances(config, now \\ DateTime.utc_now(), instance_fns \\ @instance_fns) do
+    instance_fns
+    |> Task.async_stream(& &1.(config, now), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 

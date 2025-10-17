@@ -43,7 +43,7 @@ defmodule Screens.V2.Departure.Builder do
   defp relevant_departures(departures, now) do
     departures
     |> Stream.reject(&cancelled_or_skipped?(&1))
-    |> Stream.reject(&in_past_or_nil_time?(Departure.departure_time(&1), now))
+    |> Stream.reject(&in_past_or_nil_time?(&1, now))
     |> Stream.reject(&multi_route_duplicate?(&1))
     |> Stream.reject(&vehicle_already_departed?(&1))
     |> choose_earliest_arrival_per_trip()
@@ -58,11 +58,23 @@ defmodule Screens.V2.Departure.Builder do
       schedule: Map.get(schedules_by_trip_id, trip_id)
     }
 
-  defp in_past_or_nil_time?(nil, _), do: true
-
-  defp in_past_or_nil_time?(departure_time, now) do
+  defp in_past_or_nil_time?(
+         %Departure{prediction: %Prediction{departure_time: departure_time}},
+         now
+       )
+       when not is_nil(departure_time) do
     DateTime.compare(departure_time, now) == :lt
   end
+
+  defp in_past_or_nil_time?(
+         %Departure{schedule: %Schedule{departure_time: departure_time}},
+         now
+       )
+       when not is_nil(departure_time) do
+    DateTime.compare(departure_time, now) == :lt
+  end
+
+  defp in_past_or_nil_time?(_, _), do: true
 
   defp multi_route_duplicate?(%Departure{
          prediction: %Prediction{route: %{id: id1}, trip: %{route_id: id2}}

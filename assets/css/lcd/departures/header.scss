@@ -10,7 +10,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 3px;
-  white-space: pre-line; // Allow using embedded line breaks to control wrapping
+  white-space: pre-line;
   border-top: 4px solid colors.$true-grey-70;
 
   &:not(:empty) {
@@ -32,6 +32,7 @@
   margin-left: 32px;
   font-size: 40px;
   line-height: 54px;
+  white-space: pre-line;
 }
 
 .departures-header__subtitle + .departure-row::before {

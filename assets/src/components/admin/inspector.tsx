@@ -40,7 +40,10 @@ const AUDIO_SCREEN_TYPES = new Set([
   "pre_fare_v2",
 ]);
 
-const SCREEN_TYPE_VARIANTS = { dup_v2: ["new_departures"] };
+const SCREEN_TYPE_VARIANTS = {
+  dup_v2: ["new_departures"],
+  pre_fare_v2: ["new_elevators"],
+};
 
 const MAX_SSML_BILLED_CHARS = 3000;
 const MAX_SSML_TOTAL_CHARS = 6000;
