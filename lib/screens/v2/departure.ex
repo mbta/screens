@@ -114,14 +114,6 @@ defmodule Screens.V2.Departure do
     end
   end
 
-  def departure_time(%__MODULE__{prediction: p}) when not is_nil(p) do
-    select_departure_time(p)
-  end
-
-  def departure_time(%__MODULE__{prediction: nil, schedule: s}) do
-    select_departure_time(s)
-  end
-
   def headsign(%__MODULE__{prediction: p, schedule: s}) when not is_nil(p) do
     %Prediction{trip: %Trip{headsign: headsign}} = p
 
@@ -236,9 +228,6 @@ defmodule Screens.V2.Departure do
 
   defp select_arrival_time(%{arrival_time: nil, departure_time: t}), do: t
   defp select_arrival_time(%{arrival_time: t, departure_time: _}), do: t
-
-  defp select_departure_time(%{arrival_time: t, departure_time: nil}), do: t
-  defp select_departure_time(%{arrival_time: _, departure_time: t}), do: t
 
   defp identify_stop_type_from_times(arrival_time, departure_time)
   defp identify_stop_type_from_times(nil, _), do: :first_stop

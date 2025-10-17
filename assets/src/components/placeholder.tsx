@@ -10,8 +10,8 @@ const Placeholder: ComponentType<Props> = ({ color, text }) => {
   return (
     <div className={classWithModifier("placeholder", color)}>
       <div className="placeholder__text">
-        <h1>Test Mode</h1>
-        <h3>{text}</h3>
+        <h1>Placeholder</h1>
+        <pre>{text}</pre>
       </div>
     </div>
   );
