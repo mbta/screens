@@ -154,9 +154,6 @@ defmodule Screens.Alerts.Alert do
   @type result :: {:ok, [t()]} | :error
   @type fetch :: (options() -> result())
 
-  # Internally used type for distinguishing different station closures we handle differently
-  @type closure_type :: :partial_closure | :full_station_closure | :partial_closure_multiple_stops
-
   @base_includes ~w[facilities]
   @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops]
 
@@ -422,13 +419,12 @@ defmodule Screens.Alerts.Alert do
     Enum.filter(informed_entities, &InformedEntity.parent_station?/1)
   end
 
-  @spec station_closure_type(__MODULE__.t(), list(Stop.t())) :: closure_type
-  def(
-    station_closure_type(
-      %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
-      all_platforms_at_informed_stations
-    )
-  ) do
+  @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
+          :partial_closure | :full_station_closure | :partial_closure_multiple_stops
+  def station_closure_type(
+        %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
+        all_platforms_at_informed_stations
+      ) do
     # Alerts UI allows you to create partial closures affecting multiple stations.
     # Typically, these partial closures affecting child stops will only affect a single station.
     # However, we do want to consider the case in which multiple stations have closures,
