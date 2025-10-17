@@ -179,9 +179,10 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   defp get_verb_atom("Single Tracking" <> _), do: :is
 
   defp get_verb_atom(status) do
-    cond do
-      String.ends_with?(status, "Stops Skipped") -> :is
-      true -> :has
+    if String.ends_with?(status, "Stops Skipped") do
+      :is
+    else
+      :has
     end
   end
 
