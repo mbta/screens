@@ -176,11 +176,11 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   `target_slots` gives the desired number of remaining slots in the region after omission.
 
   Stops are omitted from the center of the region, unless that would result
-  in the omission of the home stop or a bypassed stop.
+  in the omission of the home stop or a skipped stop.
   In that case, we try to find another segment, or segments, of stops to omit, staying as close to the center as possible.
 
   Returns an error result if it's not possible to omit the required number of stops without
-  also omitting the home stop or a bypassed stop.
+  also omitting the home stop or a skipped stop.
   """
   @spec try_omit_stops(t(), :closure | :gap, pos_integer()) ::
           {:ok, t()} | {:error, reason :: String.t()}
@@ -258,7 +258,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
   **This can be different from the number of disrupted stops!**
 
-  For station closures, we count from the stop on the left of the first bypassed stop to the stop on the right of the last bypassed stop:
+  For station closures, we count from the stop on the left of the first skipped stop to the stop on the right of the last skipped stop:
       O === O === X === O === X === X === O === O
             |-----------------------------|
                        count = 6
@@ -914,7 +914,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   end
 
   # Returns a sorted list of indices of the stops that are in the alert's informed entities.
-  # For station closures, this is the stops that are bypassed.
+  # For station closures, this is the stops that are skipped.
   # For shuttles and suspensions, this is the stops that don't have any train service
   # *as well as* the stops at the boundary of the disruption that don't have train service in one direction.
   defp disrupted_stop_indices(%__MODULE__{} = builder) do
@@ -929,10 +929,10 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
   # The closure has highest priority, so no other overlapping region can take stops from it.
   defp closure_indices(%{metadata: %{effect: :station_closure}} = builder) do
-    # first = One stop before the first bypassed stop, if it exists. Otherwise, the first bypassed stop.
+    # first = One stop before the first skipped stop, if it exists. Otherwise, the first skipped stop.
     first = clamp(builder.metadata.first_disrupted_stop - 1, vec_size(builder.sequence))
 
-    # last = One stop past the last bypassed stop, if it exists. Otherwise, the last bypassed stop.
+    # last = One stop past the last skipped stop, if it exists. Otherwise, the last skipped stop.
     last = clamp(builder.metadata.last_disrupted_stop + 1, vec_size(builder.sequence))
 
     first..last//1
