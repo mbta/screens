@@ -1,26 +1,22 @@
 {
   "50": {
     "alternate_ids": [],
-    "entering": "7",
-    "exiting": "",
+    "category": 5,
     "summary": "Request assistance from conductor."
   },
   "51": {
     "alternate_ids": [],
-    "entering": "7",
-    "exiting": "",
+    "category": 5,
     "summary": "Request assistance from conductor."
   },
   "52": {
     "alternate_ids": [],
-    "entering": "4A",
-    "exiting": "4A",
+    "category": 5,
     "summary": "Request assistance from conductor."
   },
   "53": {
     "alternate_ids": [],
-    "entering": "4A",
-    "exiting": "4A",
+    "category": 5,
     "summary": "Request assistance from conductor."
   },
   "6476": {
@@ -28,8 +24,7 @@
       "926",
       "949"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "701": {
@@ -37,8 +32,7 @@
       "702",
       "703"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "702": {
@@ -46,8 +40,7 @@
       "701",
       "703"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "703": {
@@ -55,8 +48,7 @@
       "701",
       "702"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "708": {
@@ -65,8 +57,7 @@
       "702",
       "703"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "709": {
@@ -75,8 +66,7 @@
       "702",
       "703"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "710": {
@@ -85,16 +75,14 @@
       "702",
       "703"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "711": {
     "alternate_ids": [
       "710"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "712": {
@@ -102,8 +90,7 @@
       "713",
       "715"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "713": {
@@ -111,8 +98,7 @@
       "712",
       "714"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "714": {
@@ -120,8 +106,7 @@
       "715",
       "713"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "715": {
@@ -129,8 +114,7 @@
       "714",
       "712"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "716": {
@@ -138,8 +122,7 @@
       "718",
       "719"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "717": {
@@ -147,8 +130,7 @@
       "718",
       "719"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "718": {
@@ -156,8 +138,7 @@
       "716",
       "717"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "719": {
@@ -165,64 +146,56 @@
       "716",
       "717"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "720": {
     "alternate_ids": [
       "721"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "721": {
     "alternate_ids": [
       "720"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "722": {
     "alternate_ids": [
       "723"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "723": {
     "alternate_ids": [
       "722"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "724": {
     "alternate_ids": [
       "842"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "725": {
     "alternate_ids": [
       "727"
     ],
-    "entering": "?",
-    "exiting": "",
+    "category": 2,
     "summary": "Request assistance from conductor."
   },
   "726": {
     "alternate_ids": [
       "727"
     ],
-    "entering": "?",
-    "exiting": "",
+    "category": 2,
     "summary": "Request assistance from conductor."
   },
   "727": {
@@ -230,16 +203,14 @@
       "725",
       "726"
     ],
-    "entering": "?",
-    "exiting": "",
+    "category": 2,
     "summary": "Request assistance from conductor."
   },
   "728": {
     "alternate_ids": [
       "848"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "731": {
@@ -247,8 +218,7 @@
       "912",
       "732"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "732": {
@@ -256,16 +226,14 @@
       "731",
       "912"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "733": {
     "alternate_ids": [
       "734"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "734": {
@@ -273,16 +241,14 @@
       "733",
       "735"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "735": {
     "alternate_ids": [
       "734"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "736": {
@@ -290,16 +256,14 @@
       "805",
       "810"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "743": {
     "alternate_ids": [
       "746"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "744": {
@@ -307,8 +271,7 @@
       "800",
       "945"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "745": {
@@ -317,50 +280,43 @@
       "945",
       "800"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "746": {
     "alternate_ids": [
       "743"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "747": {
     "alternate_ids": [],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at North Station. Request shuttle bus back to Winchester Center."
   },
   "748": {
     "alternate_ids": [
       "749"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "749": {
     "alternate_ids": [
       "748"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "750": {
     "alternate_ids": [],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "751": {
     "alternate_ids": [],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "756": {
@@ -372,8 +328,7 @@
       "951",
       "952"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "757": {
@@ -385,8 +340,7 @@
       "951",
       "952"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "762": {
@@ -394,8 +348,7 @@
       "763",
       "764"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "763": {
@@ -403,8 +356,7 @@
       "762",
       "764"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "764": {
@@ -412,98 +364,84 @@
       "762",
       "763"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "765": {
     "alternate_ids": [
       "766"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "766": {
     "alternate_ids": [
       "765"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "767": {
     "alternate_ids": [
       "768"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "768": {
     "alternate_ids": [
       "767"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "769": {
     "alternate_ids": [],
-    "entering": "2B",
-    "exiting": "2B",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "770": {
     "alternate_ids": [
       "772"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "771": {
     "alternate_ids": [],
-    "entering": "2B",
-    "exiting": "2B",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "772": {
     "alternate_ids": [
       "770"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "778": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "?",
+    "category": 100,
     "summary": "Request assistance from conductor."
   },
   "779": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "?",
+    "category": 2,
     "summary": "Request assistance from conductor."
   },
   "780": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "",
+    "category": 100,
     "summary": "Request assistance from conductor."
   },
   "781": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "",
+    "category": 100,
     "summary": "Request assistance from conductor."
   },
   "782": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "",
+    "category": 2,
     "summary": "Request assistance from conductor."
   },
   "802": {
@@ -512,8 +450,7 @@
       "974",
       "975"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "803": {
@@ -522,8 +459,7 @@
       "892",
       "891"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "804": {
@@ -534,8 +470,7 @@
       "812",
       "823"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "805": {
@@ -543,24 +478,21 @@
       "736",
       "810"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "806": {
     "alternate_ids": [
       "807"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "807": {
     "alternate_ids": [
       "806"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "808": {
@@ -568,8 +500,7 @@
       "978",
       "979"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "810": {
@@ -577,8 +508,7 @@
       "805",
       "806"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Quincy Adams Station. Request shuttle bus back to Quincy Center."
   },
   "811": {
@@ -586,8 +516,7 @@
       "805",
       "810"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Quincy Adams Station. Request shuttle bus back to Braintree."
   },
   "812": {
@@ -597,32 +526,28 @@
       "804",
       "979"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "813": {
     "alternate_ids": [
       "961"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "814": {
     "alternate_ids": [
       "815"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "815": {
     "alternate_ids": [
       "814"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "816": {
@@ -630,8 +555,7 @@
       "821",
       "973"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Harvard Station. Request shuttle bus back to Davis."
   },
   "817": {
@@ -639,16 +563,14 @@
       "821",
       "973"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Harvard Station. Request shuttle bus back to Davis."
   },
   "821": {
     "alternate_ids": [
       "973"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "823": {
@@ -658,8 +580,7 @@
       "804",
       "979"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "830": {
@@ -668,8 +589,7 @@
       "880",
       "879"
     ],
-    "entering": "3A",
-    "exiting": "3AB",
+    "category": 3,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "831": {
@@ -678,16 +598,14 @@
       "880",
       "879"
     ],
-    "entering": "3A",
-    "exiting": "3AB",
+    "category": 3,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "840": {
     "alternate_ids": [
       "881"
     ],
-    "entering": "2AB",
-    "exiting": "2AB",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "841": {
@@ -700,38 +618,33 @@
       "856",
       "724"
     ],
-    "entering": "3D",
-    "exiting": "3D",
+    "category": 5,
     "summary": "Exit at Ruggles or Back Bay Stations. Take the Orange Line to Forest Hills."
   },
   "842": {
     "alternate_ids": [
       "724"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "843": {
     "alternate_ids": [],
-    "entering": "2C",
-    "exiting": "2C",
+    "category": 2,
     "summary": "Accessible ramp available"
   },
   "844": {
     "alternate_ids": [
       "842"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Forest Hills Station. Request shuttle bus back to Green Street."
   },
   "845": {
     "alternate_ids": [
       "846"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Jackson Sq Station. Request shuttle bus back to Stony Brook."
   },
   "846": {
@@ -739,8 +652,7 @@
       "845",
       "847"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Stony Brook Station. Request shuttle bus back to Jackson Sq."
   },
   "847": {
@@ -748,16 +660,14 @@
       "846",
       "850"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Ruggles Station. Request shuttle bus back to Roxbury Crossing."
   },
   "848": {
     "alternate_ids": [
       "728"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "849": {
@@ -768,8 +678,7 @@
       "855",
       "856"
     ],
-    "entering": "3D",
-    "exiting": "3D",
+    "category": 5,
     "summary": "Exit at Back Bay Station. Take the Orange Line to Ruggles. "
   },
   "850": {
@@ -777,32 +686,28 @@
       "846",
       "847"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Jackson Sq Station. Request shuttle bus back to Ruggles."
   },
   "851": {
     "alternate_ids": [
       "N/A"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Ruggles Station. Request shuttle bus back to Ruggles."
   },
   "852": {
     "alternate_ids": [
       "853"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Back Bay Station. Request shuttle bus back to Mass Ave."
   },
   "853": {
     "alternate_ids": [
       "852"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Mass Ave Station. Request shuttle bus back to Back Bay."
   },
   "854": {
@@ -812,8 +717,7 @@
       "841",
       "842"
     ],
-    "entering": "3D",
-    "exiting": "3D",
+    "category": 5,
     "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay."
   },
   "855": {
@@ -823,8 +727,7 @@
       "841",
       "842"
     ],
-    "entering": "3D",
-    "exiting": "3D",
+    "category": 5,
     "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay."
   },
   "856": {
@@ -834,8 +737,7 @@
       "841",
       "842"
     ],
-    "entering": "3D",
-    "exiting": "3D",
+    "category": 5,
     "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay."
   },
   "857": {
@@ -844,8 +746,7 @@
       "876",
       "922"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center."
   },
   "858": {
@@ -853,8 +754,7 @@
       "853",
       "859"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center."
   },
   "859": {
@@ -862,8 +762,7 @@
       "853",
       "858"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center."
   },
   "860": {
@@ -872,8 +771,7 @@
       "821",
       "973"
     ],
-    "entering": "3C",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Harvard Station. Take an Ashmont/Braintree train back to Central."
   },
   "861": {
@@ -884,24 +782,21 @@
       "863",
       "866"
     ],
-    "entering": "3A",
-    "exiting": "3C",
+    "category": 3,
     "summary": "Exit at Harvard. Take a Route 1 bus to Central. "
   },
   "864": {
     "alternate_ids": [
       "865"
     ],
-    "entering": "2AB",
-    "exiting": "2AB",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "865": {
     "alternate_ids": [
       "864"
     ],
-    "entering": "2AB",
-    "exiting": "2AB",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "866": {
@@ -912,8 +807,7 @@
       "951",
       "952"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Harvard Station. Take an Ashmont/Braintree train back to Kendall/MIT."
   },
   "867": {
@@ -922,8 +816,7 @@
       "879",
       "880"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Andrew Station. Request shuttle bus back to Broadway."
   },
   "868": {
@@ -932,8 +825,7 @@
       "879",
       "880"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Andrew Station. Request shuttle bus back to Broadway."
   },
   "869": {
@@ -941,8 +833,7 @@
       "998",
       "999"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "870": {
@@ -950,8 +841,7 @@
       "979",
       "978"
     ],
-    "entering": "3",
-    "exiting": "3",
+    "category": 3,
     "summary": "Exit at Park St Station."
   },
   "872": {
@@ -959,8 +849,7 @@
       "868",
       "867"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Broadway Station. Request shuttle bus back to Andrew."
   },
   "876": {
@@ -970,8 +859,7 @@
       "858",
       "859"
     ],
-    "entering": "3A",
-    "exiting": "3C",
+    "category": 3,
     "summary": "Exit at Tufts Medical Center Station. Take an SL4 or SL5 bus to Chinatown."
   },
   "879": {
@@ -979,8 +867,7 @@
       "880",
       "872"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at JFK/UMass Station. Take an Alewife train back to Andrew."
   },
   "880": {
@@ -988,16 +875,14 @@
       "879",
       "872"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Broadway Station. Take an Ashmont/Braintree train back to Andrew."
   },
   "881": {
     "alternate_ids": [
       "840"
     ],
-    "entering": "2AB",
-    "exiting": "2AB",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "884": {
@@ -1006,8 +891,7 @@
       "709",
       "710"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Beachmont Station. Take a Wonderland train back to Revere Beach."
   },
   "885": {
@@ -1016,8 +900,7 @@
       "709",
       "710"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Wonderland Station. Take a Bowdoin train back to Revere Beach."
   },
   "886": {
@@ -1026,8 +909,7 @@
       "884",
       "885"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Suffolk Downs Station. Take a Wonderland train back to Beachmont."
   },
   "887": {
@@ -1036,8 +918,7 @@
       "884",
       "885"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Revere Beach Station. Take a Bowdoin train back to Beachmont."
   },
   "889": {
@@ -1047,8 +928,7 @@
       "931",
       "932"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Airport Station. Take a Wonderland train back to Wood Island."
   },
   "890": {
@@ -1058,22 +938,19 @@
       "931",
       "932"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Orient Heights Station. Take a Bowdoin train back to Wood Island."
   },
   "891": {
     "alternate_ids": [],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "892": {
     "alternate_ids": [
       "804"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "896": {
@@ -1083,32 +960,28 @@
       "830",
       "831"
     ],
-    "entering": "3D",
-    "exiting": "5",
+    "category": 5,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "897": {
     "alternate_ids": [
       "900"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "898": {
     "alternate_ids": [
       "900"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "899": {
     "alternate_ids": [
       "900"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "900": {
@@ -1117,8 +990,7 @@
       "898",
       "899"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "901": {
@@ -1127,8 +999,7 @@
       "927",
       "919"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "903": {
@@ -1139,8 +1010,7 @@
       "907",
       "908"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "904": {
@@ -1151,8 +1021,7 @@
       "907",
       "908"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "905": {
@@ -1163,8 +1032,7 @@
       "907",
       "908"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "906": {
@@ -1175,8 +1043,7 @@
       "907",
       "908"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "907": {
@@ -1187,8 +1054,7 @@
       "906",
       "908"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "908": {
@@ -1199,8 +1065,7 @@
       "907",
       "903"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "909": {
@@ -1208,8 +1073,7 @@
       "912",
       "731"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "910": {
@@ -1219,8 +1083,7 @@
       "906",
       "907"
     ],
-    "entering": "3A",
-    "exiting": "5",
+    "category": 3,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "911": {
@@ -1230,8 +1093,7 @@
       "906",
       "907"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Community College Station. Take Forest Hills train back to North Station."
   },
   "912": {
@@ -1241,8 +1103,7 @@
       "909",
       ""
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "913": {
@@ -1250,8 +1111,7 @@
       "924",
       "925"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "914": {
@@ -1259,8 +1119,7 @@
       "923",
       "925"
     ],
-    "entering": "2D",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "915": {
@@ -1269,14 +1128,12 @@
       "924",
       "925"
     ],
-    "entering": "2",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "917": {
     "alternate_ids": [],
-    "entering": "3C",
-    "exiting": "3C",
+    "category": 4,
     "summary": "Exit at Northeastern. Take a Route 39 bus to Prudential. "
   },
   "918": {
@@ -1285,8 +1142,7 @@
       "927",
       "919"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "919": {
@@ -1294,8 +1150,7 @@
       "927",
       "901"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "920": {
@@ -1305,8 +1160,7 @@
       "977",
       "976"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Northeastern Station. Take a Medford/Tufts train back to Prudential."
   },
   "921": {
@@ -1316,8 +1170,7 @@
       "977",
       "976"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Copley Station. Take a Heath St train back to Prudential."
   },
   "922": {
@@ -1327,8 +1180,7 @@
       "858",
       "859"
     ],
-    "entering": "3",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Tufts Medical Center Station. Take an Oak Grove train back to Chinatown."
   },
   "923": {
@@ -1336,8 +1188,7 @@
       "914",
       "915"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "924": {
@@ -1345,8 +1196,7 @@
       "913",
       "915"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "925": {
@@ -1355,8 +1205,7 @@
       "914",
       "915"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "926": {
@@ -1364,8 +1213,7 @@
       "949",
       "6476"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "927": {
@@ -1373,30 +1221,26 @@
       "919",
       "918"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "928": {
     "alternate_ids": [],
-    "entering": "4A",
-    "exiting": "4A",
+    "category": 5,
     "summary": "Request assistance from conductor."
   },
   "929": {
     "alternate_ids": [
       "930"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "930": {
     "alternate_ids": [
       "929"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "931": {
@@ -1404,8 +1248,7 @@
       "956",
       "955"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "932": {
@@ -1413,8 +1256,7 @@
       "955",
       "956"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "933": {
@@ -1422,8 +1264,7 @@
       "840",
       "881"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Sullivan Station. Request shuttle bus back to Community College."
   },
   "934": {
@@ -1432,8 +1273,7 @@
       "901",
       "927"
     ],
-    "entering": "",
-    "exiting": "",
+    "category": 3,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "935": {
@@ -1442,8 +1282,7 @@
       "937",
       "938"
     ],
-    "entering": "3A",
-    "exiting": "3",
+    "category": 3,
     "summary": "Exit at Courthouse. Take an outbound SL bus to World Trade Center."
   },
   "936": {
@@ -1452,8 +1291,7 @@
       "937",
       "938"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Silver Line Way. Take an inbound SL bus back to World Trade Center."
   },
   "937": {
@@ -1466,8 +1304,7 @@
       "919",
       "927"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at South Station. Take an outbound SL bus to Courthouse."
   },
   "938": {
@@ -1480,24 +1317,21 @@
       "919",
       "927"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at World Trade Center Station. Take an inbound SL bus to Courthouse."
   },
   "939": {
     "alternate_ids": [
       "940"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "940": {
     "alternate_ids": [
       "939"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "944": {
@@ -1507,8 +1341,7 @@
       "731",
       "732"
     ],
-    "entering": "3D",
-    "exiting": "5",
+    "category": 5,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "945": {
@@ -1516,8 +1349,7 @@
       "800",
       "801"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Oak Grove Station. Request shuttle bus back to Malden Center."
   },
   "946": {
@@ -1525,22 +1357,19 @@
       "831",
       "830"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at JFK/UMass Station. Request shuttle bus back to Savin Hill."
   },
   "947": {
     "alternate_ids": [],
-    "entering": "2B",
-    "exiting": "2B",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "948": {
     "alternate_ids": [
       "972"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "949": {
@@ -1548,8 +1377,7 @@
       "926",
       "6476"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "951": {
@@ -1558,8 +1386,7 @@
       "866",
       "863"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Park St Station. Take an Alewife train back to Charles/MGH."
   },
   "952": {
@@ -1568,8 +1395,7 @@
       "866",
       "863"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Kendall/MIT Station. Take an Ashmont/Braintree train back to Charles/MGH."
   },
   "953": {
@@ -1581,8 +1407,7 @@
       "969",
       "970"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Fields Corner Station. Take an Ashmont train back to Shawmut."
   },
   "954": {
@@ -1594,8 +1419,7 @@
       "969",
       "970"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Ashmont Station. Take an Alewife train back to Shawmut."
   },
   "955": {
@@ -1603,8 +1427,7 @@
       "932",
       "931"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "956": {
@@ -1612,8 +1435,7 @@
       "931",
       "932"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "957": {
@@ -1622,8 +1444,7 @@
       "953",
       "954"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Savin Hill Station. Take an Ashmont train back to Fields Corner."
   },
   "958": {
@@ -1632,16 +1453,14 @@
       "964",
       "957"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Shawmut Station. Take an Alewife train back to Fields Corner."
   },
   "961": {
     "alternate_ids": [
       "813"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "962": {
@@ -1652,8 +1471,7 @@
       "976",
       "977"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Copley Station. Take a Park St & North train back to Arlington."
   },
   "963": {
@@ -1664,8 +1482,7 @@
       "976",
       "977"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Park St Station. Take a westbound train back to Arlington."
   },
   "964": {
@@ -1673,24 +1490,21 @@
       "976",
       "977"
     ],
-    "entering": "3B",
-    "exiting": "3B",
+    "category": 4,
     "summary": "Exit at Copley Station. Request shuttle bus back to Arlington."
   },
   "965": {
     "alternate_ids": [
       "966"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "966": {
     "alternate_ids": [
       "965"
     ],
-    "entering": "2A",
-    "exiting": "2A",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "967": {
@@ -1699,30 +1513,26 @@
       "975",
       "802"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "968": {
     "alternate_ids": [
       "969"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "969": {
     "alternate_ids": [
       "968"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "970": {
     "alternate_ids": [],
-    "entering": "N/A",
-    "exiting": "4B",
+    "category": 5,
     "summary": "Request assistance to exit."
   },
   "971": {
@@ -1732,8 +1542,7 @@
       "976",
       "977"
     ],
-    "entering": "3A",
-    "exiting": "3AB",
+    "category": 3,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "972": {
@@ -1743,16 +1552,14 @@
       "977",
       "976"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Copley Station. Take a Kenmore & West train back to Kenmore."
   },
   "973": {
     "alternate_ids": [
       "821"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "974": {
@@ -1761,8 +1568,7 @@
       "967",
       "802"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "975": {
@@ -1771,8 +1577,7 @@
       "967",
       "802"
     ],
-    "entering": "2D",
-    "exiting": "2D",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "976": {
@@ -1783,8 +1588,7 @@
       "972",
       "971"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Arlington Station. Take a westbound train back to Copley."
   },
   "977": {
@@ -1797,8 +1601,7 @@
       "972",
       "971"
     ],
-    "entering": "3A",
-    "exiting": "3AB",
+    "category": 3,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "978": {
@@ -1810,8 +1613,7 @@
       "823",
       "979"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "979": {
@@ -1819,120 +1621,104 @@
       "808",
       "804"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "980": {
     "alternate_ids": [
       "981"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at North Station. Take a Lechmere & North train back to Science Park/West End."
   },
   "981": {
     "alternate_ids": [
       "980"
     ],
-    "entering": "3A",
-    "exiting": "3A",
+    "category": 3,
     "summary": "Exit at Lechmere Station. Take a Copley & West  train back to Science Park/West End."
   },
   "982": {
     "alternate_ids": [
       "985"
     ],
-    "entering": "2",
-    "exiting": "1",
+    "category": 2,
     "summary": "Alternative elevator available at station"
   },
   "983": {
     "alternate_ids": [
       "987"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "985": {
     "alternate_ids": [
       "982"
     ],
-    "entering": "2",
-    "exiting": "2",
+    "category": 2,
     "summary": "Accessible route available"
   },
   "986": {
     "alternate_ids": [
       "896"
     ],
-    "entering": "3D",
-    "exiting": "3BC",
+    "category": 5,
     "summary": "Visit mbta.com/elevators for more info."
   },
   "987": {
     "alternate_ids": [
       "983"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "990": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "",
+    "category": 100,
     "summary": "Request assistance from conductor."
   },
   "991": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "",
+    "category": 100,
     "summary": "Request assistance from conductor."
   },
   "992": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "",
+    "category": 100,
     "summary": "Request assistance from conductor."
   },
   "993": {
     "alternate_ids": [],
-    "entering": "?",
-    "exiting": "",
+    "category": 100,
     "summary": "Request assistance from conductor."
   },
   "994": {
     "alternate_ids": [
       "995"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "995": {
     "alternate_ids": [
       "994"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "996": {
     "alternate_ids": [
       "997"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "997": {
     "alternate_ids": [
       "996"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "998": {
@@ -1940,8 +1726,7 @@
       "999",
       "869"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   },
   "999": {
@@ -1949,8 +1734,7 @@
       "998",
       "869"
     ],
-    "entering": "1",
-    "exiting": "1",
+    "category": 1,
     "summary": "Alternative elevator available at station"
   }
 }

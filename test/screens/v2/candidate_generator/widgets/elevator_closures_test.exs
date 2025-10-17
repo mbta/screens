@@ -55,16 +55,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
 
   #### HELPER FUNCTIONS
   defp build_elevator(id, fields \\ []) do
-    struct!(
-      %Elevator{
-        id: id,
-        alternate_ids: [],
-        entering_redundancy: :none,
-        exiting_redundancy: :none,
-        exiting_summary: ""
-      },
-      fields
-    )
+    struct!(%Elevator{id: id, alternate_ids: [], exiting_summary: "", redundancy: :other}, fields)
   end
 
   defp build_facility(id, fields \\ []) do
@@ -137,8 +128,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
     end
 
     stub(@elevator, :get, fn
-      "elev_1" -> build_elevator("elev_1", exiting_redundancy: :none)
-      "elev_2" -> build_elevator("elev_2", exiting_redundancy: :nearby)
+      "elev_1" -> build_elevator("elev_1", redundancy: :none)
+      "elev_2" -> build_elevator("elev_2", redundancy: :nearby)
     end)
 
     result =
@@ -167,9 +158,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
     end
 
     stub(@elevator, :get, fn
-      "elev_1" -> build_elevator("elev_1", exiting_redundancy: :nearby, alternate_ids: ["elev_3"])
-      "elev_2" -> build_elevator("elev_2", exiting_redundancy: :nearby)
-      "elev_3" -> build_elevator("elev_3", exiting_redundancy: :nearby)
+      "elev_1" -> build_elevator("elev_1", redundancy: :nearby, alternate_ids: ["elev_3"])
+      "elev_2" -> build_elevator("elev_2", redundancy: :nearby)
+      "elev_3" -> build_elevator("elev_3", redundancy: :nearby)
     end)
 
     result =
@@ -206,13 +197,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
 
     stub(@elevator, :get, fn
       "elev_1" ->
-        build_elevator("elev_1", exiting_redundancy: :nearby, alternate_ids: ["elev_3"])
+        build_elevator("elev_1", redundancy: :nearby, alternate_ids: ["elev_3"])
 
       "elev_2" ->
-        build_elevator("elev_2", exiting_redundancy: :nearby)
+        build_elevator("elev_2", redundancy: :nearby)
 
       "elev_3" ->
-        build_elevator("elev_3", exiting_redundancy: :nearby)
+        build_elevator("elev_3", redundancy: :nearby)
     end)
 
     result =
@@ -242,7 +233,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
     end
 
     stub(@elevator, :get, fn
-      "elev_1" -> build_elevator("elev_1", exiting_redundancy: :nearby, alternate_ids: ["elev_2"])
+      "elev_1" -> build_elevator("elev_1", redundancy: :nearby, alternate_ids: ["elev_2"])
     end)
 
     result =
