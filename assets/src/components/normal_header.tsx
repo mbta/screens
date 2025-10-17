@@ -23,6 +23,29 @@ const ICON_TO_SRC: Record<Icon, string> = {
   logo_negative: "logo-black.svg",
 };
 
+// When the header text is a stop name consisting of two street names with a
+// separator like "@" between them, if the text has to wrap, we prefer the line
+// break to fall immediately before or after the separator. Define a pattern to
+// look for this and some possible replacements.
+const BREAK_PATTERN = / (@|opp) /;
+const BREAK_AFTER = " $1\n";
+const BREAK_BEFORE = "\n$1 ";
+const BREAK_NONE = "$&";
+
+const SIZING_STEPS: [string[], string][] = [
+  [["large"], BREAK_AFTER],
+  [["large"], BREAK_BEFORE],
+  // Intentionally omit large/BREAK_NONE so we prefer reducing the text size
+  // over allowing an "awkward" line break.
+  [["small"], BREAK_AFTER],
+  [["small"], BREAK_BEFORE],
+  // Only allow "free" wrapping if none of our preferred line break placements
+  // worked out.
+  [["small", "wrap"], BREAK_NONE],
+];
+
+const SIZING_STEP_KEYS = Array.from(SIZING_STEPS.keys());
+
 interface NormalHeaderTitleProps {
   icon?: Icon;
   text: string;
@@ -35,7 +58,10 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
   showTo,
 }) => {
   const environmentName = getDatasetValue("environmentName") || "";
-  const { ref, step: size } = useAutoSize(["large", "small"], text);
+  const { ref, step } = useAutoSize(SIZING_STEP_KEYS, text);
+
+  const [classes, replacement] = SIZING_STEPS[step];
+  const textWithBreak = text.replace(BREAK_PATTERN, replacement);
 
   return (
     <>
@@ -44,7 +70,7 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
       )}
       <div
         className={classWithModifiers("normal-header-title", [
-          size,
+          ...classes,
           icon ? "with-icon" : "no-icon",
         ])}
         ref={ref}
@@ -57,7 +83,7 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
         )}
         <div className="normal-header-title__text">
           {showTo && <div className="normal-header-to__text">TO</div>}
-          {text}
+          {textWithBreak}
         </div>
       </div>
     </>
