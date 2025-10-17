@@ -16,7 +16,7 @@
   font-weight: 700;
   line-height: 1;
   color: #fff;
-  white-space: pre-line;
+  white-space: pre;
 
   .normal-header--duo & {
     width: 1000px;
@@ -33,6 +33,10 @@
 
   &--small {
     font-size: 72px;
+  }
+
+  &--wrap {
+    white-space: pre-line;
   }
 }
 
