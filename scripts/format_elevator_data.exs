@@ -36,12 +36,12 @@ path
 
     {
       id,
-      %{
+      Jason.OrderedObject.new([
         alternate_ids: alternate_ids,
         entering: entering |> String.split("-", parts: 2) |> hd() |> String.trim(),
         exiting: exiting |> String.split("-", parts: 2) |> hd() |> String.trim(),
         summary: summary
-      }
+      ])
     }
 end)
 |> Enum.reject(&is_nil/1)
