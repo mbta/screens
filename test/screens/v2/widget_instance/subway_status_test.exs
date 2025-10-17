@@ -8,7 +8,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   alias ScreensConfig.Screen.BusShelter
 
   defp subway_alerts(alerts),
-    do: Enum.map(alerts, &%{alert: &1, context: %{all_platforms_at_informed_station: []}})
+    do: Enum.map(alerts, &%{alert: &1, context: %{all_platforms_at_informed_stations: []}})
 
   describe "priority/1" do
     test "returns high priority for a flex zone widget" do
@@ -876,7 +876,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             context: %{
-              all_platforms_at_informed_station: [
+              all_platforms_at_informed_stations: [
                 %{id: "70065", platform_name: "Ashmont/Braintree"},
                 %{id: "70066", platform_name: "Alewife"}
               ]
@@ -891,8 +891,94 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             type: :extended,
             alert: %{
               status: "Bypassing 1 stop",
-              location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
+              location: %{
+                full: "Porter: Ashmont/Braintree platform closed",
+                abbrev: "Porter (1 side only)"
+              },
               route_pill: @rl_pill
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 1 platform closure alert on Green Line" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-D", stop: "place-eliot", route_type: 1},
+                %{route: "Green-D", stop: "70166", route_type: 1}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_stations: [
+                %{id: "70166", platform_name: "Park Street & North"},
+                %{id: "70167", platform_name: "Riverside"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{
+              status: "Bypassing 1 stop",
+              location: %{
+                full: "Eliot: Park Street & North platform closed",
+                abbrev: "Eliot (1 side only)"
+              },
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:d]}
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles single platform closure alert at multiple stops" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Red", stop: "place-portr", route_type: 1},
+                %{route: "Red", stop: "70065", route_type: 1},
+                %{route: "Red", stop: "place-davis", route_type: 1},
+                %{route: "Red", stop: "70063", route_type: 1}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_stations: [
+                %{id: "70063", platform_name: "Ashmont/Braintree"},
+                %{id: "70064", platform_name: "Alewife"},
+                %{id: "70065", platform_name: "Ashmont/Braintree"},
+                %{id: "70066", platform_name: "Alewife"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | red: %{
+            type: :extended,
+            alert: %{
+              status: "Bypassing 2 stops",
+              location: %{
+                full: "mbta.com/alerts",
+                abbrev: "mbta.com/alerts"
+              },
+              route_pill: @rl_pill,
+              station_count: 2
             }
           }
       }
@@ -912,7 +998,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             context: %{
-              all_platforms_at_informed_station: [
+              all_platforms_at_informed_stations: [
                 %{id: "70065", platform_name: "Ashmont/Braintree"},
                 %{id: "70066", platform_name: "Alewife"}
               ]
@@ -1015,7 +1101,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             context: %{
-              all_platforms_at_informed_station: [
+              all_platforms_at_informed_stations: [
                 %{id: "70085", platform_name: "Ashmont"},
                 %{id: "70086", platform_name: "Alewife (from Ashmont)"},
                 %{id: "70095", platform_name: "Braintree"},
@@ -1031,7 +1117,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | red: %{
             type: :extended,
             alert: %{
-              status: "Bypassing 2 stops",
+              status: "Bypassing 1 stop",
               location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
               route_pill: @rl_pill
             }
