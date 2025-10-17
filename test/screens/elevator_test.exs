@@ -23,35 +23,17 @@ defmodule Screens.ElevatorTest do
       assert %Elevator{alternate_ids: ~w[901 927 919]} = Elevator.get("918")
     end
 
-    test "gets elevators in each entering redundancy category" do
-      assert %Elevator{entering_redundancy: :nearby} = Elevator.get("996")
-      assert %Elevator{entering_redundancy: :in_station} = Elevator.get("918")
-      assert %Elevator{entering_redundancy: :shuttle} = Elevator.get("816")
-      assert %Elevator{entering_redundancy: :other} = Elevator.get("970")
+    test "gets elevators in each redundancy category" do
+      assert %Elevator{redundancy: :nearby} = Elevator.get("996")
+      assert %Elevator{redundancy: :in_station} = Elevator.get("918")
+      assert %Elevator{redundancy: :backtrack} = Elevator.get("830")
+      assert %Elevator{redundancy: :shuttle} = Elevator.get("816")
+      assert %Elevator{redundancy: :other} = Elevator.get("970")
     end
 
-    test "gets elevators in each exiting redundancy category" do
-      assert %Elevator{exiting_redundancy: :nearby} = Elevator.get("996")
-      assert %Elevator{exiting_redundancy: :in_station} = Elevator.get("918")
-      assert %Elevator{exiting_redundancy: :other} = Elevator.get("780")
-    end
-
-    test "gets exiting redundancy summaries" do
+    test "gets redundant route exiting summaries" do
       assert %Elevator{exiting_summary: "Request assistance from conductor."} =
                Elevator.get("780")
-    end
-
-    test "handles sub-categories of in-station redundancy" do
-      assert %Elevator{entering_redundancy: :in_station, exiting_redundancy: :in_station} =
-               Elevator.get("842")
-
-      assert %Elevator{entering_redundancy: :in_station, exiting_redundancy: :in_station} =
-               Elevator.get("771")
-    end
-
-    test "only interprets sub-category 3B as shuttle for entering redundancy" do
-      assert %Elevator{entering_redundancy: :shuttle} = Elevator.get("945")
-      assert %Elevator{entering_redundancy: :other} = Elevator.get("958")
     end
 
     test "returns nil and logs a warning when redundancy data does not exist" do

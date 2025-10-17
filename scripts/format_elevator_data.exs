@@ -1,7 +1,7 @@
 #!/usr/bin/env -S ERL_FLAGS=+B elixir
 
 # Script used to format the spreadsheet found at
-# https://docs.google.com/spreadsheets/d/1lHogme-2SuDSgjrRK52k7yVgSFK-v_LMmUfkYgBJjIU/edit?gid=179933470#gid=179933470
+# https://docs.google.com/spreadsheets/d/1lHogme-2SuDSgjrRK52k7yVgSFK-v_LMmUfkYgBJjIU/edit?gid=59591443
 
 # To use this script:
 # 1. Download the spreadsheet above to a temporary directory
@@ -24,8 +24,7 @@ path
    %{
      "elevator_id" => id,
      "alternate_elevator_ids" => alternate,
-     "Entering System Categorization" => entering,
-     "Exiting System Categorization" => exiting,
+     "Elevator Category (Disregarding Entering/Exiting)" => category,
      "Short Text" => summary
    }} ->
     alternate_ids =
@@ -36,12 +35,11 @@ path
 
     {
       id,
-      %{
+      Jason.OrderedObject.new([
         alternate_ids: alternate_ids,
-        entering: entering |> String.split("-", parts: 2) |> hd() |> String.trim(),
-        exiting: exiting |> String.split("-", parts: 2) |> hd() |> String.trim(),
+        category: category |> String.trim() |> String.to_integer(),
         summary: summary
-      }
+      ])
     }
 end)
 |> Enum.reject(&is_nil/1)
