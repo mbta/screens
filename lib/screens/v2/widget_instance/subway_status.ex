@@ -419,7 +419,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         # station, if there is an alert affecting platforms for each line.
         # So we must filter to unique parent_station IDs
         num_parent_stations =
-          length(alert |> Alert.informed_parent_stations() |> Enum.uniq_by(& &1.stop))
+          alert |> Alert.informed_parent_stations() |> Enum.uniq_by(& &1.stop) |> Enum.count()
 
         %{
           status:
