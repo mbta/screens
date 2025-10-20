@@ -18,7 +18,6 @@ import {
   isGLMultiPill,
   useSubwayStatusTextResizer,
   FittingStep,
-  LineColor,
 } from "./subway_status_common";
 
 ////////////////
