@@ -411,11 +411,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
             )
         }
 
+      # If there are multiple stations closed without all of their platforms closed,
+      # display the fallback url. This case should not happen frequently, so
+      # we default to not providing incorrect information and direct users to the website.
       :partial_closure_multiple_stops ->
-        # If there are multiple stations closed without all of their platforms closed,
-        # display the fallback url. This case should not happen frequently, so
-        # we default to not providing incorrect information and direct users to the website.
-        num_parent_stations = length(Alert.informed_parent_stations(alert))
+        # There could be informed entities for each of the GL branches at the same
+        # station, if there is an alert affecting platforms for each line.
+        # So we must filter to unique parent_station IDs
+        num_parent_stations =
+          length(alert |> Alert.informed_parent_stations() |> Enum.uniq_by(& &1.stop))
 
         %{
           status:
@@ -796,6 +800,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp format_station_closure(stop_names) do
+    IO.inspect(stop_names)
+
     case stop_names do
       [] ->
         {"Skipping", nil}
@@ -826,6 +832,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          }}
 
       stop_names ->
+        IO.inspect(stop_names)
+
         {"#{length(stop_names)} Stops Skipped",
          %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}}
     end
