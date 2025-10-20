@@ -18,7 +18,7 @@
 @use "eink/free_text";
 @use "eink/link_footer";
 @use "eink/no_data";
-@use "eink/normal_header";
+@use "eink/normal_header" as *;
 @use "eink/page_load_no_data";
 @use "eink/route_pill";
 @use "eink/screen/takeover" as *;
@@ -32,6 +32,7 @@
 @use "bus_eink/departures/row";
 @use "bus_eink/departures/time";
 @use "bus_eink/evergreen/image";
+@use "bus_eink/normal_header" as *;
 @use "bus_eink/screen/normal" as *;
 @use "bus_eink/simulation" as *;
 

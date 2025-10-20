@@ -282,7 +282,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     next_date_period =
       closures
       |> Enum.filter(fn
-        %Closure{elevator: %Elevator{entering_redundancy: :nearby}} -> false
+        %Closure{elevator: %Elevator{redundancy: :nearby}} -> false
         _other -> true
       end)
       |> Enum.flat_map(& &1.periods)
@@ -322,15 +322,15 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
 
   # Elevators with nearby redundancy are only relevant if any of their alternates are also closed.
   defp relevant_closure?(
-         %Closure{elevator: %Elevator{alternate_ids: alternate_ids, exiting_redundancy: :nearby}},
+         %Closure{elevator: %Elevator{alternate_ids: alternate_ids, redundancy: :nearby}},
          _screen_facility,
          closures
        ) do
     Enum.any?(closures, fn %Closure{facility: %Facility{id: id}} -> id in alternate_ids end)
   end
 
-  # Elevators with other kinds of exiting redundancy, or where we don't have redundancy data, are
-  # always relevant.
+  # Elevators with other kinds of redundancy, or where we don't have redundancy data, are always
+  # relevant.
   defp relevant_closure?(_closure, _screen_facility, _closures), do: true
 
   defp active_summary(
@@ -338,8 +338,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
            %Closure{
              elevator: %Elevator{
                alternate_ids: alternate_ids,
-               exiting_redundancy: redundancy,
-               exiting_summary: summary
+               exiting_summary: summary,
+               redundancy: redundancy
              },
              facility: %Facility{id: facility_id}
            }
@@ -376,7 +376,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   # `nil` indicates the specially-formatted fallback summary for upcoming closures.
   defp upcoming_summary(%Closure{elevator: nil}), do: nil
 
-  defp upcoming_summary(%Closure{elevator: %Elevator{entering_redundancy: redundancy}}) do
+  defp upcoming_summary(%Closure{elevator: %Elevator{redundancy: redundancy}}) do
     Map.get(@upcoming_summaries, redundancy, nil)
   end
 end
