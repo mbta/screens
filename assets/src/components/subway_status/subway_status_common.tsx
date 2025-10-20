@@ -159,7 +159,7 @@ export const useSubwayStatusTextResizer = (
       break;
     case FittingStep.PerAlertEffect:
       abbrev = true;
-      if (/^\d* Stops? Skipped$/.test(status)) {
+      if (/Stops? Skipped/.test(status)) {
         truncateStatus = false;
         replaceLocationWithUrl = true;
       } else {
