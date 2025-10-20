@@ -275,7 +275,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     case route_id do
       "Blue" -> %{type: :text, color: :blue, text: "BL"}
       "Orange" -> %{type: :text, color: :orange, text: "OL"}
-      "Red" -> %{type: :text, color: :red, text: "RL"}
+      "Red" -> %{type: :text, color: :red, text: "RL", branches: [:m]}
       _ -> %{type: :text, color: :green, text: "GL"}
     end
   end
