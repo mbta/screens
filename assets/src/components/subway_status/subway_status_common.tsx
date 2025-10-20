@@ -159,20 +159,21 @@ export const useSubwayStatusTextResizer = (
       break;
     case FittingStep.PerAlertEffect:
       abbrev = true;
-      switch (firstWord(status)) {
-        case "Delays":
-          truncateStatus = true;
-          break;
-        case "Bypassing":
-          truncateStatus = true;
-          replaceLocationWithUrl = true;
-          break;
-        case "Suspension":
-          replaceLocationWithUrl = true;
-          break;
-        case "Shuttle":
-        default:
-          break;
+      if (/Stops? Skipped/.test(status)) {
+        truncateStatus = false;
+        replaceLocationWithUrl = true;
+      } else {
+        switch (firstWord(status)) {
+          case "Delays":
+            truncateStatus = true;
+            break;
+          case "Suspension":
+            replaceLocationWithUrl = true;
+            break;
+          case "Shuttle":
+          default:
+            break;
+        }
       }
   }
 

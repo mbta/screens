@@ -1231,7 +1231,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected == ReconstructedAlert.serialize(widget)
 
-      assert %{issue: "Bypassing 2 platforms at Malden Center"} =
+      assert %{issue: "Skipping 2 platforms at Malden Center"} =
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
@@ -1807,7 +1807,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_informed_station_names(["Wellington"])
 
       expected = %{
-        issue: "Trains will bypass Wellington",
+        issue: "Trains will skip Wellington",
         location: "",
         cause: "",
         routes: [
@@ -1840,7 +1840,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree"])
 
       expected = %{
-        issue: "Bypassing Ashmont/Braintree platform at Porter",
+        issue: "Skipping Ashmont/Braintree platform at Porter",
         location: "",
         cause: nil,
         routes: [
@@ -1874,7 +1874,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont", "Braintree"])
 
       expected = %{
-        issue: "Bypassing 2 platforms at JFK/UMass",
+        issue: "Skipping 2 platforms at JFK/UMass",
         location: "",
         cause: nil,
         routes: [
@@ -1927,7 +1927,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_informed_station_names(["Wellington"])
 
       expected = %{
-        issue: "Trains will bypass Wellington",
+        issue: "Trains will skip Wellington",
         location: "",
         cause: "due to construction",
         routes: [

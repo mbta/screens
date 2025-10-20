@@ -113,7 +113,6 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   route_pill: routePill,
   status,
   location,
-  station_count: stationCount,
   id,
 }) => {
   const { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep } =
@@ -129,11 +128,7 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   }
 
   if (truncateStatus) {
-    const effect = firstWord(status);
-    status =
-      effect === "Bypassing"
-        ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}`
-        : effect;
+    status = firstWord(status);
   }
 
   return (
