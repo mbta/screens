@@ -127,10 +127,6 @@ const ContractedAlert: ComponentType<AlertWithID> = ({
   } else {
     locationText = location;
   }
-  if (routePill?.color === LineColor.Orange) {
-    console.log(locationText);
-    console.log(status);
-  }
 
   if (truncateStatus) {
     status = firstWord(status);
