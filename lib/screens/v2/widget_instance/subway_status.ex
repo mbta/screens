@@ -800,8 +800,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   end
 
   defp format_station_closure(stop_names) do
-    IO.inspect(stop_names)
-
     case stop_names do
       [] ->
         {"Skipping", nil}
@@ -832,8 +830,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          }}
 
       stop_names ->
-        IO.inspect(stop_names)
-
         {"#{length(stop_names)} Stops Skipped",
          %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}}
     end
