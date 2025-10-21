@@ -1,4 +1,5 @@
 import _ from "lodash";
+import weakKey from "weak-key";
 
 import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 
@@ -211,23 +212,16 @@ interface FreeTextProps {
   lines: FreeTextType | FreeTextType[];
 }
 
-const FreeText = ({ lines }: FreeTextProps) => {
-  if (Array.isArray(lines)) {
-    const [{ icon: icon1, text: text1 }, { icon: icon2, text: text2 }] = lines;
-    return (
-      <div className="free-text">
-        <FreeTextLine icon={icon1} text={text1} />
-        <FreeTextLine icon={icon2} text={text2} />
-      </div>
-    );
-  } else {
-    const { icon, text } = lines;
-    return (
-      <div className="free-text">
-        <FreeTextLine icon={icon} text={text} />
-      </div>
-    );
-  }
+const FreeText = (props: FreeTextProps) => {
+  const lines = Array.isArray(props.lines) ? props.lines : [props.lines];
+
+  return (
+    <div className="free-text">
+      {lines.map((line) => (
+        <FreeTextLine key={weakKey(line)} icon={line.icon} text={line.text} />
+      ))}
+    </div>
+  );
 };
 
 export default FreeText;
