@@ -5,29 +5,11 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   different variants depending on the "main" widget.
   """
 
-  defmodule Closure do
-    @moduledoc false
-    # Internal struct used while generating widgets. Represents a single elevator which is closed.
-
-    alias Screens.Alerts.Alert
-    alias Screens.Elevator
-    alias Screens.Facilities.Facility
-
-    @type t :: %__MODULE__{
-            elevator: Elevator.t() | nil,
-            facility: Facility.t(),
-            periods: [Alert.active_period()]
-          }
-
-    @enforce_keys ~w[elevator facility periods]a
-    defstruct @enforce_keys
-  end
-
   require Logger
   alias Screens.Alerts.Alert
   alias Screens.Elevator
+  alias Screens.Elevator.Closure
   alias Screens.Facilities.Facility
-  alias Screens.Report
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -40,9 +22,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
   alias ScreensConfig.Screen.Elevator, as: ElevatorConfig
 
   import Screens.Inject
-
   @alert injected(Alert)
-  @elevator injected(Elevator)
   @facility injected(Facility)
   @route injected(Route)
   @route_pattern injected(RoutePattern)
@@ -118,30 +98,12 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
     %NormalHeader{text: "Elevator #{elevator_id}", screen: config, time: now, variant: variant}
   end
 
-  defp elevator_closure(%Alert{
-         id: id,
-         active_period: active_periods,
-         effect: :elevator_closure,
-         informed_entities: entities
-       }) do
-    # We expect there is a 1:1 relationship between `elevator_closure` alerts and individual
-    # out-of-service elevators. Log a warning if our assumptions don't hold.
-    facilities = entities |> Enum.map(& &1.facility) |> Enum.reject(&is_nil/1) |> Enum.uniq()
-
-    case facilities do
-      [] ->
-        []
-
-      [%Facility{id: id} = facility] ->
-        [%Closure{elevator: @elevator.get(id), facility: facility, periods: active_periods}]
-
-      _multiple ->
-        Report.warning("elevator_closure_affects_multiple", alert_id: id)
-        []
+  defp elevator_closure(alert) do
+    case Closure.from_alert(alert) do
+      {:ok, closure} -> [closure]
+      :error -> []
     end
   end
-
-  defp elevator_closure(_alert), do: []
 
   defp elevator_closures(
          active_closures,
@@ -285,7 +247,7 @@ defmodule Screens.V2.CandidateGenerator.Elevator.Closures do
         %Closure{elevator: %Elevator{redundancy: :nearby}} -> false
         _other -> true
       end)
-      |> Enum.flat_map(& &1.periods)
+      |> Enum.flat_map(& &1.alert.active_period)
       |> Enum.map(fn {start_dt, end_dt} ->
         {Util.service_date(start_dt), if(end_dt, do: Util.service_date(end_dt))}
       end)

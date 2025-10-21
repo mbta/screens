@@ -1,0 +1,10 @@
+.elevator-status-new {
+  // Temporary size/position override while the slot is still sized for the
+  // non-"new" elevator status widget; should be handled by the slot itself
+  // once this widget is promoted to live (in `pre_fare/body_right/normal`)
+  height: 984px;
+  position: relative;
+  bottom: -104px;
+
+  border: 2px dashed black;
+}

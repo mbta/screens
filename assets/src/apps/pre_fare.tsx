@@ -35,6 +35,7 @@ import BodyTakeover from "Components/pre_fare/body_takeover";
 import ScreenTakeover from "Components/pre_fare/screen_takeover";
 import ScreenSplitTakeover from "Components/pre_fare/screen_split_takeover";
 import ElevatorStatus from "Components/elevator_status";
+import ElevatorStatusNew from "Components/elevator_status_new";
 import FullLineMap from "Components/full_line_map";
 import LcdSubwayStatus from "Components/subway_status/lcd_subway_status";
 import ReconstructedAlert from "Components/reconstructed_alert";
@@ -65,6 +66,7 @@ const TYPE_TO_COMPONENT = {
   placeholder: Placeholder,
   evergreen_content: EvergreenContent,
   elevator_status: ElevatorStatus,
+  elevator_status_new: ElevatorStatusNew,
   full_line_map: FullLineMap,
   subway_status: LcdSubwayStatus,
   no_data: NoData,
