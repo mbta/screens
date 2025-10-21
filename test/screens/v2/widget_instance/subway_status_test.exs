@@ -942,6 +942,49 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert expected == WidgetInstance.serialize(instance)
     end
 
+    test "handles GL partial station closure for multiple branches" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-B", stop: "place-gover"},
+                %{route: "Green-C", stop: "place-gover"},
+                %{route: "Green-D", stop: "place-gover"},
+                %{route: "Green-E", stop: "place-gover"},
+                %{route: "Green-B", stop: "70201"},
+                %{route: "Green-C", stop: "70201"},
+                %{route: "Green-D", stop: "70201"},
+                %{route: "Green-E", stop: "70201"}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_stations: [
+                %{id: "70201", platform_name: "North Station & North"},
+                %{id: "70202", platform_name: "Copley & West"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{
+              route_pill: @gl_pill,
+              status: "Stop Skipped",
+              location: %{abbrev: "mbta.com/alerts", full: "mbta.com/alerts"},
+              station_count: 1
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
     test "handles single platform closure alert at multiple stops" do
       instance = %SubwayStatus{
         subway_alerts: [
