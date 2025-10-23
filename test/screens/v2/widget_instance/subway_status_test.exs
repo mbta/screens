@@ -60,7 +60,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             type: :extended,
             alert: %{
               route_pill: @bl_pill,
-              status: "Bypassing 4 stops",
+              status: "4 Stops Skipped",
               location: %{abbrev: "mbta.com/alerts", full: "mbta.com/alerts"},
               station_count: 4
             }
@@ -91,10 +91,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             type: :extended,
             alert: %{
               route_pill: @bl_pill,
-              status: "Bypassing",
+              status: "3 Stops Skipped",
               location: %{
-                abbrev: "Airport, Maverick & Aquarium",
-                full: "Airport, Maverick & Aquarium"
+                abbrev: "mbta.com/alerts",
+                full: "Airport, Maverick, and Aquarium"
               },
               station_count: 3
             }
@@ -124,7 +124,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             type: :extended,
             alert: %{
               route_pill: @bl_pill,
-              status: "Bypassing",
+              status: "2 Stops Skipped",
               location: %{abbrev: "Airport and Maverick", full: "Airport and Maverick"},
               station_count: 2
             }
@@ -318,7 +318,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alerts: [
               %{
                 route_pill: @bl_pill,
-                status: "Bypassing",
+                status: "Stop Skipped",
                 location: %{abbrev: "Airport", full: "Airport"},
                 station_count: 1
               }
@@ -377,7 +377,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                 },
                 route_pill: @gl_pill,
                 station_count: 2,
-                status: "Bypassing"
+                status: "2 Stops Skipped"
               },
               %{
                 location: %{
@@ -603,7 +603,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alerts: [
               %{
                 route_pill: @ol_pill,
-                status: "Bypassing",
+                status: "Stop Skipped",
                 location: %{abbrev: "Oak Grove", full: "Oak Grove"},
                 station_count: 1
               }
@@ -767,7 +767,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                 location: %{abbrev: "Oak Grove", full: "Oak Grove"},
                 route_pill: @ol_pill,
                 station_count: 1,
-                status: "Bypassing"
+                status: "Stop Skipped"
               }
             ]
           },
@@ -777,7 +777,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               %{
                 location: %{abbrev: "Lechmere", full: "Lechmere"},
                 route_pill: @gl_pill,
-                status: "Bypassing",
+                status: "Stop Skipped",
                 station_count: 1
               }
             ]
@@ -813,7 +813,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             type: :extended,
             alert: %{
               route_pill: @ol_pill,
-              status: "Bypassing",
+              status: "Stop Skipped",
               location: %{abbrev: "Oak Grove", full: "Oak Grove"},
               station_count: 1
             }
@@ -890,7 +890,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | red: %{
             type: :extended,
             alert: %{
-              status: "Bypassing 1 stop",
+              status: "Stop Skipped",
               location: %{
                 full: "Porter: Ashmont/Braintree platform closed",
                 abbrev: "Porter (1 side only)"
@@ -929,12 +929,55 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | green: %{
             type: :extended,
             alert: %{
-              status: "Bypassing 1 stop",
+              status: "Stop Skipped",
               location: %{
                 full: "Eliot: Park Street & North platform closed",
                 abbrev: "Eliot (1 side only)"
               },
               route_pill: %{type: :text, text: "GL", color: :green, branches: [:d]}
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles GL partial station closure for multiple branches" do
+      instance = %SubwayStatus{
+        subway_alerts: [
+          %{
+            alert: %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-B", stop: "place-gover"},
+                %{route: "Green-C", stop: "place-gover"},
+                %{route: "Green-D", stop: "place-gover"},
+                %{route: "Green-E", stop: "place-gover"},
+                %{route: "Green-B", stop: "70201"},
+                %{route: "Green-C", stop: "70201"},
+                %{route: "Green-D", stop: "70201"},
+                %{route: "Green-E", stop: "70201"}
+              ]
+            },
+            context: %{
+              all_platforms_at_informed_stations: [
+                %{id: "70201", platform_name: "North Station & North"},
+                %{id: "70202", platform_name: "Copley & West"}
+              ]
+            }
+          }
+        ]
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{
+              route_pill: @gl_pill,
+              status: "Stop Skipped",
+              location: %{abbrev: "mbta.com/alerts", full: "mbta.com/alerts"},
+              station_count: 1
             }
           }
       }
@@ -972,7 +1015,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | red: %{
             type: :extended,
             alert: %{
-              status: "Bypassing 2 stops",
+              status: "2 Stops Skipped",
               location: %{
                 full: "mbta.com/alerts",
                 abbrev: "mbta.com/alerts"
@@ -1117,7 +1160,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         | red: %{
             type: :extended,
             alert: %{
-              status: "Bypassing 1 stop",
+              status: "Stop Skipped",
               location: %{full: "mbta.com/alerts", abbrev: "mbta.com/alerts"},
               route_pill: @rl_pill
             }

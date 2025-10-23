@@ -108,7 +108,6 @@ const AlertRow: ComponentType<AlertRowProps> = ({
   route_pill: routePill,
   status,
   location,
-  station_count: stationCount,
   id,
   showInlineBranches,
 }) => {
@@ -125,11 +124,7 @@ const AlertRow: ComponentType<AlertRowProps> = ({
   }
 
   if (truncateStatus) {
-    const effect = firstWord(status);
-    status =
-      effect === "Bypassing"
-        ? `Bypassing ${stationCount} ${stationCount === 1 ? "stop" : "stops"}`
-        : effect;
+    status = firstWord(status);
   }
 
   return (

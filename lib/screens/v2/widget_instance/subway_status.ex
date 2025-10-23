@@ -402,7 +402,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           |> Enum.map(& &1.platform_name)
 
         %{
-          status: "Bypassing 1 stop",
+          status: "Stop Skipped",
           location:
             get_stop_name_with_platform(
               informed_entities,
@@ -411,17 +411,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
             )
         }
 
+      # If there are multiple stations closed without all of their platforms closed,
+      # display the fallback url. This case should not happen frequently, so
+      # we default to not providing incorrect information and direct users to the website.
       :partial_closure_multiple_stops ->
-        # If there are multiple stations closed without all of their platforms closed,
-        # display the fallback url. This case should not happen frequently, so
-        # we default to not providing incorrect information and direct users to the website.
-        num_parent_stations = length(Alert.informed_parent_stations(alert))
+        # There could be informed entities for each of the GL branches at the same
+        # station, if there is an alert affecting platforms for each line.
+        # So we must filter to unique parent_station IDs
+        num_parent_stations =
+          alert |> Alert.informed_parent_stations() |> Enum.uniq_by(& &1.stop) |> Enum.count()
 
         %{
           status:
-            Cldr.Message.format!("Bypassing {num_parent_stations, plural,
-                                =1 {1 stop}
-                                other {# stops}}",
+            Cldr.Message.format!("{num_parent_stations, plural,
+                                =1 {Stop}
+                                other {# Stops}} Skipped",
               num_parent_stations: num_parent_stations
             ),
           location: %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url},
@@ -798,35 +802,35 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp format_station_closure(stop_names) do
     case stop_names do
       [] ->
-        {"Bypassing", nil}
+        {"Skipping", nil}
 
       [stop_name] ->
         {full_name, abbreviated_name} = stop_name
-        {"Bypassing", %{full: full_name, abbrev: abbreviated_name}}
+        {"Stop Skipped", %{full: full_name, abbrev: abbreviated_name}}
 
       [stop_name1, stop_name2] ->
         {full_name1, abbreviated_name1} = stop_name1
         {full_name2, abbreviated_name2} = stop_name2
 
-        {"Bypassing",
+        {"2 Stops Skipped",
          %{
            full: "#{full_name1} and #{full_name2}",
            abbrev: "#{abbreviated_name1} and #{abbreviated_name2}"
          }}
 
       [stop_name1, stop_name2, stop_name3] ->
-        {full_name1, abbreviated_name1} = stop_name1
-        {full_name2, abbreviated_name2} = stop_name2
-        {full_name3, abbreviated_name3} = stop_name3
+        {full_name1, _abbreviated_name1} = stop_name1
+        {full_name2, _abbreviated_name2} = stop_name2
+        {full_name3, _abbreviated_name3} = stop_name3
 
-        {"Bypassing",
+        {"3 Stops Skipped",
          %{
-           full: "#{full_name1}, #{full_name2} & #{full_name3}",
-           abbrev: "#{abbreviated_name1}, #{abbreviated_name2} & #{abbreviated_name3}"
+           full: "#{full_name1}, #{full_name2}, and #{full_name3}",
+           abbrev: @mbta_alerts_url
          }}
 
       stop_names ->
-        {"Bypassing #{length(stop_names)} stops",
+        {"#{length(stop_names)} Stops Skipped",
          %{full: @mbta_alerts_url, abbrev: @mbta_alerts_url}}
     end
   end

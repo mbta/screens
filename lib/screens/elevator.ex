@@ -6,20 +6,27 @@ defmodule Screens.Elevator do
   alias Screens.Facilities.Facility
   alias Screens.Report
 
-  @enforce_keys ~w[id alternate_ids entering_redundancy exiting_redundancy exiting_summary]a
+  @enforce_keys ~w[id alternate_ids exiting_summary redundancy]a
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
           id: Facility.id(),
           alternate_ids: [Facility.id()],
-          entering_redundancy: :nearby | :in_station | :shuttle | :other,
-          exiting_redundancy: :nearby | :in_station | :other,
-          exiting_summary: String.t()
+          exiting_summary: String.t(),
+          redundancy: :nearby | :in_station | :backtrack | :shuttle | :other
         }
 
   @data_path :screens |> :code.priv_dir() |> Path.join("elevators.json")
   @data @data_path |> File.read!() |> Jason.decode!()
   @external_resource @data_path
+
+  # Categories other than these will default to `:other`; we don't need to distinguish them.
+  @redundancy_categories %{
+    1 => :nearby,
+    2 => :in_station,
+    3 => :backtrack,
+    4 => :shuttle
+  }
 
   @callback get(Facility.id()) :: t() | nil
   def get(id) do
@@ -28,23 +35,13 @@ defmodule Screens.Elevator do
         Report.warning("elevator_redundancy_not_found", id: id)
         nil
 
-      %{"alternate_ids" => alternate_ids, "summary" => summary} = entry ->
+      %{"alternate_ids" => alternate_ids, "category" => category, "summary" => summary} ->
         %__MODULE__{
           id: id,
           alternate_ids: alternate_ids,
-          entering_redundancy: entering_redundancy(entry),
-          exiting_redundancy: exiting_redundancy(entry),
-          exiting_summary: summary
+          exiting_summary: summary,
+          redundancy: Map.get(@redundancy_categories, category, :other)
         }
     end
   end
-
-  defp entering_redundancy(%{"entering" => "1"}), do: :nearby
-  defp entering_redundancy(%{"entering" => "2" <> _}), do: :in_station
-  defp entering_redundancy(%{"entering" => "3B"}), do: :shuttle
-  defp entering_redundancy(_other), do: :other
-
-  defp exiting_redundancy(%{"exiting" => "1"}), do: :nearby
-  defp exiting_redundancy(%{"exiting" => "2" <> _}), do: :in_station
-  defp exiting_redundancy(_other), do: :other
 end
