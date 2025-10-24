@@ -13,7 +13,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
   def instances(
         %Screen{
           app_params: %Screen.PreFare{
-            elevator_status: %ScreensConfig.ElevatorStatus{parent_station_id: _parent_station_id}
+            elevator_status: %ScreensConfig.ElevatorStatus{parent_station_id: station_id}
           }
         },
         _now
@@ -30,6 +30,6 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
         end
       end)
 
-    [%ElevatorWidget{closures: active_closures}]
+    [%ElevatorWidget{closures: active_closures, station_id: station_id}]
   end
 end
