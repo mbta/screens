@@ -49,7 +49,7 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
 
   const routePill = getRoutePillObject(section, color);
   const showInlineBranches =
-    color === LineColor.Green &&
+    (color === LineColor.Green || color === LineColor.Red) &&
     isContracted(section) &&
     section.alerts.length > 1;
 
@@ -218,7 +218,6 @@ const BranchPillGroup: ComponentType<
   }
 
   const [firstBranch, ...rest] = branches;
-
   const ComboLinePill = STRING_TO_SVG[`${color}-line-${firstBranch}`];
   return (
     <>
