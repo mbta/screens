@@ -179,7 +179,7 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   effect,
 }) => {
   const { ref: alertTextRef, step: alertTextSize } = useAutoSize(
-    ["medium", "small"],
+    ["body-one", "body-two", "body-three", "body-four"],
     remedy,
   );
 

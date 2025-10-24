@@ -413,23 +413,32 @@ defmodule Screens.Alerts.Alert do
     direction_from_whole_direction_entities || direction_from_parent_station_entities
   end
 
-  def informed_parent_stations(%__MODULE__{
-        informed_entities: informed_entities
-      }) do
-    Enum.filter(informed_entities, &InformedEntity.parent_station?/1)
+  def informed_parent_stations(
+        %__MODULE__{
+          informed_entities: informed_entities
+        },
+        unique_parent_stations? \\ false
+      ) do
+    informed_entities
+    |> Enum.filter(&InformedEntity.parent_station?/1)
+    |> case do
+      parent_stations when unique_parent_stations? -> parent_stations |> Enum.uniq_by(& &1.stop)
+      parent_stations -> parent_stations
+    end
   end
 
-  @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
+  @spec station_closure_type(__MODULE__.t(), list(Stop.t()), boolean()) ::
           :partial_closure | :full_station_closure | :partial_closure_multiple_stops
   def station_closure_type(
         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
-        all_platforms_at_informed_stations
+        all_platforms_at_informed_stations,
+        unique_parent_stations? \\ false
       ) do
     # Alerts UI allows you to create partial closures affecting multiple stations.
     # Typically, these partial closures affecting child stops will only affect a single station.
     # However, we do want to consider the case in which multiple stations have closures,
     # but not every child stop at those parent stations are closed.
-    informed_parent_stations = informed_parent_stations(alert)
+    informed_parent_stations = informed_parent_stations(alert, unique_parent_stations?)
 
     informed_platforms =
       get_informed_platforms_from_entities(
