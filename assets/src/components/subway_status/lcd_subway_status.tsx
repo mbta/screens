@@ -239,7 +239,7 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
   } else {
     const LinePill = STRING_TO_SVG[`${routePill.color[0]}l`];
     return (
-      <LinePill width="144" height="74" color={getHexColor(routePill.color)} />
+      <LinePill width="100%" height="auto" color={getHexColor(routePill.color)} />
     );
   }
 };

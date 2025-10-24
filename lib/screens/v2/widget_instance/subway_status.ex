@@ -78,12 +78,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     "Green-C" => ["Westbound", "Eastbound"],
     "Green-D" => ["Westbound", "Eastbound"],
     "Green-E" => ["Westbound", "Eastbound"],
-    "Green" => ["Westbound", "Eastbound"]
+    "Green" => ["Westbound", "Eastbound"],
+    "Mattapan" => ["Southbound", "Northbound"]
   }
 
   @subway_routes Map.keys(@route_directions)
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
+  @red_line_branches ["Mattapan"]
+
   @green_line_route_ids ["Green" | @green_line_branches]
 
   @mbta_alerts_url "mbta.com/alerts"
@@ -101,15 +104,19 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       multi_alert_routes = SubwayStatus.get_multi_alert_routes(grouped_alerts)
       total_alert_count = SubwayStatus.get_total_alerts(alerts)
 
-      if Enum.any?(multi_alert_routes) do
-        SubwayStatus.serialize_routes_multiple_alerts(
-          grouped_alerts,
-          multi_alert_routes,
-          total_alert_count
-        )
-      else
-        SubwayStatus.serialize_routes_zero_or_one_alert(grouped_alerts, total_alert_count)
-      end
+      s =
+        if Enum.any?(multi_alert_routes) do
+          SubwayStatus.serialize_routes_multiple_alerts(
+            grouped_alerts,
+            multi_alert_routes,
+            total_alert_count
+          )
+        else
+          SubwayStatus.serialize_routes_zero_or_one_alert(grouped_alerts, total_alert_count)
+        end
+
+      IO.inspect(s)
+      s
     end
 
     def slot_names(_instance), do: [:medium, :large]
@@ -174,7 +181,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{
       blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
       orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
-      red: serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count),
+      red: serialize_red_line(grouped_alerts, total_alert_count),
       green: serialize_green_line(grouped_alerts, total_alert_count)
     }
   end
@@ -190,7 +197,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
           orange:
             serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
-          red: serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count),
+          red: serialize_red_line(grouped_alerts, total_alert_count),
           green: serialize_green_line(grouped_alerts, total_alert_count)
         }
 
@@ -204,7 +211,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           %{
             blue: serialize_multiple_alert_rows_for_route(grouped_alerts, "Blue"),
             orange: serialize_multiple_alert_rows_for_route(grouped_alerts, "Orange"),
-            red: serialize_multiple_alert_rows_for_route(grouped_alerts, "Red"),
+            red: serialize_red_line(grouped_alerts, total_alert_count),
             green: serialize_green_line(grouped_alerts, total_alert_count)
           }
         else
@@ -275,7 +282,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     case route_id do
       "Blue" -> %{type: :text, color: :blue, text: "BL"}
       "Orange" -> %{type: :text, color: :orange, text: "OL"}
-      "Red" -> %{type: :text, color: :red, text: "RL", branches: [:m]}
+      "Red" -> %{type: :text, color: :red, text: "RL"}
       _ -> %{type: :text, color: :green, text: "GL"}
     end
   end
@@ -283,7 +290,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_gl_pill_with_branches(route_ids) do
     branches =
       route_ids
-      |> Enum.filter(&(&1 in @green_line_branches))
+      |> Enum.filter(&String.contains?(&1, "Green-"))
       |> Enum.map(fn "Green-" <> branch ->
         branch |> String.downcase() |> String.to_existing_atom()
       end)
@@ -509,15 +516,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           alert()
   defp serialize_green_line_branch_alert(alert, route_ids)
 
-  # If only one branch is affected, we can still determine a stop
-  # range to show, for applicable alert types
-  defp serialize_green_line_branch_alert(alert, [route_id]) do
-    Map.merge(
-      %{route_pill: serialize_gl_pill_with_branches([route_id])},
-      serialize_alert(alert, route_id)
-    )
-  end
-
   defp serialize_green_line_branch_alert(
          %{
            alert: %Alert{
@@ -540,6 +538,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
+  # If only one branch is affected, we can still determine a stop
+  # range to show, for applicable alert types
+  defp serialize_green_line_branch_alert(alert, [route_id]) do
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches([route_id])},
+      serialize_alert(alert, route_id)
+    )
+  end
+
   # Otherwise, give up on determining a stop range.
   defp serialize_green_line_branch_alert(alert, route_ids) do
     Map.merge(
@@ -552,7 +559,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alert_whole_line_stops =
       informed_entities
       |> Enum.map(fn e -> Map.get(e, :route) end)
-      |> Enum.filter(&(&1 in @green_line_branches))
+      |> Enum.filter(fn
+        "Green-" <> _ -> true
+        _ -> false
+      end)
       |> Enum.uniq()
       |> Enum.sort()
 
@@ -581,11 +591,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alert_stops =
       informed_entities
       |> Enum.filter(fn
-        %{stop: nil} ->
-          false
-
-        ie ->
-          InformedEntity.parent_station?(ie) and ie.route in @green_line_branches
+        %{stop: nil} -> false
+        ie -> String.starts_with?(ie.stop, "place-") and String.starts_with?(ie.route, "Green-")
       end)
       |> Enum.map(& &1.stop)
       |> MapSet.new()
@@ -752,6 +759,92 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
+  # Red Line with Mattapan branch serialization
+  def serialize_red_line(grouped_alerts, total_alert_count) do
+    red_line_alerts = Map.get(grouped_alerts, "Red", [])
+    mattapan_alerts = Map.get(grouped_alerts, "Mattapan", [])
+
+    red_alert_count = length(red_line_alerts)
+    mattapan_alert_count = length(mattapan_alerts)
+
+    cond do
+      # No alerts for either Red Line or Mattapan
+      red_alert_count == 0 and mattapan_alert_count == 0 ->
+        serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count)
+
+      # Alert for Red Line but not Mattapan
+      red_alert_count > 0 and mattapan_alert_count == 0 ->
+        serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count)
+
+      # Alert for Mattapan but not Red Line
+      red_alert_count == 0 and mattapan_alert_count > 0 ->
+        serialize_red_line_with_branches(mattapan_alerts, total_alert_count)
+
+      # Alerts for both Red Line and Mattapan
+      red_alert_count > 0 and mattapan_alert_count > 0 ->
+        serialize_red_line_with_both_alerts(red_line_alerts, mattapan_alerts)
+    end
+  end
+
+  defp serialize_red_line_with_branches(mattapan_alerts, total_alert_count) do
+    case mattapan_alerts do
+      [alert] ->
+        serialized_alert = serialize_red_line_branch_alert(alert)
+
+        if total_alert_count < 3 do
+          %{type: :extended, alert: serialized_alert}
+        else
+          %{type: :contracted, alerts: [serialized_alert]}
+        end
+
+      [alert1, alert2] ->
+        %{
+          type: :contracted,
+          alerts: [
+            serialize_red_line_branch_alert(alert1),
+            serialize_red_line_branch_alert(alert2)
+          ]
+        }
+
+      _alerts ->
+        alert_count = length(mattapan_alerts)
+
+        %{
+          type: :contracted,
+          alerts: [
+            serialize_alert_summary(
+              alert_count,
+              serialize_red_line_pill_with_branches()
+            )
+          ]
+        }
+    end
+  end
+
+  defp serialize_red_line_with_both_alerts(red_line_alerts, mattapan_alerts) do
+    red_alert = List.first(red_line_alerts)
+    mattapan_alert = List.first(mattapan_alerts)
+
+    %{
+      type: :contracted,
+      alerts: [
+        serialize_alert_with_route_pill(red_alert, "Red"),
+        serialize_red_line_branch_alert(mattapan_alert)
+      ]
+    }
+  end
+
+  defp serialize_red_line_branch_alert(alert) do
+    Map.merge(
+      %{route_pill: %{type: :text, color: :red, text: "RL", branches: [:m]}},
+      serialize_alert(alert, "Red")
+    )
+  end
+
+  defp serialize_red_line_pill_with_branches() do
+    %{type: :text, color: :red, text: "RL", branches: [:m]}
+  end
+
   defp get_stop_name_with_platform(informed_entities, [platform_name], route_id) do
     # Although it is possible to create a closure alert for multiple partial stations,
     # we pass along platform info only if a single platform is closed at that station.
@@ -783,7 +876,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   defp get_stop_names_from_informed_entities(informed_entities, route_id) do
     informed_entities
-    |> filter_entities_by_route(route_id)
+    |> Enum.filter(fn
+      %{route: "Green-" <> _} when route_id == "Green" -> true
+      %{route: route} -> route == route_id
+    end)
     |> Enum.flat_map(fn
       %{stop: stop_id, route: route_id} ->
         stop_names = Subway.route_stop_names(route_id)
@@ -863,15 +959,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       informed_entities
       |> Enum.map(fn %{route: route} -> route end)
       |> Enum.filter(fn e ->
-        Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
+        Enum.member?(
+          ["Red", "Orange", "Green", "Blue"] ++ @green_line_branches ++ @red_line_branches,
+          e
+        )
       end)
       |> Enum.uniq()
 
     # If an alert affects 1+ GL branches, count it as one route.
+    # If an alert affects 1+ Red Line branches, count it as one route.
     affected_routes =
       affected_routes
       |> Enum.reject(fn route -> String.starts_with?(route, "Green") end)
+      |> Enum.reject(fn route -> String.starts_with?(route, "Mattapan") end)
       |> Enum.concat(["Green"])
+      |> Enum.concat(["Red"])
 
     length(affected_routes)
   end
