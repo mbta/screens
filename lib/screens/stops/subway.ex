@@ -79,15 +79,14 @@ defmodule Screens.Stops.Subway do
   ]
 
   @mattapan_stops [
-    {
-      {"place-asmnl", {"Ashmont", "Ashmont"}},
-      {"place-cedgr", {"Cedar Grove", "Cedar Grove"}},
-      {"place-butlr", {"Butler", "Butler"}},
-      {"place-miltt", {"Milton", "Milton"}},
-      {"place-cenav", {"Valley Road", "Valley Rd"}},
-      {"place-capst", {"Capen Street", "Capen St"}},
-      {"place-matt", {"Mattapan", "Mattapan"}}
-    }
+    {"place-asmnl", {"Ashmont", "Ashmont"}},
+    {"place-cedgr", {"Cedar Grove", "Cedar Grove"}},
+    {"place-butlr", {"Butler", "Butler"}},
+    {"place-miltt", {"Milton", "Milton"}},
+    {"place-cenav", {"Central Avenue", "Central Ave"}},
+    {"place-valrd", {"Valley Road", "Valley Rd"}},
+    {"place-capst", {"Capen Street", "Capen St"}},
+    {"place-matt", {"Mattapan", "Mattapan"}}
   ]
 
   @green_line_b_stops [

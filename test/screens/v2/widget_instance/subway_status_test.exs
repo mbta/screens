@@ -895,7 +895,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                   full: "Porter"
                 },
                 route_pill: @rl_pill,
-                status: "Stop Skipped"
+                status: "Stop Skipped",
+                station_count: 1
               },
               %{
                 location: %{
@@ -903,7 +904,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                   full: "Central Avenue"
                 },
                 route_pill: @rl_pill_mattapan,
-                status: "Stop Skipped"
+                status: "Suspension"
               }
             ]
           }

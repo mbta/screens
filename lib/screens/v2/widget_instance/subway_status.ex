@@ -286,7 +286,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_gl_pill_with_branches(route_ids) do
     branches =
       route_ids
-      |> Enum.filter(&String.contains?(&1, "Green-"))
+      |> Enum.filter(&(&1 in @green_line_branches))
       |> Enum.map(fn "Green-" <> branch ->
         branch |> String.downcase() |> String.to_existing_atom()
       end)
@@ -515,6 +515,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           alert()
   defp serialize_green_line_branch_alert(alert, route_ids)
 
+  # If only one branch is affected, we can still determine a stop
+  # range to show, for applicable alert types
+  defp serialize_green_line_branch_alert(alert, [route_id]) do
+    Map.merge(
+      %{route_pill: serialize_gl_pill_with_branches([route_id])},
+      serialize_alert(alert, route_id)
+    )
+  end
+
   defp serialize_green_line_branch_alert(
          %{
            alert: %Alert{
@@ -537,15 +546,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     }
   end
 
-  # If only one branch is affected, we can still determine a stop
-  # range to show, for applicable alert types
-  defp serialize_green_line_branch_alert(alert, [route_id]) do
-    Map.merge(
-      %{route_pill: serialize_gl_pill_with_branches([route_id])},
-      serialize_alert(alert, route_id)
-    )
-  end
-
   # Otherwise, give up on determining a stop range.
   defp serialize_green_line_branch_alert(alert, route_ids) do
     Map.merge(
@@ -558,10 +558,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alert_whole_line_stops =
       informed_entities
       |> Enum.map(fn e -> Map.get(e, :route) end)
-      |> Enum.filter(fn
-        "Green-" <> _ -> true
-        _ -> false
-      end)
+      |> Enum.filter(&(&1 in @green_line_branches))
       |> Enum.uniq()
       |> Enum.sort()
 
@@ -590,8 +587,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     alert_stops =
       informed_entities
       |> Enum.filter(fn
-        %{stop: nil} -> false
-        ie -> String.starts_with?(ie.stop, "place-") and String.starts_with?(ie.route, "Green-")
+        %{stop: nil} ->
+          false
+
+        ie ->
+          InformedEntity.parent_station?(ie) and ie.route in @green_line_branches
       end)
       |> Enum.map(& &1.stop)
       |> MapSet.new()
@@ -868,7 +868,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_red_line_branch_alert(alert) do
     Map.merge(
       %{route_pill: serialize_rl_pill_with_branch()},
-      serialize_alert(alert, "Red")
+      serialize_alert(alert, "Mattapan")
     )
   end
 
@@ -907,10 +907,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   defp get_stop_names_from_informed_entities(informed_entities, route_id) do
     informed_entities
-    |> Enum.filter(fn
-      %{route: "Green-" <> _} when route_id == "Green" -> true
-      %{route: route} -> route == route_id
-    end)
+    |> filter_entities_by_route(route_id)
     |> Enum.flat_map(fn
       %{stop: stop_id, route: route_id} ->
         stop_names = Subway.route_stop_names(route_id)
@@ -998,13 +995,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       |> Enum.uniq()
 
     # If an alert affects 1+ GL branches, count it as one route.
-    # If an alert affects 1+ Red Line branches, count it as one route.
     affected_routes =
       affected_routes
       |> Enum.reject(fn route -> String.starts_with?(route, "Green") end)
-      |> Enum.reject(fn route -> String.starts_with?(route, "Mattapan") end)
       |> Enum.concat(["Green"])
-      |> Enum.concat(["Red"])
 
     length(affected_routes)
   end
