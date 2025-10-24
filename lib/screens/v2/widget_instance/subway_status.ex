@@ -807,13 +807,25 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         end
 
       [alert1, alert2] ->
-        %{
-          type: :contracted,
-          alerts: [
-            serialize_red_line_branch_alert(alert1),
-            serialize_red_line_branch_alert(alert2)
-          ]
-        }
+        if total_alert_count < 3 do
+          %{
+            type: :contracted,
+            alerts: [
+              serialize_red_line_branch_alert(alert1),
+              serialize_red_line_branch_alert(alert2)
+            ]
+          }
+        else
+          %{
+            type: :contracted,
+            alerts: [
+              serialize_alert_summary(
+                length(mattapan_alerts),
+                serialize_rl_pill_with_branch()
+              )
+            ]
+          }
+        end
 
       _alerts ->
         alert_count = length(mattapan_alerts)
@@ -835,24 +847,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
          mattapan_alerts,
          green_line_alert_count
        ) do
-    # TODO: This isn't right
-    red_alert = List.first(red_line_alerts)
-    mattapan_alert = List.first(mattapan_alerts)
-
     rl_alert_count = length(red_line_alerts)
     mattapan_alert_count = length(mattapan_alerts)
 
-    if green_line_alert_count < 2 do
-      %{
-        type: :contracted,
-        alerts: [
-          serialize_alert_with_route_pill(red_alert, "Red"),
-          serialize_red_line_branch_alert(mattapan_alert)
-        ]
-      }
-    else
+    if green_line_alert_count > 1 do
       # If 2 or more GL alerts, consolidate the RL and mattapan alerts to one row
-      # TODO: Return one row with alert count
       %{
         type: :contracted,
         alerts: [
@@ -860,6 +859,41 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
             rl_alert_count + mattapan_alert_count,
             serialize_rl_pill_with_branch()
           )
+        ]
+      }
+    else
+      # If there is enough space for RL and Mattapan to take up two rows,
+      # then we show a row for each. Show a summary of total alerts if
+      # there is more than one alert for either RL or Mattapan.
+      serialized_rl_alert =
+        case red_line_alerts do
+          [rl_alert] ->
+            serialize_alert_with_route_pill(rl_alert, "Red")
+
+          _rl_alerts ->
+            serialize_alert_summary(
+              rl_alert_count,
+              serialize_route_pill("Red")
+            )
+        end
+
+      serialized_mattapan_alert =
+        case mattapan_alerts do
+          [mattapan_alert] ->
+            serialize_red_line_branch_alert(mattapan_alert)
+
+          _mattapan_alerts ->
+            serialize_alert_summary(
+              mattapan_alert_count,
+              serialize_rl_pill_with_branch()
+            )
+        end
+
+      %{
+        type: :contracted,
+        alerts: [
+          serialized_rl_alert,
+          serialized_mattapan_alert
         ]
       }
     end
