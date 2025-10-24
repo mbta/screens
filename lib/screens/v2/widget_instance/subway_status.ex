@@ -294,6 +294,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{type: :text, color: :green, text: "GL", branches: branches}
   end
 
+  defp serialize_rl_mattapan_pill() do
+    %{type: :text, color: :red, text: "RL", branches: [:m]}
+  end
+
   defp alert_is_whole_route?(informed_entities) do
     Enum.any?(informed_entities, &InformedEntity.whole_route?/1)
   end
@@ -783,7 +787,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       # Alert for Mattapan but not Red Line
       red_alert_count == 0 and mattapan_alert_count > 0 ->
-        serialize_red_line_with_branches(mattapan_alerts, total_alert_count)
+        serialize_red_line_with_mattapan(mattapan_alerts, total_alert_count)
 
       # Alerts for both Red Line and Mattapan
       red_alert_count > 0 and mattapan_alert_count > 0 ->
@@ -795,7 +799,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
-  defp serialize_red_line_with_branches(mattapan_alerts, total_alert_count) do
+  defp serialize_red_line_with_mattapan(mattapan_alerts, total_alert_count) do
     case mattapan_alerts do
       [alert] ->
         serialized_alert = serialize_red_line_branch_alert(alert)
@@ -821,7 +825,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
             alerts: [
               serialize_alert_summary(
                 length(mattapan_alerts),
-                serialize_rl_pill_with_branch()
+                serialize_rl_mattapan_pill()
               )
             ]
           }
@@ -835,7 +839,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           alerts: [
             serialize_alert_summary(
               alert_count,
-              serialize_rl_pill_with_branch()
+              serialize_rl_mattapan_pill()
             )
           ]
         }
@@ -857,7 +861,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
         alerts: [
           serialize_alert_summary(
             rl_alert_count + mattapan_alert_count,
-            serialize_rl_pill_with_branch()
+            serialize_rl_mattapan_pill()
           )
         ]
       }
@@ -885,7 +889,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           _mattapan_alerts ->
             serialize_alert_summary(
               mattapan_alert_count,
-              serialize_rl_pill_with_branch()
+              serialize_rl_mattapan_pill()
             )
         end
 
@@ -901,13 +905,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
   defp serialize_red_line_branch_alert(alert) do
     Map.merge(
-      %{route_pill: serialize_rl_pill_with_branch()},
+      %{route_pill: serialize_rl_mattapan_pill()},
       serialize_alert(alert, "Mattapan")
     )
-  end
-
-  defp serialize_rl_pill_with_branch() do
-    %{type: :text, color: :red, text: "RL", branches: [:m]}
   end
 
   defp get_stop_name_with_platform(informed_entities, [platform_name], route_id) do
