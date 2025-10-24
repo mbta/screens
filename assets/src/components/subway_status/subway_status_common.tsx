@@ -40,12 +40,12 @@ interface AlertLocationMap {
 
 export interface SubwayStatusPill {
   color: LineColor;
-  branches?: GLBranch[];
+  branches?: Branch[];
 }
 
-export interface GLMultiPill extends SubwayStatusPill {
+export interface MultiPill extends SubwayStatusPill {
   // Specifically, a non-empty array
-  branches: GLBranch[];
+  branches: Branch[];
 }
 
 export enum LineColor {
@@ -55,18 +55,21 @@ export enum LineColor {
   Green = "green",
 }
 
-enum GLBranch {
+enum Branch {
+  // Green Line branches
   B = "b",
   C = "c",
   D = "d",
   E = "e",
+  // Red Line branch (Mattapan)
+  M = "m",
 }
 
 /////////////////
 // TYPE GUARDS //
 /////////////////
 
-export const isGLMultiPill = (pill?: SubwayStatusPill): pill is GLMultiPill =>
+export const isMultiPill = (pill?: SubwayStatusPill): pill is MultiPill =>
   (pill?.branches?.length ?? 0) > 0;
 
 export const isAlertLocationMap = (
@@ -107,7 +110,12 @@ const clearLocationForAllGLBranchesAlert = (
   location: AlertLocation,
   routePill?: SubwayStatusPill,
 ): AlertLocation => {
-  if (isGLMultiPill(routePill) && new Set(routePill.branches).size === 4) {
+  // Only clear location if it's a Green Line pill with all 4 GL branches
+  if (
+    isMultiPill(routePill) &&
+    routePill.color === LineColor.Green &&
+    new Set(routePill.branches).size === 4
+  ) {
     return null;
   }
   return location;

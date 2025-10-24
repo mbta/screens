@@ -78,6 +78,17 @@ defmodule Screens.Stops.Subway do
     {"place-brntn", {"Braintree", "Braintree"}}
   ]
 
+  @mattapan_stops [
+    {"place-asmnl", {"Ashmont", "Ashmont"}},
+    {"place-cedgr", {"Cedar Grove", "Cedar Grove"}},
+    {"place-butlr", {"Butler", "Butler"}},
+    {"place-miltt", {"Milton", "Milton"}},
+    {"place-cenav", {"Central Avenue", "Central Ave"}},
+    {"place-valrd", {"Valley Road", "Valley Rd"}},
+    {"place-capst", {"Capen Street", "Capen St"}},
+    {"place-matt", {"Mattapan", "Mattapan"}}
+  ]
+
   @green_line_b_stops [
     {"place-gover", {"Government Center", "Gov't Ctr"}},
     {"place-pktrm", {"Park Street", "Park St"}},
@@ -216,6 +227,7 @@ defmodule Screens.Stops.Subway do
       @red_line_trunk_stops ++ @red_line_ashmont_branch_stops,
       @red_line_trunk_stops ++ @red_line_braintree_branch_stops
     ],
+    "Mattapan" => [@mattapan_stops],
     "Green-B" => [@green_line_b_stops],
     "Green-C" => [@green_line_c_stops],
     "Green-D" => [@green_line_d_stops],

@@ -53,10 +53,16 @@
       $contracted-status-with-two-alerts-bottom-padding;
   }
 
-  // &--contracted.subway-status_status--two-alerts.subway-status_status--has-second-pill {}
-  // ^
-  // Height is not needed for statuses with 2 alerts + 2 pills because this can only happen
-  // for the GL status, which always appears last and has nothing below it (not even the last
+  .subway-status_status--two-alerts.subway-status_status--has-second-pill:not(
+      :last-child
+    ) {
+    // 216px
+    height: (2 * $status-top-padding) + (2 * $pill-height) +
+      $intra-alert-margin-with-second-pill;
+  }
+
+  // Height is not needed for statuses with 2 alerts + 2 pills when it is for the GL status,
+  // which always appears last with nothing below it (not even the last
   // rule, since the 2nd pill means we don't show it--see `shouldShowLastRule` JS function)
 
   .subway-status_status--extended {
