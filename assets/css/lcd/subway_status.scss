@@ -53,9 +53,12 @@
       $contracted-status-with-two-alerts-bottom-padding;
   }
 
-  .subway-status_status--two-alerts.subway-status_status--has-second-pill:not(:last-child) {
+  .subway-status_status--two-alerts.subway-status_status--has-second-pill:not(
+      :last-child
+    ) {
     // 216px
-    height: (2 * $status-top-padding) + (2 * $pill-height) + $intra-alert-margin-with-second-pill; 
+    height: (2 * $status-top-padding) + (2 * $pill-height) +
+      $intra-alert-margin-with-second-pill;
   }
 
   // Height is not needed for statuses with 2 alerts + 2 pills when it is for the GL status,

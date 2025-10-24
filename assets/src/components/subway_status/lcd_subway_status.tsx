@@ -239,14 +239,15 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
   } else {
     const LinePill = STRING_TO_SVG[`${routePill.color[0]}l`];
     return (
-      <LinePill width="100%" height="auto" color={getHexColor(routePill.color)} />
+      <LinePill width="144" height="74" color={getHexColor(routePill.color)} />
     );
   }
 };
 
-const BranchPillGroup: ComponentType<
-  Pick<MultiPill, "branches" | "color">
-> = ({ color, branches: [firstBranch, ...rest] }) => {
+const BranchPillGroup: ComponentType<Pick<MultiPill, "branches" | "color">> = ({
+  color,
+  branches: [firstBranch, ...rest],
+}) => {
   // Determine the line prefix based on color
   const linePrefix = color === "green" ? "gl" : color === "red" ? "rl" : color;
   const ComboLinePill = STRING_TO_SVG[`${linePrefix}-${firstBranch}`];
