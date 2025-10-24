@@ -22,6 +22,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     @gl_pill %{type: :text, text: "GL", color: :green}
     @ol_pill %{type: :text, text: "OL", color: :orange}
     @rl_pill %{type: :text, text: "RL", color: :red}
+    @rl_pill_mattapan %{type: :text, text: "RL", color: :red, branches: [:m]}
 
     @normal_service %{
       blue: %{type: :contracted, alerts: [%{route_pill: @bl_pill, status: "Normal Service"}]},
@@ -864,6 +865,53 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert expected == WidgetInstance.serialize(instance)
     end
 
+    test "handles 1 alert on RL trunk and 1 alert on Mattapan" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Mattapan", stop: "place-cenav"}
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Red", stop: "place-portr"}
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | red: %{
+            type: :contracted,
+            alerts: [
+              %{
+                location: %{
+                  abbrev: "Porter",
+                  full: "Porter"
+                },
+                route_pill: @rl_pill,
+                status: "Stop Skipped"
+              },
+              %{
+                location: %{
+                  abbrev: "Central Ave",
+                  full: "Central Avenue"
+                },
+                route_pill: @rl_pill_mattapan,
+                status: "Stop Skipped"
+              }
+            ]
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
     test "handles 1 platform closure alert" do
       instance = %SubwayStatus{
         subway_alerts: [
@@ -1372,3 +1420,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     end
   end
 end
+
+# test cases to add
+# 1 mattapan alert, no rl alert
+# 1 rl alert no mattapan alert
+# 1 rl alert 1 mattapan alert
+# 2 gl alerts and 2 rl alerts w/ branches

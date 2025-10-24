@@ -104,19 +104,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       multi_alert_routes = SubwayStatus.get_multi_alert_routes(grouped_alerts)
       total_alert_count = SubwayStatus.get_total_alerts(alerts)
 
-      s =
-        if Enum.any?(multi_alert_routes) do
-          SubwayStatus.serialize_routes_multiple_alerts(
-            grouped_alerts,
-            multi_alert_routes,
-            total_alert_count
-          )
-        else
-          SubwayStatus.serialize_routes_zero_or_one_alert(grouped_alerts, total_alert_count)
-        end
-
-      IO.inspect(s)
-      s
+      if Enum.any?(multi_alert_routes) do
+        SubwayStatus.serialize_routes_multiple_alerts(
+          grouped_alerts,
+          multi_alert_routes,
+          total_alert_count
+        )
+      else
+        SubwayStatus.serialize_routes_zero_or_one_alert(grouped_alerts, total_alert_count)
+      end
     end
 
     def slot_names(_instance), do: [:medium, :large]
@@ -352,7 +348,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp get_location(informed_entities, route_id) do
     cond do
       alert_is_whole_route?(informed_entities) ->
-        "Entire line"
+        case route_id do
+          "Mattapan" -> "Entire Mattapan line"
+          _ -> "Entire line"
+        end
 
       alert_is_whole_direction?(informed_entities) ->
         get_direction(informed_entities, route_id)
@@ -764,6 +763,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     red_line_alerts = Map.get(grouped_alerts, "Red", [])
     mattapan_alerts = Map.get(grouped_alerts, "Mattapan", [])
 
+    green_line_alert_count =
+      @green_line_branches
+      |> Enum.flat_map(fn route -> Map.get(grouped_alerts, route, []) end)
+      |> Enum.uniq()
+      |> Enum.count()
+
     red_alert_count = length(red_line_alerts)
     mattapan_alert_count = length(mattapan_alerts)
 
@@ -782,7 +787,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
       # Alerts for both Red Line and Mattapan
       red_alert_count > 0 and mattapan_alert_count > 0 ->
-        serialize_red_line_with_both_alerts(red_line_alerts, mattapan_alerts)
+        serialize_red_line_with_both_alerts(
+          red_line_alerts,
+          mattapan_alerts,
+          green_line_alert_count
+        )
     end
   end
 
@@ -814,34 +823,56 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           alerts: [
             serialize_alert_summary(
               alert_count,
-              serialize_red_line_pill_with_branches()
+              serialize_rl_pill_with_branch()
             )
           ]
         }
     end
   end
 
-  defp serialize_red_line_with_both_alerts(red_line_alerts, mattapan_alerts) do
+  defp serialize_red_line_with_both_alerts(
+         red_line_alerts,
+         mattapan_alerts,
+         green_line_alert_count
+       ) do
+    # TODO: This isn't right
     red_alert = List.first(red_line_alerts)
     mattapan_alert = List.first(mattapan_alerts)
 
-    %{
-      type: :contracted,
-      alerts: [
-        serialize_alert_with_route_pill(red_alert, "Red"),
-        serialize_red_line_branch_alert(mattapan_alert)
-      ]
-    }
+    rl_alert_count = length(red_line_alerts)
+    mattapan_alert_count = length(mattapan_alerts)
+
+    if green_line_alert_count < 2 do
+      %{
+        type: :contracted,
+        alerts: [
+          serialize_alert_with_route_pill(red_alert, "Red"),
+          serialize_red_line_branch_alert(mattapan_alert)
+        ]
+      }
+    else
+      # If 2 or more GL alerts, consolidate the RL and mattapan alerts to one row
+      # TODO: Return one row with alert count
+      %{
+        type: :contracted,
+        alerts: [
+          serialize_alert_summary(
+            rl_alert_count + mattapan_alert_count,
+            serialize_rl_pill_with_branch()
+          )
+        ]
+      }
+    end
   end
 
   defp serialize_red_line_branch_alert(alert) do
     Map.merge(
-      %{route_pill: %{type: :text, color: :red, text: "RL", branches: [:m]}},
+      %{route_pill: serialize_rl_pill_with_branch()},
       serialize_alert(alert, "Red")
     )
   end
 
-  defp serialize_red_line_pill_with_branches() do
+  defp serialize_rl_pill_with_branch() do
     %{type: :text, color: :red, text: "RL", branches: [:m]}
   end
 
