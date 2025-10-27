@@ -108,7 +108,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Green-C" => ["Cleveland Circle", "Government Center"],
     "Green-D" => ["Riverside", "Union Square"],
     "Green-E" => ["Heath Street", "Medford/Tufts"],
-    "Green-trunk" => ["Copley & West", "North Station & North"]
+    "Green-trunk" => ["Copley & West", "North Station & North"],
+    "Mattapan" => ["Mattapan", "Ashmont"]
   }
 
   @headsign_svg_map %{
@@ -127,7 +128,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Oak Grove" => "ol-oak-grove",
     "Alewife" => "rl-alewife",
     "Ashmont" => "rl-ashmont",
-    "Braintree" => "rl-braintree"
+    "Braintree" => "rl-braintree",
+    "Mattapan" => "rl-mattapan"
   }
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]

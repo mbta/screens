@@ -109,4 +109,8 @@ defmodule Screens.V2.DisruptionDiagram.Label do
       "place-hsmnl" in end_stop_ids -> "place-hsmnl"
     end
   end
+
+  def get_end_label_id(_end_stop_ids, :mattapan, _) do
+    "place-matt"
+  end
 end
