@@ -31,6 +31,11 @@ defmodule Screens.ElevatorTest do
       assert %Elevator{redundancy: :other} = Elevator.get("970")
     end
 
+    test "gets redundant route summaries" do
+      assert %Elevator{summary: "Use nearby Magoun Square Elevator 768."} = Elevator.get("767")
+      assert %Elevator{summary: nil} = Elevator.get("780")
+    end
+
     test "gets redundant route exiting summaries" do
       assert %Elevator{exiting_summary: "Request assistance from conductor."} =
                Elevator.get("780")

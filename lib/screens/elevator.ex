@@ -6,14 +6,15 @@ defmodule Screens.Elevator do
   alias Screens.Facilities.Facility
   alias Screens.Report
 
-  @enforce_keys ~w[id alternate_ids exiting_summary redundancy]a
+  @enforce_keys ~w[id alternate_ids exiting_summary redundancy summary]a
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
           id: Facility.id(),
           alternate_ids: [Facility.id()],
           exiting_summary: String.t(),
-          redundancy: :nearby | :in_station | :backtrack | :shuttle | :other
+          redundancy: :nearby | :in_station | :backtrack | :shuttle | :other,
+          summary: String.t() | nil
         }
 
   @data_path :screens |> :code.priv_dir() |> Path.join("elevators.json")
@@ -35,12 +36,18 @@ defmodule Screens.Elevator do
         Report.warning("elevator_redundancy_not_found", id: id)
         nil
 
-      %{"alternate_ids" => alternate_ids, "category" => category, "summary" => summary} ->
+      %{
+        "alternate_ids" => alternate_ids,
+        "category" => category,
+        "exiting_summary" => exiting_summary,
+        "summary" => summary
+      } ->
         %__MODULE__{
           id: id,
           alternate_ids: alternate_ids,
-          exiting_summary: summary,
-          redundancy: Map.get(@redundancy_categories, category, :other)
+          exiting_summary: exiting_summary,
+          redundancy: Map.get(@redundancy_categories, category, :other),
+          summary: summary
         }
     end
   end

@@ -24,8 +24,9 @@ path
    %{
      "elevator_id" => id,
      "alternate_elevator_ids" => alternate,
-     "Elevator Category (Disregarding Entering/Exiting)" => category,
-     "Short Text" => summary
+     "Elevator Category" => category,
+     "Short Text" => exiting_summary,
+     "Edited Alternative Text" => summary
    }} ->
     alternate_ids =
       case String.split(alternate, ~r/(\s|,)+/) do
@@ -38,7 +39,8 @@ path
       Jason.OrderedObject.new([
         alternate_ids: alternate_ids,
         category: category |> String.trim() |> String.to_integer(),
-        summary: summary
+        exiting_summary: exiting_summary,
+        summary: if(summary == "", do: nil, else: summary)
       ])
     }
 end)
