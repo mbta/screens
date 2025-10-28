@@ -99,7 +99,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     @spec serialize(SubwayStatus.t()) :: SubwayStatus.serialized_response()
     def serialize(%SubwayStatus{subway_alerts: alerts}) do
-      SubwayStatus.get_relevant_alerts_by_route(alerts)
+      alerts
+      |> SubwayStatus.get_relevant_alerts_by_route()
       |> SubwayStatus.serialize_alerts_into_possible_rows()
       |> SubwayStatus.consolidate_alert_sections()
       |> SubwayStatus.extend_sections_if_needed()
@@ -182,7 +183,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
           case {contains_alert_status, alerts} do
             {true, [alert]} ->
-              if is_alert_summary?(alert) do
+              if alert_summary?(alert) do
                 {color, section}
               else
                 {color, %{type: :extended, alert: alert}}
@@ -200,14 +201,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     |> Enum.into(%{})
   end
 
-  defp is_alert_summary?(alert) do
-    case Map.get(alert, :status) do
-      status when is_binary(status) ->
-        String.ends_with?(status, " current alerts")
-
-      _ ->
-        false
-    end
+  defp alert_summary?(alert) do
+    String.ends_with?(Map.get(alert, :status), " current alerts")
   end
 
   # Helper functions for Red Line
@@ -324,7 +319,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp serialize_green_line_branch_alerts_only(branch_alerts) do
     case branch_alerts do
       [alert] ->
-        route_ids = alert_routes(alert) |> Enum.filter(&String.starts_with?(&1, "Green"))
+        route_ids = alert |> alert_routes() |> Enum.filter(&String.starts_with?(&1, "Green"))
 
         %{
           type: :contracted,
@@ -509,7 +504,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{type: :text, color: :green, text: "GL", branches: branches}
   end
 
-  defp serialize_rl_mattapan_pill() do
+  defp serialize_rl_mattapan_pill do
     %{type: :text, color: :red, text: "RL", branches: [:m]}
   end
 
