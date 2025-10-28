@@ -294,7 +294,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{type: :text, color: :green, text: "GL", branches: branches}
   end
 
-  defp serialize_rl_mattapan_pill() do
+  defp serialize_rl_mattapan_pill do
     %{type: :text, color: :red, text: "RL", branches: [:m]}
   end
 
