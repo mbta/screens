@@ -1758,9 +1758,3 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     end
   end
 end
-
-# test cases to add
-# 1 mattapan alert, no rl alert
-# 1 rl alert no mattapan alert
-# 1 rl alert 1 mattapan alert
-# 2 gl alerts and 2 rl alerts w/ branches

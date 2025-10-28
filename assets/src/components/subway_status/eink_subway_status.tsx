@@ -252,19 +252,17 @@ const getRoutePillObject = (
   section: Section,
   color: LineColor,
 ): SubwayStatusPill => {
-  // If the current section is `green` or `red` and there is only one alert, see if there are any branches
-  // that can be added to the route pill. If no branches exist, the pill will be rendered with no branches.
-  if (color === "green" || color === "red") {
-    if (isContractedWith1Alert(section)) {
-      return {
-        color: color,
-        branches: section.alerts.flatMap(
-          (alert) => alert.route_pill?.branches ?? [],
-        ),
-      };
-    } else if (isExtended(section)) {
-      return { color: color, branches: section.alert.route_pill?.branches };
-    }
+  // If there is only one alert, see if there are any branches that should be added 
+  // to the route pill. If no branches exist, the pill will be rendered with no branches.
+  if (isContractedWith1Alert(section)) {
+    return {
+      color: color,
+      branches: section.alerts.flatMap(
+        (alert) => alert.route_pill?.branches ?? [],
+      ),
+    };
+  } else if (isExtended(section)) {
+    return { color: color, branches: section.alert.route_pill?.branches };
   }
 
   return { color: color };
