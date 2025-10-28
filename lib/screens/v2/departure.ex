@@ -27,7 +27,6 @@ defmodule Screens.V2.Departure do
         }
 
   @type opts :: [
-          include_schedules: boolean(),
           now: DateTime.t()
         ]
 
@@ -44,19 +43,25 @@ defmodule Screens.V2.Departure do
 
     with {:ok, predictions} <- fetch_predictions_fn.(params),
          {:ok, schedules} <- fetch_schedules(params, opts) do
-      {:ok, Builder.build(predictions, schedules, now)}
+      # Only include schedules for commuter rail and ferry
+      filtered_schedules =
+        Enum.filter(schedules, fn schedule ->
+          case schedule do
+            %Schedule{route: %{type: :ferry}} -> true
+            %Schedule{route: %{type: :rail}} -> true
+            _schedule -> false
+          end
+        end)
+
+      {:ok, Builder.build(predictions, filtered_schedules, now)}
     else
       _ -> :error
     end
   end
 
   defp fetch_schedules(params, opts) do
-    if opts[:include_schedules] do
-      fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
-      fetch_fn.(params)
-    else
-      {:ok, []}
-    end
+    fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
+    fetch_fn.(params)
   end
 
   def do_fetch(endpoint, params) do
