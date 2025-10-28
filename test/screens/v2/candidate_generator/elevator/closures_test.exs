@@ -90,7 +90,8 @@ defmodule Screens.V2.CandidateGenerator.Elevator.ClosuresTest do
         id: id,
         alternate_ids: [],
         exiting_summary: "Accessible route available",
-        redundancy: :in_station
+        redundancy: :in_station,
+        summary: nil
       },
       fields
     )

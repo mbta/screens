@@ -1,23 +1,27 @@
 {
   "50": {
     "alternate_ids": [],
-    "category": 5,
-    "summary": "Request assistance from conductor."
+    "category": 2,
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please proceed to Concord street to cross over to the outbound platform."
   },
   "51": {
     "alternate_ids": [],
-    "category": 5,
-    "summary": "Request assistance from conductor."
+    "category": 2,
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please proceed to Concord street to cross over to the outbound platform."
   },
   "52": {
     "alternate_ids": [],
     "category": 5,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please see station personnel for assistance."
   },
   "53": {
     "alternate_ids": [],
     "category": 5,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please see station personnel for assistance."
   },
   "6476": {
     "alternate_ids": [
@@ -25,7 +29,8 @@
       "949"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use South Station Elevator 926 (Subway Lobby to Atlantic Avenue, Summer Street)."
   },
   "701": {
     "alternate_ids": [
@@ -33,7 +38,8 @@
       "703"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Wonderland Elevator 702 or 703."
   },
   "702": {
     "alternate_ids": [
@@ -41,7 +47,8 @@
       "703"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Wonderland Elevator 701 or 703."
   },
   "703": {
     "alternate_ids": [
@@ -49,7 +56,20 @@
       "702"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Wonderland Elevator 701 or 702."
+  },
+  "704": {
+    "alternate_ids": [],
+    "category": 2,
+    "exiting_summary": "",
+    "summary": null
+  },
+  "705": {
+    "alternate_ids": [],
+    "category": 2,
+    "exiting_summary": "",
+    "summary": null
   },
   "708": {
     "alternate_ids": [
@@ -58,7 +78,8 @@
       "703"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Wonderland Elevators 701, 702 or 703 (lobby to pedestrian bridge & garage)."
   },
   "709": {
     "alternate_ids": [
@@ -67,7 +88,8 @@
       "703"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Wonderland Elevators 701, 702 or 703 (lobby to garage & plaza)."
   },
   "710": {
     "alternate_ids": [
@@ -76,14 +98,16 @@
       "703"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Take ramp to pedestrian bridge and plaza, and elevators 701, 702 and 703."
   },
   "711": {
     "alternate_ids": [
       "710"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Wonderland Elevator 710 (Wonderland platform to plaza). "
   },
   "712": {
     "alternate_ids": [
@@ -91,7 +115,8 @@
       "715"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 713 (Bennington St busway to pedestrian bridge)."
   },
   "713": {
     "alternate_ids": [
@@ -99,7 +124,8 @@
       "714"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 712 (Bowdoin platform to pedestrian bridge)."
   },
   "714": {
     "alternate_ids": [
@@ -107,7 +133,8 @@
       "713"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 715 (Saratoga St busway to pedestrian bridge)."
   },
   "715": {
     "alternate_ids": [
@@ -115,7 +142,8 @@
       "712"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 714 (Wonderland platform to pedestrian bridge)."
   },
   "716": {
     "alternate_ids": [
@@ -123,7 +151,8 @@
       "719"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Assembly Elevator 718 (lobby to Revolution Dr) and then Elevator 719 (south platform to lobby)."
   },
   "717": {
     "alternate_ids": [
@@ -131,7 +160,8 @@
       "719"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 719 (south platform to lobby) & 718 (lobby to Revolution Dr)"
   },
   "718": {
     "alternate_ids": [
@@ -139,7 +169,8 @@
       "717"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Assembly Elev 717 (north platform to lobby) and 716 (lobby to Foley St)."
   },
   "719": {
     "alternate_ids": [
@@ -147,56 +178,64 @@
       "717"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 717 (north platform to lobby) & 716 (lobby to Foley St)."
   },
   "720": {
     "alternate_ids": [
       "721"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Government Center Elevator 721."
   },
   "721": {
     "alternate_ids": [
       "720"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Government Center Elevator 720."
   },
   "722": {
     "alternate_ids": [
       "723"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Government Center Elevator 723."
   },
   "723": {
     "alternate_ids": [
       "722"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Government Center Elevator 722."
   },
   "724": {
     "alternate_ids": [
       "842"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Forest Hills Elevator 842 (Subway platform to main lobby)."
   },
   "725": {
     "alternate_ids": [
       "727"
     ],
     "category": 2,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Use Boston Landing Elevator 727 (Platform to Everett Street)."
   },
   "726": {
     "alternate_ids": [
       "727"
     ],
     "category": 2,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Use Boston Landing Elevator 727 (Platform to Everett Street)."
   },
   "727": {
     "alternate_ids": [
@@ -204,14 +243,16 @@
       "726"
     ],
     "category": 2,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Use Boston Landing Elevator 725 (Arthur Street entrance to pedestrian bridge) and Elevator 726 (Platform to pedestrian bridge)."
   },
   "728": {
     "alternate_ids": [
       "848"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Ruggles Elevator 848 (lobby to lower busway side platform)."
   },
   "731": {
     "alternate_ids": [
@@ -219,7 +260,8 @@
       "732"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use North Station Elevator 912 (lobby to Haverhill St & Causeway St)."
   },
   "732": {
     "alternate_ids": [
@@ -227,14 +269,16 @@
       "912"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use North Station Elevator 731 (passageway to Causeway St)."
   },
   "733": {
     "alternate_ids": [
       "734"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 734 (platform to Newport Ave lobby)."
   },
   "734": {
     "alternate_ids": [
@@ -242,14 +286,16 @@
       "735"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 733 (lobby to bridge) and then Elevator 735 (bridge to platform)."
   },
   "735": {
     "alternate_ids": [
       "734"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 734 (platform to Newport Ave lobby)."
   },
   "736": {
     "alternate_ids": [
@@ -257,14 +303,16 @@
       "810"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Quincy Adams Elevator 806 (platform to lobby)."
   },
   "743": {
     "alternate_ids": [
       "746"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Oak Grove Elevator 746."
   },
   "744": {
     "alternate_ids": [
@@ -272,7 +320,8 @@
       "945"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Oak Grove Elevator 745 (Lobby to main busway/parking lot)."
   },
   "745": {
     "alternate_ids": [
@@ -281,43 +330,50 @@
       "800"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Oak Grove Elevator 744 (Lobby to Washington St). Alternately, a shuttle bus is available upon request to transport riders between the Oak Grove busway entrance and Malden Center Station."
   },
   "746": {
     "alternate_ids": [
       "743"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Oak Grove Elevator 743."
   },
   "747": {
     "alternate_ids": [],
-    "category": 4,
-    "summary": "Exit at North Station. Request shuttle bus back to Winchester Center."
+    "category": 2,
+    "exiting_summary": "Exit at North Station. Request shuttle bus back to Winchester Center.",
+    "summary": "Cross Waterfield Rd. Travel 160 ft on Laraway Rd. Take the ramp to the Track 2 inbound platform."
   },
   "748": {
     "alternate_ids": [
       "749"
     ],
-    "category": 1,
-    "summary": "Alternative elevator available at station"
+    "category": 2,
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use the ramp located 130 ft south of Elevator 748."
   },
   "749": {
     "alternate_ids": [
       "748"
     ],
-    "category": 1,
-    "summary": "Alternative elevator available at station"
+    "category": 2,
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Elevator 748 or the ramp located 130 ft south of Elevator 748."
   },
   "750": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use ramp between Washington St and outbound platform. "
   },
   "751": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use ramp between Washington St and inbound platform. "
   },
   "756": {
     "alternate_ids": [
@@ -329,7 +385,8 @@
       "952"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Kendall/MIT Elevator 757."
   },
   "757": {
     "alternate_ids": [
@@ -341,7 +398,8 @@
       "952"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Kendall/MIT Elevator 756."
   },
   "762": {
     "alternate_ids": [
@@ -349,7 +407,8 @@
       "764"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Lechmere Elevator 763."
   },
   "763": {
     "alternate_ids": [
@@ -357,7 +416,8 @@
       "764"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Lechmere Elevator 762."
   },
   "764": {
     "alternate_ids": [
@@ -365,84 +425,98 @@
       "763"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Lechmere Elevators 762 or 763 (Platform to N First Street lobby)."
   },
   "765": {
     "alternate_ids": [
       "766"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Gilman Square Elevator 766 (Platform to School Street lobby)."
   },
   "766": {
     "alternate_ids": [
       "765"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Gilman Square Elevator 766 (Platform to Community Path lobby)."
   },
   "767": {
     "alternate_ids": [
       "768"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Magoun Square Elevator 768."
   },
   "768": {
     "alternate_ids": [
       "767"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Magoun Square Elevator 767."
   },
   "769": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use the Boston Ave entrance located at the intersection of Boston Ave & Broadway."
   },
   "770": {
     "alternate_ids": [
       "772"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Medford/Tufts Elevator 772."
   },
   "771": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use the accessible walkway that connects the station entrance with Prospect St."
   },
   "772": {
     "alternate_ids": [
       "770"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Medford/Tufts Elevator 770."
   },
   "778": {
     "alternate_ids": [],
-    "category": 100,
-    "summary": "Request assistance from conductor."
+    "category": 2,
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please use the accessible ramp for access to the platform."
   },
   "779": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please use the accessible ramp for access to the platform."
   },
   "780": {
     "alternate_ids": [],
     "category": 100,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": null
   },
   "781": {
     "alternate_ids": [],
     "category": 100,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": null
   },
   "782": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Passengers may use the elevators located at 2 Washington Sq for ADA access to the platform."
   },
   "802": {
     "alternate_ids": [
@@ -451,7 +525,8 @@
       "975"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby State Elevator 967."
   },
   "803": {
     "alternate_ids": [
@@ -460,7 +535,8 @@
       "891"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "804": {
     "alternate_ids": [
@@ -471,7 +547,8 @@
       "823"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Downtown Crossing Elevator 892 (lobby to Washington St & Winter St)."
   },
   "805": {
     "alternate_ids": [
@@ -479,21 +556,24 @@
       "810"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Quincy Adams Elevator 736 (platform to lobby)."
   },
   "806": {
     "alternate_ids": [
       "807"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Quincy Adams Elevator 807 (lobby to parking garage)."
   },
   "807": {
     "alternate_ids": [
       "806"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Quincy Adams Elevator 806 (lobby to parking garage)."
   },
   "808": {
     "alternate_ids": [
@@ -501,7 +581,8 @@
       "979"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elev 979 (Red Line to Green Line) & Elev 978 (Green Line to Boston Common)."
   },
   "810": {
     "alternate_ids": [
@@ -509,7 +590,8 @@
       "806"
     ],
     "category": 4,
-    "summary": "Exit at Quincy Adams Station. Request shuttle bus back to Quincy Center."
+    "exiting_summary": "Exit at Quincy Adams Station. Request shuttle bus back to Quincy Center.",
+    "summary": "Use shuttle bus to/from Quincy Adams. "
   },
   "811": {
     "alternate_ids": [
@@ -517,7 +599,8 @@
       "810"
     ],
     "category": 4,
-    "summary": "Exit at Quincy Adams Station. Request shuttle bus back to Braintree."
+    "exiting_summary": "Exit at Quincy Adams Station. Request shuttle bus back to Braintree.",
+    "summary": "Use shuttle bus to/from Quincy Adams."
   },
   "812": {
     "alternate_ids": [
@@ -527,28 +610,32 @@
       "979"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "813": {
     "alternate_ids": [
       "961"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Alewife Elevator 961 (platform to Russell Field lobby)."
   },
   "814": {
     "alternate_ids": [
       "815"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Alewife Elevator 815 (lobby to street and parking garage)."
   },
   "815": {
     "alternate_ids": [
       "814"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Alewife Elevator 814 (lobby to street and parking garage)."
   },
   "816": {
     "alternate_ids": [
@@ -556,7 +643,8 @@
       "973"
     ],
     "category": 4,
-    "summary": "Exit at Harvard Station. Request shuttle bus back to Davis."
+    "exiting_summary": "Exit at Harvard Station. Request shuttle bus back to Davis.",
+    "summary": "A shuttle bus to/from Harvard is available."
   },
   "817": {
     "alternate_ids": [
@@ -564,14 +652,16 @@
       "973"
     ],
     "category": 4,
-    "summary": "Exit at Harvard Station. Request shuttle bus back to Davis."
+    "exiting_summary": "Exit at Harvard Station. Request shuttle bus back to Davis.",
+    "summary": "A shuttle bus to/from Harvard is available."
   },
   "821": {
     "alternate_ids": [
       "973"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Harvard Elevator 973 (upper busway to Brattle St)."
   },
   "823": {
     "alternate_ids": [
@@ -581,7 +671,8 @@
       "979"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "830": {
     "alternate_ids": [
@@ -590,7 +681,8 @@
       "879"
     ],
     "category": 3,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": null
   },
   "831": {
     "alternate_ids": [
@@ -599,14 +691,16 @@
       "879"
     ],
     "category": 3,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": null
   },
   "840": {
     "alternate_ids": [
       "881"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Sullivan Elev 881 (Oak Grove platform), then cross through to the center platform."
   },
   "841": {
     "alternate_ids": [
@@ -619,33 +713,38 @@
       "724"
     ],
     "category": 5,
-    "summary": "Exit at Ruggles or Back Bay Stations. Take the Orange Line to Forest Hills."
+    "exiting_summary": "Exit at Ruggles or Back Bay Stations. Take the Orange Line to Forest Hills.",
+    "summary": "See station staff or train conductor for help."
   },
   "842": {
     "alternate_ids": [
       "724"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Forest Hills Elev 724 (Subway platform to Arborway lobby)."
   },
   "843": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Accessible ramp available"
+    "exiting_summary": "Accessible ramp available",
+    "summary": "See station staff for assistance traveling between lobby and lower busway."
   },
   "844": {
     "alternate_ids": [
       "842"
     ],
     "category": 4,
-    "summary": "Exit at Forest Hills Station. Request shuttle bus back to Green Street."
+    "exiting_summary": "Exit at Forest Hills Station. Request shuttle bus back to Green Street.",
+    "summary": "Use shuttle bus to/from Forest Hills."
   },
   "845": {
     "alternate_ids": [
       "846"
     ],
     "category": 4,
-    "summary": "Exit at Jackson Sq Station. Request shuttle bus back to Stony Brook."
+    "exiting_summary": "Exit at Jackson Sq Station. Request shuttle bus back to Stony Brook.",
+    "summary": "Use shuttle bus to/from Stony Brook."
   },
   "846": {
     "alternate_ids": [
@@ -653,7 +752,8 @@
       "847"
     ],
     "category": 4,
-    "summary": "Exit at Stony Brook Station. Request shuttle bus back to Jackson Sq."
+    "exiting_summary": "Exit at Stony Brook Station. Request shuttle bus back to Jackson Sq.",
+    "summary": "Use shuttle bus to/from Stony Brook."
   },
   "847": {
     "alternate_ids": [
@@ -661,14 +761,16 @@
       "850"
     ],
     "category": 4,
-    "summary": "Exit at Ruggles Station. Request shuttle bus back to Roxbury Crossing."
+    "exiting_summary": "Exit at Ruggles Station. Request shuttle bus back to Roxbury Crossing.",
+    "summary": "Use shuttle bus to/from Ruggles."
   },
   "848": {
     "alternate_ids": [
       "728"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "See station staff for help traveling between lobby and lower busway."
   },
   "849": {
     "alternate_ids": [
@@ -679,7 +781,8 @@
       "856"
     ],
     "category": 5,
-    "summary": "Exit at Back Bay Station. Take the Orange Line to Ruggles. "
+    "exiting_summary": "Exit at Back Bay Station. Take the Orange Line to Ruggles. ",
+    "summary": "See station staff or train conductor for help."
   },
   "850": {
     "alternate_ids": [
@@ -687,28 +790,32 @@
       "847"
     ],
     "category": 4,
-    "summary": "Exit at Jackson Sq Station. Request shuttle bus back to Ruggles."
+    "exiting_summary": "Exit at Jackson Sq Station. Request shuttle bus back to Ruggles.",
+    "summary": "Use shuttle bus to/from Jackson Square."
   },
   "851": {
     "alternate_ids": [
       "N/A"
     ],
     "category": 4,
-    "summary": "Exit at Ruggles Station. Request shuttle bus back to Ruggles."
+    "exiting_summary": "Exit at Ruggles Station. Request shuttle bus back to Ruggles.",
+    "summary": "Shuttle bus available on request between Forsyth St entrance and the Ruggles upper busway (lobby). "
   },
   "852": {
     "alternate_ids": [
       "853"
     ],
     "category": 4,
-    "summary": "Exit at Back Bay Station. Request shuttle bus back to Mass Ave."
+    "exiting_summary": "Exit at Back Bay Station. Request shuttle bus back to Mass Ave.",
+    "summary": "Use shuttle bus to/from Back Bay. "
   },
   "853": {
     "alternate_ids": [
       "852"
     ],
     "category": 4,
-    "summary": "Exit at Mass Ave Station. Request shuttle bus back to Back Bay."
+    "exiting_summary": "Exit at Mass Ave Station. Request shuttle bus back to Back Bay.",
+    "summary": "Use shuttle bus to/from Mass Ave."
   },
   "854": {
     "alternate_ids": [
@@ -718,7 +825,8 @@
       "842"
     ],
     "category": 5,
-    "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay."
+    "exiting_summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay.",
+    "summary": "See station staff or train conductor for help."
   },
   "855": {
     "alternate_ids": [
@@ -728,7 +836,8 @@
       "842"
     ],
     "category": 5,
-    "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay."
+    "exiting_summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay.",
+    "summary": "See station staff or train conductor for help."
   },
   "856": {
     "alternate_ids": [
@@ -738,7 +847,8 @@
       "842"
     ],
     "category": 5,
-    "summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay."
+    "exiting_summary": "Exit at Ruggles or Forest Hills Stations. Take the Orange Line to Back Bay.",
+    "summary": "See station staff or train conductor for help."
   },
   "857": {
     "alternate_ids": [
@@ -747,7 +857,8 @@
       "922"
     ],
     "category": 4,
-    "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center."
+    "exiting_summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center.",
+    "summary": "Use shuttle bus to/from Back Bay."
   },
   "858": {
     "alternate_ids": [
@@ -755,7 +866,8 @@
       "859"
     ],
     "category": 4,
-    "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center."
+    "exiting_summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center.",
+    "summary": "Use shuttle bus to/from Back Bay."
   },
   "859": {
     "alternate_ids": [
@@ -763,7 +875,8 @@
       "858"
     ],
     "category": 4,
-    "summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center."
+    "exiting_summary": "Exit at Back Bay Station. Request shuttle bus back to Tufts Medical Center.",
+    "summary": "Use shuttle bus to/from Back Bay."
   },
   "860": {
     "alternate_ids": [
@@ -772,7 +885,8 @@
       "973"
     ],
     "category": 3,
-    "summary": "Exit at Harvard Station. Take an Ashmont/Braintree train back to Central."
+    "exiting_summary": "Exit at Harvard Station. Take an Ashmont/Braintree train back to Central.",
+    "summary": null
   },
   "861": {
     "alternate_ids": [
@@ -783,21 +897,24 @@
       "866"
     ],
     "category": 3,
-    "summary": "Exit at Harvard. Take a Route 1 bus to Central. "
+    "exiting_summary": "Exit at Harvard. Take a Route 1 bus to Central. ",
+    "summary": null
   },
   "864": {
     "alternate_ids": [
       "865"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Wellington Elev 865 (center platform)."
   },
   "865": {
     "alternate_ids": [
       "864"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Wellington Elev 864 (Oak Grove platform)."
   },
   "866": {
     "alternate_ids": [
@@ -808,7 +925,8 @@
       "952"
     ],
     "category": 3,
-    "summary": "Exit at Harvard Station. Take an Ashmont/Braintree train back to Kendall/MIT."
+    "exiting_summary": "Exit at Harvard Station. Take an Ashmont/Braintree train back to Kendall/MIT.",
+    "summary": null
   },
   "867": {
     "alternate_ids": [
@@ -817,7 +935,8 @@
       "880"
     ],
     "category": 4,
-    "summary": "Exit at Andrew Station. Request shuttle bus back to Broadway."
+    "exiting_summary": "Exit at Andrew Station. Request shuttle bus back to Broadway.",
+    "summary": "Shuttle bus to/from Andrew is available."
   },
   "868": {
     "alternate_ids": [
@@ -826,7 +945,8 @@
       "880"
     ],
     "category": 4,
-    "summary": "Exit at Andrew Station. Request shuttle bus back to Broadway."
+    "exiting_summary": "Exit at Andrew Station. Request shuttle bus back to Broadway.",
+    "summary": "Shuttle bus to/from Andrew is available."
   },
   "869": {
     "alternate_ids": [
@@ -834,7 +954,8 @@
       "999"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevators 998 or 999 (Red Line Passageway to Oak Grove platform)."
   },
   "870": {
     "alternate_ids": [
@@ -842,7 +963,8 @@
       "978"
     ],
     "category": 3,
-    "summary": "Exit at Park St Station."
+    "exiting_summary": "Exit at Park St Station.",
+    "summary": null
   },
   "872": {
     "alternate_ids": [
@@ -850,7 +972,8 @@
       "867"
     ],
     "category": 4,
-    "summary": "Exit at Broadway Station. Request shuttle bus back to Andrew."
+    "exiting_summary": "Exit at Broadway Station. Request shuttle bus back to Andrew.",
+    "summary": "Shuttle bus to/from Broadway is available."
   },
   "876": {
     "alternate_ids": [
@@ -860,7 +983,8 @@
       "859"
     ],
     "category": 3,
-    "summary": "Exit at Tufts Medical Center Station. Take an SL4 or SL5 bus to Chinatown."
+    "exiting_summary": "Exit at Tufts Medical Center Station. Take an SL4 or SL5 bus to Chinatown.",
+    "summary": null
   },
   "879": {
     "alternate_ids": [
@@ -868,7 +992,8 @@
       "872"
     ],
     "category": 3,
-    "summary": "Exit at JFK/UMass Station. Take an Alewife train back to Andrew."
+    "exiting_summary": "Exit at JFK/UMass Station. Take an Alewife train back to Andrew.",
+    "summary": null
   },
   "880": {
     "alternate_ids": [
@@ -876,14 +1001,16 @@
       "872"
     ],
     "category": 3,
-    "summary": "Exit at Broadway Station. Take an Ashmont/Braintree train back to Andrew."
+    "exiting_summary": "Exit at Broadway Station. Take an Ashmont/Braintree train back to Andrew.",
+    "summary": null
   },
   "881": {
     "alternate_ids": [
       "840"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Sullivan Elevator 840 to access the center platform."
   },
   "884": {
     "alternate_ids": [
@@ -892,7 +1019,8 @@
       "710"
     ],
     "category": 3,
-    "summary": "Exit at Beachmont Station. Take a Wonderland train back to Revere Beach."
+    "exiting_summary": "Exit at Beachmont Station. Take a Wonderland train back to Revere Beach.",
+    "summary": null
   },
   "885": {
     "alternate_ids": [
@@ -901,7 +1029,8 @@
       "710"
     ],
     "category": 3,
-    "summary": "Exit at Wonderland Station. Take a Bowdoin train back to Revere Beach."
+    "exiting_summary": "Exit at Wonderland Station. Take a Bowdoin train back to Revere Beach.",
+    "summary": null
   },
   "886": {
     "alternate_ids": [
@@ -910,7 +1039,8 @@
       "885"
     ],
     "category": 3,
-    "summary": "Exit at Suffolk Downs Station. Take a Wonderland train back to Beachmont."
+    "exiting_summary": "Exit at Suffolk Downs Station. Take a Wonderland train back to Beachmont.",
+    "summary": null
   },
   "887": {
     "alternate_ids": [
@@ -919,7 +1049,8 @@
       "885"
     ],
     "category": 3,
-    "summary": "Exit at Revere Beach Station. Take a Bowdoin train back to Beachmont."
+    "exiting_summary": "Exit at Revere Beach Station. Take a Bowdoin train back to Beachmont.",
+    "summary": null
   },
   "889": {
     "alternate_ids": [
@@ -929,7 +1060,8 @@
       "932"
     ],
     "category": 3,
-    "summary": "Exit at Airport Station. Take a Wonderland train back to Wood Island."
+    "exiting_summary": "Exit at Airport Station. Take a Wonderland train back to Wood Island.",
+    "summary": null
   },
   "890": {
     "alternate_ids": [
@@ -939,19 +1071,22 @@
       "932"
     ],
     "category": 3,
-    "summary": "Exit at Orient Heights Station. Take a Bowdoin train back to Wood Island."
+    "exiting_summary": "Exit at Orient Heights Station. Take a Bowdoin train back to Wood Island.",
+    "summary": null
   },
   "891": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator at 101 Arch St (101 Arch St to Summer St concourse)"
   },
   "892": {
     "alternate_ids": [
       "804"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Park St Elevator 804 at Tremont St & Winter St."
   },
   "896": {
     "alternate_ids": [
@@ -961,28 +1096,32 @@
       "831"
     ],
     "category": 5,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": null
   },
   "897": {
     "alternate_ids": [
       "900"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "At the street level, travel across the parking lot to the south lobby/busway. At the south lobby, use North Quincy Elevator 900 to reach the platform."
   },
   "898": {
     "alternate_ids": [
       "900"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use North Quincy Elevator 900 in the main lobby."
   },
   "899": {
     "alternate_ids": [
       "900"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevator 900 (platform to south lobby)."
   },
   "900": {
     "alternate_ids": [
@@ -991,7 +1130,8 @@
       "899"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevators 899 & 897 (north lobby)."
   },
   "901": {
     "alternate_ids": [
@@ -1000,7 +1140,8 @@
       "919"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "903": {
     "alternate_ids": [
@@ -1011,7 +1152,8 @@
       "908"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "904": {
     "alternate_ids": [
@@ -1022,7 +1164,8 @@
       "908"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "905": {
     "alternate_ids": [
@@ -1033,7 +1176,8 @@
       "908"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "906": {
     "alternate_ids": [
@@ -1044,7 +1188,8 @@
       "908"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "907": {
     "alternate_ids": [
@@ -1055,7 +1200,8 @@
       "908"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "908": {
     "alternate_ids": [
@@ -1066,7 +1212,8 @@
       "903"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "909": {
     "alternate_ids": [
@@ -1074,7 +1221,8 @@
       "731"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use North Station Elevator 912 (lobby to Causeway St)."
   },
   "910": {
     "alternate_ids": [
@@ -1084,7 +1232,8 @@
       "907"
     ],
     "category": 3,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": null
   },
   "911": {
     "alternate_ids": [
@@ -1094,7 +1243,8 @@
       "907"
     ],
     "category": 3,
-    "summary": "Exit at Community College Station. Take Forest Hills train back to North Station."
+    "exiting_summary": "Exit at Community College Station. Take Forest Hills train back to North Station.",
+    "summary": null
   },
   "912": {
     "alternate_ids": [
@@ -1104,7 +1254,8 @@
       ""
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use North Station Elevator 731 (passageway to Causeway St)."
   },
   "913": {
     "alternate_ids": [
@@ -1112,7 +1263,8 @@
       "925"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Aquarium Elev 924 (Wonderland platform to Atlantic Ave lobby)."
   },
   "914": {
     "alternate_ids": [
@@ -1120,7 +1272,8 @@
       "925"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Aquarium Elev 923 (Bowdoin platform to Atlantic Ave lobby)."
   },
   "915": {
     "alternate_ids": [
@@ -1129,12 +1282,14 @@
       "925"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Aquarium Elevator 925 (Atlantic Ave lobby to street)."
   },
   "917": {
     "alternate_ids": [],
     "category": 4,
-    "summary": "Exit at Northeastern. Take a Route 39 bus to Prudential. "
+    "exiting_summary": "Exit at Northeastern. Take a Route 39 bus to Prudential. ",
+    "summary": "Take route 39 bus to/from Northeastern."
   },
   "918": {
     "alternate_ids": [
@@ -1143,7 +1298,8 @@
       "919"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "919": {
     "alternate_ids": [
@@ -1151,7 +1307,8 @@
       "901"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elevators 901 (Silver Line to lobby) and 927 (platform to Silver Line)."
   },
   "920": {
     "alternate_ids": [
@@ -1161,7 +1318,8 @@
       "976"
     ],
     "category": 3,
-    "summary": "Exit at Northeastern Station. Take a Medford/Tufts train back to Prudential."
+    "exiting_summary": "Exit at Northeastern Station. Take a Medford/Tufts train back to Prudential.",
+    "summary": null
   },
   "921": {
     "alternate_ids": [
@@ -1171,7 +1329,8 @@
       "976"
     ],
     "category": 3,
-    "summary": "Exit at Copley Station. Take a Heath St train back to Prudential."
+    "exiting_summary": "Exit at Copley Station. Take a Heath St train back to Prudential.",
+    "summary": null
   },
   "922": {
     "alternate_ids": [
@@ -1181,7 +1340,8 @@
       "859"
     ],
     "category": 3,
-    "summary": "Exit at Tufts Medical Center Station. Take an Oak Grove train back to Chinatown."
+    "exiting_summary": "Exit at Tufts Medical Center Station. Take an Oak Grove train back to Chinatown.",
+    "summary": null
   },
   "923": {
     "alternate_ids": [
@@ -1189,7 +1349,8 @@
       "915"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Aquarium Elevator 914 (Bowdoin platform to State St lobby)."
   },
   "924": {
     "alternate_ids": [
@@ -1197,7 +1358,8 @@
       "915"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Aquarium Elevator 913 (Wonderland platform to State St lobby)."
   },
   "925": {
     "alternate_ids": [
@@ -1206,7 +1368,8 @@
       "915"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Aquarium Elevator 915 (State St lobby to street)."
   },
   "926": {
     "alternate_ids": [
@@ -1214,7 +1377,8 @@
       "6476"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use South Station Elevator 949 (lobby to Dewey Sq)."
   },
   "927": {
     "alternate_ids": [
@@ -1222,26 +1386,30 @@
       "918"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use South Station Elevators 918 and 919."
   },
   "928": {
     "alternate_ids": [],
     "category": 5,
-    "summary": "Request assistance from conductor."
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please contact station personnel or conductor for alternative service."
   },
   "929": {
     "alternate_ids": [
       "930"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Lynn Parking Garage Elevator 930."
   },
   "930": {
     "alternate_ids": [
       "929"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Lynn Parking Garage Elevator 929."
   },
   "931": {
     "alternate_ids": [
@@ -1249,7 +1417,8 @@
       "955"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "932": {
     "alternate_ids": [
@@ -1257,7 +1426,8 @@
       "956"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "933": {
     "alternate_ids": [
@@ -1265,7 +1435,8 @@
       "881"
     ],
     "category": 4,
-    "summary": "Exit at Sullivan Station. Request shuttle bus back to Community College."
+    "exiting_summary": "Exit at Sullivan Station. Request shuttle bus back to Community College.",
+    "summary": "Use shuttle to/from Sullivan."
   },
   "934": {
     "alternate_ids": [
@@ -1274,7 +1445,8 @@
       "927"
     ],
     "category": 3,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": null
   },
   "935": {
     "alternate_ids": [
@@ -1283,7 +1455,8 @@
       "938"
     ],
     "category": 3,
-    "summary": "Exit at Courthouse. Take an outbound SL bus to World Trade Center."
+    "exiting_summary": "Exit at Courthouse. Take an outbound SL bus to World Trade Center.",
+    "summary": null
   },
   "936": {
     "alternate_ids": [
@@ -1292,7 +1465,8 @@
       "938"
     ],
     "category": 3,
-    "summary": "Exit at Silver Line Way. Take an inbound SL bus back to World Trade Center."
+    "exiting_summary": "Exit at Silver Line Way. Take an inbound SL bus back to World Trade Center.",
+    "summary": null
   },
   "937": {
     "alternate_ids": [
@@ -1305,7 +1479,8 @@
       "927"
     ],
     "category": 3,
-    "summary": "Exit at South Station. Take an outbound SL bus to Courthouse."
+    "exiting_summary": "Exit at South Station. Take an outbound SL bus to Courthouse.",
+    "summary": null
   },
   "938": {
     "alternate_ids": [
@@ -1318,21 +1493,24 @@
       "927"
     ],
     "category": 3,
-    "summary": "Exit at World Trade Center Station. Take an inbound SL bus to Courthouse."
+    "exiting_summary": "Exit at World Trade Center Station. Take an inbound SL bus to Courthouse.",
+    "summary": null
   },
   "939": {
     "alternate_ids": [
       "940"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Courthouse Elevator 940 (Lobby to Seaport Boulevard, Fan Pier Boulevard)."
   },
   "940": {
     "alternate_ids": [
       "939"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Courthouse Elevator 939 (Lobby to Seaport Boulevard, Thomson Place)."
   },
   "944": {
     "alternate_ids": [
@@ -1342,7 +1520,8 @@
       "732"
     ],
     "category": 5,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": "Please see station personnel or conductor for assistance."
   },
   "945": {
     "alternate_ids": [
@@ -1350,7 +1529,8 @@
       "801"
     ],
     "category": 4,
-    "summary": "Exit at Oak Grove Station. Request shuttle bus back to Malden Center."
+    "exiting_summary": "Exit at Oak Grove Station. Request shuttle bus back to Malden Center.",
+    "summary": "Use shuttle bus to/from Oak Grove."
   },
   "946": {
     "alternate_ids": [
@@ -1358,19 +1538,22 @@
       "830"
     ],
     "category": 4,
-    "summary": "Exit at JFK/UMass Station. Request shuttle bus back to Savin Hill."
+    "exiting_summary": "Exit at JFK/UMass Station. Request shuttle bus back to Savin Hill.",
+    "summary": "Use shuttle bus to/from JFK/UMass."
   },
   "947": {
     "alternate_ids": [],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use main entrance on Savin Hill Ave."
   },
   "948": {
     "alternate_ids": [
       "972"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Kenmore Elevator 972 at the Kenmore busway."
   },
   "949": {
     "alternate_ids": [
@@ -1378,7 +1561,8 @@
       "6476"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use South Station Elevator 926 (lobby to Atlantic Ave, Summer St)."
   },
   "951": {
     "alternate_ids": [
@@ -1387,7 +1571,8 @@
       "863"
     ],
     "category": 3,
-    "summary": "Exit at Park St Station. Take an Alewife train back to Charles/MGH."
+    "exiting_summary": "Exit at Park St Station. Take an Alewife train back to Charles/MGH.",
+    "summary": null
   },
   "952": {
     "alternate_ids": [
@@ -1396,7 +1581,8 @@
       "863"
     ],
     "category": 3,
-    "summary": "Exit at Kendall/MIT Station. Take an Ashmont/Braintree train back to Charles/MGH."
+    "exiting_summary": "Exit at Kendall/MIT Station. Take an Ashmont/Braintree train back to Charles/MGH.",
+    "summary": null
   },
   "953": {
     "alternate_ids": [
@@ -1408,7 +1594,8 @@
       "970"
     ],
     "category": 3,
-    "summary": "Exit at Fields Corner Station. Take an Ashmont train back to Shawmut."
+    "exiting_summary": "Exit at Fields Corner Station. Take an Ashmont train back to Shawmut.",
+    "summary": null
   },
   "954": {
     "alternate_ids": [
@@ -1420,7 +1607,8 @@
       "970"
     ],
     "category": 3,
-    "summary": "Exit at Ashmont Station. Take an Alewife train back to Shawmut."
+    "exiting_summary": "Exit at Ashmont Station. Take an Alewife train back to Shawmut.",
+    "summary": null
   },
   "955": {
     "alternate_ids": [
@@ -1428,7 +1616,8 @@
       "931"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "956": {
     "alternate_ids": [
@@ -1436,7 +1625,8 @@
       "932"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "957": {
     "alternate_ids": [
@@ -1445,7 +1635,8 @@
       "954"
     ],
     "category": 3,
-    "summary": "Exit at Savin Hill Station. Take an Ashmont train back to Fields Corner."
+    "exiting_summary": "Exit at Savin Hill Station. Take an Ashmont train back to Fields Corner.",
+    "summary": null
   },
   "958": {
     "alternate_ids": [
@@ -1454,14 +1645,16 @@
       "957"
     ],
     "category": 3,
-    "summary": "Exit at Shawmut Station. Take an Alewife train back to Fields Corner."
+    "exiting_summary": "Exit at Shawmut Station. Take an Alewife train back to Fields Corner.",
+    "summary": null
   },
   "961": {
     "alternate_ids": [
       "813"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Alewife Elevator 813 (platform to main lobby)."
   },
   "962": {
     "alternate_ids": [
@@ -1472,7 +1665,8 @@
       "977"
     ],
     "category": 3,
-    "summary": "Exit at Copley Station. Take a Park St & North train back to Arlington."
+    "exiting_summary": "Exit at Copley Station. Take a Park St & North train back to Arlington.",
+    "summary": null
   },
   "963": {
     "alternate_ids": [
@@ -1483,7 +1677,8 @@
       "977"
     ],
     "category": 3,
-    "summary": "Exit at Park St Station. Take a westbound train back to Arlington."
+    "exiting_summary": "Exit at Park St Station. Take a westbound train back to Arlington.",
+    "summary": null
   },
   "964": {
     "alternate_ids": [
@@ -1491,21 +1686,24 @@
       "977"
     ],
     "category": 4,
-    "summary": "Exit at Copley Station. Request shuttle bus back to Arlington."
+    "exiting_summary": "Exit at Copley Station. Request shuttle bus back to Arlington.",
+    "summary": "Use shuttle bus to/from Copley."
   },
   "965": {
     "alternate_ids": [
       "966"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Maverick Elevator 966 (platform to Lewis Courtyard)."
   },
   "966": {
     "alternate_ids": [
       "965"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Maverick Elevator 965 (platform to Maverick Sq)."
   },
   "967": {
     "alternate_ids": [
@@ -1514,26 +1712,30 @@
       "802"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby State Street Elevator 802. "
   },
   "968": {
     "alternate_ids": [
       "969"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Ashmont Elevator 969 located in the busway lobby."
   },
   "969": {
     "alternate_ids": [
       "968"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use Ashmont Elevator 968 located in the Peabody Sq lobby."
   },
   "970": {
     "alternate_ids": [],
     "category": 5,
-    "summary": "Request assistance to exit."
+    "exiting_summary": "Request assistance to exit.",
+    "summary": "See a station personnel or use a station call box to request help"
   },
   "971": {
     "alternate_ids": [
@@ -1543,7 +1745,8 @@
       "977"
     ],
     "category": 3,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": null
   },
   "972": {
     "alternate_ids": [
@@ -1553,14 +1756,16 @@
       "976"
     ],
     "category": 3,
-    "summary": "Exit at Copley Station. Take a Kenmore & West train back to Kenmore."
+    "exiting_summary": "Exit at Copley Station. Take a Kenmore & West train back to Kenmore.",
+    "summary": null
   },
   "973": {
     "alternate_ids": [
       "821"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Harvard Elevator 821 (lobby to JFK St, Brattle St, & Mass Ave)."
   },
   "974": {
     "alternate_ids": [
@@ -1569,7 +1774,8 @@
       "802"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use State Elevator 975 (Wonderland platform to 53 State St)."
   },
   "975": {
     "alternate_ids": [
@@ -1578,7 +1784,8 @@
       "802"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use State Elevator 974 (Bowdoin platform to 60 State St)."
   },
   "976": {
     "alternate_ids": [
@@ -1589,7 +1796,8 @@
       "971"
     ],
     "category": 3,
-    "summary": "Exit at Arlington Station. Take a westbound train back to Copley."
+    "exiting_summary": "Exit at Arlington Station. Take a westbound train back to Copley.",
+    "summary": null
   },
   "977": {
     "alternate_ids": [
@@ -1602,7 +1810,8 @@
       "971"
     ],
     "category": 3,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": null
   },
   "978": {
     "alternate_ids": [
@@ -1614,7 +1823,8 @@
       "979"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": null
   },
   "979": {
     "alternate_ids": [
@@ -1622,104 +1832,128 @@
       "804"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use Elev 808 (Red Line to lobby) & Elev 804 (lobby to Tremont St)."
   },
   "980": {
     "alternate_ids": [
       "981"
     ],
     "category": 3,
-    "summary": "Exit at North Station. Take a Lechmere & North train back to Science Park/West End."
+    "exiting_summary": "Exit at North Station. Take a Lechmere & North train back to Science Park/West End.",
+    "summary": null
   },
   "981": {
     "alternate_ids": [
       "980"
     ],
     "category": 3,
-    "summary": "Exit at Lechmere Station. Take a Copley & West  train back to Science Park/West End."
+    "exiting_summary": "Exit at Lechmere Station. Take a Copley & West  train back to Science Park/West End.",
+    "summary": null
   },
   "982": {
     "alternate_ids": [
       "985"
     ],
     "category": 2,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Porter Elevator 985 (lobby to Somerville Ave)."
   },
   "983": {
     "alternate_ids": [
       "987"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Porter Elevator 987 (Red Line platforms to lobby)."
   },
   "985": {
     "alternate_ids": [
       "982"
     ],
     "category": 2,
-    "summary": "Accessible route available"
+    "exiting_summary": "Accessible route available",
+    "summary": "Use nearby Porter Elevator 982 (lobby to Somerville Ave and Mass Ave."
   },
   "986": {
     "alternate_ids": [
       "896"
     ],
     "category": 5,
-    "summary": "Visit mbta.com/elevators for more info."
+    "exiting_summary": "Visit mbta.com/elevators for more info.",
+    "summary": null
   },
   "987": {
     "alternate_ids": [
       "983"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Porter Elevator 983 (Red Line platform to lobby)."
   },
   "990": {
-    "alternate_ids": [],
-    "category": 100,
-    "summary": "Request assistance from conductor."
+    "alternate_ids": [
+      "991"
+    ],
+    "category": 1,
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please nearby Landsdowne Elevator 991."
   },
   "991": {
-    "alternate_ids": [],
-    "category": 100,
-    "summary": "Request assistance from conductor."
+    "alternate_ids": [
+      "990"
+    ],
+    "category": 1,
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please nearby Landsdowne Elevator 990."
   },
   "992": {
-    "alternate_ids": [],
-    "category": 100,
-    "summary": "Request assistance from conductor."
+    "alternate_ids": [
+      "993"
+    ],
+    "category": 1,
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please nearby Landsdowne Elevator 993."
   },
   "993": {
-    "alternate_ids": [],
-    "category": 100,
-    "summary": "Request assistance from conductor."
+    "alternate_ids": [
+      "992"
+    ],
+    "category": 1,
+    "exiting_summary": "Request assistance from conductor.",
+    "summary": "Please nearby Landsdowne Elevator 992."
   },
   "994": {
     "alternate_ids": [
       "995"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Beverly Elevator 995."
   },
   "995": {
     "alternate_ids": [
       "994"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Beverly Elevator 994."
   },
   "996": {
     "alternate_ids": [
       "997"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Salem Elevator 997."
   },
   "997": {
     "alternate_ids": [
       "996"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Salem Elevator 996."
   },
   "998": {
     "alternate_ids": [
@@ -1727,7 +1961,8 @@
       "869"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Downtown Crossing Elevator 999."
   },
   "999": {
     "alternate_ids": [
@@ -1735,6 +1970,7 @@
       "869"
     ],
     "category": 1,
-    "summary": "Alternative elevator available at station"
+    "exiting_summary": "Alternative elevator available at station",
+    "summary": "Use nearby Downtown Crossing Elevator 998."
   }
 }

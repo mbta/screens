@@ -55,7 +55,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ElevatorClosuresTest do
 
   #### HELPER FUNCTIONS
   defp build_elevator(id, fields \\ []) do
-    struct!(%Elevator{id: id, alternate_ids: [], exiting_summary: "", redundancy: :other}, fields)
+    struct!(
+      %Elevator{id: id, alternate_ids: [], exiting_summary: "", redundancy: :other, summary: nil},
+      fields
+    )
   end
 
   defp build_facility(id, fields \\ []) do
