@@ -252,7 +252,7 @@ const getRoutePillObject = (
   section: Section,
   color: LineColor,
 ): SubwayStatusPill => {
-  // If there is only one alert, see if there are any branches that should be added 
+  // If there is only one alert, see if there are any branches that should be added
   // to the route pill. If no branches exist, the pill will be rendered with no branches.
   if (isContractedWith1Alert(section)) {
     return {
