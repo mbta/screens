@@ -6,6 +6,9 @@ import OrangeLine from "Images/pills/orange-line.svg";
 import OL from "Images/pills/ol.svg";
 import RedLine from "Images/pills/red-line.svg";
 import RL from "Images/pills/rl.svg";
+import RLM from "Images/pills/rl-m.svg";
+import RedLineM from "Images/pills/red-line-m.svg";
+import RedMCircle from "Images/pills/red-m-circle.svg";
 import CommuterRail from "Images/pills/commuter-rail.svg";
 // GL Branches
 import GLB from "Images/pills/gl-b.svg";
@@ -47,6 +50,9 @@ export const STRING_TO_SVG: { [key: string]: any } = {
   ol: OL,
   "red-line": RedLine,
   rl: RL,
+  "rl-m": RLM,
+  "red-line-m": RedLineM,
+  "red-m-circle": RedMCircle,
   "commuter-rail": CommuterRail,
   // Green line branches
   "gl-b": GLB,

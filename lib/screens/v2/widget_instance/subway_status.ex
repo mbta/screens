@@ -78,12 +78,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     "Green-C" => ["Westbound", "Eastbound"],
     "Green-D" => ["Westbound", "Eastbound"],
     "Green-E" => ["Westbound", "Eastbound"],
-    "Green" => ["Westbound", "Eastbound"]
+    "Green" => ["Westbound", "Eastbound"],
+    "Mattapan" => ["Outbound", "Inbound"]
   }
 
   @subway_routes Map.keys(@route_directions)
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
+  @red_line_branches ["Mattapan"]
+
   @green_line_route_ids ["Green" | @green_line_branches]
 
   @mbta_alerts_url "mbta.com/alerts"
@@ -174,7 +177,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{
       blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
       orange: serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
-      red: serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count),
+      red: serialize_red_line(grouped_alerts, total_alert_count),
       green: serialize_green_line(grouped_alerts, total_alert_count)
     }
   end
@@ -190,7 +193,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           blue: serialize_single_alert_row_for_route(grouped_alerts, "Blue", total_alert_count),
           orange:
             serialize_single_alert_row_for_route(grouped_alerts, "Orange", total_alert_count),
-          red: serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count),
+          red: serialize_red_line(grouped_alerts, total_alert_count),
           green: serialize_green_line(grouped_alerts, total_alert_count)
         }
 
@@ -204,7 +207,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           %{
             blue: serialize_multiple_alert_rows_for_route(grouped_alerts, "Blue"),
             orange: serialize_multiple_alert_rows_for_route(grouped_alerts, "Orange"),
-            red: serialize_multiple_alert_rows_for_route(grouped_alerts, "Red"),
+            red: serialize_red_line(grouped_alerts, total_alert_count),
             green: serialize_green_line(grouped_alerts, total_alert_count)
           }
         else
@@ -291,6 +294,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     %{type: :text, color: :green, text: "GL", branches: branches}
   end
 
+  defp serialize_rl_mattapan_pill do
+    %{type: :text, color: :red, text: "RL", branches: [:m]}
+  end
+
   defp alert_is_whole_route?(informed_entities) do
     Enum.any?(informed_entities, &InformedEntity.whole_route?/1)
   end
@@ -345,7 +352,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   defp get_location(informed_entities, route_id) do
     cond do
       alert_is_whole_route?(informed_entities) ->
-        "Entire line"
+        case route_id do
+          "Mattapan" -> "Entire Mattapan line"
+          _ -> "Entire line"
+        end
 
       alert_is_whole_direction?(informed_entities) ->
         get_direction(informed_entities, route_id)
@@ -752,6 +762,154 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
   end
 
+  # Red Line with Mattapan branch serialization
+  def serialize_red_line(grouped_alerts, total_alert_count) do
+    red_line_alerts = Map.get(grouped_alerts, "Red", [])
+    mattapan_alerts = Map.get(grouped_alerts, "Mattapan", [])
+
+    green_line_alert_count =
+      @green_line_branches
+      |> Enum.flat_map(fn route -> Map.get(grouped_alerts, route, []) end)
+      |> Enum.uniq()
+      |> Enum.count()
+
+    red_alert_count = length(red_line_alerts)
+    mattapan_alert_count = length(mattapan_alerts)
+
+    cond do
+      # No alerts for either Red Line or Mattapan
+      red_alert_count == 0 and mattapan_alert_count == 0 ->
+        serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count)
+
+      # Alert for Red Line but not Mattapan
+      red_alert_count > 0 and mattapan_alert_count == 0 ->
+        serialize_single_alert_row_for_route(grouped_alerts, "Red", total_alert_count)
+
+      # Alert for Mattapan but not Red Line
+      red_alert_count == 0 and mattapan_alert_count > 0 ->
+        serialize_red_line_with_mattapan(mattapan_alerts, total_alert_count)
+
+      # Alerts for both Red Line and Mattapan
+      red_alert_count > 0 and mattapan_alert_count > 0 ->
+        serialize_red_line_with_both_alerts(
+          red_line_alerts,
+          mattapan_alerts,
+          green_line_alert_count
+        )
+    end
+  end
+
+  defp serialize_red_line_with_mattapan(mattapan_alerts, total_alert_count) do
+    case mattapan_alerts do
+      [alert] ->
+        serialized_alert = serialize_red_line_branch_alert(alert)
+
+        if total_alert_count < 3 do
+          %{type: :extended, alert: serialized_alert}
+        else
+          %{type: :contracted, alerts: [serialized_alert]}
+        end
+
+      [alert1, alert2] ->
+        if total_alert_count < 3 do
+          %{
+            type: :contracted,
+            alerts: [
+              serialize_red_line_branch_alert(alert1),
+              serialize_red_line_branch_alert(alert2)
+            ]
+          }
+        else
+          %{
+            type: :contracted,
+            alerts: [
+              serialize_alert_summary(
+                length(mattapan_alerts),
+                serialize_rl_mattapan_pill()
+              )
+            ]
+          }
+        end
+
+      _alerts ->
+        alert_count = length(mattapan_alerts)
+
+        %{
+          type: :contracted,
+          alerts: [
+            serialize_alert_summary(
+              alert_count,
+              serialize_rl_mattapan_pill()
+            )
+          ]
+        }
+    end
+  end
+
+  defp serialize_red_line_with_both_alerts(
+         red_line_alerts,
+         mattapan_alerts,
+         green_line_alert_count
+       ) do
+    rl_alert_count = length(red_line_alerts)
+    mattapan_alert_count = length(mattapan_alerts)
+
+    if green_line_alert_count > 1 do
+      # If 2 or more GL alerts, consolidate the RL and mattapan alerts to one row
+      %{
+        type: :contracted,
+        alerts: [
+          serialize_alert_summary(
+            rl_alert_count + mattapan_alert_count,
+            serialize_rl_mattapan_pill()
+          )
+        ]
+      }
+    else
+      # If there is enough space for RL and Mattapan to take up two rows,
+      # then we show a row for each. Show a summary of total alerts if
+      # there is more than one alert for either RL or Mattapan.
+      serialized_rl_alert =
+        case red_line_alerts do
+          [rl_alert] ->
+            serialize_alert_with_route_pill(rl_alert, "Red")
+
+          _rl_alerts ->
+            serialize_alert_summary(
+              rl_alert_count,
+              serialize_route_pill("Red")
+            )
+        end
+
+      serialized_mattapan_alert =
+        case mattapan_alerts do
+          [mattapan_alert] ->
+            serialize_red_line_branch_alert(mattapan_alert)
+
+          _mattapan_alerts ->
+            serialize_alert_summary(
+              mattapan_alert_count,
+              serialize_rl_mattapan_pill()
+            )
+        end
+
+      %{
+        type: :contracted,
+        alerts: [
+          serialized_rl_alert,
+          serialized_mattapan_alert
+        ]
+      }
+    end
+  end
+
+  defp serialize_red_line_branch_alert(alert) do
+    Map.merge(
+      %{route_pill: serialize_rl_mattapan_pill()},
+      serialize_alert(alert, "Mattapan")
+    )
+  end
+
   defp get_stop_name_with_platform(informed_entities, [platform_name], route_id) do
     # Although it is possible to create a closure alert for multiple partial stations,
     # we pass along platform info only if a single platform is closed at that station.
@@ -863,7 +1021,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       informed_entities
       |> Enum.map(fn %{route: route} -> route end)
       |> Enum.filter(fn e ->
-        Enum.member?(["Red", "Orange", "Green", "Blue"] ++ @green_line_branches, e)
+        Enum.member?(
+          ["Red", "Orange", "Green", "Blue"] ++ @green_line_branches ++ @red_line_branches,
+          e
+        )
       end)
       |> Enum.uniq()
 

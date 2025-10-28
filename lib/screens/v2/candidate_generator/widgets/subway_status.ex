@@ -10,7 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
         now \\ DateTime.utc_now(),
         fetch_subway_platforms_for_stop_fn \\ &Stop.fetch_subway_platforms_for_stop/1
       ) do
-    route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E"]
+    route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E", "Mattapan"]
 
     {:ok, alerts} = Screens.Alerts.Alert.fetch(route_ids: route_ids)
 

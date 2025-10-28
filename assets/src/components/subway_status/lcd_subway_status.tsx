@@ -5,7 +5,7 @@ import {
   Alert,
   ContractedSection,
   ExtendedSection,
-  GLMultiPill,
+  MultiPill,
   Section,
   SubwayStatusData,
   SubwayStatusPill,
@@ -15,7 +15,7 @@ import {
   isContracted,
   isContractedWith1Alert,
   isExtended,
-  isGLMultiPill,
+  isMultiPill,
   useSubwayStatusTextResizer,
   FittingStep,
 } from "./subway_status_common";
@@ -228,9 +228,14 @@ const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
 const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
   routePill,
 }) => {
-  if (isGLMultiPill(routePill)) {
+  if (isMultiPill(routePill)) {
     const sortedUniqueBranches = Array.from(new Set(routePill.branches)).sort();
-    return <GLBranchPillGroup branches={sortedUniqueBranches} />;
+    return (
+      <BranchPillGroup
+        color={routePill.color}
+        branches={sortedUniqueBranches}
+      />
+    );
   } else {
     const LinePill = STRING_TO_SVG[`${routePill.color[0]}l`];
     return (
@@ -239,21 +244,24 @@ const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
   }
 };
 
-const GLBranchPillGroup: ComponentType<Pick<GLMultiPill, "branches">> = ({
+const BranchPillGroup: ComponentType<Pick<MultiPill, "branches" | "color">> = ({
+  color,
   branches: [firstBranch, ...rest],
 }) => {
-  const ComboLinePill = STRING_TO_SVG[`gl-${firstBranch}`];
+  // Determine the line prefix based on color
+  const linePrefix = color === "green" ? "gl" : color === "red" ? "rl" : color;
+  const ComboLinePill = STRING_TO_SVG[`${linePrefix}-${firstBranch}`];
 
   return (
     <>
-      <ComboLinePill width="203" height="74" color={getHexColor("green")} />
+      <ComboLinePill width="203" height="74" color={getHexColor(color)} />
       {rest.map((branch) => {
-        const BranchPill = STRING_TO_SVG[`green-${branch}-circle`];
+        const BranchPill = STRING_TO_SVG[`${color}-${branch}-circle`];
         return (
           <BranchPill
             width="74"
             height="74"
-            color={getHexColor("green")}
+            color={getHexColor(color)}
             className="branch-icon"
             key={branch}
           />
