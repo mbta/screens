@@ -5,8 +5,10 @@ defmodule Screens.LogScreenData do
   alias Screens.Util
   alias ScreensConfig.Screen
 
-  def log_page_load(screen_id, is_screen, screen_side \\ nil) do
-    if is_screen do
+  def log_page_load(screen_id, params) do
+    screen_side = params["screen_side"]
+
+    if real_screen?(params) do
       data =
         %{screen_id: screen_id, screen_name: screen_name_for_id(screen_id)}
         |> insert_screen_side(screen_side)
@@ -18,12 +20,11 @@ defmodule Screens.LogScreenData do
   def log_data_request(
         screen_id,
         last_refresh,
-        is_screen,
         params
       ) do
     requestor = params["requestor"]
 
-    if is_screen or not is_nil(requestor) do
+    if real_screen?(params) or not is_nil(requestor) do
       screen_side = params["screen_side"]
       rotation_index = params["rotation_index"]
       ofm_app_package_version = params["version"]
@@ -43,8 +44,8 @@ defmodule Screens.LogScreenData do
     end
   end
 
-  def log_audio_request(screen_id, is_screen) do
-    if is_screen do
+  def log_audio_request(screen_id, params) do
+    if real_screen?(params) do
       data = %{
         screen_id: screen_id,
         screen_name: screen_name_for_id(screen_id)
@@ -64,24 +65,25 @@ defmodule Screens.LogScreenData do
     log_message("[screen frontend error]", data)
   end
 
-  def log_api_response(response, screen_id, last_refresh, is_screen, screen_side \\ nil)
+  def log_api_response(response, screen_id, last_refresh, params)
 
   def log_api_response(
         %{status: status},
         screen_id,
         last_refresh,
-        is_screen,
-        screen_side
+        params
       ) do
-    log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side)
+    log_api_response_success(screen_id, last_refresh, params, status)
   end
 
-  def log_api_response(status, screen_id, last_refresh, is_screen, screen_side) do
-    log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side)
+  def log_api_response(status, screen_id, last_refresh, params) do
+    log_api_response_success(screen_id, last_refresh, params, status)
   end
 
-  defp log_api_response_success(screen_id, last_refresh, is_screen, status, screen_side) do
-    if is_screen do
+  defp log_api_response_success(screen_id, last_refresh, params, status) do
+    screen_side = params["screen_side"]
+
+    if real_screen?(params) do
       data =
         %{
           screen_id: screen_id,
@@ -138,4 +140,7 @@ defmodule Screens.LogScreenData do
 
   defp insert_version(data, nil), do: data
   defp insert_version(data, version), do: Map.put(data, :ofm_app_package_version, version)
+
+  defp real_screen?(%{"is_real_screen" => "true"}), do: true
+  defp real_screen?(_), do: false
 end
