@@ -4,8 +4,8 @@ defmodule Screens.Elevator.Closure do
   """
 
   alias Screens.Alerts.Alert
-  alias Screens.Facilities.Facility
   alias Screens.{Elevator, Report}
+  alias Screens.Facilities.Facility
 
   import Screens.Inject
   @elevator injected(Elevator)
