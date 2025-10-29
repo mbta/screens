@@ -79,7 +79,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     "Green-D" => ["Westbound", "Eastbound"],
     "Green-E" => ["Westbound", "Eastbound"],
     "Green" => ["Westbound", "Eastbound"],
-    "Mattapan" => ["Southbound", "Northbound"]
+    "Mattapan" => ["Outbound", "Inbound"]
   }
 
   @subway_routes Map.keys(@route_directions)
