@@ -8,9 +8,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
-  alias ScreensConfig.Departures.Filters.RouteDirections
-  alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
   alias ScreensConfig.Departures.{Filters, Query, Section}
+  alias ScreensConfig.Departures.Filters.{RouteDirections, RouteDirections.RouteDirection}
   alias ScreensConfig.Screen.{BusEink, BusShelter, Busway, GlEink, PreFare}
 
   @type options :: [
