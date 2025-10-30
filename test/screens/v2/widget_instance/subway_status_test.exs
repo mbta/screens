@@ -1334,8 +1334,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %{
               route_pill: @gl_pill,
               status: "Stop Skipped",
-              location: %{abbrev: "mbta.com/alerts", full: "mbta.com/alerts"},
-              station_count: 1
+              location: %{
+                abbrev: "Government Center (1 side only)",
+                full: "Government Center: North Station & North platform closed"
+              }
             }
           }
       }

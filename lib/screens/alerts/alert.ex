@@ -416,7 +416,9 @@ defmodule Screens.Alerts.Alert do
   def informed_parent_stations(%__MODULE__{
         informed_entities: informed_entities
       }) do
-    Enum.filter(informed_entities, &InformedEntity.parent_station?/1)
+    informed_entities
+    |> Enum.filter(&InformedEntity.parent_station?/1)
+    |> Enum.uniq_by(& &1.stop)
   end
 
   @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::

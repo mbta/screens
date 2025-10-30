@@ -1145,7 +1145,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert %{issue: "No trains"} = widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "partial platform closure at home station", %{widget: widget} do
+    test "partial platform closure at home station, multiple platforms", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-portr")
@@ -1190,7 +1190,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "downstream partial platform closure", %{widget: widget} do
+    test "partial platform closure at other station, multiple platforms", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-asmnl")
@@ -1232,6 +1232,88 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert expected == ReconstructedAlert.serialize(widget)
 
       assert %{issue: "Skipping 2 platforms at Malden Center"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+    end
+
+    test "partial platform closure for here", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-jaksn")
+        |> put_effect(:station_closure)
+        |> put_informed_station_names(["Jackson Square"])
+        |> put_informed_entities([
+          ie(stop: "place-jaksn", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_alert_header("Some information typed into the alert")
+        |> put_routes_at_stop([
+          %{
+            route_id: "Orange",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+        |> put_partial_closure_platform_names(["Forest Hills"])
+
+      expected = %{
+        issue: "Forest Hills platform closed",
+        remedy: "Some information typed into the alert",
+        cause: nil,
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        effect: :station_closure,
+        updated_at: "Friday, 5:00 am",
+        region: :here,
+        stations: ["Jackson Square"]
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Forest Hills platform closed"} =
+               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+    end
+
+    test "partial platform closure for other station", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-mlmnl")
+        |> put_effect(:station_closure)
+        |> put_informed_station_names(["Jackson Square"])
+        |> put_informed_entities([
+          ie(stop: "place-jaksn", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_alert_header("Some information typed into the alert")
+        |> put_routes_at_stop([
+          %{
+            route_id: "Orange",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+        |> put_partial_closure_platform_names(["Forest Hills"])
+
+      expected = %{
+        issue: "Jackson Square: Trains skip Forest Hills platform",
+        remedy: "Some information typed into the alert",
+        cause: nil,
+        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        effect: :station_closure,
+        updated_at: "Friday, 5:00 am",
+        region: :outside,
+        stations: ["Jackson Square"]
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+
+      assert %{issue: "Jackson Square: Trains skip Forest Hills platform"} =
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
@@ -1823,7 +1905,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
-    test "platform closure", %{widget: widget} do
+    test "single platform closure", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-asmnl")
@@ -1840,7 +1922,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree"])
 
       expected = %{
-        issue: "Skipping Ashmont/Braintree platform at Porter",
+        issue: "Porter: Trains skip Ashmont/Braintree platform",
         location: "",
         cause: nil,
         routes: [

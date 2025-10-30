@@ -157,19 +157,7 @@
   }
 
   .alert-card__fallback__alert-text {
-    font-size: 68px;
-    font-weight: 500;
-    line-height: 81px;
-
-    &--medium,
-    &--small {
-      max-height: 460px;
-    }
-
-    &--small {
-      font-size: 55.1px;
-      line-height: 65.63px;
-    }
+    max-height: 460px;
 
     &--bold {
       font-weight: 700;
