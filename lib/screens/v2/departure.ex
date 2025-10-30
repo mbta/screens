@@ -173,6 +173,16 @@ defmodule Screens.V2.Departure do
     identify_stop_type_from_times(arrival_time, departure_time)
   end
 
+  # When a prediction has null times, the "relevant" times will be those of the schedule (e.g.
+  # for a skipped stop, the time the vehicle originally would have made the stop). Also accounts
+  # for `:scheduled` Commuter Rail predictions sometimes being published with null times.
+  def time(%__MODULE__{
+        prediction: %Prediction{arrival_time: nil, departure_time: nil},
+        schedule: s
+      }) do
+    select_arrival_time(s)
+  end
+
   def time(%__MODULE__{prediction: p}) when not is_nil(p) do
     select_arrival_time(p)
   end

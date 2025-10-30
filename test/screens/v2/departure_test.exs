@@ -347,6 +347,14 @@ defmodule Screens.V2.DepartureTest do
 
       assert ~U[2020-02-01T00:00:00Z] == Departure.time(departure)
     end
+
+    test "returns time from schedule for a nil/nil prediction" do
+      schedule = %Schedule{arrival_time: ~U[2020-02-01T00:00:00Z]}
+      prediction = %Prediction{arrival_time: nil, departure_time: nil}
+      departure = %Departure{prediction: prediction, schedule: schedule}
+
+      assert ~U[2020-02-01T00:00:00Z] == Departure.time(departure)
+    end
   end
 
   describe "track_number/1" do
