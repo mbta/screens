@@ -1,22 +1,67 @@
-/*
- * Text styles from the Screenkit Library
- */
-.text-body-1 {
+// Reset browser default margins on headers
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+}
+
+// Text styles from the Screenkit Library
+
+h1 {
+  font-size: 203px;
+  line-height: 1;
+}
+
+h2 {
+  font-size: 130px;
+  line-height: 134px;
+}
+
+h3 {
+  font-size: 104px;
+  line-height: 116px;
+}
+
+h4 {
+  font-size: 83px;
+  line-height: 100px;
+}
+
+h5 {
   font-size: 66px;
   line-height: 83px;
 }
 
-.text-body-2 {
+.body-1 {
+  font-size: 66px;
+  line-height: 83px;
+}
+
+.body-2 {
   font-size: 53px;
   line-height: 68px;
 }
 
-.text-body-3 {
+.body-3 {
   font-size: 42px;
   line-height: 54px;
 }
 
-.text-body-4 {
+.body-4 {
   font-size: 34px;
   line-height: 49px;
+}
+
+.caption-1 {
+  font-size: 27px;
+  line-height: 36px;
+}
+
+.caption-2 {
+  font-size: 22px;
+  line-height: 31px;
 }
