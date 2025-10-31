@@ -1173,9 +1173,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
 
       expected = %{
-        issue: nil,
-        remedy: nil,
-        remedy_bold: "Test Alert",
+        issue: "Stop Skipped",
+        remedy: "Test Alert",
         location: nil,
         cause: nil,
         routes: [%{route_id: "Red", svg_name: "rl"}],
@@ -1186,7 +1185,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected == ReconstructedAlert.serialize(widget)
 
-      assert %{remedy_bold: "Test Alert"} =
+      assert %{issue: "Stop Skipped", remedy: "Test Alert"} =
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
@@ -1218,9 +1217,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
 
       expected = %{
-        issue: nil,
-        remedy: nil,
-        remedy_bold: "Test Alert",
+        issue: "Stop Skipped",
+        remedy: "Test Alert",
         location: nil,
         cause: nil,
         routes: [%{route_id: "Red", svg_name: "rl-alewife", headsign: "Alewife"}],
@@ -1361,13 +1359,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         cause: nil,
         effect: :suspension,
-        issue: nil,
+        issue: "Suspension",
         location: nil,
-        remedy: nil,
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         updated_at: "Friday, 5:00 am",
         region: :outside,
-        remedy_bold: "Simulation of PIO text"
+        remedy: "Simulation of PIO text"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -2411,16 +2408,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         cause: "",
         effect: :shuttle,
-        issue: nil,
+        issue: "Shuttle Bus",
         location: nil,
-        remedy: nil,
         routes: [
           %{headsign: "Ashmont", route_id: "Red", svg_name: "rl-ashmont"},
           %{headsign: "Braintree", route_id: "Red", svg_name: "rl-braintree"}
         ],
         updated_at: "Friday, 5:00 am",
         region: :outside,
-        remedy_bold: "Simulation of PIO text"
+        remedy: "Simulation of PIO text"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -3408,13 +3404,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         cause: nil,
         effect: :shuttle,
-        issue: nil,
+        issue: "Shuttle Bus",
         location: nil,
         region: :boundary,
-        remedy: nil,
         routes: [%{route_id: "Green", svg_name: "gl"}],
         updated_at: "Friday, 2:24 pm",
-        remedy_bold:
+        remedy:
           "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station."
       }
 
