@@ -97,8 +97,7 @@ defmodule Screens.V2.RDSTest do
       now = ~U[2024-10-11 12:00:00Z]
 
       expect(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :bus, stop_ids: ["s0"]},
-        [include_schedules: true, now: ^now] ->
+        %{direction_id: 0, route_type: :bus, stop_ids: ["s0"]}, [now: ^now] ->
           {
             :ok,
             [
