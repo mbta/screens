@@ -27,7 +27,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
+    is_screen = real_screen?(conn)
     screen_side = params["screen_side"]
     variant = params["variant"]
     screen = Cache.screen(screen_id)
@@ -262,4 +262,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     |> put_status(:not_found)
     |> text("Not found")
   end
+
+  defp real_screen?(%{params: %{"is_real_screen" => "true"}}), do: true
+  defp real_screen?(_), do: false
 end

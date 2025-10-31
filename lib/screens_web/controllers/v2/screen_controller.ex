@@ -62,8 +62,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   def index(conn, %{"id" => screen_id} = params) do
-    is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
-    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, params["screen_side"])
+    _ = Screens.LogScreenData.log_page_load(screen_id, real_screen?(conn), params["screen_side"])
     config = Cache.screen(screen_id)
 
     if match?(%Screen{app_id: app_id} when app_id in @recognized_app_ids, config) do
@@ -227,4 +226,7 @@ defmodule ScreensWeb.V2.ScreenController do
   # While app IDs in configuration still have the "_v2" suffix, but this suffix has been removed
   # from JS/CSS entrypoints, we temporarily need to translate from one to the other.
   defp strip_v2(app_id), do: app_id |> to_string() |> String.replace("_v2", "")
+
+  defp real_screen?(%{params: %{"is_real_screen" => "true"}}), do: true
+  defp real_screen?(_), do: false
 end
