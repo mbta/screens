@@ -18,16 +18,18 @@ defmodule Screens.V2.Departure do
 
   defstruct prediction: nil, schedule: nil
 
+  @type route_type :: nil | :bus | :ferry | :light_rail | :rail | :subway
   @type params :: %{
           optional(:direction_id) => Trip.direction() | :both,
           optional(:route_ids) => [Route.id()],
-          optional(:route_type) => nil | :bus | :ferry | :light_rail | :rail | :subway,
+          optional(:route_type) => route_type(),
           optional(:sort) => String.t(),
           optional(:stop_ids) => [Stop.id()]
         }
 
   @type opts :: [
-          now: DateTime.t()
+          now: DateTime.t(),
+          schedule_route_type_filter: [route_type()]
         ]
 
   @type result :: {:ok, [t()]} | :error
@@ -41,19 +43,19 @@ defmodule Screens.V2.Departure do
     now = Keyword.get(opts, :now, DateTime.utc_now())
     fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
-    with {:ok, predictions} <- fetch_predictions_fn.(params),
-         {:ok, schedules} <- fetch_schedules(params, opts) do
-      # Only include schedules for commuter rail and ferry
-      filtered_schedules =
-        Enum.filter(schedules, fn schedule ->
-          case schedule do
-            %Schedule{route: %{type: :ferry}} -> true
-            %Schedule{route: %{type: :rail}} -> true
-            _schedule -> false
-          end
-        end)
+    #
+    fetch_schedule_params =
+      case Keyword.get(opts, :schedule_route_type_filter, []) do
+        nil ->
+          params
 
-      {:ok, Builder.build(predictions, filtered_schedules, now)}
+        route_types ->
+          Map.put(params, :route_type, route_types)
+      end
+
+    with {:ok, predictions} <- fetch_predictions_fn.(params),
+         {:ok, schedules} <- fetch_schedules(fetch_schedule_params, opts) do
+      {:ok, Builder.build(predictions, schedules, now)}
     else
       _ -> :error
     end
@@ -82,6 +84,9 @@ defmodule Screens.V2.Departure do
   defp encode_param({:route_ids, []}), do: nil
   defp encode_param({:route_ids, route_ids}), do: {"filter[route]", Enum.join(route_ids, ",")}
   defp encode_param({:route_type, nil}), do: nil
+
+  defp encode_param({:route_type, route_types}) when is_list(route_types),
+    do: {"filter[route_type]", Enum.map_join(route_types, ",", &Screens.RouteType.to_id(&1))}
 
   defp encode_param({:route_type, route_type}),
     do: {"filter[route_type]", Screens.RouteType.to_id(route_type)}

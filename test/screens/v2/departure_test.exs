@@ -407,8 +407,7 @@ defmodule Screens.V2.DepartureTest do
         %Schedule{
           trip: %Trip{id: "trip-1"},
           arrival_time: DateTime.add(now, -10, :minute),
-          departure_time: DateTime.add(now, -8, :minute),
-          route: %Route{type: :rail}
+          departure_time: DateTime.add(now, -8, :minute)
         }
 
       # The train is almost here!
@@ -423,115 +422,6 @@ defmodule Screens.V2.DepartureTest do
       fetch_schedules_fn = fn _ -> {:ok, [schedule]} end
 
       assert {:ok, [%Departure{schedule: schedule, prediction: prediction}]} ==
-               Departure.fetch(
-                 %{},
-                 now: now,
-                 fetch_predictions_fn: fetch_predictions_fn,
-                 fetch_schedules_fn: fetch_schedules_fn
-               )
-    end
-
-    test "does not include schedules for subway, bus, or light_rail" do
-      now = ~U[2024-08-28 17:13:14.116713Z]
-
-      schedules = [
-        %Schedule{
-          trip: %Trip{id: "bus-trip"},
-          arrival_time: DateTime.add(now, 4, :minute),
-          departure_time: DateTime.add(now, 5, :minute),
-          route: %Route{type: :bus}
-        },
-        %Schedule{
-          trip: %Trip{id: "subway-trip"},
-          arrival_time: DateTime.add(now, 6, :minute),
-          departure_time: DateTime.add(now, 7, :minute),
-          route: %Route{type: :subway}
-        },
-        %Schedule{
-          trip: %Trip{id: "light-rail-trip"},
-          arrival_time: DateTime.add(now, 8, :minute),
-          departure_time: DateTime.add(now, 10, :minute),
-          route: %Route{type: :light_rail}
-        }
-      ]
-
-      prediction =
-        %Prediction{
-          trip: %Trip{id: "bus-trip"},
-          arrival_time: DateTime.add(now, 2, :minute),
-          departure_time: DateTime.add(now, 5, :minute)
-        }
-
-      fetch_predictions_fn = fn _ -> {:ok, [prediction]} end
-      fetch_schedules_fn = fn _ -> {:ok, schedules} end
-
-      assert {:ok, [%Departure{schedule: nil, prediction: prediction}]} ==
-               Departure.fetch(
-                 %{},
-                 now: now,
-                 fetch_predictions_fn: fetch_predictions_fn,
-                 fetch_schedules_fn: fetch_schedules_fn
-               )
-    end
-
-    test "includes schedules for ferry and rail while filtering others" do
-      now = ~U[2024-08-28 17:13:14.116713Z]
-
-      bus_schedule =
-        %Schedule{
-          trip: %Trip{id: "bus-trip"},
-          arrival_time: DateTime.add(now, 4, :minute),
-          departure_time: DateTime.add(now, 5, :minute),
-          route: %Route{type: :bus}
-        }
-
-      rail_schedule =
-        %Schedule{
-          trip: %Trip{id: "rail-trip"},
-          arrival_time: DateTime.add(now, 6, :minute),
-          departure_time: DateTime.add(now, 7, :minute),
-          route: %Route{type: :rail}
-        }
-
-      ferry_schedule =
-        %Schedule{
-          trip: %Trip{id: "ferry-trip"},
-          arrival_time: DateTime.add(now, 8, :minute),
-          departure_time: DateTime.add(now, 10, :minute),
-          route: %Route{type: :ferry}
-        }
-
-      bus_prediction =
-        %Prediction{
-          trip: %Trip{id: "bus-trip"},
-          arrival_time: DateTime.add(now, 2, :minute),
-          departure_time: DateTime.add(now, 3, :minute)
-        }
-
-      rail_prediction = %Prediction{
-        trip: %Trip{id: "rail-trip"},
-        arrival_time: DateTime.add(now, 3, :minute),
-        departure_time: DateTime.add(now, 4, :minute)
-      }
-
-      ferry_prediction = %Prediction{
-        trip: %Trip{id: "ferry-trip"},
-        arrival_time: DateTime.add(now, 4, :minute),
-        departure_time: DateTime.add(now, 5, :minute)
-      }
-
-      fetch_predictions_fn = fn _ ->
-        {:ok, [bus_prediction, rail_prediction, ferry_prediction]}
-      end
-
-      fetch_schedules_fn = fn _ -> {:ok, [bus_schedule, rail_schedule, ferry_schedule]} end
-
-      assert {:ok,
-              [
-                %Departure{schedule: nil, prediction: bus_prediction},
-                %Departure{schedule: rail_schedule, prediction: rail_prediction},
-                %Departure{schedule: ferry_schedule, prediction: ferry_prediction}
-              ]} ==
                Departure.fetch(
                  %{},
                  now: now,
