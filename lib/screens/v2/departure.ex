@@ -67,12 +67,14 @@ defmodule Screens.V2.Departure do
   end
 
   def do_fetch(endpoint, params) do
-    encoded_params = params |> Enum.map(&encode_param/1) |> Enum.reject(&is_nil/1) |> Map.new()
-
-    case V3Api.get_json(endpoint, encoded_params) do
+    case V3Api.get_json(endpoint, encode_params(params)) do
       {:ok, result} -> {:ok, V3Api.Parser.parse(result)}
       _ -> :error
     end
+  end
+
+  def encode_params(params) do
+    params |> Enum.map(&encode_param/1) |> Enum.reject(&is_nil/1) |> Map.new()
   end
 
   defp encode_param({:date, %DateTime{} = date}), do: {"filter[date]", Util.service_date(date)}

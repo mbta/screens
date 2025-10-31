@@ -430,4 +430,38 @@ defmodule Screens.V2.DepartureTest do
                )
     end
   end
+
+  describe "encode_params/1" do
+    test "encodes params correctly, including route_type list" do
+      params = %{
+        direction_id: 1,
+        route_ids: ["CR-Fairmount"],
+        route_type: [:ferry, :rail],
+        stop_ids: ["place-sstat"]
+      }
+
+      assert %{
+               "filter[direction_id]" => 1,
+               "filter[route]" => "CR-Fairmount",
+               "filter[route_type]" => "4,2",
+               "filter[stop]" => "place-sstat"
+             } == Departure.encode_params(params)
+    end
+
+    test "encodes params correctly, including single route_type" do
+      params = %{
+        direction_id: 1,
+        route_ids: ["Red"],
+        route_type: [:subway],
+        stop_ids: ["place-sstat"]
+      }
+
+      assert %{
+               "filter[direction_id]" => 1,
+               "filter[route]" => "Red",
+               "filter[route_type]" => "1",
+               "filter[stop]" => "place-sstat"
+             } == Departure.encode_params(params)
+    end
+  end
 end
