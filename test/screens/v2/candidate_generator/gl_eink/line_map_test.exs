@@ -37,8 +37,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMapTest do
       stops_dir0 = [%Stop{id: "stop-dir0"}]
       stops_dir1 = [%Stop{id: "stop-dir1"}]
 
-      expect(@departure, :fetch, fn %{stop_ids: ["parent-test"]},
-                                    [include_schedules: true, now: @now_with_lookback] ->
+      expect(@departure, :fetch, fn %{stop_ids: ["parent-test"]}, [now: @now_with_lookback] ->
         {:ok, departures}
       end)
 

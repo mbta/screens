@@ -213,7 +213,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         now
       ) do
     fetch_params = Map.from_struct(params)
-    fetch_opts = opts |> Map.from_struct() |> Keyword.new()
+
+    fetch_opts =
+      opts
+      |> Map.from_struct()
+      # Only include schedules for commuter rail and ferry
+      |> Map.put(:schedule_route_type_filter, [:ferry, :rail])
+      |> Keyword.new()
 
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
       filtered_departures =
