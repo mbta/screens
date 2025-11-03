@@ -17,9 +17,6 @@
               },
               "grouping_type": "time",
               "query": {
-                "opts": {
-                  "include_schedules": false
-                },
                 "params": {
                   "direction_id": "both",
                   "route_ids": ["1722"],
@@ -61,9 +58,6 @@
               },
               "grouping_type": "time",
               "query": {
-                "opts": {
-                  "include_schedules": false
-                },
                 "params": {
                   "direction_id": "both",
                   "route_ids": ["383"],
@@ -105,9 +99,6 @@
               },
               "grouping_type": "time",
               "query": {
-                "opts": {
-                  "include_schedules": false
-                },
                 "params": {
                   "direction_id": "both",
                   "route_ids": ["1722"],
@@ -149,9 +140,6 @@
               },
               "grouping_type": "time",
               "query": {
-                "opts": {
-                  "include_schedules": false
-                },
                 "params": {
                   "direction_id": "both",
                   "route_ids": ["1722"],
@@ -202,9 +190,6 @@
               },
               "grouping_type": "time",
               "query": {
-                "opts": {
-                  "include_schedules": false
-                },
                 "params": {
                   "direction_id": 0,
                   "stop_ids": ["place-nuniv"],

@@ -18,17 +18,18 @@ defmodule Screens.V2.Departure do
 
   defstruct prediction: nil, schedule: nil
 
+  @type route_type :: nil | :bus | :ferry | :light_rail | :rail | :subway
   @type params :: %{
           optional(:direction_id) => Trip.direction() | :both,
           optional(:route_ids) => [Route.id()],
-          optional(:route_type) => nil | :bus | :ferry | :light_rail | :rail | :subway,
+          optional(:route_type) => route_type(),
           optional(:sort) => String.t(),
           optional(:stop_ids) => [Stop.id()]
         }
 
   @type opts :: [
-          include_schedules: boolean(),
-          now: DateTime.t()
+          now: DateTime.t(),
+          schedule_route_type_filter: [route_type()]
         ]
 
   @type result :: {:ok, [t()]} | :error
@@ -42,8 +43,17 @@ defmodule Screens.V2.Departure do
     now = Keyword.get(opts, :now, DateTime.utc_now())
     fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
+    fetch_schedule_params =
+      case Keyword.get(opts, :schedule_route_type_filter, []) do
+        nil ->
+          params
+
+        route_types ->
+          Map.put(params, :route_type, route_types)
+      end
+
     with {:ok, predictions} <- fetch_predictions_fn.(params),
-         {:ok, schedules} <- fetch_schedules(params, opts) do
+         {:ok, schedules} <- fetch_schedules(fetch_schedule_params, opts) do
       {:ok, Builder.build(predictions, schedules, now)}
     else
       _ -> :error
@@ -51,21 +61,19 @@ defmodule Screens.V2.Departure do
   end
 
   defp fetch_schedules(params, opts) do
-    if opts[:include_schedules] do
-      fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
-      fetch_fn.(params)
-    else
-      {:ok, []}
-    end
+    fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
+    fetch_fn.(params)
   end
 
   def do_fetch(endpoint, params) do
-    encoded_params = params |> Enum.map(&encode_param/1) |> Enum.reject(&is_nil/1) |> Map.new()
-
-    case V3Api.get_json(endpoint, encoded_params) do
+    case V3Api.get_json(endpoint, encode_params(params)) do
       {:ok, result} -> {:ok, V3Api.Parser.parse(result)}
       _ -> :error
     end
+  end
+
+  def encode_params(params) do
+    params |> Enum.map(&encode_param/1) |> Enum.reject(&is_nil/1) |> Map.new()
   end
 
   defp encode_param({:date, %DateTime{} = date}), do: {"filter[date]", Util.service_date(date)}
@@ -77,6 +85,9 @@ defmodule Screens.V2.Departure do
   defp encode_param({:route_ids, []}), do: nil
   defp encode_param({:route_ids, route_ids}), do: {"filter[route]", Enum.join(route_ids, ",")}
   defp encode_param({:route_type, nil}), do: nil
+
+  defp encode_param({:route_type, route_types}) when is_list(route_types),
+    do: {"filter[route_type]", Enum.map_join(route_types, ",", &Screens.RouteType.to_id(&1))}
 
   defp encode_param({:route_type, route_type}),
     do: {"filter[route_type]", Screens.RouteType.to_id(route_type)}

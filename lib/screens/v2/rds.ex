@@ -70,7 +70,7 @@ defmodule Screens.V2.RDS do
        when stop_ids != [] do
     child_stops = fetch_child_stops(stop_ids)
     {:ok, canonical_patterns} = params |> Map.put(:canonical?, true) |> @route_pattern.fetch()
-    {:ok, departures} = @departure.fetch(params, include_schedules: true, now: now)
+    {:ok, departures} = @departure.fetch(params, now: now)
 
     (tuples_from_departures(departures, now) ++
        tuples_from_patterns(canonical_patterns, child_stops))
