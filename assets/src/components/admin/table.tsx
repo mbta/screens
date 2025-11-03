@@ -49,7 +49,7 @@ const BOOLEAN_FILTERS = {
   false: (value: JSON) => !value,
 };
 
-const booleanFilter: Filter = ({ update }) => (
+const BooleanFilter: Filter = ({ update }) => (
   <select onChange={(e) => update(BOOLEAN_FILTERS[e.target.value])}>
     <option value="none"></option>
     <option value="true">true</option>
@@ -57,7 +57,7 @@ const booleanFilter: Filter = ({ update }) => (
   </select>
 );
 
-const selectFilter =
+const buildSelectFilter =
   (options: string[]): Filter =>
   ({ update }) => (
     <select
@@ -74,7 +74,7 @@ const selectFilter =
     </select>
   );
 
-const stringFilter: Filter = ({ update }) => (
+const StringFilter: Filter = ({ update }) => (
   <input
     onChange={(e) =>
       update(
@@ -89,7 +89,7 @@ const stringFilter: Filter = ({ update }) => (
   />
 );
 
-const checkboxInput: Cell = ({ value, update }) => (
+const CheckboxInput: Cell = ({ value, update }) => (
   <input
     type="checkbox"
     checked={value as boolean}
@@ -97,7 +97,7 @@ const checkboxInput: Cell = ({ value, update }) => (
   />
 );
 
-const jsonInput: Cell = ({ value, update }) => {
+const JsonInput: Cell = ({ value, update }) => {
   const [isValid, setIsValid] = useState(true);
 
   const updateIfValid = (newValue) => {
@@ -123,7 +123,7 @@ const jsonInput: Cell = ({ value, update }) => {
   );
 };
 
-const selectInput =
+const buildSelectInput =
   (options: (string | null)[]): Cell =>
   ({ value, update }) => {
     const selectValue = (value as string | null) ?? undefined;
@@ -139,7 +139,7 @@ const selectInput =
     );
   };
 
-const stringInput: Cell = ({ value, update }) => (
+const StringInput: Cell = ({ value, update }) => (
   <input
     {...AUTOLESS_ATTRIBUTES}
     defaultValue={value as string}
@@ -147,7 +147,7 @@ const stringInput: Cell = ({ value, update }) => (
   />
 );
 
-const stringFilterInput = { cell: stringInput, filter: stringFilter };
+const filteredStringCell = { cell: StringInput, filter: StringFilter };
 
 const baseFields: Field[] = [
   {
@@ -155,28 +155,28 @@ const baseFields: Field[] = [
     path: "app_id",
     cell: ({ value }) => SCREEN_APPS[value as AppId].name,
   },
-  { label: "Name", path: "name", ...stringFilterInput },
-  { label: "Location", path: "location", ...stringFilterInput },
+  { label: "Name", path: "name", ...filteredStringCell },
+  { label: "Location", path: "location", ...filteredStringCell },
   {
     label: "Vendor",
     path: "vendor",
-    cell: selectInput([null, ...SCREEN_VENDORS]),
-    filter: selectFilter(SCREEN_VENDORS),
+    cell: buildSelectInput([null, ...SCREEN_VENDORS]),
+    filter: buildSelectFilter(SCREEN_VENDORS),
   },
-  { label: "Device ID", path: "device_id", ...stringFilterInput },
+  { label: "Device ID", path: "device_id", ...filteredStringCell },
   {
     label: "Disabled?",
     path: "disabled",
-    cell: checkboxInput,
-    filter: booleanFilter,
+    cell: CheckboxInput,
+    filter: BooleanFilter,
   },
   {
     label: "Hidden?",
     path: "hidden_from_screenplay",
-    cell: checkboxInput,
-    filter: booleanFilter,
+    cell: CheckboxInput,
+    filter: BooleanFilter,
   },
-  { label: "App Params", path: "app_params", cell: jsonInput },
+  { label: "App Params", path: "app_params", cell: JsonInput },
 ];
 
 const Table = () => {
