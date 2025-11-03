@@ -43,7 +43,6 @@ defmodule Screens.V2.Departure do
     now = Keyword.get(opts, :now, DateTime.utc_now())
     fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
-    #
     fetch_schedule_params =
       case Keyword.get(opts, :schedule_route_type_filter, []) do
         nil ->
