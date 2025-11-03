@@ -1,4 +1,3 @@
-import type { PropertyName } from "lodash";
 import _ from "lodash/fp";
 import { type ComponentType, useEffect, useState, useMemo } from "react";
 import { Link } from "react-router";
@@ -15,7 +14,7 @@ import {
 
 type Field = {
   label: string;
-  path: PropertyName;
+  path: string;
   cell: Cell;
   filter?: Filter;
 };
@@ -58,6 +57,38 @@ const booleanFilter: Filter = ({ update }) => (
   </select>
 );
 
+const selectFilter =
+  (options: string[]): Filter =>
+  ({ update }) => (
+    <select
+      onChange={(e) =>
+        update(e.target.value ? (value) => value == e.target.value : undefined)
+      }
+    >
+      <option></option>
+      {options.map((opt) => (
+        <option key={opt} value={opt}>
+          {opt}
+        </option>
+      ))}
+    </select>
+  );
+
+const stringFilter: Filter = ({ update }) => (
+  <input
+    onChange={(e) =>
+      update(
+        e.target.value
+          ? (value) =>
+              typeof value == "string" &&
+              value.toLowerCase().includes(e.target.value.toLowerCase())
+          : undefined,
+      )
+    }
+    placeholder="Search"
+  />
+);
+
 const checkboxInput: Cell = ({ value, update }) => (
   <input
     type="checkbox"
@@ -93,16 +124,30 @@ const jsonInput: Cell = ({ value, update }) => {
 };
 
 const selectInput =
-  (values: string[], includeNull?: boolean): Cell =>
-  ({ value, update }) => (<select />);
+  (options: (string | null)[]): Cell =>
+  ({ value, update }) => {
+    const selectValue = (value as string | null) ?? undefined;
+
+    return (
+      <select onChange={(e) => update(e.target.value)} value={selectValue}>
+        {options.map((opt) => (
+          <option key={opt} value={opt ?? undefined}>
+            {opt}
+          </option>
+        ))}
+      </select>
+    );
+  };
 
 const stringInput: Cell = ({ value, update }) => (
   <input
     {...AUTOLESS_ATTRIBUTES}
     defaultValue={value as string}
-    onBlur={(e) => ifChanged(e.target, update)}
+    onBlur={(e) => ifChanged(e.target, (v) => update(v || null))}
   />
 );
+
+const stringFilterInput = { cell: stringInput, filter: stringFilter };
 
 const baseFields: Field[] = [
   {
@@ -110,10 +155,15 @@ const baseFields: Field[] = [
     path: "app_id",
     cell: ({ value }) => SCREEN_APPS[value as AppId].name,
   },
-  { label: "Name", path: "name", cell: stringInput },
-  { label: "Location", path: "location", cell: stringInput },
-  { label: "Vendor", path: "vendor", cell: stringInput },
-  { label: "Device ID", path: "device_id", cell: stringInput },
+  { label: "Name", path: "name", ...stringFilterInput },
+  { label: "Location", path: "location", ...stringFilterInput },
+  {
+    label: "Vendor",
+    path: "vendor",
+    cell: selectInput([null, ...SCREEN_VENDORS]),
+    filter: selectFilter(SCREEN_VENDORS),
+  },
+  { label: "Device ID", path: "device_id", ...stringFilterInput },
   {
     label: "Disabled?",
     path: "disabled",
@@ -135,6 +185,11 @@ const Table = () => {
   const [filters, setFilters] = useState<
     Record<string, undefined | ((v: JSON) => boolean)>
   >({});
+
+  const localScreensCount = useMemo(
+    () => Object.keys(localScreens).length,
+    [localScreens],
+  );
 
   const rows = useMemo(() => {
     const filterFns = Object.entries(filters);
@@ -166,21 +221,33 @@ const Table = () => {
           <thead>
             <tr>
               <th>ID</th>
-              {baseFields.map(({ label, path, filter: Filter }) => (
-                <th key={label}>
-                  {label}
+              {baseFields.map(({ label, path }) => (
+                <th key={path}>{label}</th>
+              ))}
+            </tr>
+
+            <tr>
+              <th></th>
+              {baseFields.map(({ filter: Filter, path }) => (
+                <th key={path}>
                   {Filter && (
-                    <div>
-                      <Filter
-                        update={(filter) =>
-                          setFilters({ ...filters, [path]: filter })
-                        }
-                      />
-                    </div>
+                    <Filter
+                      update={(filter) =>
+                        setFilters({ ...filters, [path]: filter })
+                      }
+                    />
                   )}
                 </th>
               ))}
             </tr>
+
+            {localScreensCount != rows.length && (
+              <tr>
+                <th colSpan={baseFields.length + 1}>
+                  Showing {rows.length} out of {localScreensCount} total screens
+                </th>
+              </tr>
+            )}
           </thead>
 
           <tbody>
@@ -195,8 +262,16 @@ const Table = () => {
                     {id}
                   </Link>
                 </td>
-                {baseFields.map(({ label, path, cell: Cell }) => (
-                  <td key={label}>
+
+                {baseFields.map(({ cell: Cell, path }) => (
+                  <td
+                    className={
+                      _.get(path, config) != _.get(path, remoteScreens[id])
+                        ? "modified"
+                        : undefined
+                    }
+                    key={path}
+                  >
                     <Cell
                       value={_.get(path, config)}
                       update={(value) =>
