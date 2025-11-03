@@ -48,6 +48,22 @@
       padding: 0;
       margin: 0;
       border: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+  }
+
+  td {
+    border-radius: 6px;
+    padding: 4px;
+  }
+
+  td.modified {
+    background-color: lightskyblue;
+
+    input,
+    select {
+      border: revert;
     }
   }
 }
