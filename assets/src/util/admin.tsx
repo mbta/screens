@@ -15,10 +15,10 @@ export type Screen = {
   device_id: string | null;
   disabled: boolean;
   hidden_from_screenplay: boolean;
-  name: string;
-  location: string;
+  name: string | null;
+  location: string | null;
   tags: string[];
-  vendor: string;
+  vendor: keyof typeof SCREEN_VENDORS | null;
 };
 
 export type ScreenWithId = { id: string; config: Screen };
