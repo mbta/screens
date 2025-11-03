@@ -20,7 +20,6 @@ interface PreFareSingleScreenAlertProps {
   location: string;
   cause: string;
   remedy: string;
-  remedy_bold?: string;
   routes: EnrichedRoute[];
   unaffected_routes?: EnrichedRoute[];
   endpoints: [string, string];
@@ -327,7 +326,6 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
     issue,
     location,
     remedy,
-    remedy_bold,
     routes,
     unaffected_routes,
     updated_at,
@@ -344,18 +342,8 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
    **/
   let layout;
   switch (true) {
-    case effect === "delay":
+    case effect === "delay" || !disruption_diagram:
       layout = <FallbackLayout issue={issue} remedy={remedy} effect={effect} />;
-      break;
-    case !disruption_diagram:
-      layout = (
-        <FallbackLayout
-          issue={issue}
-          remedy={remedy}
-          remedyBold={remedy_bold}
-          effect={effect}
-        />
-      );
       break;
     case isPartialClosure(alert):
       // By definition if `isPartialClosure` is true then `unaffected_routes` is
@@ -415,14 +403,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
       );
       break;
     default:
-      layout = (
-        <FallbackLayout
-          issue={issue}
-          remedy={remedy}
-          remedyBold={remedy_bold}
-          effect={effect}
-        />
-      );
+      layout = <FallbackLayout issue={issue} remedy={remedy} effect={effect} />;
   }
 
   const showBanner = !isPartialClosure(alert);

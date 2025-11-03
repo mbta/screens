@@ -78,8 +78,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           optional(:endpoints) => list(String.t()),
           # Unique to transfer station case
           optional(:is_transfer_station) => boolean(),
-          # Weird extra field for fallback layout with special styling
-          optional(:remedy_bold) => String.t(),
           issue: String.t() | list(String.t()) | nil,
           cause: Alert.cause() | nil,
           # List of SVG filenames
@@ -773,9 +771,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # Fallback for when we're unable to build a disruption diagram
   defp single_screen_fallback_fields(%__MODULE__{alert: alert, now: now} = t, location) do
     %{
-      issue: nil,
-      remedy: nil,
-      remedy_bold: alert.header,
+      issue:
+        case alert.effect do
+          :shuttle -> "Shuttle Bus"
+          :suspension -> "Suspension"
+          :station_closure -> "Stop Skipped"
+          :delay -> "Delay"
+        end,
+      remedy: alert.header,
       location: nil,
       cause: format_cause(alert.cause),
       routes: get_route_pills(t, location),
