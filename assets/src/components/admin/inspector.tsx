@@ -452,7 +452,7 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
     if (message.type === "audio_config") setConfig(message.config);
   });
 
-  const audioPath = AUDIO_APP_IDS.has(screen.config.app_id)
+  const audioPath = SCREEN_APPS[screen.config.app_id].hasAudio
     ? `/v2/audio/${screen.id}`
     : null;
 
