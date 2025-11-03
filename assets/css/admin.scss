@@ -12,9 +12,9 @@
 
 .admin-navbar {
   display: flex;
-  align-items: center;
   flex-wrap: wrap;
   row-gap: 0.5em;
+  align-items: center;
   padding: 1em;
   margin-bottom: 0.5em;
   background-color: #eee;
@@ -45,17 +45,17 @@
   tbody {
     input,
     select {
+      box-sizing: border-box;
+      width: 100%;
       padding: 0;
       margin: 0;
       border: 0;
-      width: 100%;
-      box-sizing: border-box;
     }
   }
 
   td {
-    border-radius: 6px;
     padding: 4px;
+    border-radius: 6px;
   }
 
   td.modified {
