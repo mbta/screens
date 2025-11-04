@@ -198,7 +198,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       %{stop: stop} -> String.starts_with?(stop, "place-")
     end)
     |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
-    |> Enum.min()
+    |> Enum.min(fn -> @default_distance end)
   end
 
   # Default to 99 if stop_id is not in distance map.
