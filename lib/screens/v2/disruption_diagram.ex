@@ -77,7 +77,7 @@ defmodule Screens.V2.DisruptionDiagram do
   # so we can send actual text for those--it will be dynamically resized to fit.
   @type end_label_id :: String.t()
 
-  @type line :: :blue | :orange | :red | :green
+  @type line :: :blue | :orange | :red | :green | :mattapan
 
   @type branch :: :b | :c | :d | :e | :ashmont | :braintree | :trunk
 
