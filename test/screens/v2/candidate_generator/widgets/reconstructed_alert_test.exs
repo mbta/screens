@@ -563,5 +563,77 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  fetch_location_context_fn
                )
     end
+
+    test "filters alerts with nil route/stop in ies", context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        happening_now_active_period: happening_now_active_period,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn,
+        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :station_closure,
+          informed_entities: [
+            %{
+              stop: nil,
+              route: nil,
+              route_type: 2,
+              direction_id: nil
+            }
+          ],
+          active_period: happening_now_active_period
+        },
+        %Alert{
+          id: "2",
+          effect: :station_closure,
+          informed_entities: [ie(stop: "place-mlmnl")],
+          active_period: happening_now_active_period
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        is_terminal_station: true,
+        is_priority: true,
+        home_station_name: "Oak Grove",
+        all_platforms_at_informed_stations: []
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :station_closure,
+              informed_entities: [ie(stop: "place-mlmnl")],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_priority: false,
+            informed_station_names: ["Malden Center"]
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn,
+                 fetch_subway_platforms_for_stop_fn
+               )
+    end
   end
 end
