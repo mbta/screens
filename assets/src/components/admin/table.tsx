@@ -1,9 +1,27 @@
 import _ from "lodash/fp";
 import { useEffect, useState, useMemo } from "react";
 
-import { fetch, type Config, type JSON } from "Util/admin";
+import {
+  type AppId,
+  type Config,
+  type JSON,
+  type Screen,
+  SCREEN_APPS,
+  fetch,
+  AppInfo,
+} from "Util/admin";
 
-import { baseFields } from "./fields";
+import { allFields, appFields } from "./fields";
+
+const appIdFilters: { id: AppId | null; name: string }[] = [
+  { id: null, name: "All" },
+  ...(Object.entries(SCREEN_APPS) as [AppId, AppInfo][]).map(
+    ([id, { name }]) => ({ id, name }),
+  ),
+];
+
+const get = (path: string, screen: Screen, id: string) =>
+  path == "id" ? id : _.get(path, screen);
 
 const Table = () => {
   const [localScreens, setLocalScreens] = useState<Config["screens"]>({});
@@ -11,21 +29,25 @@ const Table = () => {
   const [filters, setFilters] = useState<
     Record<string, undefined | ((v: JSON) => boolean)>
   >({});
+  const [appIdFilter, setAppIdFilter] = useState<AppId | null>(null);
 
   const localScreensCount = useMemo(
     () => Object.keys(localScreens).length,
     [localScreens],
   );
 
+  const fields = appIdFilter ? appFields[appIdFilter] : allFields;
+
   const rows = useMemo(() => {
     const filterFns = Object.entries(filters);
 
     return Object.entries(localScreens)
-      .filter(([, config]) =>
-        filterFns.every(([path, fn]) => !fn || fn(_.get(path, config))),
+      .filter(([id, screen]) =>
+        (appIdFilter == null || screen.app_id == appIdFilter) &&
+        filterFns.every(([path, fn]) => !fn || fn(get(path, screen, id))),
       )
       .sort(([idA], [idB]) => idA.localeCompare(idB));
-  }, [filters, localScreens]);
+  }, [appIdFilter, filters, localScreens]);
 
   const fetchConfig = async () => {
     const response = await fetch.get("/api/admin");
@@ -42,17 +64,29 @@ const Table = () => {
 
   return (
     <main>
+      <div className="admin-navbar">
+        {appIdFilters.map(({ id, name }) => (
+          <button
+            key={id}
+            className={id == appIdFilter ? "active" : undefined}
+            onClick={() => setAppIdFilter(id)}
+          >
+            {name}
+          </button>
+        ))}
+      </div>
+
       {remoteScreens ? (
         <table className="admin-table">
           <thead>
             <tr>
-              {baseFields.map(({ label, path }) => (
+              {fields.map(({ label, path }) => (
                 <th key={path}>{label}</th>
               ))}
             </tr>
 
             <tr>
-              {baseFields.map(({ filter: Filter, path }) => (
+              {fields.map(({ filter: Filter, path }) => (
                 <th key={path}>
                   {Filter && (
                     <Filter
@@ -67,7 +101,7 @@ const Table = () => {
 
             {localScreensCount != rows.length && (
               <tr>
-                <th colSpan={baseFields.length}>
+                <th colSpan={fields.length}>
                   Showing {rows.length} of {localScreensCount} total screens
                 </th>
               </tr>
@@ -75,23 +109,23 @@ const Table = () => {
           </thead>
 
           <tbody>
-            {rows.map(([id, config]) => (
+            {rows.map(([id, screen]) => (
               <tr key={id}>
-                {baseFields.map(({ cell: Cell, path }) => (
+                {fields.map(({ cell: Cell, path }) => (
                   <td
                     className={
-                      _.get(path, config) != _.get(path, remoteScreens[id])
+                      _.get(path, screen) != _.get(path, remoteScreens[id])
                         ? "modified"
                         : undefined
                     }
                     key={path}
                   >
                     <Cell
-                      value={_.get(path, config)}
+                      value={get(path, screen, id)}
                       update={(value) =>
                         setLocalScreens({
                           ...localScreens,
-                          [id]: _.set(path, value, config),
+                          [id]: _.set(path, value, screen),
                         })
                       }
                     />

@@ -27,12 +27,7 @@ const filteredBoolean = { cell: CheckboxInput, filter: BooleanFilter };
 const filteredString = { cell: StringInput, filter: StringFilter };
 
 const baseFields: Field[] = [
-  { label: "ID", path: "id", cell: InspectorLink },
-  {
-    label: "App",
-    path: "app_id",
-    cell: ({ value }) => SCREEN_APPS[value as AppId].name,
-  },
+  { label: "ID", path: "id", cell: InspectorLink, filter: StringFilter },
   { label: "Name", path: "name", ...filteredString },
   { label: "Location", path: "location", ...filteredString },
   {
@@ -44,7 +39,24 @@ const baseFields: Field[] = [
   { label: "Device ID", path: "device_id", ...filteredString },
   { label: "Disabled?", path: "disabled", ...filteredBoolean },
   { label: "Hidden?", path: "hidden_from_screenplay", ...filteredBoolean },
+];
+
+export const allFields: Field[] = [
+  {
+    label: "App",
+    path: "app_id",
+    cell: ({ value }) => SCREEN_APPS[value as AppId].name,
+  },
+  ...baseFields,
   { label: "App Params", path: "app_params", cell: JsonInput },
 ];
 
-export { baseFields };
+export const appFields: { [key in AppId]: Field[] } = {
+  bus_eink_v2: [...baseFields],
+  bus_shelter_v2: [...baseFields],
+  busway_v2: [...baseFields],
+  dup_v2: [...baseFields],
+  elevator_v2: [...baseFields],
+  gl_eink_v2: [...baseFields],
+  pre_fare_v2: [...baseFields],
+};
