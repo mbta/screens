@@ -564,7 +564,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                )
     end
 
-    test "filters alerts with nil route/stop in ies", context do
+    test "filters entire route_type alerts with nil route/stop", context do
       %{
         config: config,
         location_context: location_context,
