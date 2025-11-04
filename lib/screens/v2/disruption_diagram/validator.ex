@@ -30,7 +30,7 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
     informed_stops =
       for %{stop: stop, route: route} <- alert.informed_entities,
           match?("place-" <> _, stop),
-          route in ~w[Blue Orange Red Green-B Green-C Green-D Green-E],
+          route in ~w[Blue Orange Red Green-B Green-C Green-D Green-E Mattapan],
           uniq: true,
           do: stop
 

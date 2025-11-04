@@ -40,6 +40,7 @@ import OLOakGrove from "Images/pills/ol-oak-grove.svg";
 import RLAlewife from "Images/pills/rl-alewife.svg";
 import RLAshmont from "Images/pills/rl-ashmont.svg";
 import RLBraintree from "Images/pills/rl-braintree.svg";
+import RLMattapan from "Images/pills/rl-mattapan.svg";
 
 export const STRING_TO_SVG: { [key: string]: any } = {
   "blue-line": BlueLine,
@@ -84,6 +85,7 @@ export const STRING_TO_SVG: { [key: string]: any } = {
   "rl-alewife": RLAlewife,
   "rl-ashmont": RLAshmont,
   "rl-braintree": RLBraintree,
+  "rl-mattapan": RLMattapan,
 };
 
 const STRING_TO_COLOR: { [key: string]: string } = {

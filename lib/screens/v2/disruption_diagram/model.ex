@@ -77,6 +77,13 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     |> then(&{:ok, &1})
   end
 
+  # For Mattapan Trolley, always show all stops, starting with Ashmont.
+  defp serialize_by_line(:mattapan, builder) do
+    builder
+    |> B.serialize()
+    |> then(&{:ok, &1})
+  end
+
   # For the Green Line, we need to reverse the diagram in certain cases, as well as fit regions.
   defp serialize_by_line(:green, builder) do
     builder = maybe_reverse_gl(builder)
