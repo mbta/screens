@@ -20,9 +20,12 @@
   background-color: #eee;
 }
 
-.admin-navbar a {
-  padding: 2px;
+.admin-navbar a,
+.admin-navbar button {
   padding: 3px 5px 2px;
+  font-family: inherit;
+  font-size: inherit;
+  cursor: pointer;
   color: black;
   text-decoration: none;
   background-color: white;
@@ -41,6 +44,7 @@
 
 .admin-table {
   padding-bottom: 3em;
+  white-space: nowrap;
 
   tbody {
     input,
