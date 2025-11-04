@@ -92,7 +92,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
     end
   end
 
-  defp ies(line, stop_ids, _, _) when line in [:blue, :orange, :red] do
+  defp ies(line, stop_ids, _, _) when line in [:blue, :orange, :red, :mattapan] do
     route_id =
       line
       |> Atom.to_string()
