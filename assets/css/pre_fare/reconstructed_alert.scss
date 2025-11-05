@@ -180,6 +180,7 @@ $alert-card-footer-height: 80px;
 
   .alert-card__footer {
     height: $alert-card-footer-height;
+    color: colors.$cool-black-30;
     background-color: colors.$warm-neutral-80;
     border-radius: 0 0 32px 32px;
   }
@@ -230,13 +231,12 @@ $alert-card-footer-height: 80px;
 
       &__issue {
         width: 904px;
-        margin-bottom: 32px;
+        margin-bottom: 48px;
         line-height: 220px;
       }
 
       &__location {
-        margin-bottom: 32px;
-        font-size: 60px;
+        margin-bottom: 48px;
         font-weight: 400;
       }
 
@@ -248,7 +248,10 @@ $alert-card-footer-height: 80px;
       &__remedy {
         height: 660px;
         padding-top: 474px;
-        line-height: 220px;
+
+        &--alternate-route {
+          font-weight: 400;
+        }
       }
 
       &__shuttle-icon {
@@ -258,7 +261,6 @@ $alert-card-footer-height: 80px;
 
       &__shuttle-remedy {
         height: 660px;
-        line-height: 220px;
       }
 
       &__accessibility-info {
