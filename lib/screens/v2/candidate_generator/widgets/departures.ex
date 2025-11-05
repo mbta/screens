@@ -203,7 +203,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
   def fetch_section_departures(
         %Section{
-          query: %Query{opts: opts, params: params},
+          query: %Query{params: params},
           filters: filters,
           bidirectional: is_bidirectional,
           grouping_type: grouping_type
@@ -213,13 +213,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         now
       ) do
     fetch_params = Map.from_struct(params)
-
-    fetch_opts =
-      opts
-      |> Map.from_struct()
-      # Only include schedules for commuter rail and ferry
-      |> Map.put(:schedule_route_type_filter, [:ferry, :rail])
-      |> Keyword.new()
+    fetch_opts = [schedule_route_type_filter: [:ferry, :rail]]
 
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
       filtered_departures =
