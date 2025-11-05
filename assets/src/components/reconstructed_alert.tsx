@@ -84,7 +84,7 @@ const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
               </div>
             </div>
           </div>
-          <div className="alert-card__footer">
+          <div className="alert-card__footer body-4">
             <div className="alert-card__footer__alerts-url">
               mbta.com/alerts
             </div>

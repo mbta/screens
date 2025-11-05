@@ -422,7 +422,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           <div className={classWithModifier("alert-card__body", effect)}>
             {layout}
           </div>
-          <div className="alert-card__footer">
+          <div className="alert-card__footer body-4">
             {cause && (
               <div className="alert-card__footer__cause">
                 Cause: {formatCause(cause)}

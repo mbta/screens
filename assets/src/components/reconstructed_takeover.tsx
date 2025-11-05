@@ -64,7 +64,7 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
               )}
             </div>
           </div>
-          <div className="alert-card__footer">
+          <div className="alert-card__footer body-4">
             <div className="alert-card__footer__cause">
               {cause && `Cause: ${cause}`}
             </div>
