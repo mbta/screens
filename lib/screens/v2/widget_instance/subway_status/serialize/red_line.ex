@@ -36,10 +36,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.RedLine do
       %{
         type: :contracted,
         alerts: [
-        Serialize.serialize_alert_summary(
-          length(mattapan_alerts),
-          RoutePill.serialize_rl_mattapan_pill()
-        )
+          Serialize.serialize_alert_summary(
+            length(mattapan_alerts),
+            RoutePill.serialize_rl_mattapan_pill()
+          )
         ]
       }
     end

@@ -67,7 +67,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           color: route_color()
         }
 
-  @type branch :: :b | :c | :d | :e
+  @type branch :: :b | :c | :d | :e | :m
 
   @type route_color :: :red | :orange | :green | :blue
 

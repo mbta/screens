@@ -22,7 +22,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
   @type section :: SubwayStatus.section()
   @type serialized_response :: SubwayStatus.serialized_response()
 
-
   @spec serialize_alerts_into_possible_rows(alerts_by_route()) :: serialized_response()
   def serialize_alerts_into_possible_rows(grouped_alerts) do
     # Returns the max number of possible rows that could be displayed for a given section
@@ -205,7 +204,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
     }
   end
 
-  @spec serialize_alert_with_route_pill(SubwayStatus.SubwayStatusAlert.t() | nil,  Route.id()) :: alert()
+  @spec serialize_alert_with_route_pill(SubwayStatus.SubwayStatusAlert.t() | nil, Route.id()) ::
+          alert()
   def serialize_alert_with_route_pill(alert, route_id) do
     Map.merge(
       %{route_pill: RoutePill.serialize_route_pill(route_id)},

@@ -6,12 +6,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Stops.Subway
+  alias Screens.V2.WidgetInstance.SubwayStatus
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.RoutePill
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
-
 
   ###################################
   # Green Line Alerts Serialization #
@@ -118,8 +118,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
     end
   end
 
-
-  @spec serialize_green_line_branch_alert(SubwayStatus.t(), list(String.t())) :: SubwayStatus.alert()
+  @spec serialize_green_line_branch_alert(SubwayStatus.SubwayStatusAlert.t(), list(String.t())) ::
+          SubwayStatus.alert()
   def serialize_green_line_branch_alert(alert, route_ids)
 
   # If only one branch is affected, we can still determine a stop
