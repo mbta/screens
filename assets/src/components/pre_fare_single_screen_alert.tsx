@@ -483,14 +483,14 @@ const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
     const color = getRouteColor(route.route_id);
 
     banner = (
-      <div className={classWithModifiers("alert-banner", ["small", color])}>
-        <span className="alert-banner__attention-text">ATTENTION</span>
+      <h5 className={classWithModifiers("alert-banner", ["small", color])}>
+        <span className="alert-banner__attention-text">Attention</span>
         <LinePill
           className="alert-banner__route-pill--short"
           color={getHexColor(color)}
         />
         <span>riders</span>
-      </div>
+      </h5>
     );
   } else if (routes.length === 1) {
     // One destination, long text
@@ -499,33 +499,33 @@ const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
     const color = getRouteColor(route.route_id);
 
     banner = (
-      <div
+      <h5
         className={classWithModifiers("alert-banner", [
           "large--one-route",
           color,
         ])}
       >
         <span>
-          <span className="alert-banner__attention-text">ATTENTION,</span>{" "}
+          <span className="alert-banner__attention-text">Attention,</span>{" "}
           riders to
         </span>
         <LinePill
           className="alert-banner__route-pill--long"
           color={getHexColor(color)}
         />
-      </div>
+      </h5>
     );
   } else if (routes.length === 2) {
     // Two destinations
     banner = (
-      <div
+      <h5
         className={classWithModifiers("alert-banner", [
           "large--two-routes",
           getAlertColor(routes),
         ])}
       >
         <span>
-          <span className="alert-banner__attention-text">ATTENTION,</span>{" "}
+          <span className="alert-banner__attention-text">Attention,</span>{" "}
           riders to
         </span>
         {routes.map((route) => {
@@ -538,22 +538,22 @@ const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
             />
           );
         })}
-      </div>
+      </h5>
     );
   } else {
     // Fallback
     banner = (
-      <div
+      <h5
         className={classWithModifiers("alert-banner", [
           "small",
           getAlertColor(routes),
         ])}
       >
         <span>
-          <span className="alert-banner__attention-text">ATTENTION,</span>{" "}
+          <span className="alert-banner__attention-text">Attention,</span>{" "}
           riders
         </span>
-      </div>
+      </h5>
     );
   }
 
