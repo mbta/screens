@@ -48,7 +48,7 @@ export const allFields: Field[] = [
     cell: ({ value }) => SCREEN_APPS[value as AppId].name,
   },
   ...baseFields,
-  { label: "App Params", path: "app_params", cell: JsonInput },
+  { label: "Config", path: "app_params", cell: JsonInput },
 ];
 
 export const appFields: { [key in AppId]: Field[] } = {

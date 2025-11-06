@@ -100,7 +100,7 @@ const Inspector: ComponentType = () => {
   useLayoutEffect(adjustFrame, [isSimulation, zoom]);
 
   return (
-    <div className="inspector">
+    <main className="inspector">
       <div className="inspector__controls">
         <h1>Inspector</h1>
 
@@ -160,7 +160,7 @@ const Inspector: ComponentType = () => {
           src={iframeUrl}
         ></iframe>
       </div>
-    </div>
+    </main>
   );
 };
 
