@@ -62,8 +62,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   def index(conn, %{"id" => screen_id} = params) do
-    is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
-    _ = Screens.LogScreenData.log_page_load(screen_id, is_screen, params["screen_side"])
+    _ = Screens.LogScreenData.log_page_load(screen_id, params)
     config = Cache.screen(screen_id)
 
     if match?(%Screen{app_id: app_id} when app_id in @recognized_app_ids, config) do

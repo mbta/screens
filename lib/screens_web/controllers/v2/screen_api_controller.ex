@@ -27,15 +27,12 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    is_screen = ScreensWeb.UserAgent.screen_conn?(conn, screen_id)
-    screen_side = params["screen_side"]
     variant = params["variant"]
     screen = Cache.screen(screen_id)
 
     LogScreenData.log_data_request(
       screen_id,
       last_refresh,
-      is_screen,
       params
     )
 
@@ -45,8 +42,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
           :nonexistent,
           screen_id,
           last_refresh,
-          is_screen,
-          screen_side
+          params
         )
 
         not_found_response(conn)
@@ -56,8 +52,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
           :outdated,
           screen_id,
           last_refresh,
-          is_screen,
-          screen_side
+          params
         )
 
         json(conn, @outdated_response)
@@ -67,8 +62,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
           :disabled,
           screen_id,
           last_refresh,
-          is_screen,
-          screen_side
+          params
         )
 
         json(conn, @disabled_response)
@@ -78,8 +72,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
           :success,
           screen_id,
           last_refresh,
-          is_screen,
-          screen_side
+          params
         )
 
         response =
@@ -144,7 +137,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
     LogScreenData.log_data_request(
       screen_id,
       last_refresh,
-      false,
       params
     )
 
@@ -176,7 +168,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
     LogScreenData.log_data_request(
       screen_id,
       last_refresh,
-      false,
       params
     )
 
@@ -195,7 +186,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
     LogScreenData.log_data_request(
       screen_id,
       last_refresh,
-      false,
       params
     )
 
