@@ -42,9 +42,10 @@ const Table = () => {
     const filterFns = Object.entries(filters);
 
     return Object.entries(localScreens)
-      .filter(([id, screen]) =>
-        (appIdFilter == null || screen.app_id == appIdFilter) &&
-        filterFns.every(([path, fn]) => !fn || fn(get(path, screen, id))),
+      .filter(
+        ([id, screen]) =>
+          (appIdFilter == null || screen.app_id == appIdFilter) &&
+          filterFns.every(([path, fn]) => !fn || fn(get(path, screen, id))),
       )
       .sort(([idA], [idB]) => idA.localeCompare(idB));
   }, [appIdFilter, filters, localScreens]);
@@ -63,7 +64,7 @@ const Table = () => {
   }, []);
 
   return (
-    <main>
+    <main className="admin-table">
       <div className="admin-navbar">
         {appIdFilters.map(({ id, name }) => (
           <button
@@ -76,68 +77,72 @@ const Table = () => {
         ))}
       </div>
 
-      {remoteScreens ? (
-        <table className="admin-table">
-          <thead>
-            <tr>
-              {fields.map(({ label, path }) => (
-                <th key={path}>{label}</th>
-              ))}
-            </tr>
-
-            <tr>
-              {fields.map(({ filter: Filter, path }) => (
-                <th key={path}>
-                  {Filter && (
-                    <Filter
-                      update={(filter) =>
-                        setFilters({ ...filters, [path]: filter })
-                      }
-                    />
-                  )}
-                </th>
-              ))}
-            </tr>
-
-            {localScreensCount != rows.length && (
+      <div className="admin-table__table">
+        {remoteScreens ? (
+          <table>
+            <thead>
               <tr>
-                <th colSpan={fields.length}>
-                  Showing {rows.length} of {localScreensCount} total screens
-                </th>
-              </tr>
-            )}
-          </thead>
-
-          <tbody>
-            {rows.map(([id, screen]) => (
-              <tr key={id}>
-                {fields.map(({ cell: Cell, path }) => (
-                  <td
-                    className={
-                      _.get(path, screen) != _.get(path, remoteScreens[id])
-                        ? "modified"
-                        : undefined
-                    }
-                    key={path}
-                  >
-                    <Cell
-                      value={get(path, screen, id)}
-                      update={(value) =>
-                        setLocalScreens({
-                          ...localScreens,
-                          [id]: _.set(path, value, screen),
-                        })
-                      }
-                    />
-                  </td>
+                {fields.map(({ label, path }) => (
+                  <th key={path}>{label}</th>
                 ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
-      ) : (
-        <p>Fetching data...</p>
-      )}
+
+              <tr>
+                {fields.map(({ filter: Filter, path }) => (
+                  <th key={path}>
+                    {Filter && (
+                      <Filter
+                        update={(filter) =>
+                          setFilters({ ...filters, [path]: filter })
+                        }
+                      />
+                    )}
+                  </th>
+                ))}
+              </tr>
+
+              {localScreensCount != rows.length && (
+                <tr>
+                  <th colSpan={fields.length}>
+                    Showing {rows.length} of {localScreensCount} total screens
+                  </th>
+                </tr>
+              )}
+            </thead>
+
+            <tbody>
+              {rows.map(([id, screen]) => (
+                <tr key={id}>
+                  {fields.map(({ cell: Cell, path }) => (
+                    <td
+                      className={
+                        _.get(path, screen) != _.get(path, remoteScreens[id])
+                          ? "modified"
+                          : undefined
+                      }
+                      key={path}
+                    >
+                      <Cell
+                        value={get(path, screen, id)}
+                        update={(value) =>
+                          setLocalScreens({
+                            ...localScreens,
+                            [id]: _.set(path, value, screen),
+                          })
+                        }
+                      />
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        ) : (
+          <p>Fetching data...</p>
+        )}
+      </div>
+
+      <div className="admin-table__footer">Here is my footer</div>
     </main>
   );
 };

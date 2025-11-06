@@ -23,13 +23,13 @@ const routes: [string, string, ComponentType][] = [
 const App = (): JSX.Element => {
   return (
     <Router basename="admin">
-      <div className="admin-navbar">
+      <nav className="admin-navbar">
         {routes.map(([path, label]) => (
           <NavLink to={path} key={path}>
             {label}
           </NavLink>
         ))}
-      </div>
+      </nav>
 
       <Routes>
         {routes.map(([path, , Component]) => (

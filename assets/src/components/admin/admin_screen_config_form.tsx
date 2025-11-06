@@ -17,7 +17,7 @@ const fetchConfig = async () => {
 };
 
 const AdminScreenConfigForm = (): JSX.Element => (
-  <main>
+  <main className="admin-page">
     <h2>Config Editor</h2>
     <AdminForm
       fetchConfig={fetchConfig}
