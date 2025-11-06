@@ -31,11 +31,6 @@ const Table = () => {
   >({});
   const [appIdFilter, setAppIdFilter] = useState<AppId | null>(null);
 
-  const localScreensCount = useMemo(
-    () => Object.keys(localScreens).length,
-    [localScreens],
-  );
-
   const fields = appIdFilter ? appFields[appIdFilter] : allFields;
 
   const rows = useMemo(() => {
@@ -49,6 +44,21 @@ const Table = () => {
       )
       .sort(([idA], [idB]) => idA.localeCompare(idB));
   }, [appIdFilter, filters, localScreens]);
+
+  const counts = useMemo(() => {
+    const visibleIDs = rows.map(([id]) => id);
+    const modifiedIDs = Object.entries(localScreens)
+      .filter(([id, screen]) => !_.isEqual(screen, remoteScreens[id]))
+      .map(([id]) => id);
+
+    return {
+      remote: Object.keys(remoteScreens).length,
+      local: Object.keys(localScreens).length,
+      visible: visibleIDs.length,
+      modified: modifiedIDs.length,
+      visibleModified: _.intersection(visibleIDs, modifiedIDs).length,
+    };
+  }, [remoteScreens, localScreens, rows]);
 
   const fetchConfig = async () => {
     const response = await fetch.get("/api/admin");
@@ -101,13 +111,19 @@ const Table = () => {
                 ))}
               </tr>
 
-              {localScreensCount != rows.length && (
-                <tr>
-                  <th colSpan={fields.length}>
-                    Showing {rows.length} of {localScreensCount} total screens
-                  </th>
-                </tr>
-              )}
+              <tr>
+                <th colSpan={fields.length}>
+                  {counts.visible < counts.local
+                    ? `Showing ${counts.visible} of ${counts.local} screens`
+                    : `Showing all ${counts.local} screens`}{" "}
+                  {counts.modified > 0 &&
+                    "(" +
+                      (counts.modified != counts.visibleModified
+                        ? `${counts.visibleModified} of `
+                        : "") +
+                      `${counts.modified} modified)`}
+                </th>
+              </tr>
             </thead>
 
             <tbody>
@@ -116,9 +132,12 @@ const Table = () => {
                   {fields.map(({ cell: Cell, path }) => (
                     <td
                       className={
-                        _.get(path, screen) != _.get(path, remoteScreens[id])
-                          ? "modified"
-                          : undefined
+                        _.isEqual(
+                          _.get(path, screen),
+                          _.get(path, remoteScreens[id]),
+                        )
+                          ? undefined
+                          : "modified"
                       }
                       key={path}
                     >
@@ -142,7 +161,9 @@ const Table = () => {
         )}
       </div>
 
-      <div className="admin-table__footer">Here is my footer</div>
+      <div className="admin-table__footer">
+        <button>Do a thing</button>
+      </div>
     </main>
   );
 };
