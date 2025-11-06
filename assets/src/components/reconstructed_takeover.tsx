@@ -13,6 +13,7 @@ interface ReconAlertProps {
   routes: any[]; // shouldn't be "any"
   effect: string;
   updated_at: string;
+  end_time?: string;
   disruption_diagram?: DisruptionDiagramData;
   urgent: boolean;
 }
@@ -26,6 +27,7 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
     remedy,
     routes,
     updated_at,
+    end_time,
     disruption_diagram,
   } = alert;
 
@@ -67,7 +69,11 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
               {cause && `Cause: ${cause}`}
             </div>
             <div className="alert-card__footer__updated-at">
-              Updated <span className="bold">{updated_at}</span>
+              {end_time ? (
+                <span className="bold">Through {end_time}</span>
+              ) : (
+                <span>Updated {updated_at}</span>
+              )}
             </div>
           </div>
         </div>
