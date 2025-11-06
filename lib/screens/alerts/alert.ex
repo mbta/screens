@@ -384,7 +384,7 @@ defmodule Screens.Alerts.Alert do
     informed_route_ids = MapSet.new(alert.informed_entities, & &1.route)
 
     Enum.filter(
-      ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E"],
+      ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E", "Mattapan"],
       &(&1 in informed_route_ids)
     )
   end

@@ -114,7 +114,11 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     with {:ok, route_id, stop_sequence, branch} <-
            get_builder_data(localized_alert, informed_stop_ids) do
-      line = Route.color(route_id)
+      line =
+        case route_id do
+          "Mattapan" -> :mattapan
+          _ -> Route.color(route_id)
+        end
 
       stop_names = Subway.route_stop_names(route_id)
 
@@ -467,10 +471,11 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   # O = O = O = O = X = X = X = X = O = O = <> = O = O = O = =>
   # ^   ^   ^   ^                                    ^   ^   ^
   # Moved to left_end                                Moved to right_end
-  defp split_end_stops(builder) when builder.metadata.line == :blue do
-    # Since we always show all stops for the Blue Line, we don't need to do
+  @spec split_end_stops(t()) :: t()
+  defp split_end_stops(builder)
+       when builder.metadata.line == :blue or builder.metadata.line == :mattapan do
+    # Since we always show all stops for the Blue Line and Mattapan, we don't need to do
     # anything special with the ends. They don't need to be split out.
-
     builder
   end
 

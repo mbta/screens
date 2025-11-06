@@ -104,6 +104,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Red-Ashmont" => ["Ashmont", "Alewife"],
     "Red-Braintree" => ["Braintree", "Alewife"],
     "Red" => ["Ashmont & Braintree", "Alewife"],
+    "Mattapan" => ["Mattapan", "Ashmont"],
     "Green-B" => ["Boston College", "Government Center"],
     "Green-C" => ["Cleveland Circle", "Government Center"],
     "Green-D" => ["Riverside", "Union Square"],
@@ -127,7 +128,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Oak Grove" => "ol-oak-grove",
     "Alewife" => "rl-alewife",
     "Ashmont" => "rl-ashmont",
-    "Braintree" => "rl-braintree"
+    "Braintree" => "rl-braintree",
+    "Mattapan" => "rl-mattapan"
   }
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]

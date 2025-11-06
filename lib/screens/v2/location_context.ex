@@ -113,8 +113,8 @@ defmodule Screens.LocationContext do
   @spec route_type_filter(screen_type(), [Stop.id()]) :: list(RouteType.t())
   def route_type_filter(app, _) when app in [BusEink, BusShelter], do: [:bus]
   def route_type_filter(GlEink, _), do: [:light_rail]
-  # Ashmont should not show Mattapan alerts for PreFare or Dup
-  def route_type_filter(app, ["place-asmnl"]) when app in [PreFare, Dup], do: [:subway]
+  # Ashmont should not show Mattapan alerts for Dup
+  def route_type_filter(app, ["place-asmnl"]) when app in [Dup], do: [:subway]
   def route_type_filter(PreFare, _), do: [:light_rail, :subway]
   # WTC is a special bus-only case
   def route_type_filter(Dup, ["place-wtcst"]), do: [:bus]

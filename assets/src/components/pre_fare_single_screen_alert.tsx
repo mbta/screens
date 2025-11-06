@@ -447,6 +447,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
 const getRouteColor = (route_id: string) => {
   switch (route_id.substring(0, 3)) {
     case "Red":
+    case "Mat":
       return "red";
     case "Ora":
       return "orange";

@@ -1,7 +1,8 @@
 @use "CSS/colors";
 
 .end-slot__arrow {
-  &--red {
+  &--red,
+  &--mattapan {
     fill: colors.$line-red;
   }
 
@@ -19,7 +20,8 @@
 }
 
 .end-slot__icon {
-  &--red {
+  &--red,
+  &--mattapan {
     stroke: colors.$line-red;
   }
 
@@ -45,7 +47,8 @@
 }
 
 .middle-slot__background {
-  &--red {
+  &--red,
+  &--mattapan {
     fill: colors.$line-red;
   }
 
@@ -63,7 +66,8 @@
 }
 
 .middle-slot__icon {
-  &--red {
+  &--red,
+  &--mattapan {
     stroke: colors.$line-red;
   }
 

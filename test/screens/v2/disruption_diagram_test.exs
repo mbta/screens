@@ -1168,6 +1168,41 @@ defmodule Screens.V2.DisruptionDiagramTest do
       assert expected == actual
     end
 
+    #####################
+    # RED LINE MATTAPAN #
+    #####################
+
+    test "serializes a Mattapan Trolley shuttle" do
+      localized_alert =
+        DDAlert.make_localized_alert(
+          :shuttle,
+          :mattapan,
+          ~P"asmnl",
+          {~P"cenav", ~P"capst"}
+        )
+
+      expected = %{
+        current_station_slot_index: 0,
+        effect: :shuttle,
+        effect_region_slot_index_range: {4, 6},
+        line: :mattapan,
+        slots: [
+          %{label_id: ~P"asmnl", type: :terminal},
+          %{label: %{abbrev: "Cedar Grove", full: "Cedar Grove"}, show_symbol: true},
+          %{label: %{abbrev: "Butler", full: "Butler"}, show_symbol: true},
+          %{label: %{abbrev: "Milton", full: "Milton"}, show_symbol: true},
+          %{label: %{abbrev: "Central Ave", full: "Central Avenue"}, show_symbol: true},
+          %{label: %{abbrev: "Valley Rd", full: "Valley Road"}, show_symbol: true},
+          %{label: %{abbrev: "Capen St", full: "Capen Street"}, show_symbol: true},
+          %{label_id: ~P"matt", type: :terminal}
+        ]
+      }
+
+      assert {:ok, actual} = DD.serialize(localized_alert)
+
+      assert expected == actual
+    end
+
     ####################
     # GREEN LINE TRUNK #
     ####################
