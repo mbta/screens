@@ -74,6 +74,9 @@ body {
   }
 
   &__footer {
+    display: flex;
+    gap: 1em;
+    align-items: center;
     padding: 1em;
   }
 
@@ -88,7 +91,7 @@ body {
     background-color: #eee;
 
     tr:last-child th {
-      padding-bottom: 8px;
+      padding: 8px 0;
     }
   }
 
@@ -110,6 +113,14 @@ body {
       background-color: inherit;
       border: 0;
     }
+  }
+
+  tr:nth-child(odd):has(td.modified) {
+    background-color: lightyellow;
+  }
+
+  tr:nth-child(even):has(td.modified) {
+    background-color: lightgoldenrodyellow;
   }
 
   td {
