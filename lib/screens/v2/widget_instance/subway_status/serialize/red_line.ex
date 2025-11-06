@@ -11,14 +11,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.RedLine do
     mattapan_alerts = Map.get(grouped_alerts, "Mattapan", [])
 
     cond do
-      # Serialize a row for RL and for Mattapan branch
       !Enum.empty?(red_alerts) and !Enum.empty?(mattapan_alerts) ->
+        # Serialize a row for RL and a row for Mattapan branch
         serialize_red_and_mattapan(red_alerts, mattapan_alerts)
 
       !Enum.empty?(mattapan_alerts) ->
+        # Serialize 1 or 2 rows for the Mattapan branch
         serialize_mattapan_only(grouped_alerts)
 
       true ->
+        # Serialize 1 or 2 rows for the Red Line
         serialize_alert_rows_for_route_fn.("Red")
     end
   end
@@ -30,7 +32,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.RedLine do
     if length(mattapan_alerts) < 3 do
       %{
         type: :contracted,
-        alerts: Enum.map(mattapan_alerts, &serialize_red_line_branch_alert/1)
+        alerts: Enum.map(mattapan_alerts, &serialize_rl_branch_alert/1)
       }
     else
       %{
@@ -59,7 +61,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.RedLine do
 
     serialized_mattapan =
       if mattapan_count == 1 do
-        serialize_red_line_branch_alert(List.first(mattapan_alerts))
+        serialize_rl_branch_alert(List.first(mattapan_alerts))
       else
         Serialize.serialize_alert_summary(mattapan_count, RoutePill.serialize_rl_mattapan_pill())
       end
@@ -70,7 +72,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.RedLine do
     }
   end
 
-  defp serialize_red_line_branch_alert(alert) do
+  defp serialize_rl_branch_alert(alert) do
     Map.merge(
       %{route_pill: RoutePill.serialize_rl_mattapan_pill()},
       Serialize.serialize_alert(alert, "Mattapan")

@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils
@@ -33,7 +34,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
           subway_alerts: list(SubwayStatusAlert.t())
         }
 
-  @type alerts_by_route :: %{String.t() => list(SubwayStatusAlert.t())}
+  @type alerts_by_route :: %{Route.id() => list(SubwayStatusAlert.t())}
 
   @type serialized_response :: %{
           blue: section(),

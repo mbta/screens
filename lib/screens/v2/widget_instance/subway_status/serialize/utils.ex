@@ -1,7 +1,6 @@
 defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   @moduledoc """
   Shared utility functions for SubwayStatus serialization.
-  Includes location helpers, station closure helpers, and route matching.
   """
 
   alias Screens.Alerts.Alert

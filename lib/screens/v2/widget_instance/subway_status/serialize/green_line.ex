@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
+  alias Screens.Routes.Route
   alias Screens.Stops.Subway
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize
@@ -12,10 +13,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
-
-  ###################################
-  # Green Line Alerts Serialization #
-  ###################################
 
   def serialize_gl_alerts(grouped_alerts, serialize_alert_rows_for_route_fn) do
     green_line_alerts =
@@ -38,7 +35,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
 
       case {trunk_alerts, branch_alerts} do
         {[], branch_alerts} ->
-          serialize_green_line_branch_alerts_only(branch_alerts)
+          serialize_gl_branch_alerts_only(branch_alerts)
 
         {[trunk_alert], []} ->
           %{type: :contracted, alerts: [serialize_trunk_alert(trunk_alert)]}
@@ -48,7 +45,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
             type: :contracted,
             alerts: [
               serialize_trunk_alert(trunk_alert),
-              serialize_green_line_branch_alert_summary(branch_alerts)
+              serialize_gl_branch_alert_summary(branch_alerts)
             ]
           }
 
@@ -75,7 +72,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
     end
   end
 
-  defp serialize_green_line_branch_alerts_only(branch_alerts) do
+  @spec serialize_gl_branch_alerts_only([SubwayStatus.SubwayStatusAlert.t()]) ::
+          SubwayStatus.contracted_section()
+  defp serialize_gl_branch_alerts_only(branch_alerts) do
     case branch_alerts do
       [alert] ->
         route_ids =
@@ -86,7 +85,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
           alerts: [
             Map.merge(
               %{route_pill: RoutePill.serialize_gl_pill_with_branches(route_ids)},
-              serialize_green_line_branch_alert(alert, route_ids)
+              serialize_gl_branch_alert(alert, route_ids)
             )
           ]
         }
@@ -95,8 +94,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
         %{
           type: :contracted,
           alerts: [
-            serialize_green_line_branch_alert(alert1, Utils.alert_routes(alert1)),
-            serialize_green_line_branch_alert(alert2, Utils.alert_routes(alert2))
+            serialize_gl_branch_alert(alert1, Utils.alert_routes(alert1)),
+            serialize_gl_branch_alert(alert2, Utils.alert_routes(alert2))
           ]
         }
 
@@ -118,20 +117,20 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
     end
   end
 
-  @spec serialize_green_line_branch_alert(SubwayStatus.SubwayStatusAlert.t(), list(String.t())) ::
+  @spec serialize_gl_branch_alert(SubwayStatus.SubwayStatusAlert.t(), list(Route.id())) ::
           SubwayStatus.alert()
-  def serialize_green_line_branch_alert(alert, route_ids)
+  def serialize_gl_branch_alert(alert, route_ids)
 
-  # If only one branch is affected, we can still determine a stop
-  # range to show, for applicable alert types
-  def serialize_green_line_branch_alert(alert, [route_id]) do
+  def serialize_gl_branch_alert(alert, [route_id]) do
+    # If only one branch is affected, we can still determine a stop
+    # range to show, for applicable alert types
     Map.merge(
       %{route_pill: RoutePill.serialize_gl_pill_with_branches([route_id])},
       Serialize.serialize_alert(alert, route_id)
     )
   end
 
-  def serialize_green_line_branch_alert(
+  def serialize_gl_branch_alert(
         %{
           alert: %Alert{
             effect: :station_closure,
@@ -154,14 +153,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
   end
 
   # Otherwise, give up on determining a stop range.
-  def serialize_green_line_branch_alert(alert, route_ids) do
+  def serialize_gl_branch_alert(alert, route_ids) do
     Map.merge(
       %{route_pill: RoutePill.serialize_gl_pill_with_branches(route_ids)},
       Serialize.serialize_alert(alert, "Green")
     )
   end
 
-  defp serialize_green_line_branch_alert_summary(branch_alerts) do
+  @spec serialize_gl_branch_alert_summary([SubwayStatus.SubwayStatusAlert.t()]) ::
+          SubwayStatus.alert()
+  defp serialize_gl_branch_alert_summary(branch_alerts) do
     route_ids =
       branch_alerts
       |> Enum.flat_map(&Utils.alert_routes/1)
@@ -171,7 +172,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
 
     case branch_alerts do
       [branch_alert] ->
-        serialize_green_line_branch_alert(branch_alert, route_ids)
+        serialize_gl_branch_alert(branch_alert, route_ids)
 
       _ ->
         Serialize.serialize_alert_summary(
@@ -181,6 +182,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
     end
   end
 
+  @spec serialize_trunk_alert(SubwayStatus.SubwayStatusAlert.t()) :: SubwayStatus.alert()
   defp serialize_trunk_alert(alert) do
     Map.merge(
       %{route_pill: RoutePill.serialize_route_pill("Green")},
@@ -188,17 +190,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
     )
   end
 
-  defp alert_affects_whole_green_line?(%Alert{informed_entities: informed_entities}) do
-    alert_whole_line_stops =
-      informed_entities
-      |> Enum.map(fn e -> Map.get(e, :route) end)
-      |> Enum.filter(&(&1 in @green_line_branches))
-      |> Enum.uniq()
-      |> Enum.sort()
-
-    alert_whole_line_stops == @green_line_branches
+  @spec alert_affects_gl_trunk_or_whole_line?(
+          SubwayStatus.SubwayStatusAlert.t(),
+          list(MapSet.t(String.t()))
+        ) :: boolean()
+  defp alert_affects_gl_trunk_or_whole_line?(%{alert: alert}, gl_stop_sets) do
+    alert_affects_gl_trunk?(alert, gl_stop_sets) or alert_affects_whole_green_line?(alert)
   end
 
+  @spec alert_affects_gl_trunk?(Alert.t(), list(MapSet.t(String.t()))) :: boolean()
   # If any closed stop is served by more than one branch, the alert affects the trunk
   defp alert_affects_gl_trunk?(
          %Alert{
@@ -208,7 +208,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
          gl_stop_sets
        ) do
     informed_entities
-    |> Enum.map(fn e -> Map.get(e, :stop) end)
+    |> Enum.map(fn ie -> Map.get(ie, :stop) end)
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq()
     |> Enum.any?(fn informed_stop ->
@@ -237,8 +237,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
     end
   end
 
-  defp alert_affects_gl_trunk_or_whole_line?(%{alert: alert}, gl_stop_sets) do
-    alert_affects_gl_trunk?(alert, gl_stop_sets) or
-      alert_affects_whole_green_line?(alert)
+  @spec alert_affects_whole_green_line?(Alert.t()) :: boolean()
+  defp alert_affects_whole_green_line?(%Alert{informed_entities: informed_entities}) do
+    alert_whole_line_stops =
+      informed_entities
+      |> Enum.map(fn e -> Map.get(e, :route) end)
+      |> Enum.filter(&(&1 in @green_line_branches))
+      |> Enum.uniq()
+      |> Enum.sort()
+
+    alert_whole_line_stops == @green_line_branches
   end
 end
