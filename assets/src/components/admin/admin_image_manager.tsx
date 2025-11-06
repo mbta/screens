@@ -175,7 +175,7 @@ const ImageManager = (): JSX.Element => {
   };
 
   return (
-    <div className="admin-image-manager">
+    <main className="admin-page admin-image-manager">
       <h2>Manage Images</h2>
       <span>
         <select
@@ -229,7 +229,7 @@ const ImageManager = (): JSX.Element => {
         onUploaded={loadImages}
         selectedPrefix={selectedKey ? keyPrefix(selectedKey) : undefined}
       />
-    </div>
+    </main>
   );
 };
 
