@@ -471,9 +471,10 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   # O = O = O = O = X = X = X = X = O = O = <> = O = O = O = =>
   # ^   ^   ^   ^                                    ^   ^   ^
   # Moved to left_end                                Moved to right_end
+  @spec split_end_stops(t()) :: t()
   defp split_end_stops(builder)
        when builder.metadata.line == :blue or builder.metadata.line == :mattapan do
-    # Since we always show all stops for the Blue Line and Mattapan, we don't need to do    # Since we always show all stops for the Blue Line, we don't need to do
+    # Since we always show all stops for the Blue Line and Mattapan, we don't need to do
     # anything special with the ends. They don't need to be split out.
     builder
   end
