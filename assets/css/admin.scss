@@ -71,6 +71,17 @@ body {
     flex-grow: 1;
     padding: 0 1em;
     overflow: auto;
+
+    &__stats {
+      display: flex;
+      justify-content: center;
+
+      & > *:not(:last-child) {
+        padding-right: 1em;
+        border-right: 1px solid gray;
+        margin-right: 1em;
+      }
+    }
   }
 
   &__footer {
@@ -115,10 +126,12 @@ body {
     }
   }
 
+  tr.new:nth-child(odd),
   tr:nth-child(odd):has(td.modified) {
     background-color: lightyellow;
   }
 
+  tr.new:nth-child(even),
   tr:nth-child(even):has(td.modified) {
     background-color: lightgoldenrodyellow;
   }
