@@ -51,7 +51,7 @@ defmodule Screens.V2.Departure do
 
         route_type_filter ->
           param_route_types =
-            Map.get(params, :route_type, RouteType.all_route_types()) |> List.wrap()
+            params |> Map.get(:route_type, RouteType.all_route_types()) |> List.wrap()
 
           intersected_route_type_filter =
             Enum.filter(route_type_filter, &(&1 in param_route_types))
