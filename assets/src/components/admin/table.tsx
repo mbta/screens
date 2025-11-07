@@ -113,15 +113,25 @@ const Table = () => {
 
               <tr>
                 <th colSpan={fields.length}>
-                  {counts.visible < counts.local
-                    ? `Showing ${counts.visible} of ${counts.local} screens`
-                    : `Showing all ${counts.local} screens`}{" "}
-                  {counts.modified > 0 &&
-                    "(" +
-                      (counts.modified != counts.visibleModified
-                        ? `${counts.visibleModified} of `
-                        : "") +
-                      `${counts.modified} modified)`}
+                  <div className="admin-table__table__stats">
+                    <span>
+                      {counts.visible < counts.local
+                        ? `Showing ${counts.visible} of ${counts.local} screens`
+                        : `Showing all ${counts.local} screens`}
+                    </span>
+
+                    {counts.modified > 0 && (
+                      <span>
+                        {counts.modified != counts.visibleModified &&
+                          `${counts.visibleModified} of`}{" "}
+                        {counts.modified} modified
+                      </span>
+                    )}
+
+                    {counts.local > counts.remote && (
+                      <span>{counts.local - counts.remote} new</span>
+                    )}
+                  </div>
                 </th>
               </tr>
             </thead>
