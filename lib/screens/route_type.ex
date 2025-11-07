@@ -30,4 +30,6 @@ defmodule Screens.RouteType do
       unquote(t)
     end
   end
+
+  def all_route_types, do: @route_types
 end

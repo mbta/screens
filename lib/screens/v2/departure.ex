@@ -3,6 +3,7 @@ defmodule Screens.V2.Departure do
 
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
@@ -44,12 +45,20 @@ defmodule Screens.V2.Departure do
     fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
     fetch_schedule_params =
-      case Keyword.get(opts, :schedule_route_type_filter, []) do
+      case Keyword.get(opts, :schedule_route_type_filter, nil) do
         nil ->
           params
 
-        route_types ->
-          Map.put(params, :route_type, route_types)
+        route_type_filter ->
+          param_route_types =
+            Map.get(params, :route_type, RouteType.all_route_types()) |> List.wrap()
+
+          intersected_route_type_filter =
+            Enum.filter(route_type_filter, &(&1 in param_route_types))
+
+          if Enum.any?(intersected_route_type_filter),
+            do: Map.put(params, :route_type, intersected_route_type_filter),
+            else: params
       end
 
     with {:ok, predictions} <- fetch_predictions_fn.(params),
