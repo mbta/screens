@@ -3,6 +3,7 @@ defmodule Screens.V2.Departure do
 
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
@@ -43,14 +44,7 @@ defmodule Screens.V2.Departure do
     now = Keyword.get(opts, :now, DateTime.utc_now())
     fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
-    fetch_schedule_params =
-      case Keyword.get(opts, :schedule_route_type_filter, []) do
-        nil ->
-          params
-
-        route_types ->
-          Map.put(params, :route_type, route_types)
-      end
+    fetch_schedule_params = build_params_for_schedules(params, opts)
 
     with {:ok, predictions} <- fetch_predictions_fn.(params),
          {:ok, schedules} <- fetch_schedules(fetch_schedule_params, opts) do
@@ -70,6 +64,20 @@ defmodule Screens.V2.Departure do
       {:ok, result} -> {:ok, V3Api.Parser.parse(result)}
       _ -> :error
     end
+  end
+
+  def build_params_for_schedules(params, opts) do
+    # Default to include all route_types, unless params or options include ones to filter on.
+    # If route_types to filter on are configured in params AND options,then we only
+    # include route_types that are set in both.
+    all_types = RouteType.all()
+
+    param_route_types =
+      params |> Map.get(:route_type, all_types) |> List.wrap()
+
+    opt_route_types = Keyword.get(opts, :schedule_route_type_filter, all_types)
+
+    Map.put(params, :route_type, Enum.filter(opt_route_types, &(&1 in param_route_types)))
   end
 
   def encode_params(params) do
