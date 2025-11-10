@@ -31,5 +31,5 @@ defmodule Screens.RouteType do
     end
   end
 
-  def all_route_types, do: @route_types
+  def all, do: @route_types
 end

@@ -70,7 +70,7 @@ defmodule Screens.V2.Departure do
     # Default to include all route_types, unless params or options include ones to filter on.
     # If route_types to filter on are configured in params AND options,then we only
     # include route_types that are set in both.
-    all_types = RouteType.all_route_types()
+    all_types = RouteType.all()
 
     param_route_types =
       params |> Map.get(:route_type, all_types) |> List.wrap()
