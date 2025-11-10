@@ -474,22 +474,13 @@ defmodule Screens.V2.DepartureTest do
   end
 
   describe "build_params_for_schedules/2" do
-    test "returns params string route_type when no opts is provided" do
+    test "returns params route_type when no opts is provided" do
       params = %{route_type: :subway}
       opts = []
 
       result = Departure.build_params_for_schedules(params, opts)
 
       assert result == %{route_type: [:subway]}
-    end
-
-    test "returns params list route_type  when no opts is provided" do
-      params = %{route_type: [:light_rail, :subway]}
-      opts = []
-
-      result = Departure.build_params_for_schedules(params, opts)
-
-      assert result == params
     end
 
     test "returns schedule_route_type_filter option when provided" do
@@ -502,7 +493,7 @@ defmodule Screens.V2.DepartureTest do
     end
 
     test "returns only the intersection of params and opts" do
-      params = %{route_type: [:rail, :subway]}
+      params = %{route_type: :rail}
       opts = [schedule_route_type_filter: [:rail, :ferry]]
 
       result = Departure.build_params_for_schedules(params, opts)
@@ -511,8 +502,8 @@ defmodule Screens.V2.DepartureTest do
     end
 
     test "returns empty list when intersection is empty" do
-      params = %{route_type: [:subway, :light_rail]}
-      opts = [schedule_route_type_filter: [:ferry, :rail]]
+      params = %{route_type: :light_rail}
+      opts = [schedule_route_type_filter: [:ferry, :rail, :subway]]
 
       result = Departure.build_params_for_schedules(params, opts)
 
