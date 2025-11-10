@@ -7,17 +7,7 @@ import Config
 unless config_env() == :test do
   config :screens,
     api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
-    api_v3_key: System.get_env("API_V3_KEY"),
-    trip_updates_url:
-      System.get_env(
-        "TRIP_UPDATES_URL",
-        "https://cdn.mbta.com/realtime/TripUpdates_enhanced.json"
-      ),
-    vehicle_positions_url:
-      System.get_env(
-        "VEHICLE_POSITIONS_URL",
-        "https://cdn.mbta.com/realtime/VehiclePositions_enhanced.json"
-      )
+    api_v3_key: System.get_env("API_V3_KEY")
 end
 
 if config_env() == :prod do
