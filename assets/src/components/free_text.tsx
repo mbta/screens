@@ -1,3 +1,4 @@
+import cx from "classnames";
 import _ from "lodash";
 import weakKey from "weak-key";
 
@@ -209,15 +210,16 @@ export interface FreeTextType {
 }
 
 interface FreeTextProps {
+  className?: string;
   lines: FreeTextType | FreeTextType[];
 }
 
-const FreeText = (props: FreeTextProps) => {
-  const lines = Array.isArray(props.lines) ? props.lines : [props.lines];
+const FreeText = ({ className, lines }: FreeTextProps) => {
+  const wrappedLines = Array.isArray(lines) ? lines : [lines];
 
   return (
-    <div className="free-text">
-      {lines.map((line) => (
+    <div className={cx("free-text", className)}>
+      {wrappedLines.map((line) => (
         <FreeTextLine key={weakKey(line)} icon={line.icon} text={line.text} />
       ))}
     </div>

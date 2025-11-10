@@ -1,11 +1,121 @@
+@use "CSS/colors";
+
 .elevator-status-new {
   display: flex;
   flex-direction: column;
-  border: 2px dashed black;
+  color: colors.$cool-black-15;
+  background-color: colors.$warm-neutral-90;
+
+  &__title {
+    padding: 0 48px;
+    font-size: 56px;
+    font-weight: bold;
+    line-height: 144px;
+    color: colors.$cool-black-30;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    background-color: colors.$warm-neutral-80;
+  }
+
+  &__body {
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+    padding: 48px;
+    padding-bottom: 16px;
+  }
+
+  &__header ul {
+    margin: 0;
+    // Pull the bullets inside the bounding box, since by default they hang
+    // slightly outside it. This effect depends on the text size, so adjust
+    // based on the text size.
+    margin-left: 0.5em;
+
+    &.body-2 {
+      margin-top: 10px;
+    }
+
+    &.body-4 {
+      margin-top: 40px;
+    }
+
+    &.overflow {
+      // `overflow: hidden` also hides the bullets for some reason. This is
+      // fixed with `list-style-position: inside`, but we don't want to do that
+      // normally since wrapped text would appear directly under the bullet.
+      margin-left: 0;
+      list-style-position: inside;
+
+      li {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+  }
+
+  &__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .free-text > *:not(:first-child) {
+      // Give individual free text lines the same "gap" as the flex container.
+      margin-top: 16px;
+    }
+  }
 
   &__cta {
-    display: flex;
-    align-items: center;
+    margin-top: auto;
+  }
+
+  &:has(&__cta) {
+    padding-bottom: 0;
+  }
+}
+
+.elevator-alerts-cta {
+  display: flex;
+  align-items: center;
+  padding-right: 48px;
+  background-color: colors.$warm-neutral-80;
+
+  &--large {
+    height: 296px;
+  }
+
+  &--small {
+    height: 248px;
+  }
+
+  &__icon {
+    position: relative;
+  }
+
+  &--large &__icon {
+    top: 47px;
+    width: 273px;
+    height: 273px;
+    margin-left: -25px;
+  }
+
+  &--small &__icon {
+    top: 38px;
+    width: 223px;
+    height: 223px;
+    margin-left: -12px;
+  }
+
+  &--large &__text {
+    // The bounding box of the app-in-hand includes some empty space on the
+    // right side, and in this case the text needs to be pulled slightly inside
+    // of it to avoid running into the QR code.
+    margin-left: -24px;
+  }
+
+  &__qrcode {
+    margin-left: auto;
   }
 }
 
@@ -16,6 +126,6 @@
  */
 .elevator-status-new {
   position: relative;
-  bottom: -104px;
+  bottom: -108px;
   height: 984px;
 }
