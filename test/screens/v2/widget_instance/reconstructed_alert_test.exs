@@ -3436,7 +3436,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert WidgetInstance.valid_candidate?(widget)
     end
 
-    suppressed_alerts = ~w[645336]
+    suppressed_alerts = ~w[673353]
 
     for alert_id <- suppressed_alerts do
       @tag alert_id: alert_id
