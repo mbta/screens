@@ -310,7 +310,7 @@ const EndSlotComponent: ComponentType<EndSlotComponentProps> = ({
     );
   } else if (isAffected && isCurrentStop) {
     icon = <LargeXStopIcon iconSize={61} color="#ee2e24" />;
-  } else if (isAffected && effect != "shuttle") {
+  } else if (isAffected && effect !== "shuttle") {
     icon = <LargeXStopIcon iconSize={61} />;
   } else if (isCurrentStop && line === "red") {
     icon = <CurrentStopOpenDiamondIcon iconSize={MAX_ENDPOINT_HEIGHT} />;
@@ -723,7 +723,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   useEffect(() => {
     // Scale the line-map svg given the available screen width
     const measureDiagramAndScale = () => {
-      if (!isDone && diagramContainerHeight != 0) {
+      if (!isDone && diagramContainerHeight !== 0) {
         // If scaleFactor has already been applied to the line-map, we need to reverse that for calculations
         const unscaledHeight = lineDiagramHeight / scaleFactor;
         const unscaledWidth = lineDiagramWidth / scaleFactor;

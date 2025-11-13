@@ -132,8 +132,8 @@ const ScreenContainer = ({ id }) => {
 
   useEffect(() => {
     if (
-      blinkConfig != null &&
-      requestCount % blinkConfig.refreshesPerBlink == 0
+      blinkConfig !== null &&
+      requestCount % blinkConfig.refreshesPerBlink === 0
     ) {
       setShowBlink(true);
 

@@ -17,7 +17,7 @@ const FlexZonePageIndicator: ComponentType<Props> = ({
         let modifier;
         if (i < pageIndex) {
           modifier = "past";
-        } else if (i == pageIndex) {
+        } else if (i === pageIndex) {
           modifier = "selected";
         } else {
           modifier = "unselected";
