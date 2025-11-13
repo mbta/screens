@@ -29,7 +29,7 @@ const ImageUpload = ({ onUploaded, selectedPrefix }): JSX.Element => {
     if (!stagedUpload) return;
 
     if (
-      keyPrefix(uploadKey) == "" &&
+      keyPrefix(uploadKey) === "" &&
       !confirm("Really upload this image to the root path?")
     )
       return;
@@ -179,7 +179,7 @@ const ImageManager = (): JSX.Element => {
       <h2>Manage Images</h2>
       <span>
         <select
-          disabled={images.length == 0}
+          disabled={images.length === 0}
           onChange={(e) => setSelectedKey(e.target.value)}
           value={selectedKey}
         >

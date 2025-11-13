@@ -20,7 +20,7 @@ export type Message =
 
 export const INSPECTOR_FRAME_NAME = "screen-inspector-frame";
 
-const isFramed = (): boolean => window.name == INSPECTOR_FRAME_NAME;
+const isFramed = (): boolean => window.name === INSPECTOR_FRAME_NAME;
 
 const sendMessage = (window: Window, message: Message) =>
   window.postMessage(message, { targetOrigin: location.origin });
@@ -39,7 +39,7 @@ const useReceiveFromInspector = (handler: MessageHandler) =>
 
 const receiveHook = (handler: MessageHandler) => {
   const listener = ({ data, origin }) =>
-    origin == location.origin && handler(data);
+    origin === location.origin && handler(data);
 
   window.addEventListener("message", listener);
   return () => window.removeEventListener("message", listener);

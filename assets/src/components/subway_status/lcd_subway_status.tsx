@@ -59,7 +59,7 @@ const ContractedStatus: ComponentType<ContractedStatusProps> = ({
   showRule,
 }) => {
   const modifiers = ["contracted"];
-  if (alerts.length == 1) {
+  if (alerts.length === 1) {
     modifiers.push("one-alert");
   } else {
     modifiers.push("two-alerts");

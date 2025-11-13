@@ -465,7 +465,7 @@ const getRouteColor = (route_id: string) => {
 const getAlertColor = (routes: EnrichedRoute[]) => {
   const colors = routes.map((r) => getRouteColor(r.route_id));
   const uniqueColors = new Set(colors).size;
-  return uniqueColors == 1 ? colors[0] : "yellow";
+  return uniqueColors === 1 ? colors[0] : "yellow";
 };
 
 const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({

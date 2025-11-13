@@ -303,7 +303,7 @@ const Closures = ({
     updateVisibleData,
   });
 
-  const isUpcomingClosurePage = upcomingClosure && pageIndex == 0;
+  const isUpcomingClosurePage = upcomingClosure && pageIndex === 0;
 
   // The current page within the pages of the closure list. Note when the
   // current page is the upcoming closure page, this is -1, which correctly
@@ -316,7 +316,7 @@ const Closures = ({
   } as CSSProperties;
 
   const numRowsOffPage = pageRowCounts
-    .filter((_, index) => index != listPageIndex)
+    .filter((_, index) => index !== listPageIndex)
     .reduce((a, b) => a + b, 0);
 
   // Determine the index of the first row on each page of the closure list, for
@@ -365,7 +365,7 @@ const Closures = ({
                 >
                   {sortStations(stations, stationId).map((station, index) => (
                     <ClosureRow
-                      isCurrentStation={station.id == stationId}
+                      isCurrentStation={station.id === stationId}
                       isFirstRowOnPage={firstRowIndices.includes(index)}
                       key={station.id}
                       station={station}

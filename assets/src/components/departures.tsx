@@ -33,7 +33,7 @@ const Departures: ComponentType<Departures> = ({ sections }) => {
     if (ref.current && hasOverflowY(ref.current)) {
       const newSections = trimSections(foldedSections);
 
-      if (foldedSections != newSections) {
+      if (foldedSections !== newSections) {
         setFoldedSections(newSections);
       } else {
         report("warning", "layout failed: departures will overflow");

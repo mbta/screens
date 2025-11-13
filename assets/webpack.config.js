@@ -31,8 +31,8 @@ const ENTRYPOINTS = {
 const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 
 module.exports = (env, argv) => {
-  const isOutfrontPackage = env.package == "dup";
-  const isProduction = argv.mode == "production";
+  const isOutfrontPackage = env.package === "dup";
+  const isProduction = argv.mode === "production";
 
   return {
     devtool: "source-map",

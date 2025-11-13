@@ -49,7 +49,7 @@ export const getPlayerName = (): string | null => {
 export const getStationName = (): string | null => {
   const tags = getTags();
 
-  if (tags != null) {
+  if (tags !== null) {
     return tags.find(({ name }) => name === "Station")?.value?.[0] ?? null;
   }
 
@@ -144,7 +144,7 @@ const BASE_MRAID: Pick<MRAID, "EVENTS" | "requestInit" | "addEventListener"> = {
     return "fakeLayoutID";
   },
   addEventListener(eventID, callback, layoutID) {
-    if (eventID == "fakeOnscreenEvent" && layoutID == "fakeLayoutID") {
+    if (eventID === "fakeOnscreenEvent" && layoutID === "fakeLayoutID") {
       console.log(
         "FakeMRAID: Setting fake ONSCREEN event to fire in 3 seconds",
       );

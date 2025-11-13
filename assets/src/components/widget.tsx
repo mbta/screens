@@ -11,7 +11,7 @@ const MappingContext = createContext({});
 const Widget: ComponentType<Props> = ({ data }) => {
   const typeToComponent = useContext(MappingContext);
 
-  if (data == null) return null;
+  if (!data) return null;
 
   const { type, ...props } = data;
   const Component = typeToComponent[type];

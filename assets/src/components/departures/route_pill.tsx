@@ -131,7 +131,7 @@ const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
         innerContent = <SlashedRoutePill {...pill} />;
     }
 
-    if (pill.type == "text" && pill.branches) {
+    if (pill.type === "text" && pill.branches) {
       branches = pill.branches.map((branch: string) => (
         <div
           key={branch}
