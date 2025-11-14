@@ -208,11 +208,16 @@ interface StandardIssueSectionProps {
 const StandardIssueSection: ComponentType<StandardIssueSectionProps> = ({
   issue,
   location,
+  contentTextSize,
 }) => (
   <div className="alert-card__issue">
     <NoServiceIcon className="alert-card__icon" />
     <div>
-      <h3 className="alert-card__content-block__text">{issue}</h3>
+      {contentTextSize === "large" ? (
+        <h3 className="alert-card__content-block__text">{issue}</h3>
+      ) : (
+        <h4 className="alert-card__content-block__text">{issue}</h4>
+      )}
       {location && (
         <div className="alert-card__issue__location body-4">{location}</div>
       )}
@@ -242,6 +247,7 @@ interface RemedySectionProps {
 const RemedySection: ComponentType<RemedySectionProps> = ({
   effect,
   remedy,
+  contentTextSize,
 }) => (
   <div className="alert-card__remedy">
     {effect === "shuttle" ? (
@@ -251,7 +257,11 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
           <ISAIcon className="alert-card__isa-icon" />
         </div>
         <div>
-          <h4 className="alert-card__content-block__text">{remedy}</h4>
+          {contentTextSize === "large" ? (
+            <h3 className="alert-card__content-block__text">{remedy}</h3>
+          ) : (
+            <h4 className="alert-card__content-block__text">{remedy}</h4>
+          )}
           <div className="alert-card__body__accessibility-info--text body-4">
             All shuttle buses are accessible
           </div>
