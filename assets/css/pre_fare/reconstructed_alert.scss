@@ -180,9 +180,9 @@ $alert-card-footer-height: 80px;
 
   .alert-card__footer {
     height: $alert-card-footer-height;
+    color: colors.$cool-black-30;
     background-color: colors.$warm-neutral-80;
     border-radius: 0 0 32px 32px;
-    color: colors.$cool-black-30;
   }
 
   .alert-card__footer__alerts-url {
@@ -249,7 +249,6 @@ $alert-card-footer-height: 80px;
       &__remedy {
         height: 660px;
         padding-top: 474px;
-        line-height: 220px;
       }
 
       &__shuttle-icon {
@@ -259,7 +258,6 @@ $alert-card-footer-height: 80px;
 
       &__shuttle-remedy {
         height: 660px;
-        line-height: 220px;
       }
 
       &__accessibility-info {

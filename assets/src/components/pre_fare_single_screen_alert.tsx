@@ -125,17 +125,17 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
     <div className="alert-card__content-block">
       <div className="alert-card__issue">
         <NoServiceIcon className="alert-card__icon" />
-        <div className="alert-card__content-block__text--large">
+        <h3 className="alert-card__content-block__text">
           <AffectedLinePill
             className="alert-card__content-block__route-pill"
             color={affectedLineColor}
           />
           <span>trains are skipping this station</span>
-        </div>
+        </h3>
       </div>
       <div className="alert-card__issue">
         <InfoIcon className="alert-card__icon" />
-        <div className="alert-card__content-block__text--large">
+        <h3 className="alert-card__content-block__text">
           {unaffected_routes.map((route) => {
             const UnaffectedLinePill = STRING_TO_SVG[route.svg_name];
             const unaffectedLineColor = getHexColor(
@@ -150,7 +150,7 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
             );
           })}
           <span>trains stop as usual</span>
-        </div>
+        </h3>
       </div>
       {disruptionDiagram && (
         <MapSection disruptionDiagram={disruptionDiagram} />
@@ -186,7 +186,7 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   return (
     <div className="alert-card__fallback">
       <Icon className="alert-card__fallback__icon" />
-      {issue && <div className="alert-card__fallback__issue-text">{issue}</div>}
+      {issue && <h4 className="alert-card__fallback__issue-text">{issue}</h4>}
       {remedy && (
         <div
           className={`alert-card__fallback__alert-text ${alertTextSize}`}
@@ -213,16 +213,13 @@ const StandardIssueSection: ComponentType<StandardIssueSectionProps> = ({
   <div className="alert-card__issue">
     <NoServiceIcon className="alert-card__icon" />
     <div>
-      <div
-        className={classWithModifier(
-          "alert-card__content-block__text",
-          contentTextSize,
-        )}
-      >
-        {issue}
-      </div>
+      {contentTextSize === "large" ? (
+        <h3 className="alert-card__content-block__text">{issue}</h3>
+      ) : (
+        <h4 className="alert-card__content-block__text">{issue}</h4>
+      )}
       {location && (
-        <div className="alert-card__issue__location">{location}</div>
+        <div className="alert-card__issue__location body-4">{location}</div>
       )}
     </div>
   </div>
@@ -236,12 +233,10 @@ const DownstreamIssueSection: ComponentType<DownstreamIssueSectionProps> = ({
   endpoints,
 }) => (
   <div className="alert-card__issue">
-    <div
-      className={classWithModifier("alert-card__content-block__text", "medium")}
-    >
+    <h4 className="alert-card__content-block__text">
       No trains <span style={{ fontWeight: 500 }}>between</span> {endpoints[0]}{" "}
       <span style={{ fontWeight: 500 }}>&</span> {endpoints[1]}
-    </div>
+    </h4>
   </div>
 );
 interface RemedySectionProps {
@@ -262,15 +257,12 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
           <ISAIcon className="alert-card__isa-icon" />
         </div>
         <div>
-          <div
-            className={classWithModifier(
-              "alert-card__content-block__text",
-              contentTextSize,
-            )}
-          >
-            {remedy}
-          </div>
-          <div className="alert-card__body__accessibility-info--text">
+          {contentTextSize === "large" ? (
+            <h3 className="alert-card__content-block__text">{remedy}</h3>
+          ) : (
+            <h4 className="alert-card__content-block__text">{remedy}</h4>
+          )}
+          <div className="alert-card__body__accessibility-info--text body-4">
             All shuttle buses are accessible
           </div>
         </div>
@@ -278,7 +270,7 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
     ) : (
       <>
         <WalkingIcon className="alert-card__icon" />
-        <div className="alert-card__remedy__text">{remedy}</div>
+        <h5 className="alert-card__remedy__text">{remedy}</h5>
       </>
     )}
   </div>
