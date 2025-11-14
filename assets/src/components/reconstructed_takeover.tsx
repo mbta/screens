@@ -46,8 +46,8 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                 className="alert-card__body__icon"
                 src={imagePath("no-service-black.svg")}
               />
-              <div className="alert-card__body__issue">{issue}</div>
-              <div className="alert-card__body__location ">
+              <h1 className="alert-card__body__issue">{issue}</h1>
+              <div className="alert-card__body__location">
                 {typeof location === "string" ? (
                   location
                 ) : (
@@ -99,13 +99,13 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                     className="alert-card__body__isa-icon"
                     src={imagePath("ISA_Blue.svg")}
                   />
-                  <div className="alert-card__body__accessibility-info--text">
+                  <div className="alert-card__body__accessibility-info--text body-4">
                     All shuttle buses are accessible
                   </div>
                 </div>
               </>
             ) : (
-              <div className="alert-card__body__remedy">{remedy}</div>
+              <h3 className="alert-card__body__remedy">{remedy}</h3>
             )}
           </div>
           <div className="alert-card__footer">
