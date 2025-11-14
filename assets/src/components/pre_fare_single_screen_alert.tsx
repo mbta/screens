@@ -208,19 +208,11 @@ interface StandardIssueSectionProps {
 const StandardIssueSection: ComponentType<StandardIssueSectionProps> = ({
   issue,
   location,
-  contentTextSize,
 }) => (
   <div className="alert-card__issue">
     <NoServiceIcon className="alert-card__icon" />
     <div>
-      <div
-        className={classWithModifier(
-          "alert-card__content-block__text",
-          contentTextSize,
-        )}
-      >
-        {issue}
-      </div>
+      <h3 className="alert-card__content-block__text">{issue}</h3>
       {location && (
         <div className="alert-card__issue__location">{location}</div>
       )}
@@ -236,12 +228,10 @@ const DownstreamIssueSection: ComponentType<DownstreamIssueSectionProps> = ({
   endpoints,
 }) => (
   <div className="alert-card__issue">
-    <div
-      className={classWithModifier("alert-card__content-block__text", "medium")}
-    >
+    <h4 className="alert-card__content-block__text">
       No trains <span style={{ fontWeight: 500 }}>between</span> {endpoints[0]}{" "}
       <span style={{ fontWeight: 500 }}>&</span> {endpoints[1]}
-    </div>
+    </h4>
   </div>
 );
 interface RemedySectionProps {
@@ -278,7 +268,7 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
     ) : (
       <>
         <WalkingIcon className="alert-card__icon" />
-        <div className="alert-card__remedy__text">{remedy}</div>
+        <h4 className="alert-card__remedy__text">{remedy}</h4>
       </>
     )}
   </div>
