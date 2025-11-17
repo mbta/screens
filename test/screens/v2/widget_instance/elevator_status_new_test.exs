@@ -70,7 +70,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/stops/place-here"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
 
     test "one closure with summary" do
@@ -93,7 +94,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/stops/place-here"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
 
     test "multiple closures" do
@@ -114,7 +116,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/stops/place-here"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
   end
 
@@ -142,7 +145,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/elevators"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
 
     test "multiple closures at one station" do
@@ -159,15 +163,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/elevators"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
 
     test "closures at multiple stations" do
       closures = [
-        # require alphabetical sorting in result
-        build_closure([stop: %Stop{id: "place-b", name: "Station B"}], redundancy: :shuttle),
         build_closure([stop: %Stop{id: "place-a", name: "Station A"}], redundancy: :backtrack),
-        build_closure([stop: %Stop{id: "place-a", name: "Station A"}], redundancy: :shuttle)
+        build_closure([stop: %Stop{id: "place-a", name: "Station A"}], redundancy: :shuttle),
+        build_closure([stop: %Stop{id: "place-b", name: "Station B"}], redundancy: :shuttle)
       ]
 
       expected = %Serialized{
@@ -179,7 +183,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/elevators"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
 
     test "too many closures to list individually" do
@@ -204,10 +209,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/elevators"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
 
-    test "specific long station names are abbreviated" do
+    test "abbreviates specific long station names" do
       closures = [
         build_closure([stop: %Stop{id: "place-masta", name: "Massachusetts Avenue"}], nil)
       ]
@@ -220,7 +226,31 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/elevators"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "sorts multiple stations first by relevance and then by name" do
+      closures = [
+        build_closure([stop: %Stop{id: "place-b", name: "Beta"}], nil),
+        build_closure([stop: %Stop{id: "place-a", name: "Alpha"}], nil),
+        build_closure([stop: %Stop{id: "place-rel", name: "Relevant"}], nil)
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevators closed at:",
+        callout_items: ["Relevant", "Alpha", "Beta"],
+        footer_lines:
+          free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        qr_code_url: "https://mbta.com/elevators"
+      }
+
+      assert Widget.serialize(%Widget{
+               closures: closures,
+               home_station_id: "place-here",
+               relevant_station_ids: ~w[place-rel]
+             }) == expected
     end
   end
 
@@ -246,7 +276,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/elevators"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
   end
 
@@ -263,7 +294,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/go-access"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
 
     test "without closures" do
@@ -276,7 +308,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
         qr_code_url: "https://mbta.com/go-access"
       }
 
-      assert Widget.serialize(%Widget{closures: [], station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{closures: [], home_station_id: "place-here"}) == expected
     end
   end
 end

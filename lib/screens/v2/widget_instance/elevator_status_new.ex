@@ -7,10 +7,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   alias Screens.Stops.Stop
   alias ScreensConfig.FreeTextLine
 
-  @enforce_keys ~w[closures station_id]a
-  defstruct @enforce_keys
+  @enforce_keys ~w[closures home_station_id]a
+  defstruct @enforce_keys ++ [relevant_station_ids: []]
 
-  @type t :: %__MODULE__{closures: [Closure.t()], station_id: Stop.id()}
+  @type t :: %__MODULE__{
+          closures: [Closure.t()],
+          home_station_id: Stop.id(),
+          relevant_station_ids: MapSet.t(Stop.id())
+        }
 
   defmodule Serialized do
     @moduledoc false
@@ -89,17 +93,21 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   @max_callout_items 4
 
   @spec serialize(t()) :: Serialized.t()
-  def serialize(%__MODULE__{closures: closures, station_id: station_id}) do
+  def serialize(%__MODULE__{
+        closures: closures,
+        home_station_id: home_station_id,
+        relevant_station_ids: relevant_station_ids
+      }) do
     # Choose the first "scenario" that applies (ordered highest-priority first). Each function
     # returns a `Serialized` if it does apply or `nil` if it does not.
     Enum.find_value(
       [
-        &closed_here_without_nearby_backups/2,
-        &closed_elsewhere_without_in_station_backups/2,
-        &closed_elsewhere_with_in_station_backups/2,
-        &all_working_or_closed_with_nearby_backups/2
+        fn -> closed_here_without_nearby_backups(closures, home_station_id) end,
+        fn -> closed_elsewhere_without_in_station_backups(closures, relevant_station_ids) end,
+        fn -> closed_elsewhere_with_in_station_backups(closures) end,
+        fn -> all_working_or_closed_with_nearby_backups(closures) end
       ],
-      & &1.(closures, station_id)
+      & &1.()
     )
   end
 
@@ -149,7 +157,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   end
 
   # if reached: no elevators are closed at the home station
-  defp closed_elsewhere_without_in_station_backups(closures, _station_id) do
+  defp closed_elsewhere_without_in_station_backups(closures, relevant_ids) do
     case Enum.split_with(closures, fn
            %Closure{elevator: elevator} -> maybe_redundancy(elevator) in ~w[nearby in_station]a
          end) do
@@ -157,24 +165,26 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
         nil
 
       {with_in_station, without_in_station} ->
-        {station_names, overflow} =
+        {stations, overflow} =
           without_in_station
-          |> Enum.group_by(fn %Closure{facility: %Facility{stop: %Stop{name: name}}} -> name end)
-          |> Enum.sort_by(&elem(&1, 0))
+          |> Enum.group_by(fn %Closure{facility: %Facility{stop: stop}} -> stop end)
+          |> Enum.sort_by(fn {%Stop{id: id, name: name}, _closures} ->
+            {if(id in relevant_ids, do: 0, else: 1), name}
+          end)
           |> Enum.split(@max_callout_items)
 
         %Serialized{
           status: :alert,
           header:
-            case station_names do
-              [{name, [_closure]}] -> "Elevator closed at #{abbrev_station_name(name)}"
-              [{name, _closures}] -> "Elevators closed at #{abbrev_station_name(name)}"
+            case stations do
+              [{station, [_closure]}] -> "Elevator closed at #{station_name(station)}"
+              [{station, _closures}] -> "Elevators closed at #{station_name(station)}"
               _stations -> "Elevators closed at:"
             end,
           callout_items:
-            case station_names do
+            case stations do
               [_station] -> []
-              stations -> Enum.map(stations, fn {name, _} -> abbrev_station_name(name) end)
+              stations -> Enum.map(stations, fn {station, _} -> station_name(station) end)
             end,
           footer_lines:
             footer_lines([
@@ -190,7 +200,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   end
 
   # if reached: all closed elevators have in-station redundancy
-  defp closed_elsewhere_with_in_station_backups(closures, _station_id) do
+  defp closed_elsewhere_with_in_station_backups(closures) do
     if Enum.any?(closures, fn %Closure{elevator: %Elevator{redundancy: redundancy}} ->
          redundancy == :in_station
        end) do
@@ -204,7 +214,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   end
 
   # if reached: all closed elevators have nearby redundancy
-  defp all_working_or_closed_with_nearby_backups(closures, _station_id) do
+  defp all_working_or_closed_with_nearby_backups(closures) do
     closures? = Enum.any?(closures)
 
     %Serialized{
@@ -221,13 +231,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
     }
   end
 
-  defp abbrev_station_name("Massachusetts Avenue"), do: "Mass Ave"
-  defp abbrev_station_name(name), do: name
-
   defp footer_lines(lines), do: Enum.map(lines, &%FreeTextLine{icon: nil, text: &1})
 
   defp maybe_redundancy(%Elevator{redundancy: redundancy}), do: redundancy
   defp maybe_redundancy(nil), do: nil
+
+  defp station_name(%Stop{id: "place-masta"}), do: "Mass Ave"
+  defp station_name(%Stop{name: name}), do: name
 
   defp stop_url(station_id), do: "#{@stop_url_base}/#{station_id}"
 
