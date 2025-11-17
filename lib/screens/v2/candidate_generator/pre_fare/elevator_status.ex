@@ -3,11 +3,14 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
 
   alias Screens.Alerts.Alert
   alias Screens.Elevator.Closure
+  alias Screens.RoutePatterns.RoutePattern
+  alias Screens.Routes.Route
   alias Screens.V2.WidgetInstance.ElevatorStatusNew, as: ElevatorWidget
   alias ScreensConfig.Screen
 
   import Screens.Inject
   @alert injected(Alert)
+  @route_pattern injected(RoutePattern)
 
   @spec instances(Screen.t(), DateTime.t()) :: [ElevatorWidget.t()]
   def instances(
@@ -30,6 +33,28 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
         end
       end)
 
-    [%ElevatorWidget{closures: active_closures, station_id: station_id}]
+    relevant_station_ids =
+      case @route_pattern.fetch(%{canonical?: true, stop_ids: [station_id]}) do
+        {:ok, patterns} ->
+          patterns |> Enum.filter(&subway_route?/1) |> Enum.flat_map(&station_ids/1)
+
+        :error ->
+          []
+      end
+
+    [
+      %ElevatorWidget{
+        closures: active_closures,
+        home_station_id: station_id,
+        relevant_station_ids: MapSet.new(relevant_station_ids)
+      }
+    ]
   end
+
+  defp station_ids(%RoutePattern{stops: stops}) do
+    stops |> Enum.map(& &1.parent_station) |> Enum.reject(&is_nil/1) |> Enum.map(& &1.id)
+  end
+
+  defp subway_route?(%RoutePattern{route: %Route{type: type}}),
+    do: type in ~w[light_rail subway]a
 end
