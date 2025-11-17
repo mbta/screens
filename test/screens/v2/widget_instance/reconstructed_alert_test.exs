@@ -53,6 +53,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | alert: %{widget.alert | active_period: ap}}
   end
 
+  defp put_updated_at(widget, updated_at) do
+    %{widget | alert: %{widget.alert | updated_at: updated_at}}
+  end
+
   defp put_home_stop(widget, app_config_module, stop_id) do
     %{
       widget
@@ -565,7 +569,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         endpoints: {"Malden Center", "Wellington"},
         disruption_diagram: %{
@@ -608,7 +613,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :shuttle,
         remedy: "Use shuttle bus",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         endpoints: {"Wellington", "Assembly"},
         region: :boundary,
@@ -665,7 +671,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :station_closure,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
         other_closures: ["Malden Center"],
         disruption_diagram: diagram
@@ -680,7 +687,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         remedy: "Seek alternate route",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         unaffected_routes: [],
-        updated_at: "Friday, 5:00 am"
+        updated_at: "Jun 9",
+        end_time: "tomorrow"
       }
 
       assert expected_duo == ReconstructedAlert.serialize(widget)
@@ -705,7 +713,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: :construction,
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         endpoints: {"Wellington", "Assembly"},
         disruption_diagram: %{
@@ -748,7 +757,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
         endpoints: {"Oak Grove", "Malden Center"},
         disruption_diagram: %{
@@ -789,7 +799,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         effect: :shuttle,
         remedy: "Use shuttle bus",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
         endpoints: {"Oak Grove", "Malden Center"},
         disruption_diagram: %{
@@ -830,7 +841,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :boundary,
         endpoints: {"Oak Grove", "Malden Center"},
         is_transfer_station: false,
@@ -872,7 +884,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
         remedy: "Use shuttle bus",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :boundary,
         endpoints: {"Oak Grove", "Malden Center"},
         is_transfer_station: false,
@@ -915,7 +928,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :information,
         remedy: "Single-tracking is happening",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :boundary
       }
 
@@ -943,7 +957,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here
       }
 
@@ -971,7 +986,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here
       }
 
@@ -999,7 +1015,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here
       }
 
@@ -1027,7 +1044,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here
       }
 
@@ -1055,7 +1073,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :delay,
         remedy: "Delays are happening",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside
       }
 
@@ -1083,7 +1102,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :shuttle,
         remedy: "Shuttle buses available",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside,
         endpoints: {"Wellington", "Assembly"},
         is_transfer_station: false,
@@ -1123,7 +1143,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside,
         endpoints: {"Wellington", "Assembly"},
         is_transfer_station: false,
@@ -1179,7 +1200,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         routes: [%{route_id: "Red", svg_name: "rl"}],
         effect: :station_closure,
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here
       }
 
@@ -1223,7 +1245,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         routes: [%{route_id: "Red", svg_name: "rl-alewife", headsign: "Alewife"}],
         effect: :station_closure,
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside
       }
 
@@ -1263,7 +1286,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :station_closure,
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here,
         stations: ["Jackson Square"]
       }
@@ -1304,7 +1328,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :station_closure,
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside,
         stations: ["Jackson Square"]
       }
@@ -1336,7 +1361,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: "Simulation of PIO text",
         remedy: "Seek alternate route",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
-        updated_at: "Friday, 5:00 am"
+        updated_at: "Jun 9",
+        end_time: "tomorrow"
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
@@ -1362,7 +1388,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Suspension",
         location: nil,
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside,
         remedy: "Simulation of PIO text"
       }
@@ -1391,7 +1418,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         unaffected_routes: [%{route_id: "Red", svg_name: "rl"}],
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :station_closure,
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here,
         disruption_diagram: %{
           effect: :station_closure,
@@ -1438,7 +1466,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         region: :here,
         remedy: "Seek alternate route",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         disruption_diagram: %{
           current_station_slot_index: 3,
           effect: :suspension,
@@ -1480,7 +1509,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: "Shuttle buses between State and Chinatown",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here,
         endpoints: {"State", "Chinatown"},
         is_transfer_station: true,
@@ -1524,7 +1554,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [],
         effect: :delay,
         remedy: nil,
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :here
       }
 
@@ -2169,7 +2200,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :shuttle,
         issue: "No trains",
         remedy: "Shuttle buses available",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside,
         routes: [
           %{headsign: "Ashmont", route_id: "Red", svg_name: "rl-ashmont"},
@@ -2291,7 +2323,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :shuttle,
         issue: "No trains",
         remedy: "Shuttle buses available",
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside,
         routes: [
           %{headsign: "Ashmont", route_id: "Red", svg_name: "rl-ashmont"}
@@ -2414,7 +2447,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           %{headsign: "Ashmont", route_id: "Red", svg_name: "rl-ashmont"},
           %{headsign: "Braintree", route_id: "Red", svg_name: "rl-braintree"}
         ],
-        updated_at: "Friday, 5:00 am",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
         region: :outside,
         remedy: "Simulation of PIO text"
       }
@@ -2996,7 +3030,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :suspension,
         remedy: "Seek alternate route",
-        updated_at: "Friday, 5:14 am",
+        updated_at: "5:14 AM",
+        end_time: nil,
         region: :outside,
         endpoints: {"North Station", "Back Bay"},
         is_transfer_station: false,
@@ -3408,7 +3443,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         location: nil,
         region: :boundary,
         routes: [%{route_id: "Green", svg_name: "gl"}],
-        updated_at: "Friday, 2:24 pm",
+        updated_at: "2:24 PM",
+        end_time: nil,
         remedy:
           "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station."
       }
@@ -3445,6 +3481,152 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                |> put_alert_id(alert_id)
                |> WidgetInstance.valid_candidate?()
       end
+    end
+  end
+
+  describe "updated_at and end_time" do
+    setup @one_line_station_alert_widget_context_setup_group
+
+    test "end_time is later today", %{widget: widget} do
+      active_period = [
+        {~U[2021-01-01T00:00:00Z], ~U[2021-01-01T01:00:00Z]}
+      ]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+
+      assert %{end_time: "8:00 PM", updated_at: "Jun 9"} =
+               ReconstructedAlert.serialize(widget)
+    end
+
+    test "end_time is tomorrow", %{widget: widget} do
+      active_period = [
+        {~U[2021-01-01T00:00:00Z], ~U[2021-01-01T22:00:00Z]}
+      ]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+
+      assert %{end_time: "tomorrow", updated_at: "Jun 9"} =
+               ReconstructedAlert.serialize(widget)
+    end
+
+    test "end_time is later this week", %{widget: widget} do
+      active_period = [{~U[2021-01-01T00:00:00Z], ~U[2021-01-03T22:00:00Z]}]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+
+      assert %{end_time: "this Sunday", updated_at: "Jun 9"} =
+               ReconstructedAlert.serialize(widget)
+    end
+
+    test "end_time is in the future", %{widget: widget} do
+      active_period = [{~U[2021-01-01T00:00:00Z], ~U[2021-01-04T05:00:00Z]}]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+
+      assert %{end_time: "Jan 4", updated_at: "Jun 9"} =
+               ReconstructedAlert.serialize(widget)
+    end
+
+    test "updated earlier today", %{widget: widget} do
+      active_period = [
+        {~U[2021-01-01T00:00:00Z], nil},
+        {~U[2021-01-04T00:00:00Z], ~U[2021-01-05T22:00:00Z]}
+      ]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+        |> put_updated_at(~U[2020-12-31T22:00:00Z])
+
+      assert %{end_time: nil, updated_at: "5:00 PM"} =
+               ReconstructedAlert.serialize(widget)
+    end
+
+    test "updated yesterday", %{widget: widget} do
+      active_period = [
+        {~U[2021-01-01T00:00:00Z], nil},
+        {~U[2021-01-04T00:00:00Z], ~U[2021-01-05T22:00:00Z]}
+      ]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+        |> put_updated_at(~U[2020-12-30T22:00:00Z])
+
+      assert %{end_time: nil, updated_at: "yesterday"} =
+               ReconstructedAlert.serialize(widget)
+    end
+
+    test "updated previously", %{widget: widget} do
+      active_period = [
+        {~U[2021-01-01T00:00:00Z], nil},
+        {~U[2021-01-03T00:00:00Z], nil}
+      ]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+        |> put_updated_at(~U[2020-11-30T22:00:00Z])
+
+      assert %{end_time: nil, updated_at: "Nov 30"} =
+               ReconstructedAlert.serialize(widget)
     end
   end
 end

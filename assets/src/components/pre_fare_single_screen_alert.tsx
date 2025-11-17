@@ -31,6 +31,7 @@ interface PreFareSingleScreenAlertProps {
     | "information";
   region: "here" | "boundary" | "outside";
   updated_at: string;
+  end_time?: string;
   disruption_diagram?: DisruptionDiagramData;
 }
 
@@ -161,7 +162,6 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
 interface FallbackLayoutProps {
   issue: string;
   remedy: string;
-  remedyBold?: string;
   effect: string;
 }
 
@@ -174,7 +174,6 @@ const fallbackLayoutIcons = {
 const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   issue,
   remedy,
-  remedyBold,
   effect,
 }) => {
   const { ref: alertTextRef, step: alertTextSize } = useAutoSize(
@@ -194,11 +193,6 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
           ref={alertTextRef}
         >
           {remedy}
-        </div>
-      )}
-      {remedyBold && (
-        <div className="alert-card__fallback__alert-text alert-card__fallback__alert-text--bold">
-          {remedyBold}
         </div>
       )}
     </div>
@@ -329,6 +323,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
     routes,
     unaffected_routes,
     updated_at,
+    end_time,
     disruption_diagram,
   } = alert;
 
@@ -434,8 +429,11 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
               </div>
             )}
             <div>
-              Updated{" "}
-              <span className="alert-card__footer__datetime">{updated_at}</span>
+              {end_time ? (
+                <span className="bold">Through {end_time}</span>
+              ) : (
+                <span>Updated {updated_at}</span>
+              )}
             </div>
           </div>
         </div>
