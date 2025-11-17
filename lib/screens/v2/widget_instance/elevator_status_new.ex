@@ -167,14 +167,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
           status: :alert,
           header:
             case station_names do
-              [{name, [_closure]}] -> "Elevator closed at #{name}"
-              [{name, _closures}] -> "Elevators closed at #{name}"
+              [{name, [_closure]}] -> "Elevator closed at #{abbrev_station_name(name)}"
+              [{name, _closures}] -> "Elevators closed at #{abbrev_station_name(name)}"
               _stations -> "Elevators closed at:"
             end,
           callout_items:
             case station_names do
               [_station] -> []
-              stations -> Enum.map(stations, fn {name, _closures} -> name end)
+              stations -> Enum.map(stations, fn {name, _} -> abbrev_station_name(name) end)
             end,
           footer_lines:
             footer_lines([
@@ -220,6 +220,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
       qr_code_url: "https://#{@app_cta_url}"
     }
   end
+
+  defp abbrev_station_name("Massachusetts Avenue"), do: "Mass Ave"
+  defp abbrev_station_name(name), do: name
 
   defp footer_lines(lines), do: Enum.map(lines, &%FreeTextLine{icon: nil, text: &1})
 
