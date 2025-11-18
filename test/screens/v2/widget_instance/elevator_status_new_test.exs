@@ -119,6 +119,31 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
+
+    test "always includes elevators whose alternates are also closed" do
+      closures = [
+        build_closure(
+          [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
+          alternate_ids: ["alt"],
+          redundancy: :nearby
+        ),
+        build_closure(id: "alt")
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "An elevator is closed at this station.",
+        footer_lines:
+          free_text_lines([
+            ["Test Elevator 100 is unavailable."],
+            ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
+          ]),
+        qr_code_url: "https://mbta.com/stops/place-here"
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
   end
 
   describe "elevators without in-station redundancy are closed elsewhere" do
@@ -202,6 +227,34 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
             [
               "+2 other MBTA elevators are closed,",
               %{format: :bold, text: "which have no in-station alternative paths."},
+              "Check your trip at",
+              %{format: :bold, text: "mbta.com/elevators"}
+            ]
+          ]),
+        qr_code_url: "https://mbta.com/elevators"
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "always includes elevators whose alternates are also closed" do
+      closures = [
+        build_closure([stop: %Stop{id: "place-a", name: "Station A"}],
+          alternate_ids: ["alt"],
+          redundancy: :in_station
+        ),
+        build_closure([id: "alt"], redundancy: :in_station)
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevator closed at Station A",
+        footer_lines:
+          free_text_lines([
+            [
+              %{format: :bold, text: "+1 other MBTA elevator is closed"},
+              "(which has an in-station alternative path).",
               "Check your trip at",
               %{format: :bold, text: "mbta.com/elevators"}
             ]
