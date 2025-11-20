@@ -29,12 +29,20 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
             callout_items: [String.t()],
             footer_lines: [FreeTextLine.t()],
             cta_type: :app | :plain,
-            qr_code_url: String.t()
+            qr_code_url: String.t(),
+            # Not included in the serialized form sent to the client; only used by AlertWidget
+            alert_ids: [Alert.id()]
           }
 
     @enforce_keys ~w[status header qr_code_url]a
     defstruct @enforce_keys ++
-                [header_size: :medium, callout_items: [], footer_lines: [], cta_type: :plain]
+                [
+                  header_size: :medium,
+                  callout_items: [],
+                  footer_lines: [],
+                  cta_type: :plain,
+                  alert_ids: []
+                ]
   end
 
   defmodule Summary do
@@ -121,7 +129,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     )
   end
 
-  def serialize_to_map(%__MODULE__{} = widget), do: widget |> serialize() |> Map.from_struct()
+  def serialize_to_map(%__MODULE__{} = widget),
+    do: widget |> serialize() |> Map.from_struct() |> Map.delete(:alert_ids)
 
   defp closed_here_without_nearby_backups(closures, station_id, closed_ids) do
     case Enum.filter(
@@ -151,7 +160,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
                 %{format: :bold, text: stop_url_web(station_id)}
               ]
             ]),
-          qr_code_url: "https://#{stop_alert_url_app(alert_id, station_id)}"
+          qr_code_url: "https://#{stop_alert_url_app(alert_id, station_id)}",
+          alert_ids: [alert_id]
         }
 
       relevant_closures ->
@@ -167,7 +177,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
             footer_lines([
               ["Find an alternate path on ", %{format: :bold, text: stop_url_web(station_id)}]
             ]),
-          qr_code_url: "https://#{stop_url_app(station_id)}"
+          qr_code_url: "https://#{stop_url_app(station_id)}",
+          alert_ids: Enum.map(relevant_closures, fn %Closure{alert: %Alert{id: id}} -> id end)
         }
     end
   end
@@ -208,7 +219,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
                 @elevators_url
               )
             ]),
-          qr_code_url: "https://#{@elevators_url}"
+          qr_code_url: "https://#{@elevators_url}",
+          alert_ids: Enum.map(without_in_station, fn %Closure{alert: %Alert{id: id}} -> id end)
         }
     end
   end
@@ -270,7 +282,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   defp stop_url_web(station_id), do: "mbta.com/stops/#{station_id}"
 
   defimpl Screens.V2.AlertsWidget do
-    def alert_ids(_instance), do: []
+    alias Screens.V2.WidgetInstance.ElevatorStatus
+
+    # This is not an ideal approach since it ends up double-serializing the widget: once for the
+    # actual serialization and once to determine which alert IDs are displayed. However, since
+    # the logic that determines which closures appear in the widget is part of the serialization,
+    # this is the simplest way to avoid duplication and guarantee alignment.
+    def alert_ids(instance), do: ElevatorStatus.serialize(instance).alert_ids
   end
 
   defimpl Screens.V2.WidgetInstance do

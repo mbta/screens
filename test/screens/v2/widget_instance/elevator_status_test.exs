@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   alias Screens.Elevator.Closure
   alias Screens.Facilities.Facility
   alias Screens.Stops.Stop
+  alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: Widget
   alias Screens.V2.WidgetInstance.ElevatorStatus.Serialized
   alias ScreensConfig.FreeTextLine
@@ -46,6 +47,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
   defp free_text_lines(lines), do: Enum.map(lines, &%FreeTextLine{icon: nil, text: &1})
 
+  describe "AlertsWidget implementation" do
+    test "returns the value of Serialized.alert_ids" do
+      # This way we know the AlertsWidget implementation is actually hooked up to the `alert_ids`
+      # field of `Serialized`, and tests that assert on this field are meaningful
+      closures = [build_closure([stop: %Stop{id: "place-here"}], [redundancy: :in_station], "a1")]
+      widget = %Widget{closures: closures, home_station_id: "place-here"}
+
+      assert AlertsWidget.alert_ids(widget) == Widget.serialize(widget).alert_ids
+    end
+  end
+
   describe "elevators without nearby redundancy are closed at this station" do
     test "one closure" do
       closures = [
@@ -68,7 +80,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             ["Test Elevator 100 is unavailable."],
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
-        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here"
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
+        alert_ids: ["alert-1"]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -92,7 +105,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             ["Test Elevator 100 is unavailable.", "Use nearby elevator 101."],
             ["For more info, go to ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
-        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here"
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
+        alert_ids: ["alert-1"]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -101,9 +115,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     test "multiple closures" do
       closures = [
-        build_closure(long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}),
+        build_closure([long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}], %{}, "a1"),
         # no elevator data; not considered to have redundancy
-        build_closure([long_name: "Test Elevator 101", stop: %Stop{id: "place-here"}], nil)
+        build_closure([long_name: "Test Elevator 101", stop: %Stop{id: "place-here"}], nil, "a2")
       ]
 
       expected = %Serialized{
@@ -114,7 +128,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           free_text_lines([
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
-        qr_code_url: "https://go.mbta.com/s/place-here"
+        qr_code_url: "https://go.mbta.com/s/place-here",
+        alert_ids: ~w[a1 a2]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -139,7 +154,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             ["Test Elevator 100 is unavailable."],
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
-        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here"
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
+        alert_ids: ["alert-1"]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -150,7 +166,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   describe "elevators without in-station redundancy are closed elsewhere" do
     test "one closure" do
       closures = [
-        build_closure([stop: %Stop{id: "place-a", name: "Station A"}], redundancy: :backtrack),
+        build_closure(
+          [stop: %Stop{id: "place-a", name: "Station A"}],
+          [redundancy: :backtrack],
+          "alert-a"
+        ),
         # have in-station or nearby redundancy; include in summary
         build_closure([stop: %Stop{id: "place-b"}], redundancy: :in_station),
         build_closure([stop: %Stop{id: "place-c"}], redundancy: :nearby)
@@ -168,7 +188,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               %{format: :bold, text: "mbta.com/elevators"}
             ]
           ]),
-        qr_code_url: "https://mbta.com/elevators"
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ["alert-a"]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -177,16 +198,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     test "multiple closures at one station" do
       closures = [
-        build_closure([stop: %Stop{id: "place-a", name: "Station A"}], nil),
-        build_closure([stop: %Stop{id: "place-a", name: "Station A"}], redundancy: :shuttle)
+        build_closure([stop: %Stop{id: "place-a", name: "ABC"}], nil, "a1"),
+        build_closure([stop: %Stop{id: "place-a", name: "ABC"}], [redundancy: :shuttle], "a2")
       ]
 
       expected = %Serialized{
         status: :alert,
-        header: "Elevators closed at Station A",
+        header: "Elevators closed at ABC",
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
-        qr_code_url: "https://mbta.com/elevators"
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ~w[a1 a2]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -195,18 +217,19 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     test "closures at multiple stations" do
       closures = [
-        build_closure([stop: %Stop{id: "place-a", name: "Station A"}], redundancy: :backtrack),
-        build_closure([stop: %Stop{id: "place-a", name: "Station A"}], redundancy: :shuttle),
-        build_closure([stop: %Stop{id: "place-b", name: "Station B"}], redundancy: :shuttle)
+        build_closure([stop: %Stop{id: "place-a", name: "A"}], [redundancy: :backtrack], "a1"),
+        build_closure([stop: %Stop{id: "place-a", name: "A"}], [redundancy: :shuttle], "a2"),
+        build_closure([stop: %Stop{id: "place-b", name: "B"}], [redundancy: :shuttle], "a3")
       ]
 
       expected = %Serialized{
         status: :alert,
         header: "Elevators closed at:",
-        callout_items: ["Station A", "Station B"],
+        callout_items: ["A", "B"],
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
-        qr_code_url: "https://mbta.com/elevators"
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ~w[a1 a2 a3]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -215,8 +238,14 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     test "too many closures to list individually" do
       closures =
-        Enum.map(~w[A B C D E F], fn id ->
-          build_closure([stop: %Stop{id: "place-#{id}", name: "#{id}"}], redundancy: :backtrack)
+        ~w[A B C D E F]
+        |> Enum.with_index()
+        |> Enum.map(fn {id, index} ->
+          build_closure(
+            [stop: %Stop{id: "place-#{id}", name: "#{id}"}],
+            [redundancy: :backtrack],
+            "a#{index}"
+          )
         end)
 
       expected = %Serialized{
@@ -232,7 +261,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               %{format: :bold, text: "mbta.com/elevators"}
             ]
           ]),
-        qr_code_url: "https://mbta.com/elevators"
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ~w[a0 a1 a2 a3 a4 a5]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -241,9 +271,10 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     test "always includes elevators whose alternates are also closed" do
       closures = [
-        build_closure([stop: %Stop{id: "place-a", name: "Station A"}],
-          alternate_ids: ["alt"],
-          redundancy: :in_station
+        build_closure(
+          [stop: %Stop{id: "place-a", name: "Station A"}],
+          [alternate_ids: ["alt"], redundancy: :in_station],
+          "alert-a"
         ),
         build_closure([id: "alt"], redundancy: :in_station)
       ]
@@ -260,7 +291,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               %{format: :bold, text: "mbta.com/elevators"}
             ]
           ]),
-        qr_code_url: "https://mbta.com/elevators"
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ["alert-a"]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -269,7 +301,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     test "abbreviates specific long station names" do
       closures = [
-        build_closure([stop: %Stop{id: "place-masta", name: "Massachusetts Avenue"}], nil)
+        build_closure([stop: %Stop{id: "place-masta", name: "Massachusetts Avenue"}], nil, "a1")
       ]
 
       expected = %Serialized{
@@ -277,7 +309,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         header: "Elevator closed at Mass Ave",
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
-        qr_code_url: "https://mbta.com/elevators"
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ["a1"]
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -286,9 +319,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     test "sorts multiple stations first by relevance and then by name" do
       closures = [
-        build_closure([stop: %Stop{id: "place-b", name: "Beta"}], nil),
-        build_closure([stop: %Stop{id: "place-a", name: "Alpha"}], nil),
-        build_closure([stop: %Stop{id: "place-rel", name: "Relevant"}], nil)
+        build_closure([stop: %Stop{id: "place-b", name: "Beta"}], nil, "a1"),
+        build_closure([stop: %Stop{id: "place-a", name: "Alpha"}], nil, "a2"),
+        build_closure([stop: %Stop{id: "place-rel", name: "Relevant"}], nil, "a3")
       ]
 
       expected = %Serialized{
@@ -297,7 +330,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         callout_items: ["Relevant", "Alpha", "Beta"],
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
-        qr_code_url: "https://mbta.com/elevators"
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ~w[a1 a2 a3]
       }
 
       assert Widget.serialize(%Widget{
