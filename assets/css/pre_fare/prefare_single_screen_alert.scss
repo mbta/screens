@@ -1,16 +1,5 @@
 @use "CSS/colors";
 
-@mixin large-text {
-  font-size: 112px;
-  font-weight: 700;
-  line-height: 120px;
-}
-
-@mixin small-text {
-  font-size: 35px;
-  line-height: 42px;
-}
-
 .pre-fare-alert__page {
   display: flex;
   flex-direction: column;
@@ -97,14 +86,14 @@
 
     &__text {
       align-self: center;
-      font-size: 74px;
-      font-weight: 600;
+
+      &--alternate-route {
+        font-weight: 400;
+      }
     }
   }
 
   .alert-card__issue__location {
-    @include small-text;
-
     margin-top: 40px;
   }
 
@@ -124,25 +113,6 @@
     max-height: 772px;
   }
 
-  .alert-card__content-block__text {
-    font-weight: 700;
-
-    &--large {
-      @include large-text;
-    }
-
-    &--medium {
-      font-size: 86.4px;
-      line-height: 95px;
-    }
-  }
-
-  .alert-card__content-block--downstream {
-    .alert-card__content-block__text {
-      line-height: 108px;
-    }
-  }
-
   .alert-card__fallback__icon {
     height: 192px;
     margin-bottom: 48px;
@@ -151,9 +121,6 @@
 
   .alert-card__fallback__issue-text {
     margin-bottom: 54px;
-    font-size: 88px;
-    font-weight: 700;
-    line-height: 105.6px;
   }
 
   .alert-card__fallback__alert-text {
@@ -167,8 +134,6 @@
   .alert-card__body__accessibility-info {
     &--text {
       margin-top: 22px;
-
-      @include small-text;
     }
   }
 
@@ -185,7 +150,7 @@
     justify-content: right;
     height: 84px;
     padding: 20px 60px;
-    font-size: 32px;
+    color: colors.$cool-black-30;
     background: colors.$warm-neutral-80;
     border-radius: 0 0 4px 4px;
   }
