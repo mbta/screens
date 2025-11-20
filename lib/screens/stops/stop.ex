@@ -73,14 +73,6 @@ defmodule Screens.Stops.Stop do
   defp encode_param({:location_types, lts}), do: [{"filter[location_type]", Enum.join(lts, ",")}]
   defp encode_param({:route_types, rts}), do: [{"filter[route_type]", Enum.join(rts, ",")}]
 
-  @callback fetch_parent_station_name_map() :: {:ok, %{id() => String.t()}} | :error
-  def fetch_parent_station_name_map do
-    case fetch(%{location_types: [1]}) do
-      {:ok, stops} -> {:ok, Map.new(stops, fn %__MODULE__{id: id, name: name} -> {id, name} end)}
-      _ -> :error
-    end
-  end
-
   @callback fetch_stop_name(id()) :: String.t() | nil
   def fetch_stop_name(stop_id) do
     case fetch(%{ids: [stop_id]}) do

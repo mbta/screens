@@ -125,8 +125,10 @@ defmodule Screens.Alerts.Alert do
           stop: Stop.id() | nil
         }
 
+  @type id :: String.t()
+
   @type t :: %__MODULE__{
-          id: String.t(),
+          id: id(),
           cause: cause() | :unknown,
           effect: effect() | :unknown,
           severity: pos_integer(),

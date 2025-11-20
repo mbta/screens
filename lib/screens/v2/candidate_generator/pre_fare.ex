@@ -16,7 +16,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     &Widgets.Header.instances/2,
     &Widgets.SubwayStatus.subway_status_instances/2,
     &Widgets.ReconstructedAlert.reconstructed_alert_instances/2,
-    &Widgets.ElevatorClosures.elevator_status_instances/2,
+    &CandidateGenerator.PreFare.ElevatorStatus.instances/2,
     &Widgets.FullLineMap.full_line_map_instances/2,
     &Widgets.Evergreen.evergreen_content_instances/2,
     &Widgets.Departures.departures_instances/2

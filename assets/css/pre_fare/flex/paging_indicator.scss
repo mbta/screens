@@ -3,11 +3,10 @@
 .flex-zone-page-indicator {
   position: absolute;
   right: 0;
-  bottom: 0;
+  bottom: 32px;
   width: 1080px;
   height: 20px;
-  padding-top: 16px;
-  padding-bottom: 24px;
+  padding: 28px 0;
   text-align: center;
 }
 

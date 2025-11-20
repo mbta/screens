@@ -5,7 +5,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
   alias Screens.Elevator.Closure
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
-  alias Screens.V2.WidgetInstance.ElevatorStatusNew, as: ElevatorWidget
+  alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorWidget
   alias ScreensConfig.Screen
 
   import Screens.Inject
