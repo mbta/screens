@@ -1,12 +1,12 @@
-defmodule ScreensWeb.V2.Audio.ElevatorStatusNewViewTest do
+defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
   use ExUnit.Case, async: true
 
-  alias ScreensWeb.V2.Audio.ElevatorStatusNewView
+  alias ScreensWeb.V2.Audio.ElevatorStatusView
   alias ScreensConfig.FreeTextLine
 
   defp render(assigns) do
     "_widget.ssml"
-    |> ElevatorStatusNewView.render(assigns)
+    |> ElevatorStatusView.render(assigns)
     |> Phoenix.HTML.safe_to_string()
     |> String.replace(~r/\n\s+/, "")
   end

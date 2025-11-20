@@ -9,7 +9,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatusTest do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.PreFare.ElevatorStatus
-  alias Screens.V2.WidgetInstance.ElevatorStatusNew, as: ElevatorWidget
+  alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorWidget
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 

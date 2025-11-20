@@ -1,4 +1,4 @@
-defmodule ScreensWeb.V2.Audio.ElevatorStatusNewView do
+defmodule ScreensWeb.V2.Audio.ElevatorStatusView do
   use ScreensWeb, :view
 
   alias ScreensConfig.FreeTextLine

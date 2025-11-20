@@ -1,9 +1,10 @@
 @use "CSS/colors";
 @use "CSS/lcd/section_header";
 
-.elevator-status-new {
+.elevator-status {
   display: flex;
   flex-direction: column;
+  height: 100%;
   color: colors.$cool-black-15;
   background-color: colors.$warm-neutral-90;
 
@@ -111,15 +112,4 @@
   &__qrcode {
     margin-left: auto;
   }
-}
-
-/* stylelint-disable-next-line no-duplicate-selectors --
- * Temporary size/position override while the slot is still sized for the
- * non-"new" elevator status widget; should be handled by the slot itself
- * once this widget is promoted to live (in `pre_fare/body_right/normal`)
- */
-.elevator-status-new {
-  position: relative;
-  bottom: -108px;
-  height: 984px;
 }
