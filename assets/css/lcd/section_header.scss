@@ -1,0 +1,17 @@
+@use "CSS/colors";
+
+@mixin base {
+  box-sizing: border-box;
+  font-size: 48px;
+  font-weight: bold;
+  color: colors.$cool-black-15;
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  border-top: 4px solid colors.$true-grey-70;
+
+  &:not(:empty) {
+    min-height: 104px;
+    padding: 18px 32px 18px 48px;
+    background-color: colors.$warm-neutral-80;
+  }
+}

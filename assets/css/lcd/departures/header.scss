@@ -1,23 +1,14 @@
 @use "CSS/colors";
+@use "CSS/lcd/section_header";
 
 .departures-header {
-  box-sizing: border-box;
+  @include section_header.base;
+
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  font-size: 48px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 3px;
   white-space: pre-line;
-  border-top: 4px solid colors.$true-grey-70;
-
-  &:not(:empty) {
-    min-height: 104px;
-    padding: 18px 32px 18px 48px;
-    background-color: colors.$warm-neutral-80;
-  }
 }
 
 .departures-section:first-of-type .departures-header:empty {

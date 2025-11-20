@@ -77,10 +77,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
         response =
           screen_id
-          |> screen_response(screen, variant,
-            run_all_variants?: true,
-            update_visible_alerts?: true
-          )
+          |> screen_response(screen, variant, update_visible_alerts?: true)
           |> put_extra_fields(screen_id, screen)
 
         json(conn, response)

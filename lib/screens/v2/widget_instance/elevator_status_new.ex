@@ -1,16 +1,21 @@
 defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   @moduledoc false
 
+  alias Screens.Alerts.Alert
   alias Screens.Elevator
   alias Screens.Elevator.Closure
   alias Screens.Facilities.Facility
   alias Screens.Stops.Stop
   alias ScreensConfig.FreeTextLine
 
-  @enforce_keys ~w[closures station_id]a
-  defstruct @enforce_keys
+  @enforce_keys ~w[closures home_station_id]a
+  defstruct @enforce_keys ++ [relevant_station_ids: []]
 
-  @type t :: %__MODULE__{closures: [Closure.t()], station_id: Stop.id()}
+  @type t :: %__MODULE__{
+          closures: [Closure.t()],
+          home_station_id: Stop.id(),
+          relevant_station_ids: MapSet.t(Stop.id())
+        }
 
   defmodule Serialized do
     @moduledoc false
@@ -85,35 +90,54 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
 
   @app_cta_url "mbta.com/go-access"
   @elevators_url "mbta.com/elevators"
-  @stop_url_base "mbta.com/stops"
   @max_callout_items 4
 
   @spec serialize(t()) :: Serialized.t()
-  def serialize(%__MODULE__{closures: closures, station_id: station_id}) do
+  def serialize(%__MODULE__{
+        closures: closures,
+        home_station_id: home_station_id,
+        relevant_station_ids: relevant_station_ids
+      }) do
+    closed_elevator_ids = MapSet.new(closures, fn %Closure{facility: %Facility{id: id}} -> id end)
+
     # Choose the first "scenario" that applies (ordered highest-priority first). Each function
     # returns a `Serialized` if it does apply or `nil` if it does not.
     Enum.find_value(
       [
-        &closed_here_without_nearby_backups/2,
-        &closed_elsewhere_without_in_station_backups/2,
-        &closed_elsewhere_with_in_station_backups/2,
-        &all_working_or_closed_with_nearby_backups/2
+        fn ->
+          closed_here_without_nearby_backups(closures, home_station_id, closed_elevator_ids)
+        end,
+        fn ->
+          closed_elsewhere_without_in_station_backups(
+            closures,
+            relevant_station_ids,
+            closed_elevator_ids
+          )
+        end,
+        fn -> closed_elsewhere_with_in_station_backups(closures) end,
+        fn -> all_working_or_closed_with_nearby_backups(closures) end
       ],
-      & &1.(closures, station_id)
+      & &1.()
     )
   end
 
   def serialize_to_map(%__MODULE__{} = widget), do: widget |> serialize() |> Map.from_struct()
 
-  defp closed_here_without_nearby_backups(closures, station_id) do
-    case Enum.filter(closures, fn
-           %Closure{elevator: elevator, facility: %Facility{stop: %Stop{id: id}}} ->
-             id == station_id and maybe_redundancy(elevator) != :nearby
-         end) do
+  defp closed_here_without_nearby_backups(closures, station_id, closed_ids) do
+    case Enum.filter(
+           closures,
+           &(at_station?(&1, station_id) and not has_redundancy?(&1, [:nearby], closed_ids))
+         ) do
       [] ->
         nil
 
-      [%Closure{elevator: elevator, facility: %Facility{long_name: name}}] ->
+      [
+        %Closure{
+          alert: %Alert{id: alert_id},
+          elevator: elevator,
+          facility: %Facility{long_name: name}
+        }
+      ] ->
         summary = if(is_nil(elevator), do: nil, else: elevator.summary)
 
         %Serialized{
@@ -124,10 +148,10 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
               ["#{name} is unavailable." | List.wrap(summary)],
               [
                 if(summary, do: "For more info, go to ", else: "Find an alternate path on "),
-                %{format: :bold, text: stop_url(station_id)}
+                %{format: :bold, text: stop_url_web(station_id)}
               ]
             ]),
-          qr_code_url: "https://#{stop_url(station_id)}"
+          qr_code_url: "https://#{stop_alert_url_app(alert_id, station_id)}"
         }
 
       relevant_closures ->
@@ -141,40 +165,40 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
             ),
           footer_lines:
             footer_lines([
-              ["Find an alternate path on ", %{format: :bold, text: stop_url(station_id)}]
+              ["Find an alternate path on ", %{format: :bold, text: stop_url_web(station_id)}]
             ]),
-          qr_code_url: "https://#{stop_url(station_id)}"
+          qr_code_url: "https://#{stop_url_app(station_id)}"
         }
     end
   end
 
   # if reached: no elevators are closed at the home station
-  defp closed_elsewhere_without_in_station_backups(closures, _station_id) do
-    case Enum.split_with(closures, fn
-           %Closure{elevator: elevator} -> maybe_redundancy(elevator) in ~w[nearby in_station]a
-         end) do
+  defp closed_elsewhere_without_in_station_backups(closures, relevant_ids, closed_ids) do
+    case Enum.split_with(closures, &has_redundancy?(&1, [:nearby, :in_station], closed_ids)) do
       {_with_in_station, _without_in_station = []} ->
         nil
 
       {with_in_station, without_in_station} ->
-        {station_names, overflow} =
+        {stations, overflow} =
           without_in_station
-          |> Enum.group_by(fn %Closure{facility: %Facility{stop: %Stop{name: name}}} -> name end)
-          |> Enum.sort_by(&elem(&1, 0))
+          |> Enum.group_by(fn %Closure{facility: %Facility{stop: stop}} -> stop end)
+          |> Enum.sort_by(fn {%Stop{id: id, name: name}, _closures} ->
+            {if(id in relevant_ids, do: 0, else: 1), name}
+          end)
           |> Enum.split(@max_callout_items)
 
         %Serialized{
           status: :alert,
           header:
-            case station_names do
-              [{name, [_closure]}] -> "Elevator closed at #{name}"
-              [{name, _closures}] -> "Elevators closed at #{name}"
+            case stations do
+              [{station, [_closure]}] -> "Elevator closed at #{station_name(station)}"
+              [{station, _closures}] -> "Elevators closed at #{station_name(station)}"
               _stations -> "Elevators closed at:"
             end,
           callout_items:
-            case station_names do
+            case stations do
               [_station] -> []
-              stations -> Enum.map(stations, fn {name, _closures} -> name end)
+              stations -> Enum.map(stations, fn {station, _} -> station_name(station) end)
             end,
           footer_lines:
             footer_lines([
@@ -190,7 +214,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   end
 
   # if reached: all closed elevators have in-station redundancy
-  defp closed_elsewhere_with_in_station_backups(closures, _station_id) do
+  defp closed_elsewhere_with_in_station_backups(closures) do
     if Enum.any?(closures, fn %Closure{elevator: %Elevator{redundancy: redundancy}} ->
          redundancy == :in_station
        end) do
@@ -204,7 +228,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   end
 
   # if reached: all closed elevators have nearby redundancy
-  defp all_working_or_closed_with_nearby_backups(closures, _station_id) do
+  defp all_working_or_closed_with_nearby_backups(closures) do
     closures? = Enum.any?(closures)
 
     %Serialized{
@@ -221,12 +245,29 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
     }
   end
 
+  defp at_station?(%Closure{facility: %Facility{stop: %Stop{id: id}}}, id), do: true
+  defp at_station?(_closure, _id), do: false
+
   defp footer_lines(lines), do: Enum.map(lines, &%FreeTextLine{icon: nil, text: &1})
 
-  defp maybe_redundancy(%Elevator{redundancy: redundancy}), do: redundancy
-  defp maybe_redundancy(nil), do: nil
+  # Only consider an elevator to "have" its stated redundancy category when all of its alternate
+  # elevators are available.
+  defp has_redundancy?(
+         %Closure{elevator: %Elevator{alternate_ids: alternate_ids, redundancy: redundancy}},
+         categories,
+         closed_ids
+       ) do
+    redundancy in categories and alternate_ids |> MapSet.new() |> MapSet.disjoint?(closed_ids)
+  end
 
-  defp stop_url(station_id), do: "#{@stop_url_base}/#{station_id}"
+  defp has_redundancy?(%Closure{elevator: nil}, _categories, _closed_ids), do: false
+
+  defp station_name(%Stop{id: "place-masta"}), do: "Mass Ave"
+  defp station_name(%Stop{name: name}), do: name
+
+  defp stop_alert_url_app(alert_id, station_id), do: "go.mbta.com/a/#{alert_id}/s/#{station_id}"
+  defp stop_url_app(station_id), do: "go.mbta.com/s/#{station_id}"
+  defp stop_url_web(station_id), do: "mbta.com/stops/#{station_id}"
 
   defimpl Screens.V2.AlertsWidget do
     def alert_ids(_instance), do: []
