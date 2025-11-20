@@ -20,6 +20,7 @@ interface PreFareSingleScreenAlertProps {
   location: string;
   cause: string;
   remedy: string;
+  show_alternate_route_text: string;
   routes: EnrichedRoute[];
   unaffected_routes?: EnrichedRoute[];
   endpoints: [string, string];
@@ -43,6 +44,7 @@ interface EnrichedRoute {
 interface StandardLayoutProps {
   issue: string;
   remedy: string;
+  show_alternate_route_text: string;
   effect: string;
   location: string | null;
   disruptionDiagram?: DisruptionDiagramData;
@@ -51,6 +53,7 @@ interface StandardLayoutProps {
 const StandardLayout: ComponentType<StandardLayoutProps> = ({
   issue,
   remedy,
+  show_alternate_route_text,
   effect,
   location,
   disruptionDiagram,
@@ -74,6 +77,7 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
           effect={effect}
           remedy={remedy}
           contentTextSize="large"
+          show_alternate_route_text={show_alternate_route_text}
         />
       </div>
       {disruptionDiagram && (
@@ -87,6 +91,7 @@ interface DownstreamLayoutProps {
   endpoints: [string, string];
   effect: string;
   remedy: string;
+  show_alternate_route_text: string;
   disruptionDiagram?: DisruptionDiagramData;
 }
 
@@ -95,12 +100,18 @@ const DownstreamLayout: ComponentType<DownstreamLayoutProps> = ({
   endpoints,
   effect,
   remedy,
+  show_alternate_route_text,
   disruptionDiagram,
 }) => (
   <div className={classWithModifier("alert-card__content-block", "downstream")}>
     {disruptionDiagram && <MapSection disruptionDiagram={disruptionDiagram} />}
     <DownstreamIssueSection endpoints={endpoints} />
-    <RemedySection effect={effect} remedy={remedy} contentTextSize="medium" />
+    <RemedySection
+      effect={effect}
+      remedy={remedy}
+      contentTextSize="medium"
+      show_alternate_route_text={show_alternate_route_text}
+    />
   </div>
 );
 
@@ -242,11 +253,13 @@ const DownstreamIssueSection: ComponentType<DownstreamIssueSectionProps> = ({
 interface RemedySectionProps {
   effect: string;
   remedy: string | null;
+  show_alternate_route_text: string | null;
   contentTextSize: string;
 }
 const RemedySection: ComponentType<RemedySectionProps> = ({
   effect,
   remedy,
+  show_alternate_route_text,
   contentTextSize,
 }) => (
   <div className="alert-card__remedy">
@@ -270,7 +283,16 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
     ) : (
       <>
         <WalkingIcon className="alert-card__icon" />
-        <h5 className="alert-card__remedy__text">{remedy}</h5>
+        {show_alternate_route_text ? (
+          <h5 className="alert-card__remedy__text">
+            <span className="alert-card__remedy__text--alternate-route">
+              Find alternate route at{" "}
+            </span>
+            mbta.com/alerts
+          </h5>
+        ) : (
+          <h5 className="alert-card__remedy__text">{remedy}</h5>
+        )}
       </>
     )}
   </div>
@@ -312,6 +334,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
     issue,
     location,
     remedy,
+    show_alternate_route_text,
     routes,
     unaffected_routes,
     updated_at,
@@ -351,6 +374,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           effect={effect}
           location={location}
           disruptionDiagram={disruption_diagram}
+          show_alternate_route_text={show_alternate_route_text}
         />
       );
       break;
@@ -362,6 +386,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           effect={effect}
           location={location}
           disruptionDiagram={disruption_diagram}
+          show_alternate_route_text={show_alternate_route_text}
         />
       );
       break;
@@ -374,6 +399,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           effect={effect}
           location={location}
           disruptionDiagram={disruption_diagram}
+          show_alternate_route_text={show_alternate_route_text}
         />
       );
       break;
@@ -386,6 +412,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           effect={effect}
           remedy={remedy}
           disruptionDiagram={disruption_diagram}
+          show_alternate_route_text={show_alternate_route_text}
         />
       );
       break;

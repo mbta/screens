@@ -249,6 +249,10 @@ $alert-card-footer-height: 80px;
       &__remedy {
         height: 660px;
         padding-top: 474px;
+
+        &--alternate-route {
+          font-weight: 400;
+        }
       }
 
       &__shuttle-icon {

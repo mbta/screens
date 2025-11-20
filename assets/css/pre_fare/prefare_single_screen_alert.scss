@@ -86,6 +86,10 @@
 
     &__text {
       align-self: center;
+
+      &--alternate-route {
+        font-weight: 400;
+      }
     }
   }
 
