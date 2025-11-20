@@ -34,7 +34,7 @@ import BodyRightTakeover from "Components/pre_fare/body_right_takeover";
 import BodyTakeover from "Components/pre_fare/body_takeover";
 import ScreenTakeover from "Components/pre_fare/screen_takeover";
 import ScreenSplitTakeover from "Components/pre_fare/screen_split_takeover";
-import ElevatorStatus from "Components/elevator_status_new";
+import ElevatorStatus from "Components/elevator_status";
 import FullLineMap from "Components/full_line_map";
 import LcdSubwayStatus from "Components/subway_status/lcd_subway_status";
 import ReconstructedAlert from "Components/reconstructed_alert";
