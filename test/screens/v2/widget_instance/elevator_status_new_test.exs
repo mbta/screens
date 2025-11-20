@@ -1,4 +1,4 @@
-defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
+defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
@@ -6,8 +6,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
   alias Screens.Elevator.Closure
   alias Screens.Facilities.Facility
   alias Screens.Stops.Stop
-  alias Screens.V2.WidgetInstance.ElevatorStatusNew, as: Widget
-  alias Screens.V2.WidgetInstance.ElevatorStatusNew.Serialized
+  alias Screens.V2.WidgetInstance.ElevatorStatus, as: Widget
+  alias Screens.V2.WidgetInstance.ElevatorStatus.Serialized
   alias ScreensConfig.FreeTextLine
 
   defp build_closure(facility_fields, elevator_fields \\ %{}, alert_id \\ "0") do

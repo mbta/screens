@@ -12,7 +12,7 @@ import ElevatorAlertIcon from "Images/isa-alert-badge.svg";
 import NormalServiceIcon from "Images/normal-service.svg";
 
 const className = (elementName: string | null = null) =>
-  `elevator-status-new${elementName ? `__${elementName}` : ""}`;
+  `elevator-status${elementName ? `__${elementName}` : ""}`;
 
 type Props = {
   status: "ok" | "alert";

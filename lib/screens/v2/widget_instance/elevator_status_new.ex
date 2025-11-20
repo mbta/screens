@@ -1,4 +1,4 @@
-defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
+defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   @moduledoc false
 
   alias Screens.Alerts.Alert
@@ -274,16 +274,16 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   end
 
   defimpl Screens.V2.WidgetInstance do
-    alias Screens.V2.WidgetInstance.ElevatorStatusNew
+    alias Screens.V2.WidgetInstance.ElevatorStatus
 
     def priority(_instance), do: [2]
-    def serialize(instance), do: ElevatorStatusNew.serialize_to_map(instance)
+    def serialize(instance), do: ElevatorStatus.serialize_to_map(instance)
     def slot_names(_instance), do: [:lower_right]
-    def widget_type(_instance), do: :elevator_status_new
+    def widget_type(_instance), do: :elevator_status
     def valid_candidate?(_instance), do: true
-    def audio_serialize(instance), do: ElevatorStatusNew.serialize_to_map(instance)
+    def audio_serialize(instance), do: ElevatorStatus.serialize_to_map(instance)
     def audio_sort_key(_instance), do: [4]
     def audio_valid_candidate?(_instance), do: true
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorStatusNewView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.ElevatorStatusView
   end
 end
