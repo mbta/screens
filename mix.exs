@@ -64,7 +64,7 @@ defmodule Screens.MixProject do
       {:guardian, "~> 2.4.0"},
       {:hackney, "~> 1.25.0"},
       {:hackney_telemetry, "~> 0.2.0"},
-      {:httpoison, "~> 2.2.1"},
+      {:httpoison, "~> 2.3.0"},
       {:jason, "~> 1.0"},
       {:memcachex, "~> 0.5.5"},
       {:nebulex, "~> 2.6"},
