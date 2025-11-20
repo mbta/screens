@@ -10,6 +10,7 @@ interface ReconAlertProps {
   location: string | FreeTextType;
   cause: string;
   remedy: string;
+  show_alternate_route_text: string;
   routes: any[]; // shouldn't be "any"
   effect: string;
   updated_at: string;
@@ -25,6 +26,7 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
     issue,
     location,
     remedy,
+    show_alternate_route_text,
     routes,
     updated_at,
     end_time,
@@ -105,7 +107,18 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                 </div>
               </>
             ) : (
-              <h3 className="alert-card__body__remedy">{remedy}</h3>
+              <h3 className="alert-card__body__remedy">
+                {show_alternate_route_text ? (
+                  <>
+                    <span className="alert-card__body__remedy--alternate-route">
+                      Find alternate route at{" "}
+                    </span>
+                    mbta.com/alerts
+                  </>
+                ) : (
+                  remedy
+                )}
+              </h3>
             )}
           </div>
           <div className="alert-card__footer body-4">
