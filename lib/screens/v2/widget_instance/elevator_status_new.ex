@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   @moduledoc false
 
+  alias Screens.Alerts.Alert
   alias Screens.Elevator
   alias Screens.Elevator.Closure
   alias Screens.Facilities.Facility
@@ -89,7 +90,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
 
   @app_cta_url "mbta.com/go-access"
   @elevators_url "mbta.com/elevators"
-  @stop_url_base "mbta.com/stops"
   @max_callout_items 4
 
   @spec serialize(t()) :: Serialized.t()
@@ -131,7 +131,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
       [] ->
         nil
 
-      [%Closure{elevator: elevator, facility: %Facility{long_name: name}}] ->
+      [
+        %Closure{
+          alert: %Alert{id: alert_id},
+          elevator: elevator,
+          facility: %Facility{long_name: name}
+        }
+      ] ->
         summary = if(is_nil(elevator), do: nil, else: elevator.summary)
 
         %Serialized{
@@ -142,10 +148,10 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
               ["#{name} is unavailable." | List.wrap(summary)],
               [
                 if(summary, do: "For more info, go to ", else: "Find an alternate path on "),
-                %{format: :bold, text: stop_url(station_id)}
+                %{format: :bold, text: stop_url_web(station_id)}
               ]
             ]),
-          qr_code_url: "https://#{stop_url(station_id)}"
+          qr_code_url: "https://#{stop_alert_url_app(alert_id, station_id)}"
         }
 
       relevant_closures ->
@@ -159,9 +165,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
             ),
           footer_lines:
             footer_lines([
-              ["Find an alternate path on ", %{format: :bold, text: stop_url(station_id)}]
+              ["Find an alternate path on ", %{format: :bold, text: stop_url_web(station_id)}]
             ]),
-          qr_code_url: "https://#{stop_url(station_id)}"
+          qr_code_url: "https://#{stop_url_app(station_id)}"
         }
     end
   end
@@ -259,7 +265,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNew do
   defp station_name(%Stop{id: "place-masta"}), do: "Mass Ave"
   defp station_name(%Stop{name: name}), do: name
 
-  defp stop_url(station_id), do: "#{@stop_url_base}/#{station_id}"
+  defp stop_alert_url_app(alert_id, station_id), do: "go.mbta.com/a/#{alert_id}/s/#{station_id}"
+  defp stop_url_app(station_id), do: "go.mbta.com/s/#{station_id}"
+  defp stop_url_web(station_id), do: "mbta.com/stops/#{station_id}"
 
   defimpl Screens.V2.AlertsWidget do
     def alert_ids(_instance), do: []

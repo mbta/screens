@@ -10,9 +10,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
   alias Screens.V2.WidgetInstance.ElevatorStatusNew.Serialized
   alias ScreensConfig.FreeTextLine
 
-  defp build_closure(facility_fields, elevator_fields \\ %{}) do
+  defp build_closure(facility_fields, elevator_fields \\ %{}, alert_id \\ "0") do
     %Closure{
-      alert: %Alert{},
+      alert: %Alert{id: alert_id},
       elevator: if(is_nil(elevator_fields), do: nil, else: build_elevator(elevator_fields)),
       facility: build_facility(facility_fields)
     }
@@ -51,7 +51,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
       closures = [
         build_closure(
           [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
-          redundancy: :in_station
+          [redundancy: :in_station],
+          "alert-1"
         ),
         # has nearby redundancy; filter out
         build_closure([stop: %Stop{id: "place-here"}], redundancy: :nearby),
@@ -67,7 +68,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
             ["Test Elevator 100 is unavailable."],
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
-        qr_code_url: "https://mbta.com/stops/place-here"
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here"
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -78,8 +79,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
       closures = [
         build_closure(
           [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
-          redundancy: :in_station,
-          summary: "Use nearby elevator 101."
+          [redundancy: :in_station, summary: "Use nearby elevator 101."],
+          "alert-1"
         )
       ]
 
@@ -91,7 +92,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
             ["Test Elevator 100 is unavailable.", "Use nearby elevator 101."],
             ["For more info, go to ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
-        qr_code_url: "https://mbta.com/stops/place-here"
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here"
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -113,7 +114,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
           free_text_lines([
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
-        qr_code_url: "https://mbta.com/stops/place-here"
+        qr_code_url: "https://go.mbta.com/s/place-here"
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
@@ -124,8 +125,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
       closures = [
         build_closure(
           [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
-          alternate_ids: ["alt"],
-          redundancy: :nearby
+          [alternate_ids: ["alt"], redundancy: :nearby],
+          "alert-1"
         ),
         build_closure(id: "alt")
       ]
@@ -138,7 +139,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusNewTest do
             ["Test Elevator 100 is unavailable."],
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
-        qr_code_url: "https://mbta.com/stops/place-here"
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here"
       }
 
       assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
