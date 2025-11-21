@@ -114,16 +114,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
     end
 
     test "multiple closures" do
+      # ensure lexical ordering of elevator names
       closures = [
-        build_closure([long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}], %{}, "a1"),
+        build_closure([long_name: "Test Elevator B", stop: %Stop{id: "place-here"}], %{}, "a1"),
         # no elevator data; not considered to have redundancy
-        build_closure([long_name: "Test Elevator 101", stop: %Stop{id: "place-here"}], nil, "a2")
+        build_closure([long_name: "Test Elevator A", stop: %Stop{id: "place-here"}], nil, "a2")
       ]
 
       expected = %Serialized{
         status: :alert,
         header: "Elevators are closed at this station.",
-        callout_items: ["Test Elevator 100", "Test Elevator 101"],
+        callout_items: ["Test Elevator A", "Test Elevator B"],
         footer_lines:
           free_text_lines([
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]

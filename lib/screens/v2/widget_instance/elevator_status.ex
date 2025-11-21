@@ -169,10 +169,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           status: :alert,
           header: "Elevators are closed at this station.",
           callout_items:
-            Enum.map(
-              relevant_closures,
-              fn %Closure{facility: %Facility{long_name: name}} -> name end
-            ),
+            relevant_closures
+            |> Enum.map(fn %Closure{facility: %Facility{long_name: name}} -> name end)
+            |> Enum.sort(),
           footer_lines:
             footer_lines([
               ["Find an alternate path on ", %{format: :bold, text: stop_url_web(station_id)}]
