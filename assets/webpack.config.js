@@ -30,6 +30,14 @@ const ENTRYPOINTS = {
 
 const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 
+// Though this is normally not recommended, we transpile the dependencies we
+// ship to screens, because many libraries no longer support the old browser
+// versions we have to support. This should be reevaluated with future shifts
+// in the screens browser landscape.
+// As noted in webpack documentation, core-js will cause errors if transpiled
+// https://webpack.js.org/loaders/babel-loader/#exclude-libraries-that-should-not-be-transpiled
+const BABEL_EXCLUDED_DEPS_PATTERN = new RegExp("node_modules/core-js")
+
 module.exports = (env, argv) => {
   const isOutfrontPackage = env.package === "dup";
   const isProduction = argv.mode === "production";
@@ -46,8 +54,8 @@ module.exports = (env, argv) => {
     module: {
       rules: [
         {
-          test: /\.[jt]sx?$/,
-          exclude: /node_modules/,
+          test: /\.m?[jt]sx?$/,
+          exclude: BABEL_EXCLUDED_DEPS_PATTERN,
           use: {
             loader: "babel-loader",
             options: {
@@ -63,6 +71,8 @@ module.exports = (env, argv) => {
                 ["@babel/preset-react", { runtime: "automatic" }],
                 "@babel/preset-typescript",
               ],
+              // only needed as long as we are transpiling dependencies
+              sourceType: "unambiguous",
             },
           },
         },
@@ -115,3 +125,4 @@ module.exports = (env, argv) => {
     resolve: { alias: ALIASES, extensions: [".ts", ".tsx", ".js", ".jsx"] },
   };
 };
+
