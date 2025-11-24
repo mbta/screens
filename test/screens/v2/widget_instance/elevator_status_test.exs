@@ -199,8 +199,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
     test "multiple closures at one station" do
       closures = [
-        build_closure([stop: %Stop{id: "place-a", name: "ABC"}], nil, "a1"),
-        build_closure([stop: %Stop{id: "place-a", name: "ABC"}], [redundancy: :shuttle], "a2")
+        build_closure([stop: %Stop{id: "place-a", name: "ABC"}], [redundancy: :shuttle], "a1"),
+        # has in-station redundancy, but another closed elevator at the same station doesn't,
+        # so "Elevators closed at ABC" already includes it and it should not be double-included
+        # in the footer summary
+        build_closure([stop: %Stop{id: "place-a", name: "ABC"}], [redundancy: :nearby], "a2")
       ]
 
       expected = %Serialized{
@@ -332,7 +335,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
         qr_code_url: "https://mbta.com/elevators",
-        alert_ids: ~w[a1 a2 a3]
+        alert_ids: ~w[a2 a1 a3]
       }
 
       assert Widget.serialize(%Widget{
