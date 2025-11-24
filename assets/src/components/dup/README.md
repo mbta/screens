@@ -37,7 +37,7 @@
 
 ## Working with Outfront
 
-Once you've created the client app packages, you'll need to send them to Outfront to test and deploy. Make sure to remove any changes that you made to `dup.tsx` and  `use_api_response.tsx` for local testing before generating packages for Outfront.
+Once you've created the client app packages, you'll need to send them to Outfront to test and deploy.
 
 For detailed instructions on this process, go to [this Notion doc](https://www.notion.so/mbta-downtown-crossing/Deploying-DUP-Package-Updates-120f5d8d11ea805fa219f214c1633293).
 
