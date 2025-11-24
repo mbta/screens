@@ -184,14 +184,17 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   # if reached: no elevators are closed at the home station
   defp closed_elsewhere_without_in_station_backups(closures, relevant_ids, closed_ids) do
-    case Enum.split_with(closures, &has_redundancy?(&1, [:nearby, :in_station], closed_ids)) do
+    case closures
+         |> Enum.group_by(fn %Closure{facility: %Facility{stop: stop}} -> stop end)
+         |> Enum.split_with(fn {_stop, closures} ->
+           Enum.all?(closures, &has_redundancy?(&1, [:nearby, :in_station], closed_ids))
+         end) do
       {_with_in_station, _without_in_station = []} ->
         nil
 
       {with_in_station, without_in_station} ->
-        {stations, overflow} =
+        {callout_stations, overflow} =
           without_in_station
-          |> Enum.group_by(fn %Closure{facility: %Facility{stop: stop}} -> stop end)
           |> Enum.sort_by(fn {%Stop{id: id, name: name}, _closures} ->
             {if(id in relevant_ids, do: 0, else: 1), name}
           end)
@@ -200,26 +203,29 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         %Serialized{
           status: :alert,
           header:
-            case stations do
+            case callout_stations do
               [{station, [_closure]}] -> "Elevator closed at #{station_name(station)}"
               [{station, _closures}] -> "Elevators closed at #{station_name(station)}"
               _stations -> "Elevators closed at:"
             end,
           callout_items:
-            case stations do
+            case callout_stations do
               [_station] -> []
               stations -> Enum.map(stations, fn {station, _} -> station_name(station) end)
             end,
           footer_lines:
             footer_lines([
               Summary.text(
-                Enum.count(with_in_station),
+                with_in_station |> Enum.flat_map(&elem(&1, 1)) |> Enum.count(),
                 overflow |> Enum.flat_map(&elem(&1, 1)) |> Enum.count(),
                 @elevators_url
               )
             ]),
           qr_code_url: "https://#{@elevators_url}",
-          alert_ids: Enum.map(without_in_station, fn %Closure{alert: %Alert{id: id}} -> id end)
+          alert_ids:
+            without_in_station
+            |> Enum.flat_map(&elem(&1, 1))
+            |> Enum.map(fn %Closure{alert: %Alert{id: id}} -> id end)
         }
     end
   end
