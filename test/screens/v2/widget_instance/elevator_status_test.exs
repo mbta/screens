@@ -66,8 +66,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           [redundancy: :in_station],
           "alert-1"
         ),
-        # has nearby redundancy; filter out
-        build_closure([stop: %Stop{id: "place-here"}], redundancy: :nearby),
         # not at this station; irrelevant
         build_closure(stop: %Stop{id: "place-other"})
       ]
@@ -125,6 +123,38 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         status: :alert,
         header: "Elevators are closed at this station.",
         callout_items: ["Test Elevator A", "Test Elevator B"],
+        footer_lines:
+          free_text_lines([
+            ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
+          ]),
+        qr_code_url: "https://go.mbta.com/s/place-here",
+        alert_ids: ~w[a1 a2]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "includes closures with nearby redundancy at the same station" do
+      closures = [
+        # triggers the closures-here state
+        build_closure(
+          [long_name: "Test 1", stop: %Stop{id: "place-here"}],
+          [redundancy: :in_station],
+          "a1"
+        ),
+        # would not trigger the state on its own, but included because we're already in it
+        build_closure(
+          [long_name: "Test 2", stop: %Stop{id: "place-here"}],
+          [redundancy: :nearby],
+          "a2"
+        )
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevators are closed at this station.",
+        callout_items: ["Test 1", "Test 2"],
         footer_lines:
           free_text_lines([
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
