@@ -28,6 +28,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
             header_size: :large | :medium,
             callout_items: [String.t()],
             footer_lines: [FreeTextLine.t()],
+            footer_audio: [String.t()] | nil,
             cta_type: :app | :plain,
             qr_code_url: String.t(),
             # Not included in the serialized form sent to the client; only used by AlertWidget
@@ -40,6 +41,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
                   header_size: :medium,
                   callout_items: [],
                   footer_lines: [],
+                  footer_audio: [],
                   cta_type: :plain,
                   alert_ids: []
                 ]
@@ -98,6 +100,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   @app_cta_url "mbta.com/go-access"
   @elevators_url "mbta.com/elevators"
+
+  @elevator_hotline "617-222-2828"
+  @audio_cta_alternate_path "For an alternate path, call #{@elevator_hotline}."
+  @audio_cta_full_list "For a full list of elevator closures, call #{@elevator_hotline}."
+
   @max_callout_items 4
 
   @spec serialize(t()) :: Serialized.t()
@@ -156,18 +163,22 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         _
       } ->
         summary = if(is_nil(elevator), do: nil, else: elevator.summary)
+        summary_line = ["#{name} is unavailable." | List.wrap(summary)]
 
         %Serialized{
           status: :alert,
           header: "An elevator is closed at this station.",
           footer_lines:
             footer_lines([
-              ["#{name} is unavailable." | List.wrap(summary)],
+              summary_line,
               [
                 if(summary, do: "For more info, go to ", else: "Find an alternate path on "),
                 %{format: :bold, text: stop_url_web(station_id)}
               ]
             ]),
+          footer_audio:
+            summary_line ++
+              [if(summary, do: @audio_cta_full_list, else: @audio_cta_alternate_path)],
           qr_code_url: "https://#{stop_alert_url_app(alert_id, station_id)}",
           alert_ids: [alert_id]
         }
@@ -184,6 +195,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
             footer_lines([
               ["Find an alternate path on ", %{format: :bold, text: stop_url_web(station_id)}]
             ]),
+          footer_audio: [@audio_cta_alternate_path],
           qr_code_url: "https://#{stop_url_app(station_id)}",
           alert_ids: Enum.map(closures_here, fn %Closure{alert: %Alert{id: id}} -> id end)
         }
@@ -229,6 +241,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
                 @elevators_url
               )
             ]),
+          footer_audio: [@audio_cta_full_list],
           qr_code_url: "https://#{@elevators_url}",
           alert_ids:
             without_in_station
@@ -247,6 +260,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         status: :ok,
         header: "All elevators at this station are working.",
         footer_lines: footer_lines([Summary.text(Enum.count(closures), 0, @elevators_url)]),
+        footer_audio: [@audio_cta_full_list],
         qr_code_url: "https://#{@elevators_url}"
       }
     end
