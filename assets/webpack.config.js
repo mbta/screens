@@ -125,4 +125,3 @@ module.exports = (env, argv) => {
     resolve: { alias: ALIASES, extensions: [".ts", ".tsx", ".js", ".jsx"] },
   };
 };
-
