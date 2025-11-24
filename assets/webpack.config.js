@@ -36,7 +36,7 @@ const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 // in the screens browser landscape.
 // As noted in webpack documentation, core-js will cause errors if transpiled
 // https://webpack.js.org/loaders/babel-loader/#exclude-libraries-that-should-not-be-transpiled
-const BABEL_EXCLUDED_DEPS_PATTERN = new RegExp("node_modules/core-js")
+const BABEL_EXCLUDED_DEPS_PATTERN = new RegExp("node_modules/core-js");
 
 module.exports = (env, argv) => {
   const isOutfrontPackage = env.package === "dup";
