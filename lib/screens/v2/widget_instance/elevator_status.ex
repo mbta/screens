@@ -133,20 +133,28 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     do: widget |> serialize() |> Map.from_struct() |> Map.delete(:alert_ids)
 
   defp closed_here_without_nearby_backups(closures, station_id, closed_ids) do
-    case Enum.filter(
-           closures,
-           &(at_station?(&1, station_id) and not has_redundancy?(&1, [:nearby], closed_ids))
-         ) do
-      [] ->
+    closures_here =
+      Enum.filter(closures, fn %Closure{facility: %Facility{stop: %Stop{id: id}}} ->
+        id == station_id
+      end)
+
+    case {
+      closures_here,
+      Enum.filter(closures_here, &(not has_redundancy?(&1, [:nearby], closed_ids)))
+    } do
+      {_closures_here, []} ->
         nil
 
-      [
-        %Closure{
-          alert: %Alert{id: alert_id},
-          elevator: elevator,
-          facility: %Facility{long_name: name}
-        }
-      ] ->
+      {
+        [
+          %Closure{
+            alert: %Alert{id: alert_id},
+            elevator: elevator,
+            facility: %Facility{long_name: name}
+          }
+        ],
+        _
+      } ->
         summary = if(is_nil(elevator), do: nil, else: elevator.summary)
 
         %Serialized{
@@ -164,12 +172,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
           alert_ids: [alert_id]
         }
 
-      relevant_closures ->
+      {closures_here, _} ->
         %Serialized{
           status: :alert,
           header: "Elevators are closed at this station.",
           callout_items:
-            relevant_closures
+            closures_here
             |> Enum.map(fn %Closure{facility: %Facility{long_name: name}} -> name end)
             |> Enum.sort(),
           footer_lines:
@@ -177,12 +185,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
               ["Find an alternate path on ", %{format: :bold, text: stop_url_web(station_id)}]
             ]),
           qr_code_url: "https://#{stop_url_app(station_id)}",
-          alert_ids: Enum.map(relevant_closures, fn %Closure{alert: %Alert{id: id}} -> id end)
+          alert_ids: Enum.map(closures_here, fn %Closure{alert: %Alert{id: id}} -> id end)
         }
     end
   end
 
-  # if reached: no elevators are closed at the home station
+  # if reached: no elevators (except with nearby redundancy) are closed at the home station
   defp closed_elsewhere_without_in_station_backups(closures, relevant_ids, closed_ids) do
     case closures
          |> Enum.group_by(fn %Closure{facility: %Facility{stop: stop}} -> stop end)
@@ -230,7 +238,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     end
   end
 
-  # if reached: all closed elevators have in-station redundancy
+  # if reached: all closed elevators have in-station redundancy or better
   defp closed_elsewhere_with_in_station_backups(closures) do
     if Enum.any?(closures, fn %Closure{elevator: %Elevator{redundancy: redundancy}} ->
          redundancy == :in_station
@@ -261,9 +269,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
       qr_code_url: "https://#{@app_cta_url}"
     }
   end
-
-  defp at_station?(%Closure{facility: %Facility{stop: %Stop{id: id}}}, id), do: true
-  defp at_station?(_closure, _id), do: false
 
   defp footer_lines(lines), do: Enum.map(lines, &%FreeTextLine{icon: nil, text: &1})
 
