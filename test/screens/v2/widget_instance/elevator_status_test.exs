@@ -47,6 +47,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
   defp free_text_lines(lines), do: Enum.map(lines, &%FreeTextLine{icon: nil, text: &1})
 
+  @call_for_alternate_path "For an alternate path, call 617-222-2828."
+  @call_for_full_list "For a full list of elevator closures, call 617-222-2828."
+
   describe "AlertsWidget implementation" do
     test "returns the value of Serialized.alert_ids" do
       # This way we know the AlertsWidget implementation is actually hooked up to the `alert_ids`
@@ -78,6 +81,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             ["Test Elevator 100 is unavailable."],
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
+        footer_audio: ["Test Elevator 100 is unavailable.", @call_for_alternate_path],
         qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
         alert_ids: ["alert-1"]
       }
@@ -103,6 +107,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             ["Test Elevator 100 is unavailable.", "Use nearby elevator 101."],
             ["For more info, go to ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
+        footer_audio: [
+          "Test Elevator 100 is unavailable.",
+          "Use nearby elevator 101.",
+          @call_for_full_list
+        ],
         qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
         alert_ids: ["alert-1"]
       }
@@ -127,6 +136,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           free_text_lines([
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
+        footer_audio: [@call_for_alternate_path],
         qr_code_url: "https://go.mbta.com/s/place-here",
         alert_ids: ~w[a1 a2]
       }
@@ -159,6 +169,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           free_text_lines([
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
+        footer_audio: [@call_for_alternate_path],
         qr_code_url: "https://go.mbta.com/s/place-here",
         alert_ids: ~w[a1 a2]
       }
@@ -185,6 +196,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
             ["Test Elevator 100 is unavailable."],
             ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
           ]),
+        footer_audio: ["Test Elevator 100 is unavailable.", @call_for_alternate_path],
         qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
         alert_ids: ["alert-1"]
       }
@@ -219,6 +231,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               %{format: :bold, text: "mbta.com/elevators"}
             ]
           ]),
+        footer_audio: [@call_for_full_list],
         qr_code_url: "https://mbta.com/elevators",
         alert_ids: ["alert-a"]
       }
@@ -241,6 +254,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         header: "Elevators closed at ABC",
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        footer_audio: [@call_for_full_list],
         qr_code_url: "https://mbta.com/elevators",
         alert_ids: ~w[a1 a2]
       }
@@ -262,6 +276,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         callout_items: ["A", "B"],
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        footer_audio: [@call_for_full_list],
         qr_code_url: "https://mbta.com/elevators",
         alert_ids: ~w[a1 a2 a3]
       }
@@ -295,6 +310,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               %{format: :bold, text: "mbta.com/elevators"}
             ]
           ]),
+        footer_audio: [@call_for_full_list],
         qr_code_url: "https://mbta.com/elevators",
         alert_ids: ~w[a0 a1 a2 a3 a4 a5]
       }
@@ -325,6 +341,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               %{format: :bold, text: "mbta.com/elevators"}
             ]
           ]),
+        footer_audio: [@call_for_full_list],
         qr_code_url: "https://mbta.com/elevators",
         alert_ids: ["alert-a"]
       }
@@ -343,6 +360,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         header: "Elevator closed at Mass Ave",
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        footer_audio: [@call_for_full_list],
         qr_code_url: "https://mbta.com/elevators",
         alert_ids: ["a1"]
       }
@@ -364,6 +382,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         callout_items: ["Relevant", "Alpha", "Beta"],
         footer_lines:
           free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        footer_audio: [@call_for_full_list],
         qr_code_url: "https://mbta.com/elevators",
         alert_ids: ~w[a2 a1 a3]
       }
@@ -395,6 +414,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
               %{format: :bold, text: "mbta.com/elevators"}
             ]
           ]),
+        footer_audio: [@call_for_full_list],
         qr_code_url: "https://mbta.com/elevators"
       }
 
