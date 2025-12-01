@@ -338,6 +338,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp format_short_route_pill("Green-" <> branch), do: "gl-#{String.downcase(branch)}"
 
+  defp format_short_route_pill("Mattapan"), do: "rl-mattapan"
+
   defp format_short_route_pill(route_id),
     do: route_id |> String.first() |> String.downcase() |> Kernel.<>("l")
 
