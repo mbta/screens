@@ -421,7 +421,7 @@ defmodule Screens.Alerts.Alert do
     |> Enum.uniq_by(& &1.stop)
   end
 
-  @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
+  @spec station_closure_type(__MODULE__.t(), list(Stop.t() | String.t())) ::
           :partial_closure | :full_station_closure | :partial_closure_multiple_stops
   def station_closure_type(
         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
@@ -456,9 +456,27 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  def get_informed_platforms_from_entities(informed_entities, all_platforms_at_informed_stations) do
+  @spec get_informed_platforms_from_entities([InformedEntity.t()], [Stop.t()] | [Stop.id()]) :: [
+          InformedEntity.t()
+        ]
+  def get_informed_platforms_from_entities(
+        informed_entities,
+        [%Stop{} | _] = all_platforms_at_informed_stations
+      ) do
     platform_ids = Enum.map(all_platforms_at_informed_stations, & &1.id)
-    Enum.filter(informed_entities, &(&1.stop in platform_ids))
+
+    informed_entities
+    |> Enum.filter(&(&1.stop in platform_ids))
+    |> Enum.uniq_by(& &1.stop)
+  end
+
+  def get_informed_platforms_from_entities(
+        informed_entities,
+        all_platform_ids_at_informed_stations
+      ) do
+    informed_entities
+    |> Enum.filter(&(&1.stop in all_platform_ids_at_informed_stations))
+    |> Enum.uniq_by(& &1.stop)
   end
 
   @spec informs_stop_id?(t(), Stop.id()) :: boolean()

@@ -83,13 +83,23 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   end
 
   defp get_affected_lines_as_pills(t) do
-    t
-    |> DupAlert.get_affected_lines()
-    |> Enum.map(fn line ->
-      line
-      |> line_to_pill_atom()
-      |> free_text_pill()
-    end)
+    route_pill =
+      t
+      |> DupAlert.get_affected_lines()
+      |> Enum.map(fn line ->
+        line
+        |> line_to_pill_atom()
+        |> free_text_pill()
+      end)
+
+    case LocalizedAlert.location(t) do
+      # TODO: Handle GL branches based on design feedback
+      :inside_partial ->
+        {affected_platform_for_partial_closure(t), route_pill}
+
+      _ ->
+        route_pill
+    end
   end
 
   defp partial_alert_free_text(t) do
@@ -101,6 +111,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
       {[line], _, :inside} ->
         ["No", bold(line), "trains"]
+
+      {_, _, :inside_partial} ->
+        ["No", bold(affected_platform_for_partial_closure(t))]
 
       {[_line], _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
         headsign = get_headsign(t)
@@ -114,6 +127,36 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
       {[_line1, _line2], _, _} ->
         ["No train service"]
     end
+  end
+
+  defp affected_platform_for_partial_closure(t) do
+    stops_in_alert = Enum.map(t.alert.informed_entities, & &1.stop)
+
+    platform_names =
+      t
+      |> child_stops_for_affected_line()
+      |> Enum.filter(&(&1.id in stops_in_alert and &1.platform_name))
+      |> Enum.map(& &1.platform_name)
+
+    case platform_names do
+      [platform_name] ->
+        platform_name
+
+      [] ->
+        nil
+
+      multiple_platforms ->
+        # TODO: handle multiple platforms based on design feedback
+        "Westbound"
+    end
+  end
+
+  @spec child_stops_for_affected_line(DupAlert.t()) :: [Stop.t()]
+  defp child_stops_for_affected_line(t) do
+    t
+    |> LocalizedAlert.informed_routes_at_home_stop()
+    |> Enum.flat_map(&Map.get(t.location_context.child_stops_at_station, &1, []))
+    |> Enum.uniq()
   end
 
   defp partial_alert_icon(t) when t.alert.effect == :delay, do: :delay
@@ -146,6 +189,13 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
       [line_pill1, line_pill2] ->
         ["No", line_pill1, "or", line_pill2, "trains"]
+
+      # TODO: Change logic here to work with GL based on design feedback. Hardcoded temporarily
+      {"Westbound", [route_pill]} ->
+        [route_pill, bold("Westbound platform closed")]
+
+      {platform_name, [_route_pill]} ->
+        [bold("#{platform_name} platform closed")]
     end
   end
 
