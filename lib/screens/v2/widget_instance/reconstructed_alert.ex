@@ -440,7 +440,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "No trains",
-      remedy: "Seek alternate route",
+      remedy: nil,
+      show_alternate_route_text: true,
       location: "No #{route_id} Line trains #{format_endpoint_string(endpoints)}",
       endpoints: endpoints,
       cause: format_cause(cause),
@@ -519,7 +520,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Station closed",
-      remedy: "Seek alternate route",
+      remedy: nil,
+      show_alternate_route_text: true,
       location: location_text,
       cause: format_cause(cause),
       routes: get_route_pills(t),
@@ -545,7 +547,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     %{
       issue: if(effect == :station_closure, do: "Station closed", else: "No trains"),
-      remedy: if(effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
+      remedy:
+        if(effect == :shuttle,
+          do: "Use shuttle bus"
+        ),
+      show_alternate_route_text: effect != :shuttle,
       location: header,
       cause: format_cause(cause),
       routes: get_route_pills(t),
@@ -604,7 +610,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: issue,
-      remedy: "Seek alternate route",
+      remedy: nil,
+      show_alternate_route_text: true,
       location: location_text,
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
@@ -754,7 +761,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: if(unaffected_routes == [], do: "Station closed"),
-      remedy: if(unaffected_routes == [], do: "Seek alternate route"),
+      remedy: nil,
+      show_alternate_route_text: unaffected_routes == [],
       unaffected_routes:
         Enum.flat_map(unaffected_routes, fn route -> build_pills_from_headsign(route, nil) end),
       cause: get_cause(cause),
@@ -778,7 +786,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Trains skip #{informed_stations_string}",
-      remedy: "Seek alternate route",
+      remedy: nil,
+      show_alternate_route_text: true,
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :station_closure,
