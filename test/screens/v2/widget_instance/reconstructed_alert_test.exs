@@ -1256,6 +1256,75 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
+    test "boundary suspension with Mattapan route returns correct svg_name", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-asmnl")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-asmnl", route: "Mattapan", route_type: 0, direction_id: 0),
+          ie(stop: "place-cedgr", route: "Mattapan", route_type: 0, direction_id: 0)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Mattapan" => [
+            [
+              "place-asmnl",
+              "place-cedgr",
+              "place-butlr",
+              "place-miltt",
+              "place-cenav",
+              "place-valrd",
+              "place-capst",
+              "place-matt"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            route_id: "Mattapan",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :light_rail
+          }
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+
+      expected = %{
+        issue: "No trains to Mattapan",
+        location: "No Mattapan Line trains between Ashmont and Cedar Grove",
+        cause: nil,
+        routes: [%{route_id: "Mattapan", svg_name: "rl-mattapan"}],
+        effect: :suspension,
+        remedy: "Seek alternate route",
+        updated_at: "Jun 9",
+        end_time: "tomorrow",
+        region: :boundary,
+        endpoints: {"Ashmont", "Cedar Grove"},
+        is_transfer_station: false,
+        disruption_diagram: %{
+          current_station_slot_index: 0,
+          effect: :suspension,
+          effect_region_slot_index_range: {0, 1},
+          line: :mattapan,
+          slots: [
+            %{type: :terminal, label_id: "place-asmnl"},
+            %{label: %{full: "Cedar Grove", abbrev: "Cedar Grove"}, show_symbol: true},
+            %{label: %{full: "Butler", abbrev: "Butler"}, show_symbol: true},
+            %{label: %{full: "Milton", abbrev: "Milton"}, show_symbol: true},
+            %{label: %{full: "Central Avenue", abbrev: "Central Ave"}, show_symbol: true},
+            %{label: %{full: "Valley Road", abbrev: "Valley Rd"}, show_symbol: true},
+            %{label: %{full: "Capen Street", abbrev: "Capen St"}, show_symbol: true},
+            %{type: :terminal, label_id: "place-matt"}
+          ]
+        }
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+    end
+
     test "partial platform closure for here", %{widget: widget} do
       widget =
         widget
