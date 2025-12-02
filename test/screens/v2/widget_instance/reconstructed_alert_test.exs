@@ -1256,6 +1256,40 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
+    test "boundary suspension with Mattapan route returns correct svg_name", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-asmnl")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-asmnl", route: "Mattapan", route_type: 0, direction_id: 0),
+          ie(stop: "place-cedgr", route: "Mattapan", route_type: 0, direction_id: 0)
+        ])
+        |> put_tagged_stop_sequences(%{
+          "Mattapan" => [
+            [
+              "place-asmnl",
+              "place-cedgr",
+              "place-matt"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            route_id: "Mattapan",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :light_rail
+          }
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+
+      assert %{routes: [%{svg_name: "rl-mattapan"}]} = ReconstructedAlert.serialize(widget)
+    end
+
     test "partial platform closure for here", %{widget: widget} do
       widget =
         widget
