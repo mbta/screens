@@ -107,6 +107,11 @@
     height: 98px;
     margin-right: 45px;
     color: colors.$cool-black-15;
+
+    &--large {
+      min-width: 128px;
+      height: 128px;
+    }
   }
 
   .alert-card__content-block__text-sections {
@@ -133,13 +138,14 @@
 
   .alert-card__body__accessibility-info {
     &--text {
+      display: flex;
       margin-top: 22px;
     }
   }
 
   .alert-card__isa-icon {
     height: 40px;
-    margin: auto 45px 0 auto;
+    margin-left: 16px;
   }
 
   .alert-card__footer {

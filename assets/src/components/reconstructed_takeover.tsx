@@ -97,13 +97,13 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                 />
                 <h1 className="alert-card__body__shuttle-remedy">{remedy}</h1>
                 <div className="alert-card__body__accessibility-info">
+                  <div className="alert-card__body__accessibility-info--text body-2">
+                    All shuttle buses are accessible
+                  </div>
                   <img
                     className="alert-card__body__isa-icon"
                     src={imagePath("ISA_Blue.svg")}
                   />
-                  <div className="alert-card__body__accessibility-info--text body-2">
-                    All shuttle buses are accessible
-                  </div>
                 </div>
               </>
             ) : (

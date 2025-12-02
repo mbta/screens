@@ -222,7 +222,9 @@ const StandardIssueSection: ComponentType<StandardIssueSectionProps> = ({
   contentTextSize,
 }) => (
   <div className="alert-card__issue">
-    <NoServiceIcon className="alert-card__icon" />
+    <NoServiceIcon
+      className={classWithModifiers("alert-card__icon", [contentTextSize])}
+    />
     <div>
       {contentTextSize === "large" ? (
         <h3 className="alert-card__content-block__text">{issue}</h3>
@@ -244,9 +246,9 @@ const DownstreamIssueSection: ComponentType<DownstreamIssueSectionProps> = ({
   endpoints,
 }) => (
   <div className="alert-card__issue">
+    <NoServiceIcon className="alert-card__icon" />
     <h4 className="alert-card__content-block__text">
-      No trains <span style={{ fontWeight: 500 }}>between</span> {endpoints[0]}{" "}
-      <span style={{ fontWeight: 500 }}>&</span> {endpoints[1]}
+      No trains between {endpoints[0]} & {endpoints[1]}
     </h4>
   </div>
 );
@@ -267,7 +269,6 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
       <>
         <div className="alert-card__remedy__shuttle-icons">
           <ShuttleBusIcon className="alert-card__icon" />
-          <ISAIcon className="alert-card__isa-icon" />
         </div>
         <div>
           {contentTextSize === "large" ? (
@@ -277,6 +278,7 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
           )}
           <div className="alert-card__body__accessibility-info--text body-4">
             All shuttle buses are accessible
+            <ISAIcon className="alert-card__isa-icon" />
           </div>
         </div>
       </>
