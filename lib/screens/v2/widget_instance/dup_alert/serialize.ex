@@ -195,8 +195,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
       [line_pill1, line_pill2] ->
         ["No", line_pill1, "or", line_pill2, "trains"]
 
+      # Special case for GL westbound in which we include pill and direction
       {@gl_westbound_direction_name, [line_pill]} ->
-        no_trains = [bold("No"), line_pill, bold(@gl_westbound_direction_name)]
+        [bold("No"), line_pill, bold(@gl_westbound_direction_name)]
 
       {platform_name, [_line_pill]} ->
         [bold("#{platform_name} platform closed")]
