@@ -22,6 +22,9 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
           color: :red | :orange | :green | :blue
         }
 
+  @gl_westbound_platforms ["Boston College", "Cleveland Circle", "Riverside", "Heath Street"]
+  @gl_westbound_direction_name "Copley & West"
+
   @spec serialize_full_screen(DupAlert.t()) :: full_screen_alert_map
   def serialize_full_screen(t) do
     %{
@@ -92,13 +95,11 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
         |> free_text_pill()
       end)
 
-    case LocalizedAlert.location(t) do
-      # TODO: Handle GL branches based on design feedback
-      :inside_partial ->
-        {affected_platform_for_partial_closure(t), route_pill}
-
-      _ ->
-        route_pill
+    with :platform <- LocalizedAlert.location(t),
+         name when not is_nil(name) <- platform_closure_name(t) do
+      {name, route_pill}
+    else
+      _ -> route_pill
     end
   end
 
@@ -112,8 +113,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
       {[line], _, :inside} ->
         ["No", bold(line), "trains"]
 
-      {_, _, :inside_partial} ->
-        ["No", bold(affected_platform_for_partial_closure(t))]
+      {_, _, :platform} ->
+        ["No", bold(platform_closure_name(t))]
 
       {[_line], _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
         headsign = get_headsign(t)
@@ -129,7 +130,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     end
   end
 
-  defp affected_platform_for_partial_closure(t) do
+  @spec platform_closure_name(DupAlert.t()) :: String.t() | nil
+  defp platform_closure_name(t) do
     stops_in_alert = Enum.map(t.alert.informed_entities, & &1.stop)
 
     platform_names =
@@ -146,8 +148,11 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
         nil
 
       multiple_platforms ->
-        # TODO: handle multiple platforms based on design feedback
-        "Westbound"
+        if Enum.all?(multiple_platforms, &(&1 in @gl_westbound_platforms)) do
+          @gl_westbound_direction_name
+        else
+          nil
+        end
     end
   end
 
@@ -190,11 +195,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
       [line_pill1, line_pill2] ->
         ["No", line_pill1, "or", line_pill2, "trains"]
 
-      # TODO: Change logic here to work with GL based on design feedback. Hardcoded temporarily
-      {"Westbound", [route_pill]} ->
-        [route_pill, bold("Westbound platform closed")]
+      {@gl_westbound_direction_name, [line_pill]} ->
+        no_trains = [bold("No"), line_pill, bold(@gl_westbound_direction_name)]
 
-      {platform_name, [_route_pill]} ->
+      {platform_name, [_line_pill]} ->
         [bold("#{platform_name} platform closed")]
     end
   end

@@ -34,7 +34,7 @@ defmodule Screens.V2.LocalizedAlert do
           | :downstream
           | :elsewhere
           | :inside
-          | :inside_partial
+          | :platform
           | :upstream
 
   @typedoc """
@@ -195,7 +195,7 @@ defmodule Screens.V2.LocalizedAlert do
 
   defp get_location_atom(informed_zones_set, :partial_closure, _)
        when informed_zones_set == [:home_stop] do
-    :inside_partial
+    :platform
   end
 
   defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:home_stop] do
