@@ -7,6 +7,7 @@ defmodule Screens.V2.LocalizedAlert do
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.RouteType
+  alias Screens.Stop
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
