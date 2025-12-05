@@ -3541,9 +3541,49 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                ReconstructedAlert.serialize(widget)
     end
 
+    test "end_time is end of service", %{widget: widget} do
+      active_period = [
+        {~U[2021-01-01T00:00:00Z], ~U[2021-01-01T08:00:00Z]}
+      ]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+
+      assert %{end_time: "end of service", updated_at: "Jun 9"} =
+               ReconstructedAlert.serialize(widget)
+    end
+
     test "end_time is tomorrow", %{widget: widget} do
       active_period = [
         {~U[2021-01-01T00:00:00Z], ~U[2021-01-01T22:00:00Z]}
+      ]
+
+      widget =
+        widget
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-mlmnl", route: "Orange", route_type: 1),
+          ie(stop: "place-welln", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+        |> put_active_period(active_period)
+
+      assert %{end_time: "tomorrow", updated_at: "Jun 9"} =
+               ReconstructedAlert.serialize(widget)
+    end
+
+    test "end_time is tomorrow end of service", %{widget: widget} do
+      active_period = [
+        {~U[2021-01-01T00:00:00Z], ~U[2021-01-02T08:00:00Z]}
       ]
 
       widget =
