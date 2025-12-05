@@ -41,7 +41,7 @@ const W = DIAGRAM_WIDTH - (L + R);
 
 // List of abbreviated stations
 const abbreviationList: { [string: string]: string } = {
-  "Boston University Center": "BU Central",
+  "Boston University Central": "BU Central",
   "Boston University East": "BU East",
   "Downtown Crossing": "Downtown Xng",
   "Government Center": "Gov't Center",
