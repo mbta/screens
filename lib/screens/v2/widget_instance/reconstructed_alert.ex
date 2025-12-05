@@ -1290,6 +1290,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @suppressed_alert_ids ~w[679818]
 
+  # Temporary case: Alert suppresion shouldn't happen at Gov't Center b/c we do not
+  # have a custom graphic for alert from 12/8/2025-12/22/2025
+  def valid_candidate?(%__MODULE__{home_station_name: "Government Center"}), do: true
+
   def valid_candidate?(%__MODULE__{alert: %{id: alert_id}}) do
     alert_id not in @suppressed_alert_ids
   end
