@@ -3596,7 +3596,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
 
     test "end_time is later this week", %{widget: widget} do
-      active_period = [{~U[2021-01-01T00:00:00Z], ~U[2021-01-03T22:00:00Z]}]
+      active_period = [{~U[2021-01-01T00:00:00Z], ~U[2021-01-04T08:00:00Z]}]
 
       widget =
         widget
@@ -3614,7 +3614,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
 
     test "end_time is in the future", %{widget: widget} do
-      active_period = [{~U[2021-01-01T00:00:00Z], ~U[2021-01-04T05:00:00Z]}]
+      active_period = [{~U[2021-01-01T00:00:00Z], ~U[2021-01-05T08:00:00Z]}]
 
       widget =
         widget
