@@ -1074,20 +1074,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp end_time_text([{_start_time, end_time} | _], now) do
     end_time_eastern = Util.to_eastern(end_time)
-
-    end_date =
-      end_time_eastern
-      |> then(fn datetime ->
-        if datetime.hour in 2..5 do
-          DateTime.add(datetime, -1, :day)
-        else
-          datetime
-        end
-      end)
-      |> DateTime.to_date()
-
-    now_time_eastern = Util.to_eastern(now)
-    now_date = DateTime.to_date(now_time_eastern)
+    end_date = Util.service_date(end_time)
+    now_date = Util.service_date(now)
 
     cond do
       end_date == now_date and
@@ -1101,12 +1089,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       Date.diff(end_date, now_date) == 1 ->
         "tomorrow"
 
-      Timex.iso_week(end_date) == Timex.iso_week(now_date) and
-          DateTime.after?(end_time_eastern, now_time_eastern) ->
-        "this #{Calendar.strftime(end_time_eastern, "%A")}"
+      Timex.iso_week(end_date) == Timex.iso_week(now_date) ->
+        "this #{Calendar.strftime(end_date, "%A")}"
 
       true ->
-        Calendar.strftime(end_time_eastern, "%b %-d")
+        Calendar.strftime(end_date, "%b %-d")
     end
   end
 
