@@ -3506,15 +3506,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert WidgetInstance.valid_candidate?(widget)
     end
 
-    suppressed_alerts = ~w[679818]
-
-    for alert_id <- suppressed_alerts do
-      @tag alert_id: alert_id
-      test "returns false for alert ##{alert_id}", %{widget: widget, alert_id: alert_id} do
-        refute widget
-               |> put_alert_id(alert_id)
-               |> WidgetInstance.valid_candidate?()
-      end
+    test "returns false for suppressed alert", %{widget: widget} do
+      widget = put_in(widget.screen.app_params.reconstructed_alert_widget.stop_id, "place-kencl")
+      refute widget |> put_alert_id("679818") |> WidgetInstance.valid_candidate?()
     end
   end
 

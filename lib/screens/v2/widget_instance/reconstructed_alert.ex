@@ -1298,22 +1298,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
-  @suppressed_alert_ids ~w[679818]
-
-  # Temporary case: Alert suppresion shouldn't happen at Gov't Center b/c we do not
-  # have a custom graphic for alert from 12/8/2025-12/22/2025
+  # Suppress alerts for GL disruption 12/8/2025-12/22/2025 specifically at Kenmore, which will be
+  # configured with custom content
   def valid_candidate?(%__MODULE__{
+        alert: %Alert{id: "679818"},
         screen: %Screen{
-          app_params: %PreFare{
-            reconstructed_alert_widget: %{stop_id: "place-gover"}
-          }
+          app_params: %PreFare{reconstructed_alert_widget: %{stop_id: "place-kencl"}}
         }
       }),
-      do: true
+      do: false
 
-  def valid_candidate?(%__MODULE__{alert: %{id: alert_id}}) do
-    alert_id not in @suppressed_alert_ids
-  end
+  def valid_candidate?(_other), do: true
 
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)
