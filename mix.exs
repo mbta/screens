@@ -88,7 +88,8 @@ defmodule Screens.MixProject do
       {:timex, "~> 3.6"},
       {:tzdata, "~> 1.1"},
       {:ueberauth, "~> 0.10"},
-      {:ueberauth_oidcc, "~> 0.4"}
+      {:ueberauth_oidcc, "~> 0.4"},
+      {:unrooted_polytree, "0.1.1"}
     ] ++ dev_deps() ++ prod_deps()
   end
 

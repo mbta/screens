@@ -1688,6 +1688,102 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       assert expected == WidgetInstance.serialize(instance)
     end
+
+    test "finds correct endpoints for GL suspension across multiple branches" do
+      # TODO: Generate this instead of having such a giant list?
+      routes = ["Green-B", "Green-C", "Green-D", "Green-E"]
+
+      stops = [
+        "place_north",
+        "place-haecl",
+        "place-gover",
+        "place-pktrm",
+        "place-boyls",
+        "place-armnl",
+        "place-coecl"
+      ]
+
+      shared_entities =
+        for route <- routes,
+            stop <- stops do
+          %{route: route, stop: stop, direction_id: nil}
+        end
+
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              severity: 9,
+              informed_entities: [
+                %{stop: "place-hymnl", route: "Green-B", direction_id: nil},
+                %{stop: "place-amory", route: "Green-B", direction_id: nil},
+                %{stop: "place-bucen", route: "Green-B", direction_id: nil},
+                %{stop: "place-babck", route: "Green-B", direction_id: nil},
+                %{stop: "place-coecl", route: "Green-B", direction_id: nil},
+                %{stop: "place-armnl", route: "Green-B", direction_id: nil},
+                %{stop: "place-kencl", route: "Green-B", direction_id: nil},
+                %{stop: "place-bland", route: "Green-B", direction_id: nil},
+                %{stop: "place-pktrm", route: "Green-B", direction_id: nil},
+                %{stop: "place-boyls", route: "Green-B", direction_id: nil},
+                %{stop: "place-gover", route: "Green-B", direction_id: nil},
+                %{stop: "place-buest", route: "Green-B", direction_id: nil},
+                %{stop: "place-hymnl", route: "Green-C", direction_id: nil},
+                %{stop: "place-armnl", route: "Green-C", direction_id: nil},
+                %{stop: "place-gover", route: "Green-C", direction_id: nil},
+                %{stop: "place-pktrm", route: "Green-C", direction_id: nil},
+                %{stop: "place-coecl", route: "Green-C", direction_id: nil},
+                %{stop: "place-kencl", route: "Green-C", direction_id: nil},
+                %{stop: "place-boyls", route: "Green-C", direction_id: nil},
+                %{stop: "place-hymnl", route: "Green-D", direction_id: nil},
+                %{stop: "place-boyls", route: "Green-D", direction_id: nil},
+                %{stop: "place-coecl", route: "Green-D", direction_id: nil},
+                %{stop: "place-gover", route: "Green-D", direction_id: nil},
+                %{stop: "place-haecl", route: "Green-D", direction_id: nil},
+                %{stop: "place-armnl", route: "Green-D", direction_id: nil},
+                %{stop: "place-kencl", route: "Green-D", direction_id: nil},
+                %{stop: "place-pktrm", route: "Green-D", direction_id: nil},
+                %{stop: "place-north", route: "Green-D", direction_id: nil},
+                %{stop: "place-brmnl", route: "Green-E", direction_id: nil},
+                %{stop: "place-armnl", route: "Green-E", direction_id: nil},
+                %{stop: "place-coecl", route: "Green-E", direction_id: nil},
+                %{stop: "place-prmnl", route: "Green-E", direction_id: nil},
+                %{stop: "place-north", route: "Green-E", direction_id: nil},
+                %{stop: "place-boyls", route: "Green-E", direction_id: nil},
+                %{stop: "place-nuniv", route: "Green-E", direction_id: nil},
+                %{stop: "place-bckhl", route: "Green-E", direction_id: nil},
+                %{stop: "place-hsmnl", route: "Green-E", direction_id: nil},
+                %{stop: "place-mispk", route: "Green-E", direction_id: nil},
+                %{stop: "place-lngmd", route: "Green-E", direction_id: nil},
+                %{stop: "place-mfa", route: "Green-E", direction_id: nil},
+                %{stop: "place-pktrm", route: "Green-E", direction_id: nil},
+                %{stop: "place-fenwd", route: "Green-E", direction_id: nil},
+                %{stop: "place-gover", route: "Green-E", direction_id: nil},
+                %{stop: "place-haecl", route: "Green-E", direction_id: nil},
+                %{stop: "place-symcl", route: "Green-E", direction_id: nil},
+                %{stop: "place-rvrwy", route: "Green-E", direction_id: nil}
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{
+              route_pill: @gl_pill,
+              status: "Suspension",
+              location: %{
+                full: "North Station ↔ Westbound Stops",
+                abbrev: "North Sta ↔ Westbound"
+              }
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
   end
 
   describe "slot_names/1" do
