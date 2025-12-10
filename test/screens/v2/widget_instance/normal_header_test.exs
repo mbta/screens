@@ -10,6 +10,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
       instance: %WidgetInstance.NormalHeader{
         icon: :logo,
         text: "Ruggles",
+        read_as: "Ruggles Audio",
         time: ~U[2021-03-04 11:00:00Z]
       },
       dup_instance: %WidgetInstance.NormalHeader{
@@ -44,6 +45,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
       assert %{
                icon: :green_e,
                text: "Medford/Tufts",
+               read_as: nil,
                show_to: true
              } == WidgetInstance.serialize(instance)
     end
@@ -51,6 +53,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
     test "returns serialized text, icon and time", %{instance: instance} do
       assert %{
                icon: :logo,
+               read_as: "Ruggles Audio",
                text: "Ruggles",
                time: "2021-03-04T11:00:00Z",
                show_to: false,
@@ -76,8 +79,8 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns map with text key", %{instance: instance} do
-      assert %{text: _} = WidgetInstance.audio_serialize(instance)
+    test "returns map with read_as key", %{instance: instance} do
+      assert %{read_as: _} = WidgetInstance.audio_serialize(instance)
     end
   end
 

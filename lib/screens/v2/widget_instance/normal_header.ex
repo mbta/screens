@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   defstruct screen: nil,
             icon: nil,
+            read_as: nil,
             text: nil,
             time: nil,
             variant: nil
@@ -15,19 +16,26 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
   @type t :: %__MODULE__{
           screen: ScreensConfig.Screen.t(),
           icon: icon | nil,
+          read_as: String.t() | nil,
           text: String.t(),
           time: DateTime.t(),
           variant: atom() | nil
         }
 
   # See `docs/mercury_api.md`
-  def serialize(%__MODULE__{screen: %Screen{vendor: :mercury}, icon: icon, text: text} = t) do
-    %{icon: icon, text: text, show_to: showing_destination?(t)}
+  def serialize(
+        %__MODULE__{screen: %Screen{vendor: :mercury}, icon: icon, text: text, read_as: read_as} =
+          t
+      ) do
+    %{icon: icon, text: text, show_to: showing_destination?(t), read_as: read_as}
   end
 
-  def serialize(%__MODULE__{icon: icon, text: text, time: time, variant: variant} = t) do
+  def serialize(
+        %__MODULE__{icon: icon, text: text, time: time, variant: variant, read_as: read_as} = t
+      ) do
     %{
       icon: icon,
+      read_as: read_as,
       text: text,
       time: DateTime.to_iso8601(time),
       show_to: showing_destination?(t),
@@ -43,13 +51,17 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
     [:header]
   end
 
-  def audio_serialize(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}, text: text, icon: icon})
+  def audio_serialize(%__MODULE__{
+        screen: %Screen{app_id: :gl_eink_v2},
+        read_as: read_as,
+        icon: icon
+      })
       when icon in [:green_b, :green_c, :green_d, :green_e] do
     "green_" <> branch = to_string(icon)
-    %{text: text, branch: branch}
+    %{read_as: read_as, branch: branch}
   end
 
-  def audio_serialize(%__MODULE__{text: text}), do: %{text: text}
+  def audio_serialize(%__MODULE__{read_as: read_as}), do: %{read_as: read_as}
 
   defp showing_destination?(%__MODULE__{
          screen: %Screen{app_params: %_app{header: %Destination{}}}

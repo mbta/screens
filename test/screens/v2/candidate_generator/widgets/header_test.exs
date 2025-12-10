@@ -17,8 +17,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.HeaderTest do
     do: struct(Screen, app_params: struct(app, params))
 
   describe "instances/2" do
-    test "generates a header with stop name and time" do
-      screen = build_screen(Screen.BusShelter, header: %Header.StopName{stop_name: "foo"})
+    test "generates a header with stop name, time, and read_as" do
+      screen =
+        build_screen(Screen.BusShelter,
+          header: %Header.StopName{stop_name: "foo", read_as: "foo_audio"}
+        )
+
+      assert Generator.instances(screen, @now) ==
+               [%NormalHeader{screen: screen, read_as: "foo_audio", text: "foo", time: @now}]
+    end
+
+    test "generates a header with stop name as audio when not supplied" do
+      screen =
+        build_screen(Screen.BusShelter,
+          header: %Header.StopName{stop_name: "foo"}
+        )
 
       assert Generator.instances(screen, @now) ==
                [%NormalHeader{screen: screen, text: "foo", time: @now}]
@@ -29,7 +42,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.HeaderTest do
       expect(@stop, :fetch_stop_name, fn "1" -> "bar" end)
 
       assert Generator.instances(screen, @now) ==
-               [%NormalHeader{screen: screen, text: "bar", time: @now}]
+               [%NormalHeader{screen: screen, read_as: "bar", text: "bar", time: @now}]
     end
 
     test "generates a copy of the header for each DUP rotation" do
