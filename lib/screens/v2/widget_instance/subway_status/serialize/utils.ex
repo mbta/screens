@@ -4,10 +4,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.Endpoints
   alias Screens.Alerts.InformedEntity
   alias Screens.Stops.Subway
-  alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.Endpoints
 
+  # TODO: Should this be moved elsewhere
   @route_directions %{
     "Blue" => ["Westbound", "Eastbound"],
     "Orange" => ["Southbound", "Northbound"],
@@ -64,6 +65,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
 
     %{full: direction, abbrev: direction}
   end
+
+  def route_directions, do: @route_directions
 
   ####################################
   # Station Closure Helper Functions #

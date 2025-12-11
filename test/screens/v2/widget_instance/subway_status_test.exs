@@ -1691,6 +1691,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
     test "finds correct endpoints for GL suspension across multiple branches" do
       # TODO: Generate this instead of having such a giant list?
+      # TODO: Have a test in the opposite direction
       routes = ["Green-B", "Green-C", "Green-D", "Green-E"]
 
       stops = [
