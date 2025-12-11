@@ -7,7 +7,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   defstruct screen: nil,
             icon: nil,
-            read_as: nil,
+            audio_text: nil,
             text: nil,
             time: nil,
             variant: nil
@@ -15,8 +15,8 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
   @type icon :: :logo | :green_b | :green_c | :green_d | :green_e
   @type t :: %__MODULE__{
           screen: ScreensConfig.Screen.t(),
+          audio_text: String.t() | nil,
           icon: icon | nil,
-          read_as: String.t() | nil,
           text: String.t(),
           time: DateTime.t(),
           variant: atom() | nil
@@ -24,18 +24,24 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   # See `docs/mercury_api.md`
   def serialize(
-        %__MODULE__{screen: %Screen{vendor: :mercury}, icon: icon, text: text, read_as: read_as} =
+        %__MODULE__{
+          screen: %Screen{vendor: :mercury},
+          icon: icon,
+          text: text,
+          audio_text: audio_text
+        } =
           t
       ) do
-    %{icon: icon, text: text, show_to: showing_destination?(t), read_as: read_as}
+    %{icon: icon, text: text, show_to: showing_destination?(t), audio_text: audio_text}
   end
 
   def serialize(
-        %__MODULE__{icon: icon, text: text, time: time, variant: variant, read_as: read_as} = t
+        %__MODULE__{icon: icon, text: text, time: time, variant: variant, audio_text: audio_text} =
+          t
       ) do
     %{
+      audio_text: audio_text,
       icon: icon,
-      read_as: read_as,
       text: text,
       time: DateTime.to_iso8601(time),
       show_to: showing_destination?(t),
@@ -53,15 +59,18 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   def audio_serialize(%__MODULE__{
         screen: %Screen{app_id: :gl_eink_v2},
-        read_as: read_as,
+        text: text,
         icon: icon
       })
       when icon in [:green_b, :green_c, :green_d, :green_e] do
     "green_" <> branch = to_string(icon)
-    %{read_as: read_as, branch: branch}
+    %{audio_text: text, branch: branch}
   end
 
-  def audio_serialize(%__MODULE__{read_as: read_as}), do: %{read_as: read_as}
+  # Set audio text to the visual text when it's not explicitly provided
+  def audio_serialize(%__MODULE__{audio_text: nil, text: text}), do: %{audio_text: text}
+
+  def audio_serialize(%__MODULE__{audio_text: audio_text}), do: %{audio_text: audio_text}
 
   defp showing_destination?(%__MODULE__{
          screen: %Screen{app_params: %_app{header: %Destination{}}}
