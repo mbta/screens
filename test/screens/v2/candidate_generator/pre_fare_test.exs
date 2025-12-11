@@ -11,10 +11,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     config = %Screen{
       app_params: %Screen.PreFare{
         header: %Config.Header.StopId{stop_id: "place-gover"},
-        elevator_status: %Config.ElevatorStatus{
-          parent_station_id: "place-foo",
-          platform_stop_ids: []
-        },
+        elevator_status: %Config.ElevatorStatus{parent_station_id: "place-foo"},
         full_line_map: [
           %Config.FullLineMap{
             asset_path: "test/path"
