@@ -10,9 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Header do
 
   @spec instances(Screen.t(), DateTime.t()) :: [NormalHeader.t()]
   def instances(%Screen{app_params: %app{header: header} = app_params} = screen, time) do
-    header_text = text(header)
-
-    case header_text do
+    case  text(header)
       nil ->
         []
 
