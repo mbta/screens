@@ -26,10 +26,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatusTest do
     app_params: %PreFare{
       header: nil,
       reconstructed_alert_widget: nil,
-      elevator_status: %ScreensConfig.ElevatorStatus{
-        parent_station_id: "place-here",
-        platform_stop_ids: []
-      },
+      elevator_status: %ScreensConfig.ElevatorStatus{parent_station_id: "place-here"},
       full_line_map: nil,
       content_summary: nil
     },
