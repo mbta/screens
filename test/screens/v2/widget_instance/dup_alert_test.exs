@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
+  alias Screens.V2.CandidateGenerator.Dup.Alerts
   alias Screens.V2.WidgetInstance.DupAlert
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
 
@@ -23,6 +24,21 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
     "Red" => [~w[place-r1 place-r2 place-r3 place-x place-r4]]
   }
 
+  @child_stops %{
+    "Blue" => [
+      %Screens.Stops.Stop{
+        id: "child_plat_b0",
+        platform_name: "Northbound",
+        location_type: 0
+      },
+      %Screens.Stops.Stop{
+        id: "child_plat_b1",
+        platform_name: "Southbound",
+        location_type: 0
+      }
+    ]
+  }
+
   defp build_location_context(home_stop) do
     stop_sequences = LocationContext.untag_stop_sequences(@tagged_stop_sequences)
 
@@ -32,7 +48,8 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
       upstream_stops: LocationContext.upstream_stop_id_set([home_stop], stop_sequences),
       downstream_stops: LocationContext.downstream_stop_id_set([home_stop], stop_sequences),
       routes: @tagged_stop_sequences |> Map.keys() |> Enum.map(&%{active?: true, route_id: &1}),
-      alert_route_types: LocationContext.route_type_filter(Screen.Dup, [home_stop])
+      alert_route_types: LocationContext.route_type_filter(Screen.Dup, [home_stop]),
+      child_stops_at_station: @child_stops
     }
   end
 
@@ -58,6 +75,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
         screen: screen,
         location_context: context,
         alert: alert,
+        alert_effect_detailed: Alerts.detailed_alert_effect(alert, context),
         rotation_index: &1,
         stop_name: "Test Stop"
       }
@@ -288,6 +306,35 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
       }
 
       assert serialized(screen, context, alert) == [takeover, takeover, takeover]
+    end
+
+    test "Single platform closure" do
+      screen = build_screen()
+      context = build_location_context("place-x")
+
+      alert =
+        build_alert(
+          effect: :station_closure,
+          cause: :unknown,
+          severity: 7,
+          informed_entities: stop_informed_entities("Blue", ~w[place-x child_plat_b0])
+        )
+
+      banner = %{
+        color: :blue,
+        text: %FreeTextLine{icon: :warning, text: ["No", bold("Northbound")]}
+      }
+
+      takeover = %{
+        header: %{color: :blue, text: "Test Stop"},
+        text: %FreeTextLine{
+          icon: :warning,
+          text: [bold("Northbound platform closed")]
+        },
+        remedy: %FreeTextLine{icon: nil, text: ["Seek alternate route"]}
+      }
+
+      assert serialized(screen, context, alert) == [banner, takeover, banner]
     end
 
     test "boundary" do

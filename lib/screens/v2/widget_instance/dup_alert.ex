@@ -9,17 +9,26 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
   alias ScreensConfig.{Departures, Screen, Screen.Dup}
 
-  @enforce_keys [:screen, :alert, :location_context, :rotation_index, :stop_name]
+  @enforce_keys [
+    :screen,
+    :alert,
+    :alert_effect_detailed,
+    :location_context,
+    :rotation_index,
+    :stop_name
+  ]
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alert: Alert.t(),
+          alert_effect_detailed: alert_effect_detailed_t(),
           location_context: LocationContext.t(),
           rotation_index: rotation_index,
           stop_name: String.t()
         }
 
+  @type alert_effect_detailed_t :: Alert.effect() | :partial_closure
   @type route_id :: String.t()
   @type stop_id :: String.t()
   @type rotation_index :: :zero | :one | :two
@@ -95,13 +104,13 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @spec eliminated_service_type(t()) :: :all | :some | :none
   defp eliminated_service_type(
          %__MODULE__{
-           alert: %Alert{effect: effect},
+           alert_effect_detailed: alert_effect_detailed,
            screen: %Screen{
              app_params: %Dup{primary_departures: %Departures{sections: primary_sections}}
            }
          } = t
        )
-       when effect in [:shuttle, :station_closure, :suspension] do
+       when alert_effect_detailed in [:shuttle, :station_closure, :suspension] do
     # Assume primary departures is always configured with a section for each subway line at the
     # screen's station. So if we're `inside` a disruption and it affects the same number of lines
     # as the number we show departures for, that means all service is eliminated. Otherwise, only
@@ -126,6 +135,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
       do: :some,
       else: :none
   end
+
+  defp eliminated_service_type(%__MODULE__{alert_effect_detailed: :partial_closure}), do: :some
 
   defp eliminated_service_type(_other), do: :none
 
