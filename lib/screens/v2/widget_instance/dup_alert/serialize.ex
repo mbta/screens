@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Report
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert
@@ -86,36 +87,40 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     |> Enum.map(&"#{&1} Line")
   end
 
-  defp get_affected_lines_as_pills(t) do
-    route_pill =
-      t
-      |> DupAlert.get_affected_lines()
-      |> Enum.map(fn line ->
-        line
-        |> line_to_pill_atom()
-        |> free_text_pill()
-      end)
-
-    with :platform <- LocalizedAlert.location(t),
-         name when not is_nil(name) <- platform_closure_name(t) do
-      {name, route_pill}
+  # TODO: Add spec
+  # @spec get_affected_lines_as_pills(DupAlert.t()) ::
+  defp(get_affected_lines_as_pills(%DupAlert{alert_effect_detailed: :partial_closure} = t)) do
+    with name when not is_nil(name) <- platform_closure_name(t) do
+      {name, pills_for_alert(t)}
     else
-      _ -> route_pill
+      _ -> pills_for_alert(t)
     end
+  end
+
+  defp get_affected_lines_as_pills(t), do: pills_for_alert(t)
+
+  defp pills_for_alert(t) do
+    t
+    |> DupAlert.get_affected_lines()
+    |> Enum.map(fn line ->
+      line
+      |> line_to_pill_atom()
+      |> free_text_pill()
+    end)
   end
 
   defp partial_alert_free_text(t) do
     affected_lines = get_affected_lines_as_strings(t)
 
-    case {affected_lines, t.alert.effect, LocalizedAlert.location(t)} do
+    case {affected_lines, t.alert_effect_detailed, LocalizedAlert.location(t)} do
       {[line], :delay, _} ->
         [bold(line), "delays"]
 
+      {_, :partial_closure, _} ->
+        ["No", bold(platform_closure_name(t))]
+
       {[line], _, :inside} ->
         ["No", bold(line), "trains"]
-
-      {_, _, :platform} ->
-        ["No", bold(platform_closure_name(t))]
 
       {[_line], _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
         headsign = get_headsign(t)
@@ -152,6 +157,13 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
         if Enum.all?(multiple_platforms, &(&1 in @gl_westbound_platforms)) do
           @gl_westbound_direction_name
         else
+          # We should not end up in this state,
+          # barring an unexpected type of alert
+          Report.warning("unexpected_platform_closure_dup",
+            alert_id: t.alert.id,
+            home_stop: t.location_context.home_stop
+          )
+
           nil
         end
     end

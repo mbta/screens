@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
+  alias Screens.V2.CandidateGenerator.Dup.Alerts
   alias Screens.V2.WidgetInstance.DupAlert
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
 
@@ -74,6 +75,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
         screen: screen,
         location_context: context,
         alert: alert,
+        alert_effect_detailed: Alerts.detailed_alert_effect(alert, context),
         rotation_index: &1,
         stop_name: "Test Stop"
       }

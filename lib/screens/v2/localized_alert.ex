@@ -7,7 +7,6 @@ defmodule Screens.V2.LocalizedAlert do
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.RouteType
-  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
@@ -35,7 +34,6 @@ defmodule Screens.V2.LocalizedAlert do
           | :downstream
           | :elsewhere
           | :inside
-          | :platform
           | :upstream
 
   @typedoc """
@@ -154,30 +152,12 @@ defmodule Screens.V2.LocalizedAlert do
   end
 
   @spec location(t()) :: location()
-  def location(t, is_terminal_station \\ false)
-
-  def location(
-        %DupAlert{
-          alert: %Alert{informed_entities: informed_entities},
-          location_context: location_context
-        } = t,
-        is_terminal_station
-      ) do
-    informed_zones_set =
-      informed_entities
-      |> Enum.flat_map(&informed_entity_to_zone(&1, location_context))
-      |> Enum.uniq()
-      |> Enum.sort()
-
-    get_location_atom(informed_zones_set, detailed_alert_effect(t), is_terminal_station)
-  end
-
   def location(
         %{
           alert: %Alert{effect: effect, informed_entities: informed_entities},
           location_context: location_context
         },
-        is_terminal_station
+        is_terminal_station \\ false
       ) do
     informed_zones_set =
       informed_entities
@@ -194,14 +174,8 @@ defmodule Screens.V2.LocalizedAlert do
   defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:downstream],
     do: :downstream
 
-  defp get_location_atom(informed_zones_set, :partial_closure, _)
-       when informed_zones_set == [:home_stop] do
-    :platform
-  end
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:home_stop] do
-    :inside
-  end
+  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:home_stop],
+    do: :inside
 
   defp get_location_atom(informed_zones_set, _, _)
        when informed_zones_set == [:downstream, :home_stop, :upstream],
@@ -234,27 +208,6 @@ defmodule Screens.V2.LocalizedAlert do
        do: :downstream
 
   defp get_location_atom(_, _, _), do: :elsewhere
-
-  defp detailed_alert_effect(%DupAlert{alert: %Alert{effect: :station_closure}} = t) do
-    # Gets a more detailed effect for station_closures (partial vs. full)
-    Alert.station_closure_type(
-      t.alert,
-      Enum.concat(
-        Enum.map(child_stops_for_affected_line(t), & &1.id),
-        List.wrap(t.location_context.home_stop)
-      )
-    )
-  end
-
-  defp detailed_alert_effect(%DupAlert{alert: %Alert{effect: effect}}), do: effect
-
-  @spec child_stops_for_affected_line(DupAlert.t()) :: [Stop.t()]
-  defp child_stops_for_affected_line(t) do
-    t
-    |> informed_routes_at_home_stop()
-    |> Enum.flat_map(&Map.get(t.location_context.child_stops_at_station, &1, []))
-    |> Enum.uniq()
-  end
 
   @doc """
   Returns all routes affected by an alert.

@@ -247,6 +247,6 @@ defmodule Screens.LocationContext do
     |> Enum.into(%{})
   end
 
-  # Child Stops are only needed for DUP's location context at the time, so return an emtpy list otherwise
+  # Child Stops are only needed for DUP's location context at the time, so return an empty list otherwise
   defp child_stops_at_station(_app, _route_patterns, _route_ids_at_stop, _stop_ids), do: []
 end

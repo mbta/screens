@@ -421,34 +421,33 @@ defmodule Screens.Alerts.Alert do
     |> Enum.uniq_by(& &1.stop)
   end
 
-  @spec station_closure_type(__MODULE__.t(), list(Stop.t() | String.t())) ::
+  @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
           :partial_closure | :full_station_closure | :partial_closure_multiple_stops
   def station_closure_type(
         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
-        all_platforms_at_informed_stations
+        platforms_at_informed_stations
       ) do
     # Alerts UI allows you to create partial closures affecting multiple stations.
     # Typically, these partial closures affecting child stops will only affect a single station.
     # However, we do want to consider the case in which multiple stations have closures,
     # but not every child stop at those parent stations are closed.
-    informed_parent_stations = informed_parent_stations(alert)
+    all_child_platforms =
+      Enum.reject(platforms_at_informed_stations, &String.starts_with?(&1.id, "place-"))
 
-    informed_platforms =
-      get_informed_platforms_from_entities(
-        informed_entities,
-        all_platforms_at_informed_stations
-      )
+    informed_parent_stations = informed_parent_stations(alert)
+    informed_platforms = informed_platforms_from_entities(informed_entities, all_child_platforms)
 
     case informed_parent_stations do
       [_single_parent_station] ->
-        if length(informed_platforms) != length(all_platforms_at_informed_stations) do
+        # Compare number of platforms in alert to total number of child platforms at station
+        if length(informed_platforms) != length(all_child_platforms) do
           :partial_closure
         else
           :full_station_closure
         end
 
       _multiple_parent_stations ->
-        if length(informed_platforms) != length(all_platforms_at_informed_stations) do
+        if length(informed_platforms) != length(all_child_platforms) do
           :partial_closure_multiple_stops
         else
           :full_station_closure
@@ -456,26 +455,12 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  @spec get_informed_platforms_from_entities([InformedEntity.t()], [Stop.t()] | [Stop.id()]) :: [
-          InformedEntity.t()
-        ]
-  def get_informed_platforms_from_entities(
-        informed_entities,
-        [%Stop{} | _] = all_platforms_at_informed_stations
-      ) do
+  @spec informed_platforms_from_entities([InformedEntity.t()], [Stop.t()]) :: [InformedEntity.t()]
+  def informed_platforms_from_entities(informed_entities, all_platforms_at_informed_stations) do
     platform_ids = Enum.map(all_platforms_at_informed_stations, & &1.id)
 
     informed_entities
     |> Enum.filter(&(&1.stop in platform_ids))
-    |> Enum.uniq_by(& &1.stop)
-  end
-
-  def get_informed_platforms_from_entities(
-        informed_entities,
-        all_platform_ids_at_informed_stations
-      ) do
-    informed_entities
-    |> Enum.filter(&(&1.stop in all_platform_ids_at_informed_stations))
     |> Enum.uniq_by(& &1.stop)
   end
 
