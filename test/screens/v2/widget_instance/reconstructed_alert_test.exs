@@ -24,7 +24,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           app_id: nil,
           app_params: %PreFare{
             content_summary: %ContentSummary{parent_station_id: station_id},
-            elevator_status: %ElevatorStatus{parent_station_id: station_id, platform_stop_ids: []},
+            elevator_status: %ElevatorStatus{parent_station_id: station_id},
             full_line_map: [],
             header: %Header.StopId{stop_id: station_id},
             reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: station_id},
