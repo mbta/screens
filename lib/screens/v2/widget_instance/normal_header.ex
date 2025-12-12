@@ -27,20 +27,18 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
         %__MODULE__{
           screen: %Screen{vendor: :mercury},
           icon: icon,
-          text: text,
-          audio_text: audio_text
+          text: text
         } =
           t
       ) do
-    %{icon: icon, text: text, show_to: showing_destination?(t), audio_text: audio_text}
+    %{icon: icon, text: text, show_to: showing_destination?(t)}
   end
 
   def serialize(
-        %__MODULE__{icon: icon, text: text, time: time, variant: variant, audio_text: audio_text} =
+        %__MODULE__{icon: icon, text: text, time: time, variant: variant} =
           t
       ) do
     %{
-      audio_text: audio_text,
       icon: icon,
       text: text,
       time: DateTime.to_iso8601(time),
@@ -64,13 +62,13 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
       })
       when icon in [:green_b, :green_c, :green_d, :green_e] do
     "green_" <> branch = to_string(icon)
-    %{audio_text: text, branch: branch}
+    %{text: text, branch: branch}
   end
 
   # Set audio text to the visual text when it's not explicitly provided
-  def audio_serialize(%__MODULE__{audio_text: nil, text: text}), do: %{audio_text: text}
+  def audio_serialize(%__MODULE__{audio_text: nil, text: text}), do: %{text: text}
 
-  def audio_serialize(%__MODULE__{audio_text: audio_text}), do: %{audio_text: audio_text}
+  def audio_serialize(%__MODULE__{audio_text: audio_text}), do: %{text: audio_text}
 
   defp showing_destination?(%__MODULE__{
          screen: %Screen{app_params: %_app{header: %Destination{}}}
