@@ -8,6 +8,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert
+  alias ScreensConfig.FreeText
   alias ScreensConfig.FreeTextLine
 
   @type full_screen_alert_map :: %{
@@ -87,18 +88,17 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     |> Enum.map(&"#{&1} Line")
   end
 
-  # TODO: Add spec
-  # @spec get_affected_lines_as_pills(DupAlert.t()) ::
-  defp(get_affected_lines_as_pills(%DupAlert{alert_effect_detailed: :partial_closure} = t)) do
-    with name when not is_nil(name) <- platform_closure_name(t) do
-      {name, pills_for_alert(t)}
-    else
-      _ -> pills_for_alert(t)
+  @spec get_affected_lines_as_pills(DupAlert.t()) :: [FreeText.t()] | {String.t(), [FreeText.t()]}
+  defp get_affected_lines_as_pills(%DupAlert{alert_effect_detailed: :partial_closure} = t) do
+    case(platform_closure_name(t)) do
+      nil -> pills_for_alert(t)
+      platform_name -> {platform_name, pills_for_alert(t)}
     end
   end
 
   defp get_affected_lines_as_pills(t), do: pills_for_alert(t)
 
+  @spec pills_for_alert(DupAlert.t()) :: [FreeText.t()]
   defp pills_for_alert(t) do
     t
     |> DupAlert.get_affected_lines()

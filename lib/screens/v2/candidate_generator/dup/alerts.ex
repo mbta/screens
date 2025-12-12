@@ -279,15 +279,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           DupAlert.alert_effect_detailed_t()
   def detailed_alert_effect(%Alert{effect: effect} = alert, location_context)
       when effect in [:station_closure] do
-    # TODO: get every valid effect here
-    # Gets a more detailed effect for partial station_closures
-    # case Alert.station_closure_type(
-    #        alert,
-    #        Enum.concat(
-    #          Enum.map(child_stops_for_affected_line(alert, location_context), & &1.id),
-    #          List.wrap(location_context.home_stop)
-    #        )
-    #      ) do
     case Alert.station_closure_type(
            alert,
            child_stops_for_affected_line(alert, location_context)
@@ -304,10 +295,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   @spec child_stops_for_affected_line(Alert.t(), LocationContext.t()) :: [Stop.t()]
   defp child_stops_for_affected_line(alert, location_context) do
-    LocalizedAlert.informed_routes_at_home_stop(%{
+    %{
       alert: alert,
       location_context: location_context
-    })
+    }
+    |> LocalizedAlert.informed_routes_at_home_stop()
     |> Enum.flat_map(&Map.get(location_context.child_stops_at_station, &1, []))
     |> Enum.uniq()
   end
