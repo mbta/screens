@@ -10,6 +10,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
       instance: %WidgetInstance.NormalHeader{
         icon: :logo,
         text: "Ruggles",
+        audio_text: "Ruggles Audio",
         time: ~U[2021-03-04 11:00:00Z]
       },
       dup_instance: %WidgetInstance.NormalHeader{
@@ -76,8 +77,14 @@ defmodule Screens.V2.WidgetInstance.NormalHeaderTest do
   end
 
   describe "audio_serialize/1" do
-    test "returns map with text key", %{instance: instance} do
-      assert %{text: _} = WidgetInstance.audio_serialize(instance)
+    test "returns audio_text as text when provided", %{instance: instance} do
+      assert %{text: "Ruggles Audio"} = WidgetInstance.audio_serialize(instance)
+    end
+
+    test "returns text when audio_text not provided", %{
+      mercury_eink_instance: mercury_eink_instance
+    } do
+      assert %{text: "Medford/Tufts"} = WidgetInstance.audio_serialize(mercury_eink_instance)
     end
   end
 

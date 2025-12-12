@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   defstruct screen: nil,
             icon: nil,
+            audio_text: nil,
             text: nil,
             time: nil,
             variant: nil
@@ -14,6 +15,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
   @type icon :: :logo | :green_b | :green_c | :green_d | :green_e
   @type t :: %__MODULE__{
           screen: ScreensConfig.Screen.t(),
+          audio_text: String.t() | nil,
           icon: icon | nil,
           text: String.t(),
           time: DateTime.t(),
@@ -21,11 +23,21 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
         }
 
   # See `docs/mercury_api.md`
-  def serialize(%__MODULE__{screen: %Screen{vendor: :mercury}, icon: icon, text: text} = t) do
+  def serialize(
+        %__MODULE__{
+          screen: %Screen{vendor: :mercury},
+          icon: icon,
+          text: text
+        } =
+          t
+      ) do
     %{icon: icon, text: text, show_to: showing_destination?(t)}
   end
 
-  def serialize(%__MODULE__{icon: icon, text: text, time: time, variant: variant} = t) do
+  def serialize(
+        %__MODULE__{icon: icon, text: text, time: time, variant: variant} =
+          t
+      ) do
     %{
       icon: icon,
       text: text,
@@ -43,13 +55,20 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
     [:header]
   end
 
-  def audio_serialize(%__MODULE__{screen: %Screen{app_id: :gl_eink_v2}, text: text, icon: icon})
+  def audio_serialize(%__MODULE__{
+        screen: %Screen{app_id: :gl_eink_v2},
+        text: text,
+        icon: icon
+      })
       when icon in [:green_b, :green_c, :green_d, :green_e] do
     "green_" <> branch = to_string(icon)
     %{text: text, branch: branch}
   end
 
-  def audio_serialize(%__MODULE__{text: text}), do: %{text: text}
+  # Set audio text to the visual text when it's not explicitly provided
+  def audio_serialize(%__MODULE__{audio_text: nil, text: text}), do: %{text: text}
+
+  def audio_serialize(%__MODULE__{audio_text: audio_text}), do: %{text: audio_text}
 
   defp showing_destination?(%__MODULE__{
          screen: %Screen{app_params: %_app{header: %Destination{}}}
