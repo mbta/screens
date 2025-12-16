@@ -14,7 +14,7 @@ export interface SubwayStatusData {
 
 export type Section = ContractedSection | ExtendedSection;
 
-export interface ContractedSection {
+interface ContractedSection {
   type: "contracted";
   alerts: [Alert] | [Alert, Alert];
 }
@@ -73,7 +73,7 @@ enum Branch {
 export const isMultiPill = (pill?: SubwayStatusPill): pill is MultiPill =>
   (pill?.branches?.length ?? 0) > 0;
 
-export const isAlertLocationMap = (
+const isAlertLocationMap = (
   location: AlertLocation,
 ): location is AlertLocationMap =>
   location !== null && typeof location === "object";
@@ -126,7 +126,7 @@ const clearLocationForAllGLBranchesAlert = (
  * Uniquely identifies an alert line so that if anything changes, the text-
  * resizing logic resets.
  */
-export const getAlertID = (
+const getAlertID = (
   alert: Alert,
   statusType: Section["type"],
   index: number = 0,
@@ -146,7 +146,7 @@ export const isContractedWith1Alert = (
   isContracted(section) && section.alerts.length === 1;
 
 // Ordered from "largest" to "smallest"
-export enum FittingStep {
+enum FittingStep {
   FullSize = "FullSize",
   Abbrev = "Abbrev",
   PerAlertEffect = "PerAlertEffect",
