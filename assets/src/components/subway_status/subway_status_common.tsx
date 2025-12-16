@@ -152,44 +152,41 @@ export enum FittingStep {
 }
 
 export const useSubwayStatusTextResizer = (
-  steps: FittingStep[],
-  id: string,
-  status: string,
+  alert: Alert,
+  type: "contracted" | "extended",
 ) => {
+  const id = getAlertID(alert, type);
+  const steps =
+    type === "contracted"
+      ? [FittingStep.FullSize, FittingStep.Abbrev, FittingStep.PerAlertEffect]
+      : [FittingStep.FullSize, FittingStep.Abbrev];
   const { ref, step: fittingStep } = useAutoSize(steps, id);
 
-  let [abbrev, truncateStatus, replaceLocationWithUrl] = [false, false, false];
-  switch (fittingStep) {
-    case FittingStep.FullSize:
-      break;
-    case FittingStep.Abbrev:
-      abbrev = true;
-      break;
-    case FittingStep.PerAlertEffect:
-      abbrev = true;
-      if (/Stops? Skipped/.test(status)) {
-        truncateStatus = false;
-        replaceLocationWithUrl = true;
-      } else {
-        switch (firstWord(status)) {
-          case "Delays":
-            truncateStatus = true;
-            break;
-          case "Suspension":
-            replaceLocationWithUrl = true;
-            break;
-          case "Shuttle":
-          default:
-            break;
-        }
-      }
-  }
+  const isStopsSkipped = /Stops? Skipped/.test(alert.status);
+  const isSuspension = firstWord(alert.status) === "Suspension";
+  const isDelays = firstWord(alert.status) === "Delays";
 
-  return {
-    ref,
-    abbrev,
-    truncateStatus,
-    replaceLocationWithUrl,
-    fittingStep,
-  };
+  const location = (() => {
+    if (
+      fittingStep === FittingStep.PerAlertEffect &&
+      (isStopsSkipped || isSuspension)
+    ) {
+      return "mbta.com/alerts";
+    } else if (isAlertLocationMap(alert.location)) {
+      return fittingStep === FittingStep.Abbrev ||
+        fittingStep === FittingStep.PerAlertEffect
+        ? alert.location.abbrev
+        : alert.location.full;
+    } else {
+      return alert.location;
+    }
+  })();
+
+  const status =
+    fittingStep === FittingStep.PerAlertEffect && isDelays
+      ? "Delays"
+      : alert.status;
+  const isLastStep = fittingStep === steps.at(-1);
+
+  return { ref, location, status, isLastStep };
 };

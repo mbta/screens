@@ -1,23 +1,19 @@
-import { type ComponentType, forwardRef } from "react";
-import { classWithModifier, classWithModifiers, firstWord } from "Util/utils";
+import { type ComponentType } from "react";
+import { classWithModifier, classWithModifiers } from "Util/utils";
 import { STRING_TO_SVG, getHexColor } from "Util/svg_utils";
 import {
   Alert,
-  ContractedSection,
   ExtendedSection,
   MultiPill,
   Section,
   SubwayStatusData,
   SubwayStatusPill,
   adjustAlertForContractedStatus,
-  getAlertID,
-  isAlertLocationMap,
   isContracted,
   isContractedWith1Alert,
   isExtended,
   isMultiPill,
   useSubwayStatusTextResizer,
-  FittingStep,
 } from "./subway_status_common";
 
 ////////////////
@@ -44,186 +40,84 @@ interface WithRule {
 type LineStatusProps = { section: Section } & WithRule;
 
 const LineStatus: ComponentType<LineStatusProps> = ({ section, showRule }) => {
-  switch (section.type) {
-    case "contracted":
-      return <ContractedStatus alerts={section.alerts} showRule={showRule} />;
-    case "extended":
-      return <ExtendedStatus alert={section.alert} showRule={showRule} />;
-  }
-};
-
-type ContractedStatusProps = Pick<ContractedSection, "alerts"> & WithRule;
-
-const ContractedStatus: ComponentType<ContractedStatusProps> = ({
-  alerts,
-  showRule,
-}) => {
-  const modifiers = ["contracted"];
-  if (alerts.length === 1) {
-    modifiers.push("one-alert");
-  } else {
-    modifiers.push("two-alerts");
-  }
-
-  if (alerts?.[1]?.route_pill) {
-    modifiers.push("has-second-pill");
-  }
+  const alerts =
+    section.type === "contracted"
+      ? section.alerts.map(adjustAlertForContractedStatus)
+      : [section.alert];
 
   return (
-    <div className={classWithModifiers("subway-status_status", modifiers)}>
-      {alerts.map((alert, index) => {
-        const adjustedAlert = adjustAlertForContractedStatus(alert);
-        const id = getAlertID(adjustedAlert, "contracted", index);
-        return <ContractedAlert {...adjustedAlert} id={id} key={id} />;
-      })}
+    <div
+      className={classWithModifiers("subway-status_status", [
+        section.type,
+        alerts.length === 1 ? "one-alert" : "two-alerts",
+        alerts?.[1]?.route_pill && "has-second-pill",
+      ])}
+    >
+      {alerts.map((alert, index) => (
+        <BasicAlert alert={alert} type={section.type} key={index} />
+      ))}
       {showRule && <div className="subway-status_status_rule" />}
     </div>
-  );
-};
-
-type ExtendedStatusProps = Pick<ExtendedSection, "alert"> & WithRule;
-
-const ExtendedStatus: ComponentType<ExtendedStatusProps> = ({
-  alert,
-  showRule,
-}) => {
-  return (
-    <div className={classWithModifier("subway-status_status", "extended")}>
-      <ExtendedAlert {...alert} id={getAlertID(alert, "extended")} />
-      {showRule && <div className="subway-status_status_rule" />}
-    </div>
-  );
-};
-
-interface AlertWithID extends Alert {
-  // needed to ensure stateful components (e.g. ContractedAlert) reset when appropriate
-  id: string;
-}
-
-const CONTRACTED_ALERT_FITTING_STEPS = [
-  FittingStep.FullSize,
-  FittingStep.Abbrev,
-  FittingStep.PerAlertEffect,
-];
-const EXTENDED_ALERT_FITTING_STEPS = [FittingStep.FullSize, FittingStep.Abbrev];
-
-const ALERTS_URL = "mbta.com/alerts";
-
-const ContractedAlert: ComponentType<AlertWithID> = ({
-  route_pill: routePill,
-  status,
-  location,
-  id,
-}) => {
-  const { ref, abbrev, truncateStatus, replaceLocationWithUrl, fittingStep } =
-    useSubwayStatusTextResizer(CONTRACTED_ALERT_FITTING_STEPS, id, status);
-
-  let locationText: string | null;
-  if (replaceLocationWithUrl) {
-    locationText = ALERTS_URL;
-  } else if (isAlertLocationMap(location)) {
-    locationText = abbrev ? location.abbrev : location.full;
-  } else {
-    locationText = location;
-  }
-
-  if (truncateStatus) {
-    status = firstWord(status);
-  }
-
-  return (
-    <BasicAlert
-      routePill={routePill}
-      status={status}
-      location={locationText}
-      hideOverflow={fittingStep === CONTRACTED_ALERT_FITTING_STEPS.at(-1)}
-      ref={ref}
-    />
-  );
-};
-
-const ExtendedAlert: ComponentType<AlertWithID> = ({
-  route_pill: routePill,
-  status,
-  location,
-  id,
-}) => {
-  const { ref, abbrev, fittingStep } = useSubwayStatusTextResizer(
-    EXTENDED_ALERT_FITTING_STEPS,
-    id,
-    status,
-  );
-
-  let locationText: string | null;
-  if (isAlertLocationMap(location)) {
-    locationText = abbrev ? location.abbrev : location.full;
-  } else {
-    locationText = location;
-  }
-
-  return (
-    <BasicAlert
-      routePill={routePill}
-      status={status}
-      location={locationText}
-      hideOverflow={fittingStep === EXTENDED_ALERT_FITTING_STEPS.at(-1)}
-      ref={ref}
-    />
   );
 };
 
 const NORMAL_STATUS = "Normal Service";
 
-interface BasicAlertProps extends Omit<Alert, "route_pill"> {
-  routePill?: Alert["route_pill"];
-  location: string | null;
-  hideOverflow?: boolean;
+interface BasicAlertProps {
+  alert: Alert;
+  type: "contracted" | "extended";
 }
 
-const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
-  ({ routePill, status, location, hideOverflow = false }, ref) => {
-    const containerClassName = classWithModifier(
-      "subway-status_alert",
-      routePill ? "has-pill" : "no-pill",
-    );
+const BasicAlert = ({ alert, type }: BasicAlertProps) => {
+  const { ref, status, location, isLastStep } = useSubwayStatusTextResizer(
+    alert,
+    type,
+  );
 
-    const sizerClassName = classWithModifier(
-      "subway-status_alert-sizer",
-      hideOverflow && "hide-overflow",
-    );
+  const containerClassName = classWithModifier(
+    "subway-status_alert",
+    alert.route_pill ? "has-pill" : "no-pill",
+  );
 
-    const textContainerClassName = classWithModifiers(
-      "subway-status_alert_text-container",
-      [
-        hideOverflow && "hide-overflow",
-        routePill?.branches && `${routePill.branches.length}-branches`,
-      ],
-    );
+  const sizerClassName = classWithModifier(
+    "subway-status_alert-sizer",
+    isLastStep && "hide-overflow",
+  );
 
-    const statusTextClassName = classWithModifier(
-      "subway-status_alert_status-text",
-      status === NORMAL_STATUS && "normal-service",
-    );
+  const textContainerClassName = classWithModifiers(
+    "subway-status_alert_text-container",
+    [
+      isLastStep && "hide-overflow",
+      alert.route_pill?.branches &&
+        `${alert.route_pill.branches.length}-branches`,
+    ],
+  );
 
-    return (
-      <div className={containerClassName}>
-        <div className={sizerClassName} ref={ref}>
-          <div className="subway-status_alert_route-pill-container">
-            {routePill && <SubwayStatusRoutePill routePill={routePill} />}
-          </div>
-          <div className={textContainerClassName}>
-            {status && <span className={statusTextClassName}>{status}</span>}
-            {location && (
-              <span className="subway-status_alert_location-text">
-                {location}
-              </span>
-            )}
-          </div>
+  const statusTextClassName = classWithModifier(
+    "subway-status_alert_status-text",
+    status === NORMAL_STATUS && "normal-service",
+  );
+
+  return (
+    <div className={containerClassName}>
+      <div className={sizerClassName} ref={ref}>
+        <div className="subway-status_alert_route-pill-container">
+          {alert.route_pill && (
+            <SubwayStatusRoutePill routePill={alert.route_pill} />
+          )}
+        </div>
+        <div className={textContainerClassName}>
+          {status && <span className={statusTextClassName}>{status}</span>}
+          {location && (
+            <span className="subway-status_alert_location-text">
+              {location}
+            </span>
+          )}
         </div>
       </div>
-    );
-  },
-);
+    </div>
+  );
+};
 
 const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
   routePill,
