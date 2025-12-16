@@ -1,10 +1,8 @@
 import { type ComponentType } from "react";
 import { classWithModifier, classWithModifiers } from "Util/utils";
-import { STRING_TO_SVG, getHexColor } from "Util/svg_utils";
 import {
   Alert,
   ExtendedSection,
-  MultiPill,
   Section,
   SubwayStatusData,
   SubwayStatusPill,
@@ -12,7 +10,6 @@ import {
   isContracted,
   isContractedWith1Alert,
   isExtended,
-  isMultiPill,
   useSubwayStatusTextResizer,
 } from "./subway_status_common";
 
@@ -102,9 +99,7 @@ const BasicAlert = ({ alert, type }: BasicAlertProps) => {
     <div className={containerClassName}>
       <div className={sizerClassName} ref={ref}>
         <div className="subway-status_alert_route-pill-container">
-          {alert.route_pill && (
-            <SubwayStatusRoutePill routePill={alert.route_pill} />
-          )}
+          {alert.route_pill && <RoutePill routePill={alert.route_pill} />}
         </div>
         <div className={textContainerClassName}>
           {status && <span className={statusTextClassName}>{status}</span>}
@@ -119,49 +114,22 @@ const BasicAlert = ({ alert, type }: BasicAlertProps) => {
   );
 };
 
-const SubwayStatusRoutePill: ComponentType<{ routePill: SubwayStatusPill }> = ({
-  routePill,
-}) => {
-  if (isMultiPill(routePill)) {
-    const sortedUniqueBranches = Array.from(new Set(routePill.branches)).sort();
-    return (
-      <BranchPillGroup
-        color={routePill.color}
-        branches={sortedUniqueBranches}
-      />
-    );
-  } else {
-    const LinePill = STRING_TO_SVG[`${routePill.color[0]}l`];
-    return (
-      <LinePill width="144" height="74" color={getHexColor(routePill.color)} />
-    );
-  }
-};
+interface RoutePillProps {
+  routePill: SubwayStatusPill;
+}
 
-const BranchPillGroup: ComponentType<Pick<MultiPill, "branches" | "color">> = ({
-  color,
-  branches: [firstBranch, ...rest],
-}) => {
-  // Determine the line prefix based on color
-  const linePrefix = color === "green" ? "gl" : color === "red" ? "rl" : color;
-  const ComboLinePill = STRING_TO_SVG[`${linePrefix}-${firstBranch}`];
-
+const RoutePill = ({
+  routePill: { color, text, branches },
+}: RoutePillProps) => {
   return (
-    <>
-      <ComboLinePill width="203" height="74" color={getHexColor(color)} />
-      {rest.map((branch) => {
-        const BranchPill = STRING_TO_SVG[`${color}-${branch}-circle`];
-        return (
-          <BranchPill
-            width="74"
-            height="74"
-            color={getHexColor(color)}
-            className="branch-icon"
-            key={branch}
-          />
-        );
-      })}
-    </>
+    <span className={classWithModifier("subway-status__route-pill", color)}>
+      <span className="subway-status__route-pill__main">{text}</span>
+      {branches?.map((branch) => (
+        <span className="subway-status__route-pill__branch" key={branch}>
+          {branch.toUpperCase()}
+        </span>
+      ))}
+    </span>
   );
 };
 

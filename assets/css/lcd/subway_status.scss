@@ -186,3 +186,53 @@
     margin-left: 5px;
   }
 }
+
+.subway-status__route-pill {
+  display: inline-flex;
+
+  &--blue {
+    --pill-color: #{colors.$line-blue};
+  }
+
+  &--green {
+    --pill-color: #{colors.$line-green};
+  }
+
+  &--red {
+    --pill-color: #{colors.$line-red};
+  }
+
+  &--orange {
+    --pill-color: #{colors.$line-orange};
+  }
+
+  &__main,
+  &__branch {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 55px;
+    font-weight: 700;
+    color: white;
+    background-color: var(--pill-color);
+  }
+
+  &__main {
+    min-width: 136px;
+    height: 72px;
+    border-radius: 36px;
+  }
+
+  &__branch {
+    min-width: 84px;
+    height: 84px;
+    margin: -6px -6px -6px -28px;
+    border: 6px solid colors.$warm-neutral-90;
+    border-radius: 42px;
+
+    &:nth-child(n + 3) {
+      margin-left: -14px;
+    }
+  }
+}

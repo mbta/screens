@@ -41,6 +41,7 @@ interface AlertLocationMap {
 export interface SubwayStatusPill {
   color: LineColor;
   branches?: Branch[];
+  text?: string;
 }
 
 export interface MultiPill extends SubwayStatusPill {
