@@ -63,6 +63,7 @@ module.exports = (env, argv) => {
                 [
                   "@babel/preset-env",
                   {
+                    targets: { chrome: 51 },
                     useBuiltIns: "usage",
                     corejs: require("core-js/package.json").version,
                   },
@@ -71,8 +72,69 @@ module.exports = (env, argv) => {
                 ["@babel/preset-react", { runtime: "automatic" }],
                 "@babel/preset-typescript",
               ],
+              // plugins: ["transform-es2015-template-literal"],
               // only needed as long as we are transpiling dependencies
               sourceType: "unambiguous",
+            },
+          },
+        },
+        {
+          test: /\.(js|mjs)$/,
+          include: /node_modules\/react-router/,
+          use: {
+            loader: "babel-loader",
+            options: {
+              presets: [
+                [
+                  "@babel/preset-env",
+                  {
+                    targets: { chrome: "51" },
+                    modules: false,
+                  },
+                ],
+              ],
+              plugins: [
+                // Custom plugin to transform dynamic imports to require()
+                // Transforms: import(module) -> Promise.resolve(require(module))
+                // There are webpackIgnore comments at imports in react-router to
+                // prevent webpack from code-splitting there.
+                // However, it also prevents dynamic imports from being transpiled
+                // This is needed for DUPs, which use Chrome 51.
+                function (babel) {
+                  const t = babel.types;
+                  return {
+                    name: "transform-dynamic-import-to-require",
+                    visitor: {
+                      CallExpression(path) {
+                        if (
+                          path.node.callee &&
+                          path.node.callee.type === "Import"
+                        ) {
+                          const arg = path.node.arguments[0];
+                          path.replaceWith(
+                            t.callExpression(
+                              t.memberExpression(
+                                t.identifier("Promise"),
+                                t.identifier("resolve"),
+                              ),
+                              [
+                                arg
+                                  ? t.callExpression(t.identifier("require"), [
+                                      arg,
+                                    ])
+                                  : t.callExpression(
+                                      t.identifier("require"),
+                                      [],
+                                    ),
+                              ],
+                            ),
+                          );
+                        }
+                      },
+                    },
+                  };
+                },
+              ],
             },
           },
         },
