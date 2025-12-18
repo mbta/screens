@@ -1,5 +1,5 @@
 import _ from "lodash/fp";
-import { useEffect, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 
 import {
   type AppId,
@@ -13,6 +13,8 @@ import {
 
 import { allFields, appFields } from "./fields";
 
+const EMPTY_CONFIG: Config = { screens: {}, devops: { disabled_modes: [] } };
+
 const appIdFilters: { id: AppId | null; name: string }[] = [
   { id: null, name: "All" },
   ...(Object.entries(SCREEN_APPS) as [AppId, AppInfo][]).map(
@@ -21,11 +23,14 @@ const appIdFilters: { id: AppId | null; name: string }[] = [
 ];
 
 const get = (path: string, screen: Screen, id: string) =>
-  path == "id" ? id : _.get(path, screen);
+  path === "id" ? id : _.get(path, screen);
 
 const Table = () => {
-  const [localScreens, setLocalScreens] = useState<Config["screens"]>({});
-  const [remoteScreens, setRemoteScreens] = useState<Config["screens"]>({});
+  const [didInitialize, setDidInitialize] = useState(false);
+  const [isInFlight, setIsInFlight] = useState(false);
+  const [isCommitReady, setIsCommitReady] = useState(false);
+  const [localConfig, setLocalConfig] = useState<Config>(EMPTY_CONFIG);
+  const [remoteConfig, setRemoteConfig] = useState<Config>(EMPTY_CONFIG);
   const [filters, setFilters] = useState<
     Record<string, undefined | ((v: JSON) => boolean)>
   >({});
@@ -36,42 +41,86 @@ const Table = () => {
   const rows = useMemo(() => {
     const filterFns = Object.entries(filters);
 
-    return Object.entries(localScreens)
+    return Object.entries(localConfig.screens)
       .filter(
         ([id, screen]) =>
-          (appIdFilter == null || screen.app_id == appIdFilter) &&
+          (appIdFilter === null || screen.app_id === appIdFilter) &&
           filterFns.every(([path, fn]) => !fn || fn(get(path, screen, id))),
       )
       .sort(([idA], [idB]) => idA.localeCompare(idB));
-  }, [appIdFilter, filters, localScreens]);
+  }, [appIdFilter, filters, localConfig]);
 
   const counts = useMemo(() => {
     const visibleIDs = rows.map(([id]) => id);
-    const modifiedIDs = Object.entries(localScreens)
-      .filter(([id, screen]) => !_.isEqual(screen, remoteScreens[id]))
+    const modifiedIDs = Object.entries(localConfig.screens)
+      .filter(([id, screen]) => !_.isEqual(screen, remoteConfig.screens[id]))
       .map(([id]) => id);
 
     return {
-      remote: Object.keys(remoteScreens).length,
-      local: Object.keys(localScreens).length,
+      remote: Object.keys(remoteConfig.screens).length,
+      local: Object.keys(localConfig.screens).length,
       visible: visibleIDs.length,
       modified: modifiedIDs.length,
       visibleModified: _.intersection(visibleIDs, modifiedIDs).length,
     };
-  }, [remoteScreens, localScreens, rows]);
+  }, [localConfig, remoteConfig, rows]);
 
-  const fetchConfig = async () => {
-    const response = await fetch.get("/api/admin");
-    const config: Config = JSON.parse(response.config);
-    setLocalScreens(config.screens);
-    setRemoteScreens(config.screens);
+  const isChanged = counts.modified > 0;
+
+  const setScreen = (id: string, screen: Screen) => {
+    setLocalConfig({
+      ...localConfig,
+      screens: { ...localConfig.screens, [id]: screen },
+    });
+    setIsCommitReady(false);
   };
 
-  // Fetch config on mount
-  useEffect(() => {
-    fetchConfig();
-    return;
-  }, []);
+  const withInFlight = async (func: () => Promise<void>) => {
+    setIsInFlight(true);
+    await func();
+    setIsInFlight(false);
+  };
+
+  const reloadConfig = () => {
+    withInFlight(async () => {
+      const response = await fetch.get("/api/admin");
+      const config: Config = JSON.parse(response.config);
+      setLocalConfig(config);
+      setRemoteConfig(config);
+      setIsCommitReady(false);
+    });
+  };
+
+  const validateConfig = () => {
+    withInFlight(async () => {
+      const { config } = await fetch.post("/api/admin/screens/validate", {
+        config: JSON.stringify(localConfig),
+      });
+      setLocalConfig(config);
+      setIsCommitReady(true);
+    });
+  };
+
+  const commitConfig = () => {
+    withInFlight(async () => {
+      const { success } = await fetch.post("/api/admin/screens/confirm", {
+        config: JSON.stringify(localConfig),
+      });
+
+      if (success) {
+        setRemoteConfig(localConfig);
+        setIsCommitReady(false);
+        window.alert("Config updated successfully.");
+      } else {
+        window.alert("Error: Config update failed.");
+      }
+    });
+  };
+
+  if (!didInitialize) {
+    reloadConfig();
+    setDidInitialize(true);
+  }
 
   return (
     <main className="admin-table">
@@ -79,7 +128,7 @@ const Table = () => {
         {appIdFilters.map(({ id, name }) => (
           <button
             key={id}
-            className={id == appIdFilter ? "active" : undefined}
+            className={id === appIdFilter ? "active" : undefined}
             onClick={() => setAppIdFilter(id)}
           >
             {name}
@@ -88,91 +137,110 @@ const Table = () => {
       </div>
 
       <div className="admin-table__table">
-        {remoteScreens ? (
-          <table>
-            <thead>
-              <tr>
-                {fields.map(({ label, path }) => (
-                  <th key={path}>{label}</th>
-                ))}
-              </tr>
-
-              <tr>
-                {fields.map(({ filter: Filter, path }) => (
-                  <th key={path}>
-                    {Filter && (
-                      <Filter
-                        update={(filter) =>
-                          setFilters({ ...filters, [path]: filter })
-                        }
-                      />
-                    )}
-                  </th>
-                ))}
-              </tr>
-
-              <tr>
-                <th colSpan={fields.length}>
-                  <div className="admin-table__table__stats">
-                    <span>
-                      {counts.visible < counts.local
-                        ? `Showing ${counts.visible} of ${counts.local} screens`
-                        : `Showing all ${counts.local} screens`}
-                    </span>
-
-                    {counts.modified > 0 && (
-                      <span>
-                        {counts.modified != counts.visibleModified &&
-                          `${counts.visibleModified} of`}{" "}
-                        {counts.modified} modified
-                      </span>
-                    )}
-
-                    {counts.local > counts.remote && (
-                      <span>{counts.local - counts.remote} new</span>
-                    )}
-                  </div>
-                </th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {rows.map(([id, screen]) => (
-                <tr key={id}>
-                  {fields.map(({ cell: Cell, path }) => (
-                    <td
-                      className={
-                        _.isEqual(
-                          _.get(path, screen),
-                          _.get(path, remoteScreens[id]),
-                        )
-                          ? undefined
-                          : "modified"
-                      }
-                      key={path}
-                    >
-                      <Cell
-                        value={get(path, screen, id)}
-                        update={(value) =>
-                          setLocalScreens({
-                            ...localScreens,
-                            [id]: _.set(path, value, screen),
-                          })
-                        }
-                      />
-                    </td>
-                  ))}
-                </tr>
+        <table>
+          <thead>
+            <tr>
+              {fields.map(({ label, path }) => (
+                <th key={path}>{label}</th>
               ))}
-            </tbody>
-          </table>
-        ) : (
-          <p>Fetching data...</p>
-        )}
+            </tr>
+
+            <tr>
+              {fields.map(({ filter: Filter, path }) => (
+                <th key={path}>
+                  {Filter && (
+                    <Filter
+                      update={(filter) =>
+                        setFilters({ ...filters, [path]: filter })
+                      }
+                    />
+                  )}
+                </th>
+              ))}
+            </tr>
+
+            <tr>
+              <th colSpan={fields.length}>
+                <div className="admin-table__table__stats">
+                  {isInFlight ? (
+                    <span>Updating...</span>
+                  ) : (
+                    <>
+                      <span>
+                        {counts.visible < counts.local
+                          ? `Showing ${counts.visible} of ${counts.local} screens`
+                          : `Showing all ${counts.local} screens`}
+                      </span>
+
+                      {counts.modified > 0 && (
+                        <span>
+                          {counts.modified !== counts.visibleModified &&
+                            `${counts.visibleModified} of`}{" "}
+                          {counts.modified} modified
+                        </span>
+                      )}
+
+                      {counts.local > counts.remote && (
+                        <span>{counts.local - counts.remote} new</span>
+                      )}
+                    </>
+                  )}
+                </div>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            {rows.map(([id, screen]) => (
+              <tr key={id}>
+                {fields.map(({ cell: Cell, path }) => (
+                  <td
+                    className={
+                      _.isEqual(
+                        _.get(path, screen),
+                        _.get(path, remoteConfig.screens[id]),
+                      )
+                        ? undefined
+                        : "modified"
+                    }
+                    key={path}
+                  >
+                    <Cell
+                      value={get(path, screen, id)}
+                      update={(val) => setScreen(id, _.set(path, val, screen))}
+                    />
+                  </td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
 
       <div className="admin-table__footer">
-        <button>Do a thing</button>
+        {isCommitReady ? (
+          <button disabled={isInFlight} onClick={commitConfig}>
+            Commit changes
+          </button>
+        ) : (
+          <button disabled={!isChanged || isInFlight} onClick={validateConfig}>
+            Validate changes
+          </button>
+        )}
+
+        <button
+          disabled={isInFlight}
+          onClick={() => {
+            if (
+              !isChanged ||
+              window.confirm("This will overwrite your changes. Are you sure?")
+            ) {
+              reloadConfig();
+            }
+          }}
+        >
+          Reload from server
+        </button>
       </div>
     </main>
   );
