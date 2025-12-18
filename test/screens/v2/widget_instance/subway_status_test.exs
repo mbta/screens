@@ -1690,13 +1690,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     end
 
     test "finds correct endpoints for GL suspension across multiple branches" do
-      # TODO: Generate this instead of having such a giant list?
-      # TODO: Have a test in the opposite direction
-      routes = ["Green-B", "Green-C", "Green-D", "Green-E"]
+      all_gl_routes = ["Green-B", "Green-C", "Green-D", "Green-E"]
 
-      stops = [
-        "place_north",
-        "place-haecl",
+      stops_closed_all_lines = [
         "place-gover",
         "place-pktrm",
         "place-boyls",
@@ -1704,9 +1700,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
         "place-coecl"
       ]
 
-      shared_entities =
-        for route <- routes,
-            stop <- stops do
+      entities_at_common_stops =
+        for route <- all_gl_routes,
+            stop <- stops_closed_all_lines do
           %{route: route, stop: stop, direction_id: nil}
         end
 
@@ -1716,54 +1712,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               severity: 9,
-              informed_entities: [
-                %{stop: "place-hymnl", route: "Green-B", direction_id: nil},
-                %{stop: "place-amory", route: "Green-B", direction_id: nil},
-                %{stop: "place-bucen", route: "Green-B", direction_id: nil},
-                %{stop: "place-babck", route: "Green-B", direction_id: nil},
-                %{stop: "place-coecl", route: "Green-B", direction_id: nil},
-                %{stop: "place-armnl", route: "Green-B", direction_id: nil},
-                %{stop: "place-kencl", route: "Green-B", direction_id: nil},
-                %{stop: "place-bland", route: "Green-B", direction_id: nil},
-                %{stop: "place-pktrm", route: "Green-B", direction_id: nil},
-                %{stop: "place-boyls", route: "Green-B", direction_id: nil},
-                %{stop: "place-gover", route: "Green-B", direction_id: nil},
-                %{stop: "place-buest", route: "Green-B", direction_id: nil},
-                %{stop: "place-hymnl", route: "Green-C", direction_id: nil},
-                %{stop: "place-armnl", route: "Green-C", direction_id: nil},
-                %{stop: "place-gover", route: "Green-C", direction_id: nil},
-                %{stop: "place-pktrm", route: "Green-C", direction_id: nil},
-                %{stop: "place-coecl", route: "Green-C", direction_id: nil},
-                %{stop: "place-kencl", route: "Green-C", direction_id: nil},
-                %{stop: "place-boyls", route: "Green-C", direction_id: nil},
-                %{stop: "place-hymnl", route: "Green-D", direction_id: nil},
-                %{stop: "place-boyls", route: "Green-D", direction_id: nil},
-                %{stop: "place-coecl", route: "Green-D", direction_id: nil},
-                %{stop: "place-gover", route: "Green-D", direction_id: nil},
-                %{stop: "place-haecl", route: "Green-D", direction_id: nil},
-                %{stop: "place-armnl", route: "Green-D", direction_id: nil},
-                %{stop: "place-kencl", route: "Green-D", direction_id: nil},
-                %{stop: "place-pktrm", route: "Green-D", direction_id: nil},
-                %{stop: "place-north", route: "Green-D", direction_id: nil},
-                %{stop: "place-brmnl", route: "Green-E", direction_id: nil},
-                %{stop: "place-armnl", route: "Green-E", direction_id: nil},
-                %{stop: "place-coecl", route: "Green-E", direction_id: nil},
-                %{stop: "place-prmnl", route: "Green-E", direction_id: nil},
-                %{stop: "place-north", route: "Green-E", direction_id: nil},
-                %{stop: "place-boyls", route: "Green-E", direction_id: nil},
-                %{stop: "place-nuniv", route: "Green-E", direction_id: nil},
-                %{stop: "place-bckhl", route: "Green-E", direction_id: nil},
-                %{stop: "place-hsmnl", route: "Green-E", direction_id: nil},
-                %{stop: "place-mispk", route: "Green-E", direction_id: nil},
-                %{stop: "place-lngmd", route: "Green-E", direction_id: nil},
-                %{stop: "place-mfa", route: "Green-E", direction_id: nil},
-                %{stop: "place-pktrm", route: "Green-E", direction_id: nil},
-                %{stop: "place-fenwd", route: "Green-E", direction_id: nil},
-                %{stop: "place-gover", route: "Green-E", direction_id: nil},
-                %{stop: "place-haecl", route: "Green-E", direction_id: nil},
-                %{stop: "place-symcl", route: "Green-E", direction_id: nil},
-                %{stop: "place-rvrwy", route: "Green-E", direction_id: nil}
-              ]
+              informed_entities:
+                [
+                  %{stop: "place-hymnl", route: "Green-B", direction_id: nil},
+                  %{stop: "place-amory", route: "Green-B", direction_id: nil},
+                  %{stop: "place-hymnl", route: "Green-C", direction_id: nil},
+                  %{stop: "place-kencl", route: "Green-C", direction_id: nil},
+                  %{stop: "place-hymnl", route: "Green-D", direction_id: nil},
+                  %{stop: "place-haecl", route: "Green-D", direction_id: nil},
+                  %{stop: "place-kencl", route: "Green-D", direction_id: nil},
+                  %{stop: "place-north", route: "Green-D", direction_id: nil},
+                  %{stop: "place-brmnl", route: "Green-E", direction_id: nil},
+                  %{stop: "place-prmnl", route: "Green-E", direction_id: nil},
+                  %{stop: "place-north", route: "Green-E", direction_id: nil},
+                  %{stop: "place-nuniv", route: "Green-E", direction_id: nil}
+                ] ++ entities_at_common_stops
             }
           ])
       }

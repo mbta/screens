@@ -8,7 +8,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   alias Screens.Alerts.InformedEntity
   alias Screens.Stops.Subway
 
-  # TODO: Should this be moved elsewhere
   @route_directions %{
     "Blue" => ["Westbound", "Eastbound"],
     "Orange" => ["Southbound", "Northbound"],
