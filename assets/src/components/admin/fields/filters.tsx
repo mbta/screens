@@ -1,5 +1,5 @@
-import { type ComponentType } from "react";
-import { type JSON } from "Util/admin";
+import { type ComponentType, useState } from "react";
+import { AUTOLESS_ATTRIBUTES, type JSON } from "Util/admin";
 
 export type Filter = ComponentType<{
   update: (filter: ((value: JSON) => boolean) | undefined) => void;
@@ -35,6 +35,38 @@ export const buildSelectFilter =
       ))}
     </select>
   );
+
+export const JsonFilter: Filter = ({ update }) => {
+  const [hasChanged, setHasChanged] = useState(false);
+
+  const doUpdate = (inputValue) => {
+    update(
+      inputValue
+        ? (value) => JSON.stringify(value, null, 2).includes(inputValue)
+        : undefined,
+    );
+    setHasChanged(false);
+  };
+
+  return (
+    <form
+      onSubmit={(e) => {
+        doUpdate((e.target as HTMLFormElement).elements["input"].value);
+        e.preventDefault();
+      }}
+    >
+      <input
+        {...AUTOLESS_ATTRIBUTES}
+        className="admin-table__json-filter"
+        name="input"
+        onBlur={(e) => doUpdate(e.target.value)}
+        onChange={() => setHasChanged(true)}
+        placeholder="Search"
+      />
+      {hasChanged && <button type="submit">🔎</button>}
+    </form>
+  );
+};
 
 export const StringFilter: Filter = ({ update }) => (
   <input

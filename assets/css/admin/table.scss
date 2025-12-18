@@ -41,6 +41,20 @@
     tr:last-child th {
       padding: 8px 0;
     }
+
+    form {
+      display: flex;
+    }
+
+    input,
+    select {
+      box-sizing: border-box;
+      width: 100%;
+    }
+
+    input {
+      min-width: 20ch;
+    }
   }
 
   tbody {
@@ -93,6 +107,10 @@
   color: unset;
   text-decoration: none;
   border-bottom: 1px dotted;
+}
+
+.admin-table__json-filter {
+  font-family: monospace;
 }
 
 .admin-table__textarea {

@@ -13,6 +13,7 @@ import {
   type Filter,
   BooleanFilter,
   buildSelectFilter,
+  JsonFilter,
   StringFilter,
 } from "./fields/filters";
 
@@ -24,6 +25,7 @@ type Field = {
 };
 
 const filteredBoolean = { cell: CheckboxInput, filter: BooleanFilter };
+const filteredJson = { cell: JsonInput, filter: JsonFilter };
 const filteredString = { cell: StringInput, filter: StringFilter };
 
 const baseFields: Field[] = [
@@ -41,6 +43,12 @@ const baseFields: Field[] = [
   { label: "Hidden?", path: "hidden_from_screenplay", ...filteredBoolean },
 ];
 
+const headerField: Field = {
+  label: "Header",
+  path: "app_params.header",
+  cell: JsonInput,
+};
+
 export const allFields: Field[] = [
   {
     label: "App",
@@ -48,15 +56,15 @@ export const allFields: Field[] = [
     cell: ({ value }) => SCREEN_APPS[value as AppId].name,
   },
   ...baseFields,
-  { label: "Config", path: "app_params", cell: JsonInput },
+  { label: "Config", path: "app_params", ...filteredJson },
 ];
 
 export const appFields: { [key in AppId]: Field[] } = {
-  bus_eink_v2: [...baseFields],
-  bus_shelter_v2: [...baseFields],
-  busway_v2: [...baseFields],
-  dup_v2: [...baseFields],
+  bus_eink_v2: [...baseFields, headerField],
+  bus_shelter_v2: [...baseFields, headerField],
+  busway_v2: [...baseFields, headerField],
+  dup_v2: [...baseFields, headerField],
   elevator_v2: [...baseFields],
-  gl_eink_v2: [...baseFields],
-  pre_fare_v2: [...baseFields],
+  gl_eink_v2: [...baseFields, headerField],
+  pre_fare_v2: [...baseFields, headerField],
 };
