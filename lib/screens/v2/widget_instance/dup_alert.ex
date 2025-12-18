@@ -12,7 +12,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @enforce_keys [
     :screen,
     :alert,
-    :alert_effect_detailed,
     :location_context,
     :rotation_index,
     :stop_name
@@ -22,13 +21,11 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @type t :: %__MODULE__{
           screen: Screen.t(),
           alert: Alert.t(),
-          alert_effect_detailed: alert_effect_detailed_t(),
           location_context: LocationContext.t(),
           rotation_index: rotation_index,
           stop_name: String.t()
         }
 
-  @type alert_effect_detailed_t :: Alert.effect() | :partial_closure
   @type route_id :: String.t()
   @type stop_id :: String.t()
   @type rotation_index :: :zero | :one | :two
@@ -104,19 +101,19 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   @spec eliminated_service_type(t()) :: :all | :some | :none
   defp eliminated_service_type(
          %__MODULE__{
-           alert_effect_detailed: alert_effect_detailed,
+           alert: %Alert{effect: effect},
            screen: %Screen{
              app_params: %Dup{primary_departures: %Departures{sections: primary_sections}}
            }
          } = t
        )
-       when alert_effect_detailed in [:shuttle, :station_closure, :suspension] do
+       when effect in [:shuttle, :station_closure, :suspension] do
     # Assume primary departures is always configured with a section for each subway line at the
     # screen's station. So if we're `inside` a disruption and it affects the same number of lines
     # as the number we show departures for, that means all service is eliminated. Otherwise, only
     # some is (either we're at a boundary and there's still service in one direction, or we're at
     # a transfer station and the alert only affects one line).
-    if LocalizedAlert.location(t) == :inside and
+    if LocalizedAlert.location(t) == :inside and full_station_closure?(t) and
          length(get_affected_lines(t)) == length(primary_sections),
        do: :all,
        else: :some
@@ -136,8 +133,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
       else: :none
   end
 
-  defp eliminated_service_type(%__MODULE__{alert_effect_detailed: :partial_closure}), do: :some
-
   defp eliminated_service_type(_other), do: :none
 
   def get_affected_lines(t) do
@@ -154,6 +149,19 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
       "Green-" <> _branch -> "Green"
       other_subway_route -> other_subway_route
     end)
+    |> Enum.uniq()
+  end
+
+  @spec full_station_closure?(t()) :: boolean()
+  def full_station_closure?(t) do
+    Alert.station_closure_type(t.alert, child_stops_for_affected_line(t)) != :partial_closure
+  end
+
+  @spec child_stops_for_affected_line(t()) :: [Stop.t()]
+  def child_stops_for_affected_line(t) do
+    t
+    |> LocalizedAlert.informed_routes_at_home_stop()
+    |> Enum.flat_map(&Map.get(t.location_context.child_stops_at_station, &1, []))
     |> Enum.uniq()
   end
 

@@ -5,7 +5,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
   alias Screens.Alerts.Alert
   alias Screens.Report
-  alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert
   alias ScreensConfig.FreeText
@@ -31,7 +30,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   @spec serialize_full_screen(DupAlert.t()) :: full_screen_alert_map
   def serialize_full_screen(t) do
     %{
-      text: %FreeTextLine{icon: issue_icon(t), text: issue_free_text(t)},
+      text: %FreeTextLine{icon: full_screen_icon(t), text: full_screen_free_text(t)},
       remedy: remedy_free_text_line(t),
       header: %{
         text: t.stop_name,
@@ -88,18 +87,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     |> Enum.map(&"#{&1} Line")
   end
 
-  @spec get_affected_lines_as_pills(DupAlert.t()) :: [FreeText.t()] | {String.t(), [FreeText.t()]}
-  defp get_affected_lines_as_pills(%DupAlert{alert_effect_detailed: :partial_closure} = t) do
-    case(platform_closure_name(t)) do
-      nil -> pills_for_alert(t)
-      platform_name -> {platform_name, pills_for_alert(t)}
-    end
-  end
-
-  defp get_affected_lines_as_pills(t), do: pills_for_alert(t)
-
-  @spec pills_for_alert(DupAlert.t()) :: [FreeText.t()]
-  defp pills_for_alert(t) do
+  @spec get_affected_lines_as_pills(DupAlert.t()) :: [FreeText.t()]
+  defp get_affected_lines_as_pills(t) do
     t
     |> DupAlert.get_affected_lines()
     |> Enum.map(fn line ->
@@ -112,69 +101,28 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   defp partial_alert_free_text(t) do
     affected_lines = get_affected_lines_as_strings(t)
 
-    case {affected_lines, t.alert_effect_detailed, LocalizedAlert.location(t)} do
-      {[line], :delay, _} ->
+    case {affected_lines, t.alert.effect, LocalizedAlert.location(t), affected_platform(t)} do
+      {[line], :delay, _, _} ->
         [bold(line), "delays"]
 
-      {_, :partial_closure, _} ->
-        ["No", bold(platform_closure_name(t))]
-
-      {[line], _, :inside} ->
+      {[line], _, :inside, nil} ->
         ["No", bold(line), "trains"]
 
-      {[_line], _, boundary} when boundary in [:boundary_upstream, :boundary_downstream] ->
+      {[_line], _, boundary, nil} when boundary in [:boundary_upstream, :boundary_downstream] ->
         headsign = get_headsign(t)
 
         ["No", bold(headsign), "trains"]
         |> partial_headsign_special_cases()
 
-      {[_line1, _line2], :delay, _} ->
+      {[_line1, _line2], :delay, _, nil} ->
         ["Train delays"]
 
-      {[_line1, _line2], _, _} ->
+      {[_line1, _line2], _, _, nil} ->
         ["No train service"]
+
+      {_, :station_closure, _, platform_name} ->
+        ["No", bold(platform_name)]
     end
-  end
-
-  @spec platform_closure_name(DupAlert.t()) :: String.t() | nil
-  defp platform_closure_name(t) do
-    stops_in_alert = Enum.map(t.alert.informed_entities, & &1.stop)
-
-    platform_names =
-      t
-      |> child_stops_for_affected_line()
-      |> Enum.filter(&(&1.id in stops_in_alert and &1.platform_name))
-      |> Enum.map(& &1.platform_name)
-
-    case platform_names do
-      [platform_name] ->
-        platform_name
-
-      [] ->
-        nil
-
-      multiple_platforms ->
-        if Enum.all?(multiple_platforms, &(&1 in @gl_westbound_platforms)) do
-          @gl_westbound_direction_name
-        else
-          # We should not end up in this state,
-          # barring an unexpected type of alert
-          Report.warning("unexpected_platform_closure_dup",
-            alert_id: t.alert.id,
-            home_stop: t.location_context.home_stop
-          )
-
-          nil
-        end
-    end
-  end
-
-  @spec child_stops_for_affected_line(DupAlert.t()) :: [Stop.t()]
-  defp child_stops_for_affected_line(t) do
-    t
-    |> LocalizedAlert.informed_routes_at_home_stop()
-    |> Enum.flat_map(&Map.get(t.location_context.child_stops_at_station, &1, []))
-    |> Enum.uniq()
   end
 
   defp partial_alert_icon(t) when t.alert.effect == :delay, do: :delay
@@ -182,19 +130,21 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   defp partial_alert_icon(t),
     do: if(line_color(t) == :yellow, do: :warning_negative, else: :warning)
 
-  defp issue_icon(t) when t.alert.effect == :delay, do: :delay
-  defp issue_icon(_t), do: :warning
+  defp full_screen_icon(t) when t.alert.effect == :delay, do: :delay
+  defp full_screen_icon(_t), do: :warning
 
-  defp issue_free_text(%DupAlert{alert: %Alert{effect: :delay} = alert} = t) do
+  defp full_screen_free_text(%DupAlert{alert: %Alert{effect: :delay} = alert} = t) do
     get_affected_lines_as_pills(t) ++
       [bold("delays"), alert |> Alert.delay_description() |> bold()] ++ cause_description(alert)
   end
 
-  defp issue_free_text(t) do
+  defp full_screen_free_text(t) do
+    affected_platform_name = affected_platform(t)
     affected_lines = get_affected_lines_as_pills(t)
 
-    case affected_lines do
-      [line_pill] ->
+    case {affected_platform_name, affected_lines} do
+      # All platforms for a single line
+      {nil, [line_pill]} ->
         no_trains = [bold("No"), line_pill, bold("trains")]
 
         if LocalizedAlert.location(t) in [:boundary_upstream, :boundary_downstream] do
@@ -205,13 +155,15 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
           no_trains ++ cause_description(t.alert)
         end
 
-      [line_pill1, line_pill2] ->
+      # Only consider up to 2 routes - max number a DUP departures section should contain
+      {nil, [line_pill1, line_pill2]} ->
         ["No", line_pill1, "or", line_pill2, "trains"]
 
       # Special case for GL westbound in which we include pill and direction
       {@gl_westbound_direction_name, [line_pill]} ->
         [bold("No"), line_pill, bold(@gl_westbound_direction_name)]
 
+      # Single platform
       {platform_name, [_line_pill]} ->
         [bold("#{platform_name} platform closed")]
     end
@@ -268,4 +220,46 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   end
 
   defp partial_headsign_special_cases(other), do: other
+
+  @spec affected_platform(DupAlert.t()) :: String.t() | nil
+  defp affected_platform(t) do
+    # Returns nil if all platforms at station are affected
+    if DupAlert.full_station_closure?(t) do
+      nil
+    else
+      get_closed_platform_name(t)
+    end
+  end
+
+  @spec get_closed_platform_name(DupAlert.t()) :: String.t() | nil
+  defp get_closed_platform_name(t) do
+    stops_in_alert = Enum.map(t.alert.informed_entities, & &1.stop)
+
+    platform_names =
+      t
+      |> DupAlert.child_stops_for_affected_line()
+      |> Enum.filter(&(&1.id in stops_in_alert and &1.platform_name))
+      |> Enum.map(& &1.platform_name)
+
+    case platform_names do
+      [platform_name] ->
+        platform_name
+
+      [] ->
+        nil
+
+      multiple_platforms ->
+        if Enum.all?(multiple_platforms, &(&1 in @gl_westbound_platforms)) do
+          @gl_westbound_direction_name
+        else
+          # We should not end up in this state, barring an unexpected type of alert
+          Report.warning("unexpected_platform_closure_dup",
+            alert_id: t.alert.id,
+            home_stop: t.location_context.home_stop
+          )
+
+          nil
+        end
+    end
+  end
 end

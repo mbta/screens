@@ -104,7 +104,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
         %DupAlert{
           screen: config,
           alert: alert,
-          alert_effect_detailed: detailed_alert_effect(alert, location_context),
           location_context: location_context,
           rotation_index: rotation_index,
           stop_name: stop_name
@@ -273,34 +272,5 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   for {effect, key} <- Enum.with_index([:shuttle, :suspension, :station_closure, :detour, :delay]) do
     defp effect_key(unquote(effect)), do: unquote(key)
-  end
-
-  @spec detailed_alert_effect(Alert.t(), LocationContext.t()) ::
-          DupAlert.alert_effect_detailed_t()
-  def detailed_alert_effect(%Alert{effect: effect} = alert, location_context)
-      when effect in [:station_closure] do
-    case Alert.station_closure_type(
-           alert,
-           child_stops_for_affected_line(alert, location_context)
-         ) do
-      :partial_closure ->
-        :partial_closure
-
-      _ ->
-        effect
-    end
-  end
-
-  def detailed_alert_effect(%Alert{effect: effect}, _location_context), do: effect
-
-  @spec child_stops_for_affected_line(Alert.t(), LocationContext.t()) :: [Stop.t()]
-  defp child_stops_for_affected_line(alert, location_context) do
-    %{
-      alert: alert,
-      location_context: location_context
-    }
-    |> LocalizedAlert.informed_routes_at_home_stop()
-    |> Enum.flat_map(&Map.get(location_context.child_stops_at_station, &1, []))
-    |> Enum.uniq()
   end
 end

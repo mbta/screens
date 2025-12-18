@@ -424,7 +424,7 @@ defmodule Screens.Alerts.Alert do
   @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
           :partial_closure | :full_station_closure | :partial_closure_multiple_stops
   def station_closure_type(
-        %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
+        %__MODULE__{informed_entities: informed_entities} = alert,
         platforms_at_informed_stations
       ) do
     # Alerts UI allows you to create partial closures affecting multiple stations.
