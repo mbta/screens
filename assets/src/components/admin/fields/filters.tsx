@@ -24,7 +24,7 @@ export const buildSelectFilter =
   ({ update }) => (
     <select
       onChange={(e) =>
-        update(e.target.value ? (value) => value == e.target.value : undefined)
+        update(e.target.value ? (value) => value === e.target.value : undefined)
       }
     >
       <option></option>
@@ -42,7 +42,7 @@ export const StringFilter: Filter = ({ update }) => (
       update(
         e.target.value
           ? (value) =>
-              typeof value == "string" &&
+              typeof value === "string" &&
               value.toLowerCase().includes(e.target.value.toLowerCase())
           : undefined,
       )
