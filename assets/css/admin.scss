@@ -1,4 +1,5 @@
 @use "admin/inspector";
+@use "admin/table";
 
 body {
   margin: 0;
@@ -58,113 +59,6 @@ body {
 
   &:not(:first-child) {
     margin-left: 0.5em;
-  }
-}
-
-.admin-table {
-  display: flex;
-  flex-direction: column;
-  overflow: auto;
-  background-color: #eee;
-
-  &__table {
-    flex-grow: 1;
-    padding: 0 1em;
-    overflow: auto;
-
-    &__stats {
-      display: flex;
-      justify-content: center;
-
-      & > *:not(:last-child) {
-        padding-right: 1em;
-        border-right: 1px solid gray;
-        margin-right: 1em;
-      }
-    }
-  }
-
-  &__footer {
-    display: flex;
-    gap: 1em;
-    align-items: center;
-    padding: 1em;
-  }
-
-  table {
-    white-space: nowrap;
-    border-spacing: 0;
-  }
-
-  thead {
-    position: sticky;
-    top: 0;
-    background-color: #eee;
-
-    tr:last-child th {
-      padding: 8px 0;
-    }
-  }
-
-  tbody {
-    tr:nth-child(odd) {
-      background-color: white;
-    }
-
-    tr:nth-child(even) {
-      background-color: #eee;
-    }
-
-    input,
-    select {
-      box-sizing: border-box;
-      width: 100%;
-      padding: 0;
-      margin: 0;
-      background-color: inherit;
-      border: 0;
-    }
-  }
-
-  tr.new:nth-child(odd),
-  tr:nth-child(odd):has(td.modified) {
-    background-color: lightyellow;
-  }
-
-  tr.new:nth-child(even),
-  tr:nth-child(even):has(td.modified) {
-    background-color: lightgoldenrodyellow;
-  }
-
-  td {
-    padding: 4px;
-    border-radius: 6px;
-  }
-
-  td.modified {
-    background-color: lightskyblue;
-
-    input,
-    select {
-      background-color: revert;
-      border: revert;
-    }
-  }
-}
-
-.admin-table__inspector-link {
-  color: unset;
-  text-decoration: none;
-  border-bottom: 1px dotted;
-}
-
-.admin-table__textarea {
-  width: 400px;
-  height: 40px;
-  transition: height 0.2s;
-
-  &:focus {
-    height: 400px;
   }
 }
 
