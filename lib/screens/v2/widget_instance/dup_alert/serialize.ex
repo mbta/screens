@@ -19,7 +19,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
           }
         }
 
-  @type partial_alert_map :: %{
+  @type banner_alert_map :: %{
           text: FreeTextLine.t(),
           color: :red | :orange | :green | :blue
         }
@@ -30,7 +30,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
   @spec serialize_full_screen(DupAlert.t()) :: full_screen_alert_map
   def serialize_full_screen(t) do
     %{
-      text: %FreeTextLine{icon: full_screen_icon(t), text: full_screen_free_text(t)},
+      text: %FreeTextLine{icon: full_screen_issue_icon(t), text: full_screen_issue_free_text(t)},
       remedy: remedy_free_text_line(t),
       header: %{
         text: t.stop_name,
@@ -39,10 +39,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     }
   end
 
-  @spec serialize_partial(DupAlert.t()) :: partial_alert_map
-  def serialize_partial(t) do
+  @spec serialize_banner(DupAlert.t()) :: banner_alert_map()
+  def serialize_banner(t) do
     %{
-      text: %FreeTextLine{icon: partial_alert_icon(t), text: partial_alert_free_text(t)},
+      text: %FreeTextLine{icon: banner_icon(t), text: banner_free_text(t)},
       color: line_color(t)
     }
   end
@@ -98,7 +98,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     end)
   end
 
-  defp partial_alert_free_text(t) do
+  defp banner_free_text(t) do
     affected_lines = get_affected_lines_as_strings(t)
 
     case {affected_lines, t.alert.effect, LocalizedAlert.location(t), affected_platform(t)} do
@@ -125,20 +125,20 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     end
   end
 
-  defp partial_alert_icon(t) when t.alert.effect == :delay, do: :delay
+  defp banner_icon(t) when t.alert.effect == :delay, do: :delay
 
-  defp partial_alert_icon(t),
+  defp banner_icon(t),
     do: if(line_color(t) == :yellow, do: :warning_negative, else: :warning)
 
-  defp full_screen_icon(t) when t.alert.effect == :delay, do: :delay
-  defp full_screen_icon(_t), do: :warning
+  defp full_screen_issue_icon(t) when t.alert.effect == :delay, do: :delay
+  defp full_screen_issue_icon(_t), do: :warning
 
-  defp full_screen_free_text(%DupAlert{alert: %Alert{effect: :delay} = alert} = t) do
+  defp full_screen_issue_free_text(%DupAlert{alert: %Alert{effect: :delay} = alert} = t) do
     get_affected_lines_as_pills(t) ++
       [bold("delays"), alert |> Alert.delay_description() |> bold()] ++ cause_description(alert)
   end
 
-  defp full_screen_free_text(t) do
+  defp full_screen_issue_free_text(t) do
     affected_platform_name = affected_platform(t)
     affected_lines = get_affected_lines_as_pills(t)
 

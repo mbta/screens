@@ -45,7 +45,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   def serialize(t) do
     case alert_layout(t) do
       :full_screen -> Serialize.serialize_full_screen(t)
-      :partial -> Serialize.serialize_partial(t)
+      :partial -> Serialize.serialize_banner(t)
     end
   end
 
