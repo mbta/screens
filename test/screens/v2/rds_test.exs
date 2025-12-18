@@ -47,14 +47,14 @@ defmodule Screens.V2.RDSTest do
 
     defp stop(id), do: %Stop{id: id, location_type: 0}
 
-    test "creates destinations from canonical route patterns" do
+    test "creates destinations from typical route patterns" do
       stop_ids = ~w[s0 s1]
 
       expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
         {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
       end)
 
-      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, canonical?: true} ->
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
         {:ok,
          [
            %RoutePattern{
@@ -67,7 +67,7 @@ defmodule Screens.V2.RDSTest do
              id: "B",
              headsign: "hB",
              route: %Route{id: "r2", line: %Line{id: "l2"}},
-             stops: [%Stop{id: "otherY"}, %Stop{id: "sB"}]
+             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
            },
            %RoutePattern{
              id: "C",
@@ -123,7 +123,7 @@ defmodule Screens.V2.RDSTest do
               %Departure{
                 prediction: %Prediction{
                   # further in the future than the cutoff
-                  departure_time: ~U[2024-10-11 14:00:00Z],
+                  departure_time: ~U[2024-10-11 14:30:00Z],
                   route: %Route{id: "r3", line: %Line{id: "l3"}},
                   stop: %Stop{id: "s3"},
                   trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
@@ -153,6 +153,61 @@ defmodule Screens.V2.RDSTest do
              ]
     end
 
+    test "filters out the drop off only departures at the current stop id and route patterns" do
+      now = ~U[2024-10-11 12:00:00Z]
+      stop_ids = ~w[s0 s1 s2]
+
+      expect(@departure, :fetch, fn
+        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [now: ^now] ->
+          {
+            :ok,
+            [
+              %Departure{
+                prediction: %Prediction{
+                  arrival_time: ~U[2024-10-11 12:27:00Z],
+                  departure_time: ~U[2024-10-11 12:30:00Z],
+                  route: %Route{id: "r1", line: %Line{id: "l1"}},
+                  stop: %Stop{id: "s1"},
+                  trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+                },
+                schedule: nil
+              }
+            ]
+          }
+      end)
+
+      expect(@route_pattern, :fetch, fn %{stop_ids: ^stop_ids} ->
+        {:ok,
+         [
+           %RoutePattern{
+             id: "p1",
+             headsign: "h2",
+             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             stops: [%Stop{id: "s1"}, %Stop{id: "s2"}],
+             typicality: 1
+           }
+         ]}
+      end)
+
+      departures = %Departures{
+        sections: [
+          %Section{
+            query: %Query{
+              params: %Query.Params{
+                direction_id: 0,
+                route_type: :bus,
+                stop_ids: ["s0", "s1", "s2"]
+              }
+            }
+          }
+        ]
+      }
+
+      assert RDS.get(departures, now) == [
+               {:ok, [no_departures("s1", "l1", "h1"), no_departures("s1", "l2", "h2")]}
+             ]
+    end
+
     test "NoDepartures includes a headway range for stops that have one" do
       now = ~U[2024-10-11 12:00:00Z]
       expect(@headways, :get, fn "s1", ^now -> {5, 10} end)
@@ -164,7 +219,7 @@ defmodule Screens.V2.RDSTest do
              id: "p1",
              headsign: "h1",
              route: %Route{id: "r1", line: %Line{id: "l1"}},
-             stops: [%Stop{id: "s1"}]
+             stops: [%Stop{id: "first_stop"}, %Stop{id: "s1"}, %Stop{id: "last_stop"}]
            }
          ]}
       end)
@@ -195,7 +250,7 @@ defmodule Screens.V2.RDSTest do
     test "returns :error when route_pattern fetch fails" do
       stop_ids = ~w[s0 s1]
 
-      expect(@route_pattern, :fetch, fn %{stop_ids: ^stop_ids, canonical?: true} ->
+      expect(@route_pattern, :fetch, fn %{stop_ids: ^stop_ids, typicality: 1} ->
         :error
       end)
 
