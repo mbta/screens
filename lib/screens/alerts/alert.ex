@@ -431,23 +431,23 @@ defmodule Screens.Alerts.Alert do
     # Typically, these partial closures affecting child stops will only affect a single station.
     # However, we do want to consider the case in which multiple stations have closures,
     # but not every child stop at those parent stations are closed.
-    all_child_platforms =
-      Enum.reject(platforms_at_informed_stations, &String.starts_with?(&1.id, "place-"))
 
     informed_parent_stations = informed_parent_stations(alert)
-    informed_platforms = informed_platforms_from_entities(informed_entities, all_child_platforms)
+
+    platforms_affected_by_alert =
+      informed_platforms_from_entities(informed_entities, platforms_at_informed_stations)
 
     case informed_parent_stations do
       [_single_parent_station] ->
         # Compare number of platforms in alert to total number of child platforms at station
-        if length(informed_platforms) != length(all_child_platforms) do
+        if length(platforms_affected_by_alert) != length(platforms_at_informed_stations) do
           :partial_closure
         else
           :full_station_closure
         end
 
       _multiple_parent_stations ->
-        if length(informed_platforms) != length(all_child_platforms) do
+        if length(platforms_affected_by_alert) != length(platforms_at_informed_stations) do
           :partial_closure_multiple_stops
         else
           :full_station_closure
