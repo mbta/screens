@@ -48,7 +48,7 @@ defmodule Screens.V2.RDS do
   @route_pattern injected(RoutePattern)
   @stop injected(Stop)
 
-  @max_departure_minutes 90
+  @max_departure_minutes 120
 
   @doc """
   Generates destinations from departures widget configuration.
@@ -69,11 +69,11 @@ defmodule Screens.V2.RDS do
        )
        when stop_ids != [] do
     child_stops = fetch_child_stops(stop_ids)
-    {:ok, canonical_patterns} = params |> Map.put(:canonical?, true) |> @route_pattern.fetch()
+    {:ok, typical_patterns} = params |> Map.put(:typicality, 1) |> @route_pattern.fetch()
     {:ok, departures} = @departure.fetch(params, now: now)
 
     (tuples_from_departures(departures, now) ++
-       tuples_from_patterns(canonical_patterns, child_stops))
+       tuples_from_patterns(typical_patterns, child_stops))
     |> Enum.uniq()
     |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
       %__MODULE__{
@@ -101,9 +101,7 @@ defmodule Screens.V2.RDS do
 
   defp tuples_from_departures(departures, now) do
     departures
-    |> Enum.reject(fn d ->
-      DateTime.diff(Departure.time(d), now, :minute) > @max_departure_minutes
-    end)
+    |> Enum.reject(&hide_departure?(&1, now))
     |> Enum.map(fn d ->
       {Departure.stop(d), Departure.route(d).line, Departure.representative_headsign(d)}
     end)
@@ -120,5 +118,10 @@ defmodule Screens.V2.RDS do
         |> Enum.map(fn stop -> {stop, line, headsign} end)
       end
     )
+  end
+
+  defp hide_departure?(d, now) do
+    Departure.stop_type(d) == :last_stop ||
+      DateTime.diff(Departure.time(d), now, :minute) > @max_departure_minutes
   end
 end
