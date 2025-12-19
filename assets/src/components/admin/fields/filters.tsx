@@ -39,6 +39,12 @@ export const buildSelectFilter =
 export const JsonFilter: Filter = ({ update }) => {
   const [hasChanged, setHasChanged] = useState(false);
 
+  // Stringify JSON the same way as `JsonInput` so this filter effectively
+  // searches through the visible contents of each input. This makes it more
+  // intuitive to search for partial key-value pairs (e.g. `"read_as": "` to
+  // search for headers that have a non-null audio override), though also means
+  // it's not possible to match on a structure that spans multiple lines in the
+  // formatted JSON.
   const doUpdate = (inputValue) => {
     update(
       inputValue

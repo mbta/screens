@@ -12,6 +12,7 @@
     &__stats {
       display: flex;
       justify-content: center;
+      align-items: center;
 
       & > *:not(:last-child) {
         padding-right: 1em;
