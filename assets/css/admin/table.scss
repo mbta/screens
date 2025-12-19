@@ -11,8 +11,8 @@
 
     &__stats {
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
 
       & > *:not(:last-child) {
         padding-right: 1em;
@@ -78,14 +78,11 @@
     }
   }
 
-  tr.new:nth-child(odd),
-  tr:nth-child(odd):has(td.modified) {
-    background-color: lightyellow;
-  }
-
-  tr.new:nth-child(even),
-  tr:nth-child(even):has(td.modified) {
-    background-color: lightgoldenrodyellow;
+  tr.new,
+  tr:has(td.modified) {
+    border-radius: 6px;
+    outline: 2px solid goldenrod;
+    outline-offset: -1px;
   }
 
   td {
@@ -94,7 +91,7 @@
   }
 
   td.modified {
-    background-color: lightskyblue;
+    background-color: lightgoldenrodyellow;
 
     input,
     select {
