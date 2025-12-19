@@ -35,6 +35,7 @@ const Table = () => {
     Record<string, undefined | ((v: JSON) => boolean)>
   >({});
   const [appIdFilter, setAppIdFilter] = useState<AppId | null>(null);
+  const [filterResetKey, setFilterResetKey] = useState("");
 
   const fields = appIdFilter ? appFields[appIdFilter] : allFields;
 
@@ -66,6 +67,17 @@ const Table = () => {
   }, [localConfig, remoteConfig, rows]);
 
   const isChanged = counts.modified > 0;
+  const isFiltered = Object.values(filters).some((f) => f);
+
+  const clearFilters = () => {
+    // Since filter components are not "controlled", the easiest way to reset
+    // the UI to the initial state is forcing a fresh mount by changing its
+    // `key` to a new random value. This would need to be reconsidered if we
+    // ever have a use case that involves *setting*, rather than just clearing,
+    // a filter from outside the filter component that normally manages it.
+    setFilters({});
+    setFilterResetKey(window.crypto.randomUUID());
+  }
 
   const setScreen = (id: string, screen: Screen) => {
     setLocalConfig({
@@ -145,7 +157,7 @@ const Table = () => {
               ))}
             </tr>
 
-            <tr>
+            <tr key={filterResetKey}>
               {fields.map(({ filter: Filter, path }) => (
                 <th key={path}>
                   {Filter && (
@@ -182,6 +194,10 @@ const Table = () => {
 
                       {counts.local > counts.remote && (
                         <span>{counts.local - counts.remote} new</span>
+                      )}
+
+                      {isFiltered && (
+                        <button onClick={clearFilters}>Clear filters</button>
                       )}
                     </>
                   )}
