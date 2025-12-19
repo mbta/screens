@@ -147,7 +147,7 @@ The value of `alert_text` is the same as for `serialze_banner/1`. `remedy.icon` 
 
 ## Two separate widgets
 
-For this approach, there would be two separate `WidgetInstance`s: one for `banner`, one for `takeover`. The `CandidateGenerator` would use similar logic to what is laid out above. The key difference is instead `WidgetInstance` making the decision on alert type, the `CandidateGenerator` would hold that logic and create a `WidgetInstance` object based on the result.
+For this approach, there would be two separate `WidgetInstance`s: one for `banner`, one for `full_screen`. The `CandidateGenerator` would use similar logic to what is laid out above. The key difference is instead `WidgetInstance` making the decision on alert type, the `CandidateGenerator` would hold that logic and create a `WidgetInstance` object based on the result.
 
 ### Reason for rejection
 
@@ -155,7 +155,7 @@ This approach would require giving the `CandidateGenerator` business logic neede
 
 [^1]: An applicable alert is an alert with an effect of `delay` with `severity` >= 5, `shuttle`, `suspension`, or `station_closure` that affects the `route_ids` and `stop_ids` from the `alerts` section of the DUP config.
 [^2]: A `banner` alert takes up only a small amount of the screen to allow for other departures to remain visible.
-[^3]: A `takeover` alert displays over the whole screen including the departures.
+[^3]: A `full_screen` alert displays over the whole screen including the departures.
 [^4]: Priority for DUP alerts is pick a shuttle alert if present. Otherwise, pick the first in the list.
 
 # Addendums
