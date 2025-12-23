@@ -338,6 +338,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp format_short_route_pill("Green-" <> branch), do: "gl-#{String.downcase(branch)}"
 
+  defp format_short_route_pill("Mattapan"), do: "rl-mattapan"
+
   defp format_short_route_pill(route_id),
     do: route_id |> String.first() |> String.downcase() |> Kernel.<>("l")
 
@@ -1072,29 +1074,26 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp end_time_text([{_start_time, end_time} | _], now) do
     end_time_eastern = Util.to_eastern(end_time)
-    end_date = DateTime.to_date(end_time_eastern)
-
-    now_time_eastern = Util.to_eastern(now)
-    now_date = DateTime.to_date(now_time_eastern)
+    end_date = Util.service_date(end_time)
+    now_date = Util.service_date(now)
 
     cond do
-      now_date == end_date ->
-        Calendar.strftime(end_time_eastern, "%-I:%M %p")
-
-      Date.diff(end_time_eastern, now_time_eastern) == 1 and
+      end_date == now_date and
         end_time_eastern.hour >= 2 and
           end_time_eastern.hour < 5 ->
         "end of service"
 
-      Date.diff(end_time_eastern, now_time_eastern) == 1 ->
+      end_date == now_date ->
+        Calendar.strftime(end_time_eastern, "%-I:%M %p")
+
+      Date.diff(end_date, now_date) == 1 ->
         "tomorrow"
 
-      Timex.iso_week(end_date) == Timex.iso_week(now_date) and
-          DateTime.after?(end_time_eastern, now_time_eastern) ->
-        "this #{Calendar.strftime(end_time_eastern, "%A")}"
+      Timex.iso_week(end_date) == Timex.iso_week(now_date) ->
+        "this #{Calendar.strftime(end_date, "%A")}"
 
       true ->
-        Calendar.strftime(end_time_eastern, "%b %-d")
+        Calendar.strftime(end_date, "%b %-d")
     end
   end
 
@@ -1286,11 +1285,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
-  @suppressed_alert_ids ~w[673353]
+  # Suppress alerts for GL disruption 12/8/2025-12/22/2025 specifically at Kenmore, which will be
+  # configured with custom content
+  def valid_candidate?(%__MODULE__{
+        alert: %Alert{id: "679818"},
+        screen: %Screen{
+          app_params: %PreFare{reconstructed_alert_widget: %{stop_id: "place-kencl"}}
+        }
+      }),
+      do: false
 
-  def valid_candidate?(%__MODULE__{alert: %{id: alert_id}}) do
-    alert_id not in @suppressed_alert_ids
-  end
+  def valid_candidate?(_other), do: true
 
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)

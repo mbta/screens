@@ -1,299 +1,115 @@
-/*** HEADS UP ***
-The backend logic that fits list view rows onto pages
-makes assumptions based on styles defined here.
-
-Currently, each row for a station in the list view has its height
-calculated as:
-   100px + (48px * length(station.closures))
-
-If any changes to this stylesheet affect that, be sure to update
-the backend page-fitting logic as well.
-*** HEADS UP ***/
-
 @use "CSS/colors";
+@use "CSS/lcd/section_header";
 
 .elevator-status {
-  position: relative;
-  width: 1024px;
-  height: 1000px;
-  margin: 16px 28px;
-  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   color: colors.$cool-black-15;
-  background: colors.$warm-neutral-90;
-  border-radius: 16px;
-  box-shadow: 0 10px 20px 0 rgb(0 0 0 / 25%);
+  background-color: colors.$warm-neutral-90;
 
-  .elevator-status__header {
+  &__title {
+    @include section_header.base;
+  }
+
+  &__body {
     display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    height: 120px;
-
-    .elevator-status__header-text {
-      padding: 32px;
-      font-size: 72px;
-      font-weight: 800;
-      line-height: 56px;
-    }
-
-    .elevator-status__wayfinding-icon {
-      padding-top: 12px;
-      padding-right: 28px;
-      padding-bottom: 12px;
-    }
+    flex-direction: column;
+    gap: 40px;
+    padding: 48px;
+    padding-bottom: 16px;
   }
 
-  .elevator-status__footer {
-    position: absolute;
-    bottom: 0;
-    width: 1024px;
-    height: 124px;
-    background: colors.$warm-neutral-80;
-    border-radius: 0 0 16px 16px;
+  &__header ul {
+    margin: 0;
+    // Pull the bullets inside the bounding box, since by default they hang
+    // slightly outside it. This effect depends on the text size, so adjust
+    // based on the text size.
+    margin-left: 0.5em;
 
-    .elevator-status__footer-text {
-      padding-top: 20px;
-      padding-left: 32px;
-      font-size: 32px;
-      line-height: 40px;
-    }
-  }
-
-  &__closure-you-are-here-icon {
-    display: block;
-    margin-right: auto;
-    margin-left: auto;
-    object-fit: contain;
-  }
-
-  &__closure-route-mode-icon {
-    width: 50px;
-    height: 50px;
-
-    &:not(:last-child) {
-      padding-right: 12px;
-    }
-  }
-
-  &__list-view {
-    width: 1024px;
-    height: 760px;
-    overflow: hidden;
-  }
-
-  &__station-row {
-    box-sizing: border-box;
-    width: 1024px;
-    padding-top: 24px;
-    padding-bottom: 20px;
-    padding-left: 32px;
-    border-top: 4px solid rgb(217 214 208);
-
-    &--home-stop {
-      background-color: rgb(255 255 255 / 68%);
+    &.body-2 {
+      margin-top: 10px;
     }
 
-    &__header {
-      height: 44px;
-      margin-bottom: 16px;
+    &.body-4 {
+      margin-top: 40px;
     }
 
-    &__icons {
-      display: inline-block;
-      height: 44px;
-      margin-right: 16px;
-      line-height: 44px;
-      vertical-align: top;
-    }
+    &.overflow {
+      // `overflow: hidden` also hides the bullets for some reason. This is
+      // fixed with `list-style-position: inside`, but we don't want to do that
+      // normally since wrapped text would appear directly under the bullet.
+      margin-left: 0;
+      list-style-position: inside;
 
-    &__station-name {
-      display: inline-block;
-      height: 44px;
-      margin-bottom: 12px;
-      font-size: 40px;
-      font-weight: 700;
-      line-height: 44px;
-      letter-spacing: 0;
-      vertical-align: top;
-    }
-
-    &__ids {
-      display: inline-block;
-      height: 44px;
-      margin-left: 16px;
-      font-size: 32px;
-      font-weight: 500;
-      line-height: 44px;
-      color: rgb(115 115 115);
-      letter-spacing: 0;
-      vertical-align: text-top;
-
-      // needs a tiiiiny nudge to align with station name
-      transform: translateY(1px);
-    }
-
-    &__you-are-here-icon {
-      display: inline-block;
-      height: 44px;
-      margin-left: 24px;
-      line-height: 44px;
-      vertical-align: top;
-      transform: translateY(4px);
-
-      .elevator-status__closure-you-are-here-icon {
-        width: 34px;
-        height: 34px;
+      li {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
       }
     }
+  }
 
-    &__closures {
-      width: 960px;
+  &__footer {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+
+    .free-text > *:not(:first-child) {
+      // Give individual free text lines the same "gap" as the flex container.
+      margin-top: 16px;
     }
+  }
 
-    &__closure {
-      width: 960px;
-      height: 40px;
-      overflow: hidden;
-      font-size: 32px;
-      font-weight: 400;
-      line-height: 32px;
-      text-overflow: ellipsis;
-      letter-spacing: 0;
-      white-space: nowrap;
+  &__cta {
+    margin-top: auto;
+  }
 
-      &:not(:last-child) {
-        margin-bottom: 8px;
-      }
-    }
+  &:has(&__cta) {
+    padding-bottom: 0;
   }
 }
 
-.detail-page {
-  width: 100%;
-  height: 1000px;
-  margin-bottom: 8px;
-  border-top: 4px solid rgb(217 214 208);
+.elevator-alerts-cta {
+  display: flex;
+  align-items: center;
+  padding-right: 48px;
+  background-color: colors.$warm-neutral-80;
 
-  .detail-page__closure {
-    height: 100%;
-    padding-top: 28px;
-    padding-right: 38px;
-    padding-left: 100px;
+  &--large {
+    height: 296px;
+  }
 
-    &--active-at-home {
-      background: rgb(255 255 255 / 44%);
-    }
+  &--small {
+    height: 248px;
+  }
 
-    .detail-page__closure-location {
-      position: relative;
-      padding-bottom: 12px;
+  &__icon {
+    position: relative;
+  }
 
-      .detail-page__closure-outage-icon-container {
-        position: absolute;
-        left: -68px;
-        width: 50px;
-        height: 50px;
-        transform: translateY(10px);
+  &--large &__icon {
+    top: 47px;
+    width: 273px;
+    height: 273px;
+    margin-left: -25px;
+  }
 
-        .detail-page__closure-outage-icon {
-          display: block;
-          margin-right: auto;
-          margin-left: auto;
-          object-fit: contain;
-        }
-      }
+  &--small &__icon {
+    top: 38px;
+    width: 223px;
+    height: 223px;
+    margin-left: -12px;
+  }
 
-      .detail-page__closure-location-text {
-        display: inline-block;
-        font-size: 48px;
-        font-weight: 800;
-        line-height: 67px;
-      }
+  &--large &__text {
+    // The bounding box of the app-in-hand includes some empty space on the
+    // right side, and in this case the text needs to be pulled slightly inside
+    // of it to avoid running into the QR code.
+    margin-left: -24px;
+  }
 
-      .detail-page__closure-route-mode-icon-container {
-        display: inline-block;
-        padding-left: 30px;
-        margin: auto;
-      }
-    }
-
-    .detail-page__closure-header {
-      max-height: 144px;
-      padding-bottom: 32px;
-      font-weight: 500;
-
-      &--small {
-        font-size: 32px;
-        line-height: 40px;
-      }
-
-      &--large {
-        font-size: 36px;
-        line-height: 48px;
-      }
-    }
-
-    .detail-page__timeframe {
-      position: relative;
-      padding-bottom: 24px;
-
-      .detail-page__closure-alert-icon-container {
-        position: absolute;
-        left: -68px;
-        width: 50px;
-        height: 50px;
-
-        .detail-page__closure-alert-icon {
-          display: block;
-          margin-right: auto;
-          margin-left: auto;
-          object-fit: contain;
-        }
-      }
-
-      .detail-page__timeframe-text-start {
-        display: inline-block;
-        padding-right: 10px;
-        font-size: 36px;
-        font-weight: 800;
-        line-height: 45px;
-      }
-
-      .detail-page__timeframe-text-end {
-        display: inline-block;
-        padding-right: 32px;
-        padding-left: 10px;
-        font-size: 36px;
-        font-weight: 500;
-        line-height: 45px;
-      }
-    }
-
-    .detail-page__description {
-      max-height: 425px;
-      padding-right: 32px;
-
-      &--extra-large {
-        font-size: 36px;
-        line-height: 48px;
-      }
-
-      &--large {
-        font-size: 36px;
-        line-height: 44px;
-      }
-
-      &--small {
-        font-size: 28px;
-        line-height: 40px;
-        letter-spacing: -0.4px;
-      }
-
-      &--extra-small {
-        font-size: 24px;
-        line-height: 32px;
-        letter-spacing: -0.4px;
-      }
-    }
+  &__qrcode {
+    margin-left: auto;
   }
 }

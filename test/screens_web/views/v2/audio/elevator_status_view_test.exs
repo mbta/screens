@@ -1,79 +1,47 @@
 defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
-  use ScreensWeb.ConnCase, async: true
+  use ExUnit.Case, async: true
+
   alias ScreensWeb.V2.Audio.ElevatorStatusView
+  alias ScreensConfig.FreeTextLine
 
-  describe "No elevator alerts" do
-    test "renders all clear message" do
-      assigns = %{
-        active_at_home_pages: [],
-        list_pages: [],
-        upcoming_at_home_pages: [],
-        elsewhere_pages: []
-      }
-
-      assert render(assigns) ==
-               "\n    <p>Elevator Closures across the T.</p>\n    <p>All elevators are working at this station.</p>\n    <p>Other elevator closures:</p>\n    <p>All other MBTA elevators are working or have a backup elevator within 20 feet.</p>\n    "
-    end
-  end
-
-  describe "Elevator alert" do
-    test "with no additional closures renders closure message + other elevators working message" do
-      assigns = %{
-        active_at_home_pages: test_stations(),
-        list_pages: [],
-        upcoming_at_home_pages: [],
-        elsewhere_pages: []
-      }
-
-      assert render(assigns) =~ "take a different elevator :)"
-
-      assert render(assigns) =~
-               "All other MBTA elevators are working or have a backup elevator within 20 feet."
-    end
-
-    test "with additional closures renders closure message + additional closures message" do
-      assigns = %{
-        active_at_home_pages: test_stations(),
-        list_pages: test_stations(),
-        upcoming_at_home_pages: [],
-        elsewhere_pages: []
-      }
-
-      assert render(assigns) =~ "take a different elevator :)"
-      assert render(assigns) =~ "For a full list of elevator alerts"
-    end
-  end
-
-  ## Helper functions
-
-  defp test_stations do
-    [
-      %{
-        station: %{
-          is_at_home_stop: true,
-          name: "Haymarket",
-          elevator_closures: [
-            %{
-              elevator_id: "1",
-              elevator_name: "Haymarket1",
-              description: "take a different elevator :)",
-              timeframe: %{
-                active_period: %{
-                  "start" => "2022-01-01T00:00:00Z",
-                  "end" => "2022-01-01T22:00:00Z"
-                },
-                happening_now: true
-              }
-            }
-          ]
-        }
-      }
-    ]
-  end
-
-  defp render(data) do
+  defp render(assigns) do
     "_widget.ssml"
-    |> ElevatorStatusView.render(data)
+    |> ElevatorStatusView.render(assigns)
     |> Phoenix.HTML.safe_to_string()
+    |> String.replace(~r/\n\s+/, "")
+  end
+
+  test "uses footer audio instead of footer lines if defined" do
+    assigns = %{
+      header: "elevators are down:",
+      callout_items: ["one", "another"],
+      footer_lines: [%FreeTextLine{icon: nil, text: ["go to mbta.com/stops/place-abc for more"]}],
+      footer_audio: ["for full list", "call the hotline"]
+    }
+
+    expected = [
+      "<p>Elevator Status</p>",
+      "<p>elevators are down: one, another</p>",
+      "<p>for full list call the hotline</p>"
+    ]
+
+    assert render(assigns) == Enum.join(expected)
+  end
+
+  test "uses footer lines as-is when no footer audio defined" do
+    assigns = %{
+      header: "elevators are okay",
+      callout_items: [],
+      footer_lines: [%FreeTextLine{icon: nil, text: ["or have backups"]}],
+      footer_audio: nil
+    }
+
+    expected = [
+      "<p>Elevator Status</p>",
+      "<p>elevators are okay </p>",
+      "<p>or have backups</p>"
+    ]
+
+    assert render(assigns) == Enum.join(expected)
   end
 end

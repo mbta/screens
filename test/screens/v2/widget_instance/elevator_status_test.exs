@@ -2,1701 +2,455 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias Screens.Elevator
+  alias Screens.Elevator.Closure
   alias Screens.Facilities.Facility
-  alias Screens.LocationContext
-  alias Screens.V2.WidgetInstance
-  alias ScreensConfig.{ElevatorStatus, Screen}
-  alias ScreensConfig.Screen.PreFare
+  alias Screens.Stops.Stop
+  alias Screens.V2.AlertsWidget
+  alias Screens.V2.WidgetInstance.ElevatorStatus, as: Widget
+  alias Screens.V2.WidgetInstance.ElevatorStatus.Serialized
+  alias ScreensConfig.FreeTextLine
 
-  # Convenience function to build an elevator alert
-  defp alert(opts) do
-    %Alert{
-      effect: :elevator_closure,
-      informed_entities: opts[:informed_entities] || [],
-      active_period: opts[:active_period] || []
+  defp build_closure(facility_fields, elevator_fields \\ %{}, alert_id \\ "0") do
+    %Closure{
+      alert: %Alert{id: alert_id},
+      elevator: if(is_nil(elevator_fields), do: nil, else: build_elevator(elevator_fields)),
+      facility: build_facility(facility_fields)
     }
   end
 
-  # Convenience function to build an informed entity
-  defp ie(opts), do: %{stop: opts[:stop], facility: opts[:facility]}
-
-  defp facility(id) do
-    %Facility{
-      id: to_string(id),
-      long_name: "",
-      short_name: "Elevator #{id}",
-      stop: :unloaded,
-      type: :elevator
-    }
+  defp build_elevator(fields) do
+    struct!(
+      %Elevator{
+        id: "111",
+        alternate_ids: [],
+        exiting_summary: "",
+        redundancy: :in_station,
+        summary: nil
+      },
+      fields
+    )
   end
 
-  setup do
-    home_station_id = "place-foo"
-    home_platform_ids = ["1001", "1002"]
+  defp build_facility(fields) do
+    struct!(
+      %Facility{
+        id: "111",
+        long_name: "long",
+        short_name: "short",
+        type: :elevator,
+        stop: %Stop{id: "place-test"}
+      },
+      fields
+    )
+  end
 
-    connecting_station_id = "place-bar"
-    connecting_platform_ids = ["1003", "1004"]
+  defp free_text_lines(lines), do: Enum.map(lines, &%FreeTextLine{icon: nil, text: &1})
 
-    elsewhere_station_id = "place-baz"
-    elsewhere_platform_ids = ["2001", "2002"]
+  @call_for_alternate_path "For an alternate path, call 617-222-2828."
+  @call_for_full_list "For a full list of elevator closures, call 617-222-2828."
 
-    other_elsewhere_station_id = "place-qux"
-    other_elsewhere_platform_ids = ["2003", "2004"]
+  describe "AlertsWidget implementation" do
+    test "returns the value of Serialized.alert_ids" do
+      # This way we know the AlertsWidget implementation is actually hooked up to the `alert_ids`
+      # field of `Serialized`, and tests that assert on this field are meaningful
+      closures = [build_closure([stop: %Stop{id: "place-here"}], [redundancy: :in_station], "a1")]
+      widget = %Widget{closures: closures, home_station_id: "place-here"}
 
-    screen_config =
-      struct(Screen, %{
-        app_params:
-          struct(PreFare, %{
-            elevator_status: %ElevatorStatus{
-              parent_station_id: home_station_id,
-              platform_stop_ids: home_platform_ids
-            }
-          })
-      })
+      assert AlertsWidget.alert_ids(widget) == Widget.serialize(widget).alert_ids
+    end
+  end
 
-    now = ~U[2022-01-01T10:00:00Z]
-    happening_now_active_period = [{~U[2022-01-01T00:00:00Z], ~U[2022-01-01T22:00:00Z]}]
-    upcoming_active_period = [{~U[2022-02-01T00:00:00Z], ~U[2022-02-01T22:00:00Z]}]
-
-    station_id_to_name = %{
-      "place-foo" => "Foo Station",
-      "place-bar" => "Bar Station",
-      "place-baz" => "Baz Station",
-      "place-qux" => "Qux Station"
-    }
-
-    tagged_stop_sequences = %{
-      "A" => [
-        ["place-foo", "place-bar"],
-        ["place-foo", "place-bar"]
+  describe "elevators without nearby redundancy are closed at this station" do
+    test "one closure" do
+      closures = [
+        build_closure(
+          [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
+          [redundancy: :in_station],
+          "alert-1"
+        ),
+        # not at this station; irrelevant
+        build_closure(stop: %Stop{id: "place-other"})
       ]
-    }
 
-    stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
-
-    station_id_to_icons = %{
-      "place-foo" => [:red],
-      "place-bar" => [:red, :orange, :bus],
-      "place-baz" => [:green],
-      "place-qux" => [:green]
-    }
-
-    location_context = %LocationContext{
-      home_stop: home_station_id,
-      tagged_stop_sequences: tagged_stop_sequences,
-      upstream_stops: LocationContext.upstream_stop_id_set([home_station_id], stop_sequences),
-      downstream_stops: LocationContext.downstream_stop_id_set([home_station_id], stop_sequences),
-      routes: [],
-      alert_route_types: []
-    }
-
-    home_ies = fn facility_id ->
-      facility = facility(facility_id)
-
-      [ie(stop: home_station_id, facility: facility)] ++
-        Enum.map(home_platform_ids, &ie(stop: &1, facility: facility))
-    end
-
-    connecting_ies = fn facility_id ->
-      facility = facility(facility_id)
-
-      [ie(stop: connecting_station_id, facility: facility)] ++
-        Enum.map(connecting_platform_ids, &ie(stop: &1, facility: facility))
-    end
-
-    elsewhere_ies = fn facility_id ->
-      facility = facility(facility_id)
-
-      [ie(stop: elsewhere_station_id, facility: facility)] ++
-        Enum.map(elsewhere_platform_ids, &ie(stop: &1, facility: facility))
-    end
-
-    other_elsewhere_ies = fn facility_id ->
-      facility = facility(facility_id)
-
-      [ie(stop: other_elsewhere_station_id, facility: facility)] ++
-        Enum.map(other_elsewhere_platform_ids, &ie(stop: &1, facility: facility))
-    end
-
-    alert_active_home1 =
-      alert(
-        informed_entities: home_ies.("1"),
-        active_period: happening_now_active_period
-      )
-
-    alert_active_home2 =
-      alert(
-        informed_entities: home_ies.("5"),
-        active_period: happening_now_active_period
-      )
-
-    alert_upcoming_home1 =
-      alert(
-        informed_entities: home_ies.("1"),
-        active_period: upcoming_active_period
-      )
-
-    alert_upcoming_home2 =
-      alert(
-        informed_entities: home_ies.("5"),
-        active_period: upcoming_active_period
-      )
-
-    alert_active_connecting_station1 =
-      alert(
-        informed_entities: connecting_ies.("2"),
-        active_period: happening_now_active_period
-      )
-
-    alert_active_connecting_station2 =
-      alert(
-        informed_entities: connecting_ies.("6"),
-        active_period: happening_now_active_period
-      )
-
-    alert_upcoming_connecting_station1 =
-      alert(
-        informed_entities: connecting_ies.("2"),
-        active_period: upcoming_active_period
-      )
-
-    alert_upcoming_connecting_station2 =
-      alert(
-        informed_entities: connecting_ies.("6"),
-        active_period: upcoming_active_period
-      )
-
-    alert_active_elsewhere1 =
-      alert(
-        informed_entities: elsewhere_ies.("3"),
-        active_period: happening_now_active_period
-      )
-
-    alert_active_elsewhere2 =
-      alert(
-        informed_entities: elsewhere_ies.("7"),
-        active_period: happening_now_active_period
-      )
-
-    alert_upcoming_elsewhere1 =
-      alert(
-        informed_entities: elsewhere_ies.("3"),
-        active_period: upcoming_active_period
-      )
-
-    alert_upcoming_elsewhere2 =
-      alert(
-        informed_entities: elsewhere_ies.("7"),
-        active_period: upcoming_active_period
-      )
-
-    alert_active_other_elsewhere1 =
-      alert(
-        informed_entities: other_elsewhere_ies.("4"),
-        active_period: happening_now_active_period
-      )
-
-    alert_active_other_elsewhere2 =
-      alert(
-        informed_entities: other_elsewhere_ies.("8"),
-        active_period: happening_now_active_period
-      )
-
-    alert_active_other_elsewhere3 =
-      alert(
-        informed_entities: other_elsewhere_ies.("9"),
-        active_period: happening_now_active_period
-      )
-
-    alert_upcoming_other_elsewhere1 =
-      alert(
-        informed_entities: other_elsewhere_ies.("4"),
-        active_period: upcoming_active_period
-      )
-
-    alert_upcoming_other_elsewhere2 =
-      alert(
-        informed_entities: other_elsewhere_ies.("8"),
-        active_period: upcoming_active_period
-      )
-
-    alert_upcoming_other_elsewhere3 =
-      alert(
-        informed_entities: other_elsewhere_ies.("9"),
-        active_period: upcoming_active_period
-      )
-
-    widget = fn opts ->
-      %WidgetInstance.ElevatorStatus{
-        screen: screen_config,
-        alerts: opts[:alerts] || [],
-        station_id_to_name: station_id_to_name,
-        station_id_to_icons: station_id_to_icons,
-        now: now,
-        location_context: location_context
+      expected = %Serialized{
+        status: :alert,
+        header: "An elevator is closed at this station.",
+        footer_lines:
+          free_text_lines([
+            ["Test Elevator 100 is unavailable."],
+            ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
+          ]),
+        footer_audio: ["Test Elevator 100 is unavailable.", @call_for_alternate_path],
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
+        alert_ids: ["alert-1"]
       }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
 
-    %{
-      no_alerts_instance: widget.(alerts: []),
-
-      # Scenario A: closure at home elevator
-      # (not possible until we implement elevator screens)
-
-      # Scenario B: one or more active closure at home station
-      one_active_at_home_instance: widget.(alerts: [alert_active_home1]),
-      two_active_at_home_instance: widget.(alerts: [alert_active_home1, alert_active_home2]),
-      all_active_instance:
-        widget.(
-          alerts: [
-            alert_active_home1,
-            alert_active_home2,
-            alert_active_connecting_station1,
-            alert_active_connecting_station2,
-            alert_active_elsewhere1,
-            alert_active_elsewhere2,
-            alert_active_other_elsewhere1,
-            alert_active_other_elsewhere2,
-            alert_active_other_elsewhere3
-          ]
-        ),
-      all_mixed_instance:
-        widget.(
-          alerts: [
-            alert_active_home1,
-            alert_upcoming_home2,
-            alert_active_connecting_station1,
-            alert_upcoming_connecting_station2,
-            alert_active_elsewhere1,
-            alert_upcoming_elsewhere2,
-            alert_active_other_elsewhere1,
-            alert_upcoming_other_elsewhere2,
-            alert_upcoming_other_elsewhere3
-          ]
-        ),
-      one_active_at_home_many_active_elsewhere_instance:
-        widget.(
-          alerts: [
-            alert_active_home1,
-            alert_active_connecting_station1,
-            alert_active_connecting_station2,
-            alert_active_elsewhere1,
-            alert_active_elsewhere2,
-            alert_active_other_elsewhere1,
-            alert_active_other_elsewhere2,
-            alert_active_other_elsewhere3
-          ]
-        ),
-
-      # Scenario C: no active closures at home station
-      one_upcoming_at_home_instance: widget.(alerts: [alert_upcoming_home1]),
-      all_upcoming_instance:
-        widget.(
-          alerts: [
-            alert_upcoming_home1,
-            alert_upcoming_home2,
-            alert_upcoming_connecting_station1,
-            alert_upcoming_connecting_station2,
-            alert_upcoming_elsewhere1,
-            alert_upcoming_elsewhere2,
-            alert_upcoming_other_elsewhere1,
-            alert_upcoming_other_elsewhere2,
-            alert_upcoming_other_elsewhere3
-          ]
-        ),
-      one_active_on_connecting_line_instance: widget.(alerts: [alert_active_connecting_station1]),
-      one_active_elsewhere_instance: widget.(alerts: [alert_active_elsewhere1]),
-      non_home_active_instance:
-        widget.(
-          alerts: [
-            alert_active_connecting_station1,
-            alert_active_connecting_station2,
-            alert_active_elsewhere1,
-            alert_active_elsewhere2,
-            alert_active_other_elsewhere1,
-            alert_active_other_elsewhere2,
-            alert_active_other_elsewhere3
-          ]
-        ),
-      non_home_upcoming_instance:
-        widget.(
-          alerts: [
-            alert_upcoming_connecting_station1,
-            alert_upcoming_connecting_station2,
-            alert_upcoming_elsewhere1,
-            alert_upcoming_elsewhere2,
-            alert_upcoming_other_elsewhere1,
-            alert_upcoming_other_elsewhere2,
-            alert_upcoming_other_elsewhere3
-          ]
-        ),
-      non_home_mixed_instance:
-        widget.(
-          alerts: [
-            alert_active_connecting_station1,
-            alert_upcoming_connecting_station2,
-            alert_active_elsewhere1,
-            alert_upcoming_elsewhere2,
-            alert_active_other_elsewhere1,
-            alert_upcoming_other_elsewhere2,
-            alert_active_other_elsewhere3
-          ]
+    test "one closure with summary" do
+      closures = [
+        build_closure(
+          [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
+          [redundancy: :in_station, summary: "Use nearby elevator 101."],
+          "alert-1"
         )
-    }
-  end
+      ]
 
-  describe "priority/1" do
-    test "returns 2", %{one_active_at_home_instance: instance} do
-      assert [2] == WidgetInstance.priority(instance)
-    end
-  end
-
-  describe "serialize/1" do
-    test "returns an empty list page when there are no alerts", %{no_alerts_instance: instance} do
-      expected_result = %{
-        pages: [%WidgetInstance.ElevatorStatus.ListPage{stations: []}]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns a detail and list page for one active at-home", %{
-      one_active_at_home_instance: instance
-    } do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "1",
-                  elevator_name: "Elevator 1",
-                  timeframe: %{
-                    active_period: %{
-                      "start" => "2022-01-01T00:00:00Z",
-                      "end" => "2022-01-01T22:00:00Z"
-                    },
-                    happening_now: true
-                  },
-                  header_text: nil
-                }
-              ]
-            }
-          },
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                name: "Foo Station",
-                icons: [:red],
-                is_at_home_stop: true,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "1",
-                    elevator_name: "Elevator 1",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns two detail and one list page for two active at home", %{
-      two_active_at_home_instance: instance
-    } do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "1",
-                  elevator_name: "Elevator 1",
-                  timeframe: %{
-                    active_period: %{
-                      "start" => "2022-01-01T00:00:00Z",
-                      "end" => "2022-01-01T22:00:00Z"
-                    },
-                    happening_now: true
-                  },
-                  header_text: nil
-                }
-              ]
-            }
-          },
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "5",
-                  elevator_name: "Elevator 5",
-                  timeframe: %{
-                    active_period: %{
-                      "start" => "2022-01-01T00:00:00Z",
-                      "end" => "2022-01-01T22:00:00Z"
-                    },
-                    happening_now: true
-                  },
-                  header_text: nil
-                }
-              ]
-            }
-          },
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                name: "Foo Station",
-                icons: [:red],
-                is_at_home_stop: true,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "1",
-                    elevator_name: "Elevator 1",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "5",
-                    elevator_name: "Elevator 5",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns two detail pages and one list page for two active each at home + connecting, 4 active at elsewhere stations",
-         %{all_active_instance: instance} do
-      # Note: some content would appear on an additional list page, which gets truncated
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "1",
-                  elevator_name: "Elevator 1",
-                  timeframe: %{
-                    active_period: %{
-                      "start" => "2022-01-01T00:00:00Z",
-                      "end" => "2022-01-01T22:00:00Z"
-                    },
-                    happening_now: true
-                  },
-                  header_text: nil
-                }
-              ]
-            }
-          },
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "5",
-                  elevator_name: "Elevator 5",
-                  timeframe: %{
-                    active_period: %{
-                      "start" => "2022-01-01T00:00:00Z",
-                      "end" => "2022-01-01T22:00:00Z"
-                    },
-                    happening_now: true
-                  },
-                  header_text: nil
-                }
-              ]
-            }
-          },
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                name: "Foo Station",
-                icons: [:red],
-                is_at_home_stop: true,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "1",
-                    elevator_name: "Elevator 1",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "5",
-                    elevator_name: "Elevator 5",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  }
-                ]
-              },
-              %{
-                name: "Bar Station",
-                icons: [:red, :orange, :bus],
-                is_at_home_stop: false,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "2",
-                    elevator_name: "Elevator 2",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "6",
-                    elevator_name: "Elevator 6",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  }
-                ]
-              },
-              %{
-                name: "Baz Station",
-                icons: [:green],
-                is_at_home_stop: false,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "3",
-                    elevator_name: "Elevator 3",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "7",
-                    elevator_name: "Elevator 7",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns one detail and one list page for a mix of active/upcoming at home, connecting, elsewhere",
-         %{
-           all_mixed_instance: instance
-         } do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "1",
-                  elevator_name: "Elevator 1",
-                  header_text: nil,
-                  timeframe: %{
-                    active_period: %{
-                      "end" => "2022-01-01T22:00:00Z",
-                      "start" => "2022-01-01T00:00:00Z"
-                    },
-                    happening_now: true
-                  }
-                }
-              ]
-            }
-          },
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                name: "Foo Station",
-                icons: [:red],
-                is_at_home_stop: true,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "1",
-                    elevator_name: "Elevator 1",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ]
-              },
-              %{
-                name: "Bar Station",
-                icons: [:red, :orange, :bus],
-                is_at_home_stop: false,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "2",
-                    elevator_name: "Elevator 2",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ]
-              },
-              %{
-                name: "Baz Station",
-                icons: [:green],
-                is_at_home_stop: false,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "3",
-                    elevator_name: "Elevator 3",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ]
-              },
-              %{
-                name: "Qux Station",
-                icons: [:green],
-                is_at_home_stop: false,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "4",
-                    elevator_name: "Elevator 4",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns one detail and two list pages for one active at home and many active on connecting + elsewhere",
-         %{one_active_at_home_many_active_elsewhere_instance: instance} do
-      # List view content spills onto a second page
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "1",
-                  elevator_name: "Elevator 1",
-                  header_text: nil,
-                  timeframe: %{
-                    active_period: %{
-                      "end" => "2022-01-01T22:00:00Z",
-                      "start" => "2022-01-01T00:00:00Z"
-                    },
-                    happening_now: true
-                  }
-                }
-              ],
-              icons: [:red],
-              is_at_home_stop: true,
-              name: "Foo Station"
-            }
-          },
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "1",
-                    elevator_name: "Elevator 1",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:red],
-                is_at_home_stop: true,
-                name: "Foo Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "2",
-                    elevator_name: "Elevator 2",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "6",
-                    elevator_name: "Elevator 6",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:red, :orange, :bus],
-                is_at_home_stop: false,
-                name: "Bar Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "3",
-                    elevator_name: "Elevator 3",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "7",
-                    elevator_name: "Elevator 7",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:green],
-                is_at_home_stop: false,
-                name: "Baz Station"
-              }
-            ]
-          },
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "1",
-                    elevator_name: "Elevator 1",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:red],
-                is_at_home_stop: true,
-                name: "Foo Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "4",
-                    elevator_name: "Elevator 4",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "8",
-                    elevator_name: "Elevator 8",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "9",
-                    elevator_name: "Elevator 9",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:green],
-                is_at_home_stop: false,
-                name: "Qux Station"
-              }
-            ]
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns a list page (empty) and a detail page for one upcoming at home", %{
-      one_upcoming_at_home_instance: instance
-    } do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.ListPage{stations: []},
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "1",
-                  elevator_name: "Elevator 1",
-                  timeframe: %{
-                    active_period: %{
-                      "start" => "2022-02-01T00:00:00Z",
-                      "end" => "2022-02-01T22:00:00Z"
-                    },
-                    happening_now: false
-                  },
-                  header_text: nil
-                }
-              ]
-            }
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns list page (empty) followed by detail pages for several upcoming alerts", %{
-      all_upcoming_instance: instance
-    } do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: []
-          },
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "1",
-                  elevator_name: "Elevator 1",
-                  header_text: nil,
-                  timeframe: %{
-                    active_period: %{
-                      "end" => "2022-02-01T22:00:00Z",
-                      "start" => "2022-02-01T00:00:00Z"
-                    },
-                    happening_now: false
-                  }
-                }
-              ]
-            }
-          },
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Foo Station",
-              icons: [:red],
-              is_at_home_stop: true,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "5",
-                  elevator_name: "Elevator 5",
-                  header_text: nil,
-                  timeframe: %{
-                    active_period: %{
-                      "end" => "2022-02-01T22:00:00Z",
-                      "start" => "2022-02-01T00:00:00Z"
-                    },
-                    happening_now: false
-                  }
-                }
-              ]
-            }
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns a detail page for one active on connecting line", %{
-      one_active_on_connecting_line_instance: instance
-    } do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                name: "Bar Station",
-                icons: [:red, :orange, :bus],
-                is_at_home_stop: false,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "2",
-                    elevator_name: "Elevator 2",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  }
-                ]
-              }
-            ]
-          },
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              name: "Bar Station",
-              icons: [:red, :orange, :bus],
-              is_at_home_stop: false,
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "2",
-                  elevator_name: "Elevator 2",
-                  timeframe: %{
-                    active_period: %{
-                      "start" => "2022-01-01T00:00:00Z",
-                      "end" => "2022-01-01T22:00:00Z"
-                    },
-                    happening_now: true
-                  },
-                  header_text: nil
-                }
-              ]
-            }
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns a list page for one active elsewhere", %{
-      one_active_elsewhere_instance: instance
-    } do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                name: "Baz Station",
-                icons: [:green],
-                is_at_home_stop: false,
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "3",
-                    elevator_name: "Elevator 3",
-                    timeframe: %{
-                      active_period: %{
-                        "start" => "2022-01-01T00:00:00Z",
-                        "end" => "2022-01-01T22:00:00Z"
-                      },
-                      happening_now: true
-                    },
-                    header_text: nil
-                  }
-                ]
-              }
-            ]
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns one list and two detail pages for active on connecting lines + elsewhere", %{
-      non_home_active_instance: instance
-    } do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "2",
-                    elevator_name: "Elevator 2",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "6",
-                    elevator_name: "Elevator 6",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:red, :orange, :bus],
-                is_at_home_stop: false,
-                name: "Bar Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "3",
-                    elevator_name: "Elevator 3",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "7",
-                    elevator_name: "Elevator 7",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:green],
-                is_at_home_stop: false,
-                name: "Baz Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "4",
-                    elevator_name: "Elevator 4",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "8",
-                    elevator_name: "Elevator 8",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "9",
-                    elevator_name: "Elevator 9",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:green],
-                is_at_home_stop: false,
-                name: "Qux Station"
-              }
-            ]
-          },
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "2",
-                  elevator_name: "Elevator 2",
-                  header_text: nil,
-                  timeframe: %{
-                    active_period: %{
-                      "end" => "2022-01-01T22:00:00Z",
-                      "start" => "2022-01-01T00:00:00Z"
-                    },
-                    happening_now: true
-                  }
-                }
-              ],
-              icons: [:red, :orange, :bus],
-              is_at_home_stop: false,
-              name: "Bar Station"
-            }
-          },
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "6",
-                  elevator_name: "Elevator 6",
-                  header_text: nil,
-                  timeframe: %{
-                    active_period: %{
-                      "end" => "2022-01-01T22:00:00Z",
-                      "start" => "2022-01-01T00:00:00Z"
-                    },
-                    happening_now: true
-                  }
-                }
-              ],
-              icons: [:red, :orange, :bus],
-              is_at_home_stop: false,
-              name: "Bar Station"
-            }
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns one list page for upcoming on connecting lines + elsewhere", %{
-      non_home_upcoming_instance: instance
-    } do
-      # (We only include upcoming at home, no other upcoming closures)
-      expected_result = %{
-        pages: [%WidgetInstance.ElevatorStatus.ListPage{stations: []}]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-
-    test "returns one list page and one detail page for a mix of active/upcoming on connecting lines + elsewhere",
-         %{non_home_mixed_instance: instance} do
-      expected_result = %{
-        pages: [
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "2",
-                    elevator_name: "Elevator 2",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:red, :orange, :bus],
-                is_at_home_stop: false,
-                name: "Bar Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "3",
-                    elevator_name: "Elevator 3",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:green],
-                is_at_home_stop: false,
-                name: "Baz Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "4",
-                    elevator_name: "Elevator 4",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "9",
-                    elevator_name: "Elevator 9",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:green],
-                is_at_home_stop: false,
-                name: "Qux Station"
-              }
-            ]
-          },
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "2",
-                  elevator_name: "Elevator 2",
-                  header_text: nil,
-                  timeframe: %{
-                    active_period: %{
-                      "end" => "2022-01-01T22:00:00Z",
-                      "start" => "2022-01-01T00:00:00Z"
-                    },
-                    happening_now: true
-                  }
-                }
-              ],
-              icons: [:red, :orange, :bus],
-              is_at_home_stop: false,
-              name: "Bar Station"
-            }
-          }
-        ]
-      }
-
-      assert expected_result == WidgetInstance.serialize(instance)
-    end
-  end
-
-  describe "slot_names/1" do
-    test "returns lower_right", %{one_active_at_home_instance: instance} do
-      assert [:lower_right] == WidgetInstance.slot_names(instance)
-    end
-  end
-
-  describe "widget_type/1" do
-    test "returns elevator_status", %{one_active_at_home_instance: instance} do
-      assert :elevator_status == WidgetInstance.widget_type(instance)
-    end
-  end
-
-  describe "audio_serialize/1" do
-    test "returns map with grouped results from serialize/1", %{
-      one_active_at_home_many_active_elsewhere_instance: instance
-    } do
-      expected_result = %{
-        active_at_home_pages: [
-          %WidgetInstance.ElevatorStatus.DetailPage{
-            station: %{
-              elevator_closures: [
-                %{
-                  description: nil,
-                  alert_id: nil,
-                  elevator_id: "1",
-                  elevator_name: "Elevator 1",
-                  header_text: nil,
-                  timeframe: %{
-                    active_period: %{
-                      "end" => "2022-01-01T22:00:00Z",
-                      "start" => "2022-01-01T00:00:00Z"
-                    },
-                    happening_now: true
-                  }
-                }
-              ],
-              icons: [:red],
-              is_at_home_stop: true,
-              name: "Foo Station"
-            }
-          }
+      expected = %Serialized{
+        status: :alert,
+        header: "An elevator is closed at this station.",
+        footer_lines:
+          free_text_lines([
+            ["Test Elevator 100 is unavailable.", "Use nearby elevator 101."],
+            ["For more info, go to ", %{format: :bold, text: "mbta.com/stops/place-here"}]
+          ]),
+        footer_audio: [
+          "Test Elevator 100 is unavailable.",
+          "Use nearby elevator 101.",
+          @call_for_full_list
         ],
-        list_pages: [
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "2",
-                    elevator_name: "Elevator 2",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "6",
-                    elevator_name: "Elevator 6",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:red, :orange, :bus],
-                is_at_home_stop: false,
-                name: "Bar Station"
-              },
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "3",
-                    elevator_name: "Elevator 3",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "7",
-                    elevator_name: "Elevator 7",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:green],
-                is_at_home_stop: false,
-                name: "Baz Station"
-              }
-            ]
-          },
-          %WidgetInstance.ElevatorStatus.ListPage{
-            stations: [
-              %{
-                elevator_closures: [
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "4",
-                    elevator_name: "Elevator 4",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "8",
-                    elevator_name: "Elevator 8",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  },
-                  %{
-                    description: nil,
-                    alert_id: nil,
-                    elevator_id: "9",
-                    elevator_name: "Elevator 9",
-                    header_text: nil,
-                    timeframe: %{
-                      active_period: %{
-                        "end" => "2022-01-01T22:00:00Z",
-                        "start" => "2022-01-01T00:00:00Z"
-                      },
-                      happening_now: true
-                    }
-                  }
-                ],
-                icons: [:green],
-                is_at_home_stop: false,
-                name: "Qux Station"
-              }
-            ]
-          }
-        ],
-        upcoming_at_home_pages: [],
-        elsewhere_pages: []
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
+        alert_ids: ["alert-1"]
       }
 
-      assert expected_result == WidgetInstance.audio_serialize(instance)
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "multiple closures" do
+      # ensure lexical ordering of elevator names
+      closures = [
+        build_closure([long_name: "Test Elevator B", stop: %Stop{id: "place-here"}], %{}, "a1"),
+        # no elevator data; not considered to have redundancy
+        build_closure([long_name: "Test Elevator A", stop: %Stop{id: "place-here"}], nil, "a2")
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevators are closed at this station.",
+        callout_items: ["Test Elevator A", "Test Elevator B"],
+        footer_lines:
+          free_text_lines([
+            ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
+          ]),
+        footer_audio: [@call_for_alternate_path],
+        qr_code_url: "https://go.mbta.com/s/place-here",
+        alert_ids: ~w[a1 a2]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "includes closures with nearby redundancy at the same station" do
+      closures = [
+        # triggers the closures-here state
+        build_closure(
+          [long_name: "Test 1", stop: %Stop{id: "place-here"}],
+          [redundancy: :in_station],
+          "a1"
+        ),
+        # would not trigger the state on its own, but included because we're already in it
+        build_closure(
+          [long_name: "Test 2", stop: %Stop{id: "place-here"}],
+          [redundancy: :nearby],
+          "a2"
+        )
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevators are closed at this station.",
+        callout_items: ["Test 1", "Test 2"],
+        footer_lines:
+          free_text_lines([
+            ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
+          ]),
+        footer_audio: [@call_for_alternate_path],
+        qr_code_url: "https://go.mbta.com/s/place-here",
+        alert_ids: ~w[a1 a2]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "always includes elevators whose alternates are also closed" do
+      closures = [
+        build_closure(
+          [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
+          [alternate_ids: ["alt"], redundancy: :nearby],
+          "alert-1"
+        ),
+        build_closure(id: "alt")
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "An elevator is closed at this station.",
+        footer_lines:
+          free_text_lines([
+            ["Test Elevator 100 is unavailable."],
+            ["Find an alternate path on ", %{format: :bold, text: "mbta.com/stops/place-here"}]
+          ]),
+        footer_audio: ["Test Elevator 100 is unavailable.", @call_for_alternate_path],
+        qr_code_url: "https://go.mbta.com/a/alert-1/s/place-here",
+        alert_ids: ["alert-1"]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
   end
 
-  describe "audio_sort_key/1" do
-    test "returns [4]", %{one_active_at_home_instance: instance} do
-      assert [4] == WidgetInstance.audio_sort_key(instance)
+  describe "elevators without in-station redundancy are closed elsewhere" do
+    test "one closure" do
+      closures = [
+        build_closure(
+          [stop: %Stop{id: "place-a", name: "Station A"}],
+          [redundancy: :backtrack],
+          "alert-a"
+        ),
+        # have in-station or nearby redundancy; include in summary
+        build_closure([stop: %Stop{id: "place-b"}], redundancy: :in_station),
+        build_closure([stop: %Stop{id: "place-c"}], redundancy: :nearby)
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevator closed at Station A",
+        footer_lines:
+          free_text_lines([
+            [
+              %{format: :bold, text: "+2 other MBTA elevators are closed"},
+              "(which have in-station alternative paths).",
+              "Check your trip at",
+              %{format: :bold, text: "mbta.com/elevators"}
+            ]
+          ]),
+        footer_audio: [@call_for_full_list],
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ["alert-a"]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "multiple closures at one station" do
+      closures = [
+        build_closure([stop: %Stop{id: "place-a", name: "ABC"}], [redundancy: :shuttle], "a1"),
+        # has in-station redundancy, but another closed elevator at the same station doesn't,
+        # so "Elevators closed at ABC" already includes it and it should not be double-included
+        # in the footer summary
+        build_closure([stop: %Stop{id: "place-a", name: "ABC"}], [redundancy: :nearby], "a2")
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevators closed at ABC",
+        footer_lines:
+          free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        footer_audio: [@call_for_full_list],
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ~w[a1 a2]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "closures at multiple stations" do
+      closures = [
+        build_closure([stop: %Stop{id: "place-a", name: "A"}], [redundancy: :backtrack], "a1"),
+        build_closure([stop: %Stop{id: "place-a", name: "A"}], [redundancy: :shuttle], "a2"),
+        build_closure([stop: %Stop{id: "place-b", name: "B"}], [redundancy: :shuttle], "a3")
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevators closed at:",
+        callout_items: ["A", "B"],
+        footer_lines:
+          free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        footer_audio: [@call_for_full_list],
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ~w[a1 a2 a3]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "too many closures to list individually" do
+      closures =
+        ~w[A B C D E F]
+        |> Enum.with_index()
+        |> Enum.map(fn {id, index} ->
+          build_closure(
+            [stop: %Stop{id: "place-#{id}", name: "#{id}"}],
+            [redundancy: :backtrack],
+            "a#{index}"
+          )
+        end)
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevators closed at:",
+        callout_items: ~w[A B C D],
+        footer_lines:
+          free_text_lines([
+            [
+              "+2 other MBTA elevators are closed,",
+              %{format: :bold, text: "which have no in-station alternative paths."},
+              "Check your trip at",
+              %{format: :bold, text: "mbta.com/elevators"}
+            ]
+          ]),
+        footer_audio: [@call_for_full_list],
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ~w[a0 a1 a2 a3 a4 a5]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "always includes elevators whose alternates are also closed" do
+      closures = [
+        build_closure(
+          [stop: %Stop{id: "place-a", name: "Station A"}],
+          [alternate_ids: ["alt"], redundancy: :in_station],
+          "alert-a"
+        ),
+        build_closure([id: "alt"], redundancy: :in_station)
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevator closed at Station A",
+        footer_lines:
+          free_text_lines([
+            [
+              %{format: :bold, text: "+1 other MBTA elevator is closed"},
+              "(which has an in-station alternative path).",
+              "Check your trip at",
+              %{format: :bold, text: "mbta.com/elevators"}
+            ]
+          ]),
+        footer_audio: [@call_for_full_list],
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ["alert-a"]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "abbreviates specific long station names" do
+      closures = [
+        build_closure([stop: %Stop{id: "place-masta", name: "Massachusetts Avenue"}], nil, "a1")
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevator closed at Mass Ave",
+        footer_lines:
+          free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        footer_audio: [@call_for_full_list],
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ["a1"]
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "sorts multiple stations first by relevance and then by name" do
+      closures = [
+        build_closure([stop: %Stop{id: "place-b", name: "Beta"}], nil, "a1"),
+        build_closure([stop: %Stop{id: "place-a", name: "Alpha"}], nil, "a2"),
+        build_closure([stop: %Stop{id: "place-rel", name: "Relevant"}], nil, "a3")
+      ]
+
+      expected = %Serialized{
+        status: :alert,
+        header: "Elevators closed at:",
+        callout_items: ["Relevant", "Alpha", "Beta"],
+        footer_lines:
+          free_text_lines([["Check your trip at", %{format: :bold, text: "mbta.com/elevators"}]]),
+        footer_audio: [@call_for_full_list],
+        qr_code_url: "https://mbta.com/elevators",
+        alert_ids: ~w[a2 a1 a3]
+      }
+
+      assert Widget.serialize(%Widget{
+               closures: closures,
+               home_station_id: "place-here",
+               relevant_station_ids: ~w[place-rel]
+             }) == expected
     end
   end
 
-  describe "audio_valid_candidate?/1" do
-    test "returns true", %{one_active_at_home_instance: instance} do
-      assert WidgetInstance.audio_valid_candidate?(instance)
+  describe "elevators with in-station redundancy are closed elsewhere" do
+    test "multiple closures" do
+      closures = [
+        build_closure([stop: %Stop{id: "place-a"}], redundancy: :in_station),
+        build_closure([stop: %Stop{id: "place-b"}], redundancy: :nearby)
+      ]
+
+      expected = %Serialized{
+        status: :ok,
+        header: "All elevators at this station are working.",
+        footer_lines:
+          free_text_lines([
+            [
+              %{format: :bold, text: "+2 other MBTA elevators are closed"},
+              "(which have in-station alternative paths).",
+              "Check your trip at",
+              %{format: :bold, text: "mbta.com/elevators"}
+            ]
+          ]),
+        footer_audio: [@call_for_full_list],
+        qr_code_url: "https://mbta.com/elevators"
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
     end
   end
 
-  describe "audio_view/1" do
-    test "returns ElevatorStatusView", %{one_active_at_home_instance: instance} do
-      assert ScreensWeb.V2.Audio.ElevatorStatusView == WidgetInstance.audio_view(instance)
+  describe "all elevators are working or have nearby redundancy" do
+    test "with closures" do
+      closures = [build_closure([], redundancy: :nearby), build_closure([], redundancy: :nearby)]
+
+      expected = %Serialized{
+        status: :ok,
+        header: "All MBTA elevators are working",
+        header_size: :large,
+        footer_lines: free_text_lines([["or have a backup within 20 feet."]]),
+        cta_type: :app,
+        qr_code_url: "https://mbta.com/go-access"
+      }
+
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+               expected
+    end
+
+    test "without closures" do
+      expected = %Serialized{
+        status: :ok,
+        header: "All MBTA elevators are working.",
+        header_size: :large,
+        footer_lines: [],
+        cta_type: :app,
+        qr_code_url: "https://mbta.com/go-access"
+      }
+
+      assert Widget.serialize(%Widget{closures: [], home_station_id: "place-here"}) == expected
     end
   end
 end
