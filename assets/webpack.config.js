@@ -71,7 +71,7 @@ module.exports = (env, argv) => {
                 "@babel/preset-typescript",
               ],
               // Removing comments is needed b/c of babel-ignore comments in react-router
-              // See: https://github.com/remix-run/react-router/issues/12751 
+              // See: https://github.com/remix-run/react-router/issues/12751
               comments: false,
               // only needed as long as we are transpiling dependencies
               sourceType: "unambiguous",
