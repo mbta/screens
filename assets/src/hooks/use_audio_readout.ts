@@ -2,6 +2,7 @@ import { AudioConfig } from "Components/screen_container";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import { fetchDatasetValue } from "Util/dataset";
 import { isFramed, sendToInspector } from "Util/inspector";
+import { isDup } from "Util/outfront";
 
 const readoutPath = (id: string) => `/v2/audio/${id}/readout.mp3`;
 const volumePath = (id: string) => `/v2/audio/${id}/volume`;
@@ -52,8 +53,9 @@ const useAudioReadout = ({ id, config }: UseAudioReadoutArgs): void => {
 
   const intervalPeriodMs = readoutIntervalMinutes * 60000;
 
-  const refreshRateOffsetMs =
-    parseInt(fetchDatasetValue("refreshRateOffset"), 10) * 1000;
+  const refreshRateOffsetMs = isDup()
+    ? 0
+    : parseInt(fetchDatasetValue("refreshRateOffset"), 10) * 1000;
 
   const intervalOffsetMs = refreshRateOffsetMs + intervalOffsetSeconds * 1000;
 

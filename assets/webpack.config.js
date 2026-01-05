@@ -34,9 +34,6 @@ const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 // ship to screens, because many libraries no longer support the old browser
 // versions we have to support. This should be reevaluated with future shifts
 // in the screens browser landscape.
-// As noted in webpack documentation, core-js will cause errors if transpiled
-// https://webpack.js.org/loaders/babel-loader/#exclude-libraries-that-should-not-be-transpiled
-const BABEL_EXCLUDED_DEPS_PATTERN = new RegExp("node_modules/core-js");
 
 module.exports = (env, argv) => {
   const isOutfrontPackage = env.package === "dup";
@@ -55,7 +52,9 @@ module.exports = (env, argv) => {
       rules: [
         {
           test: /\.m?[jt]sx?$/,
-          exclude: BABEL_EXCLUDED_DEPS_PATTERN,
+          // As noted in webpack documentation, core-js will cause errors if transpiled
+          // https://webpack.js.org/loaders/babel-loader/#exclude-libraries-that-should-not-be-transpiled
+          exclude: /node_modules\/core-js/,
           use: {
             loader: "babel-loader",
             options: {
@@ -63,7 +62,6 @@ module.exports = (env, argv) => {
                 [
                   "@babel/preset-env",
                   {
-                    targets: { chrome: 51 },
                     useBuiltIns: "usage",
                     corejs: require("core-js/package.json").version,
                   },
@@ -72,69 +70,11 @@ module.exports = (env, argv) => {
                 ["@babel/preset-react", { runtime: "automatic" }],
                 "@babel/preset-typescript",
               ],
-              // plugins: ["transform-es2015-template-literal"],
+              // Removing comments is needed b/c of babel-ignore comments in react-router
+              // See: https://github.com/remix-run/react-router/issues/12751 
+              comments: false,
               // only needed as long as we are transpiling dependencies
               sourceType: "unambiguous",
-            },
-          },
-        },
-        {
-          test: /\.(js|mjs)$/,
-          include: /node_modules\/react-router/,
-          use: {
-            loader: "babel-loader",
-            options: {
-              presets: [
-                [
-                  "@babel/preset-env",
-                  {
-                    targets: { chrome: "51" },
-                    modules: false,
-                  },
-                ],
-              ],
-              plugins: [
-                // Custom plugin to transform dynamic imports to require()
-                // Transforms: import(module) -> Promise.resolve(require(module))
-                // There are webpackIgnore comments at imports in react-router to
-                // prevent webpack from code-splitting there.
-                // However, it also prevents dynamic imports from being transpiled
-                // This is needed for DUPs, which use Chrome 51.
-                function (babel) {
-                  const t = babel.types;
-                  return {
-                    name: "transform-dynamic-import-to-require",
-                    visitor: {
-                      CallExpression(path) {
-                        if (
-                          path.node.callee &&
-                          path.node.callee.type === "Import"
-                        ) {
-                          const arg = path.node.arguments[0];
-                          path.replaceWith(
-                            t.callExpression(
-                              t.memberExpression(
-                                t.identifier("Promise"),
-                                t.identifier("resolve"),
-                              ),
-                              [
-                                arg
-                                  ? t.callExpression(t.identifier("require"), [
-                                      arg,
-                                    ])
-                                  : t.callExpression(
-                                      t.identifier("require"),
-                                      [],
-                                    ),
-                              ],
-                            ),
-                          );
-                        }
-                      },
-                    },
-                  };
-                },
-              ],
             },
           },
         },
