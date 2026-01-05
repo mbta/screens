@@ -20,7 +20,7 @@ interface PreFareSingleScreenAlertProps {
   location: string;
   cause: string;
   remedy: string;
-  show_alternate_route_text: string;
+  show_alternate_route_text: boolean;
   routes: EnrichedRoute[];
   unaffected_routes?: EnrichedRoute[];
   endpoints: [string, string];
@@ -44,7 +44,7 @@ interface EnrichedRoute {
 interface StandardLayoutProps {
   issue: string;
   remedy: string;
-  show_alternate_route_text: string;
+  show_alternate_route_text: boolean;
   effect: string;
   location: string | null;
   disruptionDiagram?: DisruptionDiagramData;
@@ -91,7 +91,7 @@ interface DownstreamLayoutProps {
   endpoints: [string, string];
   effect: string;
   remedy: string;
-  show_alternate_route_text: string;
+  show_alternate_route_text: boolean;
   disruptionDiagram?: DisruptionDiagramData;
 }
 
@@ -255,7 +255,7 @@ const DownstreamIssueSection: ComponentType<DownstreamIssueSectionProps> = ({
 interface RemedySectionProps {
   effect: string;
   remedy: string | null;
-  show_alternate_route_text: string | null;
+  show_alternate_route_text: boolean;
   contentTextSize: string;
 }
 const RemedySection: ComponentType<RemedySectionProps> = ({

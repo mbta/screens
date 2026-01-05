@@ -10,7 +10,7 @@ interface ReconAlertProps {
   location: string | FreeTextType;
   cause: string;
   remedy: string;
-  show_alternate_route_text: string;
+  show_alternate_route_text: boolean;
   routes: any[]; // shouldn't be "any"
   effect: string;
   updated_at: string;
