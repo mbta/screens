@@ -1,6 +1,8 @@
 @use "CSS/colors";
 @use "CSS/lcd/section_header";
 
+// Note: These styles are closely tied to some display logic in the component, so they may need to change together
+
 .subway-status {
   width: 1080px;
   height: 640px;

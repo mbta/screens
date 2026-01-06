@@ -187,7 +187,6 @@ export const useSubwayStatusTextResizer = (
     fittingStep === FittingStep.PerAlertEffect && isDelays
       ? "Delays"
       : alert.status;
-  const isLastStep = fittingStep === steps.at(-1);
 
-  return { ref, location, status, isLastStep };
+  return { ref, location, status };
 };
