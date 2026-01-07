@@ -83,6 +83,8 @@ console.log = function (...msgs) {
     .join(" ");
 
   // add the log to the html element.
-  html_logger.innerHTML = `<div class="line">${Counter.next()} ${text} </div>${html_logger.innerHTML}`;
+  if (html_logger) {
+    html_logger.innerHTML = `<div class="line">${Counter.next()} ${text} </div>${html_logger.innerHTML}`;
+  }
 };
 ```
