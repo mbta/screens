@@ -334,6 +334,7 @@ defmodule Screens.Stops.Subway do
     |> Enum.flat_map(fn branch ->
       affected_stops_on_route(informed_entities, branch)
     end)
+    |> Enum.uniq()
   end
 
   def affected_stops_on_route(informed_entities, route_id) do
@@ -351,6 +352,8 @@ defmodule Screens.Stops.Subway do
     if Enum.empty?(ie_stops) do
       nil
     else
+      # ie_stops can include non-boarding stop_ids (location_type 2 or 3)
+      # Finding union with stop_sequence ensures we remove these
       stop_sequence
       |> Enum.filter(fn {id, _} -> Enum.member?(ie_stops, id) end)
     end
