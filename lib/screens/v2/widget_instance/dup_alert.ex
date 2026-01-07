@@ -10,13 +10,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
   alias ScreensConfig.{Departures, Screen, Screen.Dup}
 
-  @enforce_keys [
-    :screen,
-    :alert,
-    :location_context,
-    :rotation_index,
-    :stop_name
-  ]
+  @enforce_keys [:screen, :alert, :location_context, :rotation_index, :stop_name]
   defstruct @enforce_keys
 
   @type t :: %__MODULE__{
@@ -154,9 +148,13 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   end
 
   @spec full_station_closure?(t()) :: boolean()
-  def full_station_closure?(t) do
-    Alert.station_closure_type(t.alert, child_stops_for_affected_line(t)) != :partial_closure
+  def full_station_closure?(%__MODULE__{alert: %Alert{effect: effect}} = t)
+      when effect in [:station_closure] do
+    # We only consider partial station closures for the `station_closure` effect
+    Alert.station_closure_type(t.alert, child_stops_for_affected_line(t)) == :full_station_closure
   end
+
+  def full_station_closure?(t), do: true
 
   @spec child_stops_for_affected_line(t()) :: [Stop.t()]
   def child_stops_for_affected_line(t) do

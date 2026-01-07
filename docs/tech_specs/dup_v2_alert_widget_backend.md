@@ -22,7 +22,7 @@ Converting the DUP app from v1 to v2 requires a different approach to alerts and
 
 [guide-level-explanation]: #guide-level-explanation
 
-The DUP alerts widget needs to resolve a scenario specific to DUP screens: the screen "rotates" between three separate pages. When an applicable[^1] alert exists, each rotation has specific logic that determines which "type" of alert widget to display: `banner`[^2] or `full screen`[^3].
+The DUP alerts widget needs to resolve a scenario specific to DUP screens: the screen "rotates" between three separate pages. When an applicable[^1] alert exists, each rotation has specific logic that determines which "type" of alert widget to display: `banner`[^2] or `full_screen`[^3].
 
 ## Config
 
@@ -130,7 +130,7 @@ Two serialize functions will be created: `serialize_banner/1` and `serialize_ful
 }
 ```
 
-The value of `alert_text` is the same as for `serialze_banner/1`. `remedy.icon` is `:shuttle` if `alert.effect == :shuttle` and `nil` otherwise. `remedy.text` uses the following mapping:
+The value of `alert_text` is the same as for `serialize_banner/1`. `remedy.icon` is `:shuttle` if `alert.effect == :shuttle` and `nil` otherwise. `remedy.text` uses the following mapping:
 
 ```
 @alert_remedy_text_mapping %{

@@ -155,7 +155,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
           no_trains ++ cause_description(t.alert)
         end
 
-      # Only consider up to 2 routes - max number a DUP departures section should contain
+      # Only consider up to 2 routes - the alert widget only displays subway alerts
+      # and there are no stations served by more than 2
       {nil, [line_pill1, line_pill2]} ->
         ["No", line_pill1, "or", line_pill2, "trains"]
 
