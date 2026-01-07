@@ -70,7 +70,7 @@ module.exports = (env, argv) => {
                 ["@babel/preset-react", { runtime: "automatic" }],
                 "@babel/preset-typescript",
               ],
-              // Removing comments is needed b/c of babel-ignore comments in react-router
+              // Removing comments is needed b/c of webpackIgnore comments in react-router
               // See: https://github.com/remix-run/react-router/issues/12751
               comments: false,
               // only needed as long as we are transpiling dependencies
