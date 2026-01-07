@@ -30,9 +30,10 @@ defmodule Screens.V2.RDS do
             headsign: String.t(),
             state: NoDepartures.t()
           }
-          | :fetch_error
   @enforce_keys ~w[stop line headsign state]a
   defstruct @enforce_keys
+
+  @type section_t :: {:ok, [t()]} | :error
 
   defmodule NoDepartures do
     @moduledoc """
@@ -60,12 +61,12 @@ defmodule Screens.V2.RDS do
 
   ⚠️ Enforces that every section's query contains at least one ID in `stop_ids`.
   """
-  @spec get(Departures.t()) :: [[t()]]
-  @spec get(Departures.t(), DateTime.t()) :: [[t()]]
+  @spec get(Departures.t()) :: [section_t()]
+  @spec get(Departures.t(), DateTime.t()) :: [section_t()]
   def get(%Departures{sections: sections}, now \\ DateTime.utc_now()),
     do: Enum.map(sections, &from_section(&1, now))
 
-  @spec from_section(Section.t(), DateTime.t()) :: [t()]
+  @spec from_section(Section.t(), DateTime.t()) :: section_t()
   defp from_section(
          %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids} = params}},
          now
@@ -82,42 +83,39 @@ defmodule Screens.V2.RDS do
            params
            |> Map.from_struct()
            |> @departure.fetch(now: now) do
-      (tuples_from_departures(departures, now) ++
-         tuples_from_patterns(canonical_patterns, child_stops))
-      |> Enum.uniq()
-      |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
-        %__MODULE__{
-          stop: stop,
-          line: line,
-          headsign: headsign,
-          state: %NoDepartures{headways: @headways.get(stop_id, now)}
-        }
-      end)
-    else
-      _ -> :fetch_error
+      section_departures =
+        (tuples_from_departures(departures, now) ++
+           tuples_from_patterns(canonical_patterns, child_stops))
+        |> Enum.uniq()
+        |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
+          %__MODULE__{
+            stop: stop,
+            line: line,
+            headsign: headsign,
+            state: %NoDepartures{headways: @headways.get(stop_id, now)}
+          }
+        end)
+
+      {:ok, section_departures}
     end
   end
 
   @spec fetch_child_stops([Stop.id()]) :: {:ok, [Stop.id()]} | :error
   defp fetch_child_stops(stop_ids) do
-    case @stop.fetch(%{ids: stop_ids}, _include_related? = true) do
-      {:ok, stops} ->
-        stops_by_id = Map.new(stops, fn %Stop{id: id} = stop -> {id, stop} end)
+    with {:ok, stops} <- @stop.fetch(%{ids: stop_ids}, _include_related? = true) do
+      stops_by_id = Map.new(stops, fn %Stop{id: id} = stop -> {id, stop} end)
 
-        child_stop_ids =
-          stop_ids
-          |> Enum.map(&stops_by_id[&1])
-          |> Enum.flat_map(fn
-            %Stop{location_type: 0} = stop -> [stop]
-            %Stop{child_stops: stops} when is_list(stops) -> stops
-            # stop ID in screen configuration does not exist; drop it
-            nil -> []
-          end)
+      child_stop_ids =
+        stop_ids
+        |> Enum.map(&stops_by_id[&1])
+        |> Enum.flat_map(fn
+          %Stop{location_type: 0} = stop -> [stop]
+          %Stop{child_stops: stops} when is_list(stops) -> stops
+          # stop ID in screen configuration does not exist; drop it
+          nil -> []
+        end)
 
-        {:ok, child_stop_ids}
-
-      _ ->
-        :error
+      {:ok, child_stop_ids}
     end
   end
 
