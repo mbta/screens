@@ -154,7 +154,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     Alert.station_closure_type(t.alert, child_stops_for_affected_line(t)) == :full_station_closure
   end
 
-  def full_station_closure?(t), do: true
+  def full_station_closure?(_t), do: true
 
   @spec child_stops_for_affected_line(t()) :: [Stop.t()]
   def child_stops_for_affected_line(t) do
