@@ -101,7 +101,7 @@ defmodule Screens.V2.RDS do
 
   defp tuples_from_departures(departures, now) do
     departures
-    |> Enum.reject(&hide_departure?(&1, now))
+    |> Enum.filter(&departure_creates_destination?(&1, now))
     |> Enum.map(fn d ->
       {Departure.stop(d), Departure.route(d).line, Departure.representative_headsign(d)}
     end)
@@ -120,8 +120,8 @@ defmodule Screens.V2.RDS do
     )
   end
 
-  defp hide_departure?(d, now) do
-    Departure.stop_type(d) == :last_stop ||
-      DateTime.diff(Departure.time(d), now, :minute) > @max_departure_minutes
+  defp departure_creates_destination?(d, now) do
+    Departure.stop_type(d) != :last_stop &&
+      DateTime.diff(Departure.time(d), now, :minute) <= @max_departure_minutes
   end
 end
