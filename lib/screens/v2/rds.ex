@@ -72,8 +72,11 @@ defmodule Screens.V2.RDS do
     {:ok, typical_patterns} = params |> Map.put(:typicality, 1) |> @route_pattern.fetch()
     {:ok, departures} = @departure.fetch(params, now: now)
 
-    (tuples_from_departures(departures, now) ++
-       tuples_from_patterns(typical_patterns, child_stops))
+    {arrival_only_departures, regular_departures} =
+      Enum.split_with(departures, &(Departure.stop_type(&1) == :last_stop))
+
+    (tuples_from_departures(regular_departures, now) ++
+       tuples_from_patterns(typical_patterns, child_stops, arrival_only_departures))
     |> Enum.uniq()
     |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
       %__MODULE__{
@@ -101,27 +104,29 @@ defmodule Screens.V2.RDS do
 
   defp tuples_from_departures(departures, now) do
     departures
-    |> Enum.filter(&departure_creates_destination?(&1, now))
+    |> Enum.filter(&(DateTime.diff(Departure.time(&1), now, :minute) <= @max_departure_minutes))
     |> Enum.map(fn d ->
       {Departure.stop(d), Departure.route(d).line, Departure.representative_headsign(d)}
     end)
   end
 
-  defp tuples_from_patterns(route_patterns, child_stops) do
+  defp tuples_from_patterns(route_patterns, child_stops, arrival_only_departures) do
+    tuples_with_only_arrivals =
+      arrival_only_departures
+      |> Enum.map(fn d ->
+        {Departure.stop(d).id, Departure.route(d).line.id, Departure.representative_headsign(d)}
+      end)
+
     stop_ids = child_stops |> List.flatten() |> Enum.map(& &1.id) |> MapSet.new()
 
-    Enum.flat_map(
-      route_patterns,
-      fn %RoutePattern{headsign: headsign, route: %Route{line: line}, stops: stops} ->
-        stops
-        |> Enum.filter(&(&1.id in stop_ids))
-        |> Enum.map(fn stop -> {stop, line, headsign} end)
-      end
-    )
-  end
-
-  defp departure_creates_destination?(d, now) do
-    Departure.stop_type(d) != :last_stop &&
-      DateTime.diff(Departure.time(d), now, :minute) <= @max_departure_minutes
+    route_patterns
+    |> Enum.flat_map(fn %RoutePattern{headsign: headsign, route: %Route{line: line}, stops: stops} ->
+      stops
+      |> Enum.filter(
+        &(&1.id in stop_ids &&
+            not Enum.member?(tuples_with_only_arrivals, {&1.id, line.id, headsign}))
+      )
+      |> Enum.map(fn stop -> {stop, line, headsign} end)
+    end)
   end
 end

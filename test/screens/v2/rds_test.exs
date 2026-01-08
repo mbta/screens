@@ -102,7 +102,7 @@ defmodule Screens.V2.RDSTest do
              ]
     end
 
-    test "filters out the drop off only departures at the current stop id, but keeps the route pattern ones" do
+    test "filters out the drop off only departures at the current stop id and route pattern with only arrivals" do
       now = ~U[2024-10-11 12:00:00Z]
       stop_ids = ~w[s0 s1]
 
@@ -153,6 +153,13 @@ defmodule Screens.V2.RDSTest do
              headsign: "h2",
              route: %Route{id: "r2", line: %Line{id: "l2"}},
              stops: [%Stop{id: "s1"}],
+             typicality: 1
+           },
+           %RoutePattern{
+             id: "p1",
+             headsign: "other3",
+             route: %Route{id: "r3", line: %Line{id: "l3"}},
+             stops: [%Stop{id: "s3"}],
              typicality: 1
            }
          ]}
