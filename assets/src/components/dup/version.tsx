@@ -1,1 +1,1 @@
-export const DUP_VERSION = "25.12.23.1";
+export const DUP_VERSION = "26.01.07.1";
