@@ -484,10 +484,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
         vehicle_status == :stopped_at and second_diff < 90 and stop_id == vehicle_stop_id ->
           %{type: :text, text: "BRD"}
 
-        second_diff < 30 and stop_type == :first_stop ->
+        second_diff < 30 and stop_type == :first_stop and route_type != :ferry ->
           %{type: :text, text: "BRD"}
 
-        second_diff < 30 ->
+        second_diff < 30 and route_type != :ferry ->
           %{type: :text, text: "ARR"}
 
         minute_diff < 60 and route_type not in [:rail, :ferry] ->
