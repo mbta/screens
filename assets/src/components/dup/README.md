@@ -37,7 +37,7 @@
 
 ## Working with Outfront
 
-Once you've created the client app packages, you'll need to send them to Outfront to test and deploy.
+Once you've created the client app packages, you'll need to send them to Outfront to test and deploy. Make sure to remove any changes that you made to `dup.tsx` and `use_api_response.tsx` for local testing before generating packages for Outfront.
 
 For detailed instructions on this process, go to [this Notion doc](https://www.notion.so/mbta-downtown-crossing/Deploying-DUP-Package-Updates-120f5d8d11ea805fa219f214c1633293).
 
@@ -83,6 +83,8 @@ console.log = function (...msgs) {
     .join(" ");
 
   // add the log to the html element.
-  html_logger.innerHTML = `<div class="line">${Counter.next()} ${text} </div>${html_logger.innerHTML}`;
+  if (html_logger) {
+    html_logger.innerHTML = `<div class="line">${Counter.next()} ${text} </div>${html_logger.innerHTML}`;
+  }
 };
 ```

@@ -6,7 +6,7 @@ import { getDatasetValue } from "Util/dataset";
  *
  * Use this for DUP-specific logic.
  */
-export const isDup = () => /^file:.*dup-app.*/.test(location.href);
+export const isDup = () => /.*dup-app.*/.test(location.href);
 
 type RotationIndex = "0" | "1" | "2";
 const isRotationIndex = (value: any): value is RotationIndex => {
