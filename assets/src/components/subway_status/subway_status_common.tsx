@@ -13,8 +13,9 @@ export interface SubwayStatusData {
 }
 
 export type Section = ContractedSection | ExtendedSection;
+export type SectionType = "contracted" | "extended";
 
-export interface ContractedSection {
+interface ContractedSection {
   type: "contracted";
   alerts: [Alert] | [Alert, Alert];
 }
@@ -41,6 +42,7 @@ interface AlertLocationMap {
 export interface SubwayStatusPill {
   color: LineColor;
   branches?: Branch[];
+  text?: string;
 }
 
 export interface MultiPill extends SubwayStatusPill {
@@ -72,7 +74,7 @@ enum Branch {
 export const isMultiPill = (pill?: SubwayStatusPill): pill is MultiPill =>
   (pill?.branches?.length ?? 0) > 0;
 
-export const isAlertLocationMap = (
+const isAlertLocationMap = (
   location: AlertLocation,
 ): location is AlertLocationMap =>
   location !== null && typeof location === "object";
@@ -125,7 +127,7 @@ const clearLocationForAllGLBranchesAlert = (
  * Uniquely identifies an alert line so that if anything changes, the text-
  * resizing logic resets.
  */
-export const getAlertID = (
+const getAlertID = (
   alert: Alert,
   statusType: Section["type"],
   index: number = 0,
@@ -145,51 +147,44 @@ export const isContractedWith1Alert = (
   isContracted(section) && section.alerts.length === 1;
 
 // Ordered from "largest" to "smallest"
-export enum FittingStep {
+enum FittingStep {
   FullSize = "FullSize",
   Abbrev = "Abbrev",
   PerAlertEffect = "PerAlertEffect",
 }
 
-export const useSubwayStatusTextResizer = (
-  steps: FittingStep[],
-  id: string,
-  status: string,
-) => {
+export const useSubwayStatusTextResizer = (alert: Alert, type: SectionType) => {
+  const id = getAlertID(alert, type);
+  const steps =
+    type === "contracted"
+      ? [FittingStep.FullSize, FittingStep.Abbrev, FittingStep.PerAlertEffect]
+      : [FittingStep.FullSize, FittingStep.Abbrev];
   const { ref, step: fittingStep } = useAutoSize(steps, id);
 
-  let [abbrev, truncateStatus, replaceLocationWithUrl] = [false, false, false];
-  switch (fittingStep) {
-    case FittingStep.FullSize:
-      break;
-    case FittingStep.Abbrev:
-      abbrev = true;
-      break;
-    case FittingStep.PerAlertEffect:
-      abbrev = true;
-      if (/Stops? Skipped/.test(status)) {
-        truncateStatus = false;
-        replaceLocationWithUrl = true;
-      } else {
-        switch (firstWord(status)) {
-          case "Delays":
-            truncateStatus = true;
-            break;
-          case "Suspension":
-            replaceLocationWithUrl = true;
-            break;
-          case "Shuttle":
-          default:
-            break;
-        }
-      }
-  }
+  const isStopsSkipped = /Stops? Skipped/.test(alert.status);
+  const isSuspension = firstWord(alert.status) === "Suspension";
+  const isDelays = firstWord(alert.status) === "Delays";
 
-  return {
-    ref,
-    abbrev,
-    truncateStatus,
-    replaceLocationWithUrl,
-    fittingStep,
-  };
+  const location = (() => {
+    if (
+      fittingStep === FittingStep.PerAlertEffect &&
+      (isStopsSkipped || isSuspension)
+    ) {
+      return "mbta.com/alerts";
+    } else if (isAlertLocationMap(alert.location)) {
+      return fittingStep === FittingStep.Abbrev ||
+        fittingStep === FittingStep.PerAlertEffect
+        ? alert.location.abbrev
+        : alert.location.full;
+    } else {
+      return alert.location;
+    }
+  })();
+
+  const status =
+    fittingStep === FittingStep.PerAlertEffect && isDelays
+      ? "Delays"
+      : alert.status;
+
+  return { ref, location, status };
 };
