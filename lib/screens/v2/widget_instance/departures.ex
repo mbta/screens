@@ -468,6 +468,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
        ),
        do: %{time: %{type: :overnight}}
 
+  defp serialize_time(%Departure{prediction: nil} = departure, _screen, now) do
+    # We only display scheduled departures for CR and ferry routes
+    # These should not show BRD/ARR, since the schedules are not real-time
+    departure_time = Departure.time(departure)
+
+    %{time: serialize_timestamp(departure_time, now)}
+  end
+
   defp serialize_time(departure, _screen, now) do
     %Stop{id: stop_id} = Departure.stop(departure)
     departure_time = Departure.time(departure)
@@ -484,10 +492,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
         vehicle_status == :stopped_at and second_diff < 90 and stop_id == vehicle_stop_id ->
           %{type: :text, text: "BRD"}
 
-        second_diff < 30 and stop_type == :first_stop and route_type != :ferry ->
+        second_diff < 30 and stop_type == :first_stop ->
           %{type: :text, text: "BRD"}
 
-        second_diff < 30 and route_type != :ferry ->
+        second_diff < 30 ->
           %{type: :text, text: "ARR"}
 
         minute_diff < 60 and route_type not in [:rail, :ferry] ->

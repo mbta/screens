@@ -903,7 +903,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
-    test "does not show BRD or ARR for ferry", %{dup_screen: screen} do
+    test "does not show BRD or ARR for scheduled departures", %{dup_screen: screen} do
       serialized = [
         %{
           id: nil,
