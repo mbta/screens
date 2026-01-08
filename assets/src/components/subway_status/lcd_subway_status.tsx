@@ -5,6 +5,7 @@ import {
   Alert,
   ExtendedSection,
   Section,
+  SectionType,
   SubwayStatusData,
   SubwayStatusPill,
   adjustAlertForContractedStatus,
@@ -53,7 +54,7 @@ const NORMAL_STATUS = "Normal Service";
 
 interface BasicAlertProps {
   alert: Alert;
-  type: "contracted" | "extended";
+  type: SectionType;
 }
 
 const BasicAlert = ({ alert, type }: BasicAlertProps) => {

@@ -13,6 +13,7 @@ export interface SubwayStatusData {
 }
 
 export type Section = ContractedSection | ExtendedSection;
+export type SectionType = "contracted" | "extended";
 
 interface ContractedSection {
   type: "contracted";
@@ -152,10 +153,7 @@ enum FittingStep {
   PerAlertEffect = "PerAlertEffect",
 }
 
-export const useSubwayStatusTextResizer = (
-  alert: Alert,
-  type: "contracted" | "extended",
-) => {
+export const useSubwayStatusTextResizer = (alert: Alert, type: SectionType) => {
   const id = getAlertID(alert, type);
   const steps =
     type === "contracted"
