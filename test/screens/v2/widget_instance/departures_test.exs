@@ -674,7 +674,19 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         app_params: nil
       }
 
-      %{bus_eink_screen: bus_eink_screen, bus_shelter_screen: bus_shelter_screen}
+      dup_screen = %Screen{
+        app_id: :dup_v2,
+        vendor: :outfront,
+        device_id: "TEST",
+        name: "TEST",
+        app_params: nil
+      }
+
+      %{
+        bus_eink_screen: bus_eink_screen,
+        bus_shelter_screen: bus_shelter_screen,
+        dup_screen: dup_screen
+      }
     end
 
     test "identifies BRD from vehicle status", %{bus_shelter_screen: screen} do
@@ -889,6 +901,29 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert [%{time: %{type: :timestamp}}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
+    end
+
+    test "does not show BRD or ARR for scheduled departures", %{dup_screen: screen} do
+      serialized = [
+        %{
+          id: nil,
+          crowding: nil,
+          time: %{type: :timestamp, am_pm: :pm, hour: 7, minute: 0, show_am_pm: false}
+        }
+      ]
+
+      now = ~U[2020-01-01T00:00:00Z]
+
+      departure = %Departure{
+        schedule: %Schedule{
+          arrival_time: nil,
+          departure_time: ~U[2020-01-01T00:00:15Z],
+          route: %Route{type: :ferry},
+          stop: %Stop{}
+        }
+      }
+
+      assert serialized == Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
     test "correctly serializes timestamps", %{bus_shelter_screen: screen} do
