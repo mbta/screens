@@ -1,0 +1,15 @@
+@use "CSS/colors";
+@use "CSS/lcd/subway_status";
+
+.subway-status {
+  margin: 26px 28px;
+}
+
+.subway-status-footer {
+  background-color: colors.$warm-neutral-80;
+}
+
+.subway-status-footer__link {
+  font-weight: unset;
+  color: colors.$cool-black-15;
+}

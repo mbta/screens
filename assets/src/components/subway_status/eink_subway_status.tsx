@@ -1,19 +1,23 @@
-import { type ComponentType } from "react";
-import { classWithModifier } from "Util/utils";
+import { type ComponentType, forwardRef } from "react";
+import { classWithModifier, firstWord } from "Util/utils";
 import { STRING_TO_SVG } from "Util/svg_utils";
 import {
   Alert,
+  ContractedSection,
   MultiPill,
   LineColor,
   Section,
   SubwayStatusData,
   SubwayStatusPill,
   adjustAlertForContractedStatus,
+  getAlertID,
+  isAlertLocationMap,
   isContracted,
   isContractedWith1Alert,
   isExtended,
   isMultiPill,
   useSubwayStatusTextResizer,
+  FittingStep,
 } from "./subway_status_common";
 
 ////////////////
@@ -59,59 +63,115 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
       <div className="subway-status_route-pill-container">
         <SubwayStatusRoutePill routePill={routePill} />
       </div>
-      <div className="subway-status_status">
-        {alerts.map((alert, index) => {
-          const adjustedAlert = adjustAlertForContractedStatus(alert);
-          return (
-            <BasicAlert
-              alert={adjustedAlert}
-              showInlineBranches={showInlineBranches}
-              key={index}
-            />
-          );
-        })}
-      </div>
+      <Status alerts={alerts} showInlineBranches={showInlineBranches} />
       <div className="subway-status_status_rule" />
     </div>
   );
 };
 
-const NORMAL_STATUS = "Normal Service";
-
-interface BasicAlertProps {
-  alert: Alert;
+type StatusProps = Pick<ContractedSection, "alerts"> & {
   showInlineBranches: boolean;
-}
+};
 
-const BasicAlert = ({ alert, showInlineBranches }: BasicAlertProps) => {
-  const { ref, status, location } = useSubwayStatusTextResizer(
-    alert,
-    "contracted",
-  );
-  const textContainerClassName = classWithModifier(
-    "subway-status_alert_text-container",
-    status === NORMAL_STATUS && "normal-service",
-  );
-
+const Status: ComponentType<StatusProps> = ({ alerts, showInlineBranches }) => {
   return (
-    <div className="subway-status_alert" ref={ref}>
-      {showInlineBranches && alert.route_pill?.branches && (
-        <div className="subway-status_alert_route-pill-container">
-          <SubwayStatusRoutePill
-            routePill={alert.route_pill}
-            showInlineBranches
+    <div className="subway-status_status">
+      {alerts.map((alert, index) => {
+        const adjustedAlert = adjustAlertForContractedStatus(alert);
+        const id = getAlertID(adjustedAlert, "contracted", index);
+        return (
+          <AlertRow
+            {...adjustedAlert}
+            id={id}
+            key={id}
+            showInlineBranches={showInlineBranches}
           />
-        </div>
-      )}
-      <div className={textContainerClassName}>
-        {status && <span>{status}</span>}
-        {location && (
-          <span className="subway-status_alert_location-text">{location}</span>
-        )}
-      </div>
+        );
+      })}
     </div>
   );
 };
+
+interface AlertRowProps extends Alert {
+  id: string;
+  showInlineBranches: boolean;
+}
+
+const ALERTS_URL = "mbta.com/alerts";
+const ALERT_FITTING_STEPS = [
+  FittingStep.FullSize,
+  FittingStep.Abbrev,
+  FittingStep.PerAlertEffect,
+];
+
+const AlertRow: ComponentType<AlertRowProps> = ({
+  route_pill: routePill,
+  status,
+  location,
+  id,
+  showInlineBranches,
+}) => {
+  const { ref, abbrev, truncateStatus, replaceLocationWithUrl } =
+    useSubwayStatusTextResizer(ALERT_FITTING_STEPS, id, status);
+
+  let locationText: string | null;
+  if (replaceLocationWithUrl) {
+    locationText = ALERTS_URL;
+  } else if (isAlertLocationMap(location)) {
+    locationText = abbrev ? location.abbrev : location.full;
+  } else {
+    locationText = location;
+  }
+
+  if (truncateStatus) {
+    status = firstWord(status);
+  }
+
+  return (
+    <BasicAlert
+      routePill={routePill}
+      status={status}
+      location={locationText}
+      showInlineBranches={showInlineBranches}
+      ref={ref}
+    />
+  );
+};
+
+const NORMAL_STATUS = "Normal Service";
+
+interface BasicAlertProps extends Omit<Alert, "route_pill"> {
+  routePill?: Alert["route_pill"];
+  location: string | null;
+  showInlineBranches: boolean;
+}
+
+const BasicAlert = forwardRef<HTMLDivElement, BasicAlertProps>(
+  ({ routePill, status, location, showInlineBranches }, ref) => {
+    const textContainerClassName = classWithModifier(
+      "subway-status_alert_text-container",
+      status === NORMAL_STATUS && "normal-service",
+    );
+
+    return (
+      <div className="subway-status_alert" ref={ref}>
+        {showInlineBranches && routePill?.branches && (
+          <div className="subway-status_alert_route-pill-container">
+            <SubwayStatusRoutePill routePill={routePill} showInlineBranches />
+          </div>
+        )}
+        <div className={textContainerClassName}>
+          {status && <span>{status}</span>}
+          {location && (
+            <span className="subway-status_alert_location-text">
+              {location}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  },
+);
 
 const SubwayStatusRoutePill: ComponentType<{
   routePill: SubwayStatusPill;
