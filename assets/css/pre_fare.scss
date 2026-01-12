@@ -10,7 +10,6 @@
 @use "lcd/normal_header";
 @use "lcd/page_load_no_data";
 @use "lcd/route_pill";
-@use "lcd/subway_status";
 
 @use "pre_fare/alert-banner";
 @use "pre_fare/body/normal" as *;
@@ -38,6 +37,7 @@
 @use "pre_fare/screen/takeover" as *;
 @use "pre_fare/screen_container";
 @use "pre_fare/simulation" as *;
+@use "pre_fare/subway_status";
 @use "pre_fare/viewport";
 @use "pre_fare/text" as *;
 
