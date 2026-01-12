@@ -55,7 +55,7 @@
 
   &--extended {
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
   }
 }
 
@@ -72,11 +72,12 @@
 
 .subway-status__location-text {
   font-size: 34px;
-  line-height: 40px;
+  line-height: 42px;
 }
 
 .subway-status__route-pill {
   display: inline-flex;
+  overflow: hidden;
 
   &--blue {
     --pill-color: #{colors.$line-blue};
