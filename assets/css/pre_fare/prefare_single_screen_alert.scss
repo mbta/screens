@@ -1,16 +1,5 @@
 @use "CSS/colors";
 
-@mixin large-text {
-  font-size: 112px;
-  font-weight: 700;
-  line-height: 120px;
-}
-
-@mixin small-text {
-  font-size: 35px;
-  line-height: 42px;
-}
-
 .pre-fare-alert__page {
   display: flex;
   flex-direction: column;
@@ -53,7 +42,6 @@
     flex-direction: column;
     height: 100%;
     background-color: colors.$warm-neutral-90;
-    box-shadow: 0 10px 20px 0 rgb(23 31 38 / 25%);
 
     &--no-banner {
       border-radius: 4px;
@@ -93,18 +81,18 @@
   }
 
   .alert-card__remedy {
-    margin-bottom: 32px;
+    margin-bottom: 48px;
 
     &__text {
       align-self: center;
-      font-size: 74px;
-      font-weight: 600;
+
+      &--alternate-route {
+        font-weight: 400;
+      }
     }
   }
 
   .alert-card__issue__location {
-    @include small-text;
-
     margin-top: 40px;
   }
 
@@ -114,33 +102,19 @@
   }
 
   .alert-card__icon {
-    min-width: 124px;
-    height: 124px;
+    min-width: 98px;
+    height: 98px;
     margin-right: 45px;
     color: colors.$cool-black-15;
+
+    &--large {
+      min-width: 128px;
+      height: 128px;
+    }
   }
 
   .alert-card__content-block__text-sections {
     max-height: 772px;
-  }
-
-  .alert-card__content-block__text {
-    font-weight: 700;
-
-    &--large {
-      @include large-text;
-    }
-
-    &--medium {
-      font-size: 86.4px;
-      line-height: 95px;
-    }
-  }
-
-  .alert-card__content-block--downstream {
-    .alert-card__content-block__text {
-      line-height: 108px;
-    }
   }
 
   .alert-card__fallback__icon {
@@ -151,9 +125,6 @@
 
   .alert-card__fallback__issue-text {
     margin-bottom: 54px;
-    font-size: 88px;
-    font-weight: 700;
-    line-height: 105.6px;
   }
 
   .alert-card__fallback__alert-text {
@@ -166,15 +137,14 @@
 
   .alert-card__body__accessibility-info {
     &--text {
+      display: flex;
       margin-top: 22px;
-
-      @include small-text;
     }
   }
 
   .alert-card__isa-icon {
     height: 40px;
-    margin: auto 45px 0 auto;
+    margin-left: 16px;
   }
 
   .alert-card__footer {
@@ -185,7 +155,7 @@
     justify-content: right;
     height: 84px;
     padding: 20px 60px;
-    font-size: 32px;
+    color: colors.$cool-black-30;
     background: colors.$warm-neutral-80;
     border-radius: 0 0 4px 4px;
   }
