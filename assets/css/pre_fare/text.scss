@@ -11,27 +11,40 @@ h6 {
 
 // Text styles from the Screenkit Library
 
-h1 {
+.header-1,
+.header-2,
+.header-3,
+.header-4,
+.header-5 {
+  font-weight: bold;
+}
+
+h1,
+.header-1 {
   font-size: 203px;
   line-height: 1;
 }
 
-h2 {
+h2,
+.header-2 {
   font-size: 130px;
   line-height: 134px;
 }
 
-h3 {
+h3,
+.header-3 {
   font-size: 104px;
   line-height: 116px;
 }
 
-h4 {
+h4,
+.header-4 {
   font-size: 83px;
   line-height: 100px;
 }
 
-h5 {
+h5,
+.header-5 {
   font-size: 66px;
   line-height: 83px;
 }
@@ -53,7 +66,7 @@ h5 {
 
 .body-4 {
   font-size: 34px;
-  line-height: 49px;
+  line-height: 45px;
 }
 
 .caption-1 {

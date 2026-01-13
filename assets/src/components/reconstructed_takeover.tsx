@@ -10,9 +10,11 @@ interface ReconAlertProps {
   location: string | FreeTextType;
   cause: string;
   remedy: string;
+  show_alternate_route_text: boolean;
   routes: any[]; // shouldn't be "any"
   effect: string;
   updated_at: string;
+  end_time?: string;
   disruption_diagram?: DisruptionDiagramData;
   urgent: boolean;
 }
@@ -24,8 +26,10 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
     issue,
     location,
     remedy,
+    show_alternate_route_text,
     routes,
     updated_at,
+    end_time,
     disruption_diagram,
   } = alert;
 
@@ -44,8 +48,8 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                 className="alert-card__body__icon"
                 src={imagePath("no-service-black.svg")}
               />
-              <div className="alert-card__body__issue">{issue}</div>
-              <div className="alert-card__body__location ">
+              <h1 className="alert-card__body__issue">{issue}</h1>
+              <div className="alert-card__body__location body-2">
                 {typeof location === "string" ? (
                   location
                 ) : (
@@ -62,12 +66,16 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
               )}
             </div>
           </div>
-          <div className="alert-card__footer">
+          <div className="alert-card__footer body-4">
             <div className="alert-card__footer__cause">
               {cause && `Cause: ${cause}`}
             </div>
             <div className="alert-card__footer__updated-at">
-              Updated <span className="bold">{updated_at}</span>
+              {end_time ? (
+                <span className="bold">Through {end_time}</span>
+              ) : (
+                <span>Updated {updated_at}</span>
+              )}
             </div>
           </div>
         </div>
@@ -87,22 +95,33 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                   className="alert-card__body__shuttle-icon"
                   src={imagePath("bus-black.svg")}
                 />
-                <div className="alert-card__body__shuttle-remedy">{remedy}</div>
+                <h1 className="alert-card__body__shuttle-remedy">{remedy}</h1>
                 <div className="alert-card__body__accessibility-info">
+                  <div className="alert-card__body__accessibility-info--text body-2">
+                    All shuttle buses are accessible
+                  </div>
                   <img
                     className="alert-card__body__isa-icon"
                     src={imagePath("ISA_Blue.svg")}
                   />
-                  <div className="alert-card__body__accessibility-info--text">
-                    All shuttle buses are accessible
-                  </div>
                 </div>
               </>
             ) : (
-              <div className="alert-card__body__remedy">{remedy}</div>
+              <h3 className="alert-card__body__remedy">
+                {show_alternate_route_text ? (
+                  <>
+                    <span className="alert-card__body__remedy--alternate-route">
+                      Find alternate route at{" "}
+                    </span>
+                    mbta.com/alerts
+                  </>
+                ) : (
+                  remedy
+                )}
+              </h3>
             )}
           </div>
-          <div className="alert-card__footer">
+          <div className="alert-card__footer body-4">
             <div className="alert-card__footer__alerts-url">
               mbta.com/alerts
             </div>

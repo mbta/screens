@@ -42,7 +42,6 @@ const AUDIO_SCREEN_TYPES = new Set([
 
 const SCREEN_TYPE_VARIANTS = {
   dup_v2: ["new_departures"],
-  pre_fare_v2: ["new_elevators"],
 };
 
 const MAX_SSML_BILLED_CHARS = 3000;
@@ -370,7 +369,7 @@ const DataControls: ComponentType<{
   const [variant, setVariant] = useState<string | null>(null);
 
   useReceiveMessage((message) => {
-    if (message.type == "data_refreshed") {
+    if (message.type === "data_refreshed") {
       setDataTimestamp(message.timestamp);
       setDataSecondsOld(0);
     }
@@ -405,7 +404,7 @@ const DataControls: ComponentType<{
             Refresh
           </button>
 
-          {isRefreshEnabled && dataSecondsOld != null && (
+          {isRefreshEnabled && dataSecondsOld !== null && (
             <span>⏱️ {dataSecondsOld} seconds ago</span>
           )}
         </div>
@@ -465,7 +464,7 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
   );
 
   useReceiveMessage((message) => {
-    if (message.type == "audio_config") setConfig(message.config);
+    if (message.type === "audio_config") setConfig(message.config);
   });
 
   const audioPath = AUDIO_SCREEN_TYPES.has(screen.config.app_id)

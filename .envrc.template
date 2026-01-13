@@ -13,9 +13,3 @@ export API_V3_URL="https://api-v3.mbta.com"
 # export MERCURY_API_KEY=
 
 export SECRET_KEY_BASE="local_secret_key_base_at_least_64_bytes_________________________________"
-
-# # Should point to the Enhanced JSON feeds. Default values are provided, only
-# # set these if you need something different.
-# # https://github.com/mbta/gtfs-documentation/blob/master/reference/gtfs-realtime.md#enhanced-json-feeds
-# export TRIP_UPDATES_URL=
-# export VEHICLE_POSITIONS_URL=

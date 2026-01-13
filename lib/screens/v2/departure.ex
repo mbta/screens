@@ -54,6 +54,11 @@ defmodule Screens.V2.Departure do
     end
   end
 
+  defp fetch_schedules(%{route_type: []}, _opts) do
+    # Hardcode empty list return to avoid doing an unecessary API call
+    {:ok, []}
+  end
+
   defp fetch_schedules(params, opts) do
     fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
     fetch_fn.(params)

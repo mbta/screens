@@ -327,4 +327,35 @@ defmodule Screens.Stops.Subway do
       |> Enum.all?(&stop_on_route?(&1, stop_sequence))
     end
   end
+
+  @spec affected_stops_on_route([InformedEntity.t()], Route.id()) :: [station()] | nil
+  def affected_stops_on_route(informed_entities, "Green") do
+    @green_line_branches
+    |> Enum.flat_map(fn branch ->
+      affected_stops_on_route(informed_entities, branch)
+    end)
+    |> Enum.uniq()
+  end
+
+  def affected_stops_on_route(informed_entities, route_id) do
+    stop_sequences = Map.get(@route_stop_sequences, route_id)
+    Enum.map(stop_sequences, &stops_in_alert(&1, informed_entities, route_id))
+  end
+
+  @spec stops_in_alert([station()], [InformedEntity.t()], Route.id()) :: [station()]
+  defp stops_in_alert(stop_sequence, informed_entities, route_id) do
+    ie_stops =
+      informed_entities
+      |> Enum.filter(&(&1.route == route_id and !is_nil(&1.stop)))
+      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
+
+    if Enum.empty?(ie_stops) do
+      nil
+    else
+      # ie_stops can include non-boarding stop_ids (location_type 2 or 3)
+      # Finding union with stop_sequence ensures we remove these
+      stop_sequence
+      |> Enum.filter(fn {id, _} -> Enum.member?(ie_stops, id) end)
+    end
+  end
 end

@@ -27,7 +27,7 @@ export const toFoldedSection = (section: Section): FoldedSection => {
         (directionCounts[1] || 0) > (directionCounts[0] || 0) ? 0 : 1;
 
       const foldedSection: FoldedSection =
-        section.grouping_type == "destination"
+        section.grouping_type === "destination"
           ? {
               ...baseSection,
               grouping_type: "destination",
@@ -74,11 +74,11 @@ export const trimSections = (sections: FoldedSection[]): FoldedSection[] => {
 // Determine how many above-the-fold departure "items" a section contains, for
 // the purposes of deciding which sections should be trimmed first.
 const sectionLength = (section: FoldedSection): number => {
-  if (section.type == "folded_section") {
+  if (section.type === "folded_section") {
     return section.rows.aboveFold.reduce(
       (sum, row) =>
         sum +
-        (row.type == "departure_row" ? row.times_with_crowding.length : 1),
+        (row.type === "departure_row" ? row.times_with_crowding.length : 1),
       0,
     );
   } else {
@@ -111,8 +111,11 @@ const trimOneBy = (
   condition: (length: number, layout: Layout) => boolean,
 ): boolean => {
   for (const { section, length } of sections) {
-    if (section.type == "folded_section" && condition(length, section.layout)) {
-      if (section.grouping_type == "destination") {
+    if (
+      section.type === "folded_section" &&
+      condition(length, section.layout)
+    ) {
+      if (section.grouping_type === "destination") {
         if (trimSectionForDestinationGrouping(section)) return true;
       } else {
         if (trimSection(section)) return true;
@@ -126,7 +129,7 @@ const trimOneBy = (
 // Destructively shift the last above-the-fold departure time in a section to
 // below-the-fold, if possible. Returns `true` if the section was trimmed.
 const trimSection = (section: FoldedSection): boolean => {
-  if (section.type == "folded_section") {
+  if (section.type === "folded_section") {
     const {
       rows: { aboveFold, belowFold },
     } = section;
@@ -134,7 +137,7 @@ const trimSection = (section: FoldedSection): boolean => {
     for (let aboveIndex = aboveFold.length - 1; aboveIndex >= 0; aboveIndex--) {
       const row = aboveFold[aboveIndex];
 
-      if (row.type == "departure_row") {
+      if (row.type === "departure_row") {
         const trimmedTimeWithCrowding = _.last(row.times_with_crowding);
 
         if (row.times_with_crowding.length > 1) {
@@ -145,7 +148,7 @@ const trimSection = (section: FoldedSection): boolean => {
           aboveFold.splice(aboveIndex, 1);
         }
 
-        if (trimmedTimeWithCrowding != null) {
+        if (trimmedTimeWithCrowding) {
           belowFold.unshift({
             ...row,
             id: _.uniqueId(`${row.id}_`),
@@ -176,22 +179,22 @@ const trimSectionForDestinationGrouping = (
 
   for (let aboveIndex = aboveFold.length - 1; aboveIndex >= 0; aboveIndex--) {
     const row = aboveFold[aboveIndex];
-    if (row.type != "departure_row") continue;
+    if (row.type !== "departure_row") continue;
 
-    if (row.direction_id == 0) {
+    if (row.direction_id === 0) {
       directionZeroCount++;
-      if (lastDirectionZeroRowIndex == -1) {
+      if (lastDirectionZeroRowIndex === -1) {
         lastDirectionZeroRowIndex = aboveIndex;
       }
     } else {
       directionOneCount++;
-      if (lastDirectionOneRowIndex == -1) {
+      if (lastDirectionOneRowIndex === -1) {
         lastDirectionOneRowIndex = aboveIndex;
       }
     }
   }
 
-  if (directionZeroCount == 0 && directionOneCount == 0) {
+  if (directionZeroCount === 0 && directionOneCount === 0) {
     return false;
   }
 
@@ -206,7 +209,7 @@ const trimSectionForDestinationGrouping = (
   }
 
   const indexToTrim =
-    directionTrimPriority == 0
+    directionTrimPriority === 0
       ? lastDirectionZeroRowIndex
       : lastDirectionOneRowIndex;
 

@@ -107,8 +107,12 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   end
 
   defp relevant_screen_ids do
-    Screens.Config.Cache.screen_ids(fn {_id, %Screen{hidden_from_screenplay: hidden}} ->
-      not hidden
+    Screens.Config.Cache.screen_ids(fn {_id,
+                                        %Screen{
+                                          disabled: disabled,
+                                          hidden_from_screenplay: hidden
+                                        }} ->
+      not disabled and not hidden
     end)
   end
 

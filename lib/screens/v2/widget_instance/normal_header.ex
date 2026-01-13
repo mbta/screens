@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   defstruct screen: nil,
             icon: nil,
+            audio_text: nil,
             text: nil,
             time: nil,
             variant: nil
@@ -14,6 +15,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
   @type icon :: :logo | :green_b | :green_c | :green_d | :green_e
   @type t :: %__MODULE__{
           screen: ScreensConfig.Screen.t(),
+          audio_text: String.t() | nil,
           icon: icon | nil,
           text: String.t(),
           time: DateTime.t(),
@@ -49,7 +51,10 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
     %{text: text, branch: branch}
   end
 
-  def audio_serialize(%__MODULE__{text: text}), do: %{text: text}
+  # Set audio text to the visual text when it's not explicitly provided
+  def audio_serialize(%__MODULE__{audio_text: nil, text: text}), do: %{text: text}
+
+  def audio_serialize(%__MODULE__{audio_text: audio_text}), do: %{text: audio_text}
 
   defp showing_destination?(%__MODULE__{
          screen: %Screen{app_params: %_app{header: %Destination{}}}

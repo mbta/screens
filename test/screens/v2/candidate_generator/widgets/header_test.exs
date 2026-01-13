@@ -17,8 +17,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.HeaderTest do
     do: struct(Screen, app_params: struct(app, params))
 
   describe "instances/2" do
-    test "generates a header with stop name and time" do
-      screen = build_screen(Screen.BusShelter, header: %Header.StopName{stop_name: "foo"})
+    test "generates a header with text, audio_text, and time" do
+      screen =
+        build_screen(Screen.BusShelter,
+          header: %Header.StopName{stop_name: "foo", read_as: "foo_audio"}
+        )
+
+      assert Generator.instances(screen, @now) ==
+               [%NormalHeader{screen: screen, audio_text: "foo_audio", text: "foo", time: @now}]
+    end
+
+    test "generates a header without audio_text when read_as not supplied" do
+      screen =
+        build_screen(Screen.BusShelter,
+          header: %Header.StopName{stop_name: "foo"}
+        )
 
       assert Generator.instances(screen, @now) ==
                [%NormalHeader{screen: screen, text: "foo", time: @now}]

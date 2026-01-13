@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.Endpoints
   alias Screens.Alerts.InformedEntity
   alias Screens.Stops.Subway
 
@@ -40,7 +41,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
         get_direction(informed_entities, route_id)
 
       true ->
-        get_endpoints(informed_entities, route_id)
+        Endpoints.get(informed_entities, route_id)
     end
   end
 
@@ -64,36 +65,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
     %{full: direction, abbrev: direction}
   end
 
-  # credo:disable-for-next-line
-  # TODO: get_endpoints is a common function; could be consolidated
-  def get_endpoints(informed_entities, route_id) do
-    case Subway.stop_sequence_containing_informed_entities(informed_entities, route_id) do
-      nil ->
-        nil
-
-      stop_sequence ->
-        {min_index, max_index} =
-          informed_entities
-          |> Enum.filter(&Subway.stop_on_route?(&1.stop, stop_sequence))
-          |> Enum.map(&Subway.stop_index_for_informed_entity(&1, stop_sequence))
-          |> Enum.min_max()
-
-        {_, {min_full_name, min_abbreviated_name}} = Enum.at(stop_sequence, min_index)
-        {_, {max_full_name, max_abbreviated_name}} = Enum.at(stop_sequence, max_index)
-
-        if min_full_name == max_full_name and min_abbreviated_name == max_abbreviated_name do
-          %{
-            full: "#{min_full_name}",
-            abbrev: "#{min_abbreviated_name}"
-          }
-        else
-          %{
-            full: "#{min_full_name} ↔ #{max_full_name}",
-            abbrev: "#{min_abbreviated_name} ↔ #{max_abbreviated_name}"
-          }
-        end
-    end
-  end
+  def route_directions, do: @route_directions
 
   ####################################
   # Station Closure Helper Functions #

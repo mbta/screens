@@ -94,7 +94,7 @@ const doFailureBuffer = (
   setApiResponse: Dispatch<SetStateAction<ApiResponse>>,
   apiResponse: ApiResponse = FAILURE_RESPONSE,
 ) => {
-  if (lastSuccess == null) {
+  if (lastSuccess === null) {
     // We haven't had a successful request since initial page load.
     // Show the "no data" state.
     setApiResponse(FAILURE_RESPONSE);
@@ -198,7 +198,7 @@ const useBaseApiResponse = ({
 
       const response = parseRawResponse(json);
 
-      if (response.state == "failure") {
+      if (response.state === "failure") {
         report("info", "Request failed.", { json });
         doFailureBuffer(lastSuccess, setApiResponse, response);
       } else {
@@ -271,7 +271,7 @@ const useInspectorRateOverride = (): number | null => {
   const [override, setOverride] = useState<number | null>(null);
 
   useReceiveFromInspector((message) => {
-    if (message.type == "set_refresh_rate") setOverride(message.ms);
+    if (message.type === "set_refresh_rate") setOverride(message.ms);
   });
 
   return override;
@@ -281,7 +281,7 @@ const useInspectorVariant = (): string | null => {
   const [variant, setVariant] = useState<string | null>(null);
 
   useReceiveFromInspector((message) => {
-    if (message.type == "set_data_variant") setVariant(message.variant);
+    if (message.type === "set_data_variant") setVariant(message.variant);
   });
 
   return variant;
@@ -292,7 +292,7 @@ const useInspectorControls = (
   lastSuccess: number | null,
 ): void => {
   useReceiveFromInspector((message) => {
-    if (message.type == "refresh_data") fetchData();
+    if (message.type === "refresh_data") fetchData();
   });
 
   useEffect(() => {

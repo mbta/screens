@@ -78,8 +78,8 @@ const NormalSection: ComponentType<FoldedSection> = ({
               {...row}
               key={row.id}
               isBeforeDirectionSplit={
-                groupingType == "destination" &&
-                index == rowToAddDivider(aboveFold)
+                groupingType === "destination" &&
+                index === rowToAddDivider(aboveFold)
               }
             />
           );

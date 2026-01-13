@@ -29,6 +29,7 @@ export default [
   {
     settings: { react: { version: "detect" } },
     rules: {
+      eqeqeq: "error",
       "no-empty": ["error", { allowEmptyCatch: true }],
       "react/display-name": "warn",
       "react/prop-types": "warn",

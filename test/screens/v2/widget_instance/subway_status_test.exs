@@ -1688,6 +1688,66 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
 
       assert expected == WidgetInstance.serialize(instance)
     end
+
+    test "finds correct endpoints for GL suspension across multiple branches" do
+      all_gl_routes = ["Green-B", "Green-C", "Green-D", "Green-E"]
+
+      stops_closed_all_lines = [
+        "place-gover",
+        "place-pktrm",
+        "place-boyls",
+        "place-armnl",
+        "place-coecl"
+      ]
+
+      entities_at_common_stops =
+        for route <- all_gl_routes,
+            stop <- stops_closed_all_lines do
+          %{route: route, stop: stop, direction_id: nil}
+        end
+
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              severity: 9,
+              informed_entities:
+                [
+                  %{stop: "place-hymnl", route: "Green-B", direction_id: nil},
+                  %{stop: "place-amory", route: "Green-B", direction_id: nil},
+                  %{stop: "place-hymnl", route: "Green-C", direction_id: nil},
+                  %{stop: "place-kencl", route: "Green-C", direction_id: nil},
+                  %{stop: "place-hymnl", route: "Green-D", direction_id: nil},
+                  %{stop: "place-haecl", route: "Green-D", direction_id: nil},
+                  %{stop: "place-kencl", route: "Green-D", direction_id: nil},
+                  %{stop: "place-north", route: "Green-D", direction_id: nil},
+                  %{stop: "place-brmnl", route: "Green-E", direction_id: nil},
+                  %{stop: "place-prmnl", route: "Green-E", direction_id: nil},
+                  %{stop: "place-north", route: "Green-E", direction_id: nil},
+                  %{stop: "place-nuniv", route: "Green-E", direction_id: nil}
+                ] ++ entities_at_common_stops
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{
+              route_pill: @gl_pill,
+              status: "Suspension",
+              location: %{
+                full: "North Station ↔ Westbound Stops",
+                abbrev: "North Sta ↔ Westbound"
+              }
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
   end
 
   describe "slot_names/1" do

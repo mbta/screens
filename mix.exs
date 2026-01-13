@@ -64,7 +64,7 @@ defmodule Screens.MixProject do
       {:guardian, "~> 2.4.0"},
       {:hackney, "~> 1.25.0"},
       {:hackney_telemetry, "~> 0.2.0"},
-      {:httpoison, "~> 2.2.1"},
+      {:httpoison, "~> 2.3.0"},
       {:jason, "~> 1.0"},
       {:memcachex, "~> 0.5.5"},
       {:nebulex, "~> 2.6"},
@@ -88,7 +88,8 @@ defmodule Screens.MixProject do
       {:timex, "~> 3.6"},
       {:tzdata, "~> 1.1"},
       {:ueberauth, "~> 0.10"},
-      {:ueberauth_oidcc, "~> 0.4"}
+      {:ueberauth_oidcc, "~> 0.4"},
+      {:unrooted_polytree, "0.1.1"}
     ] ++ dev_deps() ++ prod_deps()
   end
 
