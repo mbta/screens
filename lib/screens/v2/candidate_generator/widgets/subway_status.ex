@@ -42,8 +42,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
     informed_parent_stations = Alert.informed_parent_stations(alert)
 
     all_platforms_at_informed_stations =
-      informed_parent_stations
-      |> Enum.flat_map(&fetch_subway_platforms_for_stop_fn.(&1.stop))
+      Enum.flat_map(informed_parent_stations, &fetch_subway_platforms_for_stop_fn.(&1.stop))
 
     %SubwayStatus.SubwayStatusAlert{
       alert: alert,

@@ -149,7 +149,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   @spec partial_station_closure?(t()) :: boolean()
   def partial_station_closure?(%__MODULE__{alert: %Alert{effect: effect}} = t)
-      when effect in [:station_closure] do
+      when effect == :station_closure do
     # We only consider and handle partial station closures for the `station_closure` effect
     Alert.station_closure_type(t.alert, child_stops_for_affected_line(t)) != :full_station_closure
   end
