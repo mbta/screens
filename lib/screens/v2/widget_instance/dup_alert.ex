@@ -1,10 +1,11 @@
 defmodule Screens.V2.WidgetInstance.DupAlert do
   @moduledoc """
-  A widget that displays an alert (either full-screen or partial) on a DUP screen.
+  A widget that displays an alert (either full-screen or partial-screen banner) on a DUP screen.
   """
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.DupAlert.Serialize
   alias ScreensConfig.{Departures, Screen, Screen.Dup}
@@ -30,7 +31,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     # Giving full_screen the highest priority so it will always show over overnight.
     case alert_layout(t) do
       :full_screen -> [1]
-      :partial -> [1, 2]
+      :banner -> [1, 2]
     end
   end
 
@@ -38,7 +39,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   def serialize(t) do
     case alert_layout(t) do
       :full_screen -> Serialize.serialize_full_screen(t)
-      :partial -> Serialize.serialize_partial(t)
+      :banner -> Serialize.serialize_banner(t)
     end
   end
 
@@ -47,18 +48,18 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     base_slot_name =
       case alert_layout(t) do
         :full_screen -> "full_rotation"
-        :partial -> "bottom_pane"
+        :banner -> "bottom_pane"
       end
 
     # Returns e.g. [:full_rotation_zero], [:bottom_pane_one], ...
     [:"#{base_slot_name}_#{t.rotation_index}"]
   end
 
-  @spec widget_type(t()) :: :takeover_alert | :partial_alert
+  @spec widget_type(t()) :: :takeover_alert | :banner_alert
   def widget_type(%__MODULE__{} = t) do
     case alert_layout(t) do
       :full_screen -> :takeover_alert
-      :partial -> :partial_alert
+      :banner -> :banner_alert
     end
   end
 
@@ -67,11 +68,11 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
 
   # Determine the desired layout for this alert. Follows the rules documented here:
   # https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-17cf5d8d11ea80399a7fe3c4f13a511f
-  @spec alert_layout(t()) :: :full_screen | :partial
+  @spec alert_layout(t()) :: :full_screen | :banner
   defp alert_layout(%__MODULE__{rotation_index: :zero} = t), do: rotation_zero_layout(t)
 
   defp alert_layout(%__MODULE__{rotation_index: :one} = t) do
-    if eliminated_service_type(t) == :none, do: :partial, else: :full_screen
+    if eliminated_service_type(t) == :none, do: :banner, else: :full_screen
   end
 
   # When no secondary departures are configured, departures in this rotation will be the same as
@@ -84,10 +85,10 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
        ),
        do: rotation_zero_layout(t)
 
-  defp alert_layout(%__MODULE__{rotation_index: :two}), do: :partial
+  defp alert_layout(%__MODULE__{rotation_index: :two}), do: :banner
 
   defp rotation_zero_layout(t) do
-    if eliminated_service_type(t) == :all, do: :full_screen, else: :partial
+    if eliminated_service_type(t) == :all, do: :full_screen, else: :banner
   end
 
   # Determine whether this alert "eliminates service" entirely, partially, or not at all, at the
@@ -107,7 +108,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     # as the number we show departures for, that means all service is eliminated. Otherwise, only
     # some is (either we're at a boundary and there's still service in one direction, or we're at
     # a transfer station and the alert only affects one line).
-    if LocalizedAlert.location(t) == :inside and
+    if LocalizedAlert.location(t) == :inside and not partial_station_closure?(t) and
          length(get_affected_lines(t)) == length(primary_sections),
        do: :all,
        else: :some
@@ -143,6 +144,23 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
       "Green-" <> _branch -> "Green"
       other_subway_route -> other_subway_route
     end)
+    |> Enum.uniq()
+  end
+
+  @spec partial_station_closure?(t()) :: boolean()
+  def partial_station_closure?(%__MODULE__{alert: %Alert{effect: effect}} = t)
+      when effect == :station_closure do
+    # We only consider and handle partial station closures for the `station_closure` effect
+    Alert.station_closure_type(t.alert, child_stops_for_affected_line(t)) != :full_station_closure
+  end
+
+  def partial_station_closure?(_t), do: false
+
+  @spec child_stops_for_affected_line(t()) :: [Stop.t()]
+  def child_stops_for_affected_line(t) do
+    t
+    |> LocalizedAlert.informed_routes_at_home_stop()
+    |> Enum.flat_map(&Map.get(t.location_context.child_stops_at_station, &1, []))
     |> Enum.uniq()
   end
 

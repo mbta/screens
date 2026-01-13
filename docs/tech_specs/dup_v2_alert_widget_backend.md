@@ -22,7 +22,7 @@ Converting the DUP app from v1 to v2 requires a different approach to alerts and
 
 [guide-level-explanation]: #guide-level-explanation
 
-The DUP alerts widget needs to resolve a scenario specific to DUP screens: the screen "rotates" between three separate pages. When an applicable[^1] alert exists, each rotation has specific logic that determines which "type" of alert widget to display: `partial`[^2] or `takeover`[^3].
+The DUP alerts widget needs to resolve a scenario specific to DUP screens: the screen "rotates" between three separate pages. When an applicable[^1] alert exists, each rotation has specific logic that determines which "type" of alert widget to display: `banner`[^2] or `full_screen`[^3].
 
 ## Config
 
@@ -101,9 +101,9 @@ A function `get_region_and_headsign(alert, parent_stop_id)` will be created base
 
 `slot_names/1` will need to use different logic for each rotation. See spec for details.
 
-Two serialize functions will be created: `serialize_partial_alert/1` and `serialize_takeover_alert/1`.
+Two serialize functions will be created: `serialize_banner/1` and `serialize_full_screen/1`.
 
-`serialize_partial_alert/1` returns the following map:
+`serialize_banner/1` returns the following map:
 
 ```
 %{
@@ -114,7 +114,7 @@ Two serialize functions will be created: `serialize_partial_alert/1` and `serial
 
 `alert_text.text` is either `No ${headsign} trains` or `No ${line} service` depending on the value of `headsign` in the return of `get_region_and_headsign/2`.
 
-`serialize_takeover_alert/1` returns the following map:
+`serialize_full_screen/1` returns the following map:
 
 ```
 %{
@@ -130,7 +130,7 @@ Two serialize functions will be created: `serialize_partial_alert/1` and `serial
 }
 ```
 
-The value of `alert_text` is the same as for `serialize_partial_alert/1`. `remedy.icon` is `:shuttle` if `alert.effect == :shuttle` and `nil` otherwise. `remedy.text` uses the following mapping:
+The value of `alert_text` is the same as for `serialize_banner/1`. `remedy.icon` is `:shuttle` if `alert.effect == :shuttle` and `nil` otherwise. `remedy.text` uses the following mapping:
 
 ```
 @alert_remedy_text_mapping %{
@@ -147,22 +147,22 @@ The value of `alert_text` is the same as for `serialize_partial_alert/1`. `remed
 
 ## Two separate widgets
 
-For this approach, there would be two separate `WidgetInstance`s: one for `partial`, one for `takeover`. The `CandidateGenerator` would use similar logic to what is laid out above. The key difference is instead `WidgetInstance` making the decision on alert type, the `CandidateGenerator` would hold that logic and create a `WidgetInstance` object based on the result.
+For this approach, there would be two separate `WidgetInstance`s: one for `banner`, one for `full_screen`. The `CandidateGenerator` would use similar logic to what is laid out above. The key difference is instead `WidgetInstance` making the decision on alert type, the `CandidateGenerator` would hold that logic and create a `WidgetInstance` object based on the result.
 
 ### Reason for rejection
 
 This approach would require giving the `CandidateGenerator` business logic needed to determine type. This pushes back on some framework fundamentals that are laid out in our [architecture doc](/docs/architecture/widget_framework.md). It is best that we give the `CandidateGenerator` the responsibility of fetching data needed for our widgets and not have it make decisions on how a widget should work.
 
 [^1]: An applicable alert is an alert with an effect of `delay` with `severity` >= 5, `shuttle`, `suspension`, or `station_closure` that affects the `route_ids` and `stop_ids` from the `alerts` section of the DUP config.
-[^2]: A `partial` alert takes up only a small amount of the screen to allow for other departures to remain visible.
-[^3]: A `takeover` alert displays over the whole screen including the departures.
+[^2]: A `banner` alert takes up only a small amount of the screen to allow for other departures to remain visible.
+[^3]: A `full_screen` alert displays over the whole screen including the departures.
 [^4]: Priority for DUP alerts is pick a shuttle alert if present. Otherwise, pick the first in the list.
 
 # Addendums
 
 2.7.23: The DUP spec has been adjusted, so the takeover alert serialization function was adjusted. 
 
-`serialize_takeover_alert/1` returns:
+`serialize_full_screen/1` returns:
 
 ```
 %{

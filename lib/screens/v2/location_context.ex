@@ -15,6 +15,7 @@ defmodule Screens.LocationContext do
             tagged_stop_sequences: %{},
             upstream_stops: MapSet.new(),
             downstream_stops: MapSet.new(),
+            child_stops_at_station: MapSet.new(),
             routes: [],
             alert_route_types: []
 
@@ -24,6 +25,7 @@ defmodule Screens.LocationContext do
           tagged_stop_sequences: %{Route.id() => list(list(Stop.id()))},
           upstream_stops: MapSet.t(Stop.id()),
           downstream_stops: MapSet.t(Stop.id()),
+          child_stops_at_station: %{Route.id() => [Stop.t()]},
           # Routes serving the stops
           routes: list(%{route_id: Route.id(), active?: boolean()}),
           # Route types we care about for the alerts of this screen type / place
@@ -51,7 +53,8 @@ defmodule Screens.LocationContext do
          {:ok, routes_at_stops} <- routes_with_active(stop_ids, alert_route_types, now),
          route_ids_at_stop = Enum.map(routes_at_stops, & &1.route_id),
          {:ok, tagged_stop_sequences} <-
-           fetch_tagged_stop_sequences(app, stop_ids, route_ids_at_stop, alert_route_types) do
+           fetch_tagged_stop_sequences(app, stop_ids, route_ids_at_stop, alert_route_types),
+         {:ok, child_stops} <- child_stops_at_station(app, route_ids_at_stop, stop_ids) do
       stop_sequences = untag_stop_sequences(tagged_stop_sequences)
 
       {
@@ -62,6 +65,7 @@ defmodule Screens.LocationContext do
               [single] -> single
               _multiple -> nil
             end,
+          child_stops_at_station: child_stops,
           tagged_stop_sequences: tagged_stop_sequences,
           upstream_stops: upstream_stop_id_set(stop_ids, stop_sequences),
           downstream_stops: downstream_stop_id_set(stop_ids, stop_sequences),
@@ -218,4 +222,38 @@ defmodule Screens.LocationContext do
       {route_id, station_sequences}
     end)
   end
+
+  @spec child_stops_at_station(screen_type(), [Route.id()], [Stop.id()]) ::
+          {:ok, %{Route.id() => [Stop.t()]}} | :error
+  defp child_stops_at_station(Dup, route_ids_at_stop, stop_ids) do
+    case RoutePattern.fetch(%{stop_ids: stop_ids, route_ids: route_ids_at_stop}) do
+      {:ok, patterns} ->
+        child_stops =
+          patterns
+          |> Enum.filter(&(&1.route.id in route_ids_at_stop))
+          |> Enum.group_by(& &1.route.id)
+          |> Enum.map(fn {route_id, patterns} ->
+            stops =
+              patterns
+              |> Enum.flat_map(& &1.stops)
+              |> Enum.filter(
+                &(!is_nil(&1.parent_station) and &1.parent_station.id in stop_ids and
+                    &1.location_type == 0)
+              )
+              |> Enum.uniq_by(& &1.id)
+
+            {route_id, stops}
+          end)
+          |> Enum.into(%{})
+
+        {:ok, child_stops}
+
+      :error ->
+        Report.error("location_context_fetch_child_stops_error", stop_ids: stop_ids)
+        :error
+    end
+  end
+
+  # Child Stops are only needed for DUP's location context at the time, so return an empty map otherwise
+  defp child_stops_at_station(_app, _route_ids_at_stop, _stop_ids), do: {:ok, %{}}
 end
