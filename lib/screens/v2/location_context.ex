@@ -228,22 +228,25 @@ defmodule Screens.LocationContext do
   defp child_stops_at_station(Dup, route_ids_at_stop, stop_ids) do
     case RoutePattern.fetch(%{stop_ids: stop_ids, route_ids: route_ids_at_stop}) do
       {:ok, patterns} ->
-        patterns
-        |> Enum.filter(&(&1.route.id in route_ids_at_stop))
-        |> Enum.group_by(& &1.route.id)
-        |> Enum.map(fn {route_id, patterns} ->
-          stops =
-            patterns
-            |> Enum.flat_map(& &1.stops)
-            |> Enum.filter(
-              &(!is_nil(&1.parent_station) and &1.parent_station.id in stop_ids and
-                  &1.location_type == 0)
-            )
-            |> Enum.uniq_by(& &1.id)
+        child_stops =
+          patterns
+          |> Enum.filter(&(&1.route.id in route_ids_at_stop))
+          |> Enum.group_by(& &1.route.id)
+          |> Enum.map(fn {route_id, patterns} ->
+            stops =
+              patterns
+              |> Enum.flat_map(& &1.stops)
+              |> Enum.filter(
+                &(!is_nil(&1.parent_station) and &1.parent_station.id in stop_ids and
+                    &1.location_type == 0)
+              )
+              |> Enum.uniq_by(& &1.id)
 
-          {route_id, stops}
-        end)
-        |> Enum.into(%{})
+            {route_id, stops}
+          end)
+          |> Enum.into(%{})
+
+        {:ok, child_stops}
 
       :error ->
         Report.error("location_context_fetch_child_stops_error", stop_ids: stop_ids)
@@ -252,5 +255,5 @@ defmodule Screens.LocationContext do
   end
 
   # Child Stops are only needed for DUP's location context at the time, so return an empty map otherwise
-  defp child_stops_at_station(_app, _route_ids_at_stop, _stop_ids), do: %{}
+  defp child_stops_at_station(_app, _route_ids_at_stop, _stop_ids), do: {:ok, %{}}
 end

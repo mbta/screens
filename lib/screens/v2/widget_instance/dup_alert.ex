@@ -108,7 +108,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     # as the number we show departures for, that means all service is eliminated. Otherwise, only
     # some is (either we're at a boundary and there's still service in one direction, or we're at
     # a transfer station and the alert only affects one line).
-    if LocalizedAlert.location(t) == :inside and full_station_closure?(t) and
+    if LocalizedAlert.location(t) == :inside and not partial_station_closure?(t) and
          length(get_affected_lines(t)) == length(primary_sections),
        do: :all,
        else: :some
@@ -147,14 +147,14 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     |> Enum.uniq()
   end
 
-  @spec full_station_closure?(t()) :: boolean()
-  def full_station_closure?(%__MODULE__{alert: %Alert{effect: effect}} = t)
+  @spec partial_station_closure?(t()) :: boolean()
+  def partial_station_closure?(%__MODULE__{alert: %Alert{effect: effect}} = t)
       when effect in [:station_closure] do
-    # We only consider partial station closures for the `station_closure` effect
-    Alert.station_closure_type(t.alert, child_stops_for_affected_line(t)) == :full_station_closure
+    # We only consider and handle partial station closures for the `station_closure` effect
+    Alert.station_closure_type(t.alert, child_stops_for_affected_line(t)) != :full_station_closure
   end
 
-  def full_station_closure?(_t), do: true
+  def partial_station_closure?(_t), do: false
 
   @spec child_stops_for_affected_line(t()) :: [Stop.t()]
   def child_stops_for_affected_line(t) do

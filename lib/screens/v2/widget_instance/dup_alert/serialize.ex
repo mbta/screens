@@ -224,11 +224,11 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
   @spec affected_platform(DupAlert.t()) :: String.t() | nil
   defp affected_platform(t) do
-    # Returns nil if all platforms at station are affected
-    if DupAlert.full_station_closure?(t) do
-      nil
-    else
+    if DupAlert.partial_station_closure?(t) do
       get_closed_platform_name(t)
+    else
+      # Returns nil if all platforms at station are affected
+      nil
     end
   end
 
