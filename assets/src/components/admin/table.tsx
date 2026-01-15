@@ -25,6 +25,11 @@ const appIdFilters: { id: AppId | null; name: string }[] = [
 const get = (path: string, screen: Screen, id: string) =>
   path === "id" ? id : _.get(path, screen);
 
+const useResetKey = (): [string, () => void] => {
+  const [key, setKey] = useState("");
+  return [key, () => setKey(window.crypto.randomUUID())];
+};
+
 const Table = () => {
   const dialogRef = useRef<HTMLDialogElement>(null);
   const [didInitialize, setDidInitialize] = useState(false);
@@ -38,17 +43,18 @@ const Table = () => {
   >({});
   const [appIdFilter, setAppIdFilter] = useState<AppId | null>(null);
 
-  // Some Cell components are "uncontrolled" to avoid triggering expensive
+  // Some input components are "uncontrolled" to avoid triggering expensive
   // re-renders on every keystroke, but this means their values don't change
-  // when updated "from the outside"; the only way to sync them with new state
-  // is to force a re-mount by changing their `key` (or the key of a containing
-  // element/component).
-  const [dialogResetKey, setDialogResetKey] = useState("");
-  const [tableResetKey, setTableResetKey] = useState("");
+  // when updated "from the outside" via props. This unfortunately means that
+  // any time the config changes, we have to manually reset the `key` of any
+  // components that didn't originate the update, forcing them to re-mount and
+  // pick up the changes.
+  const [dialogCellsKey, resetDialogCellsKey] = useResetKey();
+  const [tableCellsKey, resetTableCellsKey] = useResetKey();
   // The same is done with Filter components, but for a different reason: they
   // don't receive a value from props at all. This could be changed if we ever
   // have a need to *set* a filter "from the outside" rather than clearing it.
-  const [filterResetKey, setFilterResetKey] = useState("");
+  const [filtersKey, resetFiltersKey] = useResetKey();
 
   const fields = appIdFilter ? appFields[appIdFilter] : allFields;
 
@@ -103,26 +109,23 @@ const Table = () => {
 
   const clearFilters = () => {
     setFilters({});
-    setFilterResetKey(window.crypto.randomUUID());
+    resetFiltersKey();
   };
 
-  const setScreens = (
-    screens: Config["screens"],
-    setResetKey: (key: string) => void,
-  ) => {
+  const setScreens = (screens: Config["screens"], resetKey: () => void) => {
     setLocalConfig({
       ...localConfig,
       screens: { ...localConfig.screens, ...screens },
     });
     setIsCommitReady(false);
-    setResetKey(window.crypto.randomUUID());
+    resetKey();
   };
 
   const setScreensFromDialog = (entries: [string, Screen][]) =>
-    setScreens(Object.fromEntries(entries), setTableResetKey);
+    setScreens(Object.fromEntries(entries), resetTableCellsKey);
 
   const setScreenFromTable = (id: string, screen: Screen) =>
-    setScreens({ [id]: screen }, setDialogResetKey);
+    setScreens({ [id]: screen }, resetDialogCellsKey);
 
   const updateSelected = (id: string, isSelected: boolean) =>
     setSelectedIDs(
@@ -141,6 +144,9 @@ const Table = () => {
       const config: Config = JSON.parse(response.config);
       setLocalConfig(config);
       setRemoteConfig(config);
+      setSelectedIDs(new Set());
+      resetDialogCellsKey();
+      resetTableCellsKey();
       setIsCommitReady(false);
     });
   };
@@ -151,6 +157,8 @@ const Table = () => {
         config: JSON.stringify(localConfig),
       });
       setLocalConfig(config);
+      resetDialogCellsKey();
+      resetTableCellsKey();
       setIsCommitReady(true);
     });
   };
@@ -200,7 +208,7 @@ const Table = () => {
               ))}
             </tr>
 
-            <tr key={filterResetKey}>
+            <tr key={filtersKey}>
               <th></th>
               {fields.map(({ filter: Filter, path }) => (
                 <th key={path}>
@@ -281,7 +289,7 @@ const Table = () => {
             </tr>
           </thead>
 
-          <tbody key={tableResetKey}>
+          <tbody key={tableCellsKey}>
             {rows.map(([id, screen]) => (
               <tr
                 key={id}
@@ -331,7 +339,7 @@ const Table = () => {
 
         {isCommitReady ? (
           <button disabled={isInFlight} onClick={commitConfig}>
-            Commit changes
+            🔸 Commit changes
           </button>
         ) : (
           <button disabled={!isChanged || isInFlight} onClick={validateConfig}>
@@ -359,7 +367,7 @@ const Table = () => {
 
         {selectedIDs.size > 0 && (
           <table>
-            <tbody key={dialogResetKey}>
+            <tbody key={dialogCellsKey}>
               {fieldsForSelection.map(({ label, path, cell: Cell }) => {
                 const firstValue = get(
                   path,
