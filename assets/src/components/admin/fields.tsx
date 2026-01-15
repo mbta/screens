@@ -22,6 +22,7 @@ type Field = {
   path: string;
   cell: Cell;
   filter?: Filter;
+  isStatic?: boolean;
 };
 
 const filteredBoolean = { cell: CheckboxInput, filter: BooleanFilter };
@@ -29,7 +30,13 @@ const filteredJson = { cell: JsonInput, filter: JsonFilter };
 const filteredString = { cell: StringInput, filter: StringFilter };
 
 const baseFields: Field[] = [
-  { label: "ID", path: "id", cell: InspectorLink, filter: StringFilter },
+  {
+    label: "ID",
+    path: "id",
+    cell: InspectorLink,
+    filter: StringFilter,
+    isStatic: true,
+  },
   { label: "Name", path: "name", ...filteredString },
   { label: "Location", path: "location", ...filteredString },
   {
@@ -54,6 +61,7 @@ export const allFields: Field[] = [
     label: "App",
     path: "app_id",
     cell: ({ value }) => SCREEN_APPS[value as AppId].name,
+    isStatic: true,
   },
   ...baseFields,
   { label: "Config", path: "app_params", ...filteredJson },
