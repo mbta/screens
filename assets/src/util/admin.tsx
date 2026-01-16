@@ -54,6 +54,69 @@ export const SCREEN_VENDORS = [
   "solari",
 ];
 
+const DEFAULT_APP_PARAMS: { [key in AppId]: Screen["app_params"] } = {
+  bus_eink_v2: {
+    alerts: { stop_id: "" },
+    departures: { sections: [] },
+    evergreen_content: [],
+    footer: { stop_id: "" },
+    header: { stop_id: "" },
+  },
+  bus_shelter_v2: {
+    alerts: { stop_id: "" },
+    departures: { sections: [] },
+    evergreen_content: [],
+    footer: { stop_id: "" },
+    header: { stop_id: "" },
+  },
+  busway_v2: {
+    departures: { sections: [] },
+    evergreen_content: [],
+    header: { stop_name: "" },
+  },
+  dup_v2: {
+    alerts: { stop_id: "" },
+    evergreen_content: [],
+    header: { stop_id: "" },
+    primary_departures: { sections: [] },
+    secondary_departures: { sections: [] },
+  },
+  elevator_v2: {
+    accessible_path_image_here_coordinates: { x: 0, y: 0 },
+    alternate_direction_text: "",
+    elevator_id: "",
+    evergreen_content: [],
+  },
+  gl_eink_v2: {
+    alerts: { stop_id: "" },
+    departures: { sections: [] },
+    evergreen_content: [],
+    footer: { stop_id: "" },
+    header: { stop_id: "" },
+  },
+  pre_fare_v2: {
+    evergreen_content: [],
+    header: { stop_id: "" },
+  },
+};
+
+/**
+ * Initialize a new screen. The app params will be "valid" insofar as the admin
+ * UI can edit the screen without crashing, but may need further editing by the
+ * user to actually be valid configuration.
+ */
+export const newScreen = (appId: AppId) => ({
+  app_id: appId,
+  app_params: DEFAULT_APP_PARAMS[appId],
+  device_id: null,
+  disabled: false,
+  hidden_from_screenplay: true,
+  name: null,
+  location: null,
+  tags: [],
+  vendor: null,
+});
+
 /**
  * Set of attributes for forms and form elements which disable "auto" browser
  * behaviors like autocomplete and spell check.

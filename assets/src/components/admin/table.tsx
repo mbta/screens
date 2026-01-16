@@ -1,25 +1,26 @@
 import _ from "lodash/fp";
-import { useState, useMemo, useRef } from "react";
+import { type ComponentType, useMemo, useRef, useState } from "react";
 
 import {
   type AppId,
+  type AppInfo,
   type Config,
   type JSON,
   type Screen,
+  AUTOLESS_ATTRIBUTES,
   SCREEN_APPS,
   fetch,
-  AppInfo,
+  newScreen,
 } from "Util/admin";
 
 import { allFields, appFields } from "./fields";
 
 const EMPTY_CONFIG: Config = { screens: {}, devops: { disabled_modes: [] } };
+const SCREEN_APP_ENTRIES = Object.entries(SCREEN_APPS) as [AppId, AppInfo][];
 
 const appIdFilters: { id: AppId | null; name: string }[] = [
   { id: null, name: "All" },
-  ...(Object.entries(SCREEN_APPS) as [AppId, AppInfo][]).map(
-    ([id, { name }]) => ({ id, name }),
-  ),
+  ...SCREEN_APP_ENTRIES.map(([id, { name }]) => ({ id, name })),
 ];
 
 const get = (path: string, screen: Screen, id: string) =>
@@ -31,10 +32,10 @@ const useResetKey = (): [string, () => void] => {
 };
 
 const Table = () => {
-  const dialogRef = useRef<HTMLDialogElement>(null);
   const [didInitialize, setDidInitialize] = useState(false);
   const [isInFlight, setIsInFlight] = useState(false);
   const [isCommitReady, setIsCommitReady] = useState(false);
+  const [isAddingScreen, setIsAddingScreen] = useState(false);
   const [localConfig, setLocalConfig] = useState<Config>(EMPTY_CONFIG);
   const [remoteConfig, setRemoteConfig] = useState<Config>(EMPTY_CONFIG);
   const [selectedIDs, setSelectedIDs] = useState<Set<string>>(new Set());
@@ -42,6 +43,8 @@ const Table = () => {
     Record<string, undefined | ((v: JSON) => boolean)>
   >({});
   const [appIdFilter, setAppIdFilter] = useState<AppId | null>(null);
+
+  const editDialogRef = useRef<HTMLDialogElement>(null);
 
   // Some input components are "uncontrolled" to avoid triggering expensive
   // re-renders on every keystroke, but this means their values don't change
@@ -67,6 +70,14 @@ const Table = () => {
     return fields.filter((field) => !field.isStatic);
   }, [localConfig, selectedIDs]);
 
+  const newIDs = useMemo(
+    () =>
+      new Set(Object.keys(localConfig.screens)).difference(
+        new Set(Object.keys(remoteConfig.screens)),
+      ),
+    [remoteConfig, localConfig],
+  );
+
   const rows = useMemo(() => {
     const filterFns = Object.entries(filters);
 
@@ -76,7 +87,13 @@ const Table = () => {
           (appIdFilter === null || screen.app_id === appIdFilter) &&
           filterFns.every(([path, fn]) => !fn || fn(get(path, screen, id))),
       )
-      .sort(([idA], [idB]) => idA.localeCompare(idB));
+      .sort(([idA], [idB]) =>
+        newIDs.has(idA) && !newIDs.has(idB)
+          ? -1
+          : newIDs.has(idB) && !newIDs.has(idA)
+            ? 1
+            : idA.localeCompare(idB),
+      );
   }, [appIdFilter, filters, localConfig]);
 
   const selectedRows: [string, Screen][] = useMemo(
@@ -89,7 +106,10 @@ const Table = () => {
   const counts = useMemo(() => {
     const modifiedIDs = new Set(
       Object.entries(localConfig.screens)
-        .filter(([id, screen]) => !_.isEqual(screen, remoteConfig.screens[id]))
+        .filter(
+          ([id, screen]) =>
+            !newIDs.has(id) && !_.isEqual(screen, remoteConfig.screens[id]),
+        )
         .map(([id]) => id),
     );
 
@@ -98,11 +118,13 @@ const Table = () => {
       local: Object.keys(localConfig.screens).length,
       visible: visibleIDs.size,
       modified: modifiedIDs.size,
+      new: newIDs.size,
       selected: selectedIDs.size,
       visibleModified: visibleIDs.intersection(modifiedIDs).size,
+      visibleNew: visibleIDs.intersection(newIDs).size,
       visibleSelected: visibleIDs.intersection(selectedIDs).size,
     };
-  }, [localConfig, remoteConfig, selectedIDs, visibleIDs]);
+  }, [localConfig, remoteConfig, newIDs, selectedIDs, visibleIDs]);
 
   const isChanged = counts.modified > 0;
   const isFiltered = Object.values(filters).some((f) => f);
@@ -112,20 +134,26 @@ const Table = () => {
     resetFiltersKey();
   };
 
-  const setScreens = (screens: Config["screens"], resetKey: () => void) => {
+  const setScreens = (
+    screens: Config["screens"],
+    resetKeys: (() => void)[],
+  ) => {
     setLocalConfig({
       ...localConfig,
       screens: { ...localConfig.screens, ...screens },
     });
     setIsCommitReady(false);
-    resetKey();
+    resetKeys.forEach((fn) => fn());
   };
 
+  const addScreenFromDialog = (id: string, screen: Screen) =>
+    setScreens({ [id]: screen }, [resetDialogCellsKey, resetTableCellsKey]);
+
   const setScreensFromDialog = (entries: [string, Screen][]) =>
-    setScreens(Object.fromEntries(entries), resetTableCellsKey);
+    setScreens(Object.fromEntries(entries), [resetTableCellsKey]);
 
   const setScreenFromTable = (id: string, screen: Screen) =>
-    setScreens({ [id]: screen }, resetDialogCellsKey);
+    setScreens({ [id]: screen }, [resetDialogCellsKey]);
 
   const updateSelected = (id: string, isSelected: boolean) =>
     setSelectedIDs(
@@ -134,8 +162,11 @@ const Table = () => {
 
   const withInFlight = async (func: () => Promise<void>) => {
     setIsInFlight(true);
-    await func();
-    setIsInFlight(false);
+    try {
+      await func();
+    } finally {
+      setIsInFlight(false);
+    }
   };
 
   const reloadConfig = () => {
@@ -252,8 +283,12 @@ const Table = () => {
                         </span>
                       )}
 
-                      {counts.local > counts.remote && (
-                        <span>{counts.local - counts.remote} new</span>
+                      {counts.new > 0 && (
+                        <span>
+                          {counts.new !== counts.visibleNew &&
+                            `${counts.visibleNew} of`}{" "}
+                          {counts.new} new
+                        </span>
                       )}
 
                       {isFiltered && (
@@ -306,12 +341,13 @@ const Table = () => {
                 {fields.map(({ cell: Cell, path }) => (
                   <td
                     className={
-                      _.isEqual(
+                      newIDs.has(id) ||
+                      !_.isEqual(
                         _.get(path, screen),
                         _.get(path, remoteConfig.screens[id]),
                       )
-                        ? undefined
-                        : "modified"
+                        ? "modified"
+                        : undefined
                     }
                     key={path}
                   >
@@ -320,6 +356,7 @@ const Table = () => {
                       update={(val) =>
                         setScreenFromTable(id, _.set(path, val, screen))
                       }
+                      isNewScreen={newIDs.has(id)}
                     />
                   </td>
                 ))}
@@ -330,16 +367,18 @@ const Table = () => {
       </div>
 
       <div className="admin-table__footer">
+        <button onClick={() => setIsAddingScreen(true)}>➕ New screen</button>
+
         <button
           disabled={selectedIDs.size === 0}
-          onClick={() => dialogRef.current?.showModal()}
+          onClick={() => editDialogRef.current?.showModal()}
         >
           🔹 Edit selected
         </button>
 
         {isCommitReady ? (
           <button disabled={isInFlight} onClick={commitConfig}>
-            🔸 Commit changes
+            ✅ Commit changes
           </button>
         ) : (
           <button disabled={!isChanged || isInFlight} onClick={validateConfig}>
@@ -362,7 +401,15 @@ const Table = () => {
         </button>
       </div>
 
-      <dialog className="admin-table__dialog" ref={dialogRef}>
+      {isAddingScreen && (
+        <NewScreenDialog
+          initialAppId={appIdFilter}
+          onClose={() => setIsAddingScreen(false)}
+          onSubmit={addScreenFromDialog}
+        />
+      )}
+
+      <dialog className="admin-table__dialog" ref={editDialogRef}>
         <h2>Editing {selectedIDs.size} screens</h2>
 
         {selectedIDs.size > 0 && (
@@ -408,7 +455,7 @@ const Table = () => {
                           >
                             🔓
                           </button>{" "}
-                          (multiple values)
+                          <i>(multiple values)</i>
                         </span>
                       ) : (
                         <Cell value={firstValue} update={setValues} />
@@ -421,9 +468,81 @@ const Table = () => {
           </table>
         )}
 
-        <button onClick={() => dialogRef.current?.close()}>Done editing</button>
+        <button onClick={() => editDialogRef.current?.close()}>
+          ✓ Done editing
+        </button>
       </dialog>
     </main>
+  );
+};
+
+const NewScreenDialog: ComponentType<{
+  initialAppId: AppId | null;
+  onClose: () => void;
+  onSubmit: (id: string, screen: Screen) => void;
+}> = ({ initialAppId, onClose, onSubmit }) => {
+  const [screenId, setScreenId] = useState("");
+  const [appId, setAppId] = useState(initialAppId);
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
+
+  return (
+    <dialog
+      className="admin-table__dialog"
+      onClose={onClose}
+      ref={(elem) => {
+        setDialog(elem);
+        if (elem) elem.showModal();
+      }}
+    >
+      <h2>New screen</h2>
+
+      <form
+        method="dialog"
+        onSubmit={() => onSubmit(screenId, newScreen(appId as AppId))}
+      >
+        <table>
+          <tbody>
+            <tr>
+              <th>App</th>
+              <td>
+                <select
+                  value={appId ?? undefined}
+                  onChange={(e) => setAppId((e.target.value as AppId) ?? null)}
+                >
+                  <option></option>
+                  {SCREEN_APP_ENTRIES.map(([appId, { name }]) => (
+                    <option key={appId} value={appId}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </td>
+            </tr>
+
+            <tr>
+              <th>ID</th>
+              <td>
+                <input
+                  {...AUTOLESS_ATTRIBUTES}
+                  value={screenId}
+                  onChange={(e) => setScreenId(e.target.value)}
+                  /* https://github.com/facebook/react/issues/23301 */
+                  ref={(elem) => elem?.setAttribute("autofocus", "")}
+                />
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <button type="submit" disabled={!(screenId && appId)}>
+          ✓ Confirm
+        </button>
+
+        <button type="button" onClick={() => dialog?.close()}>
+          × Cancel
+        </button>
+      </form>
+    </dialog>
   );
 };
 

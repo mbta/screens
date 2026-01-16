@@ -6,6 +6,7 @@ import { type JSON, AUTOLESS_ATTRIBUTES } from "Util/admin";
 export type Cell = ComponentType<{
   value: JSON;
   update: (value: JSON) => void;
+  isNewScreen?: boolean;
 }>;
 
 const ifChanged = (
@@ -51,15 +52,18 @@ export const CheckboxInput: Cell = ({ value, update }) => (
   />
 );
 
-export const InspectorLink: Cell = ({ value: id }) => (
-  <Link
-    to={`/inspector?id=${id}`}
-    className="admin-table__inspector-link"
-    title="🔍 View in Inspector"
-  >
-    {id as string}
-  </Link>
-);
+export const InspectorLink: Cell = ({ value: id, isNewScreen }) =>
+  isNewScreen ? (
+    <>✴️ {id as string}</>
+  ) : (
+    <Link
+      to={`/inspector?id=${id}`}
+      className="admin-table__inspector-link"
+      title="🔍 View in Inspector"
+    >
+      {id as string}
+    </Link>
+  );
 
 export const JsonInput: Cell = ({ value, update }) => {
   const [isValid, setIsValid] = useState(true);
