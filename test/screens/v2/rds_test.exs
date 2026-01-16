@@ -23,15 +23,15 @@ defmodule Screens.V2.RDSTest do
   @route_pattern injected(RoutePattern)
   @stop injected(Stop)
 
-  describe "get/1" do
-    setup do
-      stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
-      stub(@headways, :get, fn _, _ -> nil end)
-      stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
-      stub(@stop, :fetch, fn %{ids: ids}, true -> {:ok, Enum.map(ids, &stop/1)} end)
-      :ok
-    end
+  setup do
+    stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
+    stub(@headways, :get, fn _, _ -> nil end)
+    stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
+    stub(@stop, :fetch, fn %{ids: ids}, true -> {:ok, Enum.map(ids, &stop/1)} end)
+    :ok
+  end
 
+  describe "get/1" do
     defp no_departures(stop_id, line_id, headsign, headways \\ nil) do
       %RDS{
         stop: %Stop{id: stop_id},
@@ -85,11 +85,12 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               [
-                 no_departures("sA", "l1", "hA"),
-                 no_departures("sB", "l2", "hB"),
-                 no_departures("sC", "l2", "hC")
-               ]
+               {:ok,
+                [
+                  no_departures("sA", "l1", "hA"),
+                  no_departures("sB", "l2", "hB"),
+                  no_departures("sC", "l2", "hC")
+                ]}
              ]
     end
 
@@ -148,7 +149,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures, now) == [
-               [no_departures("s1", "l1", "h1"), no_departures("s2", "l2", "h2")]
+               {:ok, [no_departures("s1", "l1", "h1"), no_departures("s2", "l2", "h2")]}
              ]
     end
 
@@ -172,7 +173,76 @@ defmodule Screens.V2.RDSTest do
         sections: [%Section{query: %Query{params: %Query.Params{stop_ids: ~w[s1]}}}]
       }
 
-      assert RDS.get(departures, now) == [[no_departures("s1", "l1", "h1", {5, 10})]]
+      assert RDS.get(departures, now) == [{:ok, [no_departures("s1", "l1", "h1", {5, 10})]}]
+    end
+  end
+
+  describe "get/1 API failure" do
+    test "returns :error when stop fetch fails" do
+      stop_ids = ~w[s0 s1]
+
+      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true -> :error end)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids}}}
+        ]
+      }
+
+      assert RDS.get(departures) == [:error]
+    end
+
+    test "returns :error when route_pattern fetch fails" do
+      stop_ids = ~w[s0 s1]
+
+      expect(@route_pattern, :fetch, fn %{stop_ids: ^stop_ids, canonical?: true} ->
+        :error
+      end)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids}}}
+        ]
+      }
+
+      assert RDS.get(departures) == [:error]
+    end
+
+    test "returns :error when departure fetch fails" do
+      now = ~U[2024-10-11 12:00:00Z]
+      stop_ids = ~w[s0]
+
+      expect(@departure, :fetch, fn %{stop_ids: ^stop_ids}, [now: ^now] -> :error end)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids}}}
+        ]
+      }
+
+      assert RDS.get(departures, now) == [:error]
+    end
+
+    test "returns :error for the failing section when multiple sections exist" do
+      now = ~U[2024-10-11 12:00:00Z]
+      stop_ids_primary = ~w[s0]
+      stop_ids_secondary = ~w[s1]
+
+      stub(@departure, :fetch, fn %{stop_ids: stop_ids}, [now: ^now] ->
+        case stop_ids do
+          ^stop_ids_primary -> {:ok, []}
+          ^stop_ids_secondary -> :error
+        end
+      end)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids_primary}}},
+          %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids_secondary}}}
+        ]
+      }
+
+      assert RDS.get(departures, now) == [{:ok, []}, :error]
     end
   end
 end
