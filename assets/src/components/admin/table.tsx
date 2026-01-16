@@ -126,7 +126,7 @@ const Table = () => {
     };
   }, [localConfig, remoteConfig, newIDs, selectedIDs, visibleIDs]);
 
-  const isChanged = counts.modified > 0;
+  const isChanged = counts.modified > 0 || newIDs.size > 0;
   const isFiltered = Object.values(filters).some((f) => f);
 
   const clearFilters = () => {
@@ -164,6 +164,8 @@ const Table = () => {
     setIsInFlight(true);
     try {
       await func();
+    } catch (e) {
+      window.alert("Error: Request failed.");
     } finally {
       setIsInFlight(false);
     }
@@ -255,7 +257,8 @@ const Table = () => {
             </tr>
 
             <tr>
-              <th colSpan={fields.length + 1}>
+              <th></th>
+              <th colSpan={fields.length}>
                 <div className="admin-table__table__stats">
                   {isInFlight ? (
                     <span>Updating...</span>

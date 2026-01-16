@@ -91,10 +91,32 @@ export const JsonInput: Cell = ({ value, update }) => {
   );
 };
 
-export const StringInput: Cell = ({ value, update }) => (
+/**
+ * String input whose value is `null` when empty.
+ */
+export const NullStringInput: Cell = ({ value, update }) => (
   <input
     {...AUTOLESS_ATTRIBUTES}
     defaultValue={value as string}
     onBlur={(e) => ifChanged(e.target, (v) => update(v || null))}
+    placeholder="null"
+  />
+);
+
+export const NumberInput: Cell = ({ value, update }) => (
+  <input
+    type="number"
+    min={0}
+    {...AUTOLESS_ATTRIBUTES}
+    defaultValue={value as number}
+    onBlur={(e) => ifChanged(e.target, (v) => update(parseInt(v)))}
+  />
+);
+
+export const StringInput: Cell = ({ value, update }) => (
+  <input
+    {...AUTOLESS_ATTRIBUTES}
+    defaultValue={value as string}
+    onBlur={(e) => ifChanged(e.target, (v) => update(v))}
   />
 );

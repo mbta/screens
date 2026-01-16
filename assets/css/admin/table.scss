@@ -12,7 +12,7 @@
     &__stats {
       display: flex;
       align-items: center;
-      justify-content: center;
+      padding: 8px 0;
 
       & > *:not(:last-child) {
         padding-right: 1em;
@@ -56,12 +56,8 @@
     top: 0;
     background-color: #eee;
 
-    tr:last-child th {
-      padding: 8px 0;
-    }
-
-    form {
-      display: flex;
+    tr:first-child th {
+      padding: 0 0.5em;
     }
 
     input,
@@ -92,6 +88,10 @@
       margin: 0;
       background-color: inherit;
       border: 0;
+    }
+
+    input[type="number"] {
+      appearance: textfield;
     }
   }
 
@@ -143,7 +143,7 @@
 }
 
 .admin-table__textarea {
-  width: 400px;
+  width: 40ch;
   height: 40px;
   transition: height 0.2s;
 

@@ -6,6 +6,8 @@ import {
   CheckboxInput,
   InspectorLink,
   JsonInput,
+  NullStringInput,
+  NumberInput,
   StringInput,
 } from "./fields/cells";
 
@@ -27,6 +29,7 @@ type Field = {
 
 const filteredBoolean = { cell: CheckboxInput, filter: BooleanFilter };
 const filteredJson = { cell: JsonInput, filter: JsonFilter };
+const filteredNullString = { cell: NullStringInput, filter: StringFilter };
 const filteredString = { cell: StringInput, filter: StringFilter };
 
 const baseFields: Field[] = [
@@ -50,10 +53,34 @@ const baseFields: Field[] = [
   { label: "Hidden?", path: "hidden_from_screenplay", ...filteredBoolean },
 ];
 
+const alertsField: Field = {
+  label: "Alerts Stop ID",
+  path: "app_params.alerts.stop_id",
+  ...filteredString,
+};
+
+const departuresField: Field = {
+  label: "Departures Sections",
+  path: "app_params.departures.sections",
+  ...filteredJson,
+};
+
+const evergreenField: Field = {
+  label: "Evergreen Content",
+  path: "app_params.evergreen_content",
+  ...filteredJson,
+};
+
+const footerField: Field = {
+  label: "Footer Stop ID",
+  path: "app_params.footer.stop_id",
+  ...filteredNullString,
+};
+
 const headerField: Field = {
   label: "Header",
   path: "app_params.header",
-  cell: JsonInput,
+  ...filteredJson,
 };
 
 export const allFields: Field[] = [
@@ -68,11 +95,81 @@ export const allFields: Field[] = [
 ];
 
 export const appFields: { [key in AppId]: Field[] } = {
-  bus_eink_v2: [...baseFields, headerField],
-  bus_shelter_v2: [...baseFields, headerField],
-  busway_v2: [...baseFields, headerField],
-  dup_v2: [...baseFields, headerField],
+  bus_eink_v2: [
+    ...baseFields,
+    evergreenField,
+    headerField,
+    departuresField,
+    {
+      label: "Alerts Stop IDs",
+      path: "app_params.alerts.stop_ids",
+      ...filteredJson,
+    },
+    footerField,
+  ],
+
+  bus_shelter_v2: [
+    ...baseFields,
+    {
+      label: "🔈Interval?",
+      path: "app_params.audio.interval_enabled",
+      ...filteredBoolean,
+    },
+    {
+      label: "🔈Offset",
+      path: "app_params.audio.interval_offset_seconds",
+      cell: NumberInput,
+    },
+    evergreenField,
+    headerField,
+    departuresField,
+    alertsField,
+    {
+      label: "Survey",
+      path: "app_params.survey",
+      ...filteredJson,
+    },
+  ],
+
+  busway_v2: [...baseFields, evergreenField, headerField],
+
+  dup_v2: [
+    ...baseFields,
+    headerField,
+    alertsField,
+    {
+      label: "Primary Departures",
+      path: "app_params.primary_departures",
+      ...filteredJson,
+    },
+    {
+      label: "Secondary Departures",
+      path: "app_params.secondary_departures",
+      ...filteredJson,
+    },
+  ],
+
   elevator_v2: [...baseFields],
-  gl_eink_v2: [...baseFields, headerField],
-  pre_fare_v2: [...baseFields, headerField],
+
+  gl_eink_v2: [
+    ...baseFields,
+    {
+      label: "Placement",
+      path: "app_params.platform_location",
+      cell: buildSelectInput([null, "front", "back"]),
+      filter: buildSelectFilter(["front", "back"]),
+    },
+    evergreenField,
+    headerField,
+    {
+      label: "Line Map",
+      path: "app_params.line_map",
+      ...filteredJson,
+    },
+    departuresField,
+    alertsField,
+    footerField,
+  ],
+
+  pre_fare_v2: [...baseFields, evergreenField, headerField],
 };

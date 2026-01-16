@@ -59,14 +59,14 @@ const DEFAULT_APP_PARAMS: { [key in AppId]: Screen["app_params"] } = {
     alerts: { stop_id: "" },
     departures: { sections: [] },
     evergreen_content: [],
-    footer: { stop_id: "" },
+    footer: { stop_id: null },
     header: { stop_id: "" },
   },
   bus_shelter_v2: {
     alerts: { stop_id: "" },
     departures: { sections: [] },
     evergreen_content: [],
-    footer: { stop_id: "" },
+    footer: { stop_id: null },
     header: { stop_id: "" },
   },
   busway_v2: {
@@ -82,6 +82,7 @@ const DEFAULT_APP_PARAMS: { [key in AppId]: Screen["app_params"] } = {
     secondary_departures: { sections: [] },
   },
   elevator_v2: {
+    accessible_path_direction_arrow: null,
     accessible_path_image_here_coordinates: { x: 0, y: 0 },
     alternate_direction_text: "",
     elevator_id: "",
@@ -91,7 +92,7 @@ const DEFAULT_APP_PARAMS: { [key in AppId]: Screen["app_params"] } = {
     alerts: { stop_id: "" },
     departures: { sections: [] },
     evergreen_content: [],
-    footer: { stop_id: "" },
+    footer: { stop_id: null },
     header: { stop_id: "" },
   },
   pre_fare_v2: {
