@@ -1461,7 +1461,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert_values(widget, {1, @right_screen}, {1, @right_screen})
     end
 
-    test "CR departures are not covered by alert at another station", %{widget: widget} do
+    test "CR departures are not covered by alert affecting another station", %{widget: widget} do
       widget =
         widget
         |> put_cr_departures()
