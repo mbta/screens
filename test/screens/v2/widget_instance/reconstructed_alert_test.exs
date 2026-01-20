@@ -10,6 +10,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias ScreensConfig.{ContentSummary, Departures, ElevatorStatus, Header, Screen}
   alias ScreensConfig.Departures.{Query, Section}
+  alias ScreensConfig.Departures.Query.Params
   alias ScreensConfig.Screen.PreFare
 
   setup :setup_base
@@ -149,6 +150,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     departures =
       struct(%Departures{
         sections: [%Section{query: %Query{}}]
+      })
+
+    app_params = struct(PreFare, departures: departures)
+
+    %{
+      widget
+      | screen: %Screen{widget.screen | app_params: app_params}
+    }
+  end
+
+  defp put_cr_departures(widget) do
+    departures =
+      struct(%Departures{
+        sections: [%Section{query: %Query{params: %Params{route_type: :rail}}}]
       })
 
     app_params = struct(PreFare, departures: departures)
@@ -1429,6 +1444,30 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       assert expected == ReconstructedAlert.serialize(widget)
+    end
+
+    test "CR departures are not covered by alert affecting home station", %{widget: widget} do
+      widget =
+        widget
+        |> put_cr_departures()
+        |> put_home_stop(PreFare, "place-forhl")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop: "place-forhl", route: "Orange", route_type: 1)
+        ])
+        |> put_cause(:unknown)
+        |> put_is_priority(true)
+
+      assert_values(widget, {1, @right_screen}, {1, @right_screen})
+    end
+
+    test "CR departures are not covered by alert at another station", %{widget: widget} do
+      widget =
+        widget
+        |> put_cr_departures()
+        |> put_is_priority(true)
+
+      assert_values(widget, {1, @right_screen}, {1, @flex_zone})
     end
   end
 

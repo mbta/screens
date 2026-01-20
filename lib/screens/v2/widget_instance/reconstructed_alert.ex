@@ -13,6 +13,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.{Departures, FreeText, FreeTextLine, Screen}
+  alias ScreensConfig.Departures.{Query, Section}
+  alias ScreensConfig.Departures.Query.Params
   alias ScreensConfig.Screen.PreFare
 
   defstruct screen: nil,
@@ -384,8 +386,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          } = t
        ) do
     has_departures = match?(%Departures{sections: [_ | _]}, departures)
+    has_cr_departures = departures_contains_commuter_rail?(departures)
     location = LocalizedAlert.location(t, is_terminal_station)
-    t |> base_placement(location) |> adjust_placement(location, template, has_departures)
+
+    t
+    |> base_placement(location)
+    |> adjust_placement(location, template, has_departures, has_cr_departures)
   end
 
   defp base_placement(
@@ -409,13 +415,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp base_placement(%__MODULE__{}, _location), do: :flex_zone
 
   # When departures are enabled, downgrade single-screen takeovers to the flex zone
-  defp adjust_placement(:single_screen, _location, :duo, true), do: :flex_zone
-  defp adjust_placement(placement, _location, :duo, _has_departures), do: placement
+  # But when CR departures are enabled, maintain level of single-screen takeovers
+  defp adjust_placement(:single_screen, _location, :duo, true, false), do: :flex_zone
+  defp adjust_placement(placement, _location, :duo, _has_departures, _has_cr), do: placement
+
   # "Downgrade" placement by one level for solo screens, with some exceptions.
-  defp adjust_placement(:dual_screen, _location, :solo, _), do: :single_screen
-  defp adjust_placement(:single_screen, :inside, :solo, _), do: :single_screen
-  defp adjust_placement(:single_screen, _location, :solo, _), do: :flex_zone
-  defp adjust_placement(:flex_zone, _location, :solo, _), do: :flex_zone
+  defp adjust_placement(:dual_screen, _location, :solo, _, _), do: :single_screen
+  defp adjust_placement(:single_screen, :inside, :solo, _, _), do: :single_screen
+  defp adjust_placement(:single_screen, _location, :solo, _, _), do: :flex_zone
+  defp adjust_placement(:flex_zone, _location, :solo, _, _), do: :flex_zone
 
   # Two screen alert, suspension
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
@@ -1262,13 +1270,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   def priority(%__MODULE__{is_priority: true}), do: [1]
   def priority(_t), do: [3]
 
-  def slot_names(%__MODULE__{screen: %Screen{app_params: %PreFare{template: template}}} = t) do
+  def slot_names(
+        %__MODULE__{
+          screen: %Screen{app_params: %PreFare{departures: departures, template: template}}
+        } = t
+      ) do
     case placement(t) do
       :dual_screen ->
         [:full_body_duo]
 
       :single_screen ->
-        if template == :duo, do: [:paged_main_content_left], else: [:full_body_right]
+        # Two situations in which we show an alert on the full_body right of a screen
+        # When a section contains CR departures, we want this to be fully displayed
+        # For single screens, we want it to be visible on the right as well
+        if template == :duo and !departures_contains_commuter_rail?(departures),
+          do: [:paged_main_content_left],
+          else: [:full_body_right]
 
       :flex_zone ->
         [:large]
@@ -1284,6 +1301,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
+
+  @spec departures_contains_commuter_rail?(Departures.t() | nil) :: boolean()
+  def departures_contains_commuter_rail?(nil), do: false
+
+  def departures_contains_commuter_rail?(%Departures{sections: sections}) do
+    Enum.any?(sections, &section_contains_commuter_rail?(&1))
+  end
+
+  @spec section_contains_commuter_rail?(Section.t() | nil) :: boolean()
+  defp section_contains_commuter_rail?(%Section{
+         query: %Query{params: %Params{route_type: route_type}}
+       }) do
+    case route_type do
+      :rail -> true
+      _ -> false
+    end
+  end
 
   # Suppress alerts for GL disruption 12/8/2025-12/22/2025 specifically at Kenmore, which will be
   # configured with custom content

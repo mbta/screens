@@ -197,6 +197,145 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
+  # def ruggles_alert do
+  #   [    alert: %Screens.Alerts.Alert{
+  #     id: "206740",
+  #     cause: :unknown,
+  #     effect: :suspension,
+  #     severity: 7,
+  #     header: "Orange Line: service is suspended at Ruggles",
+  #     informed_entities: [
+  #       %{
+  #         stop: "70010",
+  #         route: "Orange",
+  #         direction_id: 0,
+  #         route_type: 1,
+  #         activities: [:board, :ride],
+  #         facility: nil
+  #       },
+  #       %{
+  #         stop: "70011",
+  #         route: "Orange",
+  #         direction_id: 1,
+  #         route_type: 1,
+  #         activities: [:board, :ride],
+  #         facility: nil
+  #       },
+  #       %{
+  #         stop: "place-rugg",
+  #         route: "Orange",
+  #         direction_id: nil,
+  #         route_type: 1,
+  #         activities: [:board, :ride],
+  #         facility: nil
+  #       }
+  #     ],
+  #     active_period: [{~U[2026-01-15 18:42:00Z], ~U[2026-01-15 20:42:28Z]}],
+  #     lifecycle: "NEW",
+  #     timeframe: nil,
+  #     created_at: ~U[2026-01-15 18:42:11Z],
+  #     updated_at: ~U[2026-01-15 18:42:11Z],
+  #     url: nil,
+  #     description: "Affected stops:\r\nRuggles"
+  #   },
+  #   now: ~U[2026-01-15 18:42:38.064757Z],
+  #   location_context: %Screens.LocationContext{
+  #     home_stop: "place-rugg",
+  #     tagged_stop_sequences: %{
+  #       "Orange" => [
+  #         ["place-ogmnl", "place-mlmnl", "place-welln", "place-astao",
+  #          "place-sull", "place-ccmnl", "place-north", "place-haecl",
+  #          "place-state", "place-dwnxg", "place-chncl", "place-tumnl",
+  #          "place-bbsta", "place-masta", "place-rugg", "place-rcmnl",
+  #          "place-jaksn", "place-sbmnl", "place-grnst", "place-forhl"]
+  #       ]
+  #     },
+  #     upstream_stops: MapSet.new(["place-astao", "place-bbsta", "place-ccmnl",
+  #      "place-chncl", "place-dwnxg", "place-haecl", "place-masta", "place-mlmnl",
+  #      "place-north", "place-ogmnl", "place-state", "place-sull", "place-tumnl",
+  #      "place-welln"]),
+  #     downstream_stops: MapSet.new(["place-forhl", "place-grnst", "place-jaksn",
+  #      "place-rcmnl", "place-sbmnl"]),
+  #     routes: [%{route_id: "Orange", active?: true}],
+  #     alert_route_types: [:light_rail, :subway]
+  #   },
+  #   home_station_name: "Ruggles",
+  #   informed_station_names: [],
+  #   is_terminal_station: false,
+  #   is_priority: true,
+  #   partial_closure_platform_names: [],
+  #   is_commuter_rail_station: false
+  # }
+  # [%{route_id: "Orange", active?: true}]  alert: %Screens.Alerts.Alert{
+  #     id: "206740",
+  #     cause: :unknown,
+  #     effect: :suspension,
+  #     severity: 7,
+  #     header: "Orange Line: service is suspended at Ruggles",
+  #     informed_entities: [
+  #       %{
+  #         stop: "70010",
+  #         route: "Orange",
+  #         direction_id: 0,
+  #         route_type: 1,
+  #         activities: [:board, :ride],
+  #         facility: nil
+  #       },
+  #       %{
+  #         stop: "70011",
+  #         route: "Orange",
+  #         direction_id: 1,
+  #         route_type: 1,
+  #         activities: [:board, :ride],
+  #         facility: nil
+  #       },
+  #       %{
+  #         stop: "place-rugg",
+  #         route: "Orange",
+  #         direction_id: nil,
+  #         route_type: 1,
+  #         activities: [:board, :ride],
+  #         facility: nil
+  #       }
+  #     ],
+  #     active_period: [{~U[2026-01-15 18:42:00Z], ~U[2026-01-15 20:42:28Z]}],
+  #     lifecycle: "NEW",
+  #     timeframe: nil,
+  #     created_at: ~U[2026-01-15 18:42:11Z],
+  #     updated_at: ~U[2026-01-15 18:42:11Z],
+  #     url: nil,
+  #     description: "Affected stops:\r\nRuggles"
+  #   },
+  #   now: ~U[2026-01-15 18:42:38.064757Z],
+  #   location_context: %Screens.LocationContext{
+  #     home_stop: "place-rugg",
+  #     tagged_stop_sequences: %{
+  #       "Orange" => [
+  #         ["place-ogmnl", "place-mlmnl", "place-welln", "place-astao",
+  #          "place-sull", "place-ccmnl", "place-north", "place-haecl",
+  #          "place-state", "place-dwnxg", "place-chncl", "place-tumnl",
+  #          "place-bbsta", "place-masta", "place-rugg", "place-rcmnl",
+  #          "place-jaksn", "place-sbmnl", "place-grnst", "place-forhl"]
+  #       ]
+  #     },
+  #     upstream_stops: MapSet.new(["place-astao", "place-bbsta", "place-ccmnl",
+  #      "place-chncl", "place-dwnxg", "place-haecl", "place-masta", "place-mlmnl",
+  #      "place-north", "place-ogmnl", "place-state", "place-sull", "place-tumnl",
+  #      "place-welln"]),
+  #     downstream_stops: MapSet.new(["place-forhl", "place-grnst", "place-jaksn",
+  #      "place-rcmnl", "place-sbmnl"]),
+  #     routes: [%{route_id: "Orange", active?: true}],
+  #     alert_route_types: [:light_rail, :subway]
+  #   },
+  #   home_station_name: "Ruggles",
+  #   informed_station_names: [],
+  #   is_terminal_station: false,
+  #   is_priority: true,
+  #   partial_closure_platform_names: [],
+  #   is_commuter_rail_station: false
+  # }
+  # [%{route_id: "Orange", active?: true}]
+  #   end
   @doc """
   Used by V2 e-ink and bus shelter alerts
 
