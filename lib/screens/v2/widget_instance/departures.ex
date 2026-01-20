@@ -107,7 +107,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   def serialize_section(%NoDataSection{route: route}, _screen, _now, _is_only_section) do
     text = %FreeTextLine{
-      icon: Route.icon(route),
+      icon: if(route == nil, do: nil, else: Route.icon(route)),
       text: ["Updates unavailable"]
     }
 

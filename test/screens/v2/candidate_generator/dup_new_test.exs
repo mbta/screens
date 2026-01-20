@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
 
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator.DupNew
+  alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.{DeparturesNoData, EvergreenContent}
   alias ScreensConfig.{Alerts, Departures, EvergreenContentItem, Header, Schedule}
   alias ScreensConfig.Screen
@@ -13,9 +14,11 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
 
   import Screens.Inject
   @alert injected(Screens.Alerts.Alert)
+  @rds injected(RDS)
 
   setup do
     stub(@alert, :fetch, fn _ -> {:ok, []} end)
+    stub(@rds, :get, fn _, _ -> [{:ok, []}] end)
     :ok
   end
 
