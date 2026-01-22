@@ -1,9 +1,10 @@
 defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.EvergreenContent
-  alias ScreensConfig.{Schedule, Screen}
+  alias ScreensConfig.{AlertSchedule, RecurrentSchedule, Schedule, Screen}
 
   setup do
     %{
@@ -75,26 +76,61 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
     end
   end
 
+  describe "valid_candidate?/1 with alert schedule" do
+    @alerts [
+      %Alert{
+        id: "1",
+        active_period: [{~U[2026-01-01T11:00:00Z], ~U[2026-01-01T13:00:00Z]}]
+      },
+      %Alert{
+        id: "2",
+        active_period: [{~U[2026-01-02T11:00:00Z], ~U[2026-01-02T13:00:00Z]}]
+      }
+    ]
+
+    test "returns true when a relevant alert is happening now" do
+      widget =
+        struct(EvergreenContent, %{
+          alerts: @alerts,
+          now: ~U[2026-01-02T12:00:00Z],
+          schedule: %AlertSchedule{alert_ids: ~w[2]}
+        })
+
+      assert WidgetInstance.valid_candidate?(widget)
+    end
+
+    test "returns false when a relevant alert is not happening now" do
+      widget =
+        struct(EvergreenContent, %{
+          alerts: @alerts,
+          now: ~U[2026-01-02T12:00:00Z],
+          schedule: %AlertSchedule{alert_ids: ~w[1]}
+        })
+
+      refute WidgetInstance.valid_candidate?(widget)
+    end
+  end
+
   describe "valid_candidate?/1 with recurrent schedule" do
     setup do
       %{
         widget_non_overnight_schedule:
           struct(EvergreenContent, %{
-            schedule: %{
+            schedule: %RecurrentSchedule{
               dates: [%{start_date: ~D[2023-01-05], end_date: ~D[2023-01-10]}],
               times: [%{start_time_utc: ~T[06:30:00], end_time_utc: ~T[17:00:00]}]
             }
           }),
         widget_overnight_schedule:
           struct(EvergreenContent, %{
-            schedule: %{
+            schedule: %RecurrentSchedule{
               dates: [%{start_date: ~D[2023-01-05], end_date: ~D[2023-01-10]}],
               times: [%{start_time_utc: ~T[22:00:00], end_time_utc: ~T[03:00:00]}]
             }
           }),
         widget_multi_schedule:
           struct(EvergreenContent, %{
-            schedule: %{
+            schedule: %RecurrentSchedule{
               dates: [
                 %{start_date: ~D[2023-01-05], end_date: ~D[2023-01-10]},
                 %{start_date: ~D[2023-02-05], end_date: ~D[2023-02-10]}
@@ -114,7 +150,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
       widget =
         struct(EvergreenContent, %{
           now: ~U[2023-01-05T12:00:00Z],
-          schedule: %{
+          schedule: %RecurrentSchedule{
             dates: [],
             times: []
           }
@@ -127,7 +163,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
       widget =
         struct(EvergreenContent, %{
           now: ~U[2023-01-05T12:00:00Z],
-          schedule: %{
+          schedule: %RecurrentSchedule{
             dates: [],
             times: [%{start_time_utc: ~T[06:30:00], end_time_utc: ~T[17:00:00]}]
           }
@@ -140,7 +176,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
       widget =
         struct(EvergreenContent, %{
           now: ~U[2023-01-05T12:00:00Z],
-          schedule: %{
+          schedule: %RecurrentSchedule{
             dates: [%{start_date: ~D[2023-01-01], end_date: ~D[2023-01-10]}],
             times: []
           }

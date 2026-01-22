@@ -79,7 +79,7 @@ defmodule Screens.MixProject do
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
       {:retry, "~> 0.19.0"},
-      {:screens_config, github: "mbta/screens-config-lib"},
+      {:screens_config, github: "mbta/screens-config-lib", branch: "cfg-alert-schedule"},
       {:sentry, "~> 11.0"},
       {:sweet_xml, "~> 0.7.0"},
       {:telemetry, "~> 1.2"},

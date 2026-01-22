@@ -144,7 +144,7 @@ defmodule Screens.Alerts.Alert do
 
   @type options :: [
           activities: [activity()] | :all,
-          fields: [String.t()],
+          ids: [id()],
           include_all?: boolean(),
           route_id: Route.id(),
           route_ids: [Route.id()],
@@ -230,14 +230,8 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  defp format_query_param({:fields, fields}) when is_list(fields) do
-    [
-      {"fields[alert]", Enum.join(fields, ",")}
-    ]
-  end
-
-  defp format_query_param({:field, field}) when is_binary(field) do
-    format_query_param({:fields, [field]})
+  defp format_query_param({:ids, ids}) when is_list(ids) do
+    [{"filter[id]", Enum.join(ids, ",")}]
   end
 
   defp format_query_param({:stop_ids, stop_ids}) when is_list(stop_ids) do
