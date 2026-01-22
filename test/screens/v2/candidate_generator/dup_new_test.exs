@@ -11,6 +11,14 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
   import Mox
   setup :verify_on_exit!
 
+  import Screens.Inject
+  @alert injected(Screens.Alerts.Alert)
+
+  setup do
+    stub(@alert, :fetch, fn _ -> {:ok, []} end)
+    :ok
+  end
+
   describe "candidate_instances/2" do
     @config %Screen{
       app_id: :dup_v2,
