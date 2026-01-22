@@ -12,7 +12,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.{Departures, FreeText, FreeTextLine, Screen}
+
+  alias ScreensConfig.{
+    AlertSchedule,
+    Departures,
+    EvergreenContentItem,
+    FreeText,
+    FreeTextLine,
+    Screen
+  }
+
   alias ScreensConfig.Screen.PreFare
 
   defstruct screen: nil,
@@ -1298,17 +1307,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
 
-  # Suppress alerts for GL disruption 12/8/2025-12/22/2025 specifically at Kenmore, which will be
-  # configured with custom content
   def valid_candidate?(%__MODULE__{
-        alert: %Alert{id: "679818"},
-        screen: %Screen{
-          app_params: %PreFare{reconstructed_alert_widget: %{stop_id: "place-kencl"}}
-        }
-      }),
-      do: false
+        alert: %Alert{id: alert_id},
+        screen: %Screen{app_params: %_app{evergreen_content: evergreen_items}}
+      }) do
+    Enum.all?(evergreen_items, fn
+      %EvergreenContentItem{
+        schedule: %AlertSchedule{alert_ids: alert_ids, suppress_alert_widgets: true}
+      } ->
+        alert_id not in alert_ids
 
-  def valid_candidate?(_other), do: true
+      _other ->
+        true
+    end)
+  end
 
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)
