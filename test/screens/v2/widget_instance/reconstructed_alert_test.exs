@@ -8,7 +8,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
-  alias ScreensConfig.{ContentSummary, Departures, ElevatorStatus, Header, Screen}
+
+  alias ScreensConfig.{
+    AlertSchedule,
+    ContentSummary,
+    Departures,
+    ElevatorStatus,
+    EvergreenContentItem,
+    Header,
+    Screen
+  }
+
   alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Screen.PreFare
 
@@ -3517,9 +3527,26 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert WidgetInstance.valid_candidate?(widget)
     end
 
-    test "returns false for suppressed alert", %{widget: widget} do
-      widget = put_in(widget.screen.app_params.reconstructed_alert_widget.stop_id, "place-kencl")
-      refute widget |> put_alert_id("679818") |> WidgetInstance.valid_candidate?()
+    test "returns false when evergreen content suppresses the alert ID", %{widget: widget} do
+      widget =
+        put_in(widget.screen.app_params.evergreen_content, [
+          struct(EvergreenContentItem,
+            schedule: %AlertSchedule{alert_ids: ~w[500], suppress_alert_widgets: true}
+          )
+        ])
+
+      refute widget |> put_alert_id("500") |> WidgetInstance.valid_candidate?()
+    end
+
+    test "returns true when evergreen content does not suppress the alert", %{widget: widget} do
+      widget =
+        put_in(widget.screen.app_params.evergreen_content, [
+          struct(EvergreenContentItem,
+            schedule: %AlertSchedule{alert_ids: ~w[500], suppress_alert_widgets: false}
+          )
+        ])
+
+      assert widget |> put_alert_id("500") |> WidgetInstance.valid_candidate?()
     end
   end
 
