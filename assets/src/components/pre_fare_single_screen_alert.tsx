@@ -20,6 +20,7 @@ interface PreFareSingleScreenAlertProps {
   location: string;
   cause: string;
   remedy: string;
+  show_alternate_route_text: boolean;
   routes: EnrichedRoute[];
   unaffected_routes?: EnrichedRoute[];
   endpoints: [string, string];
@@ -43,6 +44,7 @@ interface EnrichedRoute {
 interface StandardLayoutProps {
   issue: string;
   remedy: string;
+  show_alternate_route_text: boolean;
   effect: string;
   location: string | null;
   disruptionDiagram?: DisruptionDiagramData;
@@ -51,6 +53,7 @@ interface StandardLayoutProps {
 const StandardLayout: ComponentType<StandardLayoutProps> = ({
   issue,
   remedy,
+  show_alternate_route_text,
   effect,
   location,
   disruptionDiagram,
@@ -74,6 +77,7 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
           effect={effect}
           remedy={remedy}
           contentTextSize="large"
+          show_alternate_route_text={show_alternate_route_text}
         />
       </div>
       {disruptionDiagram && (
@@ -87,6 +91,7 @@ interface DownstreamLayoutProps {
   endpoints: [string, string];
   effect: string;
   remedy: string;
+  show_alternate_route_text: boolean;
   disruptionDiagram?: DisruptionDiagramData;
 }
 
@@ -95,12 +100,18 @@ const DownstreamLayout: ComponentType<DownstreamLayoutProps> = ({
   endpoints,
   effect,
   remedy,
+  show_alternate_route_text,
   disruptionDiagram,
 }) => (
   <div className={classWithModifier("alert-card__content-block", "downstream")}>
     {disruptionDiagram && <MapSection disruptionDiagram={disruptionDiagram} />}
     <DownstreamIssueSection endpoints={endpoints} />
-    <RemedySection effect={effect} remedy={remedy} contentTextSize="medium" />
+    <RemedySection
+      effect={effect}
+      remedy={remedy}
+      contentTextSize="medium"
+      show_alternate_route_text={show_alternate_route_text}
+    />
   </div>
 );
 
@@ -125,17 +136,17 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
     <div className="alert-card__content-block">
       <div className="alert-card__issue">
         <NoServiceIcon className="alert-card__icon" />
-        <div className="alert-card__content-block__text--large">
+        <h3 className="alert-card__content-block__text">
           <AffectedLinePill
             className="alert-card__content-block__route-pill"
             color={affectedLineColor}
           />
           <span>trains are skipping this station</span>
-        </div>
+        </h3>
       </div>
       <div className="alert-card__issue">
         <InfoIcon className="alert-card__icon" />
-        <div className="alert-card__content-block__text--large">
+        <h3 className="alert-card__content-block__text">
           {unaffected_routes.map((route) => {
             const UnaffectedLinePill = STRING_TO_SVG[route.svg_name];
             const unaffectedLineColor = getHexColor(
@@ -150,7 +161,7 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
             );
           })}
           <span>trains stop as usual</span>
-        </div>
+        </h3>
       </div>
       {disruptionDiagram && (
         <MapSection disruptionDiagram={disruptionDiagram} />
@@ -186,7 +197,7 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   return (
     <div className="alert-card__fallback">
       <Icon className="alert-card__fallback__icon" />
-      {issue && <div className="alert-card__fallback__issue-text">{issue}</div>}
+      {issue && <h4 className="alert-card__fallback__issue-text">{issue}</h4>}
       {remedy && (
         <div
           className={`alert-card__fallback__alert-text ${alertTextSize}`}
@@ -211,18 +222,17 @@ const StandardIssueSection: ComponentType<StandardIssueSectionProps> = ({
   contentTextSize,
 }) => (
   <div className="alert-card__issue">
-    <NoServiceIcon className="alert-card__icon" />
+    <NoServiceIcon
+      className={classWithModifiers("alert-card__icon", [contentTextSize])}
+    />
     <div>
-      <div
-        className={classWithModifier(
-          "alert-card__content-block__text",
-          contentTextSize,
-        )}
-      >
-        {issue}
-      </div>
+      {contentTextSize === "large" ? (
+        <h3 className="alert-card__content-block__text">{issue}</h3>
+      ) : (
+        <h4 className="alert-card__content-block__text">{issue}</h4>
+      )}
       {location && (
-        <div className="alert-card__issue__location">{location}</div>
+        <div className="alert-card__issue__location body-4">{location}</div>
       )}
     </div>
   </div>
@@ -236,49 +246,61 @@ const DownstreamIssueSection: ComponentType<DownstreamIssueSectionProps> = ({
   endpoints,
 }) => (
   <div className="alert-card__issue">
-    <div
-      className={classWithModifier("alert-card__content-block__text", "medium")}
-    >
-      No trains <span style={{ fontWeight: 500 }}>between</span> {endpoints[0]}{" "}
-      <span style={{ fontWeight: 500 }}>&</span> {endpoints[1]}
-    </div>
+    <NoServiceIcon className="alert-card__icon" />
+    <h4 className="alert-card__content-block__text">
+      No trains between {endpoints[0]} & {endpoints[1]}
+    </h4>
   </div>
 );
 interface RemedySectionProps {
   effect: string;
   remedy: string | null;
+  show_alternate_route_text: boolean;
   contentTextSize: string;
 }
 const RemedySection: ComponentType<RemedySectionProps> = ({
   effect,
   remedy,
+  show_alternate_route_text,
   contentTextSize,
 }) => (
   <div className="alert-card__remedy">
     {effect === "shuttle" ? (
       <>
         <div className="alert-card__remedy__shuttle-icons">
-          <ShuttleBusIcon className="alert-card__icon" />
-          <ISAIcon className="alert-card__isa-icon" />
+          <ShuttleBusIcon
+            className={classWithModifiers("alert-card__icon", [
+              contentTextSize,
+            ])}
+          />
         </div>
         <div>
-          <div
-            className={classWithModifier(
-              "alert-card__content-block__text",
-              contentTextSize,
-            )}
-          >
-            {remedy}
-          </div>
-          <div className="alert-card__body__accessibility-info--text">
+          {contentTextSize === "large" ? (
+            <h3 className="alert-card__content-block__text">{remedy}</h3>
+          ) : (
+            <h4 className="alert-card__content-block__text">{remedy}</h4>
+          )}
+          <div className="alert-card__body__accessibility-info--text body-4">
             All shuttle buses are accessible
+            <ISAIcon className="alert-card__isa-icon" />
           </div>
         </div>
       </>
     ) : (
       <>
-        <WalkingIcon className="alert-card__icon" />
-        <div className="alert-card__remedy__text">{remedy}</div>
+        <WalkingIcon
+          className={classWithModifiers("alert-card__icon", [contentTextSize])}
+        />
+        {show_alternate_route_text ? (
+          <h5 className="alert-card__remedy__text">
+            <span className="alert-card__remedy__text--alternate-route">
+              Find alternate route at{" "}
+            </span>
+            mbta.com/alerts
+          </h5>
+        ) : (
+          <h5 className="alert-card__remedy__text">{remedy}</h5>
+        )}
       </>
     )}
   </div>
@@ -320,6 +342,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
     issue,
     location,
     remedy,
+    show_alternate_route_text,
     routes,
     unaffected_routes,
     updated_at,
@@ -359,6 +382,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           effect={effect}
           location={location}
           disruptionDiagram={disruption_diagram}
+          show_alternate_route_text={show_alternate_route_text}
         />
       );
       break;
@@ -370,6 +394,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           effect={effect}
           location={location}
           disruptionDiagram={disruption_diagram}
+          show_alternate_route_text={show_alternate_route_text}
         />
       );
       break;
@@ -382,6 +407,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           effect={effect}
           location={location}
           disruptionDiagram={disruption_diagram}
+          show_alternate_route_text={show_alternate_route_text}
         />
       );
       break;
@@ -394,6 +420,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           effect={effect}
           remedy={remedy}
           disruptionDiagram={disruption_diagram}
+          show_alternate_route_text={show_alternate_route_text}
         />
       );
       break;
@@ -422,7 +449,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           <div className={classWithModifier("alert-card__body", effect)}>
             {layout}
           </div>
-          <div className="alert-card__footer">
+          <div className="alert-card__footer body-4">
             {cause && (
               <div className="alert-card__footer__cause">
                 Cause: {formatCause(cause)}
@@ -483,14 +510,14 @@ const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
     const color = getRouteColor(route.route_id);
 
     banner = (
-      <div className={classWithModifiers("alert-banner", ["small", color])}>
-        <span className="alert-banner__attention-text">ATTENTION</span>
+      <h5 className={classWithModifiers("alert-banner", ["small", color])}>
+        <span className="alert-banner__attention-text">Attention</span>
         <LinePill
           className="alert-banner__route-pill--short"
           color={getHexColor(color)}
         />
         <span>riders</span>
-      </div>
+      </h5>
     );
   } else if (routes.length === 1) {
     // One destination, long text
@@ -499,33 +526,33 @@ const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
     const color = getRouteColor(route.route_id);
 
     banner = (
-      <div
+      <h5
         className={classWithModifiers("alert-banner", [
           "large--one-route",
           color,
         ])}
       >
         <span>
-          <span className="alert-banner__attention-text">ATTENTION,</span>{" "}
+          <span className="alert-banner__attention-text">Attention,</span>{" "}
           riders to
         </span>
         <LinePill
           className="alert-banner__route-pill--long"
           color={getHexColor(color)}
         />
-      </div>
+      </h5>
     );
   } else if (routes.length === 2) {
     // Two destinations
     banner = (
-      <div
+      <h5
         className={classWithModifiers("alert-banner", [
           "large--two-routes",
           getAlertColor(routes),
         ])}
       >
         <span>
-          <span className="alert-banner__attention-text">ATTENTION,</span>{" "}
+          <span className="alert-banner__attention-text">Attention,</span>{" "}
           riders to
         </span>
         {routes.map((route) => {
@@ -538,22 +565,22 @@ const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
             />
           );
         })}
-      </div>
+      </h5>
     );
   } else {
     // Fallback
     banner = (
-      <div
+      <h5
         className={classWithModifiers("alert-banner", [
           "small",
           getAlertColor(routes),
         ])}
       >
         <span>
-          <span className="alert-banner__attention-text">ATTENTION,</span>{" "}
+          <span className="alert-banner__attention-text">Attention,</span>{" "}
           riders
         </span>
-      </div>
+      </h5>
     );
   }
 

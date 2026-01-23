@@ -1,8 +1,30 @@
+@use "admin/editor";
 @use "admin/inspector";
 
+body {
+  margin: 0;
+}
+
 #app {
+  display: flex;
+  flex-direction: column;
+  width: 100vw;
+  height: 100vh;
+  overflow: auto;
   font-family: sans-serif;
   font-size: 14px;
+
+  & > * {
+    flex-grow: 1;
+  }
+
+  & > nav {
+    flex-grow: 0;
+  }
+}
+
+.admin-page {
+  margin: 8px 1em;
 }
 
 .admin__textarea {
@@ -14,25 +36,16 @@
   display: flex;
   flex-wrap: wrap;
   row-gap: 0.5em;
+  align-items: center;
   padding: 1em;
-  margin-bottom: 0.5em;
   background-color: #eee;
 }
 
-.admin-navbar__group {
-  display: flex;
-  align-items: center;
-
-  &:not(:first-child) {
-    padding-left: 1em;
-    margin-left: 1em;
-    border-left: 1px solid gray;
-  }
-}
-
-.admin-navbar a {
-  padding: 2px;
+.admin-navbar a,
+.admin-navbar button {
   padding: 3px 5px 2px;
+  font-family: inherit;
+  font-size: inherit;
   color: black;
   text-decoration: none;
   background-color: white;
@@ -47,47 +60,6 @@
   &:not(:first-child) {
     margin-left: 0.5em;
   }
-}
-
-.admin-table {
-  padding-bottom: 3em;
-
-  tbody {
-    input,
-    select {
-      padding: 0;
-      margin: 0;
-      border: 0;
-    }
-  }
-}
-
-.admin-table__textarea {
-  width: 400px;
-  height: 40px;
-  transition: height 0.2s;
-
-  &:focus {
-    height: 400px;
-  }
-}
-
-.admin-table__controls {
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  padding: 1em;
-  background: white;
-}
-
-.admin-table__column--name {
-  width: 240px;
-}
-
-.admin-table__inspector-link {
-  color: unset;
-  text-decoration: none;
-  border-bottom: 1px dotted;
 }
 
 .admin-modal__background {
@@ -108,9 +80,6 @@
 }
 
 .admin-image-manager {
-  font-family: sans-serif;
-  font-size: 14px;
-
   &__delete-button {
     margin-left: 8px;
   }

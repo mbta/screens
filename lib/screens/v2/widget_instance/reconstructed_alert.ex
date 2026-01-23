@@ -12,7 +12,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.{Departures, FreeText, FreeTextLine, Screen}
+
+  alias ScreensConfig.{
+    AlertSchedule,
+    Departures,
+    EvergreenContentItem,
+    FreeText,
+    FreeTextLine,
+    Screen
+  }
+
   alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Departures.Query.Params
   alias ScreensConfig.Screen.PreFare
@@ -448,8 +457,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "No trains",
-      remedy: "Seek alternate route",
-      location: "No #{route_id} Line trains #{format_endpoint_string(endpoints)}",
+      remedy: nil,
+      show_alternate_route_text: true,
+      location: "#{route_id} Line service is suspended #{format_endpoint_string(endpoints)}",
       endpoints: endpoints,
       cause: format_cause(cause),
       routes: get_route_pills(t),
@@ -527,7 +537,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Station closed",
-      remedy: "Seek alternate route",
+      remedy: nil,
+      show_alternate_route_text: true,
       location: location_text,
       cause: format_cause(cause),
       routes: get_route_pills(t),
@@ -553,7 +564,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        ) do
     %{
       issue: if(effect == :station_closure, do: "Station closed", else: "No trains"),
-      remedy: if(effect == :shuttle, do: "Use shuttle bus", else: "Seek alternate route"),
+      remedy:
+        if(effect == :shuttle,
+          do: "Use shuttle bus"
+        ),
+      show_alternate_route_text: effect != :shuttle,
       location: header,
       cause: format_cause(cause),
       routes: get_route_pills(t),
@@ -591,7 +606,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         endpoint_text = format_endpoint_string(endpoints)
 
         location_text =
-          if is_nil(endpoint_text), do: nil, else: "No #{route_id} Line trains #{endpoint_text}"
+          if is_nil(endpoint_text),
+            do: nil,
+            else: "#{route_id} Line service is suspended #{endpoint_text}"
 
         issue =
           cond do
@@ -612,7 +629,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: issue,
-      remedy: "Seek alternate route",
+      remedy: nil,
+      show_alternate_route_text: true,
       location: location_text,
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
@@ -651,7 +669,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         {"No trains", nil, "Shuttle buses available"}
       else
         endpoint_text = format_endpoint_string(endpoints)
-        location_text = if is_nil(endpoint_text), do: nil, else: "Shuttle buses #{endpoint_text}"
+
+        location_text =
+          if is_nil(endpoint_text), do: nil, else: "Shuttle buses replace trains #{endpoint_text}"
 
         issue =
           cond do
@@ -762,7 +782,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: if(unaffected_routes == [], do: "Station closed"),
-      remedy: if(unaffected_routes == [], do: "Seek alternate route"),
+      remedy: nil,
+      show_alternate_route_text: unaffected_routes == [],
       unaffected_routes:
         Enum.flat_map(unaffected_routes, fn route -> build_pills_from_headsign(route, nil) end),
       cause: get_cause(cause),
@@ -786,7 +807,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: "Trains skip #{informed_stations_string}",
-      remedy: "Seek alternate route",
+      remedy: nil,
+      show_alternate_route_text: true,
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :station_closure,
@@ -1319,17 +1341,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  # Suppress alerts for GL disruption 12/8/2025-12/22/2025 specifically at Kenmore, which will be
-  # configured with custom content
   def valid_candidate?(%__MODULE__{
-        alert: %Alert{id: "679818"},
-        screen: %Screen{
-          app_params: %PreFare{reconstructed_alert_widget: %{stop_id: "place-kencl"}}
-        }
-      }),
-      do: false
+        alert: %Alert{id: alert_id},
+        screen: %Screen{app_params: %_app{evergreen_content: evergreen_items}}
+      }) do
+    Enum.all?(evergreen_items, fn
+      %EvergreenContentItem{
+        schedule: %AlertSchedule{alert_ids: alert_ids, suppress_alert_widgets: true}
+      } ->
+        alert_id not in alert_ids
 
-  def valid_candidate?(_other), do: true
+      _other ->
+        true
+    end)
+  end
 
   defimpl Screens.V2.WidgetInstance do
     def priority(t), do: ReconstructedAlert.priority(t)

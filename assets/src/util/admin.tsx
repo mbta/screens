@@ -1,8 +1,9 @@
+import { type Key, type RefCallback, useState } from "react";
 import getCsrfToken from "Util/csrf";
 
 type JSONArray = Array<JSON>;
 type JSONObject = { [key: string]: JSON };
-type JSON = null | string | number | boolean | JSONArray | JSONObject;
+export type JSON = null | string | number | boolean | JSONArray | JSONObject;
 
 export type Config = {
   screens: { [id: string]: Screen };
@@ -10,33 +11,161 @@ export type Config = {
 };
 
 export type Screen = {
-  app_id: string;
+  app_id: AppId;
   app_params: JSONObject;
   device_id: string | null;
   disabled: boolean;
   hidden_from_screenplay: boolean;
-  name: string;
-  vendor: string;
+  name: string | null;
+  location: string | null;
+  tags: string[];
+  vendor: keyof typeof SCREEN_VENDORS | null;
+};
+
+export type ScreenWithId = { id: string; config: Screen };
+
+export type AppId =
+  | "bus_eink_v2"
+  | "bus_shelter_v2"
+  | "busway_v2"
+  | "dup_v2"
+  | "elevator_v2"
+  | "gl_eink_v2"
+  | "pre_fare_v2";
+
+type AppInfo = { name: string; hasAudio: boolean; variants: string[] };
+
+export const SCREEN_APPS: { [key in AppId]: AppInfo } = {
+  bus_eink_v2: { name: "Bus E-ink", hasAudio: true, variants: [] },
+  bus_shelter_v2: { name: "Bus Shelter", hasAudio: true, variants: [] },
+  busway_v2: { name: "Sectional", hasAudio: true, variants: [] },
+  dup_v2: { name: "DUP", hasAudio: false, variants: ["new_departures"] },
+  elevator_v2: { name: "Elevator", hasAudio: false, variants: [] },
+  gl_eink_v2: { name: "GL E-ink", hasAudio: true, variants: [] },
+  pre_fare_v2: { name: "Pre-Fare", hasAudio: true, variants: [] },
+};
+
+export const SCREEN_APP_ENTRIES = (
+  Object.entries(SCREEN_APPS) as [AppId, AppInfo][]
+).sort(([, { name: nameA }], [, { name: nameB }]) =>
+  nameA.localeCompare(nameB),
+);
+
+export const SCREEN_VENDORS = [
+  "c3ms",
+  "gds",
+  "lg_mri",
+  "mercury",
+  "mimo",
+  "outfront",
+  "solari",
+];
+
+const DEFAULT_APP_PARAMS: { [key in AppId]: Screen["app_params"] } = {
+  bus_eink_v2: {
+    alerts: { stop_id: "" },
+    departures: { sections: [] },
+    evergreen_content: [],
+    footer: { stop_id: null },
+    header: { stop_id: "" },
+  },
+  bus_shelter_v2: {
+    alerts: { stop_id: "" },
+    departures: { sections: [] },
+    evergreen_content: [],
+    footer: { stop_id: null },
+    header: { stop_id: "" },
+  },
+  busway_v2: {
+    departures: { sections: [] },
+    evergreen_content: [],
+    header: { stop_name: "" },
+  },
+  dup_v2: {
+    alerts: { stop_id: "" },
+    evergreen_content: [],
+    header: { stop_id: "" },
+    primary_departures: { sections: [] },
+    secondary_departures: { sections: [] },
+  },
+  elevator_v2: {
+    accessible_path_direction_arrow: null,
+    accessible_path_image_here_coordinates: { x: 0, y: 0 },
+    alternate_direction_text: "",
+    elevator_id: "",
+    evergreen_content: [],
+  },
+  gl_eink_v2: {
+    alerts: { stop_id: "" },
+    departures: { sections: [] },
+    evergreen_content: [],
+    footer: { stop_id: null },
+    header: { stop_id: "" },
+  },
+  pre_fare_v2: {
+    evergreen_content: [],
+    header: { stop_id: "" },
+  },
+};
+
+/**
+ * Initialize a new screen. The app params will be "valid" insofar as the admin
+ * UI can edit the screen without crashing, but may need further editing by the
+ * user to actually be valid configuration.
+ */
+export const newScreen = (appId: AppId) => ({
+  app_id: appId,
+  app_params: DEFAULT_APP_PARAMS[appId],
+  device_id: null,
+  disabled: false,
+  hidden_from_screenplay: true,
+  name: null,
+  location: null,
+  tags: [],
+  vendor: null,
+});
+
+/**
+ * Convenience hook for use with modal `<dialog>`s that are not mounted until
+ * they are ready to be shown. There is no need for this hook if having the
+ * `<dialog>` always mounted is acceptable (and in most cases it should be).
+ */
+export const useModalDialog = (): {
+  dialog: HTMLDialogElement | null;
+  ref: RefCallback<HTMLDialogElement>;
+} => {
+  const [dialog, setDialog] = useState<HTMLDialogElement | null>(null);
+
+  return {
+    dialog,
+    ref: (elem) => {
+      setDialog(elem);
+      if (elem) elem.showModal();
+    },
+  };
+};
+
+/**
+ * Provides a React `key`-compatible state value and a function that updates it
+ * to a new unique value. Can be used to force a component to re-mount.
+ */
+export const useResetKey = (): [Key, () => void] => {
+  const [key, setKey] = useState("");
+  return [key, () => setKey(window.crypto.randomUUID())];
 };
 
 /**
  * Set of attributes for forms and form elements which disable "auto" browser
  * behaviors like autocomplete and spell check.
  */
-const AUTOLESS_ATTRIBUTES = {
+export const AUTOLESS_ATTRIBUTES = {
   autoCapitalize: "off",
   autoComplete: "off",
   autoCorrect: "off",
   spellCheck: false,
 } as const;
 
-const gatherSelectOptions = (rows, columnId) => {
-  const options = rows.map((row) => row.values[columnId]);
-  const uniqueOptions = new Set(options);
-  return Array.from(uniqueOptions) as string[];
-};
-
-const fetch = {
+export const fetch = {
   get: (path) => doFetch(path, {}),
 
   post: (path, data) => {
@@ -90,5 +219,3 @@ const doFetch = async (
     throw error;
   }
 };
-
-export { AUTOLESS_ATTRIBUTES, fetch, gatherSelectOptions };

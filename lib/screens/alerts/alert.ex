@@ -144,7 +144,7 @@ defmodule Screens.Alerts.Alert do
 
   @type options :: [
           activities: [activity()] | :all,
-          fields: [String.t()],
+          ids: [id()],
           include_all?: boolean(),
           route_id: Route.id(),
           route_ids: [Route.id()],
@@ -230,14 +230,8 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  defp format_query_param({:fields, fields}) when is_list(fields) do
-    [
-      {"fields[alert]", Enum.join(fields, ",")}
-    ]
-  end
-
-  defp format_query_param({:field, field}) when is_binary(field) do
-    format_query_param({:fields, [field]})
+  defp format_query_param({:ids, ids}) when is_list(ids) do
+    [{"filter[id]", Enum.join(ids, ",")}]
   end
 
   defp format_query_param({:stop_ids, stop_ids}) when is_list(stop_ids) do
@@ -427,30 +421,29 @@ defmodule Screens.Alerts.Alert do
           :partial_closure | :full_station_closure | :partial_closure_multiple_stops
   def station_closure_type(
         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
-        all_platforms_at_informed_stations
+        platforms_at_informed_stations
       ) do
     # Alerts UI allows you to create partial closures affecting multiple stations.
     # Typically, these partial closures affecting child stops will only affect a single station.
     # However, we do want to consider the case in which multiple stations have closures,
     # but not every child stop at those parent stations are closed.
+
     informed_parent_stations = informed_parent_stations(alert)
 
-    informed_platforms =
-      get_informed_platforms_from_entities(
-        informed_entities,
-        all_platforms_at_informed_stations
-      )
+    platforms_affected_by_alert =
+      informed_platforms_from_entities(informed_entities, platforms_at_informed_stations)
 
     case informed_parent_stations do
       [_single_parent_station] ->
-        if length(informed_platforms) != length(all_platforms_at_informed_stations) do
+        # Compare number of platforms in alert to total number of child platforms at station
+        if length(platforms_affected_by_alert) != length(platforms_at_informed_stations) do
           :partial_closure
         else
           :full_station_closure
         end
 
       _multiple_parent_stations ->
-        if length(informed_platforms) != length(all_platforms_at_informed_stations) do
+        if length(platforms_affected_by_alert) != length(platforms_at_informed_stations) do
           :partial_closure_multiple_stops
         else
           :full_station_closure
@@ -458,9 +451,13 @@ defmodule Screens.Alerts.Alert do
     end
   end
 
-  def get_informed_platforms_from_entities(informed_entities, all_platforms_at_informed_stations) do
+  @spec informed_platforms_from_entities([InformedEntity.t()], [Stop.t()]) :: [InformedEntity.t()]
+  def informed_platforms_from_entities(informed_entities, all_platforms_at_informed_stations) do
     platform_ids = Enum.map(all_platforms_at_informed_stations, & &1.id)
-    Enum.filter(informed_entities, &(&1.stop in platform_ids))
+
+    informed_entities
+    |> Enum.filter(&(&1.stop in platform_ids))
+    |> Enum.uniq_by(& &1.stop)
   end
 
   @spec informs_stop_id?(t(), Stop.id()) :: boolean()

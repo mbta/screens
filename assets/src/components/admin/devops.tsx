@@ -44,7 +44,7 @@ const Devops = () => {
   ];
 
   return (
-    <main>
+    <main className="admin-page">
       <h2>Devops Flags</h2>
       <p>
         Disabling a mode here prevents any departures from being displayed for

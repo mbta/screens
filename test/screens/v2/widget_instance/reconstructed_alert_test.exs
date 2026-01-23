@@ -8,7 +8,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.ReconstructedAlert
-  alias ScreensConfig.{ContentSummary, Departures, ElevatorStatus, Header, Screen}
+
+  alias ScreensConfig.{
+    AlertSchedule,
+    ContentSummary,
+    Departures,
+    ElevatorStatus,
+    EvergreenContentItem,
+    Header,
+    Screen
+  }
+
   alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Departures.Query.Params
   alias ScreensConfig.Screen.PreFare
@@ -580,10 +590,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains to Forest Hills",
-        location: "No Orange Line trains between Malden Center and Wellington",
+        location: "Orange Line service is suspended between Malden Center and Wellington",
         cause: nil,
         effect: :suspension,
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         updated_at: "Jun 9",
         end_time: "tomorrow",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -624,7 +635,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains to Forest Hills",
-        location: "Shuttle buses between Wellington and Assembly",
+        location: "Shuttle buses replace trains between Wellington and Assembly",
         cause: nil,
         effect: :shuttle,
         remedy: "Use shuttle bus",
@@ -685,7 +696,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         },
         cause: nil,
         effect: :station_closure,
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         updated_at: "Jun 9",
         end_time: "tomorrow",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
@@ -696,10 +708,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected_solo = %{
         cause: nil,
         effect: :station_closure,
+        remedy: nil,
         region: :here,
         disruption_diagram: diagram,
         issue: "Station closed",
-        remedy: "Seek alternate route",
+        show_alternate_route_text: true,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         unaffected_routes: [],
         updated_at: "Jun 9",
@@ -724,10 +737,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains to Forest Hills",
-        location: "No Orange Line trains between Wellington and Assembly",
+        location: "Orange Line service is suspended between Wellington and Assembly",
         cause: :construction,
         effect: :suspension,
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         updated_at: "Jun 9",
         end_time: "tomorrow",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -768,10 +782,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains",
-        location: "No Orange Line trains between Oak Grove and Malden Center",
+        location: "Orange Line service is suspended between Oak Grove and Malden Center",
         cause: nil,
         effect: :suspension,
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         updated_at: "Jun 9",
         end_time: "tomorrow",
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
@@ -851,11 +866,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains to Oak Grove",
-        location: "No Orange Line trains between Oak Grove and Malden Center",
+        location: "Orange Line service is suspended between Oak Grove and Malden Center",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :suspension,
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         updated_at: "Jun 9",
         end_time: "tomorrow",
         region: :boundary,
@@ -894,7 +910,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       expected = %{
         issue: "No trains to Oak Grove",
-        location: "Shuttle buses between Oak Grove and Malden Center",
+        location: "Shuttle buses replace trains between Oak Grove and Malden Center",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
@@ -1157,7 +1173,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :suspension,
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         updated_at: "Jun 9",
         end_time: "tomorrow",
         region: :outside,
@@ -1408,7 +1425,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         effect: :suspension,
         issue: "No trains",
         location: "Simulation of PIO text",
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         routes: [%{color: :orange, text: "ORANGE LINE", type: :text}],
         updated_at: "Jun 9",
         end_time: "tomorrow"
@@ -1487,6 +1505,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         issue: nil,
         remedy: nil,
+        show_alternate_route_text: false,
         cause: nil,
         unaffected_routes: [%{route_id: "Red", svg_name: "rl"}],
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -1535,9 +1554,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         endpoints: {"Haymarket", "Chinatown"},
         is_transfer_station: true,
         issue: "No Orange Line trains",
-        location: "No Orange Line trains between Haymarket and Chinatown",
+        location: "Orange Line service is suspended between Haymarket and Chinatown",
         region: :here,
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         updated_at: "Jun 9",
         end_time: "tomorrow",
@@ -1579,7 +1599,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "No Orange Line trains",
         remedy: "Use shuttle bus",
         cause: nil,
-        location: "Shuttle buses between State and Chinatown",
+        location: "Shuttle buses replace trains between State and Chinatown",
         routes: [%{route_id: "Orange", svg_name: "ol"}],
         effect: :shuttle,
         updated_at: "Jun 9",
@@ -3102,7 +3122,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         cause: nil,
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
         effect: :suspension,
-        remedy: "Seek alternate route",
+        remedy: nil,
+        show_alternate_route_text: true,
         updated_at: "5:14 AM",
         end_time: nil,
         region: :outside,
@@ -3545,9 +3566,26 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert WidgetInstance.valid_candidate?(widget)
     end
 
-    test "returns false for suppressed alert", %{widget: widget} do
-      widget = put_in(widget.screen.app_params.reconstructed_alert_widget.stop_id, "place-kencl")
-      refute widget |> put_alert_id("679818") |> WidgetInstance.valid_candidate?()
+    test "returns false when evergreen content suppresses the alert ID", %{widget: widget} do
+      widget =
+        put_in(widget.screen.app_params.evergreen_content, [
+          struct(EvergreenContentItem,
+            schedule: %AlertSchedule{alert_ids: ~w[500], suppress_alert_widgets: true}
+          )
+        ])
+
+      refute widget |> put_alert_id("500") |> WidgetInstance.valid_candidate?()
+    end
+
+    test "returns true when evergreen content does not suppress the alert", %{widget: widget} do
+      widget =
+        put_in(widget.screen.app_params.evergreen_content, [
+          struct(EvergreenContentItem,
+            schedule: %AlertSchedule{alert_ids: ~w[500], suppress_alert_widgets: false}
+          )
+        ])
+
+      assert widget |> put_alert_id("500") |> WidgetInstance.valid_candidate?()
     end
   end
 

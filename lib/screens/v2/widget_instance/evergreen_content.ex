@@ -1,13 +1,15 @@
 defmodule Screens.V2.WidgetInstance.EvergreenContent do
   @moduledoc false
 
+  alias Screens.Alerts.Alert
   alias Screens.Util
   alias Screens.V2.WidgetInstance
-  alias ScreensConfig.{RecurrentSchedule, Schedule, Screen}
+  alias ScreensConfig.{AlertSchedule, RecurrentSchedule, Schedule, Screen}
 
   @enforce_keys ~w[screen slot_names asset_url priority now]a
   defstruct screen: nil,
             slot_names: nil,
+            alerts: [],
             asset_url: nil,
             priority: nil,
             schedule: [%Schedule{}],
@@ -18,9 +20,10 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   @type t :: %__MODULE__{
           screen: Screen.t(),
           slot_names: list(WidgetInstance.slot_id()),
+          alerts: list(Alert.t()),
           asset_url: String.t(),
           priority: WidgetInstance.priority(),
-          schedule: list(Schedule.t()) | RecurrentSchedule.t(),
+          schedule: list(Schedule.t()) | RecurrentSchedule.t() | AlertSchedule.t(),
           now: DateTime.t(),
           text_for_audio: String.t(),
           audio_priority: WidgetInstance.priority()
@@ -64,7 +67,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   #
   # Time ranges are allowed to cross midnight. This is detected by checking if start time is after end time.
   # If a time range crosses midnight, it's treated as crossing from today to tomorrow, *not* yesterday to today.
-  def valid_candidate?(%__MODULE__{schedule: schedule, now: now}) do
+  def valid_candidate?(%__MODULE__{schedule: %RecurrentSchedule{} = schedule, now: now}) do
     time_match =
       Enum.find(schedule.times, &Util.time_in_range?(now, &1.start_time_utc, &1.end_time_utc))
 
@@ -83,6 +86,16 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
         end)
       end
     end
+  end
+
+  def valid_candidate?(%__MODULE__{
+        alerts: alerts,
+        schedule: %AlertSchedule{alert_ids: alert_ids},
+        now: now
+      }) do
+    Enum.any?(alerts, fn %Alert{id: id} = alert ->
+      id in alert_ids and Alert.happening_now?(alert, now)
+    end)
   end
 
   # Checks if `now` is within the given `time_range` that crosses UTC midnight, as well as at least one of the date ranges in `dates`.
@@ -139,5 +152,22 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
       do: EvergreenContent.audio_valid_candidate?(instance)
 
     def audio_view(_instance), do: ScreensWeb.V2.Audio.EvergreenContentView
+  end
+
+  defimpl Screens.V2.AlertsWidget do
+    alias Screens.Alerts.Alert
+    alias Screens.V2.WidgetInstance.EvergreenContent
+
+    def alert_ids(%EvergreenContent{
+          alerts: alerts,
+          now: now,
+          schedule: %AlertSchedule{alert_ids: alert_ids, suppress_alert_widgets: true}
+        }) do
+      alerts
+      |> Enum.filter(&(&1.id in alert_ids and Alert.happening_now?(&1, now)))
+      |> Enum.map(& &1.id)
+    end
+
+    def alert_ids(_instance), do: []
   end
 end
