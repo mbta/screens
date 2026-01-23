@@ -19,18 +19,17 @@ defmodule Screens.V2.Departure do
 
   defstruct prediction: nil, schedule: nil
 
-  @type route_type :: nil | :bus | :ferry | :light_rail | :rail | :subway
   @type params :: %{
           optional(:direction_id) => Trip.direction() | :both,
           optional(:route_ids) => [Route.id()],
-          optional(:route_type) => route_type(),
+          optional(:route_type) => nil | RouteType.t() | [RouteType.t()],
           optional(:sort) => String.t(),
           optional(:stop_ids) => [Stop.id()]
         }
 
   @type opts :: [
           now: DateTime.t(),
-          schedule_route_type_filter: [route_type()]
+          schedule_route_type_filter: [RouteType.t()]
         ]
 
   @type result :: {:ok, [t()]} | :error
@@ -44,24 +43,31 @@ defmodule Screens.V2.Departure do
     now = Keyword.get(opts, :now, DateTime.utc_now())
     fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
-    fetch_schedule_params = build_params_for_schedules(params, opts)
-
     with {:ok, predictions} <- fetch_predictions_fn.(params),
-         {:ok, schedules} <- fetch_schedules(fetch_schedule_params, opts) do
+         {:ok, schedules} <- fetch_schedules(params, opts) do
       {:ok, Builder.build(predictions, schedules, now)}
     else
       _ -> :error
     end
   end
 
-  defp fetch_schedules(%{route_type: []}, _opts) do
-    # Hardcode empty list return to avoid doing an unecessary API call
-    {:ok, []}
-  end
-
-  defp fetch_schedules(params, opts) do
+  def fetch_schedules(params, opts) do
     fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
-    fetch_fn.(params)
+
+    # Default to include all route_types, unless params or options include ones to filter on. If
+    # route_types to filter on are configured in params AND options, we only include route_types
+    # that are set in both.
+    all_types = RouteType.all()
+    opt_route_types = Keyword.get(opts, :schedule_route_type_filter, all_types)
+    param_route_types = List.wrap(params[:route_type] || all_types)
+
+    # An empty list here, which we'd intend as "no route types", would encode as an empty string
+    # in the fetch params, which means "no route type *filter*" a.k.a. all route types. Fetching
+    # schedules for "no route types" is just not fetching any schedules at all, so we can skip it.
+    case Enum.filter(opt_route_types, &(&1 in param_route_types)) do
+      [] -> {:ok, []}
+      route_types -> params |> Map.put(:route_type, route_types) |> fetch_fn.()
+    end
   end
 
   def do_fetch(endpoint, params) do
@@ -69,20 +75,6 @@ defmodule Screens.V2.Departure do
       {:ok, result} -> {:ok, V3Api.Parser.parse(result)}
       _ -> :error
     end
-  end
-
-  def build_params_for_schedules(params, opts) do
-    # Default to include all route_types, unless params or options include ones to filter on.
-    # If route_types to filter on are configured in params AND options,then we only
-    # include route_types that are set in both.
-    all_types = RouteType.all()
-
-    param_route_types =
-      params |> Map.get(:route_type, all_types) |> List.wrap()
-
-    opt_route_types = Keyword.get(opts, :schedule_route_type_filter, all_types)
-
-    Map.put(params, :route_type, Enum.filter(opt_route_types, &(&1 in param_route_types)))
   end
 
   def encode_params(params) do
