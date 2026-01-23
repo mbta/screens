@@ -59,7 +59,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   def widget_type(%__MODULE__{} = t) do
     case alert_layout(t) do
       :full_screen -> :takeover_alert
-      :banner -> :banner_alert
+      :banner -> :partial_alert
     end
   end
 
