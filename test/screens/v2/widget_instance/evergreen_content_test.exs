@@ -2,7 +2,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.V2.WidgetInstance
+  alias Screens.V2.{AlertsWidget, WidgetInstance}
   alias Screens.V2.WidgetInstance.EvergreenContent
   alias ScreensConfig.{AlertSchedule, RecurrentSchedule, Schedule, Screen}
 
@@ -362,6 +362,41 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
   describe "audio_view/1" do
     test "returns EvergreenContentView", %{widget: widget} do
       assert ScreensWeb.V2.Audio.EvergreenContentView == WidgetInstance.audio_view(widget)
+    end
+  end
+
+  describe "AlertsWidget alert_ids/1" do
+    @alerts [
+      %Alert{
+        id: "1",
+        active_period: [{~U[2026-01-01T11:00:00Z], ~U[2026-01-01T13:00:00Z]}]
+      },
+      %Alert{
+        id: "2",
+        active_period: [{~U[2026-01-02T11:00:00Z], ~U[2026-01-02T13:00:00Z]}]
+      }
+    ]
+
+    test "returns the IDs of active matching alerts when alert suppression is enabled" do
+      widget =
+        struct(EvergreenContent, %{
+          alerts: @alerts,
+          now: ~U[2026-01-01T12:00:00Z],
+          schedule: %AlertSchedule{alert_ids: ~w[1 2], suppress_alert_widgets: true}
+        })
+
+      assert AlertsWidget.alert_ids(widget) == ~w[1]
+    end
+
+    test "returns empty list when alert suppression is not enabled" do
+      widget =
+        struct(EvergreenContent, %{
+          alerts: @alerts,
+          now: ~U[2026-01-01T12:00:00Z],
+          schedule: %AlertSchedule{alert_ids: ~w[1], suppress_alert_widgets: false}
+        })
+
+      assert AlertsWidget.alert_ids(widget) == ~w[]
     end
   end
 end
