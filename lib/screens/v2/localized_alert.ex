@@ -11,6 +11,7 @@ defmodule Screens.V2.LocalizedAlert do
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
   alias ScreensConfig.Screen
+  alias ScreensConfig.Screen.PreFare
 
   @type t ::
           AlertWidget.t()
@@ -252,6 +253,19 @@ defmodule Screens.V2.LocalizedAlert do
   all active routes, and therefore should be a takeover alert
   """
   @spec informs_all_active_routes_at_home_stop?(t()) :: boolean()
+  def informs_all_active_routes_at_home_stop?(
+        %ReconstructedAlert{
+          screen: %Screen{
+            app_params: %PreFare{departures: departures}
+          }
+        } = t
+      ) do
+    # We don't fetch CR routes in location context. However, when placing an alert
+    # on pre_fares, don't want to display over departures section if we include CR
+    !ReconstructedAlert.departures_contains_commuter_rail?(departures) and
+      MapSet.subset?(active_routes_at_stop(t), MapSet.new(informed_routes_at_home_stop(t)))
+  end
+
   def informs_all_active_routes_at_home_stop?(t) do
     MapSet.subset?(active_routes_at_stop(t), MapSet.new(informed_routes_at_home_stop(t)))
   end
