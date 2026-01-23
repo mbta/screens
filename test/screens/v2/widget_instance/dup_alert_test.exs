@@ -108,7 +108,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
         )
 
       assert widget_types(screen, context, alert) ==
-               [:takeover_alert, :takeover_alert, :banner_alert]
+               [:takeover_alert, :takeover_alert, :partial_alert]
     end
 
     test "all service eliminated for both lines at a transfer stop" do
@@ -136,7 +136,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
         )
 
       assert widget_types(screen, context, alert) ==
-               [:banner_alert, :takeover_alert, :banner_alert]
+               [:partial_alert, :takeover_alert, :partial_alert]
     end
 
     test "one direction of service eliminated" do
@@ -149,7 +149,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
         )
 
       assert widget_types(screen, context, alert) ==
-               [:banner_alert, :takeover_alert, :banner_alert]
+               [:partial_alert, :takeover_alert, :partial_alert]
     end
 
     test "alert effect does not eliminate service" do
@@ -158,7 +158,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
       alert = build_alert(effect: :delay, informed_entities: route_informed_entities(~w[Red]))
 
       assert widget_types(screen, context, alert) ==
-               [:banner_alert, :banner_alert, :banner_alert]
+               [:partial_alert, :partial_alert, :partial_alert]
     end
   end
 
