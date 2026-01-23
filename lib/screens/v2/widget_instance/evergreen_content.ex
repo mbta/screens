@@ -153,4 +153,21 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
 
     def audio_view(_instance), do: ScreensWeb.V2.Audio.EvergreenContentView
   end
+
+  defimpl Screens.V2.AlertsWidget do
+    alias Screens.Alerts.Alert
+    alias Screens.V2.WidgetInstance.EvergreenContent
+
+    def alert_ids(%EvergreenContent{
+          alerts: alerts,
+          now: now,
+          schedule: %AlertSchedule{alert_ids: alert_ids, suppress_alert_widgets: true}
+        }) do
+      alerts
+      |> Enum.filter(&(&1.id in alert_ids and Alert.happening_now?(&1, now)))
+      |> Enum.map(& &1.id)
+    end
+
+    def alert_ids(_instance), do: []
+  end
 end
