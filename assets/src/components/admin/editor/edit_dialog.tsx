@@ -37,8 +37,10 @@ const EditDialog: ComponentType<{
               const firstValue = _.get(path, entries[0][1]);
 
               const hasMultipleValues =
-                _.uniq(entries.map(([, screen]) => _.get(path, screen)))
-                  .length > 1;
+                _.uniqWith(
+                  _.isEqual,
+                  entries.map(([, screen]) => _.get(path, screen)),
+                ).length > 1;
 
               const setValues = (value) =>
                 setScreens(
