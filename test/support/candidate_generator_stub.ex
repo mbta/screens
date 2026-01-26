@@ -1,4 +1,7 @@
 defmodule Screens.TestSupport.CandidateGeneratorStub do
+  @moduledoc false
+
+  @doc "Convenience macro for defining a module that implements `CandidateGenerator`."
   defmacro candidate_generator(name, instances_fn) do
     quote do
       defmodule unquote(name) do

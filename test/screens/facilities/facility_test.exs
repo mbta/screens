@@ -1,8 +1,8 @@
 defmodule Screens.Facilities.FacilityTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Stops.Stop
   alias Screens.Facilities.Facility
+  alias Screens.Stops.Stop
 
   @data %{
     "id" => "954",

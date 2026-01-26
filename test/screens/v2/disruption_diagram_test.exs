@@ -1,11 +1,11 @@
 defmodule Screens.V2.DisruptionDiagramTest do
   use ExUnit.Case, async: true
 
-  alias Screens.V2.DisruptionDiagram, as: DD
-  alias Screens.LocationContext
   alias Screens.Alerts.Alert
+  alias Screens.LocationContext
   alias Screens.TestSupport.DisruptionDiagramLocalizedAlert, as: DDAlert
   alias Screens.TestSupport.SubwayTaggedStopSequences, as: TaggedSeq
+  alias Screens.V2.DisruptionDiagram, as: DD
 
   import Screens.TestSupport.ParentStationIdSigil
 
