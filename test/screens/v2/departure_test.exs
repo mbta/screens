@@ -1,8 +1,8 @@
 defmodule Screens.V2.DepartureTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Routes.Route
   alias Screens.Predictions.Prediction
+  alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
   alias Screens.V2.Departure

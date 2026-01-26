@@ -7,13 +7,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
-  alias Screens.Vehicles.Vehicle
-  alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
+  alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.{NoDataSection, NormalSection}
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias Screens.V2.WidgetInstance.OvernightDepartures
+  alias Screens.Vehicles.Vehicle
   alias ScreensConfig.{Alerts, Departures, Header}
   alias ScreensConfig.Departures.Header, as: SectionHeader
   alias ScreensConfig.Departures.{Layout, Query, Section}

@@ -1,9 +1,9 @@
 defmodule ScreensWeb.V2.ScreenApiControllerTest do
   use ScreensWeb.ConnCase
 
-  alias ScreensConfig.Screen
   alias Screens.ScreensByAlert
   alias Screens.TestSupport.CandidateGeneratorStub, as: Stub
+  alias ScreensConfig.Screen
 
   import Screens.Inject
   import Mox

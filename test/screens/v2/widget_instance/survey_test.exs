@@ -2,8 +2,8 @@ defmodule Screens.V2.WidgetInstance.SurveyTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
-  alias ScreensConfig.Screen
   alias Screens.V2.WidgetInstance.Survey
+  alias ScreensConfig.Screen
 
   setup do
     %{

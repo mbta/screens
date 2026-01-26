@@ -1,8 +1,8 @@
 defmodule ScreensWeb.V2.Audio.ElevatorStatusViewTest do
   use ExUnit.Case, async: true
 
-  alias ScreensWeb.V2.Audio.ElevatorStatusView
   alias ScreensConfig.FreeTextLine
+  alias ScreensWeb.V2.Audio.ElevatorStatusView
 
   defp render(assigns) do
     "_widget.ssml"

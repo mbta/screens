@@ -1,11 +1,10 @@
 defmodule Screens.V2.ScreenDataTest do
   use ExUnit.Case, async: true
 
-  alias ScreensConfig.Screen
-  alias Screens.V2.ScreenData
-  alias Screens.V2.WidgetInstance.MockWidget
-  alias Screens.V2.WidgetInstance.Placeholder
   alias Screens.TestSupport.CandidateGeneratorStub, as: Stub
+  alias Screens.V2.ScreenData
+  alias Screens.V2.WidgetInstance.{MockWidget, Placeholder}
+  alias ScreensConfig.Screen
 
   import ExUnit.CaptureLog
   import Screens.Inject

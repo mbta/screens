@@ -9,10 +9,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
+  alias ScreensConfig.Departures, as: DeparturesConfig
+  alias ScreensConfig.Departures.{Filters, Header, Layout, Query, Section}
   alias ScreensConfig.Departures.Filters.RouteDirections
   alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
-  alias ScreensConfig.Departures.{Filters, Header, Layout, Query, Section}
-  alias ScreensConfig.Departures, as: DeparturesConfig
   alias ScreensConfig.FreeTextLine
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.BusShelter

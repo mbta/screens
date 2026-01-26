@@ -6,11 +6,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
-  alias Screens.Vehicles.Vehicle
-  alias Screens.V2.Departure
   alias Screens.V2.CandidateGenerator.Dup
+  alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.{HeadwaySection, NormalSection}
+  alias Screens.Vehicles.Vehicle
   alias ScreensConfig.{Alerts, Departures, Header}
   alias ScreensConfig.Departures.Header, as: SectionHeader
   alias ScreensConfig.Departures.{Layout, Query, Section}

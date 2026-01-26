@@ -1,14 +1,14 @@
 defmodule Screens.V2.Departure.BuilderTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Routes.Route
   alias Screens.Predictions.Prediction
+  alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
-  alias Screens.Vehicles.Vehicle
   alias Screens.V2.Departure
   alias Screens.V2.Departure.Builder
+  alias Screens.Vehicles.Vehicle
 
   describe "build/3" do
     @now ~U[2020-01-01T01:00:00Z]

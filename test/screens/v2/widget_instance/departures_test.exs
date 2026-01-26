@@ -7,11 +7,11 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
-  alias Screens.Vehicles.Vehicle
   alias Screens.V2.{Departure, WidgetInstance}
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Departures.{HeadwaySection, NoDataSection, NormalSection}
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
+  alias Screens.Vehicles.Vehicle
   alias ScreensConfig.Departures.Header
   alias ScreensConfig.Departures.Layout
   alias ScreensConfig.{FreeTextLine, Screen}

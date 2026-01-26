@@ -1,4 +1,6 @@
 defmodule Screens.TestSupport.ParentStationIdSigil do
+  @moduledoc false
+
   @doc ~S"""
   Makes a single `"place-#{term}"` string, or a list of them if term contains 2+ words.
   Can be used in patterns and guards.

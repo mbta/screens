@@ -2,10 +2,10 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutroTest do
   use ExUnit.Case, async: true
   import ExUnit.CaptureLog
 
-  alias ScreensConfig.Screen
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.AlertsOutro
-  alias Screens.V2.WidgetInstance.{MockWidget, SubwayStatus, ReconstructedAlert}
+  alias Screens.V2.WidgetInstance.{MockWidget, ReconstructedAlert, SubwayStatus}
+  alias ScreensConfig.Screen
 
   setup do
     pre_fare_config = struct(Screen, %{app_id: :pre_fare_v2})
