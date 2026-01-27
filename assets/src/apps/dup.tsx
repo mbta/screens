@@ -9,6 +9,7 @@ import "../../css/dup.scss";
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router";
+
 import ScreenPage from "Components/screen_page";
 import { MappingContext } from "Components/widget";
 import NormalScreen, { NormalSimulation } from "Components/dup/normal_screen";
@@ -34,6 +35,8 @@ import PageLoadNoData from "Components/dup/page_load_no_data";
 import NoData from "Components/dup/no_data";
 import DeparturesNoData from "Components/dup/departures_no_data";
 import OvernightDepartures from "Components/dup/overnight_departures";
+
+import { Provider as CurrentPageProvider } from "Context/dup_page";
 import { usePlayerName } from "Hooks/outfront";
 import { isDup } from "Util/outfront";
 
@@ -114,43 +117,40 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 const App = (): JSX.Element => {
   const playerName = usePlayerName();
 
-  if (isDup()) {
-    const id = `DUP-${playerName!.trim()}`;
-    return (
+  return (
+    <CurrentPageProvider>
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>
         <ResponseMapperContext.Provider value={responseMapper}>
-          <Viewport>
-            <ScreenPage id={id} />
-          </Viewport>
+          {isDup() ? (
+            <Viewport>
+              <ScreenPage id={`DUP-${playerName!.trim()}`} />
+            </Viewport>
+          ) : (
+            <Router basename="v2/screen">
+              <Routes>
+                <Route path="dup_v2" element={<MultiScreenPage />} />
+
+                <Route
+                  path="pending?/:id"
+                  element={
+                    <Viewport>
+                      <ScreenPage />
+                    </Viewport>
+                  }
+                />
+
+                <Route
+                  path="pending?/:id/simulation"
+                  element={
+                    <SimulationScreenPage opts={{ alternateView: true }} />
+                  }
+                />
+              </Routes>
+            </Router>
+          )}
         </ResponseMapperContext.Provider>
       </MappingContext.Provider>
-    );
-  }
-
-  return (
-    <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-      <ResponseMapperContext.Provider value={responseMapper}>
-        <Router basename="v2/screen">
-          <Routes>
-            <Route path="dup_v2" element={<MultiScreenPage />} />
-
-            <Route
-              path="pending?/:id"
-              element={
-                <Viewport>
-                  <ScreenPage />
-                </Viewport>
-              }
-            />
-
-            <Route
-              path="pending?/:id/simulation"
-              element={<SimulationScreenPage opts={{ alternateView: true }} />}
-            />
-          </Routes>
-        </Router>
-      </ResponseMapperContext.Provider>
-    </MappingContext.Provider>
+    </CurrentPageProvider>
   );
 };
 

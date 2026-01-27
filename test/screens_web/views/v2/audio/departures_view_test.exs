@@ -137,13 +137,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                 times_with_crowding: [
                   %{
                     id: "test3",
-                    time: %{
-                      type: :timestamp,
-                      minute: 31,
-                      hour: 12,
-                      am_pm: :pm,
-                      show_am_pm: false
-                    },
+                    time: %{type: :timestamp, minute: 31, hour: 12, am_pm: nil},
                     crowding: nil
                   }
                 ],
