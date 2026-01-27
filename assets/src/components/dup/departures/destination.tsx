@@ -1,6 +1,7 @@
 import { type ComponentType, useLayoutEffect, useRef, useState } from "react";
 
 import type DestinationBase from "Components/departures/destination";
+import { useCurrentPage } from "Context/dup_page";
 
 const LINE_HEIGHT = 138; // px
 
@@ -25,30 +26,29 @@ enum PHASES {
   DONE,
 }
 
-const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
-  let currentPage;
+const RenderedDestination = ({ parts, index1, index2 }) => {
+  const currentPage = useCurrentPage();
+
+  let pageContent;
+
   if (index1 === parts.length) {
-    currentPage = parts.join(" ");
+    pageContent = parts.join(" ");
   } else {
     const pages = [
       parts.slice(0, index1).join(" ") + "…",
       "…" + parts.slice(index1, index2).join(" "),
     ];
-    currentPage = pages[currentPageIndex];
+    pageContent = pages[currentPage];
   }
 
   return (
     <div className="departure-destination">
-      <div className="departure-destination__headsign">{currentPage}</div>
+      <div className="departure-destination__headsign">{pageContent}</div>
     </div>
   );
 };
 
-interface Props extends DestinationBase {
-  currentPage: number;
-}
-
-const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
+const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
@@ -134,12 +134,7 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
   // Render paged version when done determining breaks
   if (phase === PHASES.DONE) {
     return (
-      <RenderedDestination
-        index1={index1}
-        index2={index2}
-        parts={parts}
-        currentPageIndex={currentPage}
-      />
+      <RenderedDestination index1={index1} index2={index2} parts={parts} />
     );
   }
 

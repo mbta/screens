@@ -1,62 +1,73 @@
 import type { ComponentType } from "react";
-import { classWithModifier } from "Util/utils";
 
-const TextDepartureTime = ({ text }) => {
-  return <div className="departure-time__text">{text}</div>;
-};
-
-const MinutesDepartureTime = ({ minutes }) => {
-  return (
-    <>
-      <div className="departure-time__minutes">{minutes}</div>
-      <div className="departure-time__minutes-label">m</div>
-    </>
-  );
-};
-
-const TimestampDepartureTime = ({ hour, minute }) => {
-  const zeroFilledMinute = minute < 10 ? "0" + minute : minute;
-  const timestamp = `${hour}:${zeroFilledMinute}`;
-
-  return <div className="departure-time__timestamp">{timestamp}</div>;
-};
+import { useCurrentPage } from "Context/dup_page";
+import MoonIcon from "Images/moon.svg";
+import { classWithModifier, classWithModifiers } from "Util/utils";
 
 type DepartureTime =
-  | (TextDeparture & { type: "text" })
-  | (MinutesDeparture & { type: "minutes" })
-  | (TimestampDeparture & { type: "timestamp" })
-  // Note: `overnight` is only produced in the DUP code path, and so is only
-  // supported in the DUP version of this component.
+  | { type: "text"; text: string }
+  | { type: "minutes"; minutes: number }
+  | { type: "timestamp"; hour: number; minute: number; am_pm: string | null }
   | { type: "overnight" };
 
-interface TextDeparture {
-  text: string;
-}
-interface MinutesDeparture {
-  minutes: number;
-}
-interface TimestampDeparture {
-  hour: number;
-  minute: number;
-  // Note: `am_pm` fields are currently only supported by the DUP version of
-  // this component, but are always present in departures serialization.
-  am_pm: string;
-  show_am_pm: boolean;
-}
+const DepartureTimePart: ComponentType<DepartureTime> = (time) => {
+  switch (time.type) {
+    case "text":
+      return <div className="departure-time__text">{time.text}</div>;
 
-const DepartureTime: ComponentType<DepartureTime> = ({ type, ...data }) => {
-  let inner;
-  if (type === "text") {
-    inner = <TextDepartureTime {...(data as TextDeparture)} />;
-  } else if (type === "minutes") {
-    inner = <MinutesDepartureTime {...(data as MinutesDeparture)} />;
-  } else if (type === "timestamp") {
-    inner = <TimestampDepartureTime {...(data as TimestampDeparture)} />;
+    case "minutes":
+      return (
+        <>
+          <div className="departure-time__minutes">{time.minutes}</div>
+          <div className="departure-time__minutes-label">m</div>
+        </>
+      );
+
+    case "timestamp": {
+      const paddedMinute = time.minute < 10 ? "0" + time.minute : time.minute;
+      const timestamp = `${time.hour}:${paddedMinute}`;
+
+      return (
+        <div className="departure-time__timestamp">
+          <span className="departure-time__time">{timestamp}</span>
+          {time.am_pm && (
+            <span className="departure-time__ampm">{time.am_pm}</span>
+          )}
+        </div>
+      );
+    }
+
+    case "overnight":
+      return <MoonIcon width={128} height={128} color="black" />;
   }
+};
 
-  return (
-    <div className={classWithModifier("departure-time", type)}>{inner}</div>
-  );
+interface Props {
+  time: DepartureTime;
+  scheduled_time?: DepartureTime;
+}
+
+const DepartureTime: ComponentType<Props> = ({ time, scheduled_time }) => {
+  const currentPage = useCurrentPage();
+
+  if (currentPage === 0 || !scheduled_time) {
+    return (
+      <div className={classWithModifier("departure-time", time.type)}>
+        <DepartureTimePart {...time} />
+      </div>
+    );
+  } else {
+    return (
+      <div
+        className={classWithModifiers("departure-time", [
+          scheduled_time.type,
+          "disabled",
+        ])}
+      >
+        <DepartureTimePart {...scheduled_time} />
+      </div>
+    );
+  }
 };
 
 export default DepartureTime;
