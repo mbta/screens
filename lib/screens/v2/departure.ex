@@ -235,6 +235,10 @@ defmodule Screens.V2.Departure do
 
   def vehicle_status(_), do: nil
 
+  # Only include status for DUP screens at this time
+  def status(%__MODULE__{prediction: %Prediction{status: status}}, %Screen{app_id: :dup_v2}), do: status
+  def status(_), do: nil
+
   defp crowding_data_relevant?(%Trip{id: trip_trip_id, stops: [first_stop | _]}, %Vehicle{
          trip_id: vehicle_trip_id,
          stop_id: next_stop

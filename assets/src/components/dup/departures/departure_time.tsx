@@ -28,6 +28,12 @@ const TimestampDepartureTime = ({ hour, minute, am_pm, show_am_pm }) => {
   );
 };
 
+const StopsAwayDepartureTime = ({ prefix, suffix, currentPage }) => {
+  // Show prefix ("Stopped") on page 0, suffix ("N stop(s) away") on page 1+
+  const text = currentPage === 0 ? prefix : suffix;
+  return <div className="departure-time__text">{text}</div>;
+};
+
 interface Props {
   time: DepartureTimeBase;
   scheduled_time?: DepartureTimeBase;
@@ -50,6 +56,10 @@ const DepartureTime: ComponentType<Props> = ({
     predictedTime = <MinutesDepartureTime {...time} />;
   } else if (time.type === "timestamp") {
     predictedTime = <TimestampDepartureTime {...time} />;
+  } else if (time.type === "stops_away") {
+    predictedTime = (
+      <StopsAwayDepartureTime {...time} currentPage={currentPage} />
+    );
   }
 
   if (!scheduled_time) {
