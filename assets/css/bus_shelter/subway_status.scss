@@ -1,0 +1,53 @@
+@use "CSS/lcd/subway_status";
+
+.subway-status {
+  width: 100%;
+  height: 100%;
+  border-radius: 16px;
+  box-shadow: 0 12px 24px 0 rgb(23 31 38 / 25%);
+}
+
+.subway-status__header {
+  display: none;
+}
+
+.subway-status__alert {
+  gap: 24px;
+}
+
+.subway-status__line {
+  padding: 24px;
+
+  &:not(:last-child)::after {
+    left: 192px;
+  }
+}
+
+.subway-status__status-text {
+  font-size: 48px;
+  font-weight: 800;
+
+  &--normal {
+    font-size: 40px;
+    font-weight: 500;
+  }
+}
+
+.subway-status__location-text {
+  font-size: 32px;
+  font-weight: 500;
+
+  .subway-status__text-container--contracted & {
+    font-size: 27px;
+  }
+}
+
+.subway-status__pill-container {
+  min-width: 144px;
+}
+
+.subway-status__route-pill {
+  &__main {
+    min-width: 144px;
+  }
+}

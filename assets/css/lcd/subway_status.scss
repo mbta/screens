@@ -1,188 +1,127 @@
 @use "CSS/colors";
+@use "CSS/lcd/section_header";
+
+// Note: These styles are closely tied to some display logic in the component, so they may need to change together
 
 .subway-status {
-  /// Reusable values for the component
-  /// (Defined here to avoid polluting the global namespace)
-  $rule-width: 808px;
-  $status-top-padding: 18px;
-  $status-left-padding: 24px;
-  $pill-width: 144px;
-  $pill-height: 74px;
-  $intra-alert-margin-without-second-pill: 7px;
-  $intra-alert-margin-with-second-pill: 32px;
-  $contracted-status-with-one-alert-bottom-padding: 22px;
-  $contracted-status-with-two-alerts-bottom-padding: 20px;
-  $extended-status-bottom-padding: 71px;
-
-  box-sizing: border-box;
-
-  /// End variables
-  /// Begin styles
-
-  width: 1024px;
-  height: 576px;
-  padding-top: 6px;
+  width: 1080px;
+  height: 640px;
   overflow: hidden;
   color: colors.$cool-black-15;
   background: colors.$warm-neutral-90;
-  border-radius: 16px;
-  box-shadow: 0 12px 24px 0 rgb(23 31 38 / 25%);
+}
 
-  .subway-status_status {
-    position: relative;
-    box-sizing: border-box;
-    width: 100%;
-    padding-top: $status-top-padding;
-    padding-left: $status-left-padding;
-    overflow: hidden;
-  }
+.subway-status__header {
+  @include section_header.base;
 
-  .subway-status_status--contracted.subway-status_status--one-alert {
-    // 114px
-    height: $status-top-padding + $pill-height +
-      $contracted-status-with-one-alert-bottom-padding;
-  }
+  margin-bottom: 6px;
+}
 
-  .subway-status_status--contracted.subway-status_status--two-alerts:not(
-      .subway-status_status--has-second-pill
-    ) {
-    // 193px
-    // Second alert still gets the height of a pill, despite not having one visible
-    height: $status-top-padding + (2 * $pill-height) +
-      $intra-alert-margin-without-second-pill +
-      $contracted-status-with-two-alerts-bottom-padding;
-  }
+.subway-status__line {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px 24px 24px 48px;
 
-  .subway-status_status--two-alerts.subway-status_status--has-second-pill:not(
-      :last-child
-    ) {
-    // 216px
-    height: (2 * $status-top-padding) + (2 * $pill-height) +
-      $intra-alert-margin-with-second-pill;
-  }
-
-  // Height is not needed for statuses with 2 alerts + 2 pills when it is for the GL status,
-  // which always appears last with nothing below it (not even the last
-  // rule, since the 2nd pill means we don't show it--see `shouldShowLastRule` JS function)
-
-  .subway-status_status--extended {
-    // 163px
-    height: $status-top-padding + $pill-height + $extended-status-bottom-padding;
-  }
-
-  // Since the rule is positioned absolutely over the row without
-  // adding any height, we can't use an ::after pseudo-element.
-  // Instead, whether to include the rule or not is determined
-  // in the React code and it's rendered as a real element.
-  .subway-status_status_rule {
+  &:not(:last-child)::after {
     position: absolute;
     right: 24px;
     bottom: 0;
-    width: $rule-width;
+    left: 200px;
     height: 4px;
     content: "";
     background: colors.$warm-neutral-80;
     border-radius: 2px;
   }
+}
 
-  .subway-status_status--contracted .subway-status_alert {
-    height: 74px;
-    overflow: hidden;
+.subway-status__alert {
+  display: flex;
+  gap: 16px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.subway-status__pill-container {
+  min-width: 136px;
+}
+
+.subway-status__text-container {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  margin-top: 8px;
+
+  &--extended {
+    flex-direction: column;
+    gap: 6px;
+  }
+}
+
+.subway-status__status-text {
+  font-size: 53px;
+  font-weight: 700;
+  line-height: 56px;
+
+  &--normal {
+    font-size: 34px;
+    font-weight: 400;
+  }
+}
+
+.subway-status__location-text {
+  font-size: 34px;
+  line-height: 42px;
+}
+
+.subway-status__route-pill {
+  display: inline-flex;
+  overflow: hidden;
+
+  &--blue {
+    --pill-color: #{colors.$line-blue};
   }
 
-  // The top margin value for the second contracted alert
-  // in a section depends on whether it has a pill or not.
-  .subway-status_alert:nth-of-type(2) {
-    &.subway-status_alert--has-pill {
-      margin-top: $intra-alert-margin-with-second-pill;
+  &--green {
+    --pill-color: #{colors.$line-green};
+  }
+
+  &--red {
+    --pill-color: #{colors.$line-red};
+  }
+
+  &--orange {
+    --pill-color: #{colors.$line-orange};
+  }
+
+  &__main,
+  &__branch {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 55px;
+    font-weight: 700;
+    color: white;
+    background-color: var(--pill-color);
+  }
+
+  &__main {
+    min-width: 136px;
+    height: 72px;
+    border-radius: 36px;
+  }
+
+  &__branch {
+    min-width: 84px;
+    height: 84px;
+    margin: -6px -6px -6px -28px;
+    border: 6px solid colors.$warm-neutral-90;
+    border-radius: 42px;
+
+    &:nth-child(n + 3) {
+      margin-left: -14px;
     }
-
-    &.subway-status_alert--no-pill {
-      margin-top: $intra-alert-margin-without-second-pill;
-    }
-  }
-
-  .subway-status_alert-sizer {
-    overflow: hidden;
-    white-space: nowrap;
-
-    // When we have resizing options remaining, make it so the text will be
-    // downsized if it goes past the right edge of the rule. Otherwise allow
-    // the text to go right up to the edge of the widget "card".
-    &:not(&--hide-overflow) {
-      // 976px
-      width: $pill-width + $status-left-padding + $rule-width;
-    }
-  }
-
-  .subway-status_alert_route-pill-container {
-    display: inline-block;
-
-    // If the row has no pill, we still keep this element as a pill-sized
-    // spacer to maintain consistent positioning of everything else in the row.
-    min-width: $pill-width;
-    height: $pill-height;
-  }
-
-  .subway-status_alert_text-container {
-    display: inline-block;
-    width: fit-content;
-    max-width: 830px;
-    margin-left: 24px;
-    vertical-align: top;
-
-    &--2-branches {
-      max-width: 671px;
-    }
-
-    &--3-branches {
-      max-width: 605px;
-    }
-
-    .subway-status_status--contracted & {
-      height: $pill-height;
-    }
-  }
-
-  span.subway-status_alert_status-text {
-    // common styles for status text
-    font-size: 48px;
-    font-weight: 800;
-    line-height: $pill-height;
-  }
-
-  .subway-status_status--extended span.subway-status_alert_status-text {
-    // extended-specific styles for status text
-    display: block;
-    height: 68px;
-    margin-bottom: 4px;
-  }
-
-  span.subway-status_alert_status-text.subway-status_alert_status-text--normal-service {
-    // "Normal Service" gets thinner text
-    font-size: 40px;
-    font-weight: 500;
-  }
-
-  span.subway-status_alert_location-text {
-    // common styles for location text
-    font-weight: 500;
-  }
-
-  .subway-status_status--contracted span.subway-status_alert_location-text {
-    // contracted-specific styles for location text
-    margin-left: 16px;
-    font-size: 27px;
-    line-height: $pill-height;
-  }
-
-  .subway-status_status--extended span.subway-status_alert_location-text {
-    // extended-specific styles for location text
-    font-size: 32px;
-    line-height: 48px;
-  }
-
-  .branch-icon {
-    margin-left: 5px;
   }
 }

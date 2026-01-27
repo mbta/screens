@@ -13,7 +13,6 @@
 @use "lcd/route_pill";
 @use "lcd/screen_container";
 @use "lcd/simulation" as *;
-@use "lcd/subway_status";
 
 @use "bus_shelter/alert";
 @use "bus_shelter/body/normal" as *;
@@ -29,6 +28,7 @@
 @use "bus_shelter/screen/normal" as *;
 @use "bus_shelter/screen/takeover" as *;
 @use "bus_shelter/simulation" as *;
+@use "bus_shelter/subway_status";
 @use "bus_shelter/survey";
 
 @import "https://rsms.me/inter/inter.css";
