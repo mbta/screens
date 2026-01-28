@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Provides real-time departure information, consisting of an ordered list of "sections".
   """
 
-  alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -476,7 +475,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{time: serialize_timestamp(departure_time, now)}
   end
 
-  defp serialize_time(departure, _screen, now) do
+  defp serialize_time(departure, screen, now) do
     %Stop{id: stop_id} = Departure.stop(departure)
     departure_time = Departure.time(departure)
     vehicle_status = Departure.vehicle_status(departure)

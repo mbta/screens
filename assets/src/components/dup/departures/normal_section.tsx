@@ -10,12 +10,20 @@ const NormalSection: ComponentType<Props> = ({ rows }) => {
 
   if (rows.length === 0) return null;
 
+  const requiresNarrowHeadsign =  rows.some(
+    (row) => 
+      row.type ==="departure_row" &&
+    row.times_with_crowding?.some(
+      (time) => time.time?.type === "stops_away"
+    )
+  )
+
   return (
-    <div className="departures-section">
+    <div className={`departures-section${requiresNarrowHeadsign ? "--has-stops-away" :""}`}>
       {rows.map((row, index) => {
         if (row.type === "departure_row") {
           return (
-            <DepartureRow {...row} key={row.id} currentPage={currentPage} />
+            <DepartureRow {...row} key={row.id} currentPage={currentPage} narrowHeadsign={requiresNarrowHeadsign} />
           );
         } else {
           return <NoticeRow row={row} key={"notice" + index} />;

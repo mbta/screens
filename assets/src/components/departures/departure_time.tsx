@@ -25,6 +25,7 @@ type DepartureTime =
   | (TextDeparture & { type: "text" })
   | (MinutesDeparture & { type: "minutes" })
   | (TimestampDeparture & { type: "timestamp" })
+  | (StopsAwayDeparture & { type: "stops_away" })
   // Note: `overnight` is only produced in the DUP code path, and so is only
   // supported in the DUP version of this component.
   | { type: "overnight" };
@@ -42,6 +43,11 @@ interface TimestampDeparture {
   // this component, but are always present in departures serialization.
   am_pm: string;
   show_am_pm: boolean;
+}
+interface StopsAwayDeparture {
+  // Only used by DUPs
+  prefix: string;
+  suffix: string;
 }
 
 const DepartureTime: ComponentType<DepartureTime> = ({ type, ...data }) => {

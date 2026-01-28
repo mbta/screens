@@ -15,6 +15,7 @@ const ABBREVIATIONS = {
   Landing: "Ldg",
   One: "1",
   Washington: "Wash",
+  "Medford/Tufts": "Medfd/Tufts"
 };
 
 enum PHASES {
@@ -25,7 +26,7 @@ enum PHASES {
   DONE,
 }
 
-const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
+const RenderedDestination = ({ parts, index1, index2, currentPageIndex, narrowHeadsign}) => {
   let currentPage;
   if (index1 === parts.length) {
     currentPage = parts.join(" ");
@@ -38,7 +39,7 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
   }
 
   return (
-    <div className="departure-destination">
+    <div className={`departure-destination${narrowHeadsign ? "--narrow": ""}`}>
       <div className="departure-destination__headsign">{currentPage}</div>
     </div>
   );
@@ -46,9 +47,10 @@ const RenderedDestination = ({ parts, index1, index2, currentPageIndex }) => {
 
 interface Props extends DestinationBase {
   currentPage: number;
+  narrowHeadsign: boolean;
 }
 
-const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
+const Destination: ComponentType<Props> = ({ headsign, currentPage, narrowHeadsign}) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
@@ -69,17 +71,22 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
    */
   useLayoutEffect(() => {
     if (firstLineRef.current && secondLineRef.current) {
+
+
       const firstLines = Math.round(
         firstLineRef.current.clientHeight / LINE_HEIGHT,
       );
       const secondLines = Math.round(
         secondLineRef.current.clientHeight / LINE_HEIGHT,
       );
+      const widthOverflow = firstLineRef.current.scrollWidth > firstLineRef.current.clientWidth
 
+      console.log(!widthOverflow)
+      
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
           // Don't abbreviate if it already fits on one line.
-          if (firstLines === 1 && secondLines === 0) {
+          if (firstLines === 1 && secondLines === 0 && !widthOverflow) {
             setPhase(PHASES.DONE);
           } else {
             setAbbreviate(true);
@@ -139,6 +146,7 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
         index2={index2}
         parts={parts}
         currentPageIndex={currentPage}
+        narrowHeadsign={narrowHeadsign}
       />
     );
   }
@@ -155,7 +163,7 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage }) => {
   }
 
   return (
-    <div className="departure-destination">
+    <div className={`departure-destination${narrowHeadsign ? "--narrow": ""}`}>
       <div className="departure-destination__headsign" ref={firstLineRef}>
         {firstLine}
       </div>

@@ -25,9 +25,23 @@
   vertical-align: middle;
 }
 
+.departure-row__destination--narrow {
+  display: inline-block;
+  vertical-align: middle;
+}
+
 .departure-row__time {
   display: inline-block;
   width: 400px;
+  margin-right: 32px;
+  font-size: 138px;
+  color: colors.$cool-black-15;
+  text-align: right;
+  vertical-align: middle;
+}
+.departure-row__time--wide {
+  display: inline-block;
+  width: 733px;
   margin-right: 32px;
   font-size: 138px;
   color: colors.$cool-black-15;

@@ -29,9 +29,10 @@ const TimestampDepartureTime = ({ hour, minute, am_pm, show_am_pm }) => {
 };
 
 const StopsAwayDepartureTime = ({ prefix, suffix, currentPage }) => {
-  // Show prefix ("Stopped") on page 0, suffix ("N stop(s) away") on page 1+
+  // Show prefix ("Stopped") on page 0, suffix ("N stop(s) away") on page 1
   const text = currentPage === 0 ? prefix : suffix;
-  return <div className="departure-time__text">{text}</div>;
+
+  return <div className="departure-time__stops_away">{text}</div>;
 };
 
 interface Props {
