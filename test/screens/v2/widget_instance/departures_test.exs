@@ -904,14 +904,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
 
     test "does not show BRD or ARR for scheduled departures", %{dup_screen: screen} do
-      serialized = [
-        %{
-          id: nil,
-          crowding: nil,
-          time: %{type: :timestamp, am_pm: :pm, hour: 7, minute: 0, show_am_pm: false}
-        }
-      ]
-
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -923,24 +915,16 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert serialized == Departures.serialize_times_with_crowding([departure], screen, now)
+      assert [
+               %{
+                 id: nil,
+                 crowding: nil,
+                 time: %{type: :timestamp, am_pm: nil, hour: 7, minute: 0}
+               }
+             ] = Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
     test "correctly serializes timestamps", %{bus_shelter_screen: screen} do
-      serialized_timestamp = [
-        %{
-          id: nil,
-          crowding: nil,
-          time: %{
-            type: :timestamp,
-            am_pm: :am,
-            hour: 12,
-            minute: 20,
-            show_am_pm: true
-          }
-        }
-      ]
-
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -952,7 +936,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert serialized_timestamp ==
+      assert [
+               %{
+                 id: nil,
+                 crowding: nil,
+                 time: %{type: :timestamp, am_pm: nil, hour: 12, minute: 20}
+               }
+             ] =
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
@@ -978,16 +968,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                %{
                  id: nil,
                  crowding: nil,
-                 time: %{am_pm: :pm, hour: 9, minute: 20, type: :timestamp, show_am_pm: false},
-                 scheduled_time: %{
-                   am_pm: :pm,
-                   hour: 9,
-                   minute: 15,
-                   type: :timestamp,
-                   show_am_pm: false
-                 }
+                 time: %{am_pm: nil, hour: 9, minute: 20, type: :timestamp},
+                 scheduled_time: %{am_pm: nil, hour: 9, minute: 15, type: :timestamp}
                }
-             ] ==
+             ] =
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 

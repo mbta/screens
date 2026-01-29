@@ -1195,7 +1195,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alerts: [
               %{
                 location: "mbta.com/alerts",
-                route_pill: %{branches: [:m], color: :red, text: "RL", type: :text},
+                route_pill: %{color: :red, text: "RL", type: :text},
                 status: "2 current alerts"
               }
             ]

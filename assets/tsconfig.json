@@ -47,6 +47,7 @@
     "paths": {
       "CSS/*": ["css/*"],
       "Components/*": ["src/components/*"],
+      "Context/*": ["src/context/*"],
       "Hooks/*": ["src/hooks/*"],
       "Images/*": ["images/*"],
       "Util/*": ["src/util/*"]

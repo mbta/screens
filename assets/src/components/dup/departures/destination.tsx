@@ -1,6 +1,7 @@
 import { type ComponentType, useLayoutEffect, useRef, useState } from "react";
 
 import type DestinationBase from "Components/departures/destination";
+import { useCurrentPage } from "Context/dup_page";
 
 const LINE_HEIGHT = 138; // px
 
@@ -15,7 +16,7 @@ const ABBREVIATIONS = {
   Landing: "Ldg",
   One: "1",
   Washington: "Wash",
-  "Medford/Tufts": "Medfd/Tufts"
+  "Medford/Tufts": "Medfd/Tufts",
 };
 
 enum PHASES {
@@ -26,31 +27,33 @@ enum PHASES {
   DONE,
 }
 
-const RenderedDestination = ({ parts, index1, index2, currentPageIndex, narrowHeadsign}) => {
-  let currentPage;
+const RenderedDestination = ({ parts, index1, index2, narrowHeadsign }) => {
+  const currentPage = useCurrentPage();
+
+  let pageContent;
+
   if (index1 === parts.length) {
-    currentPage = parts.join(" ");
+    pageContent = parts.join(" ");
   } else {
     const pages = [
       parts.slice(0, index1).join(" ") + "…",
       "…" + parts.slice(index1, index2).join(" "),
     ];
-    currentPage = pages[currentPageIndex];
+    pageContent = pages[currentPage];
   }
 
   return (
-    <div className={`departure-destination${narrowHeadsign ? "--narrow": ""}`}>
-      <div className="departure-destination__headsign">{currentPage}</div>
+    <div className={`departure-destination${narrowHeadsign ? "--narrow" : ""}`}>
+      <div className="departure-destination__headsign">{pageContent}</div>
     </div>
   );
 };
 
 interface Props extends DestinationBase {
-  currentPage: number;
   narrowHeadsign: boolean;
 }
 
-const Destination: ComponentType<Props> = ({ headsign, currentPage, narrowHeadsign}) => {
+const Destination: ComponentType<Props> = ({ headsign, narrowHeadsign }) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
@@ -71,18 +74,17 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage, narrowHeadsi
    */
   useLayoutEffect(() => {
     if (firstLineRef.current && secondLineRef.current) {
-
-
       const firstLines = Math.round(
         firstLineRef.current.clientHeight / LINE_HEIGHT,
       );
       const secondLines = Math.round(
         secondLineRef.current.clientHeight / LINE_HEIGHT,
       );
-      const widthOverflow = firstLineRef.current.scrollWidth > firstLineRef.current.clientWidth
+      const widthOverflow =
+        firstLineRef.current.scrollWidth > firstLineRef.current.clientWidth;
 
-      console.log(!widthOverflow)
-      
+      console.log(!widthOverflow);
+
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
           // Don't abbreviate if it already fits on one line.
@@ -145,7 +147,6 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage, narrowHeadsi
         index1={index1}
         index2={index2}
         parts={parts}
-        currentPageIndex={currentPage}
         narrowHeadsign={narrowHeadsign}
       />
     );
@@ -163,7 +164,7 @@ const Destination: ComponentType<Props> = ({ headsign, currentPage, narrowHeadsi
   }
 
   return (
-    <div className={`departure-destination${narrowHeadsign ? "--narrow": ""}`}>
+    <div className={`departure-destination${narrowHeadsign ? "--narrow" : ""}`}>
       <div className="departure-destination__headsign" ref={firstLineRef}>
         {firstLine}
       </div>

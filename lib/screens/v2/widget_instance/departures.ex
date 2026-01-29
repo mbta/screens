@@ -437,7 +437,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp crowding_compatible?(_, %Screen{app_id: :dup_v2}), do: false
   defp crowding_compatible?(_, _), do: true
 
-  defp serialize_time(departure, %Screen{app_id: app_id}, now)
+  defp serialize_time(departure, %Screen{app_id: app_id} = screen, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
 
@@ -453,7 +453,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time, now)
+          serialize_timestamp(departure_time, screen, now)
       end
 
     # See `docs/mercury_api.md`
@@ -467,12 +467,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
        ),
        do: %{time: %{type: :overnight}}
 
-  defp serialize_time(%Departure{prediction: nil} = departure, _screen, now) do
+  defp serialize_time(%Departure{prediction: nil} = departure, screen, now) do
     # We only display scheduled departures for CR and ferry routes
     # These should not show BRD/ARR, since the schedules are not real-time
     departure_time = Departure.time(departure)
 
-    %{time: serialize_timestamp(departure_time, now)}
+    %{time: serialize_timestamp(departure_time, screen, now)}
   end
 
   defp serialize_time(departure, screen, now) do
@@ -506,7 +506,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           %{type: :minutes, minutes: minute_diff}
 
         true ->
-          serialize_timestamp(departure_time, now)
+          serialize_timestamp(departure_time, screen, now)
       end
 
     %{time: time}
@@ -520,7 +520,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     if is_nil(scheduled_time) do
       %{time: serialized_time}
     else
-      serialized_scheduled_time = serialize_timestamp(scheduled_time, now)
+      serialized_scheduled_time = serialize_timestamp(scheduled_time, screen, now)
 
       case serialized_time do
         %{type: :text} ->
@@ -535,14 +535,24 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
   end
 
-  defp serialize_timestamp(departure_time, now) do
+  defp serialize_timestamp(departure_time, %Screen{app_id: app_id}, now) do
     local_time = Util.to_eastern(departure_time)
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
     service_date_tomorrow = now |> Util.service_date() |> Date.add(1)
-    show_am_pm = local_time.day == service_date_tomorrow.day
-    %{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm, show_am_pm: show_am_pm}
+    # Screen types other than DUPs currently have no implemented design for the AM/PM indicator.
+    show_am_pm = app_id == :dup_v2 and local_time.day == service_date_tomorrow.day
+
+    # Temporarily retain `show_am_pm` for compatibility with deployed DUP code that still expects
+    # this field. Remove when deployed DUP version > 26.01.13.1.
+    %{
+      type: :timestamp,
+      hour: hour,
+      minute: minute,
+      am_pm: if(show_am_pm, do: am_pm, else: nil),
+      show_am_pm: show_am_pm
+    }
   end
 
   defp parse_stops_away_status(status) when is_binary(status) do

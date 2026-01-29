@@ -101,11 +101,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
   defp color_to_route_id(:green), do: "Green"
 
   @spec get_route_pill_for_consolidated_row([alert()], String.t()) :: route_pill()
-  defp get_route_pill_for_consolidated_row(alerts, route_id) do
-    # Check if any alert has a route pill with branches
-    # Since we never consolidate GL section, only need to check RL branch
-    has_mattapan_branch =
-      Enum.any?(alerts, fn alert ->
+  defp get_route_pill_for_consolidated_row(alerts, "Red") do
+    # Check if alerts for RL are exclusively for Mattapan branch
+    # If they are, we want to show the M branch on the RL pill
+    all_alerts_are_mattapan =
+      Enum.all?(alerts, fn alert ->
         case Map.get(alert, :route_pill) do
           %{branches: branches} when is_list(branches) ->
             :m in branches
@@ -115,11 +115,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
         end
       end)
 
-    if has_mattapan_branch and route_id == "Red" do
+    if all_alerts_are_mattapan do
       RoutePill.serialize_rl_mattapan_pill()
     else
-      RoutePill.serialize_route_pill(route_id)
+      RoutePill.serialize_route_pill("Red")
     end
+  end
+
+  defp get_route_pill_for_consolidated_row(_alerts, route_id) do
+    RoutePill.serialize_route_pill(route_id)
   end
 
   @spec extend_sections_if_needed(serialized_response()) :: serialized_response()

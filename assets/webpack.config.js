@@ -12,6 +12,7 @@ const ALIASES = {
   // See also `paths` in `tsconfig.json`!
   CSS: path.resolve(__dirname, "css"),
   Components: path.resolve(__dirname, "src/components"),
+  Context: path.resolve(__dirname, "src/context"),
   Hooks: path.resolve(__dirname, "src/hooks"),
   Images: path.resolve(__dirname, "images"),
   Util: path.resolve(__dirname, "src/util"),
