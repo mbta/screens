@@ -49,3 +49,6 @@ npm-debug.log
 
 # Detritus left behind by macOS Finder
 .DS_Store
+
+# VSCode local settings directory
+.vscode/
