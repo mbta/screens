@@ -8,6 +8,7 @@ injected_modules = [
   Screens.Routes.Route,
   Screens.Stops.Stop,
   Screens.V2.Departure,
+  Screens.V2.RDS,
   Screens.V2.ScreenData,
   Screens.V2.ScreenData.Parameters
 ]
