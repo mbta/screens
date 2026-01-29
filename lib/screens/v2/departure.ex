@@ -236,11 +236,13 @@ defmodule Screens.V2.Departure do
 
   def vehicle_status(_), do: nil
 
-  # Only include status for DUP screens at this time
-  def status(%__MODULE__{prediction: %Prediction{status: status}}, %Screen{app_id: :dup_v2}),
-    # do: nil
-    do: "Stopped 21 stops away"
+  # Once the FE changes are pushed to DUPs, we will be able to enable this
+  # feature on the backend by returning the status
+  @spec status(t(), Screen.t()) :: String.t() | nil
+  def status(%__MODULE__{prediction: %Prediction{status: _status}}, %Screen{app_id: :dup_v2}),
+    do: nil
 
+  # Only include status for DUPs
   def status(_, _), do: nil
 
   defp crowding_data_relevant?(%Trip{id: trip_trip_id, stops: [first_stop | _]}, %Vehicle{

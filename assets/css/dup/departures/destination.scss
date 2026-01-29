@@ -6,15 +6,18 @@
   font-size: 138px;
   color: colors.$cool-black-15;
   vertical-align: middle;
+
+  .departures-section--shortenedHeadsigns & {
+    width: 843px;
+  }
 }
 
-.departure-destination--narrow {
-  display: inline-block;
-  width: 843px;
-  font-size: 138px;
-  color: colors.$cool-black-15;
-  vertical-align: middle;
-}
+// .departure-destination-{
+//   display: inline-block;
+//   font-size: 138px;
+//   color: colors.$cool-black-15;
+//   vertical-align: middle;
+// }
 
 .departure-destination__headsign {
   font-size: 138px;

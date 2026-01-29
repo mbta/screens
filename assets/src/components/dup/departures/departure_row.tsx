@@ -5,27 +5,20 @@ import DepartureTimes from "Components/departures/departure_times";
 import RoutePill from "Components/departures/route_pill";
 import Destination from "./destination";
 
-interface Props extends DepartureRowBase {
-  narrowHeadsign: boolean;
-}
-
-const DepartureRow: ComponentType<Props> = ({
+const DepartureRow: ComponentType<DepartureRowBase> = ({
   headsign,
   route,
   times_with_crowding: timesWithCrowding,
-  narrowHeadsign,
 }) => {
   return (
     <div className="departure-row">
       <div className="departure-row__route">
         <RoutePill pill={route} />
       </div>
-      <div
-        className={`departure-row__destination${narrowHeadsign ? "--narrow" : ""}`}
-      >
-        <Destination {...headsign} narrowHeadsign={narrowHeadsign} />
+      <div className={"departure-row__destination"}>
+        <Destination {...headsign} />
       </div>
-      <div className={`departure-row__time${narrowHeadsign ? "--wide" : ""}`}>
+      <div className={"departure-row__time"}>
         <DepartureTimes timesWithCrowding={timesWithCrowding} />
       </div>
     </div>

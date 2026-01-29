@@ -27,7 +27,7 @@ enum PHASES {
   DONE,
 }
 
-const RenderedDestination = ({ parts, index1, index2, narrowHeadsign }) => {
+const RenderedDestination = ({ parts, index1, index2 }) => {
   const currentPage = useCurrentPage();
 
   let pageContent;
@@ -43,17 +43,13 @@ const RenderedDestination = ({ parts, index1, index2, narrowHeadsign }) => {
   }
 
   return (
-    <div className={`departure-destination${narrowHeadsign ? "--narrow" : ""}`}>
+    <div className={"departure-destination"}>
       <div className="departure-destination__headsign">{pageContent}</div>
     </div>
   );
 };
 
-interface Props extends DestinationBase {
-  narrowHeadsign: boolean;
-}
-
-const Destination: ComponentType<Props> = ({ headsign, narrowHeadsign }) => {
+const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
@@ -82,8 +78,6 @@ const Destination: ComponentType<Props> = ({ headsign, narrowHeadsign }) => {
       );
       const widthOverflow =
         firstLineRef.current.scrollWidth > firstLineRef.current.clientWidth;
-
-      console.log(!widthOverflow);
 
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
@@ -143,12 +137,7 @@ const Destination: ComponentType<Props> = ({ headsign, narrowHeadsign }) => {
   // Render paged version when done determining breaks
   if (phase === PHASES.DONE) {
     return (
-      <RenderedDestination
-        index1={index1}
-        index2={index2}
-        parts={parts}
-        narrowHeadsign={narrowHeadsign}
-      />
+      <RenderedDestination index1={index1} index2={index2} parts={parts} />
     );
   }
 
@@ -164,7 +153,7 @@ const Destination: ComponentType<Props> = ({ headsign, narrowHeadsign }) => {
   }
 
   return (
-    <div className={`departure-destination${narrowHeadsign ? "--narrow" : ""}`}>
+    <div className={"departure-destination"}>
       <div className="departure-destination__headsign" ref={firstLineRef}>
         {firstLine}
       </div>
