@@ -199,7 +199,6 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
       alert =
         build_alert(effect: :delay, informed_entities: route_informed_entities(~w[Red Blue]))
 
-      # BUG: shows a white delay icon on a yellow background, need an inverse delay icon
       banner = %{
         color: :yellow,
         text: %FreeTextLine{icon: :delay_negative, text: ["Train delays"]}
