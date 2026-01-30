@@ -11,9 +11,13 @@
     margin-top: 32px;
   }
 
-  &--disabled {
-    color: #6e6e6e;
+  &--cancelled,
+  &--delayed {
     text-decoration: line-through;
+  }
+
+  &--delayed {
+    color: #6e6e6e;
   }
 }
 
