@@ -221,11 +221,12 @@ defmodule Screens.V2.WidgetInstance.LineMap do
        ) do
     vehicle_stop_index = Enum.find_index(stops, fn %{id: stop} -> stop == vehicle_stop end)
     current_stop_index = Enum.find_index(stops, fn %{id: stop} -> stop == current_stop end)
-    future_stops = min(length(stops) - current_stop_index - 1, @num_future_stops)
 
-    if is_nil(vehicle_stop_index) do
+    if is_nil(vehicle_stop_index) || is_nil(current_stop_index) do
       []
     else
+      future_stops = min(length(stops) - current_stop_index - 1, @num_future_stops)
+
       index =
         future_stops + current_stop_index - vehicle_stop_index +
           status_adjustment(vehicle_stop_index, vehicle_status)
