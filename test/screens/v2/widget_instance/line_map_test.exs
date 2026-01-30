@@ -191,6 +191,17 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
                  now,
                  false
                )
+
+      assert [] =
+               LineMap.serialize_vehicles(
+                 [d],
+                 stops,
+                 reverse_stops,
+                 direction_id,
+                 "bad_stop",
+                 now,
+                 false
+               )
     end
 
     test "correctly serializes labels", %{stops: stops, reverse_stops: reverse_stops} do
@@ -257,6 +268,65 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
                  reverse_stops,
                  direction_id,
                  current_stop,
+                 now,
+                 false
+               )
+    end
+
+    test "returns empty array when vehicle stop index or current stop index is not found", %{
+      stops: stops,
+      reverse_stops: reverse_stops
+    } do
+      direction_id = 0
+      now = ~U[2020-01-01T02:00:00Z]
+
+      current_stop = "70230"
+      bad_current_stop_id = "3"
+
+      good_departure = %Departure{
+        prediction: %Prediction{
+          departure_time: ~U[2020-01-01T02:02:00Z],
+          vehicle: %Vehicle{
+            id: "1",
+            current_status: :stopped_at,
+            stop_id: "70236",
+            direction_id: 0
+          },
+          trip: %Trip{id: "1", direction_id: 0}
+        }
+      }
+
+      bad_departure = %Departure{
+        prediction: %Prediction{
+          departure_time: ~U[2020-01-01T02:02:00Z],
+          vehicle: %Vehicle{
+            id: "1",
+            current_status: :stopped_at,
+            stop_id: "3",
+            direction_id: 0
+          },
+          trip: %Trip{id: "1", direction_id: 0}
+        }
+      }
+
+      assert [] =
+               LineMap.serialize_vehicles(
+                 [bad_departure],
+                 stops,
+                 reverse_stops,
+                 direction_id,
+                 current_stop,
+                 now,
+                 false
+               )
+
+      assert [] =
+               LineMap.serialize_vehicles(
+                 [good_departure],
+                 stops,
+                 reverse_stops,
+                 direction_id,
+                 bad_current_stop_id,
                  now,
                  false
                )

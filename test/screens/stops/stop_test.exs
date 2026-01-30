@@ -134,5 +134,55 @@ defmodule Screens.Stops.StopTest do
                ]
              } = Stop.fetch(%{ids: ~w[s1 s2 p1 p2 c3]}, true, get_json_fn)
     end
+
+    test "parsing prevents connecting stops from loading more connecting stops" do
+      get_json_fn =
+        fn "stops",
+           %{
+             "filter[id]" => "s1,s2",
+             "include" =>
+               "child_stops,connecting_stops,parent_station.child_stops,parent_station.connecting_stops"
+           } ->
+          {
+            :ok,
+            %{
+              "data" => [
+                stop_data("s1", %{}, nil, [], [stop_ref("s2")]),
+                stop_data("s2", %{}, nil, [], [stop_ref("s1")])
+              ],
+              "included" => [
+                stop_data("s1", %{}, nil, [], [stop_ref("s2")]),
+                stop_data("s2", %{}, nil, [], [stop_ref("s1")])
+              ]
+            }
+          }
+        end
+
+      assert {
+               :ok,
+               [
+                 %Stop{
+                   id: "s1",
+                   location_type: 0,
+                   parent_station: nil,
+                   child_stops: [],
+                   connecting_stops: [
+                     %Stop{id: "s2", parent_station: nil, connecting_stops: :unloaded}
+                   ],
+                   vehicle_type: :bus
+                 },
+                 %Stop{
+                   id: "s2",
+                   location_type: 0,
+                   parent_station: nil,
+                   child_stops: [],
+                   connecting_stops: [
+                     %Stop{id: "s1", parent_station: nil, connecting_stops: :unloaded}
+                   ],
+                   vehicle_type: :bus
+                 }
+               ]
+             } = Stop.fetch(%{ids: ~w[s1 s2]}, true, get_json_fn)
+    end
   end
 end
