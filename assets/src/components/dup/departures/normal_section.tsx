@@ -11,19 +11,12 @@ const NormalSection: ComponentType<Props> = ({ rows }) => {
   if (rows.length === 0) return null;
 
   return (
-    // <div className={"departures-section"}>
     <div
       className={`departures-section${shortenHeadsignsForSection(rows) ? "--shortenedHeadsigns" : ""}`}
     >
       {rows.map((row, index) => {
         if (row.type === "departure_row") {
-          return (
-            <DepartureRow
-              {...row}
-              key={row.id}
-              shortenHeadsign={shortenHeadsignsForSection(rows)}
-            />
-          );
+          return <DepartureRow {...row} key={row.id} />;
         } else {
           return <NoticeRow row={row} key={"notice" + index} />;
         }

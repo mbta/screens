@@ -482,16 +482,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
     vehicle_stop_id = Prediction.stop_for_vehicle(departure.prediction)
     stop_type = Departure.stop_type(departure)
     %Route{type: route_type} = Departure.route(departure)
-    prediction_status = Departure.status(departure, screen)
+    prediction_stops_away = parse_stops_away_from_status(Departure.status(departure, screen))
 
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)
 
     time =
       cond do
-        # Check for "Stopped N stops away" status pattern
-        prediction_status != nil and parse_stops_away_status(prediction_status) != nil ->
-          parse_stops_away_status(prediction_status)
+        prediction_stops_away != nil ->
+          serialize_stops_away(prediction_stops_away)
 
         vehicle_status == :stopped_at and second_diff < 90 and stop_id == vehicle_stop_id ->
           %{type: :text, text: "BRD"}
@@ -555,26 +554,29 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  defp parse_stops_away_status(status) when is_binary(status) do
+  @spec parse_stops_away_from_status(String.t() | nil) :: pos_integer()
+  defp(parse_stops_away_from_status(status) when is_binary(status)) do
     # Match pattern like "Stopped 3 stops away" or "Stopped 1 stop away"
-    case Regex.run(~r/^Stopped\s+(\d+)\s+stop(?:s)?\s+away$/i, status) do
-      [_full_match, stop_count_str] ->
-        stop_count = String.to_integer(stop_count_str)
-        stop_word = if stop_count == 1, do: "stop", else: "stops"
-
-        %{
-          type: :stops_away,
-          prefix: "Stopped",
-          count: stop_count,
-          suffix: "#{stop_count} #{stop_word} away"
-        }
-
+    case Regex.run(~r/Stopped (\d+) stops? away/, status) do
       nil ->
         nil
+
+      [_full_match, num_stops_str] ->
+        String.to_integer(num_stops_str)
     end
   end
 
-  defp parse_stops_away_status(_), do: nil
+  defp parse_stops_away_from_status(_), do: nil
+
+  defp serialize_stops_away(num_stops) do
+    stop_word = if num_stops == 1, do: "stop", else: "stops"
+
+    %{
+      type: :stops_away,
+      prefix: "Stopped",
+      suffix: "#{num_stops} #{stop_word} away"
+    }
+  end
 
   defp get_headway_text(
          headsign,

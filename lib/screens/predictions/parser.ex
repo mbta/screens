@@ -10,8 +10,9 @@ defmodule Screens.Predictions.Parser do
           "attributes" => %{
             "arrival_time" => arrival_time_string,
             "departure_time" => departure_time_string,
-            "schedule_relationship" => schedule_relationship
-          } = attributes,
+            "schedule_relationship" => schedule_relationship,
+            "status" => status
+          },
           "relationships" => %{
             "route" => route,
             "stop" => stop,
@@ -33,7 +34,7 @@ defmodule Screens.Predictions.Parser do
       departure_time: parse_time(departure_time_string),
       track_number: stop.platform_code,
       schedule_relationship: ScheduleRelationship.parse(schedule_relationship),
-      status: Map.get(attributes, "status")
+      status: status
     }
   end
 
