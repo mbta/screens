@@ -19,12 +19,12 @@ export const useDupLocalTestingEnvironment = () =>
     const queryParams = new URLSearchParams(window.location.search);
 
     const isLocalTest = queryParams.get(IS_TEST_KEY);
-    const playerName= queryParams.get(PLAYER_NAME_KEY);
+    const playerName = queryParams.get(PLAYER_NAME_KEY);
     const station = queryParams.get(STATION_NAME_KEY);
 
     if (isLocalTest !== null || playerName || station) {
       __TEST_setFakeMRAID__({
-        playerName: playerName  ? playerName   : DEFAULT_PLAYER_NAME,
+        playerName: playerName ? playerName : DEFAULT_PLAYER_NAME,
         station: station ? station : DEFAULT_STATION,
       });
     }
