@@ -4,6 +4,9 @@ initSentry("dup_v2");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
+import { initFakeMRAID } from "Util/outfront";
+initFakeMRAID();
+
 import "../../css/dup.scss";
 
 import { StrictMode } from "react";
@@ -116,9 +119,6 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 };
 
 const App = (): JSX.Element => {
-  // If testing an OFM client package locally, we create Fake MRAID
-  useDupFakeMRAID();
-
   const playerName = usePlayerName();
 
   return (

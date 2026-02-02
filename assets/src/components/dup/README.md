@@ -24,12 +24,12 @@
 - To test the `index.html` that is created locally or in Browserstack, you need to set a query param `test` to any value, such as `index.html?test=`.
   - Setting this query param sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
   - You can also set `playerName` and `station` within the URL params to change which screen is emulated.
-  - If you are testing multiple iterations locally and don't want to add the URL params with each rebuild of the package, temporarily modify the if statment and/or defaults within the `useDupFakeMRAID` hook. Just make sure to remove before sending client packages to Outfront to test.
+  - If you are testing multiple iterations locally and don't want to add the URL params with each rebuild of the package, temporarily modify the if statment and/or defaults within `outfront.tsx`'s `initFakeMRAID` function. Just make sure to remove before sending client packages to Outfront to test.
 - When testing is complete, commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
 ## Working with Outfront
 
-Once you've created the client app packages, you'll need to send them to Outfront to test and deploy. Make sure to remove any changes that you made to `useDupFakeMRAID.ts` and `use_api_response.tsx` for local testing before generating packages for Outfront.
+Once you've created the client app packages, you'll need to send them to Outfront to test and deploy. Make sure to remove any changes that you made to `outfront.tsx` and `use_api_response.tsx` for local testing before generating packages for Outfront.
 
 For detailed instructions on this process, go to [this Notion doc](https://www.notion.so/mbta-downtown-crossing/Deploying-DUP-Package-Updates-120f5d8d11ea805fa219f214c1633293).
 
