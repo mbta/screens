@@ -42,7 +42,6 @@ import OvernightDepartures from "Components/dup/overnight_departures";
 import { Provider as CurrentPageProvider } from "Context/dup_page";
 import { usePlayerName } from "Hooks/outfront";
 import { isDup } from "Util/outfront";
-import { useDupFakeMRAID } from "Hooks/use_dup_fake_mraid";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
