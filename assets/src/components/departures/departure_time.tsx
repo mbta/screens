@@ -48,8 +48,11 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
 
     case "stops_away":
       // Show prefix ("Stopped") on page 0, suffix ("N stop(s) away") on page 1
-      const text = currentPage === 0 ? time.prefix : time.suffix;
-      return <div className="departure-time__stops_away">{text}</div>;
+      return (
+        <div className="departure-time__stops_away">
+          {currentPage === 0 ? time.prefix : time.suffix}
+        </div>
+      );
 
     case "overnight":
       return <MoonIcon width={128} height={128} color="black" />;
