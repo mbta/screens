@@ -106,7 +106,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   def serialize_section(%NoDataSection{route: route}, _screen, _now, _is_only_section) do
     text = %FreeTextLine{
-      icon: Route.icon(route),
+      icon: if(route == nil, do: nil, else: Route.icon(route)),
       text: ["Updates unavailable"]
     }
 
@@ -176,19 +176,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(%OvernightSection{routes: routes}, _screen, _now, _is_only_section) do
-    route_pill =
-      routes
-      |> Enum.map(&Route.icon/1)
-      |> List.first()
-
-    text = %FreeTextLine{
-      icon: route_pill,
-      text: [
-        "Service resumes",
-        %{special: :break},
-        "in the morning"
-      ]
-    }
+    route_pill = routes |> Enum.map(&Route.icon/1) |> List.first()
+    text = %FreeTextLine{icon: route_pill, text: ["Service ended"]}
 
     %{type: :overnight_section, text: FreeTextLine.to_json(text)}
   end

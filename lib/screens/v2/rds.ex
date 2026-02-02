@@ -61,8 +61,8 @@ defmodule Screens.V2.RDS do
 
   ⚠️ Enforces that every section's query contains at least one ID in `stop_ids`.
   """
-  @spec get(Departures.t()) :: [section_t()]
-  @spec get(Departures.t(), DateTime.t()) :: [section_t()]
+  @callback get(Departures.t()) :: [section_t()]
+  @callback get(Departures.t(), DateTime.t()) :: [section_t()]
   def get(%Departures{sections: sections}, now \\ DateTime.utc_now()),
     do: Enum.map(sections, &from_section(&1, now))
 
