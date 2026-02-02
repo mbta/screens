@@ -39,7 +39,7 @@ import OvernightDepartures from "Components/dup/overnight_departures";
 import { Provider as CurrentPageProvider } from "Context/dup_page";
 import { usePlayerName } from "Hooks/outfront";
 import { isDup } from "Util/outfront";
-import { useDupLocalTestingEnvironment } from "Hooks/use_dup_local_testing_environment";
+import { useDupFakeMRAID } from "Hooks/use_dup_fake_mraid";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -117,7 +117,7 @@ const responseMapper: ResponseMapper = (apiResponse) => {
 
 const App = (): JSX.Element => {
   // If testing an OFM client package locally, we create Fake MRAID
-  useDupLocalTestingEnvironment();
+  useDupFakeMRAID();
 
   const playerName = usePlayerName();
 
