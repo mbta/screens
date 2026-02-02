@@ -34,8 +34,8 @@ defmodule Screens.Schedules.Schedule do
   @type result :: {:ok, [t()]} | :error
   @type fetch_with_date :: (Departure.params(), date_param() -> result())
 
-  @spec fetch(Departure.params()) :: result()
-  @spec fetch(Departure.params(), date_param()) :: result()
+  @callback fetch(Departure.params()) :: result()
+  @callback fetch(Departure.params(), date_param()) :: result()
   def fetch(%{} = params, date \\ nil) do
     params = if is_nil(date), do: params, else: Map.put(params, :date, date)
     result = Departure.do_fetch("schedules", Map.put(params, :include, @includes))

@@ -15,36 +15,39 @@ defmodule Screens.V2.RDS do
   alias Screens.Lines.Line
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
+  alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
+  alias Screens.Trips.Trip
+  alias Screens.Util
+
   alias Screens.V2.Departure
 
   alias ScreensConfig.Departures
   alias ScreensConfig.Departures.{Query, Section}
 
   alias __MODULE__.Countdowns
-  alias __MODULE__.NoDepartures
+  alias __MODULE__.NoService
 
   @type t ::
           %__MODULE__{
             stop: Stop.t(),
             line: Line.t(),
             headsign: String.t(),
-            state: NoDepartures.t() | Countdowns.t()
+            state: NoService.t() | Countdowns.t()
           }
   @enforce_keys ~w[stop line headsign state]a
   defstruct @enforce_keys
 
   @type section_t :: {:ok, [t()]} | :error
 
-  defmodule NoDepartures do
+  defmodule NoService do
     @moduledoc """
-    The fallback state, presented as a headway or "no departures" message. A destination is in
-    this state when A) displaying departures has been manually disabled for the relevant transit
-    mode, or B) there simply aren't any upcoming departures we want to display, and as far as we
-    can tell this is "normal"/expected.
+    The state that represents when a given destination 
+    has no relevant live data (alerts or predictions) 
+    and no scheduled departures for the day.
     """
-    @type t :: %__MODULE__{headways: Headways.range() | nil}
-    defstruct ~w[headways]a
+    @type t :: %__MODULE__{routes: [Route.t()]}
+    defstruct ~w[routes]a
   end
 
   defmodule Countdowns do
@@ -59,6 +62,7 @@ defmodule Screens.V2.RDS do
   @departure injected(Departure)
   @headways injected(Headways)
   @route_pattern injected(RoutePattern)
+  @schedule injected(Schedule)
   @stop injected(Stop)
 
   @max_departure_minutes 120
@@ -78,7 +82,11 @@ defmodule Screens.V2.RDS do
 
   @spec from_section(Section.t(), DateTime.t()) :: section_t()
   defp from_section(
-         %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids} = params}},
+         %Section{
+           query: %Query{
+             params: %Query.Params{stop_ids: stop_ids, route_ids: route_id_params} = params
+           }
+         },
          now
        )
        when stop_ids != [] do
@@ -89,10 +97,23 @@ defmodule Screens.V2.RDS do
            |> @route_pattern.fetch(),
          {:ok, child_stops} <-
            fetch_child_stops(stop_ids),
+         {:ok, scheduled_departures} <-
+           @schedule.fetch(%{stop_ids: stop_ids}, Util.service_date(now)),
          {:ok, departures} <-
            params
            |> Map.from_struct()
            |> @departure.fetch(now: now) do
+      scheduled_departures_by_headsign_and_line =
+        scheduled_departures
+        |> Enum.group_by(fn
+          %Schedule{
+            stop: %Stop{id: stop_id},
+            route: %Route{line: %Line{id: line_id}},
+            trip: trip
+          } ->
+            {stop_id, line_id, Trip.representative_headsign(trip)}
+        end)
+
       departures_by_destination =
         departures
         |> Enum.group_by(fn departure ->
@@ -103,6 +124,16 @@ defmodule Screens.V2.RDS do
           end)
         end)
 
+      routes_for_section =
+        (departures ++ scheduled_departures ++ typical_patterns)
+        |> Enum.map(fn
+          %Departure{} = departure -> Departure.route(departure)
+          %Schedule{route: route} -> route
+          %RoutePattern{route: route} -> route
+        end)
+        |> Enum.uniq()
+        |> filter_for_route_id_params(route_id_params)
+
       section_rds =
         (tuples_from_departures(departures, now) ++
            tuples_from_patterns(typical_patterns, child_stops))
@@ -110,18 +141,21 @@ defmodule Screens.V2.RDS do
         |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
           headway_for_stop = @headways.get(stop_id, now)
 
-          departures_for_headsign =
+          departures =
             Map.get(departures_by_destination, {stop.id, line.id, headsign}, [])
             |> Enum.filter(fn
               %{prediction: nil} -> headway_for_stop == nil
               _ -> true
             end)
 
+          scheduled_departures =
+            scheduled_departures_by_headsign_and_line |> Map.get({stop.id, line.id, headsign}, [])
+
           %__MODULE__{
             stop: stop,
             line: line,
             headsign: headsign,
-            state: state(departures_for_headsign, stop_id, now)
+            state: state(departures, scheduled_departures, stop_id, routes_for_section, now)
           }
         end)
 
@@ -173,11 +207,28 @@ defmodule Screens.V2.RDS do
      Departure.representative_headsign(departure)}
   end
 
-  defp state([] = _departures_by_headsign, _stop_id, _now) do
-    %NoDepartures{}
+  defp state(
+         [] = _departures_for_headsign,
+         [] = _scheduled_departures_for_headsign,
+         _stop_id,
+         routes_for_section,
+         _now
+       ) do
+    %NoService{routes: routes_for_section}
   end
 
-  defp state(departures_by_headsign, _stop_id, _now) do
-    %Countdowns{departures: departures_by_headsign}
+  defp state(
+         departures_for_headsign,
+         _scheduled_departures_by_headsign,
+         _stop_id,
+         _route_ids_for_section,
+         _now
+       ) do
+    %Countdowns{departures: departures_for_headsign}
   end
+
+  defp filter_for_route_id_params(all_route_ids, []), do: all_route_ids
+
+  defp filter_for_route_id_params(all_route_ids, route_id_params),
+    do: Enum.filter(all_route_ids, fn route -> route.id in route_id_params end)
 end

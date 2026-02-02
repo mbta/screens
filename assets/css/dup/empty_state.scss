@@ -1,6 +1,7 @@
 @use "CSS/colors";
 
 .no-data__container,
+.no-service__container,
 .loading__container {
   height: 100%;
   background-color: #e6e4e1;
@@ -12,6 +13,7 @@
 }
 
 .no-data__icon-container,
+.no-service__icon-container,
 .loading__icon-container {
   display: inline-block;
   width: 312px;
@@ -20,11 +22,13 @@
 }
 
 .no-data__icon-image,
+.no-service__icon-image,
 .loading__icon-image {
   width: 160px;
 }
 
 .no-data__message,
+.no-service__message,
 .loading__heading {
   display: inline-block;
   width: 1544px;
@@ -48,6 +52,7 @@
 }
 
 .no-data__link,
+.no-service__link,
 .loading__link {
   position: absolute;
   right: 72px;
@@ -55,16 +60,66 @@
 }
 
 .no-data__link-arrow,
+.no-service__link-arrow,
 .loading__link-arrow {
   display: inline-block;
   vertical-align: middle;
 }
 
 .no-data__link-text,
+.no-service__link-text,
 .loading__link-text {
   display: inline-block;
   margin-left: 72px;
   font-size: 108px;
   color: colors.$cool-black-15;
   vertical-align: middle;
+}
+
+.no-service__top-section {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.no-service__top-row {
+  display: flex;
+  align-items: center;
+}
+
+.no-service__body {
+  display: flex;
+  padding: 76px 100px;
+}
+
+.no-service__route-pill-container {
+  display: inline-flex;
+  margin-left: 32px;
+
+  .route-pill {
+    position: relative;
+    width: 248px;
+    height: 144px;
+    margin: 32px;
+    border-radius: 100px;
+    box-shadow: none;
+  }
+}
+
+.no-service__body--with-routes {
+  flex-direction: column;
+
+  .no-service__message {
+    margin-left: 220px;
+  }
+}
+
+.no-service__body--no-routes {
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 160px;
+
+  .no-service__message {
+    margin-left: 64px;
+  }
 }
