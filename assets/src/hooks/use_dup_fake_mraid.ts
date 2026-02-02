@@ -13,7 +13,7 @@ const STATION_NAME_KEY = "station";
  * If any of the specified query params are provided in the URL,
  * we are testing in a local environment and explicitly set
  * a fake MRAID object to test as if running on a real DUP screen.
- * 
+ *
  * This hook allows us to test the same client package locally and on
  * OFM's test DUP hardware, depending on if query params are present.
  */
