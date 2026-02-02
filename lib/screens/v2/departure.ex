@@ -236,7 +236,8 @@ defmodule Screens.V2.Departure do
 
   def vehicle_status(_), do: nil
 
-  # Once the FE changes are pushed to DUPs, we will be able to enable this
+  # credo:disable-for-next-line
+  # TODO: Once the FE changes are pushed to DUPs, we will be able to enable this
   # feature on the backend by returning the status
   @spec status(t(), Screen.t()) :: String.t() | nil
   def status(%__MODULE__{prediction: %Prediction{status: _status}}, %Screen{app_id: :dup_v2}),

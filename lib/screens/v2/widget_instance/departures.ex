@@ -543,7 +543,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  @spec parse_stops_away_from_status(String.t() | nil) :: pos_integer()
+  @spec parse_stops_away_from_status(String.t() | nil) :: pos_integer() | nil
   defp(parse_stops_away_from_status(status) when is_binary(status)) do
     # Match pattern like "Stopped 3 stops away" or "Stopped 1 stop away"
     case Regex.run(~r/Stopped (\d+) stops? away/, status) do

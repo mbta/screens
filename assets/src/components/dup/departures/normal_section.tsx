@@ -12,7 +12,7 @@ const NormalSection: ComponentType<Props> = ({ rows }) => {
 
   return (
     <div
-      className={`departures-section${shortenHeadsignsForSection(rows) ? "--shortenedHeadsigns" : ""}`}
+      className={`departures-section${shortenHeadsignsForSection(rows) ? "--shortened-headsigns" : ""}`}
     >
       {rows.map((row, index) => {
         if (row.type === "departure_row") {
