@@ -55,8 +55,18 @@ defmodule Screens.V2.WidgetInstance.Departures do
     defstruct ~w[route]a
   end
 
+  defmodule NoServiceSection do
+    @moduledoc "Section consisting of a 'no service' message."
+    @type t :: %__MODULE__{route: Route.t()}
+    defstruct ~w[route]a
+  end
+
   @type section ::
-          HeadwaySection.t() | NormalSection.t() | OvernightSection.t() | NoDataSection.t()
+          HeadwaySection.t()
+          | NormalSection.t()
+          | OvernightSection.t()
+          | NoDataSection.t()
+          | NoServiceSection.t()
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
@@ -112,6 +122,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
 
     %{type: :no_data_section, text: FreeTextLine.to_json(text)}
+  end
+
+  def serialize_section(%NoServiceSection{route: route}, _screen, _now, _is_only_section) do
+    text = %FreeTextLine{
+      icon: if(route == nil, do: nil, else: Route.icon(route)),
+      text: ["No Service today"]
+    }
+
+    %{type: :no_service_section, text: FreeTextLine.to_json(text)}
   end
 
   def serialize_section(

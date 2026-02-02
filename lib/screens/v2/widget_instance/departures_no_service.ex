@@ -1,14 +1,19 @@
 defmodule Screens.V2.WidgetInstance.DeparturesNoService do
   @moduledoc false
 
-  defstruct screen: nil
+  defstruct screen: nil, slot_name: nil
 
   @type t :: %__MODULE__{
-          screen: ScreensConfig.Screen.t()
+          screen: ScreensConfig.Screen.t(),
+          slot_name: atom()
         }
 
   def priority(_instance), do: [2]
   def serialize(_instance), do: %{}
+
+  def slot_names(%__MODULE__{slot_name: slot_name}) when not is_nil(slot_name),
+    do: [slot_name]
+
   def slot_names(_instance), do: [:main_content]
   def widget_type(_instance), do: :departures_no_service
   def valid_candidate?(_instance), do: true

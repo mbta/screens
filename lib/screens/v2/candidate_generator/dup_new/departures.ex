@@ -5,10 +5,11 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   alias Screens.V2.Departure
   alias Screens.V2.RDS
-  alias Screens.V2.RDS.{Countdowns, NoDepartures}
+  alias Screens.V2.RDS.{Countdowns, NoService}
+
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.Departures.{NoDataSection, NormalSection}
-  alias Screens.V2.WidgetInstance.{DeparturesNoData, OvernightDepartures}
+  alias Screens.V2.WidgetInstance.Departures.{NoDataSection, NormalSection, NoServiceSection}
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
 
   alias ScreensConfig.Departures
   alias ScreensConfig.Departures.{Header, Layout, Section}
@@ -46,11 +47,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
       create_departure_sections(primary_rds_sections, primary_departures)
 
     secondary_departure_sections =
-      if secondary_rds_sections == [] or
-           Enum.all?(secondary_rds_sections, fn
-             :error -> false
-             {:ok, rds_list} -> no_departures?(rds_list)
-           end) do
+      if secondary_rds_sections == [] or Enum.all?(secondary_rds_sections, &(&1 == {:ok, []})) do
         primary_departure_sections
       else
         create_departure_sections(secondary_rds_sections, secondary_departures)
@@ -86,11 +83,8 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     cond do
       # all headways -> HeadwaySection()
       # all overnight -> OvernightSection()
-
-      # credo:disable-for-next-line
-      # TODO: Remove this code path once we've refactored the RDS State to remove NoDepartures
-      no_departures?(rds_list) ->
-        %NoDataSection{}
+      no_service?(rds_list) ->
+        %NoServiceSection{}
 
       true ->
         %NormalSection{
@@ -100,7 +94,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
               %RDS{state: %Countdowns{departures: departures}} ->
                 departures
 
-              %RDS{state: %NoDepartures{headways: _headways}} ->
+              %RDS{state: %NoService{}} ->
                 []
             end)
             |> Enum.sort_by(&Departure.time/1, DateTime)
@@ -112,20 +106,23 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     end
   end
 
-  defp no_departures?(rds_list) do
-    Enum.all?(rds_list, &is_struct(&1.state, NoDepartures))
+  defp no_service?(rds_list) do
+    Enum.all?(rds_list, &is_struct(&1.state, NoService))
   end
 
   defp build_instances(slot_names, departure_sections, config, now) do
-    # credo:disable-for-next-line
-    # TODO: Remove this NoDataSection check once we've refactored it in RDS
-    if Enum.all?(departure_sections, &(&1 == :error || is_struct(&1, NoDataSection))) do
-      Enum.map(slot_names, &%DeparturesNoData{screen: config, slot_name: &1})
-    else
-      Enum.map(
-        slot_names,
-        &sections_to_departure_widget(&1, departure_sections, config, now)
-      )
+    cond do
+      Enum.all?(departure_sections, &is_struct(&1, NoDataSection)) ->
+        Enum.map(slot_names, &%DeparturesNoData{screen: config, slot_name: &1})
+
+      Enum.all?(departure_sections, &is_struct(&1, NoServiceSection)) ->
+        Enum.map(slot_names, &%DeparturesNoService{screen: config, slot_name: &1})
+
+      true ->
+        Enum.map(
+          slot_names,
+          &sections_to_departure_widget(&1, departure_sections, config, now)
+        )
     end
   end
 
