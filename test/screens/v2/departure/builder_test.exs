@@ -300,46 +300,49 @@ defmodule Screens.V2.Departure.BuilderTest do
       assert expected == Builder.build(predictions, schedules, @now)
     end
 
-    test "filters out departures that have been marked cancelled" do
-      p1 = %Prediction{id: "p1", departure_time: ~U[2020-02-01T00:00:00Z], trip: %Trip{id: "t7"}}
+    test "filters out departures that have been marked cancelled or skipped" do
+      p1 = %Prediction{id: "p1", departure_time: ~U[2020-02-01T00:00:00Z], trip: %Trip{id: "t1"}}
 
       p2 = %Prediction{
         id: "p2",
         departure_time: nil,
-        trip: %Trip{id: "t3"},
+        trip: %Trip{id: "t2"},
         schedule_relationship: :cancelled
       }
 
-      predictions = [p1, p2]
-
-      s1 = %Schedule{id: "s1", departure_time: ~U[2020-02-01T01:01:00Z], trip: %Trip{id: "t3"}}
-      s2 = %Schedule{id: "s2", departure_time: ~U[2020-02-01T00:01:00Z], trip: %Trip{id: "t7"}}
-      schedules = [s1, s2]
-
-      expected = [%Departure{prediction: p1, schedule: s2}]
-
-      assert expected == Builder.build(predictions, schedules, @now)
-    end
-
-    test "filters out departures that have been marked skipped" do
-      p1 = %Prediction{id: "p1", departure_time: ~U[2020-02-01T00:00:00Z], trip: %Trip{id: "t7"}}
-
-      p2 = %Prediction{
-        id: "p2",
+      p3 = %Prediction{
+        id: "p3",
         departure_time: ~U[2020-02-01T01:00:00Z],
         trip: %Trip{id: "t3"},
         schedule_relationship: :skipped
       }
 
-      predictions = [p1, p2]
+      p4 = %Prediction{
+        id: "p4",
+        departure_time: ~U[2020-02-01T01:00:00Z],
+        trip: %Trip{id: "no-schedule"},
+        schedule_relationship: :skipped
+      }
 
-      s1 = %Schedule{id: "s1", departure_time: ~U[2020-02-01T01:01:00Z], trip: %Trip{id: "t3"}}
-      s2 = %Schedule{id: "s2", departure_time: ~U[2020-02-01T00:01:00Z], trip: %Trip{id: "t7"}}
-      schedules = [s1, s2]
+      predictions = [p1, p2, p3, p4]
 
-      expected = [%Departure{prediction: p1, schedule: s2}]
+      s1 = %Schedule{id: "s1", departure_time: ~U[2020-02-01T00:01:00Z], trip: %Trip{id: "t1"}}
+      s2 = %Schedule{id: "s2", departure_time: ~U[2020-02-01T01:01:00Z], trip: %Trip{id: "t2"}}
+      s3 = %Schedule{id: "s3", departure_time: ~U[2020-02-01T02:01:00Z], trip: %Trip{id: "t3"}}
+      schedules = [s1, s2, s3]
+
+      expected = [%Departure{prediction: p1, schedule: s1}]
+
+      expected_with_option = [
+        %Departure{prediction: p1, schedule: s1},
+        %Departure{prediction: p3, schedule: s3},
+        %Departure{prediction: p2, schedule: s2}
+      ]
 
       assert expected == Builder.build(predictions, schedules, @now)
+
+      assert expected_with_option ==
+               Builder.build(predictions, schedules, @now, include_scheduled_cancelled?: true)
     end
   end
 end

@@ -38,7 +38,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           }
         } = config,
         now,
-        fetch_departures_fn \\ &Departure.fetch/2,
+        fetch_departures_fn \\ fn params, opts ->
+          Departure.fetch(params, Keyword.put(opts, :include_scheduled_cancelled?, true))
+        end,
         fetch_alerts_fn \\ &Alert.fetch_or_empty_list/1,
         fetch_schedules_fn \\ &Screens.Schedules.Schedule.fetch/2,
         fetch_routes_fn \\ &Screens.Routes.Route.fetch/1,
