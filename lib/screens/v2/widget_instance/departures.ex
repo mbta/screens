@@ -396,54 +396,32 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_time_with_crowding(departure, screen, now) do
-    serialized_time =
-      case Departure.route(departure).type do
-        :rail -> serialize_time_with_schedule(departure, screen, now)
-        _ -> serialize_time(departure, screen, now)
-      end
-
-    crowding =
-      if crowding_compatible?(serialized_time, screen) do
-        Departure.crowding_level(departure)
-      else
-        nil
-      end
-
-    Map.merge(serialized_time, %{
-      id: Departure.id(departure),
-      crowding: crowding
-    })
+    serialize_time(departure, screen, now)
+    |> Map.merge(%{id: Departure.id(departure), crowding: serialize_crowding(departure, screen)})
   end
 
   def serialize_direction_id([first_departure | _]) do
     Departure.direction_id(first_departure)
   end
 
-  # Timestamps represent a time further in the future (except for CR, which doesn't have crowding)
-  # and can't physically fit on the same row as crowding icons.
-  # All other time representations are compatible.
-  defp crowding_compatible?(serialized_time, screen)
-  defp crowding_compatible?(%{time: %{type: :timestamp}}, _), do: false
-  defp crowding_compatible?(_, %Screen{app_id: :dup_v2}), do: false
-  defp crowding_compatible?(_, _), do: true
+  # Crowding information doesn't fit alongside timestamps since they take up extra space.
+  defp serialize_crowding(%{time: %{type: :timestamp}}, _screen), do: nil
+  # DUPs don't display crowding information (space constraints, no design implemented for it).
+  defp serialize_crowding(_departure, %Screen{app_id: :dup_v2}), do: nil
+  # Otherwise, include crowding information.
+  defp serialize_crowding(departure, _screen), do: Departure.crowding_level(departure)
 
   defp serialize_time(departure, %Screen{app_id: app_id} = screen, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
-
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)
 
     time =
       cond do
-        second_diff < 60 ->
-          %{type: :text, text: "Now"}
-
-        minute_diff < 60 ->
-          %{type: :minutes, minutes: minute_diff}
-
-        true ->
-          serialize_timestamp(departure_time, screen, now)
+        second_diff < 60 -> %{type: :text, text: "Now"}
+        minute_diff < 60 -> %{type: :minutes, minutes: minute_diff}
+        true -> serialize_timestamp(departure_time, screen, now)
       end
 
     # See `docs/mercury_api.md`
@@ -457,71 +435,58 @@ defmodule Screens.V2.WidgetInstance.Departures do
        ),
        do: %{time: %{type: :overnight}}
 
-  defp serialize_time(%Departure{prediction: nil} = departure, screen, now) do
-    # We only display scheduled departures for CR and ferry routes
-    # These should not show BRD/ARR, since the schedules are not real-time
-    departure_time = Departure.time(departure)
+  defp serialize_time(%Departure{prediction: prediction} = departure, screen, now) do
+    scheduled_time = Departure.scheduled_time(departure)
+    %Route{type: route_type} = Departure.route(departure)
+    include_scheduled_time? = route_type in [:ferry, :rail]
+    predicted? = not is_nil(prediction)
 
-    %{time: serialize_timestamp(departure_time, screen, now)}
+    serialized_time =
+      cond do
+        Departure.cancelled?(departure) -> nil
+        predicted? and not include_scheduled_time? -> serialize_realtime(departure, screen, now)
+        true -> departure |> Departure.time() |> serialize_timestamp(screen, now)
+      end
+
+    serialized_scheduled_time =
+      if include_scheduled_time? and not is_nil(scheduled_time) do
+        serialized_scheduled_time = serialize_timestamp(scheduled_time, screen, now)
+
+        case serialized_time do
+          %{type: :text} -> nil
+          ^serialized_scheduled_time -> nil
+          _ -> serialized_scheduled_time
+        end
+      end
+
+    %{time: serialized_time, scheduled_time: serialized_scheduled_time}
   end
 
-  defp serialize_time(departure, screen, now) do
-    %Stop{id: stop_id} = Departure.stop(departure)
+  defp serialize_realtime(
+         %Departure{prediction: %Prediction{stop: %Stop{id: stop_id}} = prediction} = departure,
+         screen,
+         now
+       ) do
+    at_first_stop? = Departure.stop_type(departure) == :first_stop
     departure_time = Departure.time(departure)
-    vehicle_status = Departure.vehicle_status(departure)
-    vehicle_stop_id = Prediction.stop_for_vehicle(departure.prediction)
-    stop_type = Departure.stop_type(departure)
-    %Route{type: route_type} = Departure.route(departure)
-
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)
 
-    time =
-      cond do
-        vehicle_status == :stopped_at and second_diff < 90 and stop_id == vehicle_stop_id ->
-          %{type: :text, text: "BRD"}
+    stopped_at_predicted_stop? =
+      Departure.vehicle_status(departure) == :stopped_at and
+        stop_id == Prediction.stop_for_vehicle(prediction)
 
-        second_diff < 30 and stop_type == :first_stop ->
-          %{type: :text, text: "BRD"}
-
-        second_diff < 30 ->
-          %{type: :text, text: "ARR"}
-
-        minute_diff < 60 and route_type not in [:rail, :ferry] ->
-          %{type: :minutes, minutes: minute_diff}
-
-        true ->
-          serialize_timestamp(departure_time, screen, now)
-      end
-
-    %{time: time}
-  end
-
-  defp serialize_time_with_schedule(departure, screen, now) do
-    %{time: serialized_time} = serialize_time(departure, screen, now)
-
-    scheduled_time = Departure.scheduled_time(departure)
-
-    if is_nil(scheduled_time) do
-      %{time: serialized_time}
-    else
-      serialized_scheduled_time = serialize_timestamp(scheduled_time, screen, now)
-
-      case serialized_time do
-        %{type: :text} ->
-          %{time: serialized_time}
-
-        ^serialized_scheduled_time ->
-          %{time: serialized_time}
-
-        _ ->
-          %{time: serialized_time, scheduled_time: serialized_scheduled_time}
-      end
+    cond do
+      second_diff < 90 and stopped_at_predicted_stop? -> %{type: :text, text: "BRD"}
+      second_diff < 30 and at_first_stop? -> %{type: :text, text: "BRD"}
+      second_diff < 30 -> %{type: :text, text: "ARR"}
+      minute_diff < 60 -> %{type: :minutes, minutes: minute_diff}
+      true -> serialize_timestamp(departure_time, screen, now)
     end
   end
 
-  defp serialize_timestamp(departure_time, %Screen{app_id: app_id}, now) do
-    local_time = Util.to_eastern(departure_time)
+  defp serialize_timestamp(datetime, %Screen{app_id: app_id}, now) do
+    local_time = Util.to_eastern(datetime)
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
     am_pm = if local_time.hour >= 12, do: :pm, else: :am
@@ -529,15 +494,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     # Screen types other than DUPs currently have no implemented design for the AM/PM indicator.
     show_am_pm = app_id == :dup_v2 and local_time.day == service_date_tomorrow.day
 
-    # Temporarily retain `show_am_pm` for compatibility with deployed DUP code that still expects
-    # this field. Remove when deployed DUP version > 26.01.13.1.
-    %{
-      type: :timestamp,
-      hour: hour,
-      minute: minute,
-      am_pm: if(show_am_pm, do: am_pm, else: nil),
-      show_am_pm: show_am_pm
-    }
+    %{type: :timestamp, hour: hour, minute: minute, am_pm: if(show_am_pm, do: am_pm, else: nil)}
   end
 
   defp get_headway_text(

@@ -5,7 +5,7 @@ import DepartureCrowding, { CrowdingLevel } from "./departure_crowding";
 
 export type TimeWithCrowding = {
   id: string;
-  time: DepartureTime;
+  time?: DepartureTime;
   scheduled_time?: DepartureTime;
   crowding: CrowdingLevel | null;
 };

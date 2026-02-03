@@ -9,12 +9,15 @@ defmodule Screens.V2.Departure.Builder do
   alias Screens.V2.Departure
   alias Screens.Vehicles.Vehicle
 
+  @typep opts :: [include_scheduled_cancelled?: boolean()]
+
   @doc """
   Merges Predictions and Schedules into Departures, and filters out any which should not be
   presented to riders.
   """
   @spec build([Prediction.t()], [Schedule.t()], now :: DateTime.t()) :: [Departure.t()]
-  def build(predictions, schedules, now) do
+  @spec build([Prediction.t()], [Schedule.t()], now :: DateTime.t(), opts()) :: [Departure.t()]
+  def build(predictions, schedules, now, opts \\ []) do
     predicted_trip_ids =
       predictions
       |> Enum.reject(&is_nil(&1.trip))
@@ -36,13 +39,14 @@ defmodule Screens.V2.Departure.Builder do
 
     (predictions ++ scheduled_only)
     |> Enum.map(&map_to_departure(&1, schedules_by_trip_id))
-    |> relevant_departures(now)
+    |> relevant_departures(now, opts)
     |> Enum.sort_by(&Departure.time/1, DateTime)
   end
 
-  defp relevant_departures(departures, now) do
+  defp relevant_departures(departures, now, opts) do
     departures
-    |> Stream.reject(&cancelled_or_skipped?(&1))
+    |> Stream.reject(&unscheduled_cancelled?(&1))
+    |> maybe_reject_scheduled_cancelled(opts)
     |> Stream.reject(&in_past_or_nil_time?(&1, now))
     |> Stream.reject(&multi_route_duplicate?(&1))
     |> Stream.reject(&vehicle_already_departed?(&1))
@@ -57,6 +61,19 @@ defmodule Screens.V2.Departure.Builder do
       prediction: prediction,
       schedule: Map.get(schedules_by_trip_id, trip_id)
     }
+
+  # There isn't much we can do with a cancelled departure with no schedule information other than
+  # not present it at all, so always reject those (unclear whether we'd even produce them)
+  defp unscheduled_cancelled?(%Departure{schedule: schedule} = departure),
+    do: is_nil(schedule) and Departure.cancelled?(departure)
+
+  # Temporary option enables gradual implementation of displaying skipped/cancelled departures.
+  # This step of the pipeline can be deleted once all screen types support this.
+  defp maybe_reject_scheduled_cancelled(departures, opts) do
+    if Keyword.get(opts, :include_scheduled_cancelled?, false),
+      do: departures,
+      else: Stream.reject(departures, &Departure.cancelled?/1)
+  end
 
   defp in_past_or_nil_time?(
          %Departure{prediction: %Prediction{departure_time: departure_time}},
@@ -120,9 +137,4 @@ defmodule Screens.V2.Departure.Builder do
       Enum.min_by(departures, &Departure.time(&1), DateTime)
     end)
   end
-
-  defp cancelled_or_skipped?(%Departure{prediction: %Prediction{schedule_relationship: sr}}),
-    do: sr in [:cancelled, :skipped]
-
-  defp cancelled_or_skipped?(_), do: false
 end
