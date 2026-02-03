@@ -21,7 +21,7 @@
   done
   ```
 - On completion, the packaged client apps will be saved at `priv/static/dup-app-(0|1|2).zip`.
-- To test the `index.html` that is created locally or in Browserstack, you need to set a query param `test` to any value, such as `index.html?test=`.
+- To test the created package locally or in Browserstack, you need to add any query param with key `test` to the `index.html`, such as `index.html?test=`.
   - Setting this query param sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
   - You can also set `playerName` and `station` within the URL params to change which screen is emulated.
   - If you are testing multiple iterations locally and don't want to add the URL params with each rebuild of the package, temporarily modify the if statment and/or defaults within `outfront.tsx`'s `initFakeMRAID` function. Just make sure to remove before sending client packages to Outfront to test.
