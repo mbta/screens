@@ -8,19 +8,7 @@
 
 - Set the version string in assets/src/components/dup/version.tsx to `current_year.current_month.current_day.1`.
 - If you've renamed / removed image assets, you might want to delete the corresponding folder in `/priv/static`. The folder accumulates assets without clearing old ones out, and these will be included in the built bundle!
-- **Only if you are packaging for local testing**
-  - add the following to the top of assets/src/apps/dup.tsx, filling in the string values:
-    ```ts
-    import { __TEST_setFakeMRAID__ } from "Util/outfront";
-    __TEST_setFakeMRAID__({
-      playerName:
-        "<a DUP player name, e.g. BKB-DUP-002. For others, look in priv/local.json for IDs of the pattern 'DUP-${playerName}'>",
-      station: "<a station name>",
-    });
-    ```
-    This sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
-    The MRAID object gives our client info about which screen it's running on.
-  - replace the definition of `OUTFRONT_BASE_URI` in `assets/src/hooks/use_api_response.tsx` with `"http://localhost:4000"`.
+- **Only if you are packaging for local testing:** To test against your local screens backend instead of production, then replace the definition of `OUTFRONT_BASE_URI` in `assets/src/hooks/use_api_response.tsx` with `"http://localhost:4000"`.
 - `cd` to priv/static and run the following:
   ```sh
   for ROTATION_INDEX in {0..2}; do
@@ -33,11 +21,15 @@
   done
   ```
 - On completion, the packaged client apps will be saved at `priv/static/dup-app-(0|1|2).zip`.
-- Commit the version bump on a branch, push it, and create a PR to mark the deploy.
+- To test the created package locally or in Browserstack, you need to add any query param with key `test` to the `index.html`, such as `index.html?test=`.
+  - Setting this query param sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
+  - You can also set `playerName` and `station` within the URL params to change which screen is emulated.
+  - If you are testing multiple iterations locally and don't want to add the URL params with each rebuild of the package, temporarily modify the if statment and/or defaults within `outfront.tsx`'s `initFakeMRAID` function. Just make sure to remove before sending client packages to Outfront to test.
+- When testing is complete, commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
 ## Working with Outfront
 
-Once you've created the client app packages, you'll need to send them to Outfront to test and deploy. Make sure to remove any changes that you made to `dup.tsx` and `use_api_response.tsx` for local testing before generating packages for Outfront.
+Once you've created the client app packages, you'll need to send them to Outfront to test and deploy. Make sure to remove any changes that you made to `outfront.tsx` and `use_api_response.tsx` for local testing before generating packages for Outfront.
 
 For detailed instructions on this process, go to [this Notion doc](https://www.notion.so/mbta-downtown-crossing/Deploying-DUP-Package-Updates-120f5d8d11ea805fa219f214c1633293).
 
