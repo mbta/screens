@@ -4,6 +4,9 @@ initSentry("dup_v2");
 import initFullstory from "Util/fullstory";
 initFullstory();
 
+import { initFakeMRAID } from "Util/outfront";
+initFakeMRAID();
+
 import "../../css/dup.scss";
 
 import { StrictMode } from "react";

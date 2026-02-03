@@ -103,12 +103,8 @@ export const getMRAID = (): MRAID | false => {
 /**
  * For use in test DUP packages only! Sets a fake MRAID object on `window` so
  * we can test OFM client packages as if they are running on real OFM screens.
- * @knipignore
  */
-export const __TEST_setFakeMRAID__ = (options: {
-  playerName: string;
-  station: string;
-}) => {
+const setFakeMRAID = (options: { playerName: string; station: string }) => {
   const { playerName, station } = options;
 
   const tagsJSON = JSON.stringify({
@@ -159,4 +155,25 @@ const BASE_MRAID: Pick<MRAID, "EVENTS" | "requestInit" | "addEventListener"> = {
       );
     }
   },
+};
+
+/**
+ * When testing a DUP client package build locally, indicated by
+ * including query params for testing, initialize a fake MRAID.
+ */
+export const initFakeMRAID = () => {
+  const defaultPlayerName = "BKB-DUP-TEST";
+  const defaultStation = "Back Bay";
+
+  const queryParams = new URLSearchParams(window.location.search);
+  const isLocalTest = queryParams.get("test");
+  const playerName = queryParams.get("playerName");
+  const station = queryParams.get("station");
+
+  if (isLocalTest !== null || playerName || station) {
+    setFakeMRAID({
+      playerName: playerName ? playerName : defaultPlayerName,
+      station: station ? station : defaultStation,
+    });
+  }
 };

@@ -43,30 +43,32 @@ const DepartureTimePart: ComponentType<DepartureTime> = (time) => {
 };
 
 interface Props {
-  time: DepartureTime;
+  time?: DepartureTime;
   scheduled_time?: DepartureTime;
 }
 
 const DepartureTime: ComponentType<Props> = ({ time, scheduled_time }) => {
   const currentPage = useCurrentPage();
 
-  if (currentPage === 0 || !scheduled_time) {
+  if (time && (currentPage === 0 || !scheduled_time)) {
     return (
       <div className={classWithModifier("departure-time", time.type)}>
         <DepartureTimePart {...time} />
       </div>
     );
-  } else {
+  } else if (scheduled_time && (currentPage === 1 || !time)) {
     return (
       <div
         className={classWithModifiers("departure-time", [
           scheduled_time.type,
-          "disabled",
+          time ? "delayed" : "cancelled",
         ])}
       >
         <DepartureTimePart {...scheduled_time} />
       </div>
     );
+  } else {
+    throw new Error("DepartureTime has neither time nor scheduled_time");
   }
 };
 
