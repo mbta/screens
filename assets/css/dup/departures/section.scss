@@ -1,4 +1,5 @@
-.departures-section {
+.departures-section,
+.departures-section--shortened-headsigns {
   position: relative;
 
   &:not(:first-child)::before {

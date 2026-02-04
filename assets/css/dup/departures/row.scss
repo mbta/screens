@@ -33,4 +33,8 @@
   color: colors.$cool-black-15;
   text-align: right;
   vertical-align: middle;
+
+  .departures-section--shortened-headsigns & {
+    width: 733px;
+  }
 }

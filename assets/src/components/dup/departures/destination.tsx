@@ -16,6 +16,7 @@ const ABBREVIATIONS = {
   Landing: "Ldg",
   One: "1",
   Washington: "Wash",
+  "Medford/Tufts": "Medfd/Tufts",
 };
 
 enum PHASES {
@@ -76,10 +77,13 @@ const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
         secondLineRef.current.clientHeight / LINE_HEIGHT,
       );
 
+      const widthOverflow =
+        firstLineRef.current.scrollWidth > firstLineRef.current.clientWidth;
+
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
           // Don't abbreviate if it already fits on one line.
-          if (firstLines === 1 && secondLines === 0) {
+          if (firstLines === 1 && secondLines === 0 && !widthOverflow) {
             setPhase(PHASES.DONE);
           } else {
             setAbbreviate(true);

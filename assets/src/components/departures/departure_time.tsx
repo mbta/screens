@@ -8,9 +8,18 @@ type DepartureTime =
   | { type: "text"; text: string }
   | { type: "minutes"; minutes: number }
   | { type: "timestamp"; hour: number; minute: number; am_pm: string | null }
+  | { type: "stops_away"; prefix: string; suffix: string }
   | { type: "overnight" };
 
-const DepartureTimePart: ComponentType<DepartureTime> = (time) => {
+interface DepartureTimePartProps {
+  time: DepartureTime;
+  currentPage: number;
+}
+
+const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
+  time,
+  currentPage,
+}) => {
   switch (time.type) {
     case "text":
       return <div className="departure-time__text">{time.text}</div>;
@@ -37,6 +46,14 @@ const DepartureTimePart: ComponentType<DepartureTime> = (time) => {
       );
     }
 
+    case "stops_away":
+      // Show prefix ("Stopped") on page 0, suffix ("N stop(s) away") on page 1
+      return (
+        <div className="departure-time__stops_away">
+          {currentPage === 0 ? time.prefix : time.suffix}
+        </div>
+      );
+
     case "overnight":
       return <MoonIcon width={128} height={128} color="black" />;
   }
@@ -53,7 +70,7 @@ const DepartureTime: ComponentType<Props> = ({ time, scheduled_time }) => {
   if (time && (currentPage === 0 || !scheduled_time)) {
     return (
       <div className={classWithModifier("departure-time", time.type)}>
-        <DepartureTimePart {...time} />
+        <DepartureTimePart {...{ time, currentPage }} />{" "}
       </div>
     );
   } else if (scheduled_time && (currentPage === 1 || !time)) {
@@ -64,7 +81,7 @@ const DepartureTime: ComponentType<Props> = ({ time, scheduled_time }) => {
           time ? "delayed" : "cancelled",
         ])}
       >
-        <DepartureTimePart {...scheduled_time} />
+        <DepartureTimePart {...{ time: scheduled_time, currentPage }} />{" "}
       </div>
     );
   } else {
