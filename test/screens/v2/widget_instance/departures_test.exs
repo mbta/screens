@@ -1101,7 +1101,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     @prediction %Prediction{
       arrival_time: ~U[2020-01-01T09:00:00Z],
-      route: %Route{id: "Red"},
+      route: %Route{id: "Red", type: :subway},
       trip: %Trip{headsign: "Test"},
       stop: %Stop{id: "place-test"}
     }
@@ -1159,8 +1159,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         rows: [
           %Departure{prediction: @prediction},
           %Departure{prediction: @prediction},
-          %Departure{prediction: %{@prediction | route: %Route{id: "1"}}},
-          %Departure{prediction: %{@prediction | route: %Route{id: "2"}}}
+          %Departure{prediction: %{@prediction | route: %Route{id: "1", type: :bus}}},
+          %Departure{prediction: %{@prediction | route: %Route{id: "2", type: :bus}}}
         ],
         header: %Header{},
         layout: %Layout{max: 3}
@@ -1188,28 +1188,28 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
             prediction: %{
               @prediction
               | arrival_time: ~U[2020-01-01T09:00:00Z],
-                route: %Route{id: "1"}
+                route: %Route{id: "1", type: :bus}
             }
           },
           %Departure{
             prediction: %{
               @prediction
               | arrival_time: ~U[2020-01-01T09:10:00Z],
-                route: %Route{id: "1"}
+                route: %Route{id: "1", type: :bus}
             }
           },
           %Departure{
             prediction: %{
               @prediction
               | arrival_time: ~U[2020-01-01T09:00:00Z],
-                route: %Route{id: "2"}
+                route: %Route{id: "2", type: :bus}
             }
           },
           %Departure{
             prediction: %{
               @prediction
               | arrival_time: ~U[2020-01-01T09:15:00Z],
-                route: %Route{id: "2"}
+                route: %Route{id: "2", type: :bus}
             }
           }
         ],
