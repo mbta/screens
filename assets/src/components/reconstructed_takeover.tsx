@@ -4,8 +4,10 @@ import DisruptionDiagram, {
   DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";
 import FreeText, { FreeTextType } from "./free_text";
+import { QRCodeSVG as QRCode } from "qrcode.react";
 
 interface ReconAlertProps {
+  id: string;
   issue: string | any; // shouldn't be "any"
   location: string | FreeTextType;
   cause: string;
@@ -17,10 +19,13 @@ interface ReconAlertProps {
   end_time?: string;
   disruption_diagram?: DisruptionDiagramData;
   urgent: boolean;
+  vanity_url?: string;
+  stop_id: string;
 }
 
 const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
   const {
+    id: alertId,
     cause,
     effect,
     issue,
@@ -31,14 +36,25 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
     updated_at,
     end_time,
     disruption_diagram,
+    vanity_url: vanityURL,
+    stop_id: stopId,
   } = alert;
+
+  const singleRoute = routes[0];
+  const qrCodeUrl =
+    routes.length > 1
+      ? `go.mbta.com/a/${alertId}/r/${singleRoute}`
+      : `go.mbta.com/a/${alertId}/s/${stopId}`;
+  const alertURL = vanityURL
+    ? vanityURL.replace(/^https?:\/\//i, "").replace(/^www\./i, "")
+    : "mbta.com/alerts";
 
   return (
     <>
       <div
         className={classWithModifiers("alert-container", [
           "takeover",
-          routes.length > 1 ? "yellow" : routes[0].color,
+          routes.length > 1 ? "yellow" : singleRoute.color,
         ])}
       >
         <div className="alert-card alert-card--left">
@@ -84,7 +100,7 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
         className={classWithModifiers("alert-container", [
           "takeover",
           "right",
-          routes.length > 1 ? "yellow" : routes[0].color,
+          routes.length > 1 ? "yellow" : singleRoute.color,
         ])}
       >
         <div className="alert-card">
@@ -113,7 +129,11 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                     <span className="alert-card__body__remedy--alternate-route">
                       Find alternate route at{" "}
                     </span>
-                    mbta.com/alerts
+                    {alertURL}
+
+                    <div className="alert-card__body__remedy--alternate-route-qrcode">
+                      <QRCode marginSize={1} size={128} value={qrCodeUrl} />
+                    </div>
                   </>
                 ) : (
                   remedy

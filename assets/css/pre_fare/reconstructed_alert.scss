@@ -252,6 +252,10 @@ $alert-card-footer-height: 80px;
         &--alternate-route {
           font-weight: 400;
         }
+
+        &--alternate-route-qrcode {
+          margin-top: 24px;
+        }
       }
 
       &__shuttle-icon {
