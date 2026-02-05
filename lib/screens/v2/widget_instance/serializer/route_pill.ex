@@ -32,7 +32,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @type audio_route :: %{
           id: Route.id(),
           route_text: String.t(),
-          vehicle_type: :train | :bus | :trolley | :ferry | nil,
+          vehicle_type: :train | :bus | nil,
           track_number: pos_integer() | nil
         }
 
@@ -89,15 +89,13 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           audio_route()
   def serialize_for_audio_departure(route_id, route_name, route_type, track_number) do
     vehicle_type =
-      case {route_type, route_id} do
-        # "Trolley" is part of the route name
-        {:light_rail, "Mattapan"} -> nil
-        {:light_rail, "Green-" <> _} -> :train
-        {:subway, _} -> :train
-        {:rail, _} -> :train
-        # "Ferry" is part of the route name
-        {:ferry, _} -> nil
-        {other, _} -> other
+      case route_type do
+        :light_rail -> :train
+        :subway -> :train
+        :rail -> :train
+        :bus -> :bus
+        # "Ferry" is part of the route name; read as e.g. "The next Charlestown Ferry trip to..."
+        :ferry -> nil
       end
 
     %{

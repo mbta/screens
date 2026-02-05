@@ -1172,7 +1172,7 @@ defmodule Screens.V2.DisruptionDiagramTest do
     # RED LINE MATTAPAN #
     #####################
 
-    test "serializes a Mattapan Trolley shuttle" do
+    test "serializes a Mattapan Line shuttle" do
       localized_alert =
         DDAlert.make_localized_alert(
           :shuttle,

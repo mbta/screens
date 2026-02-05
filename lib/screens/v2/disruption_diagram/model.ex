@@ -77,7 +77,7 @@ defmodule Screens.V2.DisruptionDiagram.Model do
     |> then(&{:ok, &1})
   end
 
-  # For Mattapan Trolley, always show all stops, starting with Ashmont.
+  # For Mattapan Line, always show all stops, starting with Ashmont.
   defp serialize_by_line(:mattapan, builder) do
     builder
     |> B.serialize()
