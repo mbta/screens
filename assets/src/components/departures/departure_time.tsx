@@ -8,7 +8,7 @@ type DepartureTime =
   | { type: "text"; text: string }
   | { type: "minutes"; minutes: number }
   | { type: "timestamp"; hour: number; minute: number; am_pm: string | null }
-  | { type: "stops_away"; prefix: string; suffix: string }
+  | { type: "status"; pages: string[] }
   | { type: "overnight" };
 
 interface DepartureTimePartProps {
@@ -46,12 +46,9 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
       );
     }
 
-    case "stops_away":
-      // Show prefix ("Stopped") on page 0, suffix ("N stop(s) away") on page 1
+    case "status":
       return (
-        <div className="departure-time__stops_away">
-          {currentPage === 0 ? time.prefix : time.suffix}
-        </div>
+        <div className="departure-time__status">{time.pages[currentPage]}</div>
       );
 
     case "overnight":
@@ -70,7 +67,7 @@ const DepartureTime: ComponentType<Props> = ({ time, scheduled_time }) => {
   if (time && (currentPage === 0 || !scheduled_time)) {
     return (
       <div className={classWithModifier("departure-time", time.type)}>
-        <DepartureTimePart {...{ time, currentPage }} />{" "}
+        <DepartureTimePart currentPage={currentPage} time={time} />
       </div>
     );
   } else if (scheduled_time && (currentPage === 1 || !time)) {
