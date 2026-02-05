@@ -10,12 +10,16 @@ const ABBREVIATIONS = {
   Center: "Ctr",
   Square: "Sq",
   Court: "Crt",
-  Circle: "Circ",
+  Circle: "Cir",
   South: "So",
   West: "W",
   Landing: "Ldg",
   One: "1",
   Washington: "Wash",
+  Street: "St",
+  College: "Col",
+  Cleveland: "Clvlnd",
+  Government: "Govt",
   "Medford/Tufts": "Medfd/Tufts",
 };
 
