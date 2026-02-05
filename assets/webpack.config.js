@@ -7,6 +7,7 @@ const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
+const fs = require("fs");
 
 const ALIASES = {
   // See also `paths` in `tsconfig.json`!
@@ -30,6 +31,26 @@ const ENTRYPOINTS = {
 };
 
 const STATIC_PATH = path.resolve(__dirname, "../priv/static");
+
+/**
+ * Replace absolute paths (/fonts/) with relative paths (./fonts/) in CSS
+ * Processes packaged_dup.css after it's emitted by css-loader, which generates
+ * absolute URL paths within packaged_dup.css, which cause issues on DUP hardware
+ */
+const FixDupFontPathsPlugin = () => {
+  return {
+    apply(compiler) {
+      compiler.hooks.afterEmit.tap("FixDupFontPaths", (compilation) => {
+        const cssFile = path.join(STATIC_PATH, "packaged_dup.css");
+        if (fs.existsSync(cssFile)) {
+          let css = fs.readFileSync(cssFile, "utf8");
+          css = css.replace(/\/fonts\//g, "./fonts/");
+          fs.writeFileSync(cssFile, css, "utf8");
+        }
+      });
+    },
+  };
+};
 
 // Though this is normally not recommended, we transpile the dependencies we
 // ship to screens, because many libraries no longer support the old browser
@@ -112,8 +133,11 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
-      new MiniCssExtractPlugin({ filename: isOutfrontPackage ? "[name].css" : "css/[name].css" }),
+      new MiniCssExtractPlugin({
+        filename: isOutfrontPackage ? "[name].css" : "css/[name].css",
+      }),
       new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "./" }] }),
+      ...(isOutfrontPackage ? [FixDupFontPathsPlugin()] : []),
       // Upload source maps to Sentry for prod builds. Must be the last plugin.
       ...(isProduction
         ? [
