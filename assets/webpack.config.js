@@ -106,7 +106,7 @@ module.exports = (env, argv) => {
             // The DUP app packaging process moves the bundled CSS up a
             // directory level, which would break references to font files;
             // this compensates for that. See also `utils.imagePath`.
-            publicPath: isOutfrontPackage ? "./fonts/" : "../fonts/",
+            publicPath: isOutfrontPackage ? "/fonts/" : "../fonts/",
           },
         },
       ],
