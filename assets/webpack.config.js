@@ -112,7 +112,7 @@ module.exports = (env, argv) => {
       ],
     },
     plugins: [
-      new MiniCssExtractPlugin({ filename: "css/[name].css" }),
+      new MiniCssExtractPlugin({ filename: isOutfrontPackage ? "[name].css" : "css/[name].css" }),
       new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "./" }] }),
       // Upload source maps to Sentry for prod builds. Must be the last plugin.
       ...(isProduction
