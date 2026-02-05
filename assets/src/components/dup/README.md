@@ -9,7 +9,7 @@
 - Set the version string in assets/src/components/dup/version.tsx to `current_year.current_month.current_day.1`.
 - If you've renamed / removed image assets, you might want to delete the corresponding folder in `/priv/static`. The folder accumulates assets without clearing old ones out, and these will be included in the built bundle!
 - **Only if you are packaging for local testing:** To test against your local screens backend instead of production, then replace the definition of `OUTFRONT_BASE_URI` in `assets/src/hooks/use_api_response.tsx` with `"http://localhost:4000"`.
-- `cd` to priv/static and run the following shell script: `sh build_dup_client_package.sh`
+- `cd` to `scripts` and run the following shell script: `sh build_dup_client_package.sh`
 - On completion, the packaged client apps will be saved at `priv/static/dup-app-(0|1|2).zip`.
 - To test the created package locally or in Browserstack, you need to add any query param with key `test` to the `index.html`, such as `index.html?test=`.
   - Setting this query param sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
