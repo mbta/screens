@@ -125,7 +125,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     end
   end
 
-  defp banner_icon(t) when t.alert.effect == :delay, do: :delay
+  defp banner_icon(t) when t.alert.effect == :delay,
+    do: if(line_color(t) == :yellow, do: :delay_negative, else: :delay)
 
   defp banner_icon(t),
     do: if(line_color(t) == :yellow, do: :warning_negative, else: :warning)
