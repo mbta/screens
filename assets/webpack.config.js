@@ -40,7 +40,7 @@ const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 const FixDupFontPathsPlugin = () => {
   return {
     apply(compiler) {
-      compiler.hooks.afterEmit.tap("FixDupFontPaths", (compilation) => {
+      compiler.hooks.afterEmit.tap("FixDupFontPaths", () => {
         const cssFile = path.join(STATIC_PATH, "packaged_dup.css");
         if (fs.existsSync(cssFile)) {
           let css = fs.readFileSync(cssFile, "utf8");
