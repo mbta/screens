@@ -162,12 +162,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         sections: [%Section{query: %Query{}}]
       })
 
-    app_params = struct(PreFare, departures: departures)
-
-    %{
-      widget
-      | screen: %Screen{widget.screen | app_params: app_params}
-    }
+    update_in(widget.screen.app_params, fn
+      %PreFare{} = app_params ->
+        %{app_params | departures: departures}
+    end)
   end
 
   defp put_cr_departures(widget) do
@@ -589,6 +587,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains to Forest Hills",
         location: "Orange Line service is suspended between Malden Center and Wellington",
         cause: nil,
@@ -634,6 +635,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains to Forest Hills",
         location: "Shuttle buses replace trains between Wellington and Assembly",
         cause: nil,
@@ -689,6 +693,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       expected_duo = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Station closed",
         location: %ScreensConfig.FreeTextLine{
           icon: nil,
@@ -706,6 +713,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       expected_solo = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         cause: nil,
         effect: :station_closure,
         remedy: nil,
@@ -736,6 +746,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains to Forest Hills",
         location: "Orange Line service is suspended between Wellington and Assembly",
         cause: :construction,
@@ -781,6 +794,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains",
         location: "Orange Line service is suspended between Oak Grove and Malden Center",
         cause: nil,
@@ -824,6 +840,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains",
         location: "Shuttle buses replace Orange Line trains between Oak Grove and Malden Center",
         cause: nil,
@@ -865,6 +884,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains to Oak Grove",
         location: "Orange Line service is suspended between Oak Grove and Malden Center",
         cause: nil,
@@ -909,6 +931,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains to Oak Grove",
         location: "Shuttle buses replace trains between Oak Grove and Malden Center",
         cause: nil,
@@ -954,6 +979,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Single tracking",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -983,6 +1011,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Trains may be delayed up to 20 minutes",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -1012,6 +1043,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_alert_header("Delays are happening")
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Trains may be delayed over 60 minutes",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -1041,6 +1075,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Trains may be delayed up to 20 minutes",
         cause: nil,
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
@@ -1070,6 +1107,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_alert_header("Delays are happening")
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Trains may be delayed over 60 minutes",
         cause: :construction,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -1099,6 +1139,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_alert_header("Delays are happening")
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Trains may be delayed over 60 minutes",
         cause: nil,
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
@@ -1127,6 +1170,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains",
         location: nil,
         cause: nil,
@@ -1168,6 +1214,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No trains",
         location: nil,
         cause: nil,
@@ -1226,6 +1275,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Stop Skipped",
         remedy: "Test Alert",
         location: nil,
@@ -1271,6 +1323,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Stop Skipped",
         remedy: "Test Alert",
         location: nil,
@@ -1347,6 +1402,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Forest Hills"])
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Forest Hills platform closed",
         remedy: "Some information typed into the alert",
         cause: nil,
@@ -1389,6 +1447,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Forest Hills"])
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Jackson Square: Trains skip Forest Hills platform",
         remedy: "Some information typed into the alert",
         cause: nil,
@@ -1421,6 +1482,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         cause: nil,
         effect: :suspension,
         issue: "No trains",
@@ -1450,6 +1514,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         cause: nil,
         effect: :suspension,
         issue: "Suspension",
@@ -1503,6 +1570,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: nil,
         remedy: nil,
         show_alternate_route_text: false,
@@ -1549,6 +1619,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         cause: nil,
         effect: :suspension,
         endpoints: {"Haymarket", "Chinatown"},
@@ -1596,6 +1669,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "No Orange Line trains",
         remedy: "Use shuttle bus",
         cause: nil,
@@ -1642,6 +1718,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         issue: "Trains may be delayed up to 20 minutes",
         cause: nil,
         routes: [],
@@ -2288,6 +2367,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         cause: nil,
         location: nil,
         effect: :shuttle,
@@ -2411,6 +2493,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         cause: nil,
         location: nil,
         effect: :shuttle,
@@ -2532,6 +2617,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        id: "123",
+        vanity_url: nil,
+        stop_id: "place-xyz",
         cause: "",
         effect: :shuttle,
         issue: "Shuttle Bus",
@@ -3117,6 +3205,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Fullscreen test
       expected = %{
+        id: "450523",
+        vanity_url: nil,
+        stop_id: "place-welln",
         issue: "No trains",
         location: nil,
         cause: nil,
@@ -3183,6 +3274,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       routes_at_stop = [
         %{
+          id: "450522",
+          vanity_url: nil,
+          stop_id: "place-xyz",
           route_id: "Green-B",
           active?: false,
           direction_destinations: nil,
@@ -3531,6 +3625,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Fullscreen test
       expected = %{
+        id: "450522",
+        vanity_url: nil,
+        stop_id: "place-gover",
         cause: nil,
         effect: :shuttle,
         issue: "Shuttle Bus",

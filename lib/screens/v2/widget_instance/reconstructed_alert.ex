@@ -14,6 +14,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
   alias ScreensConfig.{
+    Alerts,
     AlertSchedule,
     Departures,
     EvergreenContentItem,
@@ -67,7 +68,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           cause: String.t(),
           effect: :suspension | :shuttle | :station_closure,
           updated_at: String.t(),
-          routes: list(RoutePill.t())
+          routes: list(RoutePill.t()),
+          vanity_url: String.t(),
+          stop_id: String.t() | nil,
+          id: String.t()
         }
 
   @type enriched_route :: %{
@@ -97,7 +101,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           routes: list(enriched_route()),
           effect: effect(),
           updated_at: String.t(),
-          region: region()
+          region: region(),
+          vanity_url: String.t() | nil,
+          stop_id: String.t() | nil,
+          id: String.t()
         }
 
   @type flex_serialized_response :: %{
@@ -438,10 +445,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
     %__MODULE__{
       alert: %Alert{
+        id: id,
         cause: cause,
         informed_entities: informed_entities,
         updated_at: updated_at,
-        active_period: active_period
+        active_period: active_period,
+        url: url
       },
       location_context: %LocationContext{home_stop: home_stop},
       now: now
@@ -456,6 +465,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     endpoints = get_endpoints(informed_entities, route_id, home_stop)
 
     %{
+      id: id,
+      stop_id: nil,
       issue: "No trains",
       remedy: nil,
       show_alternate_route_text: true,
@@ -465,7 +476,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t),
       effect: :suspension,
       end_time: end_time_text(active_period, now),
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      vanity_url: url
     }
   end
 
@@ -473,10 +485,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :shuttle}} = t) do
     %__MODULE__{
       alert: %Alert{
+        id: id,
         cause: cause,
         informed_entities: informed_entities,
         updated_at: updated_at,
-        active_period: active_period
+        active_period: active_period,
+        url: url
       },
       location_context: %LocationContext{home_stop: home_stop},
       now: now
@@ -491,6 +505,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     endpoints = get_endpoints(informed_entities, route_id, home_stop)
 
     %{
+      id: id,
+      stop_id: nil,
       issue: "No trains",
       remedy: "Use shuttle bus",
       location:
@@ -500,14 +516,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t),
       effect: :shuttle,
       end_time: end_time_text(active_period, now),
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      vanity_url: url
     }
   end
 
   # Two screen alert, station closure
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, active_period: active_period},
+      alert: %{
+        id: id,
+        cause: cause,
+        updated_at: updated_at,
+        active_period: active_period,
+        url: url
+      },
       now: now,
       home_station_name: home_station_name,
       informed_station_names: informed_station_names
@@ -536,6 +559,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     other_closures = List.delete(informed_station_names, home_station_name)
 
     %{
+      id: id,
+      stop_id: nil,
       issue: "Station closed",
       remedy: nil,
       show_alternate_route_text: true,
@@ -545,7 +570,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :station_closure,
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
-      other_closures: other_closures
+      other_closures: other_closures,
+      vanity_url: url
     }
   end
 
@@ -553,16 +579,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp dual_screen_fallback_fields(
          %__MODULE__{
            alert: %{
+             id: id,
              active_period: active_period,
              effect: effect,
              cause: cause,
              header: header,
-             updated_at: updated_at
+             updated_at: updated_at,
+             url: url
            },
            now: now
          } = t
        ) do
     %{
+      id: id,
+      stop_id: nil,
       issue: if(effect == :station_closure, do: "Station closed", else: "No trains"),
       remedy:
         if(effect == :shuttle,
@@ -574,17 +604,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t),
       effect: effect,
       end_time: end_time_text(active_period, now),
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      vanity_url: url
     }
   end
 
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t, location) do
     %__MODULE__{
       alert: %Alert{
+        id: id,
         cause: cause,
         informed_entities: informed_entities,
         updated_at: updated_at,
-        active_period: active_period
+        active_period: active_period,
+        url: url
       },
       location_context: %LocationContext{home_stop: home_stop},
       now: now
@@ -628,6 +661,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
+      id: id,
+      stop_id: nil,
       issue: issue,
       remedy: nil,
       show_alternate_route_text: true,
@@ -639,17 +674,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       endpoints: endpoints,
-      is_transfer_station: location == :inside
+      is_transfer_station: location == :inside,
+      vanity_url: url
     }
   end
 
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :shuttle}} = t, location) do
     %__MODULE__{
       alert: %Alert{
+        id: id,
         cause: cause,
         informed_entities: informed_entities,
         updated_at: updated_at,
-        active_period: active_period
+        active_period: active_period,
+        url: url
       },
       location_context: %LocationContext{home_stop: home_stop},
       now: now
@@ -689,6 +727,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
+      id: id,
+      stop_id: nil,
       issue: issue,
       remedy: remedy,
       location: location_text,
@@ -699,7 +739,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       endpoints: endpoints,
-      is_transfer_station: location == :inside
+      is_transfer_station: location == :inside,
+      vanity_url: url
     }
   end
 
@@ -714,7 +755,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          location
        ) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, header: header, active_period: active_period},
+      alert: %{
+        id: id,
+        cause: cause,
+        updated_at: updated_at,
+        header: header,
+        active_period: active_period,
+        url: url
+      },
       now: now,
       informed_station_names: informed_station_names
     } = t
@@ -729,6 +777,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
+      id: id,
+      stop_id: nil,
       issue: issue,
       remedy: header,
       cause: get_cause(cause),
@@ -737,7 +787,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: region,
-      stations: informed_station_names
+      stations: informed_station_names,
+      vanity_url: url
     }
   end
 
@@ -758,7 +809,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # This station closed for entire/only route
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, :inside) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, active_period: active_period},
+      alert: %{
+        id: id,
+        cause: cause,
+        updated_at: updated_at,
+        active_period: active_period,
+        url: url
+      },
       now: now
     } = t
 
@@ -781,6 +838,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
+      id: id,
+      stop_id: nil,
       issue: if(unaffected_routes == [], do: "Station closed"),
       remedy: nil,
       show_alternate_route_text: unaffected_routes == [],
@@ -791,14 +850,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :station_closure,
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
-      region: :here
+      region: :here,
+      vanity_url: url
     }
   end
 
   # Downstream closure
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, location) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, active_period: active_period},
+      alert: %{
+        id: id,
+        cause: cause,
+        updated_at: updated_at,
+        active_period: active_period,
+        url: url
+      },
       now: now,
       informed_station_names: informed_station_names
     } = t
@@ -806,6 +872,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     informed_stations_string = Util.format_name_list_to_string(informed_station_names)
 
     %{
+      id: id,
+      stop_id: nil,
       issue: "Trains skip #{informed_stations_string}",
       remedy: nil,
       show_alternate_route_text: true,
@@ -815,7 +883,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
-      stations: informed_station_names
+      stations: informed_station_names,
+      vanity_url: url
     }
   end
 
@@ -823,11 +892,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %__MODULE__{
       alert:
         %Alert{
+          id: id,
           cause: cause,
           severity: severity,
           updated_at: updated_at,
           header: header,
-          active_period: active_period
+          active_period: active_period,
+          url: url
         } = alert,
       now: now
     } = t
@@ -844,6 +915,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
+      id: id,
+      stop_id: nil,
       issue: issue,
       remedy: header,
       cause: if(severity == 1, do: nil, else: get_cause(cause)),
@@ -851,21 +924,26 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: if(severity == 1, do: :information, else: :delay),
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
-      region: get_region_from_location(location)
+      region: get_region_from_location(location),
+      vanity_url: url
     }
   end
 
   # Fallback for when we're unable to build a disruption diagram
   defp single_screen_fallback_fields(%__MODULE__{alert: alert, now: now} = t, location) do
     %{
+      id: id,
       active_period: active_period,
       updated_at: updated_at,
       cause: cause,
       effect: effect,
-      header: header
+      header: header,
+      url: url
     } = alert
 
     %{
+      id: id,
+      stop_id: nil,
       issue:
         case effect do
           :shuttle -> "Shuttle Bus"
@@ -880,7 +958,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: effect,
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
-      region: get_region_from_location(location)
+      region: get_region_from_location(location),
+      vanity_url: url
     }
   end
 
@@ -1222,13 +1301,29 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "between #{min_station} and #{max_station}"
   end
 
-  def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
+  def serialize(
+        %__MODULE__{
+          screen: %Screen{
+            app_params: %PreFare{
+              reconstructed_alert_widget: %Alerts{stop_id: stop_id}
+            }
+          },
+          is_terminal_station: is_terminal_station
+        } = t
+      ) do
     location = LocalizedAlert.location(t, is_terminal_station)
 
     case placement(t) do
-      :dual_screen -> serialize_dual_screen(t)
-      :single_screen -> serialize_single_screen(t, location)
-      :flex_zone -> serialize_flex_zone(t, location)
+      :dual_screen ->
+        serialize_dual_screen(t)
+        |> Map.put(:stop_id, stop_id)
+
+      :single_screen ->
+        serialize_single_screen(t, location)
+        |> Map.put(:stop_id, stop_id)
+
+      :flex_zone ->
+        serialize_flex_zone(t, location)
     end
   end
 
