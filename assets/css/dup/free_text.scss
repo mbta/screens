@@ -232,8 +232,9 @@
   }
 }
 
-// No Data and Overnight sections have similar styles
+// No Data, No Service and Overnight sections have similar styles
 .no-data-section,
+.no-service-section,
 .overnight-section {
   .free-text__line {
     width: 1400px;
@@ -252,6 +253,7 @@
   }
 }
 
+.no-service-section,
 .no-data-section {
   .free-text {
     display: inline-block;

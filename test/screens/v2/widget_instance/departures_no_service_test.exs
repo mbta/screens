@@ -1,4 +1,4 @@
-defmodule Screens.V2.WidgetInstance.DeparturesNoSerivceTest do
+defmodule Screens.V2.WidgetInstance.DeparturesNoServiceTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.WidgetInstance
@@ -26,7 +26,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoSerivceTest do
   end
 
   describe "slot_names/1" do
-    test "returns main_content", %{widget: widget} do
+    test "returns slot_name", %{widget: widget} do
+      assert [:primary_slot] ==
+               WidgetInstance.slot_names(%{
+                 widget
+                 | slot_name: :primary_slot
+               })
+    end
+
+    test "returns main_content when slot_name undefined", %{widget: widget} do
       assert [:main_content] == WidgetInstance.slot_names(widget)
     end
   end

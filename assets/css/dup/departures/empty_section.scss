@@ -1,0 +1,46 @@
+@use "CSS/colors";
+
+.departures-section.no-data-section,
+.departures-section.no-service-section {
+  width: 1920px;
+  height: 416px;
+
+  .body-split__main-content-reduced & {
+    height: 208px;
+  }
+
+  .no-data-section__icon-container,
+  .no-service-section__icon-container {
+    display: inline-block;
+    height: 100%;
+    margin-right: 32px;
+    margin-left: 32px;
+    vertical-align: middle;
+  }
+
+  .no-data-section__no-connection-icon,
+  .no-service-section_info-icon {
+    width: 144px;
+    height: 144px;
+  }
+
+  .no-data-section__row {
+    height: 208px;
+  }
+
+  .no-service-section__row {
+    position: relative;
+    height: 208px;
+
+    &::after {
+      position: absolute;
+      bottom: 0;
+      left: 200px;
+      width: 100%;
+      height: 4px;
+      content: "";
+      background-color: colors.$warm-neutral-80;
+      border-radius: 2px;
+    }
+  }
+}
