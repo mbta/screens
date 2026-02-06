@@ -9,17 +9,7 @@
 - Set the version string in assets/src/components/dup/version.tsx to `current_year.current_month.current_day.1`.
 - If you've renamed / removed image assets, you might want to delete the corresponding folder in `/priv/static`. The folder accumulates assets without clearing old ones out, and these will be included in the built bundle!
 - **Only if you are packaging for local testing:** To test against your local screens backend instead of production, then replace the definition of `OUTFRONT_BASE_URI` in `assets/src/hooks/use_api_response.tsx` with `"http://localhost:4000"`.
-- `cd` to priv/static and run the following:
-  ```sh
-  for ROTATION_INDEX in {0..2}; do
-    echo "export const ROTATION_INDEX = ${ROTATION_INDEX};" > ../../assets/src/components/dup/rotation_index.tsx && \
-    npm --prefix ../../assets run deploy:dup && \
-    cp -r css/packaged_dup.css js/packaged_dup.js js/packaged_dup.js.map ../dup_preview.png ../dup-app.html . && \
-    cp ../dup_template.json ./template.json && \
-    sed -i "" "s/DUP APP ./DUP APP ${ROTATION_INDEX}/" template.json && \
-    zip -r dup-app-${ROTATION_INDEX}.zip packaged_dup.css packaged_dup.js fonts images dup-app.html template.json dup_preview.png
-  done
-  ```
+- `cd` to `scripts` and run the following shell script: `sh build_dup_client_package.sh`
 - On completion, the packaged client apps will be saved at `priv/static/dup-app-(0|1|2).zip`.
 - To test the created package locally or in Browserstack, you need to add any query param with key `test` to the `index.html`, such as `index.html?test=`.
   - Setting this query param sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
