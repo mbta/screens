@@ -150,10 +150,10 @@ defmodule Screens.LocationContext do
 
   # Returns a map from route ID to a list of stop sequences of that route, for all routes serving
   # stop, in all applicable directions.
-  @spec fetch_tagged_stop_sequences_through_stops([Stop.id()], [Route.id()]) ::
+  @spec fetch_tagged_stop_sequences_through_stops([Stop.id()]) ::
           {:ok, %{Route.id() => [[Stop.id()]]}} | :error
-  defp fetch_tagged_stop_sequences_through_stops(stop_ids, route_ids \\ []) do
-    case RoutePattern.fetch(%{stop_ids: stop_ids, route_ids: route_ids}) do
+  defp fetch_tagged_stop_sequences_through_stops(stop_ids) do
+    case RoutePattern.fetch(%{stop_ids: stop_ids}) do
       {:ok, patterns} -> {:ok, get_tagged_stop_sequences(patterns)}
       _ -> :error
     end
