@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* global require, module, __dirname */
 
+const fs = require("fs");
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const CopyWebpackPlugin = require("copy-webpack-plugin");
 const { sentryWebpackPlugin } = require("@sentry/webpack-plugin");
-const fs = require("fs");
 
 const ALIASES = {
   // See also `paths` in `tsconfig.json`!
@@ -33,10 +33,9 @@ const ENTRYPOINTS = {
 const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 
 /**
- * Processes packaged_dup.css after it's emitted by css-loader.
- * For an unknown reason, we've found that fonts are not loaded properly on DUP
- * hardware when the URL paths in packaged_dup.css are absolute ("/fonts/").
- * This plugin replaces the URL paths for fonts with relative paths ("./fonts/").
+ * Replace absolute paths (/fonts/) with relative paths (./fonts/) in CSS.
+ * Processes packaged_dup.css after it's emitted by css-loader with absolute 
+ * URL paths within packaged_dup.css, which cause issues on DUP hardware.
  */
 const FixDupFontPathsPlugin = () => {
   return {
@@ -45,7 +44,7 @@ const FixDupFontPathsPlugin = () => {
         const cssFile = path.join(STATIC_PATH, "css/packaged_dup.css");
         if (fs.existsSync(cssFile)) {
           let css = fs.readFileSync(cssFile, "utf8");
-          css = css.replace(/\.\.\/fonts\//g, "./fonts/");
+          css = css.replace(/\/fonts\//g, "./fonts/");
           fs.writeFileSync(cssFile, css, "utf8");
         }
       });
@@ -125,8 +124,10 @@ module.exports = (env, argv) => {
           generator: {
             filename: "[base]",
             outputPath: "fonts/",
-            publicPath: "../fonts/",
-          },
+            // The DUP app packaging process moves the bundled CSS up a
+            // directory level, which breaks references to font files.
+            // See FixDupFontPathsPlugin for more info.
+            publicPath: isOutfrontPackage ? "fonts/" : "../fonts/",          },
         },
       ],
     },
