@@ -11,6 +11,7 @@ defmodule Screens.V2.Departure do
   alias Screens.V2.Departure.Builder
   alias Screens.V3Api
   alias Screens.Vehicles.Vehicle
+  alias ScreensConfig.Screen
 
   @type t :: %__MODULE__{
           prediction: Screens.Predictions.Prediction.t() | nil,
@@ -241,6 +242,15 @@ defmodule Screens.V2.Departure do
   end
 
   def vehicle_status(_), do: nil
+
+  @spec status(t(), Screen.t()) :: String.t() | nil
+  # Only include predction status for DUPs at this time
+  def status(%__MODULE__{prediction: %Prediction{status: status}}, %Screen{app_id: :dup_v2}) do
+    IO.inspect(status)
+    status
+  end
+
+  def status(_, _), do: nil
 
   defp crowding_data_relevant?(%Trip{id: trip_trip_id, stops: [first_stop | _]}, %Vehicle{
          trip_id: vehicle_trip_id,

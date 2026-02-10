@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Provides real-time departure information, consisting of an ordered list of "sections".
   """
 
-  alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -471,12 +470,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     departure_time = Departure.time(departure)
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)
+    num_stops_away = parse_stops_away_from_status(Departure.status(departure, screen))
 
     stopped_at_predicted_stop? =
       Departure.vehicle_status(departure) == :stopped_at and
         stop_id == Prediction.stop_for_vehicle(prediction)
 
     cond do
+      num_stops_away != nil -> serialize_stops_away(num_stops_away)
       second_diff < 90 and stopped_at_predicted_stop? -> %{type: :text, text: "BRD"}
       second_diff < 30 and at_first_stop? -> %{type: :text, text: "BRD"}
       second_diff < 30 -> %{type: :text, text: "ARR"}
@@ -555,6 +556,30 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %FreeTextLine{
       icon: pill_color,
       text: [%{format: :bold, text: headsign}, %{format: :small, text: "every #{lo}-#{hi}m"}]
+    }
+  end
+
+  @spec parse_stops_away_from_status(String.t() | nil) :: pos_integer() | nil
+  defp parse_stops_away_from_status(status) when not is_nil(status) do
+    # Match pattern like "Stopped 3 stops away" or "Stopped 1 stop away"
+    case Regex.run(~r/Stopped (\d+) stops? away/, status) do
+      nil ->
+        nil
+
+      [_full_match, num_stops_str] ->
+        String.to_integer(num_stops_str)
+    end
+  end
+
+  defp parse_stops_away_from_status(_), do: nil
+
+  @spec serialize_stops_away(pos_integer()) :: %{type: :status, pages: [String.t()]}
+  defp serialize_stops_away(num_stops) do
+    stop_word = if num_stops == 1, do: "stop", else: "stops"
+
+    %{
+      type: :status,
+      pages: ["Stopped", "#{num_stops} #{stop_word} away"]
     }
   end
 end
