@@ -1072,6 +1072,50 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       [result] = Departures.serialize_times_with_crowding([departure], screen, now)
       assert is_nil(Map.get(result, :scheduled_time))
     end
+
+    test "serializes stops away status when provided", %{
+      dup_screen: screen
+    } do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      departure = %Departure{
+        prediction: %Prediction{
+          departure_time: ~U[2020-01-01T00:05:00Z],
+          route: %Route{type: :subway},
+          stop: %Stop{}
+        }
+      }
+
+      # 3 stops away
+      departure_3_stops_away = put_in(departure.prediction.status, "Stopped 3 stops away")
+
+      assert [
+               %{
+                 time: %{
+                   type: :status,
+                   pages: ["Stopped", "3 stops away"]
+                 }
+               }
+             ] = Departures.serialize_times_with_crowding([departure_3_stops_away], screen, now)
+
+      # 1 stop away (singular)
+      departure_1_stop_away = put_in(departure.prediction.status, "Stopped 1 stop away")
+
+      assert [
+               %{
+                 time: %{
+                   type: :status,
+                   pages: ["Stopped", "1 stop away"]
+                 }
+               }
+             ] = Departures.serialize_times_with_crowding([departure_1_stop_away], screen, now)
+
+      # Non-matching status falls back to normal time serialization
+      departure_no_status = put_in(departure.prediction.status, "Waiting to depart")
+
+      assert [%{time: %{type: :minutes}}] =
+               Departures.serialize_times_with_crowding([departure_no_status], screen, now)
+    end
   end
 
   describe "slot_names/1" do
