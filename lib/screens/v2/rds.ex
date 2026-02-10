@@ -21,6 +21,7 @@ defmodule Screens.V2.RDS do
   alias ScreensConfig.Departures
   alias ScreensConfig.Departures.{Query, Section}
 
+  alias __MODULE__.Countdowns
   alias __MODULE__.NoDepartures
 
   @type t ::
@@ -28,7 +29,7 @@ defmodule Screens.V2.RDS do
             stop: Stop.t(),
             line: Line.t(),
             headsign: String.t(),
-            state: NoDepartures.t()
+            state: NoDepartures.t() | Countdowns.t()
           }
   @enforce_keys ~w[stop line headsign state]a
   defstruct @enforce_keys
@@ -44,6 +45,15 @@ defmodule Screens.V2.RDS do
     """
     @type t :: %__MODULE__{headways: Headways.range() | nil}
     defstruct ~w[headways]a
+  end
+
+  defmodule Countdowns do
+    @moduledoc """
+    State when there is upcoming service to a destination 
+    and/or alerts which affect service to the destination.
+    """
+    @type t :: %__MODULE__{departures: [Departure.t()]}
+    defstruct ~w[departures]a
   end
 
   @departure injected(Departure)
@@ -83,20 +93,39 @@ defmodule Screens.V2.RDS do
            params
            |> Map.from_struct()
            |> @departure.fetch(now: now) do
-      section_departures =
+      departures_by_destination =
+        departures
+        |> Enum.group_by(fn departure ->
+          departure
+          |> destination_from_departure()
+          |> then(fn {%Stop{id: stop_id}, %Line{id: line_id}, headsign} ->
+            {stop_id, line_id, headsign}
+          end)
+        end)
+
+      section_rds =
         (tuples_from_departures(departures, now) ++
            tuples_from_patterns(typical_patterns, child_stops))
         |> Enum.uniq()
         |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
+          headway_for_stop = @headways.get(stop_id, now)
+
+          departures_for_headsign =
+            Map.get(departures_by_destination, {stop.id, line.id, headsign}, [])
+            |> Enum.filter(fn
+              %{prediction: nil} -> headway_for_stop == nil
+              _ -> true
+            end)
+
           %__MODULE__{
             stop: stop,
             line: line,
             headsign: headsign,
-            state: %NoDepartures{headways: @headways.get(stop_id, now)}
+            state: state(departures_for_headsign, stop_id, now)
           }
         end)
 
-      {:ok, section_departures}
+      {:ok, section_rds}
     end
   end
 
@@ -122,9 +151,7 @@ defmodule Screens.V2.RDS do
   defp tuples_from_departures(departures, now) do
     departures
     |> Enum.filter(&(DateTime.diff(Departure.time(&1), now, :minute) <= @max_departure_minutes))
-    |> Enum.map(fn d ->
-      {Departure.stop(d), Departure.route(d).line, Departure.representative_headsign(d)}
-    end)
+    |> Enum.map(&destination_from_departure(&1))
   end
 
   defp tuples_from_patterns(route_patterns, child_stops) do
@@ -139,5 +166,18 @@ defmodule Screens.V2.RDS do
         |> Enum.map(fn stop -> {stop, line, headsign} end)
       end
     )
+  end
+
+  defp destination_from_departure(departure) do
+    {Departure.stop(departure), Departure.route(departure).line,
+     Departure.representative_headsign(departure)}
+  end
+
+  defp state([] = _departures_by_headsign, _stop_id, _now) do
+    %NoDepartures{}
+  end
+
+  defp state(departures_by_headsign, _stop_id, _now) do
+    %Countdowns{departures: departures_by_headsign}
   end
 end

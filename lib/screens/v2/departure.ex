@@ -28,6 +28,7 @@ defmodule Screens.V2.Departure do
         }
 
   @type opts :: [
+          include_scheduled_cancelled?: boolean(),
           now: DateTime.t(),
           schedule_route_type_filter: [RouteType.t()]
         ]
@@ -45,7 +46,7 @@ defmodule Screens.V2.Departure do
 
     with {:ok, predictions} <- fetch_predictions_fn.(params),
          {:ok, schedules} <- fetch_schedules(params, opts) do
-      {:ok, Builder.build(predictions, schedules, now)}
+      {:ok, Builder.build(predictions, schedules, now, opts)}
     else
       _ -> :error
     end
@@ -102,6 +103,12 @@ defmodule Screens.V2.Departure do
   defp encode_param({:stop_ids, stop_ids}), do: {"filter[stop]", Enum.join(stop_ids, ",")}
 
   ### Accessor functions
+
+  def cancelled?(%__MODULE__{prediction: %Prediction{schedule_relationship: sr}})
+      when sr in [:cancelled, :skipped],
+      do: true
+
+  def cancelled?(%__MODULE__{}), do: false
 
   def crowding_level(%__MODULE__{prediction: p}) when not is_nil(p) do
     case p do
