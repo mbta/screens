@@ -32,7 +32,6 @@ const NormalSection: ComponentType<Props> = ({ rows }) => {
 const shortenHeadsignsForSection = (rows: Row[]) => {
   // Stop away messages take up a larger block of space,
   // so we need to shorten the space designated for headsigns.
-  console.log(rows);
   return rows.some(
     (row) =>
       row.type === "departure_row" &&

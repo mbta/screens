@@ -78,7 +78,7 @@ const DepartureTime: ComponentType<Props> = ({ time, scheduled_time }) => {
           time ? "delayed" : "cancelled",
         ])}
       >
-        <DepartureTimePart {...{ time: scheduled_time, currentPage }} />{" "}
+        <DepartureTimePart {...{ time: scheduled_time, currentPage }} />
       </div>
     );
   } else {
