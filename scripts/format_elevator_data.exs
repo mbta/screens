@@ -25,7 +25,6 @@ path
      "elevator_id" => id,
      "alternate_elevator_ids" => alternate,
      "Elevator Category" => category,
-     "Short Text" => exiting_summary,
      "Edited Alternative Text" => summary
    }} ->
     alternate_ids =
@@ -39,7 +38,6 @@ path
       Jason.OrderedObject.new([
         alternate_ids: alternate_ids,
         category: category |> String.trim() |> String.to_integer(),
-        exiting_summary: exiting_summary,
         summary: if(summary == "", do: nil, else: summary)
       ])
     }

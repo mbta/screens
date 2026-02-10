@@ -50,13 +50,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatusTest do
       informed_entities: [%{facility: facility}]
     }
 
-    elevator = %Elevator{
-      id: "111",
-      alternate_ids: [],
-      exiting_summary: "",
-      redundancy: :other,
-      summary: nil
-    }
+    elevator = %Elevator{id: "111", alternate_ids: [], redundancy: :other, summary: nil}
 
     expect(@alert, :fetch, fn [activities: [:using_wheelchair], include_all?: true] ->
       {:ok, [alert]}

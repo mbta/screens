@@ -21,13 +21,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
   defp build_elevator(fields) do
     struct!(
-      %Elevator{
-        id: "111",
-        alternate_ids: [],
-        exiting_summary: "",
-        redundancy: :in_station,
-        summary: nil
-      },
+      %Elevator{id: "111", alternate_ids: [], redundancy: :in_station, summary: nil},
       fields
     )
   end

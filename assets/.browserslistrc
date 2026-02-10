@@ -5,9 +5,6 @@ defaults
 # Outfront DUPs
 Chrome 51
 
-# MIMO Elevator Tablets
-Chrome 83
-
 # GDS CIDs (current gen)
 Chrome >= 126
 

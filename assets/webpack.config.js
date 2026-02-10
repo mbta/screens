@@ -25,7 +25,6 @@ const ENTRYPOINTS = {
   bus_shelter: "./src/apps/bus_shelter.tsx",
   busway: "./src/apps/busway.tsx",
   dup: "./src/apps/dup.tsx",
-  elevator: "./src/apps/elevator.tsx",
   gl_eink: "./src/apps/gl_eink.tsx",
   pre_fare: "./src/apps/pre_fare.tsx",
 };
