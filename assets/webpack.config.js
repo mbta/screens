@@ -33,18 +33,19 @@ const ENTRYPOINTS = {
 const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 
 /**
- * Replace absolute paths (/fonts/) with relative paths (./fonts/) in CSS
- * Processes packaged_dup.css after it's emitted by css-loader, which generates
- * absolute URL paths within packaged_dup.css, which cause issues on DUP hardware
+ * Processes packaged_dup.css after it's emitted by css-loader.
+ * For an unknown reason, we've found that fonts are not loaded properly on DUP
+ * hardware when the URL paths in packaged_dup.css are absolute ("/fonts/").
+ * This plugin replaces the URL paths for fonts with relative paths ("./fonts/").
  */
 const FixDupFontPathsPlugin = () => {
   return {
     apply(compiler) {
       compiler.hooks.afterEmit.tap("FixDupFontPaths", () => {
-        const cssFile = path.join(STATIC_PATH, "packaged_dup.css");
+        const cssFile = path.join(STATIC_PATH, "css/packaged_dup.css");
         if (fs.existsSync(cssFile)) {
           let css = fs.readFileSync(cssFile, "utf8");
-          css = css.replace(/\/fonts\//g, "./fonts/");
+          css = css.replace(/\.\.\/fonts\//g, "./fonts/");
           fs.writeFileSync(cssFile, css, "utf8");
         }
       });
@@ -124,17 +125,14 @@ module.exports = (env, argv) => {
           generator: {
             filename: "[base]",
             outputPath: "fonts/",
-            // The DUP app packaging process moves the bundled CSS up a
-            // directory level, which would break references to font files;
-            // this compensates for that. See also `utils.imagePath`.
-            publicPath: isOutfrontPackage ? "fonts/" : "../fonts/",
+            publicPath: "../fonts/",
           },
         },
       ],
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: isOutfrontPackage ? "[name].css" : "css/[name].css",
+        filename: "css/[name].css",
       }),
       new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "./" }] }),
       ...(isOutfrontPackage ? [FixDupFontPathsPlugin()] : []),
