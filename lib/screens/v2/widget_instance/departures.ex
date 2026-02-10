@@ -439,7 +439,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   # DUPs don't display crowding information (space constraints, no design implemented for it).
   defp serialize_crowding(_departure, %Screen{app_id: :dup_v2}), do: nil
-  # Otherwise, include crowding information. Will return nil
+  # Otherwise, include crowding information for any valid departure.
+  # Will return nil for schedules or predictions without crowding data.
   defp serialize_crowding(departure, _screen), do: Departure.crowding_level(departure)
 
   @spec serialize_time(Departure.t(), Screen.t(), DateTime.t()) ::
