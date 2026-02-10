@@ -1,5 +1,5 @@
 import cx from "classnames";
-import Arrow45 from "Images/Arrow-45-no-padding.svg";
+import Arrow45 from "Images/arrow-45.svg";
 
 type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 

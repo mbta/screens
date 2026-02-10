@@ -1,4 +1,3 @@
-import { Direction } from "Components/arrow";
 import { type AppId, SCREEN_APPS, SCREEN_VENDORS } from "Util/admin";
 
 import {
@@ -176,37 +175,6 @@ export const APP_FIELDS: { [key in AppId]: Field[] } = {
       label: "Secondary Departures",
       path: "app_params.secondary_departures",
       ...filteredJson,
-    },
-  ],
-
-  elevator_v2: [
-    ...baseFields,
-    evergreenField,
-    { label: "Elevator ID", path: "app_params.elevator_id", ...filteredString },
-    {
-      label: "♿️ Path Arrow",
-      path: "app_params.accessible_path_direction_arrow",
-      cell: buildSelectInput([null, ...Object.values(Direction)]),
-    },
-    {
-      label: "♿️ Path Text",
-      path: "app_params.alternate_direction_text",
-      ...filteredString,
-    },
-    {
-      label: "♿️ Path Image",
-      path: "app_params.accessible_path_image_url",
-      ...filteredNullString,
-    },
-    {
-      label: "Dot X",
-      path: "app_params.accessible_path_image_here_coordinates.x",
-      cell: NumberInput,
-    },
-    {
-      label: "Dot Y",
-      path: "app_params.accessible_path_image_here_coordinates.y",
-      cell: NumberInput,
     },
   ],
 

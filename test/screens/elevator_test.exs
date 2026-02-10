@@ -36,11 +36,6 @@ defmodule Screens.ElevatorTest do
       assert %Elevator{summary: nil} = Elevator.get("780")
     end
 
-    test "gets redundant route exiting summaries" do
-      assert %Elevator{exiting_summary: "Request assistance from conductor."} =
-               Elevator.get("780")
-    end
-
     test "returns nil and logs a warning when redundancy data does not exist" do
       logs =
         capture_log(fn ->

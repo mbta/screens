@@ -29,7 +29,6 @@ export type AppId =
   | "bus_shelter_v2"
   | "busway_v2"
   | "dup_v2"
-  | "elevator_v2"
   | "gl_eink_v2"
   | "pre_fare_v2";
 
@@ -40,7 +39,6 @@ export const SCREEN_APPS: { [key in AppId]: AppInfo } = {
   bus_shelter_v2: { name: "Bus Shelter", hasAudio: true, variants: [] },
   busway_v2: { name: "Sectional", hasAudio: true, variants: [] },
   dup_v2: { name: "DUP", hasAudio: false, variants: ["new_departures"] },
-  elevator_v2: { name: "Elevator", hasAudio: false, variants: [] },
   gl_eink_v2: { name: "GL E-ink", hasAudio: true, variants: [] },
   pre_fare_v2: { name: "Pre-Fare", hasAudio: true, variants: [] },
 };
@@ -56,7 +54,6 @@ export const SCREEN_VENDORS = [
   "gds",
   "lg_mri",
   "mercury",
-  "mimo",
   "outfront",
   "solari",
 ];
@@ -87,13 +84,6 @@ const DEFAULT_APP_PARAMS: { [key in AppId]: Screen["app_params"] } = {
     header: { stop_id: "" },
     primary_departures: { sections: [] },
     secondary_departures: { sections: [] },
-  },
-  elevator_v2: {
-    accessible_path_direction_arrow: null,
-    accessible_path_image_here_coordinates: { x: 0, y: 0 },
-    alternate_direction_text: "",
-    elevator_id: "",
-    evergreen_content: [],
   },
   gl_eink_v2: {
     alerts: { stop_id: "" },
