@@ -244,11 +244,9 @@ defmodule Screens.V2.Departure do
   def vehicle_status(_), do: nil
 
   @spec status(t(), Screen.t()) :: String.t() | nil
-  # Only include predction status for DUPs at this time
-  def status(%__MODULE__{prediction: %Prediction{status: status}}, %Screen{app_id: :dup_v2}) do
-    IO.inspect(status)
-    status
-  end
+  # Only include prediction status for DUPs at this time
+  def status(%__MODULE__{prediction: %Prediction{status: status}}, %Screen{app_id: :dup_v2}),
+    do: status
 
   def status(_, _), do: nil
 

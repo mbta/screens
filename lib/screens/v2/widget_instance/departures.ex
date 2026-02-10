@@ -65,6 +65,27 @@ defmodule Screens.V2.WidgetInstance.Departures do
         }
   defstruct screen: nil, sections: [], slot_names: [], now: nil
 
+  # Possible type representations for predictions and schedules
+  # for the client to determine how to display the time until departure.
+  @type serialized_text_t :: %{type: :text, text: String.t()}
+  @type serialized_minutes_t :: %{type: :minutes, minutes: non_neg_integer()}
+  @type serialized_timestamp_t :: %{
+          type: :timestamp,
+          hour: pos_integer(),
+          minute: non_neg_integer(),
+          am_pm: :am | :pm | nil
+        }
+  @type serialized_status_t :: %{type: :status, pages: [String.t()]}
+  @type serialized_overnight_t :: %{type: :overnight}
+
+  @typedoc "All possible serialized time representations"
+  @type serialized_time_t ::
+          serialized_text_t()
+          | serialized_minutes_t()
+          | serialized_timestamp_t()
+          | serialized_status_t()
+          | serialized_overnight_t()
+
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
   @sl_route_ids ~w[741 742 743 746 749 751]
@@ -394,6 +415,19 @@ defmodule Screens.V2.WidgetInstance.Departures do
     Enum.map(departures, &serialize_time_with_crowding(&1, screen, now))
   end
 
+  @spec serialize_time_with_crowding(Departure.t(), Screen.t(), DateTime.t()) ::
+          %{
+            time: serialized_time_t(),
+            time_in_epoch: integer(),
+            id: String.t(),
+            crowding: pos_integer() | nil
+          }
+          | %{
+              time: serialized_time_t() | nil,
+              scheduled_time: serialized_timestamp_t() | nil,
+              id: String.t(),
+              crowding: pos_integer() | nil
+            }
   defp serialize_time_with_crowding(departure, screen, now) do
     serialize_time(departure, screen, now)
     |> Map.merge(%{id: Departure.id(departure), crowding: serialize_crowding(departure, screen)})
@@ -403,13 +437,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     Departure.direction_id(first_departure)
   end
 
-  # Crowding information doesn't fit alongside timestamps since they take up extra space.
-  defp serialize_crowding(%{time: %{type: :timestamp}}, _screen), do: nil
   # DUPs don't display crowding information (space constraints, no design implemented for it).
   defp serialize_crowding(_departure, %Screen{app_id: :dup_v2}), do: nil
-  # Otherwise, include crowding information.
+  # Otherwise, include crowding information. Will return nil
   defp serialize_crowding(departure, _screen), do: Departure.crowding_level(departure)
 
+  @spec serialize_time(Departure.t(), Screen.t(), DateTime.t()) ::
+          %{time: serialized_time_t(), time_in_epoch: integer()}
+          | %{time: serialized_time_t() | nil, scheduled_time: serialized_timestamp_t() | nil}
   defp serialize_time(departure, %Screen{app_id: app_id} = screen, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
@@ -461,6 +496,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{time: serialized_time, scheduled_time: serialized_scheduled_time}
   end
 
+  @spec serialize_realtime(Departure.t(), Screen.t(), DateTime.t()) :: serialized_time_t()
   defp serialize_realtime(
          %Departure{prediction: %Prediction{stop: %Stop{id: stop_id}} = prediction} = departure,
          screen,
@@ -486,6 +522,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
   end
 
+  @spec serialize_timestamp(DateTime.t(), Screen.t(), DateTime.t()) ::
+          serialized_timestamp_t()
   defp serialize_timestamp(datetime, %Screen{app_id: app_id}, now) do
     local_time = Util.to_eastern(datetime)
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
@@ -573,7 +611,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp parse_stops_away_from_status(_), do: nil
 
-  @spec serialize_stops_away(pos_integer()) :: %{type: :status, pages: [String.t()]}
+  @spec serialize_stops_away(pos_integer()) :: serialized_status_t()
   defp serialize_stops_away(num_stops) do
     stop_word = if num_stops == 1, do: "stop", else: "stops"
 
