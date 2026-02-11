@@ -34,14 +34,14 @@ const STATIC_PATH = path.resolve(__dirname, "../priv/static");
 
 /**
  * Replace absolute paths (/fonts/) with relative paths (./fonts/) in CSS.
- * Processes packaged_dup.css after it's emitted by css-loader with absolute 
- * URL paths within packaged_dup.css, which cause issues on DUP hardware.
+ * Processes packaged_dup.css after it's emitted by css-loader, which generates
+ * absolute URL paths. These paths cause issues on DUP hardware for an unknown reason
  */
 const FixDupFontPathsPlugin = () => {
   return {
     apply(compiler) {
       compiler.hooks.afterEmit.tap("FixDupFontPaths", () => {
-        const cssFile = path.join(STATIC_PATH, "css/packaged_dup.css");
+        const cssFile = path.join(STATIC_PATH, "packaged_dup.css");
         if (fs.existsSync(cssFile)) {
           let css = fs.readFileSync(cssFile, "utf8");
           css = css.replace(/\/fonts\//g, "./fonts/");
@@ -127,13 +127,17 @@ module.exports = (env, argv) => {
             // The DUP app packaging process moves the bundled CSS up a
             // directory level, which breaks references to font files.
             // See FixDupFontPathsPlugin for more info.
-            publicPath: isOutfrontPackage ? "fonts/" : "../fonts/",          },
+            publicPath: isOutfrontPackage ? "/fonts/" : "../fonts/",
+          },
         },
       ],
     },
     plugins: [
-      new MiniCssExtractPlugin({ filename: "css/[name].css" }),
+      new MiniCssExtractPlugin({
+        filename: isOutfrontPackage ? "[name].css" : "css/[name].css",
+      }),
       new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "./" }] }),
+      // The DUP app packaging process moves the bundled CSS up a level. Also see FixDupFontPathsPlugin
       ...(isOutfrontPackage ? [FixDupFontPathsPlugin()] : []),
       // Upload source maps to Sentry for prod builds. Must be the last plugin.
       ...(isProduction
