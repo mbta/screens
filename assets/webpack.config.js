@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-require-imports */
 /* global require, module, __dirname */
 
+const fs = require("fs");
 const path = require("path");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
@@ -30,6 +31,26 @@ const ENTRYPOINTS = {
 };
 
 const STATIC_PATH = path.resolve(__dirname, "../priv/static");
+
+/**
+ * Replace absolute paths (/fonts/) with relative paths (./fonts/) in CSS.
+ * Processes packaged_dup.css after it's emitted by css-loader, which generates
+ * absolute URL paths. These paths cause issues on DUP hardware for an unknown reason
+ */
+const FixDupFontPathsPlugin = () => {
+  return {
+    apply(compiler) {
+      compiler.hooks.afterEmit.tap("FixDupFontPaths", () => {
+        const cssFile = path.join(STATIC_PATH, "packaged_dup.css");
+        if (fs.existsSync(cssFile)) {
+          let css = fs.readFileSync(cssFile, "utf8");
+          css = css.replace(/\/fonts\//g, "./fonts/");
+          fs.writeFileSync(cssFile, css, "utf8");
+        }
+      });
+    },
+  };
+};
 
 // Though this is normally not recommended, we transpile the dependencies we
 // ship to screens, because many libraries no longer support the old browser
@@ -104,16 +125,20 @@ module.exports = (env, argv) => {
             filename: "[base]",
             outputPath: "fonts/",
             // The DUP app packaging process moves the bundled CSS up a
-            // directory level, which would break references to font files;
-            // this compensates for that. See also `utils.imagePath`.
-            publicPath: isOutfrontPackage ? "fonts/" : "../fonts/",
+            // directory level, which breaks references to font files.
+            // See FixDupFontPathsPlugin for more info.
+            publicPath: isOutfrontPackage ? "/fonts/" : "../fonts/",
           },
         },
       ],
     },
     plugins: [
-      new MiniCssExtractPlugin({ filename: "css/[name].css" }),
+      new MiniCssExtractPlugin({
+        filename: isOutfrontPackage ? "[name].css" : "css/[name].css",
+      }),
       new CopyWebpackPlugin({ patterns: [{ from: "static/", to: "./" }] }),
+      // The DUP app packaging process moves the bundled CSS up a level. Also see FixDupFontPathsPlugin
+      ...(isOutfrontPackage ? [FixDupFontPathsPlugin()] : []),
       // Upload source maps to Sentry for prod builds. Must be the last plugin.
       ...(isProduction
         ? [
