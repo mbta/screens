@@ -11,7 +11,6 @@ defmodule Screens.V2.Departure do
   alias Screens.V2.Departure.Builder
   alias Screens.V3Api
   alias Screens.Vehicles.Vehicle
-  alias ScreensConfig.Screen
 
   @type t :: %__MODULE__{
           prediction: Screens.Predictions.Prediction.t() | nil,
