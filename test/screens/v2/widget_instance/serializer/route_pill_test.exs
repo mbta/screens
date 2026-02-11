@@ -30,8 +30,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                serialize_for_departure("Boat-F1", "", :ferry, nil)
     end
 
-    test "Returns purple rail icon for CapeFlyer" do
-      assert %{type: :icon, icon: :rail, color: :purple} ==
+    test "Returns ocean blue rail icon for CapeFlyer" do
+      assert %{type: :icon, icon: :rail, color: :ocean_blue} ==
                serialize_for_departure("CapeFlyer", "", :rail, nil)
     end
 

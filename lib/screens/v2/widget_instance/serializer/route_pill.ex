@@ -156,6 +156,9 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
       :cr ->
         %{type: :icon, icon: :rail, color: :purple}
 
+      :capeflyer ->
+        %{type: :icon, icon: :rail, color: :ocean_blue}
+
       :ferry ->
         %{type: :icon, icon: :boat, color: :teal}
 
