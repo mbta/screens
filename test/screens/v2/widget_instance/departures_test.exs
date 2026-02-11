@@ -1116,6 +1116,28 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert [%{time: %{type: :minutes}}] =
                Departures.serialize_times_with_crowding([departure_no_status], screen, now)
     end
+
+    test "does not serialize status for non DUP screens", %{
+      bus_eink_screen: bus_eink_screen,
+      bus_shelter_screen: bus_shelter_screen
+    } do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      departure = %Departure{
+        prediction: %Prediction{
+          departure_time: ~U[2020-01-01T00:05:00Z],
+          route: %Route{type: :subway},
+          status: "Stopped 9 stops away",
+          stop: %Stop{}
+        }
+      }
+
+      assert [%{time: %{type: :minutes}}] =
+               Departures.serialize_times_with_crowding([departure], bus_eink_screen, now)
+
+      assert [%{time: %{type: :minutes}}] =
+               Departures.serialize_times_with_crowding([departure], bus_shelter_screen, now)
+    end
   end
 
   describe "slot_names/1" do

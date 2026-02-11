@@ -407,61 +407,6 @@ defmodule Screens.V2.DepartureTest do
     end
   end
 
-  describe "status/2" do
-    setup do
-      %{
-        dup_screen: %ScreensConfig.Screen{
-          app_id: :dup_v2,
-          vendor: :outfront,
-          device_id: "TEST",
-          name: "TEST",
-          app_params: nil
-        },
-        bus_shelter_screen: %ScreensConfig.Screen{
-          app_id: :bus_shelter_v2,
-          vendor: :lg_mri,
-          device_id: "TEST",
-          name: "TEST",
-          app_params: nil
-        },
-        gl_eink_screen: %ScreensConfig.Screen{
-          app_id: :gl_eink_v2,
-          vendor: :gds,
-          device_id: "TEST",
-          name: "TEST",
-          app_params: nil
-        }
-      }
-    end
-
-    test "returns prediction status for DUP screens", %{dup_screen: dup_screen} do
-      prediction = %Prediction{status: "Stopped 3 stops away"}
-      schedule = %Schedule{id: "schedule"}
-      departure = %Departure{prediction: prediction, schedule: schedule}
-
-      assert "Stopped 3 stops away" == Departure.status(departure, dup_screen)
-    end
-
-    test "returns nil for non-DUP screens", %{
-      bus_shelter_screen: bus_shelter_screen,
-      gl_eink_screen: gl_eink_screen
-    } do
-      prediction = %Prediction{status: "Stopped 3 stops away"}
-      schedule = %Schedule{id: "schedule"}
-      departure = %Departure{prediction: prediction, schedule: schedule}
-
-      assert nil == Departure.status(departure, bus_shelter_screen)
-      assert nil == Departure.status(departure, gl_eink_screen)
-    end
-
-    test "returns nil for departure without prediction", %{dup_screen: dup_screen} do
-      schedule = %Schedule{id: "schedule"}
-      departure = %Departure{prediction: nil, schedule: schedule}
-
-      assert nil == Departure.status(departure, dup_screen)
-    end
-  end
-
   describe "fetch/1" do
     test "maintains schedules even if they are in the past" do
       now = ~U[2024-08-28 17:13:14.116713Z]
