@@ -131,7 +131,7 @@ defmodule Screens.Alerts.Alert do
           id: id(),
           cause: cause() | :unknown,
           effect: effect() | :unknown,
-          severity: pos_integer(),
+          severity: non_neg_integer(),
           header: String.t(),
           informed_entities: list(informed_entity()),
           active_period: list(active_period()),
@@ -363,7 +363,7 @@ defmodule Screens.Alerts.Alert do
   alerts).
   """
   @spec delay_description(t()) :: String.t()
-  def delay_description(%__MODULE__{severity: 1}), do: ""
+  def delay_description(%__MODULE__{severity: sev}) when sev <= 1, do: ""
   # 2 currently cannot be selected, but is a technically allowed value
   def delay_description(%__MODULE__{severity: sev}) when sev in 2..3, do: "up to 10 minutes"
   def delay_description(%__MODULE__{severity: 4}), do: "up to 15 minutes"
@@ -372,8 +372,8 @@ defmodule Screens.Alerts.Alert do
   def delay_description(%__MODULE__{severity: 7}), do: "up to 30 minutes"
   def delay_description(%__MODULE__{severity: 8}), do: "over 30 minutes"
   # 10 is essentially a signal for urgent notification delivery; its label does not describe any
-  # particular impact on trip times
-  def delay_description(%__MODULE__{severity: sev}) when sev in 9..10, do: "over 60 minutes"
+  # particular impact on trip times. Use the same description for it as 9.
+  def delay_description(%__MODULE__{severity: sev}) when sev >= 9, do: "over 60 minutes"
 
   @doc "Returns IDs of all subway routes affected by the alert. Green Line routes are not consolidated."
   def informed_subway_routes(%__MODULE__{} = alert) do
