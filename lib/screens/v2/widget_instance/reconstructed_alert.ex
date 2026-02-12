@@ -833,7 +833,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     } = t
 
     issue =
-      if severity == 1,
+      if severity <= 1,
         do: format_cause(cause, true),
         else: "Trains may be delayed #{Alert.delay_description(alert)}"
 
@@ -846,9 +846,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %{
       issue: issue,
       remedy: header,
-      cause: if(severity == 1, do: nil, else: get_cause(cause)),
+      cause: if(severity <= 1, do: nil, else: get_cause(cause)),
       routes: routes,
-      effect: if(severity == 1, do: :information, else: :delay),
+      effect: if(severity <= 1, do: :information, else: :delay),
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location)
@@ -886,7 +886,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Special case for informational alerts; currently intended only for single-tracking but may
   # work acceptably with other "causes"
-  defp flex_zone_fields(%__MODULE__{alert: %Alert{severity: 1}} = t, location) do
+  defp flex_zone_fields(%__MODULE__{alert: %Alert{severity: sev}} = t, location) when sev <= 1 do
     %__MODULE__{
       alert: %Alert{cause: cause, informed_entities: informed_entities},
       location_context: %LocationContext{home_stop: home_stop}
