@@ -37,6 +37,7 @@ const iconPaths: { [key: string]: string } = _.mapValues(
     delay: "clock.svg",
     delay_negative: "clock-negative.svg",
     ferry: "ferry.svg",
+    info: "info.svg",
   },
   imagePath,
 );
