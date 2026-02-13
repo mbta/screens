@@ -1,7 +1,7 @@
 import globals from "globals";
 import pluginJs from "@eslint/js";
 import tseslint from "typescript-eslint";
-import pluginReactConfig from "eslint-plugin-react/configs/recommended.js";
+import pluginReact from "eslint-plugin-react";
 import pluginReactHooks from "eslint-plugin-react-hooks";
 import eslintConfigPrettier from "eslint-config-prettier";
 import jestPlugin from "eslint-plugin-jest";
@@ -10,7 +10,8 @@ export default [
   { languageOptions: { globals: globals.browser } },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
-  pluginReactConfig,
+  pluginReact.configs.flat.recommended,
+  pluginReact.configs.flat["jsx-runtime"],
   eslintConfigPrettier,
   {
     files: ["test/**"],
@@ -32,9 +33,11 @@ export default [
       eqeqeq: "error",
       "no-empty": ["error", { allowEmptyCatch: true }],
       "react/display-name": "warn",
-      "react/prop-types": "warn",
-      // not valid when using the "automatic" JSX transform
-      "react/react-in-jsx-scope": "off",
+      // In addition to the deprecated React `propTypes`, this rule supposedly
+      // can detect when types of props are specified in TypeScript, but that
+      // doesn't seem to be working and it raises an error on every component.
+      // See: https://github.com/jsx-eslint/eslint-plugin-react/issues/3753#issuecomment-2189377576
+      "react/prop-types": "off",
       "@typescript-eslint/ban-ts-comment": "warn",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/no-unused-vars": [

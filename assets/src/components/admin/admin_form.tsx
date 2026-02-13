@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type JSX } from "react";
 import { AUTOLESS_ATTRIBUTES, fetch } from "Util/admin";
 
 const validateJson = (json) => {

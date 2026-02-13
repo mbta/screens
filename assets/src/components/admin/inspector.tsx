@@ -530,7 +530,7 @@ const AudioControls: ComponentType<{ screen: ScreenWithId }> = ({ screen }) => {
 };
 
 const adjustScreenFrame = (
-  ref: RefObject<HTMLIFrameElement>,
+  ref: RefObject<HTMLIFrameElement | null>,
   isSimulation: boolean,
   zoom: number,
 ) => {

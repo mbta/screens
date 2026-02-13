@@ -9,7 +9,7 @@ initFakeMRAID();
 
 import "../../css/dup.scss";
 
-import { StrictMode } from "react";
+import { StrictMode, type JSX } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router";
 

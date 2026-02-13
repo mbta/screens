@@ -1,4 +1,5 @@
 import _ from "lodash";
+import { type JSX } from "react";
 
 import AdminForm from "Components/admin/admin_form";
 import { fetch } from "Util/admin";

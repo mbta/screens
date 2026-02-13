@@ -6,7 +6,7 @@ initFullstory();
 
 import "../../css/bus_eink.scss";
 
-import { StrictMode } from "react";
+import { StrictMode, type JSX } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter as Router, Route, Routes } from "react-router";
 import ScreenPage from "Components/screen_page";

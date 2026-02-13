@@ -29,7 +29,7 @@ const NavLayout: ComponentType = () => (
   <>
     <nav className="admin-navbar">
       {routes.map(([path, label]) => (
-        <NavLink key={path} to={path ?? "/admin"} end={!path}>
+        <NavLink key={path ?? ""} to={path ?? "/admin"} end={!path}>
           {label}
         </NavLink>
       ))}

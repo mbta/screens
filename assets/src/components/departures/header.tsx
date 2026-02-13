@@ -1,4 +1,6 @@
 import cx from "classnames";
+import { type JSX } from "react";
+
 import Arrow45 from "Images/arrow-45.svg";
 
 type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
