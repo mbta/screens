@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Provides real-time departure information, consisting of an ordered list of "sections".
   """
 
-  alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -65,6 +64,35 @@ defmodule Screens.V2.WidgetInstance.Departures do
           now: DateTime.t()
         }
   defstruct screen: nil, sections: [], slot_names: [], now: nil
+
+  # Possible type representations for predictions and schedules
+  # for the client to determine how to display the time until departure.
+  @type serialized_text :: %{type: :text, text: String.t()}
+  @type serialized_minutes :: %{type: :minutes, minutes: non_neg_integer()}
+  @type serialized_timestamp :: %{
+          type: :timestamp,
+          hour: pos_integer(),
+          minute: non_neg_integer(),
+          am_pm: :am | :pm | nil
+        }
+  @type serialized_status :: %{type: :status, pages: [String.t()]}
+  @type serialized_overnight :: %{type: :overnight}
+
+  @typedoc "All possible serialized time representations"
+  @type serialized_time ::
+          serialized_text()
+          | serialized_minutes()
+          | serialized_timestamp()
+          | serialized_status()
+          | serialized_overnight()
+
+  @typep serialized_time_with_crowding :: %{
+           required(:id) => String.t(),
+           required(:time) => serialized_time(),
+           required(:scheduled_time) => serialized_timestamp() | nil,
+           required(:crowding) => pos_integer() | nil,
+           optional(:time_in_epoch) => integer()
+         }
 
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
@@ -395,6 +423,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     Enum.map(departures, &serialize_time_with_crowding(&1, screen, now))
   end
 
+  @spec serialize_time_with_crowding(Departure.t(), Screen.t(), DateTime.t()) ::
+          serialized_time_with_crowding()
   defp serialize_time_with_crowding(departure, screen, now) do
     serialize_time(departure, screen, now)
     |> Map.merge(%{id: Departure.id(departure), crowding: serialize_crowding(departure, screen)})
@@ -404,13 +434,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
     Departure.direction_id(first_departure)
   end
 
-  # Crowding information doesn't fit alongside timestamps since they take up extra space.
-  defp serialize_crowding(%{time: %{type: :timestamp}}, _screen), do: nil
   # DUPs don't display crowding information (space constraints, no design implemented for it).
   defp serialize_crowding(_departure, %Screen{app_id: :dup_v2}), do: nil
-  # Otherwise, include crowding information.
+  # Otherwise, include crowding information for any valid departure.
+  # Will return nil for schedules or predictions without crowding data.
   defp serialize_crowding(departure, _screen), do: Departure.crowding_level(departure)
 
+  @spec serialize_time(Departure.t(), Screen.t(), DateTime.t()) ::
+          %{time: serialized_time(), time_in_epoch: integer()}
+          | %{time: serialized_time() | nil, scheduled_time: serialized_timestamp() | nil}
   defp serialize_time(departure, %Screen{app_id: app_id} = screen, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
@@ -462,8 +494,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{time: serialized_time, scheduled_time: serialized_scheduled_time}
   end
 
+  @spec serialize_realtime(Departure.t(), Screen.t(), DateTime.t()) :: serialized_time()
   defp serialize_realtime(
-         %Departure{prediction: %Prediction{stop: %Stop{id: stop_id}} = prediction} = departure,
+         %Departure{
+           prediction: %Prediction{stop: %Stop{id: stop_id}, status: status} = prediction
+         } = departure,
          screen,
          now
        ) do
@@ -471,12 +506,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
     departure_time = Departure.time(departure)
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)
+    status_pages = parse_status_pages(status, screen)
 
     stopped_at_predicted_stop? =
       Departure.vehicle_status(departure) == :stopped_at and
         stop_id == Prediction.stop_for_vehicle(prediction)
 
     cond do
+      status_pages != nil -> %{type: :status, pages: status_pages}
       second_diff < 90 and stopped_at_predicted_stop? -> %{type: :text, text: "BRD"}
       second_diff < 30 and at_first_stop? -> %{type: :text, text: "BRD"}
       second_diff < 30 -> %{type: :text, text: "ARR"}
@@ -485,6 +522,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
   end
 
+  @spec serialize_timestamp(DateTime.t(), Screen.t(), DateTime.t()) ::
+          serialized_timestamp()
   defp serialize_timestamp(datetime, %Screen{app_id: app_id}, now) do
     local_time = Util.to_eastern(datetime)
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
@@ -557,4 +596,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
       text: [%{format: :bold, text: headsign}, %{format: :small, text: "every #{lo}-#{hi}m"}]
     }
   end
+
+  @spec parse_status_pages(String.t() | nil, Screen.t()) :: [String.t()] | nil
+  defp parse_status_pages(status, %Screen{app_id: :dup_v2}) when not is_nil(status) do
+    # Status is only used on DUPs at this time. Matches "Stopped X stop(s) away" pattern
+    # and returns pages like ["Stopped", "3 stops away"] or ["Stopped", "1 stop away"]
+    Regex.run(~r/(Stopped) (\d+ stops? away)/, status, capture: :all_but_first)
+  end
+
+  defp parse_status_pages(_status, _screen), do: nil
 end
