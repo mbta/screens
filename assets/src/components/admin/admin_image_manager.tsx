@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type JSX } from "react";
 import { useDropzone } from "react-dropzone";
 import _ from "lodash";
 
