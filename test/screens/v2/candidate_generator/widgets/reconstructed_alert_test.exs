@@ -4,14 +4,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   import Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
+  alias Screens.Stops.Stop
   alias Screens.LocationContext
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.{Busway, PreFare}
 
   defp ie(opts) do
-    %{
-      stop: opts[:stop],
+    %InformedEntity{
+      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
       route: opts[:route],
       route_type: opts[:route_type],
       direction_id: opts[:direction_id]
@@ -579,14 +581,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "1",
           effect: :station_closure,
-          informed_entities: [
-            %{
-              stop: nil,
-              route: nil,
-              route_type: 2,
-              direction_id: nil
-            }
-          ],
+          informed_entities: [ie(route_type: 2)],
           active_period: happening_now_active_period
         },
         %Alert{

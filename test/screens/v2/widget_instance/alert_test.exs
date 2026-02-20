@@ -2,6 +2,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
+  alias Screens.Stops.Stop
   alias Screens.LocationContext
   alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
@@ -106,7 +108,12 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   defp ie(opts) do
-    %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
+    %InformedEntity{
+      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
+      route: opts[:route],
+      route_type: opts[:route_type],
+      direction_id: opts[:direction_id]
+    }
   end
 
   defp setup_home_stop(%{widget: widget}) do

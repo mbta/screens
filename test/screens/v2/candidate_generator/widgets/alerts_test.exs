@@ -4,13 +4,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
   import Screens.V2.CandidateGenerator.Widgets.Alerts
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
+  alias Screens.Stops.Stop
   alias Screens.LocationContext
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Alerts, MultiStopAlerts, Screen}
   alias ScreensConfig.Screen.{BusEink, BusShelter}
 
-  defp ie(opts \\ []) do
-    %{stop: opts[:stop], route: opts[:route], route_type: opts[:route_type]}
+  defp ie(opts) do
+    %InformedEntity{
+      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
+      route: opts[:route],
+      route_type: opts[:route_type],
+      direction_id: opts[:direction_id]
+    }
   end
 
   # credo:disable-for-next-line
@@ -370,7 +377,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "1",
           effect: :suspension,
-          informed_entities: [ie()],
+          informed_entities: [ie(stop: nil)],
           active_period: [{now, nil}]
         }
       ]

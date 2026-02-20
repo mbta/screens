@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   Shared utility functions for SubwayStatus serialization.
   """
 
+  alias Screens.Stops.Stop
   alias Screens.Alerts.Alert
   alias Screens.Alerts.Endpoints
   alias Screens.Alerts.InformedEntity
@@ -82,7 +83,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
 
     parent_station_id =
       Enum.find_value(relevant_entities, fn
-        %InformedEntity{stop: %{id: stop_id}} ->
+        %InformedEntity{stop: %Stop{id: stop_id}} ->
           if Map.has_key?(stop_names, stop_id), do: stop_id
 
         %InformedEntity{stop: nil} ->

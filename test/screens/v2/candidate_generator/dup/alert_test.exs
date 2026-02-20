@@ -3,7 +3,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Dup.Alerts
   alias ScreensConfig.Alerts, as: AlertsConfig
   alias ScreensConfig.Screen
@@ -19,8 +21,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
     header: "Orange Line experiencing delays up to 20 minutes.",
     id: "999",
     informed_entities: [
-      %{
-        stop: "place-bbsta",
+      %InformedEntity{
+        stop: %Stop{id: "place-bbsta"},
         route: "Orange",
         direction_id: nil,
         route_type: nil,
@@ -107,8 +109,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    severity: 5,
                    header: "Orange Line experiencing delays up to 20 minutes.",
                    informed_entities: [
-                     %{
-                       stop: "place-bbsta",
+                     %InformedEntity{
+                       stop: %Stop{id: "place-bbsta"},
                        route: "Orange",
                        direction_id: nil,
                        route_type: nil,
@@ -135,8 +137,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    severity: 5,
                    header: "Orange Line experiencing delays up to 20 minutes.",
                    informed_entities: [
-                     %{
-                       stop: "place-bbsta",
+                     %InformedEntity{
+                       stop: %Stop{id: "place-bbsta"},
                        route: "Orange",
                        direction_id: nil,
                        route_type: nil,
@@ -163,8 +165,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    severity: 5,
                    header: "Orange Line experiencing delays up to 20 minutes.",
                    informed_entities: [
-                     %{
-                       stop: "place-bbsta",
+                     %InformedEntity{
+                       stop: %Stop{id: "place-bbsta"},
                        route: "Orange",
                        direction_id: nil,
                        route_type: nil,

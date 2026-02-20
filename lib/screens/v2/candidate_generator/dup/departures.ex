@@ -443,7 +443,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   defp interpret_entities(entities, parent_stop_ids) do
-    informed_stop_ids = Enum.into(entities, MapSet.new(), & &1.stop)
+    informed_stop_ids = Enum.into(entities, MapSet.new(), & &1.stop.id)
     parent_stop_id = List.first(parent_stop_ids)
 
     {region, headsign} =

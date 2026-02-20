@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -30,6 +31,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
           widget.app_params
           | primary_departures: %Departures{sections: primary_departures_sections}
         }
+    }
+  end
+
+  defp ie(opts) do
+    %InformedEntity{
+      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
+      route: opts[:route],
+      route_type: opts[:route_type],
+      direction_id: opts[:direction_id]
     }
   end
 
@@ -332,7 +342,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
           struct(Alert,
             effect: :suspension,
             informed_entities: [
-              %{stop: "place-B", route: "Red"}
+              ie(stop: "place-B", route: "Red")
             ],
             active_period: [{~U[2020-04-06T09:00:00Z], nil}]
           )
@@ -540,34 +550,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
           struct(Alert,
             effect: :suspension,
             informed_entities: [
-              %{
-                direction_id: nil,
-                facility: nil,
-                route: "Green-C",
-                route_type: 0,
-                stop: "70151"
-              },
-              %{
-                direction_id: nil,
-                facility: nil,
-                route: "Green-C",
-                route_type: 0,
-                stop: "70152"
-              },
-              %{
-                direction_id: nil,
-                facility: nil,
-                route: "Green-C",
-                route_type: 0,
-                stop: "place-kencl"
-              },
-              %{
-                direction_id: nil,
-                facility: nil,
-                route: "Green-C",
-                route_type: 0,
-                stop: "place-hymnl"
-              }
+              ie(stop: "place-kencl", route: "Green-C"),
+              ie(stop: "place-hymnl", route: "Green-C"),
+              ie(stop: "70151", route: "Green-C"),
+              ie(stop: "70152", route: "Green-C")
             ],
             active_period: [{~U[2020-04-06T09:00:00Z], nil}]
           )
