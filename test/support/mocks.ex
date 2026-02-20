@@ -6,6 +6,7 @@ injected_modules = [
   Screens.Headways,
   Screens.RoutePatterns.RoutePattern,
   Screens.Routes.Route,
+  Screens.Schedules.Schedule,
   Screens.Stops.Stop,
   Screens.V2.Departure,
   Screens.V2.RDS,

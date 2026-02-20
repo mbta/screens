@@ -21,23 +21,56 @@ defmodule Screens.V2.RDSTest do
   @departure injected(Departure)
   @headways injected(Headways)
   @route_pattern injected(RoutePattern)
+  @schedule injected(Schedule)
   @stop injected(Stop)
 
   setup do
     stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
     stub(@headways, :get, fn _, _ -> nil end)
     stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
+    stub(@schedule, :fetch, fn _, _ -> {:ok, []} end)
     stub(@stop, :fetch, fn %{ids: ids}, true -> {:ok, Enum.map(ids, &stop/1)} end)
     :ok
   end
 
   describe "get/1" do
-    defp no_departures(stop_id, line_id, headsign) do
+    defp no_service(stop_id, line_id, headsign) do
       %RDS{
         stop: %Stop{id: stop_id},
         line: %Line{id: line_id},
         headsign: headsign,
-        state: %RDS.NoDepartures{}
+        state: %RDS.NoService{
+          routes: [
+            %Screens.Routes.Route{
+              id: "r1",
+              short_name: nil,
+              long_name: nil,
+              direction_names: nil,
+              direction_destinations: nil,
+              type: nil,
+              line: %Screens.Lines.Line{
+                id: "l1",
+                long_name: nil,
+                short_name: nil,
+                sort_order: nil
+              }
+            },
+            %Screens.Routes.Route{
+              id: "r2",
+              short_name: nil,
+              long_name: nil,
+              direction_names: nil,
+              direction_destinations: nil,
+              type: nil,
+              line: %Screens.Lines.Line{
+                id: "l2",
+                long_name: nil,
+                short_name: nil,
+                sort_order: nil
+              }
+            }
+          ]
+        }
       }
     end
 
@@ -56,7 +89,7 @@ defmodule Screens.V2.RDSTest do
 
     defp stop(id), do: %Stop{id: id, location_type: 0}
 
-    test "creates destinations from typical route patterns" do
+    test "creates no service destinations from typical route patterns with no departures" do
       stop_ids = ~w[s0 s1]
 
       expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
@@ -96,9 +129,9 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures) == [
                {:ok,
                 [
-                  no_departures("sA", "l1", "hA"),
-                  no_departures("sB", "l2", "hB"),
-                  no_departures("sC", "l2", "hC")
+                  no_service("sA", "l1", "hA"),
+                  no_service("sB", "l2", "hB"),
+                  no_service("sC", "l2", "hC")
                 ]}
              ]
     end
@@ -233,7 +266,7 @@ defmodule Screens.V2.RDSTest do
                {:ok,
                 [
                   countdowns("s1", "l1", "h1", expected_departures),
-                  no_departures("s1", "l2", "h2")
+                  no_service("s1", "l2", "h2")
                 ]}
              ]
     end
