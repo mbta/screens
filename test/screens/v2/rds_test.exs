@@ -1,6 +1,7 @@
 defmodule Screens.V2.RDSTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Config.Cache
   alias Screens.Headways
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
@@ -23,6 +24,7 @@ defmodule Screens.V2.RDSTest do
   @route_pattern injected(RoutePattern)
   @schedule injected(Schedule)
   @stop injected(Stop)
+  @config_cache injected(Cache)
 
   setup do
     stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
@@ -30,6 +32,7 @@ defmodule Screens.V2.RDSTest do
     stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
     stub(@schedule, :fetch, fn _, _ -> {:ok, []} end)
     stub(@stop, :fetch, fn %{ids: ids}, true -> {:ok, Enum.map(ids, &stop/1)} end)
+    stub(@config_cache, :disabled_modes, fn -> [] end)
     :ok
   end
 
@@ -323,9 +326,22 @@ defmodule Screens.V2.RDSTest do
       stop_ids_primary = ~w[s0]
       stop_ids_secondary = ~w[s1]
 
+      expected_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+          },
+          schedule: nil
+        }
+      ]
+
       stub(@departure, :fetch, fn %{stop_ids: stop_ids}, [now: ^now] ->
         case stop_ids do
-          ^stop_ids_primary -> {:ok, []}
+          ^stop_ids_primary -> {:ok, expected_departures}
           ^stop_ids_secondary -> :error
         end
       end)
@@ -337,7 +353,77 @@ defmodule Screens.V2.RDSTest do
         ]
       }
 
-      assert RDS.get(departures, now) == [{:ok, []}, :error]
+      assert RDS.get(departures, now) ==
+               [{:ok, [countdowns("s1", "l1", "h1", expected_departures)]}, :error]
+    end
+
+    test "returns :error when a section has a disabled mode" do
+      now = ~U[2024-10-11 12:00:00Z]
+      stop_ids = ~w[s0 s1 s2]
+
+      bus_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+          },
+          schedule: nil
+        }
+      ]
+
+      subway_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r2", line: %Line{id: "l2"}, type: :subway},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other2", pattern_headsign: "h2"}
+          },
+          schedule: nil
+        }
+      ]
+
+      stub(@departure, :fetch, fn
+        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [now: ^now] ->
+          {:ok, bus_departures}
+
+        %{direction_id: 0, route_type: :subway, stop_ids: ^stop_ids}, [now: ^now] ->
+          {:ok, subway_departures}
+      end)
+
+      stub(@config_cache, :disabled_modes, fn -> [:bus] end)
+
+      departures = %Departures{
+        sections: [
+          %Section{
+            query: %Query{
+              params: %Query.Params{
+                direction_id: 0,
+                route_type: :bus,
+                stop_ids: ["s0", "s1", "s2"]
+              }
+            }
+          },
+          %Section{
+            query: %Query{
+              params: %Query.Params{
+                direction_id: 0,
+                route_type: :subway,
+                stop_ids: ["s0", "s1", "s2"]
+              }
+            }
+          }
+        ]
+      }
+
+      assert RDS.get(departures, now) == [
+               {:ok, []},
+               {:ok, [countdowns("s1", "l2", "h2", subway_departures)]}
+             ]
     end
   end
 end

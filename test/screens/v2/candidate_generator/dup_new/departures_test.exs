@@ -53,12 +53,12 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
     }
   end
 
-  defp no_service(stop_id, line_id, headsign) do
+  defp no_service(stop_id, line_id, headsign, routes \\ []) do
     %RDS{
       stop: %Stop{id: stop_id},
       line: %Line{id: line_id},
       headsign: headsign,
-      state: %RDS.NoService{routes: []}
+      state: %RDS.NoService{routes: routes}
     }
   end
 
@@ -162,7 +162,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
       assert actual_instances == expected_instances
     end
 
-    test "returns DeparturesNoService on RDS returning no predictions or scheduled departures for Countdown state" do
+    test "returns DeparturesNoService on RDS returning NoService states" do
       primary_departures = [
         %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}},
         %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
@@ -178,8 +178,14 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
         |> put_primary_departures(primary_departures)
         |> put_secondary_departures_sections(secondary_departures)
 
-      expect(@rds, :get, fn _primary_departures, @now -> [{:ok, []}, {:ok, []}] end)
-      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok, [no_service("place-A", "line-A", "headsign")]},
+          {:ok, [no_service("place-B", "line-B", "headsign2")]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [] end)
 
       expected_instances = [
         %DeparturesNoService{screen: config, slot_name: :main_content_zero},
@@ -309,6 +315,71 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
              rds_countdown("s1", "l1", "other1", expected_departures)
            ]},
           {:ok, [no_service("s2", "l2", "other2")]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = DupNew.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates no service section with routes for no service states that have routes" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_route = %Route{id: "r1", line: %Line{id: "l1"}, type: :bus}
+
+      secondary_departures = []
+
+      expected_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: expected_route,
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+          },
+          schedule: nil
+        }
+      ]
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        },
+        %Screens.V2.WidgetInstance.Departures.NoServiceSection{routes: [expected_route]}
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok, [rds_countdown("s1", "l1", "other1", expected_departures)]},
+          {:ok, [no_service("s2", "l2", "other2", [expected_route])]}
         ]
       end)
 

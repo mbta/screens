@@ -99,6 +99,7 @@ defmodule Screens.Config.Cache do
     mode in disabled_modes()
   end
 
+  @callback disabled_modes() :: [atom()]
   def disabled_modes do
     with_table default: [] do
       case :ets.match(@table, {:devops, %{disabled_modes: :"$1"}}) do
