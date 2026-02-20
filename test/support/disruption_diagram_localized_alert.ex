@@ -8,7 +8,9 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.Stops.Subway
 
   @doc """
@@ -70,7 +72,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
   defp ies(:green, stop_ids, :per_stop, _home_stop) do
     for stop_id <- stop_ids,
         "Green" <> _ = route_id <- subway_routes_at_station(stop_id),
-        do: %{route: route_id, stop: stop_id}
+        do: %InformedEntity{route: route_id, stop: %Stop{id: stop_id}}
   end
 
   defp ies(:green, stop_ids, :overall, home_stop) do
@@ -83,7 +85,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
     result =
       for stop_id <- stop_ids,
           route_id <- route_ids,
-          do: %{route: route_id, stop: stop_id}
+          do: %InformedEntity{route: route_id, stop: %Stop{id: stop_id}}
 
     if result == [] do
       raise "No stop sequence contains all informed stops + home stop"
@@ -98,7 +100,7 @@ defmodule Screens.TestSupport.DisruptionDiagramLocalizedAlert do
       |> Atom.to_string()
       |> String.capitalize()
 
-    for stop_id <- stop_ids, do: %{route: route_id, stop: stop_id}
+    for stop_id <- stop_ids, do: %InformedEntity{route: route_id, stop: %Stop{id: stop_id}}
   end
 
   defp stop_range_to_list({first_station_id, last_station_id}) do

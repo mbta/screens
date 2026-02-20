@@ -4,10 +4,26 @@ defmodule Screens.Alerts.InformedEntity do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Facilities.Facility
   alias Screens.Routes.Route
+  alias Screens.Stops.Stop
   alias Screens.Trips.Trip
 
-  @type t :: Alert.informed_entity()
+  defstruct activities: [],
+            direction_id: nil,
+            facility: nil,
+            route: nil,
+            route_type: nil,
+            stop: nil
+
+  @type t :: %__MODULE__{
+          activities: nonempty_list(Alert.activity()),
+          direction_id: Trip.direction() | nil,
+          facility: Facility.t() | nil,
+          route: Route.id() | nil,
+          route_type: non_neg_integer() | nil,
+          stop: Stop.t() | nil
+        }
 
   @spec whole_route?(t()) :: boolean
   def whole_route?(ie) do
@@ -28,9 +44,8 @@ defmodule Screens.Alerts.InformedEntity do
   end
 
   @spec parent_station?(t()) :: boolean
-  def parent_station?(ie) do
-    match?(%{stop: "place-" <> _}, ie)
-  end
+  def parent_station?(%__MODULE__{stop: %Stop{id: "place-" <> _}}), do: true
+  def parent_station?(_), do: false
 
   @spec present_alert_for_route?(t(), Route.id(), Trip.direction() | nil) :: boolean()
   def present_alert_for_route?(

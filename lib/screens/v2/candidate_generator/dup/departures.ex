@@ -362,7 +362,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
          informed_entities
        ) do
     Enum.find_value(informed_entities, "", fn
-      %{route: route, stop: ^stop_id} -> route
+      %InformedEntity{route: route, stop: %{id: ^stop_id}} -> route
       _ -> nil
     end)
   end

@@ -273,9 +273,11 @@ defmodule Screens.Stops.Subway do
   end
 
   @spec stop_index_for_informed_entity(InformedEntity.t(), [station()]) :: non_neg_integer() | nil
-  def stop_index_for_informed_entity(%{stop: stop_id}, stop_sequence) do
+  def stop_index_for_informed_entity(%InformedEntity{stop: %{id: stop_id}}, stop_sequence) do
     Enum.find_index(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
   end
+
+  def stop_index_for_informed_entity(%InformedEntity{stop: nil}, _stop_sequence), do: nil
 
   @spec stop_on_route?(Stop.id(), [station()]) :: boolean()
   def stop_on_route?(stop_id, stop_sequence) when not is_nil(stop_id) do
@@ -316,7 +318,10 @@ defmodule Screens.Stops.Subway do
   defp sequence_match?(stop_sequence, informed_entities) do
     ie_stops =
       informed_entities
-      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
+      |> Enum.map(fn
+        %{stop: %{id: stop_id}} -> stop_id
+        %{stop: nil} -> nil
+      end)
       |> Enum.reject(&is_nil/1)
 
     if Enum.empty?(ie_stops) do
@@ -347,7 +352,7 @@ defmodule Screens.Stops.Subway do
     ie_stops =
       informed_entities
       |> Enum.filter(&(&1.route == route_id and !is_nil(&1.stop)))
-      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
+      |> Enum.map(fn %{stop: %{id: stop_id}} -> stop_id end)
 
     if Enum.empty?(ie_stops) do
       nil

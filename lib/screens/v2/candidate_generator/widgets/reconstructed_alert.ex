@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   @moduledoc false
 
+  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
   alias Screens.Stops.Stop
@@ -194,8 +195,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     ies
     |> Enum.filter(fn
       # Alert affects entire line
-      %{stop: nil, route: route} -> is_binary(route)
-      %{stop: stop} -> String.starts_with?(stop, "place-")
+      %InformedEntity{stop: nil, route: route} -> is_binary(route)
+      %InformedEntity{stop: %{id: stop_id}} -> String.starts_with?(stop_id, "place-")
+      %InformedEntity{stop: _} -> false
     end)
     |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
     |> Enum.min(fn -> @default_distance end)
@@ -204,20 +206,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # Default to 99 if stop_id is not in distance map.
   # Stops will not be present in the map if informed_entity and home stop are on different branches.
   # i.e. Braintree is not present in Ashmont stop_sequences, but is still a relevant alert.
-  @spec get_distance(stop_id(), home_stop_distance_map(), Alert.informed_entity()) :: distance()
+  @spec get_distance(stop_id(), home_stop_distance_map(), InformedEntity.t()) :: distance()
   defp get_distance(home_stop_id, home_stop_distance_map, informed_entity)
 
-  defp get_distance(_home_stop_id, _home_stop_distance_map, %{stop: nil}), do: 0
+  defp get_distance(_home_stop_id, _home_stop_distance_map, %InformedEntity{stop: nil}), do: 0
 
-  defp get_distance(home_stop_id, home_stop_distance_map, %{route: "Green" <> _, stop: ie_stop_id})
+  defp get_distance(home_stop_id, home_stop_distance_map, %InformedEntity{
+         route: "Green" <> _,
+         stop: %{id: ie_stop_id}
+       })
        when home_stop_id in @gl_trunk_stop_ids and ie_stop_id in @gl_eastbound_split_stops,
        do: Map.get(home_stop_distance_map, "place-lech", @default_distance)
 
-  defp get_distance(home_stop_id, home_stop_distance_map, %{route: "Green" <> _, stop: ie_stop_id})
+  defp get_distance(home_stop_id, home_stop_distance_map, %{
+         route: "Green" <> _,
+         stop: %{id: ie_stop_id}
+       })
        when home_stop_id in @gl_trunk_stop_ids and ie_stop_id not in @gl_trunk_stop_ids,
        do: Map.get(home_stop_distance_map, "place-kencl", @default_distance)
 
-  defp get_distance(_, home_stop_distance_map, %{stop: stop_id}),
+  defp get_distance(_, home_stop_distance_map, %InformedEntity{stop: %{id: stop_id}}),
     do: Map.get(home_stop_distance_map, stop_id, @default_distance)
 
   # If the current station's stop_id is the first or last entry in all stop_sequences, it is a
@@ -255,11 +263,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          fetch_stop_name_fn
        ) do
     stop_ids =
-      Enum.flat_map(informed_entities, fn %{stop: stop_id} ->
-        case stop_id do
-          nil -> []
-          id -> [id]
-        end
+      Enum.flat_map(informed_entities, fn
+        %{stop: %{id: stop_id}} -> [stop_id]
+        %{stop: nil} -> []
       end)
 
     case stop_ids do

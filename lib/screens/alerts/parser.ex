@@ -1,6 +1,7 @@
 defmodule Screens.Alerts.Parser do
   @moduledoc false
 
+  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
   alias Screens.V3Api
 
@@ -53,13 +54,13 @@ defmodule Screens.Alerts.Parser do
   }
 
   defp parse_informed_entity(ie, included) do
-    %{
+    %InformedEntity{
       activities: Enum.map(ie["activities"], &Map.fetch!(@activities, &1)),
       direction_id: ie["direction_id"],
       facility: parse_informed_facility(ie["facility"], included),
       route: ie["route"],
       route_type: ie["route_type"],
-      stop: ie["stop"]
+      stop: parse_informed_stop(ie["stop"], included)
     }
   end
 
@@ -67,6 +68,11 @@ defmodule Screens.Alerts.Parser do
 
   defp parse_informed_facility(id, included),
     do: V3Api.Parser.included!(%{"data" => %{"id" => id, "type" => "facility"}}, included)
+
+  defp parse_informed_stop(nil, _included), do: nil
+
+  defp parse_informed_stop(id, included),
+    do: V3Api.Parser.included!(%{"data" => %{"id" => id, "type" => "stop"}}, included)
 
   defp parse_and_sort_active_periods(periods) do
     periods

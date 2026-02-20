@@ -28,11 +28,12 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   defp validate_stop_count(%{effect: continuous_effect} = alert)
        when continuous_effect in [:shuttle, :suspension] do
     informed_stops =
-      for %{stop: stop, route: route} <- alert.informed_entities,
-          match?("place-" <> _, stop),
+      for %InformedEntity{stop: stop, route: route} <- alert.informed_entities,
+          not is_nil(stop),
+          match?("place-" <> _, stop.id),
           route in ~w[Blue Orange Red Green-B Green-C Green-D Green-E Mattapan],
           uniq: true,
-          do: stop
+          do: stop.id
 
     if length(informed_stops) >= 2 do
       :ok

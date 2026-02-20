@@ -208,7 +208,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
          gl_stop_sets
        ) do
     informed_entities
-    |> Enum.map(fn ie -> Map.get(ie, :stop) end)
+    |> Enum.map(fn
+      %InformedEntity{stop: %{id: stop_id}} -> stop_id
+      %InformedEntity{stop: nil} -> nil
+    end)
     |> Enum.reject(&is_nil/1)
     |> Enum.uniq()
     |> Enum.any?(fn informed_stop ->
@@ -227,7 +230,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
         ie ->
           InformedEntity.parent_station?(ie) and ie.route in @green_line_branches
       end)
-      |> Enum.map(& &1.stop)
+      |> Enum.map(fn %{stop: %{id: stop_id}} -> stop_id end)
       |> MapSet.new()
 
     if MapSet.size(alert_stops) > 0 do

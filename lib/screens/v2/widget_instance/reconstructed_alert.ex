@@ -189,22 +189,26 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # Given an entity and the directionality of the alert from the home stop,
   # return a tuple with the affected direction_id and route_id
 
-  defp get_direction_and_route_from_entity(%{stop: "place-jfk"}, :station_closure, _location),
-    do: {nil, "Red"}
+  defp get_direction_and_route_from_entity(
+         %{stop: %{id: "place-jfk"}},
+         :station_closure,
+         _location
+       ),
+       do: {nil, "Red"}
 
   # Skip processing JFK, because it is a branching node station. The other stations in the alert
   # will determine the destination needed for this alert
-  defp get_direction_and_route_from_entity(%{stop: "place-jfk"}, _, _location),
+  defp get_direction_and_route_from_entity(%{stop: %{id: "place-jfk"}}, _, _location),
     do: nil
 
   # If the route is red and the alert is downstream, we have to figure out whether the alert
   # only affects one branch or both
   defp get_direction_and_route_from_entity(
-         %{direction_id: nil, route: "Red", stop: stop_id},
+         %{direction_id: nil, route: "Red", stop: %{id: stop_id}},
          _,
          location
        )
-       when stop_id != nil and location in [:downstream, :boundary_downstream] do
+       when location in [:downstream, :boundary_downstream] do
     cond do
       Subway.ashmont_branch_stop?(stop_id) ->
         {0, "Red-Ashmont"}
@@ -219,11 +223,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Same with RL upstream alerts
   defp get_direction_and_route_from_entity(
-         %{direction_id: nil, route: "Red", stop: stop_id},
+         %{direction_id: nil, route: "Red", stop: %{id: stop_id}},
          _,
          location
        )
-       when stop_id != nil and location in [:upstream, :boundary_upstream] do
+       when location in [:upstream, :boundary_upstream] do
     cond do
       Subway.ashmont_branch_stop?(stop_id) ->
         {1, "Red-Ashmont"}
@@ -1133,7 +1137,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp cause_description(%Alert{cause: :unknown}), do: ""
   defp cause_description(alert), do: "due to " <> Alert.cause_description(alert)
 
-  @spec get_endpoints(list(Alert.informed_entity()), Route.id(), Stop.id()) ::
+  @spec get_endpoints(list(InformedEntity.t()), Route.id(), Stop.id()) ::
           {String.t(), String.t()} | nil
   defp get_endpoints(informed_entities, route_id, home_stop) do
     with {left_endpoint, right_endpoint} <- do_get_endpoints(informed_entities, route_id) do
@@ -1155,7 +1159,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       stop_sequence ->
         {min_index, max_index} =
           informed_entities
-          |> Enum.filter(&Subway.stop_on_route?(&1.stop, stop_sequence))
+          |> Enum.filter(&Subway.stop_on_route?(&1.stop.id, stop_sequence))
           |> Enum.map(&Subway.stop_index_for_informed_entity(&1, stop_sequence))
           |> Enum.min_max()
 

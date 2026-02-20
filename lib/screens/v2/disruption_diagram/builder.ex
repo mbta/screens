@@ -5,6 +5,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   Values should be accessed/manipulated only via public module functions.
   """
 
+  alias Screens.Alerts.InformedEntity
   alias Aja.Vector
   alias Screens.Routes.Route
   alias Screens.Stops.{Stop, Subway}
@@ -108,9 +109,11 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   @spec new(LocalizedAlert.t()) :: {:ok, t()} | {:error, reason :: String.t()}
   def new(localized_alert) do
     informed_stop_ids =
-      for %{stop: "place-" <> _ = stop_id} <- localized_alert.alert.informed_entities,
+      for %InformedEntity{stop: stop} <- localized_alert.alert.informed_entities,
+          not is_nil(stop),
+          match?("place-" <> _, stop.id),
           into: MapSet.new(),
-          do: stop_id
+          do: stop.id
 
     with {:ok, route_id, stop_sequence, branch} <-
            get_builder_data(localized_alert, informed_stop_ids) do

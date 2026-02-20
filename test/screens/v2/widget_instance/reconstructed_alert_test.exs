@@ -1,6 +1,8 @@
 defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Stops.Stop
+  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
   alias Screens.Stops.Subway
@@ -185,8 +187,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp ie(opts) do
-    %{
-      stop: opts[:stop],
+    %InformedEntity{
+      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
       route: opts[:route],
       route_type: opts[:route_type],
       direction_id: opts[:direction_id]
@@ -2927,153 +2929,27 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             "Orange Line is suspended between North Station and Back Bay due to a structural issue with the Government Center garage. ",
           id: "450523",
           informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70014"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70015"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70016"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70017"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70018"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70019"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70020"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70021"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70022"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70023"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70024"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70025"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70026"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "70027"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-bbsta"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-chncl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-dwnxg"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-haecl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-north"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-state"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Orange",
-              route_type: 1,
-              stop: "place-tumnl"
-            }
+            ie(stop: "70014", route: "Orange", route_type: 1),
+            ie(stop: "70015", route: "Orange", route_type: 1),
+            ie(stop: "70016", route: "Orange", route_type: 1),
+            ie(stop: "70017", route: "Orange", route_type: 1),
+            ie(stop: "70018", route: "Orange", route_type: 1),
+            ie(stop: "70019", route: "Orange", route_type: 1),
+            ie(stop: "70020", route: "Orange", route_type: 1),
+            ie(stop: "70021", route: "Orange", route_type: 1),
+            ie(stop: "70022", route: "Orange", route_type: 1),
+            ie(stop: "70023", route: "Orange", route_type: 1),
+            ie(stop: "70024", route: "Orange", route_type: 1),
+            ie(stop: "70025", route: "Orange", route_type: 1),
+            ie(stop: "70026", route: "Orange", route_type: 1),
+            ie(stop: "70027", route: "Orange", route_type: 1),
+            ie(stop: "place-bbsta", route: "Orange", route_type: 1),
+            ie(stop: "place-chncl", route: "Orange", route_type: 1),
+            ie(stop: "place-dwnxg", route: "Orange", route_type: 1),
+            ie(stop: "place-haecl", route: "Orange", route_type: 1),
+            ie(stop: "place-north", route: "Orange", route_type: 1),
+            ie(stop: "place-state", route: "Orange", route_type: 1),
+            ie(stop: "place-tumnl", route: "Orange", route_type: 1)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -3236,258 +3112,42 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station.",
           id: "450522",
           informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-north"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70504"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "place-unsqu"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-spmnl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70204"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70202"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70501"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70202"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70207"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-unsqu"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "place-north"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70208"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70208"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70206"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-lech"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70205"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-north"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70203"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70201"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-gover"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70206"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-unsqu"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70504"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70202"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-gover"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70201"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70504"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-lech"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70501"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70202"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70208"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-gover"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-spmnl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70207"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70204"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70203"
-            }
+            ie(stop: "place-north", route: "Green-D", route_type: 0),
+            ie(stop: "70504", route: "Green-E", route_type: 0),
+            ie(stop: "place-unsqu", route: "Green-E", route_type: 0),
+            ie(stop: "place-spmnl", route: "Green-C", route_type: 0),
+            ie(stop: "70204", route: "Green-C", route_type: 0),
+            ie(stop: "70202", route: "Green-D", route_type: 0),
+            ie(stop: "70501", route: "Green-D", route_type: 0),
+            ie(stop: "70202", route: "Green-B", route_type: 0),
+            ie(stop: "70207", route: "Green-D", route_type: 0),
+            ie(stop: "place-unsqu", route: "Green-D", route_type: 0),
+            ie(stop: "place-north", route: "Green-E", route_type: 0),
+            ie(stop: "70208", route: "Green-D", route_type: 0),
+            ie(stop: "70208", route: "Green-E", route_type: 0),
+            ie(stop: "70206", route: "Green-B", route_type: 0),
+            ie(stop: "place-lech", route: "Green-B", route_type: 0),
+            ie(stop: "70205", route: "Green-B", route_type: 0),
+            ie(stop: "place-north", route: "Green-B", route_type: 0),
+            ie(stop: "70203", route: "Green-B", route_type: 0),
+            ie(stop: "70201", route: "Green-C", route_type: 0),
+            ie(stop: "place-gover", route: "Green-B", route_type: 0),
+            ie(stop: "70206", route: "Green-C", route_type: 0),
+            ie(stop: "place-unsqu", route: "Green-C", route_type: 0),
+            ie(stop: "70504", route: "Green-C", route_type: 0),
+            ie(stop: "70202", route: "Green-C", route_type: 0),
+            ie(stop: "place-gover", route: "Green-C", route_type: 0),
+            ie(stop: "70201", route: "Green-B", route_type: 0),
+            ie(stop: "70504", route: "Green-B", route_type: 0),
+            ie(stop: "place-lech", route: "Green-C", route_type: 0),
+            ie(stop: "70501", route: "Green-B", route_type: 0),
+            ie(stop: "70202", route: "Green-E", route_type: 0),
+            ie(stop: "70208", route: "Green-B", route_type: 0),
+            ie(stop: "place-gover", route: "Green-D", route_type: 0),
+            ie(stop: "place-spmnl", route: "Green-D", route_type: 0),
+            ie(stop: "70207", route: "Green-E", route_type: 0),
+            ie(stop: "70204", route: "Green-B", route_type: 0),
+            ie(stop: "70203", route: "Green-C", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,

@@ -2,7 +2,6 @@ defmodule Screens.Alerts.Alert do
   @moduledoc false
 
   alias Screens.Alerts.InformedEntity
-  alias Screens.Facilities.Facility
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
@@ -116,15 +115,6 @@ defmodule Screens.Alerts.Alert do
 
   @type active_period :: {DateTime.t(), DateTime.t() | nil}
 
-  @type informed_entity :: %{
-          activities: nonempty_list(activity()),
-          direction_id: Trip.direction() | nil,
-          facility: Facility.t() | nil,
-          route: Route.id() | nil,
-          route_type: non_neg_integer() | nil,
-          stop: Stop.id() | nil
-        }
-
   @type id :: String.t()
 
   @type t :: %__MODULE__{
@@ -133,7 +123,7 @@ defmodule Screens.Alerts.Alert do
           effect: effect() | :unknown,
           severity: non_neg_integer(),
           header: String.t(),
-          informed_entities: list(informed_entity()),
+          informed_entities: list(InformedEntity.t()),
           active_period: list(active_period()),
           lifecycle: String.t(),
           timeframe: String.t(),
@@ -156,8 +146,8 @@ defmodule Screens.Alerts.Alert do
   @type result :: {:ok, [t()]} | :error
   @type fetch :: (options() -> result())
 
-  @base_includes ~w[facilities]
-  @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops]
+  @base_includes ~w[facilities stops]
+  @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops stops]
 
   @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
@@ -414,7 +404,10 @@ defmodule Screens.Alerts.Alert do
       }) do
     informed_entities
     |> Enum.filter(&InformedEntity.parent_station?/1)
-    |> Enum.uniq_by(& &1.stop)
+    |> Enum.uniq_by(fn
+      %{stop: %{id: id}} -> id
+      %{stop: nil} -> nil
+    end)
   end
 
   @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
@@ -456,13 +449,22 @@ defmodule Screens.Alerts.Alert do
     platform_ids = Enum.map(all_platforms_at_informed_stations, & &1.id)
 
     informed_entities
-    |> Enum.filter(&(&1.stop in platform_ids))
-    |> Enum.uniq_by(& &1.stop)
+    |> Enum.filter(fn
+      %{stop: %{id: stop_id}} -> stop_id in platform_ids
+      %{stop: nil} -> false
+    end)
+    |> Enum.uniq_by(fn
+      %{stop: %{id: id}} -> id
+      %{stop: nil} -> nil
+    end)
   end
 
   @spec informs_stop_id?(t(), Stop.id()) :: boolean()
   def informs_stop_id?(%__MODULE__{informed_entities: informed_entities}, stop_id) do
-    Enum.any?(informed_entities, &(&1.stop == stop_id))
+    Enum.any?(informed_entities, fn
+      %{stop: %{id: ^stop_id}} -> true
+      _ -> false
+    end)
   end
 
   @spec normalize_informed_entities(t()) :: t()
