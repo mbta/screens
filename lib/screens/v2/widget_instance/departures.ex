@@ -188,7 +188,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %NormalSection{rows: rows, header: header, grouping_type: :destination},
+        %NormalSection{
+          rows: rows,
+          header: header,
+          layout: %Layout{max: max},
+          grouping_type: :destination
+        },
         screen,
         now,
         _is_only_section
@@ -204,7 +209,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       rows: serialized_rows,
       layout:
         Layout.to_json(%Layout{
-          max: nil,
+          max: max,
           base: length(serialized_rows),
           min: 2,
           include_later: false
