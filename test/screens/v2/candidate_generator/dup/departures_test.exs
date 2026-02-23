@@ -2286,7 +2286,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
-    test "returns OvernightDepartures for rail sections with active alert and no active vehicles",
+    test "doesn't return OvernightDepartures for rail sections without active vehicles but with an active alert",
          %{
            config: config,
            fetch_departures_fn: fetch_departures_fn,
@@ -2344,9 +2344,42 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_vehicles_fn = fn _, _ -> [] end
 
       expected_departures = [
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_zero]},
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_one]},
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_two]}
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: []
+            }
+          ],
+          slot_names: [:main_content_zero],
+          now: now
+        },
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: []
+            }
+          ],
+          slot_names: [:main_content_one],
+          now: now
+        },
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: []
+            }
+          ],
+          slot_names: [:main_content_two],
+          now: now
+        }
       ]
 
       actual_instances =
