@@ -1,9 +1,9 @@
 defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Stops.Stop
-  alias Screens.Alerts.Alert
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias ScreensConfig.{Audio, Screen}

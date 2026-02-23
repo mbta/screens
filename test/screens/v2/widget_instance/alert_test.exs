@@ -3,8 +3,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
-  alias Screens.Stops.Stop
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Audio, Screen}

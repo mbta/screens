@@ -1,8 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Stops.Stop

@@ -2,8 +2,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.InformedEntity
-  alias Screens.Stops.Stop
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
   alias ScreensConfig.{Alerts, Departures, FreeTextLine, Screen}

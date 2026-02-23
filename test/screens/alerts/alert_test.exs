@@ -3,8 +3,8 @@ defmodule Screens.Alerts.AlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
-  alias Screens.Stops.Stop
   alias Screens.Facilities.Facility
+  alias Screens.Stops.Stop
 
   # Minimal valid attributes by V3 API resource definitions.
   @minimal_attributes %{

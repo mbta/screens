@@ -11,8 +11,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
-  alias Screens.Stops.Stop
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.Stops.Subway
   alias Screens.Util
   alias Screens.V2.CandidateGenerator

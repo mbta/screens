@@ -1,10 +1,10 @@
 defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Stops.Stop
-  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.Stops.Subway
   alias Screens.V2.AlertsWidget
   alias Screens.V2.CandidateGenerator

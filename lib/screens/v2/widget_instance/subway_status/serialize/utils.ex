@@ -3,11 +3,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   Shared utility functions for SubwayStatus serialization.
   """
 
-  alias Screens.Stops.Stop
   alias Screens.Alerts.Alert
   alias Screens.Alerts.Endpoints
   alias Screens.Alerts.InformedEntity
+  alias Screens.Routes.Route
+  alias Screens.Stops.Stop
   alias Screens.Stops.Subway
+  alias Screens.V2.WidgetInstance.SubwayStatus
 
   @route_directions %{
     "Blue" => ["Westbound", "Eastbound"],
@@ -73,7 +75,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   ####################################
 
   @spec get_stop_name_with_platform(list(InformedEntity.t()), list(String.t()), Route.id()) ::
-          Subway.location_map()
+          SubwayStatus.location_map()
   def get_stop_name_with_platform(informed_entities, [platform_name], route_id) do
     # Although it is possible to create a closure alert for multiple partial stations,
     # we pass along platform info only if a single platform is closed at that station.

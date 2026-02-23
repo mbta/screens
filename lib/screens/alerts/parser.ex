@@ -1,8 +1,8 @@
 defmodule Screens.Alerts.Parser do
   @moduledoc false
 
-  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.V3Api
 
   def parse(

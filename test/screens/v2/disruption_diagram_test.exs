@@ -1,10 +1,10 @@
 defmodule Screens.V2.DisruptionDiagramTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Alerts.InformedEntity
-  alias Screens.Stops.Stop
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.TestSupport.DisruptionDiagramLocalizedAlert, as: DDAlert
   alias Screens.TestSupport.SubwayTaggedStopSequences, as: TaggedSeq
   alias Screens.V2.DisruptionDiagram, as: DD

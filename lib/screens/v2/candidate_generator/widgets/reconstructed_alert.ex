@@ -1,8 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   @moduledoc false
 
-  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert

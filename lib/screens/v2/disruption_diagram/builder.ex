@@ -5,8 +5,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   Values should be accessed/manipulated only via public module functions.
   """
 
-  alias Screens.Alerts.InformedEntity
   alias Aja.Vector
+  alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
   alias Screens.Stops.{Stop, Subway}
   alias Screens.V2.DisruptionDiagram, as: DD

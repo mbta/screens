@@ -5,8 +5,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
-  alias Screens.Stops.Stop
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Alerts, MultiStopAlerts, Screen}
   alias ScreensConfig.Screen.{BusEink, BusShelter}

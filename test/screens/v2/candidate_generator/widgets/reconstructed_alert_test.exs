@@ -5,8 +5,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
-  alias Screens.Stops.Stop
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.{Busway, PreFare}

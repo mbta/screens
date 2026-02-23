@@ -3,8 +3,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   Functions to fetch alert data and convert it to alert widgets for DUP screens.
   """
 
-  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.Report
   alias Screens.Stops.Stop

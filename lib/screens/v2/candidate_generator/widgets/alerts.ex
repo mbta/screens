@@ -1,8 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   @moduledoc false
 
-  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Alerts, MultiStopAlerts}

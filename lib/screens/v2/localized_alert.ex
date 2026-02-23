@@ -3,12 +3,12 @@ defmodule Screens.V2.LocalizedAlert do
   Common logic for Alerts with location and screen context.
   """
 
-  alias Screens.Stops.Stop
-  alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.RouteType
+  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
