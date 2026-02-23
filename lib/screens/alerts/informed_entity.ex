@@ -49,7 +49,7 @@ defmodule Screens.Alerts.InformedEntity do
 
   @spec present_alert_for_route?(t(), Route.id(), Trip.direction() | nil) :: boolean()
   def present_alert_for_route?(
-        %{route: entity_route_id, direction_id: entity_direction},
+        %__MODULE__{route: entity_route_id, direction_id: entity_direction},
         route_id,
         direction_id
       )

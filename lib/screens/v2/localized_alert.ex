@@ -69,7 +69,7 @@ defmodule Screens.V2.LocalizedAlert do
       )
       when app_id in [:dup_v2, :pre_fare_v2] do
     with headsign_matchers when is_map(headsign_matchers) <- headsign_matchers(t) do
-      informed_stop_ids = MapSet.new(informed_entities, & &1.stop)
+      informed_stop_ids = MapSet.new(informed_entities, & &1.stop.id)
 
       headsign_matchers
       |> Map.get(location_context.home_stop)
