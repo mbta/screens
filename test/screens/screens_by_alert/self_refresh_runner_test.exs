@@ -10,9 +10,6 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
 
   # NOTE: Screen IDs used in these tests come from `test/fixtures/config.json`
 
-  # Use longer timeout locally where machines may be slower than Github CI
-  @receive_timeout if System.get_env("CI") == "true", do: 100, else: 500
-
   @tag :capture_log
   test "refreshes a batch of the most-outdated screens" do
     now = System.system_time(:second)
@@ -28,8 +25,9 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
     screen_ids = MapSet.new(~w[1301 1401])
     assert {:noreply, ^screen_ids} = SelfRefreshRunner.handle_info(:check, MapSet.new())
 
-    assert_receive({:done, "1401"}, @receive_timeout)
-    assert_receive({:done, "1301"}, @receive_timeout)
+    # Wait longer than the default 100ms to avoid occasional timeouts
+    assert_receive({:done, "1401"}, 200)
+    assert_receive({:done, "1301"}, 200)
   end
 
   test "skips refreshing if any refreshes are in progress" do
