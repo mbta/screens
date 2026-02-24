@@ -408,6 +408,55 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               ]
             },
             %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                %{route: "Green-B", stop: "place-brico"}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 6,
+              informed_entities: [
+                %{route: "Green-B", stop: nil},
+                %{route: "Green-C", stop: nil},
+                %{route: "Green-D", stop: nil},
+                %{route: "Green-E", stop: nil}
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{location: nil, route_pill: @gl_pill, status: "Delays up to 25 minutes"},
+              %{
+                route_pill: gl_pill([:b, :c]),
+                location: "mbta.com/alerts",
+                status: "2 current alerts"
+              }
+            ]
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 1 delay alert on GL trunk and 1 less severe delay alert on GL branch" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :suspension,
+              informed_entities: [
+                %{route: "Green-C", stop: "place-hwsst"},
+                %{route: "Green-C", stop: "place-kntst"},
+                %{route: "Green-C", stop: "place-stpul"}
+              ]
+            },
+            %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
@@ -434,10 +483,51 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alerts: [
               %{location: nil, route_pill: @gl_pill, status: "Delays up to 25 minutes"},
               %{
-                route_pill: gl_pill([:b, :c]),
-                status: "2 current alerts",
-                location: "mbta.com/alerts"
+                route_pill: gl_pill([:c]),
+                location: %{
+                  full: "Hawes Street ↔ Saint Paul Street",
+                  abbrev: "Hawes St ↔ St. Paul St"
+                },
+                status: "Suspension"
               }
+            ]
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "handles 1 delay alert on GL trunk and 1 more severe delay alert on GL branch" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 7,
+              informed_entities: [
+                %{route: "Green-B", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-B", stop: nil},
+                %{route: "Green-C", stop: nil},
+                %{route: "Green-D", stop: nil},
+                %{route: "Green-E", stop: nil}
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{location: nil, route_pill: @gl_pill, status: "Delays up to 20 minutes"},
+              %{location: nil, route_pill: gl_pill([:b]), status: "Delays up to 30 minutes"}
             ]
           }
       }
@@ -1743,6 +1833,45 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                 abbrev: "North Sta ↔ Westbound"
               }
             }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "consolidates multiple delays on the same route" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 1,
+              informed_entities: [
+                %{route: "Green-C", stop: nil}
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :extended,
+            alert: %{route_pill: gl_pill([:c]), status: "Delays over 60 minutes", location: nil}
           }
       }
 

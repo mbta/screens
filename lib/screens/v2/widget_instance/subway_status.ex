@@ -126,5 +126,28 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
       fn {_alert, route} -> route end,
       fn {alert, _route} -> alert end
     )
+    |> Enum.map(fn {route, route_alerts} ->
+      {route, consolidate_delays(route_alerts)}
+    end)
+    |> Map.new()
+  end
+
+  @spec consolidate_delays(list(SubwayStatusAlert.t())) :: list(SubwayStatusAlert.t())
+  defp consolidate_delays(alerts) do
+    {delay_alerts, other_alerts} = Enum.split_with(alerts, &(&1.alert.effect == :delay))
+
+    case delay_alerts do
+      [] ->
+        other_alerts
+
+      [single_delay] ->
+        other_alerts ++ [single_delay]
+
+      multiple_delays ->
+        # If there are multiple delay alerts on a single route, we only want to
+        # include the delay with the highest severity rather than display multiple.
+        highest_severity_delay = Enum.max_by(multiple_delays, & &1.alert.severity)
+        [highest_severity_delay | other_alerts]
+    end
   end
 end
