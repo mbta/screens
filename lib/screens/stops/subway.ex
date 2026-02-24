@@ -5,6 +5,7 @@ defmodule Screens.Stops.Subway do
   diagrams.
   """
 
+  alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -318,11 +319,9 @@ defmodule Screens.Stops.Subway do
   defp sequence_match?(stop_sequence, informed_entities) do
     ie_stops =
       informed_entities
-      |> Enum.map(fn
-        %{stop: %{id: stop_id}} -> stop_id
-        %{stop: nil} -> nil
-      end)
-      |> Enum.reject(&is_nil/1)
+      |> Enum.filter(&InformedEntity.parent_station?/1)
+      |> Alert.entities_by_uniq_stop_id()
+      |> Enum.map(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id end)
 
     if Enum.empty?(ie_stops) do
       nil
@@ -352,7 +351,7 @@ defmodule Screens.Stops.Subway do
     ie_stops =
       informed_entities
       |> Enum.filter(&(&1.route == route_id and !is_nil(&1.stop)))
-      |> Enum.map(fn %{stop: %{id: stop_id}} -> stop_id end)
+      |> Enum.map(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id end)
 
     if Enum.empty?(ie_stops) do
       nil

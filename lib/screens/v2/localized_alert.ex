@@ -128,7 +128,7 @@ defmodule Screens.V2.LocalizedAlert do
   end
 
   # Only stop is not nil (route type ignored)
-  defp informed_entity_to_zone(%InformedEntity{stop: %{id: stop_id}}, context)
+  defp informed_entity_to_zone(%InformedEntity{stop: %Stop{id: stop_id}}, context)
        when not is_nil(stop_id) do
     cond do
       stop_id == context.home_stop -> [:home_stop]

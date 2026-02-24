@@ -188,9 +188,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Given an entity and the directionality of the alert from the home stop,
   # return a tuple with the affected direction_id and route_id
-
+  @spec get_direction_and_route_from_entity(
+          InformedEntity.t(),
+          Alert.effect(),
+          LocalizedAlert.location()
+        ) :: {0 | 1 | nil, Route.id()} | nil
   defp get_direction_and_route_from_entity(
-         %{stop: %{id: "place-jfk"}},
+         %InformedEntity{stop: %Stop{id: "place-jfk"}},
          :station_closure,
          _location
        ),
@@ -198,13 +202,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Skip processing JFK, because it is a branching node station. The other stations in the alert
   # will determine the destination needed for this alert
-  defp get_direction_and_route_from_entity(%{stop: %{id: "place-jfk"}}, _, _location),
-    do: nil
+  defp get_direction_and_route_from_entity(
+         %InformedEntity{stop: %Stop{id: "place-jfk"}},
+         _,
+         _location
+       ),
+       do: nil
 
   # If the route is red and the alert is downstream, we have to figure out whether the alert
   # only affects one branch or both
   defp get_direction_and_route_from_entity(
-         %{direction_id: nil, route: "Red", stop: %{id: stop_id}},
+         %InformedEntity{direction_id: nil, route: "Red", stop: %Stop{id: stop_id}},
          _,
          location
        )
@@ -223,7 +231,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Same with RL upstream alerts
   defp get_direction_and_route_from_entity(
-         %{direction_id: nil, route: "Red", stop: %{id: stop_id}},
+         %InformedEntity{direction_id: nil, route: "Red", stop: %Stop{id: stop_id}},
          _,
          location
        )
@@ -240,16 +248,28 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, _, location)
+  defp get_direction_and_route_from_entity(
+         %InformedEntity{direction_id: nil, route: route},
+         _,
+         location
+       )
        when location in [:downstream, :boundary_downstream],
        do: {0, route}
 
-  defp get_direction_and_route_from_entity(%{direction_id: nil, route: route}, _, location)
+  defp get_direction_and_route_from_entity(
+         %InformedEntity{direction_id: nil, route: route},
+         _,
+         location
+       )
        when location in [:upstream, :boundary_upstream],
        do: {1, route}
 
-  defp get_direction_and_route_from_entity(%{direction_id: direction_id, route: route}, _, _),
-    do: {direction_id, route}
+  defp get_direction_and_route_from_entity(
+         %InformedEntity{direction_id: direction_id, route: route},
+         _,
+         _
+       ),
+       do: {direction_id, route}
 
   # Select 1 direction + route from this list of directions + routes for multiple branches
   defp select_direction_and_route([]), do: {nil, nil}

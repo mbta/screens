@@ -399,15 +399,13 @@ defmodule Screens.Alerts.Alert do
     direction_from_whole_direction_entities || direction_from_parent_station_entities
   end
 
+  @spec informed_parent_stations(t()) :: [InformedEntity.t()]
   def informed_parent_stations(%__MODULE__{
         informed_entities: informed_entities
       }) do
     informed_entities
     |> Enum.filter(&InformedEntity.parent_station?/1)
-    |> Enum.uniq_by(fn
-      %{stop: %{id: id}} -> id
-      %{stop: nil} -> nil
-    end)
+    |> entities_by_uniq_stop_id()
   end
 
   @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
@@ -449,14 +447,8 @@ defmodule Screens.Alerts.Alert do
     platform_ids = Enum.map(all_platforms_at_informed_stations, & &1.id)
 
     informed_entities
-    |> Enum.filter(fn
-      %{stop: %{id: stop_id}} -> stop_id in platform_ids
-      %{stop: nil} -> false
-    end)
-    |> Enum.uniq_by(fn
-      %{stop: %{id: id}} -> id
-      %{stop: nil} -> nil
-    end)
+    |> entities_by_uniq_stop_id()
+    |> Enum.filter(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id in platform_ids end)
   end
 
   @spec informs_stop_id?(t(), Stop.id()) :: boolean()
@@ -479,5 +471,19 @@ defmodule Screens.Alerts.Alert do
       {_directionless_entity, [entity]} -> entity
       {directionless_entity, _multiple} -> directionless_entity
     end)
+  end
+
+  @spec entities_by_uniq_stop_id([InformedEntity.t()]) :: [InformedEntity.t()]
+  @doc """
+  Returns a deduplicated list of informed entities based on stop ID.
+  Removes any Informed Entities with nil stops.
+  """
+  def entities_by_uniq_stop_id(entities) do
+    entities
+    |> Enum.uniq_by(fn
+      %InformedEntity{stop: %Stop{id: id}} -> id
+      _ -> nil
+    end)
+    |> Enum.filter(fn id -> not is_nil(id) end)
   end
 end

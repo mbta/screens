@@ -113,7 +113,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
     informed_entities
     |> filter_entities_by_route(route_id)
     |> Enum.flat_map(fn
-      %{stop: %{id: stop_id}, route: route_id} ->
+      %InformedEntity{stop: %Stop{id: stop_id}, route: route_id} ->
         stop_names = Subway.route_stop_names(route_id)
 
         case Map.get(stop_names, stop_id) do

@@ -109,11 +109,10 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   @spec new(LocalizedAlert.t()) :: {:ok, t()} | {:error, reason :: String.t()}
   def new(localized_alert) do
     informed_stop_ids =
-      for %InformedEntity{stop: stop} <- localized_alert.alert.informed_entities,
-          not is_nil(stop),
-          match?("place-" <> _, stop.id),
+      for %InformedEntity{stop: %Stop{id: "place-" <> _ = stop_id}} <-
+            localized_alert.alert.informed_entities,
           into: MapSet.new(),
-          do: stop.id
+          do: stop_id
 
     with {:ok, route_id, stop_sequence, branch} <-
            get_builder_data(localized_alert, informed_stop_ids) do

@@ -237,9 +237,9 @@ defmodule Screens.Alerts.AlertTest do
                 "type" => "stop",
                 "attributes" => %{
                   "name" => "Stop One",
+                  "platform_name" => "Stop One Platform",
                   "location_type" => 0,
                   "platform_code" => nil,
-                  "platform_name" => nil,
                   "vehicle_type" => nil
                 },
                 "relationships" => %{}
@@ -266,7 +266,7 @@ defmodule Screens.Alerts.AlertTest do
       assert %Alert{
                informed_entities: [
                  %InformedEntity{
-                   stop: %Stop{id: "stop_one"},
+                   stop: %Stop{id: "stop_one", platform_name: "Stop One Platform"},
                    route: "1",
                    direction_id: nil,
                    route_type: nil,

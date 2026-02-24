@@ -103,7 +103,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
               location_context: location_context,
               home_station_name:
                 fetch_station_name(location_context.home_stop, fetch_stop_name_fn),
-              informed_station_names: get_stations(alert, fetch_stop_name_fn),
+              informed_station_names: get_station_names(alert, fetch_stop_name_fn),
               is_terminal_station: is_terminal_station,
               is_priority: is_priority,
               partial_closure_platform_names: all_platforms_names_at_informed_station
@@ -213,7 +213,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp get_distance(home_stop_id, home_stop_distance_map, %InformedEntity{
          route: "Green" <> _,
-         stop: %{id: ie_stop_id}
+         stop: %Stop{id: ie_stop_id}
        })
        when home_stop_id in @gl_trunk_stop_ids and ie_stop_id in @gl_eastbound_split_stops,
        do: Map.get(home_stop_distance_map, "place-lech", @default_distance)
@@ -258,30 +258,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # Direction filtering doesn't apply to other kinds of alerts.
   defp relevant_direction?(_alert, _home_stop_id, _stop_sequences), do: true
 
-  defp get_stations(
-         %{effect: :station_closure, informed_entities: informed_entities},
+  @spec get_station_names(Alert.t(), (String.t() -> String.t() | nil)) :: [String.t()]
+  defp get_station_names(
+         %Alert{effect: :station_closure} = alert,
          fetch_stop_name_fn
        ) do
-    stop_ids =
-      Enum.flat_map(informed_entities, fn
-        %{stop: %{id: stop_id}} -> [stop_id]
-        %{stop: nil} -> []
-      end)
-
-    case stop_ids do
+    case Alert.informed_parent_stations(alert) do
       [] ->
         []
 
-      _ ->
-        stop_ids
-        |> Enum.filter(&String.starts_with?(&1, "place-"))
-        |> Enum.uniq()
-        |> Enum.map(&fetch_station_name(&1, fetch_stop_name_fn))
+      informed_parent_stations ->
+        informed_parent_stations
+        |> Enum.map(&fetch_station_name(&1.stop.id, fetch_stop_name_fn))
         |> Enum.reject(&is_nil/1)
     end
   end
 
-  defp get_stations(_alert, _fetch_stop_name_fn), do: []
+  defp get_station_names(_alert, _fetch_stop_name_fn), do: []
 
   defp fetch_station_name(id, fetch_stop_name_fn) do
     case fetch_stop_name_fn.(id) do
