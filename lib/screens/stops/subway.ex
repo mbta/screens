@@ -5,7 +5,6 @@ defmodule Screens.Stops.Subway do
   diagrams.
   """
 
-  alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -320,7 +319,7 @@ defmodule Screens.Stops.Subway do
     ie_stops =
       informed_entities
       |> Enum.filter(&InformedEntity.parent_station?/1)
-      |> Alert.entities_by_uniq_stop_id()
+      |> InformedEntity.filter_duplicate_and_nil_stops()
       |> Enum.map(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id end)
 
     if Enum.empty?(ie_stops) do

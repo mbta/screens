@@ -209,7 +209,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
          gl_stop_sets
        ) do
     informed_entities
-    |> Alert.entities_by_uniq_stop_id()
+    |> InformedEntity.filter_duplicate_and_nil_stops()
     |> Enum.map(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id end)
     |> Enum.any?(fn informed_stop ->
       Enum.count(gl_stop_sets, &(informed_stop in &1)) > 1
