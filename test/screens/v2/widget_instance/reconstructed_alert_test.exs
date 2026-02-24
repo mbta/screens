@@ -162,12 +162,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         sections: [%Section{query: %Query{}}]
       })
 
-    app_params = struct(PreFare, departures: departures)
-
-    %{
-      widget
-      | screen: %Screen{widget.screen | app_params: app_params}
-    }
+    update_in(widget.screen.app_params, fn
+      %PreFare{} = app_params ->
+        %{app_params | departures: departures}
+    end)
   end
 
   defp put_cr_departures(widget) do
@@ -589,6 +587,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains to Forest Hills",
         location: "Orange Line service is suspended between Malden Center and Wellington",
         cause: nil,
@@ -634,6 +634,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains to Forest Hills",
         location: "Shuttle buses replace trains between Wellington and Assembly",
         cause: nil,
@@ -689,6 +691,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       expected_duo = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Station closed",
         location: %ScreensConfig.FreeTextLine{
           icon: nil,
@@ -706,6 +710,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       }
 
       expected_solo = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         cause: nil,
         effect: :station_closure,
         remedy: nil,
@@ -736,6 +742,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains to Forest Hills",
         location: "Orange Line service is suspended between Wellington and Assembly",
         cause: :construction,
@@ -781,6 +789,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains",
         location: "Orange Line service is suspended between Oak Grove and Malden Center",
         cause: nil,
@@ -824,6 +834,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains",
         location: "Shuttle buses replace Orange Line trains between Oak Grove and Malden Center",
         cause: nil,
@@ -865,6 +877,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains to Oak Grove",
         location: "Orange Line service is suspended between Oak Grove and Malden Center",
         cause: nil,
@@ -909,6 +923,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains to Oak Grove",
         location: "Shuttle buses replace trains between Oak Grove and Malden Center",
         cause: nil,
@@ -954,6 +970,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Single tracking",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -983,6 +1001,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Trains may be delayed up to 20 minutes",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -1012,6 +1032,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_alert_header("Delays are happening")
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Trains may be delayed over 60 minutes",
         cause: nil,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -1041,6 +1063,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Trains may be delayed up to 20 minutes",
         cause: nil,
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
@@ -1070,6 +1094,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_alert_header("Delays are happening")
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Trains may be delayed over 60 minutes",
         cause: :construction,
         routes: [%{route_id: "Orange", svg_name: "ol"}],
@@ -1099,6 +1125,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_alert_header("Delays are happening")
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Trains may be delayed over 60 minutes",
         cause: nil,
         routes: [%{headsign: "Forest Hills", route_id: "Orange", svg_name: "ol-forest-hills"}],
@@ -1127,6 +1155,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains",
         location: nil,
         cause: nil,
@@ -1168,6 +1198,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No trains",
         location: nil,
         cause: nil,
@@ -1226,6 +1258,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Red",
         issue: "Stop Skipped",
         remedy: "Test Alert",
         location: nil,
@@ -1271,6 +1305,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree", "Alewife"])
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Red",
         issue: "Stop Skipped",
         remedy: "Test Alert",
         location: nil,
@@ -1347,6 +1383,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Forest Hills"])
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Forest Hills platform closed",
         remedy: "Some information typed into the alert",
         cause: nil,
@@ -1389,6 +1427,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Forest Hills"])
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "Jackson Square: Trains skip Forest Hills platform",
         remedy: "Some information typed into the alert",
         cause: nil,
@@ -1421,6 +1461,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         cause: nil,
         effect: :suspension,
         issue: "No trains",
@@ -1450,6 +1492,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         cause: nil,
         effect: :suspension,
         issue: "Suspension",
@@ -1503,6 +1547,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: nil,
         remedy: nil,
         show_alternate_route_text: false,
@@ -1549,6 +1595,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         cause: nil,
         effect: :suspension,
         endpoints: {"Haymarket", "Chinatown"},
@@ -1596,6 +1644,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Orange",
         issue: "No Orange Line trains",
         remedy: "Use shuttle bus",
         cause: nil,
@@ -1642,6 +1692,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/s/place-dwnxg",
         issue: "Trains may be delayed up to 20 minutes",
         cause: nil,
         routes: [],
@@ -2288,6 +2340,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Red",
         cause: nil,
         location: nil,
         effect: :shuttle,
@@ -2411,6 +2465,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Red",
         cause: nil,
         location: nil,
         effect: :shuttle,
@@ -2532,6 +2588,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_priority(true)
 
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/123/r/Red",
         cause: "",
         effect: :shuttle,
         issue: "Shuttle Bus",
@@ -3117,6 +3175,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Fullscreen test
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/450523/r/Orange",
         issue: "No trains",
         location: nil,
         cause: nil,
@@ -3531,6 +3591,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Fullscreen test
       expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/450522/r/Green",
         cause: nil,
         effect: :shuttle,
         issue: "Shuttle Bus",

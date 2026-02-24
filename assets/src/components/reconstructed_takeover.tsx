@@ -4,6 +4,7 @@ import DisruptionDiagram, {
   DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";
 import FreeText, { FreeTextType } from "./free_text";
+import { QRCodeSVG as QRCode } from "qrcode.react";
 
 interface ReconAlertProps {
   issue: string | any; // shouldn't be "any"
@@ -17,6 +18,8 @@ interface ReconAlertProps {
   end_time?: string;
   disruption_diagram?: DisruptionDiagramData;
   urgent: boolean;
+  alternate_route_url: string;
+  qr_code_url: string;
 }
 
 const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
@@ -31,6 +34,8 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
     updated_at,
     end_time,
     disruption_diagram,
+    alternate_route_url: alternateRouteURL,
+    qr_code_url: qrCodeURL,
   } = alert;
 
   return (
@@ -113,7 +118,11 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                     <span className="alert-card__body__remedy--alternate-route">
                       Find alternate route at{" "}
                     </span>
-                    mbta.com/alerts
+                    {alternateRouteURL}
+
+                    <div className="alert-card__body__remedy--alternate-route-qrcode">
+                      <QRCode marginSize={1} size={128} value={qrCodeURL} />
+                    </div>
                   </>
                 ) : (
                   remedy
