@@ -102,8 +102,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
               now: now,
               location_context: location_context,
               home_station_name:
-                fetch_station_name(location_context.home_stop, fetch_stop_name_fn),
-              informed_station_names: get_station_names(alert, fetch_stop_name_fn),
+                format_station_name(fetch_stop_name_fn.(location_context.home_stop)),
+              informed_station_names: get_station_names(alert),
               is_terminal_station: is_terminal_station,
               is_priority: is_priority,
               partial_closure_platform_names: all_platforms_names_at_informed_station
@@ -258,30 +258,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # Direction filtering doesn't apply to other kinds of alerts.
   defp relevant_direction?(_alert, _home_stop_id, _stop_sequences), do: true
 
-  @spec get_station_names(Alert.t(), (String.t() -> String.t() | nil)) :: [String.t()]
-  defp get_station_names(
-         %Alert{effect: :station_closure} = alert,
-         fetch_stop_name_fn
-       ) do
+  @spec get_station_names(Alert.t()) :: [String.t()]
+  defp get_station_names(%Alert{effect: :station_closure} = alert) do
     case Alert.informed_parent_stations(alert) do
       [] ->
         []
 
       informed_parent_stations ->
         informed_parent_stations
-        |> Enum.map(&fetch_station_name(&1.stop.id, fetch_stop_name_fn))
+        |> Enum.map(&format_station_name(&1.stop.name))
         |> Enum.reject(&is_nil/1)
     end
   end
 
-  defp get_station_names(_alert, _fetch_stop_name_fn), do: []
+  defp get_station_names(_alert), do: []
 
-  defp fetch_station_name(id, fetch_stop_name_fn) do
-    case fetch_stop_name_fn.(id) do
-      "Massachusetts Avenue" -> ["Mass Ave"]
-      name -> name
-    end
-  end
+  defp format_station_name("Massachusetts Avenue"), do: "Mass Ave"
+  defp format_station_name(name), do: name
 
   defp terminal?(stop_id, stop_sequences) do
     # Can't use Enum.any, because then Govt Center will be seen as a terminal
