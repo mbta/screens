@@ -531,28 +531,18 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   @spec serialize_realtime(Departure.t(), Screen.t(), DateTime.t()) :: serialized_time()
-  defp serialize_realtime(
-         %Departure{
-           prediction: %Prediction{stop: %Stop{id: stop_id}, status: status} = prediction
-         } = departure,
-         screen,
-         now
-       ) do
-    at_first_stop? = Departure.stop_type(departure) == :first_stop
+  defp serialize_realtime(departure, screen, now) do
+    %Route{type: route_type} = Departure.route(departure)
+    subway? = route_type in [:light_rail, :subway]
     departure_time = Departure.time(departure)
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)
-    status_pages = parse_status_pages(status, screen)
-
-    stopped_at_predicted_stop? =
-      Departure.vehicle_status(departure) == :stopped_at and
-        stop_id == Prediction.stop_for_vehicle(prediction)
+    status_pages = parse_status_pages(departure, screen)
 
     cond do
       status_pages != nil -> %{type: :status, pages: status_pages}
-      second_diff < 90 and stopped_at_predicted_stop? -> %{type: :text, text: "BRD"}
-      second_diff < 30 and at_first_stop? -> %{type: :text, text: "BRD"}
-      second_diff < 30 -> %{type: :text, text: "ARR"}
+      subway? and boarding?(departure, second_diff) -> %{type: :text, text: "BRD"}
+      second_diff <= 30 -> %{type: :text, text: if(subway?, do: "ARR", else: "Now")}
       minute_diff < 60 -> %{type: :minutes, minutes: minute_diff}
       true -> serialize_timestamp(departure_time, screen, now)
     end
@@ -570,6 +560,19 @@ defmodule Screens.V2.WidgetInstance.Departures do
     show_am_pm = app_id == :dup_v2 and local_time.day == service_date_tomorrow.day
 
     %{type: :timestamp, hour: hour, minute: minute, am_pm: if(show_am_pm, do: am_pm, else: nil)}
+  end
+
+  defp boarding?(
+         %Departure{prediction: %Prediction{stop: %Stop{id: stop_id}} = prediction} = departure,
+         seconds
+       ) do
+    at_first_stop? = Departure.stop_type(departure) == :first_stop
+
+    stopped_at_predicted_stop? =
+      Departure.vehicle_status(departure) == :stopped_at and
+        stop_id == Prediction.stop_for_vehicle(prediction)
+
+    (seconds <= 90 and stopped_at_predicted_stop?) or (seconds <= 30 and at_first_stop?)
   end
 
   defp get_headway_text(
@@ -633,12 +636,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  @spec parse_status_pages(String.t() | nil, Screen.t()) :: [String.t()] | nil
-  defp parse_status_pages(status, %Screen{app_id: :dup_v2}) when not is_nil(status) do
+  @spec parse_status_pages(Departure.t(), Screen.t()) :: [String.t()] | nil
+  defp parse_status_pages(
+         %Departure{prediction: %Prediction{status: status}},
+         %Screen{app_id: :dup_v2}
+       )
+       when not is_nil(status) do
     # Status is only used on DUPs at this time. Matches "Stopped X stop(s) away" pattern
     # and returns pages like ["Stopped", "3 stops away"] or ["Stopped", "1 stop away"]
     Regex.run(~r/(Stopped) (\d+ stops? away)/, status, capture: :all_but_first)
   end
 
-  defp parse_status_pages(_status, _screen), do: nil
+  defp parse_status_pages(_departure, _screen), do: nil
 end
