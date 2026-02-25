@@ -55,11 +55,29 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
         create_departure_sections(secondary_rds_sections, secondary_departures)
       end
 
+    all_sections_no_data =
+      Enum.all?(
+        primary_departure_sections ++ secondary_departure_sections,
+        &is_struct(&1, NoDataSection)
+      )
+
     primary_instances =
-      build_instances(@primary_slot_names, primary_departure_sections, config, now)
+      build_instances(
+        @primary_slot_names,
+        primary_departure_sections,
+        all_sections_no_data,
+        config,
+        now
+      )
 
     secondary_instances =
-      build_instances(@secondary_slot_names, secondary_departure_sections, config, now)
+      build_instances(
+        @secondary_slot_names,
+        secondary_departure_sections,
+        all_sections_no_data,
+        config,
+        now
+      )
 
     primary_instances ++ secondary_instances
   end
@@ -73,9 +91,12 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     end)
   end
 
-  @spec map_to_departure_section(:error | {:ok, [RDS.t()]}, boolean(), number()) ::
-          :error | DeparturesWidget.section()
+  @spec map_to_departure_section(RDS.section_t(), boolean(), number()) ::
+          DeparturesWidget.section()
+
   defp map_to_departure_section(:error, _, _), do: %NoDataSection{}
+
+  defp map_to_departure_section({:ok, []}, _, _), do: %NoDataSection{}
 
   defp map_to_departure_section({:ok, rds_list}, bidirectional, section_count) do
     num_departures_per_section = div(@max_departures_per_rotation, section_count)
@@ -117,11 +138,14 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     Enum.all?(rds_list, &is_struct(&1.state, NoService))
   end
 
-  defp build_instances(slot_names, departure_sections, config, now) do
-    cond do
-      Enum.all?(departure_sections, &is_struct(&1, NoDataSection)) ->
-        Enum.map(slot_names, &%DeparturesNoData{screen: config, slot_name: &1})
+  defp build_instances(slot_names, _departure_sections, true = _all_section_no_data, config, _now) do
+    Enum.map(slot_names, &%DeparturesNoData{screen: config, slot_name: &1})
+  end
 
+  defp build_instances(slot_names, departure_sections, _all_section_no_data, config, now) do
+    # Disable credo as this will be filled in shortly
+    # credo:disable-for-next-line
+    cond do
       Enum.all?(departure_sections, &is_struct(&1, NoServiceSection)) ->
         Enum.map(
           slot_names,

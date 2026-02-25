@@ -11,6 +11,7 @@ defmodule Screens.V2.RDS do
 
   import Screens.Inject
 
+  alias Screens.Config.Cache
   alias Screens.Headways
   alias Screens.Lines.Line
   alias Screens.RoutePatterns.RoutePattern
@@ -64,6 +65,7 @@ defmodule Screens.V2.RDS do
   @route_pattern injected(RoutePattern)
   @schedule injected(Schedule)
   @stop injected(Stop)
+  @config_cache injected(Cache)
 
   @max_departure_minutes 120
 
@@ -103,63 +105,28 @@ defmodule Screens.V2.RDS do
            params
            |> Map.from_struct()
            |> @departure.fetch(now: now) do
-      scheduled_departures_by_headsign_and_line =
-        scheduled_departures
-        |> Enum.group_by(fn
-          %Schedule{
-            stop: %Stop{id: stop_id},
-            route: %Route{line: %Line{id: line_id}},
-            trip: trip
-          } ->
-            {stop_id, line_id, Trip.representative_headsign(trip)}
-        end)
+      case create_routes_for_section(
+             departures,
+             scheduled_departures,
+             typical_patterns,
+             route_id_params
+           ) do
+        {[_ | _] = enabled_routes_for_section, _} ->
+          create_section_rds(
+            departures,
+            scheduled_departures,
+            typical_patterns,
+            child_stops,
+            enabled_routes_for_section,
+            now
+          )
 
-      departures_by_destination =
-        departures
-        |> Enum.group_by(fn departure ->
-          departure
-          |> destination_from_departure()
-          |> then(fn {%Stop{id: stop_id}, %Line{id: line_id}, headsign} ->
-            {stop_id, line_id, headsign}
-          end)
-        end)
+        {[], [_ | _] = _routes_for_section} ->
+          {:ok, []}
 
-      routes_for_section =
-        (departures ++ scheduled_departures ++ typical_patterns)
-        |> Enum.map(fn
-          %Departure{} = departure -> Departure.route(departure)
-          %Schedule{route: route} -> route
-          %RoutePattern{route: route} -> route
-        end)
-        |> Enum.uniq()
-        |> filter_for_route_id_params(route_id_params)
-
-      section_rds =
-        (tuples_from_departures(departures, now) ++
-           tuples_from_patterns(typical_patterns, child_stops))
-        |> Enum.uniq()
-        |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} ->
-          headway_for_stop = @headways.get(stop_id, now)
-
-          departures =
-            Map.get(departures_by_destination, {stop.id, line.id, headsign}, [])
-            |> Enum.filter(fn
-              %{prediction: nil} -> headway_for_stop == nil
-              _ -> true
-            end)
-
-          scheduled_departures =
-            scheduled_departures_by_headsign_and_line |> Map.get({stop.id, line.id, headsign}, [])
-
-          %__MODULE__{
-            stop: stop,
-            line: line,
-            headsign: headsign,
-            state: state(departures, scheduled_departures, stop_id, routes_for_section, now)
-          }
-        end)
-
-      {:ok, section_rds}
+        _ ->
+          :error
+      end
     end
   end
 
@@ -180,6 +147,79 @@ defmodule Screens.V2.RDS do
 
       {:ok, child_stop_ids}
     end
+  end
+
+  defp create_section_rds(
+         departures,
+         scheduled_departures,
+         typical_patterns,
+         child_stops,
+         routes_for_section,
+         now
+       ) do
+    departures_by_destination =
+      departures
+      |> Enum.group_by(fn departure ->
+        departure
+        |> destination_from_departure()
+        |> then(fn {%Stop{id: stop_id}, %Line{id: line_id}, headsign} ->
+          {stop_id, line_id, headsign}
+        end)
+      end)
+
+    scheduled_departures_by_destination =
+      scheduled_departures
+      |> Enum.group_by(fn
+        %Schedule{
+          stop: %Stop{id: stop_id},
+          route: %Route{line: %Line{id: line_id}},
+          trip: trip
+        } ->
+          {stop_id, line_id, Trip.representative_headsign(trip)}
+      end)
+
+    section_rds =
+      (tuples_from_departures(departures, now) ++
+         tuples_from_patterns(typical_patterns, child_stops))
+      |> Enum.uniq()
+      |> Enum.map(fn rds ->
+        create_destination_rds(
+          rds,
+          departures_by_destination,
+          scheduled_departures_by_destination,
+          routes_for_section,
+          now
+        )
+      end)
+
+    {:ok, section_rds}
+  end
+
+  defp create_destination_rds(
+         {%Stop{id: stop_id} = stop, line, headsign},
+         departures_by_destination,
+         scheduled_departures_by_headsign_and_line,
+         routes_for_section,
+         now
+       ) do
+    headway_for_stop = @headways.get(stop_id, now)
+
+    departures =
+      Map.get(departures_by_destination, {stop.id, line.id, headsign}, [])
+      |> Enum.filter(fn
+        %{prediction: nil} -> headway_for_stop == nil
+        _ -> true
+      end)
+
+    scheduled_departures =
+      scheduled_departures_by_headsign_and_line |> Map.get({stop.id, line.id, headsign}, [])
+
+    %__MODULE__{
+      stop: stop,
+      line: line,
+      headsign: headsign,
+      state: state(departures, scheduled_departures, stop_id, routes_for_section, now)
+    }
   end
 
   defp tuples_from_departures(departures, now) do
@@ -227,8 +267,35 @@ defmodule Screens.V2.RDS do
     %Countdowns{departures: departures_for_headsign}
   end
 
-  defp filter_for_route_id_params(all_route_ids, []), do: all_route_ids
+  defp create_routes_for_section(
+         departures,
+         scheduled_departures,
+         typical_patterns,
+         route_id_params
+       ) do
+    routes_for_section =
+      (departures ++ scheduled_departures ++ typical_patterns)
+      |> Enum.map(fn
+        %Departure{} = departure -> Departure.route(departure)
+        %Schedule{route: route} -> route
+        %RoutePattern{route: route} -> route
+      end)
+      |> Enum.uniq()
+      |> filter_for_route_id_params(route_id_params)
 
-  defp filter_for_route_id_params(all_route_ids, route_id_params),
-    do: Enum.filter(all_route_ids, fn route -> route.id in route_id_params end)
+    enabled_routes_for_section =
+      reject_disabled_modes(routes_for_section, @config_cache.disabled_modes())
+
+    {enabled_routes_for_section, routes_for_section}
+  end
+
+  defp filter_for_route_id_params(all_routes, []), do: all_routes
+
+  defp filter_for_route_id_params(all_routes, route_id_params),
+    do: Enum.filter(all_routes, fn route -> route.id in route_id_params end)
+
+  defp reject_disabled_modes(all_routes, []), do: all_routes
+
+  defp reject_disabled_modes(all_routes, disabled_modes),
+    do: Enum.reject(all_routes, fn route -> route.type in disabled_modes end)
 end
