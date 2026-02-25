@@ -37,6 +37,7 @@ import {
 import PageLoadNoData from "Components/dup/page_load_no_data";
 import NoData from "Components/dup/no_data";
 import DeparturesNoData from "Components/dup/departures_no_data";
+import DeparturesNoService from "Components/dup/departures_no_service";
 import OvernightDepartures from "Components/dup/overnight_departures";
 
 import { Provider as CurrentPageProvider } from "Context/dup_page";
@@ -67,6 +68,7 @@ const TYPE_TO_COMPONENT = {
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
   departures_no_data: DeparturesNoData,
+  departures_no_service: DeparturesNoService,
   overnight_departures: OvernightDepartures,
 };
 

@@ -781,6 +781,22 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
+    test "does not use BRD for non-subway", %{bus_shelter_screen: screen} do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      departure = %Departure{
+        prediction: %Prediction{
+          departure_time: ~U[2020-01-01T00:01:10Z],
+          route: %Route{type: :bus},
+          vehicle: %Vehicle{current_status: :stopped_at, stop_id: "stop-b"},
+          stop: %Stop{id: "stop-b"}
+        }
+      }
+
+      assert [%{time: %{type: :minutes, minutes: 1}}] =
+               Departures.serialize_times_with_crowding([departure], screen, now)
+    end
+
     test "identifies ARR", %{bus_shelter_screen: screen} do
       now = ~U[2020-01-01T00:00:00Z]
 
@@ -806,6 +822,22 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       }
 
       assert [%{time: %{type: :minutes, minutes: 1}}] =
+               Departures.serialize_times_with_crowding([departure], screen, now)
+    end
+
+    test "uses Now instead of ARR for non-subway", %{bus_shelter_screen: screen} do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      departure = %Departure{
+        prediction: %Prediction{
+          arrival_time: ~U[2020-01-01T00:00:10Z],
+          departure_time: ~U[2020-01-01T00:00:10Z],
+          route: %Route{type: :bus},
+          stop: %Stop{}
+        }
+      }
+
+      assert [%{time: %{type: :text, text: "Now"}}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 

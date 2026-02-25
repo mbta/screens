@@ -3,6 +3,7 @@ import type { ComponentType } from "react";
 import useAutoSize from "Hooks/use_auto_size";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import { classWithModifier, classWithModifiers, formatCause } from "Util/utils";
+import { QRCodeSVG as QRCode } from "qrcode.react";
 
 import DisruptionDiagram, {
   DisruptionDiagramData,
@@ -12,7 +13,6 @@ import ClockIcon from "Images/clock-negative.svg";
 import NoServiceIcon from "Images/no-service.svg";
 import InfoIcon from "Images/info.svg";
 import ISAIcon from "Images/isa.svg";
-import WalkingIcon from "Images/nearby.svg";
 import ShuttleBusIcon from "Images/bus.svg";
 
 interface PreFareSingleScreenAlertProps {
@@ -34,6 +34,8 @@ interface PreFareSingleScreenAlertProps {
   updated_at: string;
   end_time?: string;
   disruption_diagram?: DisruptionDiagramData;
+  alternate_route_url: string;
+  qr_code_url: string;
 }
 
 interface EnrichedRoute {
@@ -48,6 +50,8 @@ interface StandardLayoutProps {
   effect: string;
   location: string | null;
   disruptionDiagram?: DisruptionDiagramData;
+  alternateRouteURL: string;
+  qrCodeURL: string;
 }
 
 const StandardLayout: ComponentType<StandardLayoutProps> = ({
@@ -57,6 +61,8 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
   effect,
   location,
   disruptionDiagram,
+  alternateRouteURL,
+  qrCodeURL,
 }) => {
   // For station closure alerts, content may need to be sized down depending on
   // how many stations are affected
@@ -78,6 +84,8 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
           remedy={remedy}
           contentTextSize="large"
           show_alternate_route_text={show_alternate_route_text}
+          alternateRouteURL={alternateRouteURL}
+          qrCodeURL={qrCodeURL}
         />
       </div>
       {disruptionDiagram && (
@@ -93,6 +101,8 @@ interface DownstreamLayoutProps {
   remedy: string;
   show_alternate_route_text: boolean;
   disruptionDiagram?: DisruptionDiagramData;
+  alternateRouteURL: string;
+  qrCodeURL: string;
 }
 
 // In the downstream layout, the map is at the top, and the font size stays constant
@@ -102,6 +112,8 @@ const DownstreamLayout: ComponentType<DownstreamLayoutProps> = ({
   remedy,
   show_alternate_route_text,
   disruptionDiagram,
+  alternateRouteURL,
+  qrCodeURL,
 }) => (
   <div className={classWithModifier("alert-card__content-block", "downstream")}>
     {disruptionDiagram && <MapSection disruptionDiagram={disruptionDiagram} />}
@@ -111,6 +123,8 @@ const DownstreamLayout: ComponentType<DownstreamLayoutProps> = ({
       remedy={remedy}
       contentTextSize="medium"
       show_alternate_route_text={show_alternate_route_text}
+      alternateRouteURL={alternateRouteURL}
+      qrCodeURL={qrCodeURL}
     />
   </div>
 );
@@ -257,12 +271,16 @@ interface RemedySectionProps {
   remedy: string | null;
   show_alternate_route_text: boolean;
   contentTextSize: string;
+  alternateRouteURL: string;
+  qrCodeURL: string;
 }
 const RemedySection: ComponentType<RemedySectionProps> = ({
   effect,
   remedy,
   show_alternate_route_text,
   contentTextSize,
+  alternateRouteURL,
+  qrCodeURL,
 }) => (
   <div className="alert-card__remedy">
     {effect === "shuttle" ? (
@@ -288,15 +306,18 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
       </>
     ) : (
       <>
-        <WalkingIcon
+        <QRCode
           className={classWithModifiers("alert-card__icon", [contentTextSize])}
+          marginSize={1}
+          size={128}
+          value={qrCodeURL}
         />
         {show_alternate_route_text ? (
           <h5 className="alert-card__remedy__text">
             <span className="alert-card__remedy__text--alternate-route">
               Find alternate route at{" "}
             </span>
-            mbta.com/alerts
+            {alternateRouteURL}
           </h5>
         ) : (
           <h5 className="alert-card__remedy__text">{remedy}</h5>
@@ -348,6 +369,8 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
     updated_at,
     end_time,
     disruption_diagram,
+    alternate_route_url: alternateRouteURL,
+    qr_code_url: qrCodeURL,
   } = alert;
 
   /**
@@ -383,6 +406,8 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           location={location}
           disruptionDiagram={disruption_diagram}
           show_alternate_route_text={show_alternate_route_text}
+          alternateRouteURL={alternateRouteURL}
+          qrCodeURL={qrCodeURL}
         />
       );
       break;
@@ -395,6 +420,8 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           location={location}
           disruptionDiagram={disruption_diagram}
           show_alternate_route_text={show_alternate_route_text}
+          alternateRouteURL={alternateRouteURL}
+          qrCodeURL={qrCodeURL}
         />
       );
       break;
@@ -408,6 +435,8 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           location={location}
           disruptionDiagram={disruption_diagram}
           show_alternate_route_text={show_alternate_route_text}
+          alternateRouteURL={alternateRouteURL}
+          qrCodeURL={qrCodeURL}
         />
       );
       break;
@@ -421,6 +450,8 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
           remedy={remedy}
           disruptionDiagram={disruption_diagram}
           show_alternate_route_text={show_alternate_route_text}
+          alternateRouteURL={alternateRouteURL}
+          qrCodeURL={qrCodeURL}
         />
       );
       break;

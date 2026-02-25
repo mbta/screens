@@ -10,6 +10,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Util
   alias Screens.V2.DisruptionDiagram
   alias Screens.V2.LocalizedAlert
+  alias Screens.V2.WebLink
   alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
 
@@ -67,7 +68,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           cause: String.t(),
           effect: :suspension | :shuttle | :station_closure,
           updated_at: String.t(),
-          routes: list(RoutePill.t())
+          routes: list(RoutePill.t()),
+          alternate_route_url: String.t(),
+          qr_code_url: String.t()
         }
 
   @type enriched_route :: %{
@@ -97,7 +100,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           routes: list(enriched_route()),
           effect: effect(),
           updated_at: String.t(),
-          region: region()
+          region: region(),
+          alternate_route_url: String.t(),
+          qr_code_url: String.t()
         }
 
   @type flex_serialized_response :: %{
@@ -441,7 +446,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: cause,
         informed_entities: informed_entities,
         updated_at: updated_at,
-        active_period: active_period
+        active_period: active_period,
+        url: url
       },
       location_context: %LocationContext{home_stop: home_stop},
       now: now
@@ -465,7 +471,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t),
       effect: :suspension,
       end_time: end_time_text(active_period, now),
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -476,7 +484,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: cause,
         informed_entities: informed_entities,
         updated_at: updated_at,
-        active_period: active_period
+        active_period: active_period,
+        url: url
       },
       location_context: %LocationContext{home_stop: home_stop},
       now: now
@@ -500,14 +509,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t),
       effect: :shuttle,
       end_time: end_time_text(active_period, now),
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
   # Two screen alert, station closure
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, active_period: active_period},
+      alert: %{cause: cause, updated_at: updated_at, active_period: active_period, url: url},
       now: now,
       home_station_name: home_station_name,
       informed_station_names: informed_station_names
@@ -545,7 +556,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :station_closure,
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
-      other_closures: other_closures
+      other_closures: other_closures,
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -557,7 +570,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
              effect: effect,
              cause: cause,
              header: header,
-             updated_at: updated_at
+             updated_at: updated_at,
+             url: url
            },
            now: now
          } = t
@@ -574,7 +588,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       routes: get_route_pills(t),
       effect: effect,
       end_time: end_time_text(active_period, now),
-      updated_at: format_updated_at(updated_at, now)
+      updated_at: format_updated_at(updated_at, now),
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -584,7 +600,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: cause,
         informed_entities: informed_entities,
         updated_at: updated_at,
-        active_period: active_period
+        active_period: active_period,
+        url: url
       },
       location_context: %LocationContext{home_stop: home_stop},
       now: now
@@ -639,7 +656,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       endpoints: endpoints,
-      is_transfer_station: location == :inside
+      is_transfer_station: location == :inside,
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -649,7 +668,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: cause,
         informed_entities: informed_entities,
         updated_at: updated_at,
-        active_period: active_period
+        active_period: active_period,
+        url: url
       },
       location_context: %LocationContext{home_stop: home_stop},
       now: now
@@ -699,7 +719,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       endpoints: endpoints,
-      is_transfer_station: location == :inside
+      is_transfer_station: location == :inside,
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -714,7 +736,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          location
        ) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, header: header, active_period: active_period},
+      alert: %{
+        cause: cause,
+        updated_at: updated_at,
+        header: header,
+        active_period: active_period,
+        url: url
+      },
       now: now,
       informed_station_names: informed_station_names
     } = t
@@ -737,7 +765,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: region,
-      stations: informed_station_names
+      stations: informed_station_names,
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -758,7 +788,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # This station closed for entire/only route
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, :inside) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, active_period: active_period},
+      alert: %{cause: cause, updated_at: updated_at, active_period: active_period, url: url},
       now: now
     } = t
 
@@ -791,14 +821,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: :station_closure,
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
-      region: :here
+      region: :here,
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
   # Downstream closure
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, location) do
     %__MODULE__{
-      alert: %{cause: cause, updated_at: updated_at, active_period: active_period},
+      alert: %{cause: cause, updated_at: updated_at, active_period: active_period, url: url},
       now: now,
       informed_station_names: informed_station_names
     } = t
@@ -815,7 +847,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
-      stations: informed_station_names
+      stations: informed_station_names,
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -827,7 +861,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           severity: severity,
           updated_at: updated_at,
           header: header,
-          active_period: active_period
+          active_period: active_period,
+          url: url
         } = alert,
       now: now
     } = t
@@ -851,7 +886,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: if(severity <= 1, do: :information, else: :delay),
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
-      region: get_region_from_location(location)
+      region: get_region_from_location(location),
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -862,7 +899,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       updated_at: updated_at,
       cause: cause,
       effect: effect,
-      header: header
+      header: header,
+      url: url
     } = alert
 
     %{
@@ -880,7 +918,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       effect: effect,
       end_time: end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
-      region: get_region_from_location(location)
+      region: get_region_from_location(location),
+      alternate_route_url: WebLink.alternate_route_url(url),
+      qr_code_url: qr_code_url(t)
     }
   end
 
@@ -1354,6 +1394,19 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       _other ->
         true
     end)
+  end
+
+  defp qr_code_url(
+         %__MODULE__{
+           alert: %Alert{id: id},
+           location_context: %LocationContext{home_stop: home_stop}
+         } = t
+       ) do
+    case LocalizedAlert.consolidated_informed_subway_routes(t) do
+      ["Green" <> _] -> WebLink.route_alert_url_app(id, "Green")
+      [route_id] -> WebLink.route_alert_url_app(id, route_id)
+      _ -> WebLink.stop_alert_url_app(id, home_stop)
+    end
   end
 
   defimpl Screens.V2.WidgetInstance do

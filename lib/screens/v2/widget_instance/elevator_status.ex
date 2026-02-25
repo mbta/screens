@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   alias Screens.Elevator.Closure
   alias Screens.Facilities.Facility
   alias Screens.Stops.Stop
+  alias Screens.V2.WebLink
   alias ScreensConfig.FreeTextLine
 
   @enforce_keys ~w[closures home_station_id]a
@@ -173,13 +174,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
               summary_line,
               [
                 if(summary, do: "For more info, go to ", else: "Find an alternate path on "),
-                %{format: :bold, text: stop_url_web(station_id)}
+                %{format: :bold, text: WebLink.stop_url_web(station_id)}
               ]
             ]),
           footer_audio:
             summary_line ++
               [if(summary, do: @audio_cta_full_list, else: @audio_cta_alternate_path)],
-          qr_code_url: "https://#{stop_alert_url_app(alert_id, station_id)}",
+          qr_code_url: "https://#{WebLink.stop_alert_url_app(alert_id, station_id)}",
           alert_ids: [alert_id]
         }
 
@@ -193,10 +194,13 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
             |> Enum.sort(),
           footer_lines:
             footer_lines([
-              ["Find an alternate path on ", %{format: :bold, text: stop_url_web(station_id)}]
+              [
+                "Find an alternate path on ",
+                %{format: :bold, text: WebLink.stop_url_web(station_id)}
+              ]
             ]),
           footer_audio: [@audio_cta_alternate_path],
-          qr_code_url: "https://#{stop_url_app(station_id)}",
+          qr_code_url: "https://#{WebLink.stop_url_app(station_id)}",
           alert_ids: Enum.map(closures_here, fn %Closure{alert: %Alert{id: id}} -> id end)
         }
     end
@@ -300,10 +304,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp station_name(%Stop{id: "place-masta"}), do: "Mass Ave"
   defp station_name(%Stop{name: name}), do: name
-
-  defp stop_alert_url_app(alert_id, station_id), do: "go.mbta.com/a/#{alert_id}/s/#{station_id}"
-  defp stop_url_app(station_id), do: "go.mbta.com/s/#{station_id}"
-  defp stop_url_web(station_id), do: "mbta.com/stops/#{station_id}"
 
   defimpl Screens.V2.AlertsWidget do
     alias Screens.V2.WidgetInstance.ElevatorStatus
