@@ -53,6 +53,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
     Enum.any?(informed_entities, &InformedEntity.whole_direction?/1)
   end
 
+  defp whole_route_delay?(alert) do
+    alert.effect == :delay and alert_is_whole_route?(alert.informed_entities)
+  end
+
   defp get_direction(informed_entities, route_id) do
     [%{direction_id: direction_id} | _] =
       Enum.filter(informed_entities, &InformedEntity.whole_direction?/1)
@@ -181,5 +185,28 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
     |> Enum.reject(&is_nil/1)
     |> Enum.filter(&(&1 in @subway_routes))
     |> Enum.uniq()
+  end
+
+  ############################
+  # Alert Filtering.         #
+  ############################
+
+  @spec consolidate_delays(list(SubwayStatusAlert.t())) :: list(SubwayStatusAlert.t())
+  def consolidate_delays(alerts) do
+    {delay_alerts, other_alerts} = Enum.split_with(alerts, &whole_route_delay?(&1.alert))
+
+    case delay_alerts do
+      [] ->
+        other_alerts
+
+      [single_delay] ->
+        other_alerts ++ [single_delay]
+
+      multiple_delays ->
+        # If there are multiple delay alerts on a single route, we only want to
+        # include the delay with the highest severity rather than display multiple.
+        highest_severity_delay = Enum.max_by(multiple_delays, & &1.alert.severity)
+        [highest_severity_delay | other_alerts]
+    end
   end
 end

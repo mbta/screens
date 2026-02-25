@@ -460,17 +460,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 5,
               informed_entities: [
-                %{route: "Green-B", stop: nil}
+                %{route: "Green-B", stop: nil, direction_id: nil}
               ]
             },
             %Alert{
               effect: :delay,
               severity: 6,
               informed_entities: [
-                %{route: "Green-B", stop: nil},
-                %{route: "Green-C", stop: nil},
-                %{route: "Green-D", stop: nil},
-                %{route: "Green-E", stop: nil}
+                %{route: "Green-B", stop: nil, direction_id: nil},
+                %{route: "Green-C", stop: nil, direction_id: nil},
+                %{route: "Green-D", stop: nil, direction_id: nil},
+                %{route: "Green-E", stop: nil, direction_id: nil}
               ]
             }
           ])
@@ -505,17 +505,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 7,
               informed_entities: [
-                %{route: "Green-B", stop: nil}
+                %{route: "Green-B", stop: nil, direction_id: nil}
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                %{route: "Green-B", stop: nil},
-                %{route: "Green-C", stop: nil},
-                %{route: "Green-D", stop: nil},
-                %{route: "Green-E", stop: nil}
+                %{route: "Green-B", stop: nil, direction_id: nil},
+                %{route: "Green-C", stop: nil, direction_id: nil},
+                %{route: "Green-D", stop: nil, direction_id: nil},
+                %{route: "Green-E", stop: nil, direction_id: nil}
               ]
             }
           ])
@@ -1847,21 +1847,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                %{route: "Green-C", stop: nil}
+                %{route: "Green-C", stop: nil, direction_id: nil}
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                %{route: "Green-C", stop: nil}
+                %{route: "Green-C", stop: nil, direction_id: nil}
               ]
             },
             %Alert{
               effect: :delay,
               severity: 1,
               informed_entities: [
-                %{route: "Green-C", stop: nil}
+                %{route: "Green-C", stop: nil, direction_id: nil}
               ]
             }
           ])
