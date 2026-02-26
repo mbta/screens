@@ -1,13 +1,13 @@
 defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
-  alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
   alias ScreensConfig.{Alerts, Departures, FreeTextLine, Screen}
   alias ScreensConfig.Screen.Dup
+
+  import Screens.TestSupport.InformedEntityBuilder
 
   defp routes("place-kencl") do
     [
@@ -135,15 +135,6 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
     }
   end
 
-  defp ie(opts) do
-    %InformedEntity{
-      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
-      route: opts[:route],
-      route_type: opts[:route_type],
-      direction_id: opts[:direction_id]
-    }
-  end
-
   describe "dup alert_instances/6 > serialize/1" do
     setup do
       config_kenmore =
@@ -182,18 +173,18 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Shuttle buses replacing Green Line B branch service",
           id: "137269",
           informed_entities: [
-            ie(stop: "70144", route: "Green-B", route_type: 0),
-            ie(stop: "70145", route: "Green-B", route_type: 0),
-            ie(stop: "70146", route: "Green-B", route_type: 0),
-            ie(stop: "70147", route: "Green-B", route_type: 0),
-            ie(stop: "70148", route: "Green-B", route_type: 0),
-            ie(stop: "70149", route: "Green-B", route_type: 0),
-            ie(stop: "71150", route: "Green-B", route_type: 0),
-            ie(stop: "71151", route: "Green-B", route_type: 0),
-            ie(stop: "place-bland", route: "Green-B", route_type: 0),
-            ie(stop: "place-bucen", route: "Green-B", route_type: 0),
-            ie(stop: "place-buest", route: "Green-B", route_type: 0),
-            ie(stop: "place-kencl", route: "Green-B", route_type: 0)
+            ie(stop_id: "70144", route: "Green-B", route_type: 0),
+            ie(stop_id: "70145", route: "Green-B", route_type: 0),
+            ie(stop_id: "70146", route: "Green-B", route_type: 0),
+            ie(stop_id: "70147", route: "Green-B", route_type: 0),
+            ie(stop_id: "70148", route: "Green-B", route_type: 0),
+            ie(stop_id: "70149", route: "Green-B", route_type: 0),
+            ie(stop_id: "71150", route: "Green-B", route_type: 0),
+            ie(stop_id: "71151", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-bucen", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-buest", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-B", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -211,15 +202,15 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Shuttle buses replacing Green Line C branch service",
           id: "137270",
           informed_entities: [
-            ie(stop: "70150", route: "Green-C", route_type: 0),
-            ie(stop: "70151", route: "Green-C", route_type: 0),
-            ie(stop: "70211", route: "Green-C", route_type: 0),
-            ie(stop: "70212", route: "Green-C", route_type: 0),
-            ie(stop: "70213", route: "Green-C", route_type: 0),
-            ie(stop: "70214", route: "Green-C", route_type: 0),
-            ie(stop: "place-hwsst", route: "Green-C", route_type: 0),
-            ie(stop: "place-kencl", route: "Green-C", route_type: 0),
-            ie(stop: "place-smary", route: "Green-C", route_type: 0)
+            ie(stop_id: "70150", route: "Green-C", route_type: 0),
+            ie(stop_id: "70151", route: "Green-C", route_type: 0),
+            ie(stop_id: "70211", route: "Green-C", route_type: 0),
+            ie(stop_id: "70212", route: "Green-C", route_type: 0),
+            ie(stop_id: "70213", route: "Green-C", route_type: 0),
+            ie(stop_id: "70214", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-hwsst", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-C", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -237,12 +228,12 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Shuttle buses replacing Green Line D branch service",
           id: "137272",
           informed_entities: [
-            ie(stop: "70150", route: "Green-D", route_type: 0),
-            ie(stop: "70151", route: "Green-D", route_type: 0),
-            ie(stop: "70186", route: "Green-D", route_type: 0),
-            ie(stop: "70187", route: "Green-D", route_type: 0),
-            ie(stop: "place-fenwy", route: "Green-D", route_type: 0),
-            ie(stop: "place-kencl", route: "Green-D", route_type: 0)
+            ie(stop_id: "70150", route: "Green-D", route_type: 0),
+            ie(stop_id: "70151", route: "Green-D", route_type: 0),
+            ie(stop_id: "70186", route: "Green-D", route_type: 0),
+            ie(stop_id: "70187", route: "Green-D", route_type: 0),
+            ie(stop_id: "place-fenwy", route: "Green-D", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-D", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -261,42 +252,42 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Shuttle buses replacing Green Line service",
           id: "137273",
           informed_entities: [
-            ie(stop: "70187", route: "Green-E", route_type: 0),
-            ie(stop: "70149", route: "Green-D", route_type: 0),
-            ie(stop: "71151", route: "Green-B", route_type: 0),
-            ie(stop: "70148", route: "Green-D", route_type: 0),
-            ie(stop: "70149", route: "Green-C", route_type: 0),
-            ie(stop: "71150", route: "Green-C", route_type: 0),
-            ie(stop: "place-smary", route: "Green-D", route_type: 0),
-            ie(stop: "place-fenwy", route: "Green-E", route_type: 0),
-            ie(stop: "place-bland", route: "Green-B", route_type: 0),
-            ie(stop: "place-kencl", route: "Green-C", route_type: 0),
-            ie(stop: "70187", route: "Green-B", route_type: 0),
-            ie(stop: "place-smary", route: "Green-C", route_type: 0),
-            ie(stop: "place-bland", route: "Green-E", route_type: 0),
-            ie(stop: "70151", route: "Green-E", route_type: 0),
-            ie(stop: "70148", route: "Green-E", route_type: 0),
-            ie(stop: "70186", route: "Green-D", route_type: 0),
-            ie(stop: "70150", route: "Green-B", route_type: 0),
-            ie(stop: "71151", route: "Green-C", route_type: 0),
-            ie(stop: "71150", route: "Green-B", route_type: 0),
-            ie(stop: "place-bland", route: "Green-C", route_type: 0),
-            ie(stop: "70148", route: "Green-B", route_type: 0),
-            ie(stop: "place-smary", route: "Green-B", route_type: 0),
-            ie(stop: "place-fenwy", route: "Green-C", route_type: 0),
-            ie(stop: "70151", route: "Green-B", route_type: 0),
-            ie(stop: "71151", route: "Green-D", route_type: 0),
-            ie(stop: "70212", route: "Green-D", route_type: 0),
-            ie(stop: "70151", route: "Green-C", route_type: 0),
-            ie(stop: "70212", route: "Green-C", route_type: 0),
-            ie(stop: "70211", route: "Green-D", route_type: 0),
-            ie(stop: "71151", route: "Green-E", route_type: 0),
-            ie(stop: "place-kencl", route: "Green-D", route_type: 0),
-            ie(stop: "70149", route: "Green-B", route_type: 0),
-            ie(stop: "71150", route: "Green-D", route_type: 0),
-            ie(stop: "70212", route: "Green-E", route_type: 0),
-            ie(stop: "70211", route: "Green-E", route_type: 0),
-            ie(stop: "place-smary", route: "Green-E", route_type: 0)
+            ie(stop_id: "70187", route: "Green-E", route_type: 0),
+            ie(stop_id: "70149", route: "Green-D", route_type: 0),
+            ie(stop_id: "71151", route: "Green-B", route_type: 0),
+            ie(stop_id: "70148", route: "Green-D", route_type: 0),
+            ie(stop_id: "70149", route: "Green-C", route_type: 0),
+            ie(stop_id: "71150", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-D", route_type: 0),
+            ie(stop_id: "place-fenwy", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
+            ie(stop_id: "70187", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-E", route_type: 0),
+            ie(stop_id: "70151", route: "Green-E", route_type: 0),
+            ie(stop_id: "70148", route: "Green-E", route_type: 0),
+            ie(stop_id: "70186", route: "Green-D", route_type: 0),
+            ie(stop_id: "70150", route: "Green-B", route_type: 0),
+            ie(stop_id: "71151", route: "Green-C", route_type: 0),
+            ie(stop_id: "71150", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-C", route_type: 0),
+            ie(stop_id: "70148", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-fenwy", route: "Green-C", route_type: 0),
+            ie(stop_id: "70151", route: "Green-B", route_type: 0),
+            ie(stop_id: "71151", route: "Green-D", route_type: 0),
+            ie(stop_id: "70212", route: "Green-D", route_type: 0),
+            ie(stop_id: "70151", route: "Green-C", route_type: 0),
+            ie(stop_id: "70212", route: "Green-C", route_type: 0),
+            ie(stop_id: "70211", route: "Green-D", route_type: 0),
+            ie(stop_id: "71151", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-D", route_type: 0),
+            ie(stop_id: "70149", route: "Green-B", route_type: 0),
+            ie(stop_id: "71150", route: "Green-D", route_type: 0),
+            ie(stop_id: "70212", route: "Green-E", route_type: 0),
+            ie(stop_id: "70211", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-E", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -317,30 +308,30 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Silver Line - SL1, Silver Line - SL2 and Silver Line - SL3 detoured",
           id: "137327",
           informed_entities: [
-            ie(stop: "74611", route: "741", route_type: 3),
-            ie(stop: "74612", route: "741", route_type: 3),
-            ie(stop: "74613", route: "741", route_type: 3),
-            ie(stop: "place-crtst", route: "741", route_type: 3),
-            ie(stop: "place-sstat", route: "741", route_type: 3),
-            ie(stop: "place-wtcst", route: "741", route_type: 3),
-            ie(stop: "74611", route: "742", route_type: 3),
-            ie(stop: "74612", route: "742", route_type: 3),
-            ie(stop: "74613", route: "742", route_type: 3),
-            ie(stop: "place-crtst", route: "742", route_type: 3),
-            ie(stop: "place-sstat", route: "742", route_type: 3),
-            ie(stop: "place-wtcst", route: "742", route_type: 3),
-            ie(stop: "74611", route: "743", route_type: 3),
-            ie(stop: "74612", route: "743", route_type: 3),
-            ie(stop: "74613", route: "743", route_type: 3),
-            ie(stop: "place-crtst", route: "743", route_type: 3),
-            ie(stop: "place-sstat", route: "743", route_type: 3),
-            ie(stop: "place-wtcst", route: "743", route_type: 3),
-            ie(stop: "74611", route: "746", route_type: 3),
-            ie(stop: "74612", route: "746", route_type: 3),
-            ie(stop: "74613", route: "746", route_type: 3),
-            ie(stop: "place-crtst", route: "746", route_type: 3),
-            ie(stop: "place-sstat", route: "746", route_type: 3),
-            ie(stop: "place-wtcst", route: "746", route_type: 3)
+            ie(stop_id: "74611", route: "741", route_type: 3),
+            ie(stop_id: "74612", route: "741", route_type: 3),
+            ie(stop_id: "74613", route: "741", route_type: 3),
+            ie(stop_id: "place-crtst", route: "741", route_type: 3),
+            ie(stop_id: "place-sstat", route: "741", route_type: 3),
+            ie(stop_id: "place-wtcst", route: "741", route_type: 3),
+            ie(stop_id: "74611", route: "742", route_type: 3),
+            ie(stop_id: "74612", route: "742", route_type: 3),
+            ie(stop_id: "74613", route: "742", route_type: 3),
+            ie(stop_id: "place-crtst", route: "742", route_type: 3),
+            ie(stop_id: "place-sstat", route: "742", route_type: 3),
+            ie(stop_id: "place-wtcst", route: "742", route_type: 3),
+            ie(stop_id: "74611", route: "743", route_type: 3),
+            ie(stop_id: "74612", route: "743", route_type: 3),
+            ie(stop_id: "74613", route: "743", route_type: 3),
+            ie(stop_id: "place-crtst", route: "743", route_type: 3),
+            ie(stop_id: "place-sstat", route: "743", route_type: 3),
+            ie(stop_id: "place-wtcst", route: "743", route_type: 3),
+            ie(stop_id: "74611", route: "746", route_type: 3),
+            ie(stop_id: "74612", route: "746", route_type: 3),
+            ie(stop_id: "74613", route: "746", route_type: 3),
+            ie(stop_id: "place-crtst", route: "746", route_type: 3),
+            ie(stop_id: "place-sstat", route: "746", route_type: 3),
+            ie(stop_id: "place-wtcst", route: "746", route_type: 3)
           ],
           lifecycle: "NEW",
           severity: 7,

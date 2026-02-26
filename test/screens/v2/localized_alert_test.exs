@@ -2,14 +2,14 @@ defmodule Screens.V2.LocalizedAlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.RouteType
-  alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert, as: LocalizedAlert
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.BusShelter
+
+  import Screens.TestSupport.InformedEntityBuilder
 
   setup :setup_base
 
@@ -74,15 +74,6 @@ defmodule Screens.V2.LocalizedAlertTest do
 
   defp put_now(widget, now) do
     %{widget | now: now}
-  end
-
-  defp ie(opts \\ []) do
-    %InformedEntity{
-      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
-      route: opts[:route],
-      route_type: opts[:route_type],
-      direction_id: opts[:direction_id]
-    }
   end
 
   defp setup_home_stop(%{widget: widget}) do
@@ -165,10 +156,10 @@ defmodule Screens.V2.LocalizedAlertTest do
          %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "0"),
+          ie(stop_id: "0"),
           ie(route_type: RouteType.to_id(:bus)),
           ie(route: "x"),
-          ie(stop: "20", route: "a"),
+          ie(stop_id: "20", route: "a"),
           ie()
         ])
 
@@ -178,9 +169,9 @@ defmodule Screens.V2.LocalizedAlertTest do
     test "ignores route type if paired with any other specifier", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "1", route_type: RouteType.to_id(:bus)),
+          ie(stop_id: "1", route_type: RouteType.to_id(:bus)),
           ie(route: "x", route_type: RouteType.to_id(:bus)),
-          ie(stop: "1", route: "x", route_type: RouteType.to_id(:bus))
+          ie(stop_id: "1", route: "x", route_type: RouteType.to_id(:bus))
         ])
 
       assert :upstream == LocalizedAlert.location(widget)
@@ -196,9 +187,9 @@ defmodule Screens.V2.LocalizedAlertTest do
          %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "0"),
+          ie(stop_id: "0"),
           ie(route: "b"),
-          ie(stop: "20", route: "a")
+          ie(stop_id: "20", route: "a")
         ])
 
       assert :inside == LocalizedAlert.location(widget)
@@ -217,7 +208,7 @@ defmodule Screens.V2.LocalizedAlertTest do
     test "ignores route if it doesn't serve this stop", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "1"),
+          ie(stop_id: "1"),
           ie(route: "x")
         ])
 
@@ -227,8 +218,8 @@ defmodule Screens.V2.LocalizedAlertTest do
     test "returns :upstream for an alert that only affects upstream stops", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "0"),
-          ie(stop: "20", route: "a")
+          ie(stop_id: "0"),
+          ie(stop_id: "20", route: "a")
         ])
 
       assert :upstream == LocalizedAlert.location(widget)
@@ -239,9 +230,9 @@ defmodule Screens.V2.LocalizedAlertTest do
     } do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "0"),
-          ie(stop: "5"),
-          ie(stop: "20", route: "a")
+          ie(stop_id: "0"),
+          ie(stop_id: "5"),
+          ie(stop_id: "20", route: "a")
         ])
 
       assert :boundary_upstream == LocalizedAlert.location(widget)
@@ -250,9 +241,9 @@ defmodule Screens.V2.LocalizedAlertTest do
     test "returns :inside for an alert that only affects this stop", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "5"),
-          ie(stop: "5", route_type: RouteType.to_id(:bus)),
-          ie(stop: "5", route: "a")
+          ie(stop_id: "5"),
+          ie(stop_id: "5", route_type: RouteType.to_id(:bus)),
+          ie(stop_id: "5", route: "a")
         ])
 
       assert :inside == LocalizedAlert.location(widget)
@@ -262,9 +253,9 @@ defmodule Screens.V2.LocalizedAlertTest do
          %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "4"),
-          ie(stop: "5"),
-          ie(stop: "6")
+          ie(stop_id: "4"),
+          ie(stop_id: "5"),
+          ie(stop_id: "6")
         ])
 
       assert :inside == LocalizedAlert.location(widget)
@@ -276,9 +267,9 @@ defmodule Screens.V2.LocalizedAlertTest do
          } do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "6"),
-          ie(stop: "5"),
-          ie(stop: "90", route: "a")
+          ie(stop_id: "6"),
+          ie(stop_id: "5"),
+          ie(stop_id: "90", route: "a")
         ])
 
       assert :boundary_downstream == LocalizedAlert.location(widget)
@@ -287,8 +278,8 @@ defmodule Screens.V2.LocalizedAlertTest do
     test "returns :downstream for an alert that only affects downstream stops", %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "6"),
-          ie(stop: "90", route: "a")
+          ie(stop_id: "6"),
+          ie(stop_id: "90", route: "a")
         ])
 
       assert :downstream == LocalizedAlert.location(widget)
@@ -298,8 +289,8 @@ defmodule Screens.V2.LocalizedAlertTest do
          %{widget: widget} do
       widget =
         put_informed_entities(widget, [
-          ie(stop: "4"),
-          ie(stop: "6")
+          ie(stop_id: "4"),
+          ie(stop_id: "6")
         ])
 
       assert :downstream == LocalizedAlert.location(widget)

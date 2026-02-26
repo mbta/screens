@@ -2,7 +2,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Alerts.InformedEntity
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -22,6 +21,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias ScreensConfig.Screen.Dup, as: DupConfig
 
   import Screens.Inject
+  import Screens.TestSupport.InformedEntityBuilder
   import Mox
   setup :verify_on_exit!
 
@@ -44,15 +44,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           widget.app_params
           | secondary_departures: %Departures{sections: secondary_departures_sections}
         }
-    }
-  end
-
-  defp ie(opts) do
-    %InformedEntity{
-      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
-      route: opts[:route],
-      route_type: opts[:route_type],
-      direction_id: opts[:direction_id]
     }
   end
 
@@ -1246,8 +1237,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             struct(Alert,
               effect: :suspension,
               informed_entities: [
-                %InformedEntity{stop: %Stop{id: "place-B"}, route: "Red"},
-                %InformedEntity{stop: %Stop{id: "place-C"}, route: "Red"}
+                ie(stop_id: "place-B", route: "Red"),
+                ie(stop_id: "place-C", route: "Red")
               ],
               active_period: [{~U[2020-05-06T09:00:00Z], nil}]
             )
@@ -1456,12 +1447,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             struct(Alert,
               effect: :suspension,
               informed_entities: [
-                ie(stop: "place-kencl", route: "Green-C"),
-                ie(stop: "place-smary", route: "Green-C"),
-                ie(stop: "70150", route: "Green-C"),
-                ie(stop: "70151", route: "Green-C"),
-                ie(stop: "70211", route: "Green-C"),
-                ie(stop: "70212", route: "Green-C")
+                ie(stop_id: "place-kencl", route: "Green-C"),
+                ie(stop_id: "place-smary", route: "Green-C"),
+                ie(stop_id: "70150", route: "Green-C"),
+                ie(stop_id: "70151", route: "Green-C"),
+                ie(stop_id: "70211", route: "Green-C"),
+                ie(stop_id: "70212", route: "Green-C")
               ],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )
@@ -2335,7 +2326,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           [
             struct(Alert,
               effect: :suspension,
-              informed_entities: [ie(stop: "place-overnight", route: "Red", route_type: 0)],
+              informed_entities: [ie(stop_id: "place-overnight", route: "Red", route_type: 0)],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )
           ]
@@ -2731,7 +2722,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           [
             struct(Alert,
               effect: :suspension,
-              informed_entities: [ie(stop: "place-closed", route: "Red", route_type: 0)],
+              informed_entities: [ie(stop_id: "place-closed", route: "Red", route_type: 0)],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )
           ]
@@ -2848,7 +2839,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             struct(Alert,
               effect: :suspension,
               informed_entities: [
-                ie(stop: "place-closed", route: "Red", route_type: 0, direction_id: 0)
+                ie(stop_id: "place-closed", route: "Red", route_type: 0, direction_id: 0)
               ],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )

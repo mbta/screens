@@ -4,21 +4,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
   import Screens.V2.CandidateGenerator.Widgets.Alerts
 
   alias Screens.Alerts.Alert
-  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
-  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Alerts, MultiStopAlerts, Screen}
   alias ScreensConfig.Screen.{BusEink, BusShelter}
 
-  defp ie(opts) do
-    %InformedEntity{
-      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
-      route: opts[:route],
-      route_type: opts[:route_type],
-      direction_id: opts[:direction_id]
-    }
-  end
+  import Screens.TestSupport.InformedEntityBuilder
 
   # credo:disable-for-next-line
   # TODO: GL e-ink needs to be specifically tested here, because sometimes the alerts are rendered slightly differently
@@ -57,7 +48,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "1",
           effect: :stop_closure,
-          informed_entities: [ie(stop: "1265"), ie(stop: "11531")],
+          informed_entities: [ie(stop_id: "1265"), ie(stop_id: "11531")],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -69,7 +60,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "3",
           effect: :delay,
-          informed_entities: [ie(stop: "1265")],
+          informed_entities: [ie(stop_id: "1265")],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -81,7 +72,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "5",
           effect: :stop_closure,
-          informed_entities: [ie(stop: "1262")],
+          informed_entities: [ie(stop_id: "1262")],
           active_period: [{now, nil}]
         }
       ]
@@ -139,7 +130,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
             alert: %Alert{
               id: "1",
               effect: :stop_closure,
-              informed_entities: [ie(stop: "1265"), ie(stop: "11531")],
+              informed_entities: [ie(stop_id: "1265"), ie(stop_id: "11531")],
               active_period: [{now, nil}]
             }
           },
@@ -211,7 +202,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
             alert: %Alert{
               id: "1",
               effect: :stop_closure,
-              informed_entities: [ie(stop: "1265"), ie(stop: "11531")],
+              informed_entities: [ie(stop_id: "1265"), ie(stop_id: "11531")],
               active_period: [{now, nil}]
             }
           },
@@ -233,7 +224,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
             alert: %Alert{
               id: "5",
               effect: :stop_closure,
-              informed_entities: [ie(stop: "1262")],
+              informed_entities: [ie(stop_id: "1262")],
               active_period: [{now, nil}]
             }
           },
@@ -264,7 +255,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "1",
           effect: :suspension,
-          informed_entities: [ie(stop: "1")],
+          informed_entities: [ie(stop_id: "1")],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -276,7 +267,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "3",
           effect: :suspension,
-          informed_entities: [ie(stop: "1", route: "11")],
+          informed_entities: [ie(stop_id: "1", route: "11")],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -288,7 +279,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "5",
           effect: :suspension,
-          informed_entities: [ie(stop: "1", route: "99")],
+          informed_entities: [ie(stop_id: "1", route: "99")],
           active_period: [{now, nil}]
         }
       ]
@@ -306,7 +297,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "1",
           effect: :suspension,
-          informed_entities: [ie(stop: "1")],
+          informed_entities: [ie(stop_id: "1")],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -318,19 +309,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "3",
           effect: :suspension,
-          informed_entities: [ie(stop: "1", route: "22")],
+          informed_entities: [ie(stop_id: "1", route: "22")],
           active_period: [{now, nil}]
         },
         %Alert{
           id: "4",
           effect: :suspension,
-          informed_entities: [ie(stop: "8")],
+          informed_entities: [ie(stop_id: "8")],
           active_period: [{now, nil}]
         },
         %Alert{
           id: "5",
           effect: :suspension,
-          informed_entities: [ie(stop: "9", route: "33")],
+          informed_entities: [ie(stop_id: "9", route: "33")],
           active_period: [{now, nil}]
         }
       ]
@@ -354,7 +345,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "2",
           effect: :suspension,
-          informed_entities: [ie(stop: "9", route_type: 1)],
+          informed_entities: [ie(stop_id: "9", route_type: 1)],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -377,7 +368,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "1",
           effect: :suspension,
-          informed_entities: [ie(stop: nil)],
+          informed_entities: [ie(stop_id: nil)],
           active_period: [{now, nil}]
         }
       ]
@@ -394,7 +385,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "1",
           effect: :extra_service,
-          informed_entities: [ie(stop: "1")],
+          informed_entities: [ie(stop_id: "1")],
           active_period: [{now, nil}]
         }
       ]
@@ -411,7 +402,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "1",
           effect: :extra_service,
-          informed_entities: [ie(stop: "1")],
+          informed_entities: [ie(stop_id: "1")],
           active_period: [{~U[3021-01-01T00:00:00Z], nil}]
         }
       ]

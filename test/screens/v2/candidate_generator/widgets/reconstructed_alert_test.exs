@@ -4,21 +4,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
   import Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert
 
   alias Screens.Alerts.Alert
-  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
-  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.{Busway, PreFare}
 
-  defp ie(opts) do
-    %InformedEntity{
-      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
-      route: opts[:route],
-      route_type: opts[:route_type],
-      direction_id: opts[:direction_id]
-    }
-  end
+  import Screens.TestSupport.InformedEntityBuilder
 
   describe "reconstructed_alert_instances/5" do
     setup do
@@ -52,20 +43,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "1",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-ogmnl")],
+          informed_entities: [ie(stop_id: "place-ogmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-mlmnl")],
+          informed_entities: [ie(stop_id: "place-mlmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "3",
           effect: :delay,
           severity: 5,
-          informed_entities: [ie(stop: "place-ogmnl")],
+          informed_entities: [ie(stop_id: "place-ogmnl")],
           active_period: happening_now_active_period
         }
       ]
@@ -75,21 +66,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           id: "1",
           effect: :delay,
           severity: 5,
-          informed_entities: [ie(stop: "place-ogmnl", direction_id: 0)],
+          informed_entities: [ie(stop_id: "place-ogmnl", direction_id: 0)],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :delay,
           severity: 5,
-          informed_entities: [ie(stop: "place-ogmnl")],
+          informed_entities: [ie(stop_id: "place-ogmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "3",
           effect: :delay,
           severity: 5,
-          informed_entities: [ie(stop: "place-ogmnl", direction_id: 1)],
+          informed_entities: [ie(stop_id: "place-ogmnl", direction_id: 1)],
           active_period: happening_now_active_period
         }
       ]
@@ -148,20 +139,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "1",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-ogmnl")],
+          informed_entities: [ie(stop_id: "place-ogmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-mlmnl")],
+          informed_entities: [ie(stop_id: "place-mlmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "3",
           effect: :delay,
           severity: 5,
-          informed_entities: [ie(stop: "place-ogmnl")],
+          informed_entities: [ie(stop_id: "place-ogmnl")],
           active_period: happening_now_active_period
         }
       ]
@@ -183,7 +174,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-ogmnl")],
+              informed_entities: [ie(stop_id: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
@@ -196,7 +187,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-mlmnl")],
+              informed_entities: [ie(stop_id: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
@@ -210,7 +201,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               id: "3",
               effect: :delay,
               severity: 5,
-              informed_entities: [ie(stop: "place-ogmnl")],
+              informed_entities: [ie(stop_id: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
@@ -247,19 +238,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "1",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-mlmnl")],
+          informed_entities: [ie(stop_id: "place-mlmnl")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-astao")],
+          informed_entities: [ie(stop_id: "place-astao")],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "3",
           effect: :shuttle,
-          informed_entities: [ie(stop: "place-mlmnl"), ie(stop: "place-welln")],
+          informed_entities: [ie(stop_id: "place-mlmnl"), ie(stop_id: "place-welln")],
           active_period: happening_now_active_period
         }
       ]
@@ -281,7 +272,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-mlmnl")],
+              informed_entities: [ie(stop_id: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
@@ -294,7 +285,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "3",
               effect: :shuttle,
-              informed_entities: [ie(stop: "place-mlmnl"), ie(stop: "place-welln")],
+              informed_entities: [ie(stop_id: "place-mlmnl"), ie(stop_id: "place-welln")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
@@ -307,7 +298,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-astao")],
+              informed_entities: [ie(stop_id: "place-astao")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: ["Assembly"]
@@ -343,7 +334,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           id: "1",
           effect: :delay,
           severity: 6,
-          informed_entities: [ie(stop: "place-mlmnl")],
+          informed_entities: [ie(stop_id: "place-mlmnl")],
           active_period: happening_now_active_period
         }
       ]
@@ -366,7 +357,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               id: "1",
               effect: :delay,
               severity: 6,
-              informed_entities: [ie(stop: "place-mlmnl")],
+              informed_entities: [ie(stop_id: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
@@ -463,7 +454,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-ogmnl")],
+              informed_entities: [ie(stop_id: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true
@@ -475,7 +466,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-mlmnl")],
+              informed_entities: [ie(stop_id: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             }
           },
@@ -487,7 +478,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               id: "3",
               effect: :delay,
               severity: 5,
-              informed_entities: [ie(stop: "place-ogmnl")],
+              informed_entities: [ie(stop_id: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false
@@ -534,7 +525,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               id: "1",
               effect: :delay,
               severity: 5,
-              informed_entities: [ie(stop: "place-ogmnl", direction_id: 0)],
+              informed_entities: [ie(stop_id: "place-ogmnl", direction_id: 0)],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: []
@@ -547,7 +538,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               id: "2",
               effect: :delay,
               severity: 5,
-              informed_entities: [ie(stop: "place-ogmnl")],
+              informed_entities: [ie(stop_id: "place-ogmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: []
@@ -587,7 +578,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "2",
           effect: :station_closure,
-          informed_entities: [ie(stop: "place-mlmnl")],
+          informed_entities: [ie(stop_id: "place-mlmnl")],
           active_period: happening_now_active_period
         }
       ]
@@ -610,7 +601,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: "place-mlmnl")],
+              informed_entities: [ie(stop_id: "place-mlmnl")],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,

@@ -2,13 +2,13 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
-  alias Screens.Stops.Stop
   alias Screens.V2.AlertsWidget
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Audio, Screen}
   alias ScreensConfig.Screen.{BusEink, BusShelter, GlEink}
+
+  import Screens.TestSupport.InformedEntityBuilder
 
   setup :setup_base
 
@@ -107,15 +107,6 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     %{widget | now: now}
   end
 
-  defp ie(opts) do
-    %InformedEntity{
-      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
-      route: opts[:route],
-      route_type: opts[:route_type],
-      direction_id: opts[:direction_id]
-    }
-  end
-
   defp setup_home_stop(%{widget: widget}) do
     home_stop = "5"
 
@@ -164,7 +155,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   end
 
   defp setup_informed_entities(%{widget: widget}) do
-    %{widget: put_informed_entities(widget, [ie(stop: "5")])}
+    %{widget: put_informed_entities(widget, [ie(stop_id: "5")])}
   end
 
   defp setup_active_period(%{widget: widget}) do
@@ -472,8 +463,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
         informed_entities =
           if(unquote(set_location_inside_or_boundary?),
-            do: [ie(stop: "4"), ie(stop: "5"), ie(stop: "6")],
-            else: [ie(stop: "6"), ie(stop: "7")]
+            do: [ie(stop_id: "4"), ie(stop_id: "5"), ie(stop_id: "6")],
+            else: [ie(stop_id: "6"), ie(stop_id: "7")]
           )
 
         widget =
@@ -567,23 +558,25 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     setup @valid_alert_setup_group
 
     test "returns 1 if home stop is inside informed region", %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(stop: "5")])
+      widget = put_informed_entities(widget, [ie(stop_id: "5")])
 
       assert 1 == AlertWidget.tiebreaker_location(widget)
     end
 
     test "returns 2 if home stop is at the boundary of informed region", %{widget: widget} do
-      upstream_boundary_widget = put_informed_entities(widget, [ie(stop: "5"), ie(stop: "4")])
+      upstream_boundary_widget =
+        put_informed_entities(widget, [ie(stop_id: "5"), ie(stop_id: "4")])
 
       assert 2 == AlertWidget.tiebreaker_location(upstream_boundary_widget)
 
-      downstream_boundary_widget = put_informed_entities(widget, [ie(stop: "5"), ie(stop: "6")])
+      downstream_boundary_widget =
+        put_informed_entities(widget, [ie(stop_id: "5"), ie(stop_id: "6")])
 
       assert 2 == AlertWidget.tiebreaker_location(downstream_boundary_widget)
     end
 
     test "returns 3 if informed region is downstream of home stop", %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(stop: "6")])
+      widget = put_informed_entities(widget, [ie(stop_id: "6")])
 
       assert 3 == AlertWidget.tiebreaker_location(widget)
     end
@@ -591,7 +584,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     test "returns :no_render if informed region is upstream of home stop or elsewhere", %{
       widget: widget
     } do
-      upstream_widget = put_informed_entities(widget, [ie(stop: "4")])
+      upstream_widget = put_informed_entities(widget, [ie(stop_id: "4")])
 
       assert :no_render == AlertWidget.tiebreaker_location(upstream_widget)
 

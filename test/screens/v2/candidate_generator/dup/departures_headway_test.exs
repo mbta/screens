@@ -2,7 +2,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
-  alias Screens.Alerts.InformedEntity
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Stops.Stop
@@ -19,6 +18,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
   alias ScreensConfig.Screen.Dup, as: DupConfig
 
   import Screens.Inject
+  import Screens.TestSupport.InformedEntityBuilder
   import Mox
   setup :verify_on_exit!
 
@@ -31,15 +31,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
           widget.app_params
           | primary_departures: %Departures{sections: primary_departures_sections}
         }
-    }
-  end
-
-  defp ie(opts) do
-    %InformedEntity{
-      stop: if(opts[:stop], do: %Stop{id: opts[:stop]}, else: nil),
-      route: opts[:route],
-      route_type: opts[:route_type],
-      direction_id: opts[:direction_id]
     }
   end
 
@@ -342,7 +333,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
           struct(Alert,
             effect: :suspension,
             informed_entities: [
-              ie(stop: "place-B", route: "Red")
+              ie(stop_id: "place-B", route: "Red")
             ],
             active_period: [{~U[2020-04-06T09:00:00Z], nil}]
           )
@@ -550,10 +541,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
           struct(Alert,
             effect: :suspension,
             informed_entities: [
-              ie(stop: "place-kencl", route: "Green-C"),
-              ie(stop: "place-hymnl", route: "Green-C"),
-              ie(stop: "70151", route: "Green-C"),
-              ie(stop: "70152", route: "Green-C")
+              ie(stop_id: "place-kencl", route: "Green-C"),
+              ie(stop_id: "place-hymnl", route: "Green-C"),
+              ie(stop_id: "70151", route: "Green-C"),
+              ie(stop_id: "70152", route: "Green-C")
             ],
             active_period: [{~U[2020-04-06T09:00:00Z], nil}]
           )
