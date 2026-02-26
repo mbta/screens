@@ -6,7 +6,7 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   """
 
   alias Aja.Vector
-  alias Screens.Alerts.InformedEntity
+  alias Screens.Alerts.Alert
   alias Screens.Routes.Route
   alias Screens.Stops.{Stop, Subway}
   alias Screens.V2.DisruptionDiagram, as: DD
@@ -109,10 +109,10 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
   @spec new(LocalizedAlert.t()) :: {:ok, t()} | {:error, reason :: String.t()}
   def new(localized_alert) do
     informed_stop_ids =
-      for %InformedEntity{stop: %Stop{id: "place-" <> _ = stop_id}} <-
-            localized_alert.alert.informed_entities,
-          into: MapSet.new(),
-          do: stop_id
+      localized_alert.alert
+      |> Alert.informed_parent_stations()
+      |> Enum.map(& &1.stop.id)
+      |> MapSet.new()
 
     with {:ok, route_id, stop_sequence, branch} <-
            get_builder_data(localized_alert, informed_stop_ids) do

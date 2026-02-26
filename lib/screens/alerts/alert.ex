@@ -405,7 +405,7 @@ defmodule Screens.Alerts.Alert do
       }) do
     informed_entities
     |> Enum.filter(&InformedEntity.parent_station?/1)
-    |> InformedEntity.filter_duplicate_and_nil_stops()
+    |> InformedEntity.uniq_by_stop()
   end
 
   @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
@@ -447,7 +447,7 @@ defmodule Screens.Alerts.Alert do
     platform_ids = Enum.map(all_platforms_at_informed_stations, & &1.id)
 
     informed_entities
-    |> InformedEntity.filter_duplicate_and_nil_stops()
+    |> InformedEntity.uniq_by_stop()
     |> Enum.filter(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id in platform_ids end)
   end
 

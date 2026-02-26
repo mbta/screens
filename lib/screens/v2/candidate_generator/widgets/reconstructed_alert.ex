@@ -196,8 +196,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     |> Enum.filter(fn
       # Alert affects entire line
       %InformedEntity{stop: nil, route: route} -> is_binary(route)
-      %InformedEntity{stop: %{id: stop_id}} -> String.starts_with?(stop_id, "place-")
-      %InformedEntity{stop: _} -> false
+      ie -> InformedEntity.parent_station?(ie)
     end)
     |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
     |> Enum.min(fn -> @default_distance end)

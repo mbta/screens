@@ -63,17 +63,17 @@ defmodule Screens.Alerts.InformedEntity do
 
   def present_alert_for_route?(_, _, _), do: false
 
-  @spec filter_duplicate_and_nil_stops([t()]) :: [t()]
   @doc """
   Returns a deduplicated list of informed entities based on stop ID.
   Removes any Informed Entities with nil stops.
   """
-  def filter_duplicate_and_nil_stops(entities) do
+  @spec uniq_by_stop([t()]) :: [t()]
+  def uniq_by_stop(entities) do
     entities
     |> Enum.uniq_by(fn
       %__MODULE__{stop: %Stop{id: id}} -> id
       _ -> nil
     end)
-    |> Enum.filter(fn id -> not is_nil(id) end)
+    |> Enum.filter(fn ie -> not is_nil(ie.stop) end)
   end
 end
