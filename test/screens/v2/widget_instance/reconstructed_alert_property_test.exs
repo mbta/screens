@@ -18,1070 +18,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 
-  # TBD: should have more alerts that match troublesome alerts we've seen before
-  @alerts [
-    %Alert{
-      active_period: [{~U[2022-09-07 13:02:00Z], ~U[2022-09-07 15:16:18Z]}],
-      cause: :unknown,
-      created_at: ~U[2022-09-07 13:02:33Z],
-      description: "Affected stops:\r\nDavis\r\nPorter\r\nHarvard",
-      effect: :suspension,
-      header: "Red Line service suspended",
-      id: "133885",
-      informed_entities: [
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "70065"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "70066"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "70067"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "70068"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "70069"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "70070"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "place-cntsq"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "place-harsq"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Red",
-          route_type: 1,
-          stop: "place-portr"
-        }
-      ],
-      lifecycle: "NEW",
-      severity: 7,
-      timeframe: nil,
-      updated_at: ~U[2022-09-07 13:16:14Z],
-      url: nil
-    },
-    %Alert{
-      active_period: [{~U[2022-06-24 09:13:15Z], nil}],
-      cause: :unknown,
-      created_at: ~U[2022-06-24 09:13:17Z],
-      description:
-        "Orange Line Service is running between Oak Grove and North Station and between Forest Hills and Back Bay. \r\nCustomers can use Green Line service through Downtown. \r\n\r\nAffected stops:\r\nHaymarket\r\nState\r\nDowntown Crossing\r\nChinatown\r\nTufts Medical Center",
-      effect: :suspension,
-      header:
-        "Orange Line is suspended between North Station and Back Bay due to a structural issue with the Government Center garage. ",
-      id: "450523",
-      informed_entities: [
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70014"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70015"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70016"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70017"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70018"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70019"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70020"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70021"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70022"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70023"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70024"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70025"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70026"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "70027"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "place-bbsta"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "place-chncl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "place-dwnxg"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "place-haecl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "place-north"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "place-state"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: "place-tumnl"
-        }
-      ],
-      lifecycle: "NEW",
-      severity: 7,
-      timeframe: nil,
-      updated_at: ~U[2022-06-24 09:14:52Z],
-      url: nil
-    },
-    %Alert{
-      active_period: [{~U[2022-06-24 09:12:00Z], nil}],
-      cause: :unknown,
-      created_at: ~U[2022-06-24 09:12:47Z],
-      description:
-        "Affected stops:\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
-      effect: :shuttle,
-      header:
-        "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station.",
-      id: "450522",
-      informed_entities: [
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-north"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70504"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "place-unsqu"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-spmnl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70204"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70202"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70501"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70202"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70207"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-unsqu"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "place-north"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70208"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70208"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70206"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-lech"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70205"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-north"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70203"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70201"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-gover"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70206"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-unsqu"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70504"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70202"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-gover"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70201"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70504"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-lech"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70501"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70202"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70208"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-gover"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-spmnl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70207"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70204"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70203"
-        }
-      ],
-      lifecycle: "NEW",
-      severity: 7,
-      timeframe: nil,
-      updated_at: ~U[2022-06-24 18:24:03Z],
-      url: nil
-    },
-    %Screens.Alerts.Alert{
-      active_period: [{~U[2022-08-20 01:00:00Z], ~U[2022-09-19 06:30:00Z]}],
-      cause: :unknown,
-      created_at: ~U[2022-08-03 17:32:41Z],
-      description:
-        "Alternative Travel Options for Riders:\r\n\r\nRiders commuting to downtown are encouraged to use the Commuter Rail. Zone 1A, 1, and 2 fares can be paid simply by showing a CharlieCard or CharlieTicket on ALL Commuter Rail lines. \r\n\r\nMost Needham and Providence Line Commuter Rail trains will stop at Forest Hills, Ruggles, Back Bay, and South Station.\r\nHaverhill Line Commuter Rail trains will stop at Oak Grove, Malden Center, and North Station. \r\n\r\nRiders can use other existing MBTA bus and subway services to complete their trips.\r\n\r\nShuttle bus service will operate in both directions, connecting Oak Grove and Forest Hills stations to downtown Boston. \r\n\r\nA Rider's Guide is available on mbta.com",
-      effect: :suspension,
-      header:
-        "Orange Line service is suspended through Sun, Sep 18. This suspension will allow for upgrades and improvements of track and signal systems along the line.",
-      id: "456090",
-      informed_entities: [
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Orange",
-          route_type: 1,
-          stop: nil
-        }
-      ],
-      lifecycle: "ONGOING",
-      severity: 1,
-      timeframe: "through September 18",
-      updated_at: ~U[2022-08-22 16:38:57Z],
-      url: "https://mbta.com/BBT2022"
-    },
-    %Screens.Alerts.Alert{
-      active_period: [{~U[2022-08-22 08:30:00Z], ~U[2022-09-19 06:30:00Z]}],
-      cause: :unknown,
-      created_at: ~U[2022-08-08 15:11:48Z],
-      description:
-        "All shuttle buses will be accessible for passengers with disabilities. Haymarket station will not be serviced by shuttles due to the proximity to Government Center Garage demolition work. \r\n\r\nAffected stops:\r\nUnion Square\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
-      effect: :shuttle,
-      header:
-        "Shuttle buses replace Green Line service between Union Square and Government Center through Sun, Sep 18. This is to allow for work on the Green Line Extension, the Lechmere Viaduct, and the Government Center Garage project.",
-      id: "456774",
-      informed_entities: [
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "place-haecl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-north"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-lech"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70204"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70503"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70202"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-gover"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70206"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70208"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70206"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70207"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70203"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "place-north"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70201"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70502"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-spmnl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70501"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70207"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70204"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70205"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70201"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70502"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "place-unsqu"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-haecl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70202"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "place-spmnl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70504"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70503"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-gover"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70205"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70205"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70502"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70208"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70207"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "place-gover"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-haecl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-north"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70201"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-unsqu"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70502"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70204"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70201"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70202"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70504"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "place-lech"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70503"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70203"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70203"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-haecl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70501"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70206"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70203"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70208"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "70503"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70208"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-lech"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70204"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70202"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70501"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70206"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-unsqu"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70501"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-E",
-          route_type: 0,
-          stop: "70205"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-unsqu"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "70504"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-gover"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-spmnl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70504"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-B",
-          route_type: 0,
-          stop: "place-north"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-C",
-          route_type: 0,
-          stop: "place-spmnl"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "70207"
-        },
-        %{
-          direction_id: nil,
-          facility: nil,
-          route: "Green-D",
-          route_type: 0,
-          stop: "place-lech"
-        }
-      ],
-      lifecycle: "ONGOING",
-      severity: 7,
-      timeframe: "through September 18",
-      updated_at: ~U[2022-08-23 11:28:40Z],
-      url: nil
-    }
-  ]
+  import Screens.TestSupport.InformedEntityBuilder
 
   @stops_with_screens [
     {"place-asmnl", {"Ashmont", "Ashmont"}},
@@ -1098,11 +35,241 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
 
   @tag :capture_log
   property "reconstructed alert serialization" do
+    alerts = [
+      %Alert{
+        active_period: [{~U[2022-09-07 13:02:00Z], ~U[2022-09-07 15:16:18Z]}],
+        cause: :unknown,
+        created_at: ~U[2022-09-07 13:02:33Z],
+        description: "Affected stops:\r\nDavis\r\nPorter\r\nHarvard",
+        effect: :suspension,
+        header: "Red Line service suspended",
+        id: "133885",
+        informed_entities: [
+          ie(stop_id: "70065", route: "Red", route_type: 1),
+          ie(stop_id: "70066", route: "Red", route_type: 1),
+          ie(stop_id: "70067", route: "Red", route_type: 1),
+          ie(stop_id: "70068", route: "Red", route_type: 1),
+          ie(stop_id: "70069", route: "Red", route_type: 1),
+          ie(stop_id: "70070", route: "Red", route_type: 1),
+          ie(stop_id: "place-cntsq", route: "Red", route_type: 1),
+          ie(stop_id: "place-harsq", route: "Red", route_type: 1),
+          ie(stop_id: "place-portr", route: "Red", route_type: 1)
+        ],
+        lifecycle: "NEW",
+        severity: 7,
+        timeframe: nil,
+        updated_at: ~U[2022-09-07 13:16:14Z],
+        url: nil
+      },
+      %Alert{
+        active_period: [{~U[2022-06-24 09:13:15Z], nil}],
+        cause: :unknown,
+        created_at: ~U[2022-06-24 09:13:17Z],
+        description:
+          "Orange Line Service is running between Oak Grove and North Station and between Forest Hills and Back Bay. \r\nCustomers can use Green Line service through Downtown. \r\n\r\nAffected stops:\r\nHaymarket\r\nState\r\nDowntown Crossing\r\nChinatown\r\nTufts Medical Center",
+        effect: :suspension,
+        header:
+          "Orange Line is suspended between North Station and Back Bay due to a structural issue with the Government Center garage. ",
+        id: "450523",
+        informed_entities: [
+          ie(stop_id: "70014", route: "Orange", route_type: 1),
+          ie(stop_id: "70015", route: "Orange", route_type: 1),
+          ie(stop_id: "70016", route: "Orange", route_type: 1),
+          ie(stop_id: "70017", route: "Orange", route_type: 1),
+          ie(stop_id: "70018", route: "Orange", route_type: 1),
+          ie(stop_id: "70019", route: "Orange", route_type: 1),
+          ie(stop_id: "70020", route: "Orange", route_type: 1),
+          ie(stop_id: "70021", route: "Orange", route_type: 1),
+          ie(stop_id: "70022", route: "Orange", route_type: 1),
+          ie(stop_id: "70023", route: "Orange", route_type: 1),
+          ie(stop_id: "70024", route: "Orange", route_type: 1),
+          ie(stop_id: "70025", route: "Orange", route_type: 1),
+          ie(stop_id: "70026", route: "Orange", route_type: 1),
+          ie(stop_id: "70027", route: "Orange", route_type: 1),
+          ie(stop_id: "place-bbsta", route: "Orange", route_type: 1),
+          ie(stop_id: "place-chncl", route: "Orange", route_type: 1),
+          ie(stop_id: "place-dwnxg", route: "Orange", route_type: 1),
+          ie(stop_id: "place-haecl", route: "Orange", route_type: 1),
+          ie(stop_id: "place-north", route: "Orange", route_type: 1),
+          ie(stop_id: "place-state", route: "Orange", route_type: 1),
+          ie(stop_id: "place-tumnl", route: "Orange", route_type: 1)
+        ],
+        lifecycle: "NEW",
+        severity: 7,
+        timeframe: nil,
+        updated_at: ~U[2022-06-24 09:14:52Z],
+        url: nil
+      },
+      %Alert{
+        active_period: [{~U[2022-06-24 09:12:00Z], nil}],
+        cause: :unknown,
+        created_at: ~U[2022-06-24 09:12:47Z],
+        description:
+          "Affected stops:\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
+        effect: :shuttle,
+        header:
+          "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station.",
+        id: "450522",
+        informed_entities: [
+          ie(stop_id: "place-north", route: "Green-D", route_type: 0),
+          ie(stop_id: "70504", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-unsqu", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-spmnl", route: "Green-C", route_type: 0),
+          ie(stop_id: "70204", route: "Green-C", route_type: 0),
+          ie(stop_id: "70202", route: "Green-D", route_type: 0),
+          ie(stop_id: "70501", route: "Green-D", route_type: 0),
+          ie(stop_id: "70202", route: "Green-B", route_type: 0),
+          ie(stop_id: "70207", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-unsqu", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-north", route: "Green-E", route_type: 0),
+          ie(stop_id: "70208", route: "Green-D", route_type: 0),
+          ie(stop_id: "70208", route: "Green-E", route_type: 0),
+          ie(stop_id: "70206", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-lech", route: "Green-B", route_type: 0),
+          ie(stop_id: "70205", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-north", route: "Green-B", route_type: 0),
+          ie(stop_id: "70203", route: "Green-B", route_type: 0),
+          ie(stop_id: "70201", route: "Green-C", route_type: 0),
+          ie(stop_id: "place-gover", route: "Green-B", route_type: 0),
+          ie(stop_id: "70206", route: "Green-C", route_type: 0),
+          ie(stop_id: "place-unsqu", route: "Green-C", route_type: 0),
+          ie(stop_id: "70504", route: "Green-C", route_type: 0),
+          ie(stop_id: "70202", route: "Green-C", route_type: 0),
+          ie(stop_id: "place-gover", route: "Green-C", route_type: 0),
+          ie(stop_id: "70201", route: "Green-B", route_type: 0),
+          ie(stop_id: "70504", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-lech", route: "Green-C", route_type: 0),
+          ie(stop_id: "70501", route: "Green-B", route_type: 0),
+          ie(stop_id: "70202", route: "Green-E", route_type: 0),
+          ie(stop_id: "70208", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-gover", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-spmnl", route: "Green-D", route_type: 0),
+          ie(stop_id: "70207", route: "Green-E", route_type: 0),
+          ie(stop_id: "70204", route: "Green-B", route_type: 0),
+          ie(stop_id: "70203", route: "Green-C", route_type: 0)
+        ],
+        lifecycle: "NEW",
+        severity: 7,
+        timeframe: nil,
+        updated_at: ~U[2022-06-24 18:24:03Z],
+        url: nil
+      },
+      %Screens.Alerts.Alert{
+        active_period: [{~U[2022-08-20 01:00:00Z], ~U[2022-09-19 06:30:00Z]}],
+        cause: :unknown,
+        created_at: ~U[2022-08-03 17:32:41Z],
+        description:
+          "Alternative Travel Options for Riders:\r\n\r\nRiders commuting to downtown are encouraged to use the Commuter Rail. Zone 1A, 1, and 2 fares can be paid simply by showing a CharlieCard or CharlieTicket on ALL Commuter Rail lines. \r\n\r\nMost Needham and Providence Line Commuter Rail trains will stop at Forest Hills, Ruggles, Back Bay, and South Station.\r\nHaverhill Line Commuter Rail trains will stop at Oak Grove, Malden Center, and North Station. \r\n\r\nRiders can use other existing MBTA bus and subway services to complete their trips.\r\n\r\nShuttle bus service will operate in both directions, connecting Oak Grove and Forest Hills stations to downtown Boston. \r\n\r\nA Rider's Guide is available on mbta.com",
+        effect: :suspension,
+        header:
+          "Orange Line service is suspended through Sun, Sep 18. This suspension will allow for upgrades and improvements of track and signal systems along the line.",
+        id: "456090",
+        informed_entities: [
+          ie(stop_id: nil, route: "Orange", route_type: 1)
+        ],
+        lifecycle: "ONGOING",
+        severity: 1,
+        timeframe: "through September 18",
+        updated_at: ~U[2022-08-22 16:38:57Z],
+        url: "https://mbta.com/BBT2022"
+      },
+      %Screens.Alerts.Alert{
+        active_period: [{~U[2022-08-22 08:30:00Z], ~U[2022-09-19 06:30:00Z]}],
+        cause: :unknown,
+        created_at: ~U[2022-08-08 15:11:48Z],
+        description:
+          "All shuttle buses will be accessible for passengers with disabilities. Haymarket station will not be serviced by shuttles due to the proximity to Government Center Garage demolition work. \r\n\r\nAffected stops:\r\nUnion Square\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
+        effect: :shuttle,
+        header:
+          "Shuttle buses replace Green Line service between Union Square and Government Center through Sun, Sep 18. This is to allow for work on the Green Line Extension, the Lechmere Viaduct, and the Government Center Garage project.",
+        id: "456774",
+        informed_entities: [
+          ie(stop_id: "place-haecl", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-north", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-lech", route: "Green-B", route_type: 0),
+          ie(stop_id: "70204", route: "Green-B", route_type: 0),
+          ie(stop_id: "70503", route: "Green-E", route_type: 0),
+          ie(stop_id: "70202", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-gover", route: "Green-D", route_type: 0),
+          ie(stop_id: "70206", route: "Green-D", route_type: 0),
+          ie(stop_id: "70208", route: "Green-D", route_type: 0),
+          ie(stop_id: "70206", route: "Green-B", route_type: 0),
+          ie(stop_id: "70207", route: "Green-E", route_type: 0),
+          ie(stop_id: "70203", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-north", route: "Green-E", route_type: 0),
+          ie(stop_id: "70201", route: "Green-B", route_type: 0),
+          ie(stop_id: "70502", route: "Green-C", route_type: 0),
+          ie(stop_id: "place-spmnl", route: "Green-D", route_type: 0),
+          ie(stop_id: "70501", route: "Green-C", route_type: 0),
+          ie(stop_id: "70207", route: "Green-B", route_type: 0),
+          ie(stop_id: "70204", route: "Green-D", route_type: 0),
+          ie(stop_id: "70205", route: "Green-D", route_type: 0),
+          ie(stop_id: "70201", route: "Green-D", route_type: 0),
+          ie(stop_id: "70502", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-unsqu", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-haecl", route: "Green-B", route_type: 0),
+          ie(stop_id: "70202", route: "Green-C", route_type: 0),
+          ie(stop_id: "place-spmnl", route: "Green-E", route_type: 0),
+          ie(stop_id: "70504", route: "Green-C", route_type: 0),
+          ie(stop_id: "70503", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-gover", route: "Green-C", route_type: 0),
+          ie(stop_id: "70205", route: "Green-B", route_type: 0),
+          ie(stop_id: "70205", route: "Green-C", route_type: 0),
+          ie(stop_id: "70502", route: "Green-E", route_type: 0),
+          ie(stop_id: "70208", route: "Green-C", route_type: 0),
+          ie(stop_id: "70207", route: "Green-C", route_type: 0),
+          ie(stop_id: "place-gover", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-haecl", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-north", route: "Green-C", route_type: 0),
+          ie(stop_id: "70201", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-unsqu", route: "Green-B", route_type: 0),
+          ie(stop_id: "70502", route: "Green-B", route_type: 0),
+          ie(stop_id: "70204", route: "Green-C", route_type: 0),
+          ie(stop_id: "70201", route: "Green-C", route_type: 0),
+          ie(stop_id: "70202", route: "Green-E", route_type: 0),
+          ie(stop_id: "70504", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-lech", route: "Green-E", route_type: 0),
+          ie(stop_id: "70503", route: "Green-B", route_type: 0),
+          ie(stop_id: "70203", route: "Green-B", route_type: 0),
+          ie(stop_id: "70203", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-haecl", route: "Green-C", route_type: 0),
+          ie(stop_id: "70501", route: "Green-B", route_type: 0),
+          ie(stop_id: "70206", route: "Green-C", route_type: 0),
+          ie(stop_id: "70203", route: "Green-C", route_type: 0),
+          ie(stop_id: "70208", route: "Green-B", route_type: 0),
+          ie(stop_id: "70503", route: "Green-C", route_type: 0),
+          ie(stop_id: "70208", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-lech", route: "Green-C", route_type: 0),
+          ie(stop_id: "70204", route: "Green-E", route_type: 0),
+          ie(stop_id: "70202", route: "Green-D", route_type: 0),
+          ie(stop_id: "70501", route: "Green-E", route_type: 0),
+          ie(stop_id: "70206", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-unsqu", route: "Green-C", route_type: 0),
+          ie(stop_id: "70501", route: "Green-D", route_type: 0),
+          ie(stop_id: "70205", route: "Green-E", route_type: 0),
+          ie(stop_id: "place-unsqu", route: "Green-D", route_type: 0),
+          ie(stop_id: "70504", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-gover", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-spmnl", route: "Green-B", route_type: 0),
+          ie(stop_id: "70504", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-north", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-spmnl", route: "Green-C", route_type: 0),
+          ie(stop_id: "70207", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-lech", route: "Green-D", route_type: 0)
+        ],
+        lifecycle: "ONGOING",
+        severity: 7,
+        timeframe: "through September 18",
+        updated_at: ~U[2022-08-23 11:28:40Z],
+        url: nil
+      }
+    ]
+
     # This runs the test 100 times
     check all(
             {stop_id, _abbrev} = stop <- StreamData.member_of(@stops_with_screens),
             random_pos_integer <- StreamData.positive_integer(),
-            alert <- StreamData.member_of(@alerts),
+            alert <- StreamData.member_of(alerts),
             max_runs: 1000
           ) do
       config =

@@ -6,7 +6,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.Endpoints
   alias Screens.Alerts.InformedEntity
+  alias Screens.Routes.Route
+  alias Screens.Stops.Stop
   alias Screens.Stops.Subway
+  alias Screens.V2.WidgetInstance.SubwayStatus
 
   @route_directions %{
     "Blue" => ["Westbound", "Eastbound"],
@@ -71,6 +74,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   # Station Closure Helper Functions #
   ####################################
 
+  @spec get_stop_name_with_platform(list(InformedEntity.t()), list(String.t()), Route.id()) ::
+          SubwayStatus.location_map()
   def get_stop_name_with_platform(informed_entities, [platform_name], route_id) do
     # Although it is possible to create a closure alert for multiple partial stations,
     # we pass along platform info only if a single platform is closed at that station.
@@ -79,8 +84,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
     relevant_entities = filter_entities_by_route(informed_entities, route_id)
 
     parent_station_id =
-      Enum.find_value(relevant_entities, fn %{stop: stop_id} ->
-        if Map.has_key?(stop_names, stop_id), do: stop_id
+      Enum.find_value(relevant_entities, fn
+        %InformedEntity{stop: %Stop{id: stop_id}} ->
+          if Map.has_key?(stop_names, stop_id), do: stop_id
+
+        %InformedEntity{stop: nil} ->
+          nil
       end)
 
     case Map.get(stop_names, parent_station_id) do
@@ -104,7 +113,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
     informed_entities
     |> filter_entities_by_route(route_id)
     |> Enum.flat_map(fn
-      %{stop: stop_id, route: route_id} ->
+      %InformedEntity{stop: %Stop{id: stop_id}, route: route_id} ->
         stop_names = Subway.route_stop_names(route_id)
 
         case Map.get(stop_names, stop_id) do

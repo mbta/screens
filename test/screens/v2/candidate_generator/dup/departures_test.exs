@@ -21,6 +21,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias ScreensConfig.Screen.Dup, as: DupConfig
 
   import Screens.Inject
+  import Screens.TestSupport.InformedEntityBuilder
   import Mox
   setup :verify_on_exit!
 
@@ -1236,8 +1237,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             struct(Alert,
               effect: :suspension,
               informed_entities: [
-                %{stop: "place-B", route: "Red"},
-                %{stop: "place-C", route: "Red"}
+                ie(stop_id: "place-B", route: "Red"),
+                ie(stop_id: "place-C", route: "Red")
               ],
               active_period: [{~U[2020-05-06T09:00:00Z], nil}]
             )
@@ -1446,48 +1447,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             struct(Alert,
               effect: :suspension,
               informed_entities: [
-                %{
-                  direction_id: nil,
-                  facility: nil,
-                  route: "Green-C",
-                  route_type: 0,
-                  stop: "70150"
-                },
-                %{
-                  direction_id: nil,
-                  facility: nil,
-                  route: "Green-C",
-                  route_type: 0,
-                  stop: "70151"
-                },
-                %{
-                  direction_id: nil,
-                  facility: nil,
-                  route: "Green-C",
-                  route_type: 0,
-                  stop: "70211"
-                },
-                %{
-                  direction_id: nil,
-                  facility: nil,
-                  route: "Green-C",
-                  route_type: 0,
-                  stop: "70212"
-                },
-                %{
-                  direction_id: nil,
-                  facility: nil,
-                  route: "Green-C",
-                  route_type: 0,
-                  stop: "place-kencl"
-                },
-                %{
-                  direction_id: nil,
-                  facility: nil,
-                  route: "Green-C",
-                  route_type: 0,
-                  stop: "place-smary"
-                }
+                ie(stop_id: "place-kencl", route: "Green-C"),
+                ie(stop_id: "place-smary", route: "Green-C"),
+                ie(stop_id: "70150", route: "Green-C"),
+                ie(stop_id: "70151", route: "Green-C"),
+                ie(stop_id: "70211", route: "Green-C"),
+                ie(stop_id: "70212", route: "Green-C")
               ],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )
@@ -2312,7 +2277,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
     end
 
-    test "returns OvernightDepartures for rail sections with active alert and no active vehicles",
+    test "doesn't return OvernightDepartures for rail sections without active vehicles but with an active alert",
          %{
            config: config,
            fetch_departures_fn: fetch_departures_fn,
@@ -2361,13 +2326,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           [
             struct(Alert,
               effect: :suspension,
-              informed_entities: [
-                %{
-                  route: %{id: "Red"},
-                  route_type: 0,
-                  stop: "place-overnight"
-                }
-              ],
+              informed_entities: [ie(stop_id: "place-overnight", route: "Red", route_type: 0)],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )
           ]
@@ -2376,9 +2335,42 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       fetch_vehicles_fn = fn _, _ -> [] end
 
       expected_departures = [
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_zero]},
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_one]},
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_two]}
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: []
+            }
+          ],
+          slot_names: [:main_content_zero],
+          now: now
+        },
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: []
+            }
+          ],
+          slot_names: [:main_content_one],
+          now: now
+        },
+        %DeparturesWidget{
+          screen: config,
+          sections: [
+            %NormalSection{
+              layout: %Layout{},
+              header: %SectionHeader{},
+              rows: []
+            }
+          ],
+          slot_names: [:main_content_two],
+          now: now
+        }
       ]
 
       actual_instances =
@@ -2730,14 +2722,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           [
             struct(Alert,
               effect: :suspension,
-              informed_entities: [
-                %{
-                  route: "Red",
-                  route_type: 0,
-                  stop: "place-closed",
-                  direction_id: nil
-                }
-              ],
+              informed_entities: [ie(stop_id: "place-closed", route: "Red", route_type: 0)],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )
           ]
@@ -2854,12 +2839,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             struct(Alert,
               effect: :suspension,
               informed_entities: [
-                %{
-                  route: %{id: "Red"},
-                  route_type: 0,
-                  stop: "place-closed",
-                  direction_id: 0
-                }
+                ie(stop_id: "place-closed", route: "Red", route_type: 0, direction_id: 0)
               ],
               active_period: [{~U[2020-04-06T09:00:00Z], nil}]
             )

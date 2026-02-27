@@ -235,7 +235,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
   @spec get_closed_platform_name(DupAlert.t()) :: String.t() | nil
   defp get_closed_platform_name(t) do
-    stops_in_alert = Enum.map(t.alert.informed_entities, & &1.stop)
+    stops_in_alert = Enum.map(t.alert.informed_entities, & &1.stop.id)
 
     platform_names =
       t

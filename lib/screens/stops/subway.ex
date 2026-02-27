@@ -273,9 +273,11 @@ defmodule Screens.Stops.Subway do
   end
 
   @spec stop_index_for_informed_entity(InformedEntity.t(), [station()]) :: non_neg_integer() | nil
-  def stop_index_for_informed_entity(%{stop: stop_id}, stop_sequence) do
+  def stop_index_for_informed_entity(%InformedEntity{stop: %{id: stop_id}}, stop_sequence) do
     Enum.find_index(stop_sequence, fn {station_id, _} -> station_id == stop_id end)
   end
+
+  def stop_index_for_informed_entity(%InformedEntity{stop: nil}, _stop_sequence), do: nil
 
   @spec stop_on_route?(Stop.id(), [station()]) :: boolean()
   def stop_on_route?(stop_id, stop_sequence) when not is_nil(stop_id) do
@@ -313,18 +315,15 @@ defmodule Screens.Stops.Subway do
     |> Enum.uniq()
   end
 
+  @spec sequence_match?([station()], [InformedEntity.t()]) :: boolean()
   defp sequence_match?(stop_sequence, informed_entities) do
-    ie_stops =
-      informed_entities
-      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-      |> Enum.reject(&is_nil/1)
-
-    if Enum.empty?(ie_stops) do
-      nil
-    else
-      ie_stops
-      |> Enum.filter(&String.starts_with?(&1, "place-"))
-      |> Enum.all?(&stop_on_route?(&1, stop_sequence))
+    informed_entities
+    |> Enum.filter(&InformedEntity.parent_station?/1)
+    |> InformedEntity.uniq_by_stop()
+    |> Enum.map(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id end)
+    |> case do
+      [] -> nil
+      ie_parent_stops -> Enum.all?(ie_parent_stops, &stop_on_route?(&1, stop_sequence))
     end
   end
 
@@ -344,18 +343,14 @@ defmodule Screens.Stops.Subway do
 
   @spec stops_in_alert([station()], [InformedEntity.t()], Route.id()) :: [station()]
   defp stops_in_alert(stop_sequence, informed_entities, route_id) do
-    ie_stops =
-      informed_entities
-      |> Enum.filter(&(&1.route == route_id and !is_nil(&1.stop)))
-      |> Enum.map(fn %{stop: stop_id} -> stop_id end)
-
-    if Enum.empty?(ie_stops) do
-      nil
-    else
+    informed_entities
+    |> Enum.filter(&(&1.route == route_id and !is_nil(&1.stop)))
+    |> Enum.map(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id end)
+    |> case do
+      [] -> []
       # ie_stops can include non-boarding stop_ids (location_type 2 or 3)
       # Finding union with stop_sequence ensures we remove these
-      stop_sequence
-      |> Enum.filter(fn {id, _} -> Enum.member?(ie_stops, id) end)
+      ie_stops -> Enum.filter(stop_sequence, fn {id, _} -> Enum.member?(ie_stops, id) end)
     end
   end
 end

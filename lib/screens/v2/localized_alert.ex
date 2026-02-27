@@ -4,9 +4,11 @@ defmodule Screens.V2.LocalizedAlert do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.RouteType
+  alias Screens.Stops.Stop
   alias Screens.Util
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias Screens.V2.WidgetInstance.{DupAlert, ReconstructedAlert}
@@ -67,7 +69,7 @@ defmodule Screens.V2.LocalizedAlert do
       )
       when app_id in [:dup_v2, :pre_fare_v2] do
     with headsign_matchers when is_map(headsign_matchers) <- headsign_matchers(t) do
-      informed_stop_ids = MapSet.new(informed_entities, & &1.stop)
+      informed_stop_ids = MapSet.new(informed_entities, & &1.stop.id)
 
       headsign_matchers
       |> Map.get(location_context.home_stop)
@@ -98,20 +100,26 @@ defmodule Screens.V2.LocalizedAlert do
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
-  @spec informed_entity_to_zone(Alert.informed_entity(), LocationContext.t()) ::
+  @spec informed_entity_to_zone(InformedEntity.t(), LocationContext.t()) ::
           list(:upstream | :home_stop | :downstream)
   defp informed_entity_to_zone(informed_entity, location_context)
 
   # All values nil
-  defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: nil}, _location_context) do
+  defp informed_entity_to_zone(
+         %InformedEntity{stop: nil, route: nil, route_type: nil},
+         _location_context
+       ) do
     []
   end
 
   # Only route type is not nil--this is the only time we consider route type,
   # since it's implied by other values when they are not nil
-  defp informed_entity_to_zone(%{stop: nil, route: nil, route_type: route_type_id}, %{
-         alert_route_types: alert_route_types
-       }) do
+  defp informed_entity_to_zone(
+         %InformedEntity{stop: nil, route: nil, route_type: route_type_id},
+         %{
+           alert_route_types: alert_route_types
+         }
+       ) do
     if RouteType.from_id(route_type_id) in alert_route_types do
       [:upstream, :home_stop, :downstream]
     else
@@ -120,29 +128,35 @@ defmodule Screens.V2.LocalizedAlert do
   end
 
   # Only stop is not nil (route type ignored)
-  defp informed_entity_to_zone(%{stop: stop, route: nil}, context) do
+  defp informed_entity_to_zone(%InformedEntity{stop: %Stop{id: stop_id}}, context)
+       when not is_nil(stop_id) do
     cond do
-      stop == context.home_stop -> [:home_stop]
+      stop_id == context.home_stop -> [:home_stop]
       # Stops can be both upstream and downstream simultaneously, on different routes through the home stop.
       # We check whether it's downstream first, since that takes priority.
-      stop in context.downstream_stops -> [:downstream]
-      stop in context.upstream_stops -> [:upstream]
+      stop_id in context.downstream_stops -> [:downstream]
+      stop_id in context.upstream_stops -> [:upstream]
       true -> []
     end
   end
 
   # Only route is not nil (route type ignored)
-  defp informed_entity_to_zone(%{stop: nil, route: route}, context) do
+  defp informed_entity_to_zone(%InformedEntity{stop: nil, route: route}, context) do
     route_ids = LocationContext.route_ids(context)
     if route in route_ids, do: [:upstream, :home_stop, :downstream], else: []
   end
 
-  defp informed_entity_to_zone(%{stop: _stop} = entity, context) do
+  defp informed_entity_to_zone(%InformedEntity{stop: stop} = entity, context)
+       when not is_nil(stop) do
     informed_entity_to_zone(Map.put(entity, :route, nil), context)
   end
 
   # Both stop and route are not nil (route type ignored)
-  defp informed_entity_to_zone(%{stop: _stop, route: route} = informed_entity, context) do
+  defp informed_entity_to_zone(
+         %InformedEntity{stop: stop, route: route} = informed_entity,
+         context
+       )
+       when not is_nil(stop) do
     route_ids = LocationContext.route_ids(context)
 
     if route in route_ids do
@@ -302,7 +316,7 @@ defmodule Screens.V2.LocalizedAlert do
           {:halt, empty_set}
 
         # If entity has no route indicator, don't mark any route as informed
-        %{route_type: nil, stop: nil, route: nil}, uninformed ->
+        %InformedEntity{route_type: nil, stop: nil, route: nil}, uninformed ->
           {:cont, uninformed}
 
         # For a systemwide alert (affecting all bus or all subway/light rail)
@@ -310,18 +324,18 @@ defmodule Screens.V2.LocalizedAlert do
         # credo:disable-for-next-line
         # TODO bug: currently breaks for pre-fare, dups (because they are multimodal, and alerts UI lumps
         # together subway and light rail)
-        %{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
+        %InformedEntity{route_type: route_type_id, stop: nil, route: nil}, uninformed ->
           if RouteType.from_id(route_type_id) in rts,
             do: {:halt, empty_set},
             else: {:cont, uninformed}
 
         # If entity is home stop and NO route, indicate all routes are informed
         # Might not be feasible with Alerts UI
-        %{stop: ^home_stop, route: nil}, _uninformed ->
+        %InformedEntity{stop: %Stop{id: ^home_stop}, route: nil}, _uninformed ->
           {:halt, empty_set}
 
         # If entity is home stop AND a route, then just that route is marked informed
-        %{stop: ^home_stop, route: route}, uninformed ->
+        %InformedEntity{stop: %Stop{id: ^home_stop}, route: route}, uninformed ->
           {:cont, MapSet.delete(uninformed, route)}
 
         # Removed the case with downstream alerts because:
@@ -329,7 +343,7 @@ defmodule Screens.V2.LocalizedAlert do
         #  - we don't want to ever show downstream alerts on bus shelter / bus e-ink
 
         # If the entity has a route, but no stop, that route is marked informed
-        %{stop: nil, route: route}, uninformed ->
+        %InformedEntity{stop: nil, route: route}, uninformed ->
           {:cont, MapSet.delete(uninformed, route)}
 
         _ie, uninformed ->

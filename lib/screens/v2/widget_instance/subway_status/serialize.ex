@@ -254,7 +254,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
       # Logic for partial_station_closure will remove any alerts that apply to more than
       # a single parent platform.
       :partial_closure ->
-        informed_stop_ids = Enum.map(informed_entities, & &1.stop)
+        informed_stop_ids = Enum.map(informed_entities, & &1.stop.id)
 
         platform_names =
           all_platforms_at_informed_stations

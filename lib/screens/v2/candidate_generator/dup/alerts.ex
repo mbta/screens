@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.Report
   alias Screens.Stops.Stop
@@ -234,7 +235,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     detoured_routes =
       alert
       |> Map.get(:informed_entities)
-      |> Enum.map(fn entity -> if entity.stop === "place-wtcst", do: entity.route end)
+      |> Enum.map(fn
+        %InformedEntity{stop: %{id: "place-wtcst"}, route: route} -> route
+        _ -> nil
+      end)
       |> Enum.filter(& &1)
       |> Enum.sort()
 
@@ -262,9 +266,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
           [String.t()]
   defp get_branches_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
     stop_matchers
-    |> Enum.filter(fn stop ->
-      Enum.any?(informed_entities, fn e ->
-        stop.stop === e.stop
+    |> Enum.filter(fn stop_matcher ->
+      Enum.any?(informed_entities, fn
+        %{stop: %{id: stop_id}} -> stop_matcher.stop === stop_id
+        %{stop: nil} -> false
       end)
     end)
     |> Enum.map(&Map.get(&1, :branch))

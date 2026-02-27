@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Alerts, MultiStopAlerts}
@@ -54,16 +55,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     route_id_set = MapSet.new(route_ids)
 
     relevant_ie? = fn
-      %{route_type: route_type, stop: nil, route: nil} when not is_nil(route_type) ->
+      %InformedEntity{route_type: route_type, stop: nil, route: nil}
+      when not is_nil(route_type) ->
         true
 
-      %{stop: stop, route: route} when not is_nil(stop) and not is_nil(route) ->
-        stop in stop_id_set and route in route_id_set
+      %InformedEntity{stop: %{id: stop_id}, route: route}
+      when not is_nil(stop_id) and not is_nil(route) ->
+        stop_id in stop_id_set and route in route_id_set
 
-      %{stop: stop, route: nil} ->
-        stop in stop_id_set
+      %InformedEntity{stop: %{id: stop_id}, route: nil} when not is_nil(stop_id) ->
+        stop_id in stop_id_set
 
-      %{stop: nil, route: route} ->
+      %InformedEntity{stop: nil, route: route} ->
         route in route_id_set
 
       _ ->

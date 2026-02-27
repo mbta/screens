@@ -18,6 +18,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
   alias ScreensConfig.Screen.Dup, as: DupConfig
 
   import Screens.Inject
+  import Screens.TestSupport.InformedEntityBuilder
   import Mox
   setup :verify_on_exit!
 
@@ -332,7 +333,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
           struct(Alert,
             effect: :suspension,
             informed_entities: [
-              %{stop: "place-B", route: "Red"}
+              ie(stop_id: "place-B", route: "Red")
             ],
             active_period: [{~U[2020-04-06T09:00:00Z], nil}]
           )
@@ -540,34 +541,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesHeadwayTest do
           struct(Alert,
             effect: :suspension,
             informed_entities: [
-              %{
-                direction_id: nil,
-                facility: nil,
-                route: "Green-C",
-                route_type: 0,
-                stop: "70151"
-              },
-              %{
-                direction_id: nil,
-                facility: nil,
-                route: "Green-C",
-                route_type: 0,
-                stop: "70152"
-              },
-              %{
-                direction_id: nil,
-                facility: nil,
-                route: "Green-C",
-                route_type: 0,
-                stop: "place-kencl"
-              },
-              %{
-                direction_id: nil,
-                facility: nil,
-                route: "Green-C",
-                route_type: 0,
-                stop: "place-hymnl"
-              }
+              ie(stop_id: "place-kencl", route: "Green-C"),
+              ie(stop_id: "place-hymnl", route: "Green-C"),
+              ie(stop_id: "70151", route: "Green-C"),
+              ie(stop_id: "70152", route: "Green-C")
             ],
             active_period: [{~U[2020-04-06T09:00:00Z], nil}]
           )

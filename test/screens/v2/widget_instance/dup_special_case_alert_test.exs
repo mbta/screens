@@ -7,6 +7,8 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   alias ScreensConfig.{Alerts, Departures, FreeTextLine, Screen}
   alias ScreensConfig.Screen.Dup
 
+  import Screens.TestSupport.InformedEntityBuilder
+
   defp routes("place-kencl") do
     [
       %{active?: true, route_id: "Green-B"},
@@ -171,90 +173,18 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Shuttle buses replacing Green Line B branch service",
           id: "137269",
           informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70144"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70145"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70146"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70147"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70148"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70149"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "71150"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "71151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-bland"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-bucen"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-buest"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-kencl"
-            }
+            ie(stop_id: "70144", route: "Green-B", route_type: 0),
+            ie(stop_id: "70145", route: "Green-B", route_type: 0),
+            ie(stop_id: "70146", route: "Green-B", route_type: 0),
+            ie(stop_id: "70147", route: "Green-B", route_type: 0),
+            ie(stop_id: "70148", route: "Green-B", route_type: 0),
+            ie(stop_id: "70149", route: "Green-B", route_type: 0),
+            ie(stop_id: "71150", route: "Green-B", route_type: 0),
+            ie(stop_id: "71151", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-bucen", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-buest", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-B", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -272,69 +202,15 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Shuttle buses replacing Green Line C branch service",
           id: "137270",
           informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70150"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70211"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70212"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70213"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70214"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-hwsst"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-kencl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-smary"
-            }
+            ie(stop_id: "70150", route: "Green-C", route_type: 0),
+            ie(stop_id: "70151", route: "Green-C", route_type: 0),
+            ie(stop_id: "70211", route: "Green-C", route_type: 0),
+            ie(stop_id: "70212", route: "Green-C", route_type: 0),
+            ie(stop_id: "70213", route: "Green-C", route_type: 0),
+            ie(stop_id: "70214", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-hwsst", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-C", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -352,48 +228,12 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Shuttle buses replacing Green Line D branch service",
           id: "137272",
           informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70150"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70186"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70187"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-fenwy"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-kencl"
-            }
+            ie(stop_id: "70150", route: "Green-D", route_type: 0),
+            ie(stop_id: "70151", route: "Green-D", route_type: 0),
+            ie(stop_id: "70186", route: "Green-D", route_type: 0),
+            ie(stop_id: "70187", route: "Green-D", route_type: 0),
+            ie(stop_id: "place-fenwy", route: "Green-D", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-D", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -412,258 +252,42 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Shuttle buses replacing Green Line service",
           id: "137273",
           informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70187"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70149"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "71151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70148"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70149"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "71150"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-smary"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "place-fenwy"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-bland"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-kencl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70187"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-smary"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "place-bland"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70148"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70186"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70150"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "71151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "71150"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-bland"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70148"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "place-smary"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "place-fenwy"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "71151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70212"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-C",
-              route_type: 0,
-              stop: "70212"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "70211"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "71151"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "place-kencl"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-B",
-              route_type: 0,
-              stop: "70149"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-D",
-              route_type: 0,
-              stop: "71150"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70212"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "70211"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "Green-E",
-              route_type: 0,
-              stop: "place-smary"
-            }
+            ie(stop_id: "70187", route: "Green-E", route_type: 0),
+            ie(stop_id: "70149", route: "Green-D", route_type: 0),
+            ie(stop_id: "71151", route: "Green-B", route_type: 0),
+            ie(stop_id: "70148", route: "Green-D", route_type: 0),
+            ie(stop_id: "70149", route: "Green-C", route_type: 0),
+            ie(stop_id: "71150", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-D", route_type: 0),
+            ie(stop_id: "place-fenwy", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
+            ie(stop_id: "70187", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-E", route_type: 0),
+            ie(stop_id: "70151", route: "Green-E", route_type: 0),
+            ie(stop_id: "70148", route: "Green-E", route_type: 0),
+            ie(stop_id: "70186", route: "Green-D", route_type: 0),
+            ie(stop_id: "70150", route: "Green-B", route_type: 0),
+            ie(stop_id: "71151", route: "Green-C", route_type: 0),
+            ie(stop_id: "71150", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-C", route_type: 0),
+            ie(stop_id: "70148", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-fenwy", route: "Green-C", route_type: 0),
+            ie(stop_id: "70151", route: "Green-B", route_type: 0),
+            ie(stop_id: "71151", route: "Green-D", route_type: 0),
+            ie(stop_id: "70212", route: "Green-D", route_type: 0),
+            ie(stop_id: "70151", route: "Green-C", route_type: 0),
+            ie(stop_id: "70212", route: "Green-C", route_type: 0),
+            ie(stop_id: "70211", route: "Green-D", route_type: 0),
+            ie(stop_id: "71151", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-D", route_type: 0),
+            ie(stop_id: "70149", route: "Green-B", route_type: 0),
+            ie(stop_id: "71150", route: "Green-D", route_type: 0),
+            ie(stop_id: "70212", route: "Green-E", route_type: 0),
+            ie(stop_id: "70211", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-E", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -684,174 +308,30 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           header: "Silver Line - SL1, Silver Line - SL2 and Silver Line - SL3 detoured",
           id: "137327",
           informed_entities: [
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "741",
-              route_type: 3,
-              stop: "74611"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "741",
-              route_type: 3,
-              stop: "74612"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "741",
-              route_type: 3,
-              stop: "74613"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "741",
-              route_type: 3,
-              stop: "place-crtst"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "741",
-              route_type: 3,
-              stop: "place-sstat"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "741",
-              route_type: 3,
-              stop: "place-wtcst"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "742",
-              route_type: 3,
-              stop: "74611"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "742",
-              route_type: 3,
-              stop: "74612"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "742",
-              route_type: 3,
-              stop: "74613"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "742",
-              route_type: 3,
-              stop: "place-crtst"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "742",
-              route_type: 3,
-              stop: "place-sstat"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "742",
-              route_type: 3,
-              stop: "place-wtcst"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "743",
-              route_type: 3,
-              stop: "74611"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "743",
-              route_type: 3,
-              stop: "74612"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "743",
-              route_type: 3,
-              stop: "74613"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "743",
-              route_type: 3,
-              stop: "place-crtst"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "743",
-              route_type: 3,
-              stop: "place-sstat"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "743",
-              route_type: 3,
-              stop: "place-wtcst"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "746",
-              route_type: 3,
-              stop: "74611"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "746",
-              route_type: 3,
-              stop: "74612"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "746",
-              route_type: 3,
-              stop: "74613"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "746",
-              route_type: 3,
-              stop: "place-crtst"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "746",
-              route_type: 3,
-              stop: "place-sstat"
-            },
-            %{
-              direction_id: nil,
-              facility: nil,
-              route: "746",
-              route_type: 3,
-              stop: "place-wtcst"
-            }
+            ie(stop_id: "74611", route: "741", route_type: 3),
+            ie(stop_id: "74612", route: "741", route_type: 3),
+            ie(stop_id: "74613", route: "741", route_type: 3),
+            ie(stop_id: "place-crtst", route: "741", route_type: 3),
+            ie(stop_id: "place-sstat", route: "741", route_type: 3),
+            ie(stop_id: "place-wtcst", route: "741", route_type: 3),
+            ie(stop_id: "74611", route: "742", route_type: 3),
+            ie(stop_id: "74612", route: "742", route_type: 3),
+            ie(stop_id: "74613", route: "742", route_type: 3),
+            ie(stop_id: "place-crtst", route: "742", route_type: 3),
+            ie(stop_id: "place-sstat", route: "742", route_type: 3),
+            ie(stop_id: "place-wtcst", route: "742", route_type: 3),
+            ie(stop_id: "74611", route: "743", route_type: 3),
+            ie(stop_id: "74612", route: "743", route_type: 3),
+            ie(stop_id: "74613", route: "743", route_type: 3),
+            ie(stop_id: "place-crtst", route: "743", route_type: 3),
+            ie(stop_id: "place-sstat", route: "743", route_type: 3),
+            ie(stop_id: "place-wtcst", route: "743", route_type: 3),
+            ie(stop_id: "74611", route: "746", route_type: 3),
+            ie(stop_id: "74612", route: "746", route_type: 3),
+            ie(stop_id: "74613", route: "746", route_type: 3),
+            ie(stop_id: "place-crtst", route: "746", route_type: 3),
+            ie(stop_id: "place-sstat", route: "746", route_type: 3),
+            ie(stop_id: "place-wtcst", route: "746", route_type: 3)
           ],
           lifecycle: "NEW",
           severity: 7,
