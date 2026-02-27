@@ -68,21 +68,13 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
 
   defimpl Screens.V2.WidgetInstance do
     def priority(_instance), do: [2]
-
     def serialize(t), do: NormalHeader.serialize(t)
-
     def slot_names(t), do: NormalHeader.slot_names(t)
-
     def widget_type(_instance), do: :normal_header
-
     def valid_candidate?(_instance), do: true
-
     def audio_serialize(instance), do: NormalHeader.audio_serialize(instance)
-
     def audio_sort_key(_instance), do: [0]
-
     def audio_valid_candidate?(_instance), do: true
-
     def audio_view(_instance), do: ScreensWeb.V2.Audio.NormalHeaderView
   end
 end

@@ -63,9 +63,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     end
   end
 
-  @spec valid_candidate?(t()) :: boolean()
-  def valid_candidate?(%__MODULE__{}), do: true
-
   # Determine the desired layout for this alert. Follows the rules documented here:
   # https://www.notion.so/mbta-downtown-crossing/DUP-Alert-Widget-Specification-17cf5d8d11ea80399a7fe3c4f13a511f
   @spec alert_layout(t()) :: :full_screen | :banner
@@ -164,26 +161,6 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     |> Enum.uniq()
   end
 
-  def alert_ids(%__MODULE__{} = t), do: [t.alert.id]
-
-  ### Required audio callbacks. The widget does not have audio equivalence, so these are "stubbed".
-
-  def audio_serialize(_t) do
-    %{}
-  end
-
-  def audio_sort_key(_t) do
-    [0]
-  end
-
-  def audio_valid_candidate?(_t) do
-    false
-  end
-
-  def audio_view(_t) do
-    nil
-  end
-
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.DupAlert
 
@@ -191,16 +168,15 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     def serialize(instance), do: DupAlert.serialize(instance)
     def slot_names(instance), do: DupAlert.slot_names(instance)
     def widget_type(instance), do: DupAlert.widget_type(instance)
-    def valid_candidate?(instance), do: DupAlert.valid_candidate?(instance)
-    def audio_serialize(instance), do: DupAlert.audio_serialize(instance)
-    def audio_sort_key(instance), do: DupAlert.audio_sort_key(instance)
-    def audio_valid_candidate?(instance), do: DupAlert.audio_valid_candidate?(instance)
-    def audio_view(instance), do: DupAlert.audio_view(instance)
+    def valid_candidate?(_instance), do: true
+
+    def audio_serialize(_instance), do: %{}
+    def audio_sort_key(_instance), do: [0]
+    def audio_valid_candidate?(_instance), do: false
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.NullView
   end
 
   defimpl Screens.V2.AlertsWidget do
-    alias Screens.V2.WidgetInstance.DupAlert
-
-    def alert_ids(instance), do: DupAlert.alert_ids(instance)
+    def alert_ids(instance), do: [instance.alert.id]
   end
 end

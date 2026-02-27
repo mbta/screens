@@ -24,8 +24,6 @@ defmodule Screens.V2.WidgetInstance.AlertHeader do
         }
 
   defimpl Screens.V2.WidgetInstance do
-    def priority(_instance), do: [2]
-
     def serialize(%AlertHeader{text: text, icon: icon, color: color, accent: accent, time: time}) do
       %{text: text, icon: icon, color: color, accent: accent, time: serialize_time(time)}
     end
@@ -36,18 +34,13 @@ defmodule Screens.V2.WidgetInstance.AlertHeader do
 
     defp serialize_time(nil), do: nil
 
+    def priority(_instance), do: [2]
     def slot_names(_instance), do: [:header]
-
     def widget_type(_instance), do: :alert_header
-
     def valid_candidate?(_instance), do: true
-
     def audio_serialize(_instance), do: %{}
-
     def audio_sort_key(_instance), do: [0]
-
     def audio_valid_candidate?(_instance), do: false
-
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.AlertHeaderView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.NullView
   end
 end

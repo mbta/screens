@@ -50,10 +50,4 @@ defmodule Screens.V2.WidgetInstance.OvernightDeparturesTest do
       refute WidgetInstance.audio_valid_candidate?(instance)
     end
   end
-
-  describe "audio_view/1" do
-    test "returns OvernightDeparturesView", %{instance: instance} do
-      assert ScreensWeb.V2.Audio.OvernightDeparturesView == WidgetInstance.audio_view(instance)
-    end
-  end
 end

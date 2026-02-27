@@ -58,10 +58,4 @@ defmodule Screens.V2.WidgetInstance.BottomScreenFillerTest do
       assert false == WidgetInstance.audio_valid_candidate?(instance)
     end
   end
-
-  describe "audio_view/1" do
-    test "returns ScreensWeb.V2.Audio.BottomScreenFillerView", %{instance: instance} do
-      assert ScreensWeb.V2.Audio.BottomScreenFillerView == WidgetInstance.audio_view(instance)
-    end
-  end
 end
