@@ -24,8 +24,6 @@ defmodule Screens.V2.WidgetInstance.LineMap do
   @num_future_stops 2
 
   defimpl Screens.V2.WidgetInstance do
-    def priority(_instance), do: [2]
-
     def serialize(
           %LineMap{
             screen: config,
@@ -67,19 +65,14 @@ defmodule Screens.V2.WidgetInstance.LineMap do
       }
     end
 
+    def priority(_instance), do: [2]
     def slot_names(_instance), do: [:left_sidebar]
-
     def widget_type(_instance), do: :line_map
-
     def valid_candidate?(_instance), do: true
-
     def audio_serialize(_instance), do: %{}
-
     def audio_sort_key(_instance), do: [0]
-
     def audio_valid_candidate?(_instance), do: false
-
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.LineMapView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.NullView
   end
 
   def serialize_stops(current_stop, stops, reverse_stops, terminal?) do

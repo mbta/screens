@@ -62,11 +62,4 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoServiceTest do
       refute WidgetInstance.audio_valid_candidate?(widget)
     end
   end
-
-  describe "audio_view/1" do
-    test "returns DeparturesNoServiceView", %{widget: widget} do
-      assert ScreensWeb.V2.Audio.DeparturesNoServiceView ==
-               WidgetInstance.audio_view(widget)
-    end
-  end
 end

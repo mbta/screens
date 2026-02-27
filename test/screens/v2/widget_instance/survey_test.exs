@@ -16,10 +16,6 @@ defmodule Screens.V2.WidgetInstance.SurveyTest do
     }
   end
 
-  defp put_app_id(widget, app_id) do
-    %{widget | screen: %{widget.screen | app_id: app_id}}
-  end
-
   defp put_enabled(widget, enabled?) do
     %{widget | enabled?: enabled?}
   end
@@ -38,16 +34,8 @@ defmodule Screens.V2.WidgetInstance.SurveyTest do
   end
 
   describe "slot_names/1" do
-    test "returns large and medium for bus shelter", %{widget: widget} do
-      widget = put_app_id(widget, :bus_shelter_v2)
-
+    test "returns large and medium", %{widget: widget} do
       assert [:large, :medium_left, :medium_right] == WidgetInstance.slot_names(widget)
-    end
-
-    test "not defined for non-bus shelter apps", %{widget: widget} do
-      widget = put_app_id(widget, :gl_eink_v2)
-
-      assert_raise FunctionClauseError, fn -> WidgetInstance.slot_names(widget) end
     end
   end
 
@@ -82,12 +70,6 @@ defmodule Screens.V2.WidgetInstance.SurveyTest do
   describe "audio_valid_candidate?/1" do
     test "returns false", %{widget: widget} do
       refute WidgetInstance.audio_valid_candidate?(widget)
-    end
-  end
-
-  describe "audio_view/1" do
-    test "returns SurveyView", %{widget: widget} do
-      assert ScreensWeb.V2.Audio.SurveyView == WidgetInstance.audio_view(widget)
     end
   end
 end

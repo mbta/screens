@@ -10,8 +10,6 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooter do
   defimpl Screens.V2.WidgetInstance do
     @text "For real-time predictions and fare purchase locations:"
 
-    def priority(_instance), do: [2]
-
     def serialize(%FareInfoFooter{mode: mode, stop_id: stop_id}) do
       {mode_icon, mode_text, mode_cost} =
         case mode do
@@ -24,18 +22,13 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooter do
       %{mode_icon: mode_icon, mode_text: mode_text, mode_cost: mode_cost, text: @text, url: url}
     end
 
+    def priority(_instance), do: [2]
     def slot_names(_instance), do: [:footer]
-
     def widget_type(_instance), do: :fare_info_footer
-
     def valid_candidate?(_instance), do: true
-
     def audio_serialize(_instance), do: %{}
-
     def audio_sort_key(_instance), do: [0]
-
     def audio_valid_candidate?(_instance), do: false
-
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.FareInfoFooterView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.NullView
   end
 end

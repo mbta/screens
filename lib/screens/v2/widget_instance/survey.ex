@@ -13,12 +13,6 @@ defmodule Screens.V2.WidgetInstance.Survey do
           large_asset_url: String.t()
         }
 
-  @flex_zone_priority 2
-
-  @survey_priority 10
-
-  def priority(%__MODULE__{}), do: [@flex_zone_priority, @survey_priority]
-
   def serialize(%__MODULE__{medium_asset_url: medium_asset_url, large_asset_url: large_asset_url}) do
     %{
       medium_asset_url: medium_asset_url,
@@ -26,25 +20,20 @@ defmodule Screens.V2.WidgetInstance.Survey do
     }
   end
 
-  def slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
-    [:large, :medium_left, :medium_right]
-  end
-
-  def widget_type(%__MODULE__{}), do: :survey
-
   def valid_candidate?(%__MODULE__{enabled?: enabled?}), do: enabled?
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.Survey
 
-    def priority(instance), do: Survey.priority(instance)
+    def priority(_instance), do: [2, 10]
     def serialize(instance), do: Survey.serialize(instance)
-    def slot_names(instance), do: Survey.slot_names(instance)
-    def widget_type(instance), do: Survey.widget_type(instance)
+    def slot_names(_instance), do: [:large, :medium_left, :medium_right]
+    def widget_type(_instance), do: :survey
     def valid_candidate?(instance), do: Survey.valid_candidate?(instance)
+
     def audio_serialize(_instance), do: %{}
     def audio_sort_key(_instance), do: [0]
     def audio_valid_candidate?(_instance), do: false
-    def audio_view(_instance), do: ScreensWeb.V2.Audio.SurveyView
+    def audio_view(_instance), do: ScreensWeb.V2.Audio.NullView
   end
 end

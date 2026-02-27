@@ -133,7 +133,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
     def audio_serialize(_t), do: %{}
     def audio_sort_key(_t), do: [0]
     def audio_valid_candidate?(_t), do: false
-    def audio_view(_t), do: nil
+    def audio_view(_t), do: ScreensWeb.V2.Audio.NullView
   end
 
   defimpl Screens.V2.AlertsWidget do
