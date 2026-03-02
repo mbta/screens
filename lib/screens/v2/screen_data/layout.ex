@@ -65,24 +65,20 @@ defmodule Screens.V2.ScreenData.Layout do
   end
 
   defp place_instance(instance, placements) do
-    instance_slots = WidgetInstance.slot_names(instance)
-    live_templates = Map.keys(placements)
-    placeable_templates = get_valid_templates(live_templates, instance_slots)
-
-    case placeable_templates do
+    case valid_placements(placements, instance) do
       [] ->
         # If none of the remaining templates can hold the current instance, don't include that
         # instance, and continue with the same live templates and placements.
         placements
 
-      _ ->
+      valid_placements ->
         # If at least one of the remaining templates can hold the current instance, throw out all
         # templates which can't. For those which can, choose a valid slot and place the instance
         # there, adding it to the slot_id => instance mapping for that template, and removing it
         # from the list of unoccupied slot_ids.
-        placeable_templates
-        |> Enum.map(fn t ->
-          chosen_slot = get_first_slot(t, instance_slots)
+        valid_placements
+        |> Enum.map(fn {t, _} = placement ->
+          chosen_slot = placement |> valid_slots(instance) |> hd()
 
           updated_placement =
             placements
@@ -98,27 +94,48 @@ defmodule Screens.V2.ScreenData.Layout do
     end
   end
 
-  defp get_valid_templates(templates, instance_slots) do
-    Enum.filter(templates, &template_is_placeable?(&1, instance_slots))
+  defp valid_placements(placements, instance) do
+    Enum.filter(placements, &(&1 |> valid_slots(instance) |> Enum.any?()))
   end
 
-  defp get_first_slot(template, instance_slots) do
-    template
-    |> get_valid_slots(instance_slots)
-    |> hd()
-  end
-
-  defp template_is_placeable?(template, instance_slots) do
-    matching_slots = get_valid_slots(template, instance_slots)
-    length(matching_slots) > 0
-  end
-
-  defp get_valid_slots(template, instance_slots) do
-    {template_slots, _} = template
+  defp valid_slots({{template_slots, _}, existing_slot_contents}, instance) do
+    instance_slots = WidgetInstance.slot_names(instance)
+    instance_page_groups = WidgetInstance.page_groups(instance)
 
     # N.B. The slots are sorted so that paged regions have their earlier pages filled first.
     # e.g. [{0, :paged_region1}, {0, :paged_region2}, {1, :paged_region1}, {1, :paged_region2}]
-    sorted_slot_list_intersection(template_slots, instance_slots)
+    template_slots
+    |> sorted_slot_list_intersection(instance_slots)
+    |> reject_incompatible_paged_slots(existing_slot_contents, instance_page_groups)
+  end
+
+  # Widgets with no page groups defined have no additional restrictions on slot placement.
+  defp reject_incompatible_paged_slots(slots, _slot_contents, [] = _page_groups), do: slots
+
+  defp reject_incompatible_paged_slots(slots, existing_slot_contents, instance_page_groups) do
+    instance_page_groups = MapSet.new(instance_page_groups)
+
+    # For each paged slot with widgets already placed in it, determine the intersection of page
+    # groups for all of its widgets. This will always be non-empty, due to this function itself
+    # ensuring that all prior placements had intersecting page groups.
+    page_groups_by_unpaged_slot =
+      existing_slot_contents
+      |> Enum.filter(fn {slot, instance} ->
+        is_paged_slot_id(slot) and WidgetInstance.page_groups(instance) != []
+      end)
+      |> Enum.reduce(%{}, fn {slot, instance}, acc ->
+        groups = instance |> WidgetInstance.page_groups() |> MapSet.new()
+        Map.update(acc, Template.unpage(slot), groups, &MapSet.intersection(&1, groups))
+      end)
+
+    # Reject slots where the page groups of the widget to be placed are disjoint with the current
+    # page-group-intersection of the paged slot.
+    Enum.reject(slots, fn slot ->
+      case Map.get(page_groups_by_unpaged_slot, Template.unpage(slot)) do
+        nil -> false
+        groups -> MapSet.disjoint?(groups, instance_page_groups)
+      end
+    end)
   end
 
   defp log_mismatched_placement_widgets(placements) when map_size(placements) < 2, do: placements

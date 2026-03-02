@@ -102,15 +102,11 @@ Since it takes a minute or more to cycle through all pages when there are 3 or m
 
 By keeping the backend in control of paging, content stays real-time, all the time.
 
-### Persistent front-end widgets and frontend paging
+### Page groups
 
-A small number of widgets perform paging internally, entirely on the client. These include the elevator status widget and the pre-fare "full line map" widget. They use a [special function](/assets/src/components/v2/persistent_carousel.tsx#L110) to create a component that cycles through one page at a time, ignoring new data from the backend until it finishes consuming the pages it last received.
+Sometimes we want one widget to exclude another widget from the same slot. For regular slots, this is straightforward since only one widget *can* be placed in a given slot; the highest-priority widget wins. But paged regions can hold multiple widgets, which by default do not exclude each other.
 
-To the backend, they are just normal widgets—it sends data for them in every response, and the client chooses whether or not to discard it.
-
-We use persistent widgets when the number of pages is variable, and when all pages are part of the same widget—as opposed to cycling through a heterogeneous list of e.g. alerts and PSAs.
-
-This approach does have the downside of "stale" data mentioned in [**Why backend paging?**](#why-backend-paging).
+To retain the ability to "exclude" other widgets even in paged regions, widgets can define `page_groups`. For details on this, see the documentation for the `WidgetInstance` protocol.
 
 ## Feature: Audio-only widgets
 

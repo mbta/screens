@@ -21,6 +21,7 @@ defmodule Screens.V2.WidgetInstance.OvernightDepartures do
     def priority(_instance), do: [1]
     def serialize(instance), do: OvernightDepartures.serialize(instance)
     def slot_names(instance), do: OvernightDepartures.slot_names(instance)
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :overnight_departures
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}

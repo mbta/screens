@@ -124,6 +124,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def slot_names(%Departures{slot_names: []}), do: [:main_content]
     def slot_names(%Departures{slot_names: slot_names}), do: slot_names
 
+    def page_groups(_instance), do: []
+
     def widget_type(_instance), do: :departures
 
     def valid_candidate?(_instance), do: true
@@ -133,7 +135,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
 
     def audio_sort_key(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [2]
-
     def audio_sort_key(_instance), do: [1]
 
     def audio_valid_candidate?(_instance), do: true

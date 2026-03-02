@@ -9,6 +9,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   @enforce_keys ~w[screen slot_names asset_url priority now]a
   defstruct screen: nil,
             slot_names: nil,
+            page_groups: [],
             alerts: [],
             asset_url: nil,
             priority: nil,
@@ -20,6 +21,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   @type t :: %__MODULE__{
           screen: Screen.t(),
           slot_names: list(WidgetInstance.slot_id()),
+          page_groups: list(atom()),
           alerts: list(Alert.t()),
           asset_url: String.t(),
           priority: WidgetInstance.priority(),
@@ -35,7 +37,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
 
   def slot_names(%__MODULE__{slot_names: slot_names}), do: slot_names
 
-  def widget_type(_instance), do: :evergreen_content
+  def page_groups(%__MODULE__{page_groups: page_groups}), do: page_groups
 
   def valid_candidate?(%__MODULE__{schedule: schedule, now: now}) when is_list(schedule) do
     # Valid if any of the schedule items contains `now`.
@@ -143,7 +145,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
     def priority(instance), do: EvergreenContent.priority(instance)
     def serialize(instance), do: EvergreenContent.serialize(instance)
     def slot_names(instance), do: EvergreenContent.slot_names(instance)
-    def widget_type(instance), do: EvergreenContent.widget_type(instance)
+    def page_groups(instance), do: EvergreenContent.page_groups(instance)
+    def widget_type(_instance), do: :evergreen_content
     def valid_candidate?(instance), do: EvergreenContent.valid_candidate?(instance)
     def audio_serialize(instance), do: EvergreenContent.audio_serialize(instance)
     def audio_sort_key(instance), do: EvergreenContent.audio_sort_key(instance)

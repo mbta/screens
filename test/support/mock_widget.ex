@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.MockWidget do
 
   @enforce_keys [:slot_names]
   defstruct priority: [2],
+            page_groups: [],
             widget_type: :mock_widget,
             content: nil,
             slot_names: nil,
@@ -12,6 +13,7 @@ defmodule Screens.V2.WidgetInstance.MockWidget do
 
   @type t :: %__MODULE__{
           priority: list(non_neg_integer()),
+          page_groups: list(atom()),
           widget_type: atom(),
           content: any(),
           slot_names: list(atom()),
@@ -24,6 +26,7 @@ defmodule Screens.V2.WidgetInstance.MockWidget do
     def priority(t), do: t.priority
     def serialize(t), do: %{content: t.content}
     def slot_names(t), do: t.slot_names
+    def page_groups(t), do: t.page_groups
     def widget_type(t), do: t.widget_type
     def valid_candidate?(t), do: t.valid_candidate?
     def audio_serialize(t), do: %{content: t.content}
