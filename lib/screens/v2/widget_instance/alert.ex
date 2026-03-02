@@ -290,6 +290,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
     def priority(instance), do: Alert.priority(instance)
     def serialize(instance), do: Alert.serialize(instance)
     def slot_names(instance), do: Alert.slot_names(instance)
+    def page_groups(_instance), do: []
     def widget_type(instance), do: Alert.widget_type(instance)
     def valid_candidate?(instance), do: Alert.valid_candidate?(instance)
     def audio_serialize(instance), do: Alert.audio_serialize(instance)

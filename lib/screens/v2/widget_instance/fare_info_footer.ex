@@ -24,6 +24,7 @@ defmodule Screens.V2.WidgetInstance.FareInfoFooter do
 
     def priority(_instance), do: [2]
     def slot_names(_instance), do: [:footer]
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :fare_info_footer
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}

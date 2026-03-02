@@ -59,6 +59,28 @@ defprotocol Screens.V2.WidgetInstance do
   def slot_names(instance)
 
   @doc """
+  Page groups this widget can be placed in. `[]` means the widget can belong to any group.
+
+  A "page group" is essentially an arbitrary tag. Widgets are only placed in the same paged slot
+  when they share one or more page groups. Conflicts are resolved according to `priority/1`, the
+  same as with non-paged slots.
+
+  ## Example
+
+  Suppose these widgets can be placed in the same paged slot:
+
+  * Widget 1 has page groups `[:a, :b]` and priority `[1]`
+  * Widget 2 has page groups `[:b, :c]` and priority `[2]`
+  * Widget 3 has page groups `[:a, :c]` and priority `[3]`
+  * Widget 4 has page groups `[]`       and priority `[4]`
+
+  Widgets 1, 2, and 4 will be placed in the slot. Widget 3 will be placed elsewhere if possible,
+  or dropped if not.
+  """
+  @spec page_groups(t) :: list(atom()) | no_render()
+  def page_groups(instance)
+
+  @doc """
   A unique name for the widget, used by the client to render the widget's data with the appropriate React component.
   """
   @spec widget_type(t) :: widget_type() | no_render()

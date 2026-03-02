@@ -167,6 +167,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     def priority(instance), do: DupAlert.priority(instance)
     def serialize(instance), do: DupAlert.serialize(instance)
     def slot_names(instance), do: DupAlert.slot_names(instance)
+    def page_groups(_instance), do: []
     def widget_type(instance), do: DupAlert.widget_type(instance)
     def valid_candidate?(_instance), do: true
 

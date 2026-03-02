@@ -321,6 +321,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     def priority(_instance), do: [2]
     def serialize(instance), do: ElevatorStatus.serialize_to_map(instance)
     def slot_names(_instance), do: [:lower_right]
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :elevator_status
     def valid_candidate?(_instance), do: true
     def audio_serialize(instance), do: ElevatorStatus.serialize_to_map(instance)

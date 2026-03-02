@@ -21,6 +21,7 @@ defmodule Screens.V2.WidgetInstance.BottomScreenFiller do
     def priority(_instance), do: [10]
     def serialize(_instance), do: %{}
     def slot_names(_instance), do: [:full_body_bottom_screen]
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :bottom_screen_filler
     def valid_candidate?(_instance), do: true
 

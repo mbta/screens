@@ -128,6 +128,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
     def priority(_t), do: [1, 2]
     def serialize(t), do: DupSpecialCaseAlert.serialize(t)
     def slot_names(t), do: t.slot_names
+    def page_groups(_instance), do: []
     def widget_type(t), do: t.widget_type
     def valid_candidate?(_t), do: true
     def audio_serialize(_t), do: %{}

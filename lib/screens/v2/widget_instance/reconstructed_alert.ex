@@ -1378,6 +1378,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
+  def page_groups(%__MODULE__{} = t) do
+    case placement(t) do
+      :single_screen -> [:alerts]
+      _ -> []
+    end
+  end
+
   def widget_type(%__MODULE__{} = t) do
     case placement(t) do
       :dual_screen -> :reconstructed_takeover
@@ -1437,6 +1444,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     def priority(t), do: ReconstructedAlert.priority(t)
     def serialize(t), do: ReconstructedAlert.serialize(t)
     def slot_names(t), do: ReconstructedAlert.slot_names(t)
+    def page_groups(t), do: ReconstructedAlert.page_groups(t)
     def widget_type(t), do: ReconstructedAlert.widget_type(t)
     def valid_candidate?(t), do: ReconstructedAlert.valid_candidate?(t)
     def audio_serialize(t), do: ReconstructedAlert.serialize(t)

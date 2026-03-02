@@ -8,7 +8,9 @@ defmodule Screens.V2.Template.Guards do
            when is_atom(value)
 
   defguard is_paged_slot_id(value)
-           when is_paging_index(elem(value, 0)) and
+           when is_tuple(value) and
+                  tuple_size(value) == 2 and
+                  is_paging_index(elem(value, 0)) and
                   is_non_paged_slot_id(elem(value, 1))
 
   defguard is_slot_id(value)
