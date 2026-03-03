@@ -406,9 +406,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       route: serialize_route(departures, route_pill_serializer),
       headsign: serialize_headsign(departures, screen),
       times_with_crowding: serialize_times_with_crowding(departures, screen, now),
-      direction_id: serialize_direction_id(departures),
-      # Temporarily retained for compatibility with deployed clients that expect this field
-      inline_alerts: []
+      direction_id: serialize_direction_id(departures)
     }
   end
 
