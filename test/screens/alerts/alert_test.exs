@@ -6,6 +6,8 @@ defmodule Screens.Alerts.AlertTest do
   alias Screens.Facilities.Facility
   alias Screens.Stops.Stop
 
+  import Screens.TestSupport.InformedEntityBuilder
+
   # Minimal valid attributes by V3 API resource definitions.
   @minimal_attributes %{
     "active_period" => [%{"start" => "2017-08-14T14:54:01-04:00", "end" => nil}],
@@ -505,6 +507,108 @@ defmodule Screens.Alerts.AlertTest do
       }
 
       assert Alert.direction_id(alert) == 1
+    end
+  end
+
+  describe "consolidate_route_delays/1" do
+    test "keeps the highest severity delay for each route" do
+      red_alert_1 = %Alert{
+        id: "1",
+        effect: :delay,
+        severity: 3,
+        informed_entities: [ie(route: "Red")]
+      }
+
+      red_alert_2 = %Alert{
+        id: "2",
+        effect: :delay,
+        severity: 5,
+        informed_entities: [ie(route: "Red")]
+      }
+
+      red_alert_3 = %Alert{
+        id: "3",
+        effect: :delay,
+        severity: 4,
+        informed_entities: [ie(route: "Red")]
+      }
+
+      orange_alert_1 = %Alert{
+        id: "4",
+        effect: :delay,
+        severity: 2,
+        informed_entities: [ie(route: "Orange")]
+      }
+
+      orange_alert_2 = %Alert{
+        id: "5",
+        effect: :delay,
+        severity: 4,
+        informed_entities: [ie(route: "Orange")]
+      }
+
+      blue_alert = %Alert{
+        id: "6",
+        effect: :delay,
+        severity: 1,
+        informed_entities: [ie(route: "Blue")]
+      }
+
+      result =
+        Alert.consolidate_whole_route_delays([
+          red_alert_1,
+          red_alert_2,
+          red_alert_3,
+          orange_alert_1,
+          orange_alert_2,
+          blue_alert
+        ])
+
+      assert Enum.member?(result, red_alert_2)
+      assert Enum.member?(result, orange_alert_2)
+      assert Enum.member?(result, blue_alert)
+      assert length(result) == 3
+    end
+
+    test "properly consolidates a multi-branch GL delay" do
+      gl_ies = [
+        ie(route: "Green-B"),
+        ie(route: "Green-C"),
+        ie(route: "Green-D"),
+        ie(route: "Green-E")
+      ]
+
+      alerts = [
+        %Alert{
+          informed_entities: gl_ies,
+          id: "1",
+          effect: :delay,
+          severity: 3
+        },
+        %Alert{
+          informed_entities: gl_ies,
+          id: "2",
+          effect: :delay,
+          severity: 5
+        },
+        %Alert{
+          informed_entities: gl_ies,
+          id: "3",
+          effect: :delay,
+          severity: 2
+        }
+      ]
+
+      expected = [
+        %Alert{
+          informed_entities: gl_ies,
+          id: "2",
+          effect: :delay,
+          severity: 5
+        }
+      ]
+
+      assert expected == Alert.consolidate_whole_route_delays(alerts)
     end
   end
 end

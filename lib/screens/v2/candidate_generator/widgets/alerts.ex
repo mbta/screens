@@ -30,6 +30,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
          route_ids <- LocationContext.route_ids(location_context),
          {:ok, alerts} <- fetch_alerts_by_stop_and_route_fn.(reachable_stop_ids, route_ids) do
       alerts
+      |> Alert.consolidate_whole_route_delays()
       |> relevant_alerts(reachable_stop_ids, route_ids, now)
       |> Enum.map(
         &%AlertWidget{alert: &1, screen: config, location_context: location_context, now: now}

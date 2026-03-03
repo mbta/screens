@@ -128,9 +128,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         struct(
           %AlertWidget{
             alert: %Alert{
-              id: "1",
+              id: "2",
               effect: :stop_closure,
-              informed_entities: [ie(stop_id: "1265"), ie(stop_id: "11531")],
+              informed_entities: [ie(route: "22")],
               active_period: [{now, nil}]
             }
           },
@@ -139,9 +139,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         struct(
           %AlertWidget{
             alert: %Alert{
-              id: "2",
+              id: "1",
               effect: :stop_closure,
-              informed_entities: [ie(route: "22")],
+              informed_entities: [ie(stop_id: "1265"), ie(stop_id: "11531")],
               active_period: [{now, nil}]
             }
           },
@@ -200,17 +200,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         struct(
           %AlertWidget{
             alert: %Alert{
-              id: "1",
-              effect: :stop_closure,
-              informed_entities: [ie(stop_id: "1265"), ie(stop_id: "11531")],
-              active_period: [{now, nil}]
-            }
-          },
-          expected_common_data
-        ),
-        struct(
-          %AlertWidget{
-            alert: %Alert{
               id: "2",
               effect: :stop_closure,
               informed_entities: [ie(route: "22")],
@@ -225,6 +214,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
               id: "5",
               effect: :stop_closure,
               informed_entities: [ie(stop_id: "1262")],
+              active_period: [{now, nil}]
+            }
+          },
+          expected_common_data
+        ),
+        struct(
+          %AlertWidget{
+            alert: %Alert{
+              id: "1",
+              effect: :stop_closure,
+              informed_entities: [ie(stop_id: "1265"), ie(stop_id: "11531")],
               active_period: [{now, nil}]
             }
           },
