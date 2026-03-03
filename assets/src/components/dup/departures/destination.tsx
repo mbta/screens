@@ -2,8 +2,7 @@ import { type ComponentType, useLayoutEffect, useRef, useState } from "react";
 
 import type DestinationBase from "Components/departures/destination";
 import { useCurrentPage } from "Context/dup_page";
-
-const LINE_HEIGHT = 138; // px
+import { hasOverflowX } from "Util/utils";
 
 // Global abbreviations
 const ABBREVIATIONS = {
@@ -34,7 +33,7 @@ enum PHASES {
 const RenderedDestination = ({ parts, index1, index2 }) => {
   const currentPage = useCurrentPage();
 
-  let pageContent;
+  let pageContent: string;
 
   if (index1 === parts.length) {
     pageContent = parts.join(" ");
@@ -74,20 +73,13 @@ const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
    */
   useLayoutEffect(() => {
     if (firstLineRef.current && secondLineRef.current) {
-      const firstLines = Math.round(
-        firstLineRef.current.clientHeight / LINE_HEIGHT,
-      );
-      const secondLines = Math.round(
-        secondLineRef.current.clientHeight / LINE_HEIGHT,
-      );
-
-      const widthOverflow =
-        firstLineRef.current.scrollWidth > firstLineRef.current.clientWidth;
+      const firstLineFits = !hasOverflowX(firstLineRef.current);
+      const secondLineFits = !hasOverflowX(secondLineRef.current);
 
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
           // Don't abbreviate if it already fits on one line.
-          if (firstLines === 1 && secondLines === 0 && !widthOverflow) {
+          if (firstLineFits) {
             setPhase(PHASES.DONE);
           } else {
             setAbbreviate(true);
@@ -97,7 +89,7 @@ const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
 
         case PHASES.ONE_LINE_ABBREV:
           // Do abbreviate if it's the difference between fitting on one line and not.
-          if (firstLines === 1 && secondLines === 0) {
+          if (firstLineFits) {
             setPhase(PHASES.DONE);
           } else {
             setAbbreviate(false);
@@ -107,7 +99,7 @@ const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
 
         case PHASES.TWO_LINES_FULL:
           // Don't abbreviate if we fit on two lines either way
-          if (firstLines === 1 && secondLines === 1) {
+          if (firstLineFits && secondLineFits) {
             setPhase(PHASES.DONE);
           } else {
             // Try all possible positions for the line break
@@ -125,10 +117,10 @@ const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
         case PHASES.TWO_LINES_ABBREV:
           // Do abbreviate if it's the difference between fitting on two lines and not.
           // Cut off at 2 lines no matter what, so unexpected input doesn't wrap.
-          if (firstLines > 1 && index1 > 1) {
+          if (!firstLineFits && index1 > 1) {
             // Find position of first line break
             setIndex1((n) => n - 1);
-          } else if (secondLines > 1 && index2 > index1 + 1) {
+          } else if (!secondLineFits && index2 > index1 + 1) {
             // Find position of second line break
             setIndex2((n) => n - 1);
           } else {
@@ -147,8 +139,8 @@ const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
   }
 
   // Version just for determining line breaks, never visible to riders
-  let firstLine;
-  let secondLine;
+  let firstLine: string;
+  let secondLine: string;
   if (index1 === parts.length) {
     firstLine = parts.join(" ");
     secondLine = "";

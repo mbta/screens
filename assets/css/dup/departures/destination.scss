@@ -5,6 +5,7 @@
   width: 1176px;
   font-size: 138px;
   color: colors.$cool-black-15;
+  white-space: nowrap;
   vertical-align: middle;
 
   .departures-section--shortened-headsigns & {
@@ -16,12 +17,5 @@
   font-size: 138px;
   font-weight: 600;
   line-height: 1em;
-  color: black;
-}
-
-.departure-destination__variation {
-  font-size: 48px;
-  font-weight: 400;
-  line-height: 48px;
   color: black;
 }
