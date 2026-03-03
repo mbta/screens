@@ -8,7 +8,7 @@ defmodule Screens.TestSupport.InformedEntityBuilder do
 
   def ie(opts \\ []) do
     %InformedEntity{
-      stop: if(opts[:stop_id], do: %Stop{id: opts[:stop_id], name: opts[:stop_name]}, else: nil),
+      stop: if(not is_nil(opts[:stop_id]), do: %Stop{id: opts[:stop_id]}, else: opts[:stop]),
       route: opts[:route],
       route_type: opts[:route_type],
       direction_id: opts[:direction_id]
