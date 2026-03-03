@@ -1105,7 +1105,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert is_nil(Map.get(result, :scheduled_time))
     end
 
-    @tag skip: "temporarily disabled due to client rendering issues"
     test "serializes stops away status when provided", %{dup_screen: screen} do
       now = ~U[2020-01-01T00:00:00Z]
 

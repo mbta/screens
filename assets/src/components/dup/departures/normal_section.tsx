@@ -11,16 +11,17 @@ import { classWithModifier } from "Util/utils";
 const NormalSection: ComponentType<Props> = ({ rows }) => {
   if (rows.length === 0) return null;
 
+  const classModifier = shortenHeadsignsForSection(rows)
+    ? "shortened-headsigns"
+    : "";
+
   return (
-    <div
-      className={classWithModifier(
-        "departures-section",
-        shortenHeadsignsForSection(rows) ? "shortened-headsigns" : "",
-      )}
-    >
+    <div className={classWithModifier("departures-section", classModifier)}>
       {rows.map((row, index) => {
         if (row.type === "departure_row") {
-          return <DepartureRow {...row} key={row.id} />;
+          // When the available width for headsigns changes, re-render the
+          // departures so headsign abbreviation will be redone.
+          return <DepartureRow {...row} key={row.id + classModifier} />;
         } else {
           return <NoticeRow row={row} key={"notice" + index} />;
         }

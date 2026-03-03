@@ -535,11 +535,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
     departure_time = Departure.time(departure)
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)
-    _status_pages = parse_status_pages(departure, screen)
+    status_pages = parse_status_pages(departure, screen)
 
     cond do
-      # Temporarily disable stops-away output due to client rendering issues
-      # status_pages != nil -> %{type: :status, pages: status_pages}
+      status_pages != nil -> %{type: :status, pages: status_pages}
       subway? and boarding?(departure, second_diff) -> %{type: :text, text: "BRD"}
       second_diff <= 30 -> %{type: :text, text: if(subway?, do: "ARR", else: "Now")}
       minute_diff < 60 -> %{type: :minutes, minutes: minute_diff}

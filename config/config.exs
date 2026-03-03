@@ -442,6 +442,7 @@ config :screens,
     ]
   },
   dup_headsign_replacements: %{
+    "Government Center" => "Government Ctr",
     "Charlestown Navy Yard" => "Charlestown",
     "Saugus Center via Kennedy Dr & Square One Mall" => "Saugus Center via Kndy Dr & Square One",
     "Malden via Square One Mall & Kennedy Dr" => "Malden via Square One Mall & Kndy Dr",
