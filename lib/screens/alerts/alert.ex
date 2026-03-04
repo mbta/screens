@@ -479,7 +479,6 @@ defmodule Screens.Alerts.Alert do
   """
   @spec consolidate_whole_route_delays(list(t())) :: list(t())
   def consolidate_whole_route_delays(alerts) do
-    # Group alerts by route before consol
     alerts
     |> Enum.group_by(&Enum.uniq_by(&1.informed_entities, fn ie -> ie.route end))
     |> Enum.flat_map(fn {_affected_routes, alerts_for_route} ->
