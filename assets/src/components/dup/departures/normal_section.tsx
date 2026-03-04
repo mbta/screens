@@ -31,12 +31,13 @@ const NormalSection: ComponentType<Props> = ({ rows }) => {
 };
 
 const shortenHeadsignsForSection = (rows: Row[]) => {
-  // Stop away messages take up a larger block of space,
+  // Stop away messages and First Trip text take up a larger block of space,
   // so we need to shorten the space designated for headsigns.
   return rows.some(
     (row) =>
       row.type === "departure_row" &&
-      row.times_with_crowding?.some((time) => time.time?.type === "status"),
+      (row.times_with_crowding?.some((time) => time.time?.type === "status") ||
+        row.is_first_trip),
   );
 };
 

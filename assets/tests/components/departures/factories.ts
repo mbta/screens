@@ -20,6 +20,7 @@ export const departureRow = Factory.define<Row>(({ sequence }) => ({
   times_with_crowding: timeWithCrowding.buildList(1),
   direction_id: 0,
   isBeforeDirectionSplit: false,
+  is_first_trip: false,
 }));
 
 export const timeWithCrowding = Factory.define<TimeWithCrowding>(

@@ -10,7 +10,13 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   alias Screens.V2.RDS.{Countdowns, FirstTrip, NoService}
 
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.Departures.{NoDataSection, NormalSection, NoServiceSection}
+
+  alias Screens.V2.WidgetInstance.Departures.{
+    NoDataSection,
+    NormalSection,
+    NoServiceSection
+  }
+
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
 
   alias ScreensConfig.Departures
@@ -123,12 +129,21 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
                 departures
 
               %RDS{state: %FirstTrip{first_scheduled_departure: first_scheduled_departure}} ->
-                [first_scheduled_departure]
+                [{first_scheduled_departure, :first_trip}]
 
               %RDS{state: %NoService{}} ->
                 []
             end)
-            |> Enum.sort_by(&Departure.time/1, DateTime)
+            |> Enum.sort_by(
+              fn
+                %Departure{} = departure ->
+                  Departure.time(departure)
+
+                {first_scheduled_departure, :first_trip} ->
+                  Departure.time(first_scheduled_departure)
+              end,
+              DateTime
+            )
             |> maybe_make_bidirectional(bidirectional)
             |> Enum.take(num_departures_per_section),
           layout: %Layout{},
@@ -185,11 +200,22 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   defp maybe_make_bidirectional(departures, false), do: departures
 
   defp maybe_make_bidirectional([first | rest], true) do
-    first_direction = Departure.direction_id(first)
+    first_direction =
+      case first do
+        %Departure{} ->
+          Departure.direction_id(first)
+
+        {first_scheduled_departure, :first_trip} ->
+          Departure.direction_id(first_scheduled_departure)
+      end
 
     opposite? =
-      Enum.find(rest, Enum.at(rest, 0), fn departure ->
-        Departure.direction_id(departure) == 1 - first_direction
+      Enum.find(rest, Enum.at(rest, 0), fn
+        %Departure{} = departure ->
+          Departure.direction_id(departure) == 1 - first_direction
+
+        {first_scheduled_departure, :first_trip} ->
+          Departure.direction_id(first_scheduled_departure) == 1 - first_direction
       end)
 
     Enum.reject([first, opposite?], &is_nil/1)
