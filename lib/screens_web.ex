@@ -23,7 +23,8 @@ defmodule ScreensWeb do
     quote do
       use Phoenix.Controller,
         namespace: ScreensWeb,
-        layouts: [html: {ScreensWeb.LayoutView, :app}]
+        layouts: [html: {ScreensWeb.LayoutView, :app}],
+        formats: [html: "View", json: "View"]
 
       import Plug.Conn
       use Gettext, backend: ScreensWeb.Gettext

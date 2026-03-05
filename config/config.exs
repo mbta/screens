@@ -15,10 +15,6 @@ config :screens, ScreensWeb.Endpoint,
   pubsub_server: ScreensWeb.PubSub,
   live_view: [signing_salt: "cK5v02Jnzmp4C8NjV0wwpD2IdTaZdMvi"]
 
-# Include 2 logger backends
-config :logger,
-  backends: [:console, Sentry.LoggerBackend]
-
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

@@ -82,7 +82,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     cond do
       # If every rotation is showing OvernightDepartures, we don't need to render any route pills.
       Enum.all?(instances, &is_struct(&1, OvernightDepartures)) ->
-        Enum.map(instances, &%OvernightDepartures{&1 | routes: []})
+        Enum.map(instances, fn instance = %OvernightDepartures{} ->
+          %{instance | routes: []}
+        end)
 
       # If every rotation consists entirely of NoDataSections, replace all with DeparturesNoData.
       Enum.all?(instances, &no_departures?/1) ->

@@ -92,5 +92,6 @@ defmodule Screens.DeviceMonitor do
     Process.send_after(self(), :run, send_after)
   end
 
-  defp truncate_seconds(dt), do: DateTime.truncate(%DateTime{dt | second: 0}, :second)
+  defp truncate_seconds(dt = %DateTime{}),
+    do: DateTime.truncate(%DateTime{dt | second: 0}, :second)
 end

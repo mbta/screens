@@ -170,7 +170,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end)
   end
 
-  defp put_cr_departures(widget) do
+  defp put_cr_departures(widget = %ReconstructedAlert{screen: %Screen{} = screen}) do
     departures =
       struct(%Departures{
         sections: [%Section{query: %Query{params: %Params{route_type: :rail}}}]
@@ -180,7 +180,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
     %{
       widget
-      | screen: %Screen{widget.screen | app_params: app_params}
+      | screen: %Screen{screen | app_params: app_params}
     }
   end
 

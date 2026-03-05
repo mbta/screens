@@ -6,6 +6,10 @@ defmodule Screens.Application do
   use Application
 
   def start(_type, _args) do
+    # Add custom and console logger backends
+    LoggerBackends.add(Sentry.LoggerBackend)
+    LoggerBackends.add(:console)
+
     # List all child processes to be supervised
     children =
       [
