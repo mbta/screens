@@ -20,6 +20,10 @@ config :logger, :console,
   format: "$time $metadata[$level] $message\n",
   metadata: [:client_ip, :remote_ip, :request_id]
 
+# Configure Sentry Logger Handler
+config :logger,
+  handlers: [Sentry.LoggerHandler]
+
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
 
