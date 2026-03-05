@@ -121,9 +121,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
       }
     end
 
-    def slot_names(%Departures{slot_names: []}), do: [:main_content]
     def slot_names(%Departures{slot_names: slot_names}), do: slot_names
 
+    def page_groups(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [:departures]
     def page_groups(_instance), do: []
 
     def widget_type(_instance), do: :departures

@@ -93,7 +93,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     end
 
     def slot_names(_instance), do: [:medium, :large]
+
+    def page_groups(%SubwayStatus{screen: %Screen{app_id: :pre_fare_v2}}), do: [:subway_status]
     def page_groups(_instance), do: []
+
     def widget_type(_instance), do: :subway_status
     def valid_candidate?(_instance), do: true
 
