@@ -15,6 +15,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias ScreensConfig.Departures.Header
   alias ScreensConfig.Departures.Layout
   alias ScreensConfig.{FreeTextLine, Screen}
+  alias ScreensConfig.Screen.{BusShelter, PreFare}
 
   describe "priority/1" do
     test "returns 2" do
@@ -1171,9 +1172,21 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   end
 
   describe "slot_names/1" do
-    test "returns main_content" do
-      instance = %Departures{sections: []}
-      assert [:main_content] == WidgetInstance.slot_names(instance)
+    test "returns the slot names specified" do
+      instance = %Departures{slot_names: [:abc]}
+      assert [:abc] == WidgetInstance.slot_names(instance)
+    end
+  end
+
+  describe "page_groups/1" do
+    test "has its own group on Pre-Fare screens" do
+      instance = %Departures{screen: struct(Screen, app_params: struct(PreFare))}
+      assert WidgetInstance.page_groups(instance) == [:departures]
+    end
+
+    test "has no groups on other screen types" do
+      instance = %Departures{screen: struct(Screen, app_params: struct(BusShelter))}
+      assert WidgetInstance.page_groups(instance) == []
     end
   end
 
