@@ -510,7 +510,7 @@ defmodule Screens.Alerts.AlertTest do
     end
   end
 
-  describe "consolidate_route_delays/1" do
+  describe "consolidate_whole_route_delays/1" do
     test "keeps the highest severity delay for each route" do
       red_alert_1 = %Alert{
         id: "1",

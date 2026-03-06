@@ -488,21 +488,14 @@ defmodule Screens.Alerts.Alert do
 
   @spec consolidate_delays_for_route(list(t())) :: list(t())
   defp consolidate_delays_for_route(alerts) do
+    # If there are multiple delay alerts on a single route, we only want to
+    # include the delay with the highest severity rather than display multiple.
     {delay_alerts, other_alerts} = Enum.split_with(alerts, &whole_route_delay?/1)
 
-    case delay_alerts do
-      [] ->
-        other_alerts
-
-      [single_delay] ->
-        [single_delay | other_alerts]
-
-      multiple_delays ->
-        # If there are multiple delay alerts on a single route, we only want to
-        # include the delay with the highest severity rather than display multiple.
-        highest_severity_delay = Enum.max_by(multiple_delays, & &1.severity)
-        [highest_severity_delay | other_alerts]
-    end
+    delay_alerts
+    |> Enum.max_by(& &1.severity, fn -> nil end)
+    |> List.wrap()
+    |> Enum.concat(other_alerts)
   end
 
   @spec whole_route_delay?(t()) :: boolean()
