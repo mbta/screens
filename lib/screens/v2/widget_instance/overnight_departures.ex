@@ -10,10 +10,8 @@ defmodule Screens.V2.WidgetInstance.OvernightDepartures do
     %{routes: Enum.map(routes, &RoutePill.serialize_icon/1)}
   end
 
-  def slot_names(%__MODULE__{slot_names: slot_names}) when length(slot_names) > 0,
-    do: slot_names
-
-  def slot_names(_instance), do: [:full_screen]
+  def slot_names(%__MODULE__{slot_names: []}), do: [:full_screen]
+  def slot_names(%__MODULE__{slot_names: slot_names}), do: slot_names
 
   defimpl Screens.V2.WidgetInstance do
     alias Screens.V2.WidgetInstance.OvernightDepartures

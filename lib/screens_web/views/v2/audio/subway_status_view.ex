@@ -111,7 +111,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
   end
 
   @spec render_gl_branch_or_line(SubwayStatus.alert()) :: ssml_blob
-  defp render_gl_branch_or_line(%{route_pill: %{branches: branches}}) when length(branches) > 0 do
+  defp render_gl_branch_or_line(%{route_pill: %{branches: branches}}) when branches != [] do
     branch_or_branches = if length(branches) == 1, do: "branch", else: "branches"
 
     {all_but_last, last} =
