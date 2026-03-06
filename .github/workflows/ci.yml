@@ -23,7 +23,7 @@ jobs:
     name: Elixir Warnings
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - run: mix compile --warnings-as-errors
 
@@ -31,7 +31,7 @@ jobs:
     name: Elixir Credo
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - run: mix credo.ci
 
@@ -39,7 +39,7 @@ jobs:
     name: Elixir Dialyze
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - uses: mbta/actions/dialyzer@v2
 
@@ -47,7 +47,7 @@ jobs:
     name: Elixir Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - run: mix format --check-formatted
 
@@ -55,7 +55,7 @@ jobs:
     name: Elixir Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - run: mix test
 
@@ -63,7 +63,7 @@ jobs:
     name: Frontend Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run deploy
@@ -72,7 +72,7 @@ jobs:
     name: Frontend Format
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run format:check
@@ -81,7 +81,7 @@ jobs:
     name: Frontend Lint
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run lint:errors
@@ -90,7 +90,7 @@ jobs:
     name: Frontend Styles
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run styles:check
@@ -99,7 +99,7 @@ jobs:
     name: Frontend Tests
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm test
@@ -108,7 +108,7 @@ jobs:
     name: Frontend Types
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run tsc:check
@@ -117,7 +117,7 @@ jobs:
     name: Frontend Unused
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run unused
