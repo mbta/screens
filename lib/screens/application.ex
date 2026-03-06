@@ -33,6 +33,8 @@ defmodule Screens.Application do
       ]
       |> Enum.reject(&is_nil/1)
 
+    Logger.add_handlers(:screens)
+
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: Screens.Supervisor]

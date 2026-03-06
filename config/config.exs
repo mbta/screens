@@ -21,8 +21,9 @@ config :logger, :console,
   metadata: [:client_ip, :remote_ip, :request_id]
 
 # Configure Sentry Logger Handler
-config :logger,
-  handlers: [Sentry.LoggerHandler]
+config :screens, :logger, [
+  {:handler, :sentry_handler, Sentry.LoggerHandler, %{}}
+]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
