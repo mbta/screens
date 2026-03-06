@@ -86,6 +86,17 @@ defmodule Screens.V2.RDSTest do
       }
     end
 
+    defp first_trip(stop_id, line_id, headsign, schedule) do
+      %RDS{
+        stop: %Stop{id: stop_id},
+        line: %Line{id: line_id},
+        headsign: headsign,
+        state: %RDS.FirstTrip{
+          first_scheduled_departure: %Departure{prediction: nil, schedule: schedule}
+        }
+      }
+    end
+
     defp station(id, child_stop_ids) do
       %Stop{id: id, child_stops: Enum.map(child_stop_ids, &stop/1)}
     end
@@ -270,6 +281,158 @@ defmodule Screens.V2.RDSTest do
                 [
                   countdowns("s1", "l1", "h1", expected_departures),
                   no_service("s1", "l2", "h2")
+                ]}
+             ]
+    end
+
+    test "creates first trip state when in the early morning with no headways" do
+      now = ~U[2024-10-11 10:44:00Z]
+      stop_ids = ~w[s0 s1]
+
+      first_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}},
+          stop: %Stop{id: "sA"},
+          trip: %Trip{headsign: "h1", pattern_headsign: "hA"}
+        }
+
+      second_schedule = %Schedule{
+        departure_time: ~U[2024-10-11 10:45:00Z],
+        route: %Route{id: "r2", line: %Line{id: "l2"}},
+        stop: %Stop{id: "sB"},
+        trip: %Trip{headsign: "h2", pattern_headsign: "hB"}
+      }
+
+      third_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{id: "r2", line: %Line{id: "l2"}},
+          stop: %Stop{id: "sC"},
+          trip: %Trip{headsign: "h3", pattern_headsign: "hC"}
+        }
+
+      all_schedules = [first_schedule, second_schedule, third_schedule]
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
+      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
+        {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
+      end)
+
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+        {:ok,
+         [
+           %RoutePattern{
+             id: "A",
+             headsign: "hA",
+             route: %Route{id: "r1", line: %Line{id: "l1"}},
+             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
+           },
+           %RoutePattern{
+             id: "B",
+             headsign: "hB",
+             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
+           },
+           %RoutePattern{
+             id: "C",
+             headsign: "hC",
+             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
+           }
+         ]}
+      end)
+
+      assert RDS.get(departures, now) == [
+               {:ok,
+                [
+                  first_trip("sA", "l1", "hA", first_schedule),
+                  first_trip("sB", "l2", "hB", second_schedule),
+                  first_trip("sC", "l2", "hC", third_schedule)
+                ]}
+             ]
+    end
+
+    test "creates first trip state when in the early morning adjusted for headways" do
+      now = ~U[2024-10-11 10:34:00Z]
+      stop_ids = ~w[s0 s1]
+
+      first_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}},
+          stop: %Stop{id: "sA"},
+          trip: %Trip{headsign: "h1", pattern_headsign: "hA"}
+        }
+
+      second_schedule = %Schedule{
+        departure_time: ~U[2024-10-11 10:45:00Z],
+        route: %Route{id: "r2", line: %Line{id: "l2"}},
+        stop: %Stop{id: "sB"},
+        trip: %Trip{headsign: "h2", pattern_headsign: "hB"}
+      }
+
+      third_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{id: "r2", line: %Line{id: "l2"}},
+          stop: %Stop{id: "sC"},
+          trip: %Trip{headsign: "h3", pattern_headsign: "hC"}
+        }
+
+      all_schedules = [first_schedule, second_schedule, third_schedule]
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      stub(@headways, :get, fn _, _ -> {5, 10} end)
+
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
+      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
+        {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
+      end)
+
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+        {:ok,
+         [
+           %RoutePattern{
+             id: "A",
+             headsign: "hA",
+             route: %Route{id: "r1", line: %Line{id: "l1"}},
+             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
+           },
+           %RoutePattern{
+             id: "B",
+             headsign: "hB",
+             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
+           },
+           %RoutePattern{
+             id: "C",
+             headsign: "hC",
+             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
+           }
+         ]}
+      end)
+
+      assert RDS.get(departures, now) == [
+               {:ok,
+                [
+                  first_trip("sA", "l1", "hA", first_schedule),
+                  first_trip("sB", "l2", "hB", second_schedule),
+                  first_trip("sC", "l2", "hC", third_schedule)
                 ]}
              ]
     end

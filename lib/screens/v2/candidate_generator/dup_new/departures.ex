@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   alias Screens.V2.Departure
   alias Screens.V2.RDS
-  alias Screens.V2.RDS.{Countdowns, NoService}
+  alias Screens.V2.RDS.{Countdowns, FirstTrip, NoService}
 
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.{NoDataSection, NormalSection, NoServiceSection}
@@ -121,6 +121,9 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
             |> Enum.flat_map(fn
               %RDS{state: %Countdowns{departures: departures}} ->
                 departures
+
+              %RDS{state: %FirstTrip{first_scheduled_departure: first_scheduled_departure}} ->
+                [first_scheduled_departure]
 
               %RDS{state: %NoService{}} ->
                 []
