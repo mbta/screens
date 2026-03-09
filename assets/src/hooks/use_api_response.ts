@@ -219,12 +219,10 @@ const useBaseApiResponse = ({
   }, [apiPath, lastSuccess]);
 
   // Fetch data once, immediately, on first render
-  useEffect(() => {
-    if (!initialFetchDone) {
-      fetchData();
-      setInitialFetchDone(true);
-    }
-  }, [fetchData, initialFetchDone]);
+  if (!initialFetchDone) {
+    fetchData();
+    setInitialFetchDone(true);
+  }
 
   // Schedule subsequent data fetches, if we need to
   useDriftlessInterval(
