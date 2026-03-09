@@ -7,14 +7,15 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   alias Screens.V2.Departure
   alias Screens.V2.RDS
-  alias Screens.V2.RDS.{Countdowns, FirstTrip, NoService}
+  alias Screens.V2.RDS.{Countdowns, FirstTrip, NoService, ServiceEnded}
 
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
 
   alias Screens.V2.WidgetInstance.Departures.{
     NoDataSection,
     NormalSection,
-    NoServiceSection
+    NoServiceSection,
+    OvernightSection
   }
 
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
@@ -67,11 +68,18 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
         &is_struct(&1, NoDataSection)
       )
 
+    all_sections_service_ended =
+      Enum.all?(
+        primary_departure_sections ++ secondary_departure_sections,
+        &is_struct(&1, OvernightSection)
+      )
+
     primary_instances =
       build_instances(
         @primary_slot_names,
         primary_departure_sections,
         all_sections_no_data,
+        all_sections_service_ended,
         config,
         now
       )
@@ -81,6 +89,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
         @secondary_slot_names,
         secondary_departure_sections,
         all_sections_no_data,
+        all_sections_service_ended,
         config,
         now
       )
@@ -107,11 +116,8 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   defp map_to_departure_section({:ok, rds_list}, bidirectional, section_count) do
     num_departures_per_section = div(@max_departures_per_rotation, section_count)
 
-    # Disable credo as this will be filled in shortly
-    # credo:disable-for-next-line
     cond do
       # all headways -> HeadwaySection()
-      # all overnight -> OvernightSection()
       no_service?(rds_list) ->
         %NoServiceSection{
           routes:
@@ -120,30 +126,24 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
             |> Enum.uniq()
         }
 
+      service_ended?(rds_list) ->
+        %OvernightSection{
+          routes:
+            rds_list
+            |> Enum.map(fn %RDS{
+                             state: %ServiceEnded{
+                               last_scheduled_departure: last_scheduled_departure
+                             }
+                           } ->
+              Departure.route(last_scheduled_departure)
+            end)
+            |> Enum.uniq()
+        }
+
       true ->
         %NormalSection{
           rows:
-            rds_list
-            |> Enum.flat_map(fn
-              %RDS{state: %Countdowns{departures: departures}} ->
-                departures
-
-              %RDS{state: %FirstTrip{first_scheduled_departure: first_scheduled_departure}} ->
-                [{first_scheduled_departure, :first_trip}]
-
-              %RDS{state: %NoService{}} ->
-                []
-            end)
-            |> Enum.sort_by(
-              fn
-                %Departure{} = departure ->
-                  Departure.time(departure)
-
-                {first_scheduled_departure, :first_trip} ->
-                  Departure.time(first_scheduled_departure)
-              end,
-              DateTime
-            )
+            create_and_sort_rows(rds_list)
             |> maybe_make_bidirectional(bidirectional)
             |> Enum.take(num_departures_per_section),
           layout: %Layout{},
@@ -156,13 +156,40 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     Enum.all?(rds_list, &is_struct(&1.state, NoService))
   end
 
-  defp build_instances(slot_names, _departure_sections, true = _all_section_no_data, config, _now) do
+  defp service_ended?(rds_list) do
+    Enum.all?(rds_list, &is_struct(&1.state, ServiceEnded))
+  end
+
+  defp build_instances(
+         slot_names,
+         _departure_sections,
+         true = _all_section_no_data,
+         _all_section_service_ended,
+         config,
+         _now
+       ) do
     Enum.map(slot_names, &%DeparturesNoData{screen: config, slot_name: &1})
   end
 
-  defp build_instances(slot_names, departure_sections, _all_section_no_data, config, now) do
-    # Disable credo as this will be filled in shortly
-    # credo:disable-for-next-line
+  defp build_instances(
+         slot_names,
+         _departure_sections,
+         _all_section_no_data,
+         true = _all_section_service_ended,
+         config,
+         _now
+       ) do
+    Enum.map(slot_names, &%OvernightDepartures{screen: config, slot_names: [&1]})
+  end
+
+  defp build_instances(
+         slot_names,
+         departure_sections,
+         _all_section_no_data,
+         _all_section_service_ended,
+         config,
+         now
+       ) do
     cond do
       Enum.all?(departure_sections, &is_struct(&1, NoServiceSection)) ->
         Enum.map(
@@ -173,6 +200,20 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
             routes:
               departure_sections
               |> Enum.flat_map(fn %NoServiceSection{routes: routes} -> routes end)
+              |> Enum.map(fn route -> Route.icon(route) end)
+              |> Enum.uniq()
+          }
+        )
+
+      Enum.all?(departure_sections, &is_struct(&1, OvernightSection)) ->
+        Enum.map(
+          slot_names,
+          &%OvernightDepartures{
+            screen: config,
+            slot_names: [&1],
+            routes:
+              departure_sections
+              |> Enum.flat_map(fn %OvernightSection{routes: routes} -> routes end)
               |> Enum.map(fn route -> Route.icon(route) end)
               |> Enum.uniq()
           }
@@ -195,29 +236,79 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     }
   end
 
+  @spec create_and_sort_rows([RDS.t()]) :: [NormalSection.row()]
+  defp create_and_sort_rows(rds_list) do
+    {service_ended_rds, rds} =
+      Enum.split_with(rds_list, &match?(%RDS{state: %ServiceEnded{}}, &1))
+
+    sorted_departures_from_rds(rds) ++
+      sorted_departures_from_rds(service_ended_rds, true)
+  end
+
   @spec maybe_make_bidirectional([Departure.t()], boolean()) :: [Departure.t()]
   defp maybe_make_bidirectional([], _), do: []
   defp maybe_make_bidirectional(departures, false), do: departures
 
   defp maybe_make_bidirectional([first | rest], true) do
-    first_direction =
-      case first do
-        %Departure{} ->
-          Departure.direction_id(first)
-
-        {first_scheduled_departure, :first_trip} ->
-          Departure.direction_id(first_scheduled_departure)
-      end
+    first_direction = departure_direction_id(first)
 
     opposite? =
-      Enum.find(rest, Enum.at(rest, 0), fn
-        %Departure{} = departure ->
-          Departure.direction_id(departure) == 1 - first_direction
-
-        {first_scheduled_departure, :first_trip} ->
-          Departure.direction_id(first_scheduled_departure) == 1 - first_direction
-      end)
+      Enum.find(rest, Enum.at(rest, 0), &(departure_direction_id(&1) == 1 - first_direction))
 
     Enum.reject([first, opposite?], &is_nil/1)
   end
+
+  @spec sorted_departures_from_rds([RDS.t()], boolean()) :: [Departure.t()]
+  defp sorted_departures_from_rds(rds, reverse \\ false) do
+    sort_order =
+      if reverse do
+        :desc
+      else
+        :asc
+      end
+
+    rds
+    |> Enum.flat_map(&departures_from_state(&1))
+    |> Enum.sort_by(
+      &departure_time(&1),
+      {
+        sort_order,
+        DateTime
+      }
+    )
+  end
+
+  @spec departures_from_state(RDS.t()) :: [Departure.t()]
+  defp departures_from_state(%RDS{state: %Countdowns{departures: departures}}), do: departures
+
+  defp departures_from_state(%RDS{
+         state: %FirstTrip{first_scheduled_departure: first_scheduled_departure}
+       }) do
+    [{first_scheduled_departure, :first_trip}]
+  end
+
+  defp departures_from_state(%RDS{
+         state: %ServiceEnded{last_scheduled_departure: last_scheduled_departure}
+       }) do
+    [{last_scheduled_departure, :last_trip}]
+  end
+
+  defp departures_from_state(%RDS{state: %NoService{}}), do: []
+
+  @spec departure_time(Departure.t()) :: DateTime.t()
+  defp departure_time(%Departure{} = departure), do: Departure.time(departure)
+
+  defp departure_time({first_scheduled_departure, :first_trip}),
+    do: Departure.time(first_scheduled_departure)
+
+  defp departure_time({last_scheduled_departure, :last_trip}),
+    do: Departure.time(last_scheduled_departure)
+
+  defp departure_direction_id(%Departure{} = departure), do: Departure.direction_id(departure)
+
+  defp departure_direction_id({first_scheduled_departure, :first_trip}),
+    do: Departure.direction_id(first_scheduled_departure)
+
+  defp departure_direction_id({last_scheduled_departure, :last_trip}),
+    do: Departure.direction_id(last_scheduled_departure)
 end
