@@ -54,7 +54,7 @@ const buildIframeUrl = (
 
 const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
-  const [frameLoadedAt, setFrameLoadedAt] = useState(Date.now());
+  const [frameLoadedAt, setFrameLoadedAt] = useState(0);
 
   useEffect(() => {
     fetch

@@ -135,6 +135,7 @@ const ScreenContainer = ({ id }) => {
       blinkConfig !== null &&
       requestCount % blinkConfig.refreshesPerBlink === 0
     ) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowBlink(true);
 
       setTimeout(() => {

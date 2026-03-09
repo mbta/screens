@@ -15,9 +15,10 @@ export const useCurrentPage = () => useContext(Context);
 
 export const Provider: ComponentType<PropsWithChildren> = ({ children }) => {
   const [page, setPage] = useState(0);
+  const [didInit, setDidInit] = useState(false);
   const [isPaging, setIsPaging] = useState(false);
 
-  useEffect(() => {
+  if (!didInit) {
     const mraid = getMRAID();
 
     if (mraid) {
@@ -31,7 +32,9 @@ export const Provider: ComponentType<PropsWithChildren> = ({ children }) => {
     } else {
       setIsPaging(true);
     }
-  }, []);
+
+    setDidInit(true);
+  }
 
   useEffect(() => {
     if (isPaging) {

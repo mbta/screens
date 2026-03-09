@@ -42,7 +42,6 @@ import OvernightDepartures from "Components/dup/overnight_departures";
 
 import { Provider as CurrentPageProvider } from "Context/dup_page";
 import { usePlayerName } from "Hooks/outfront";
-import { isDup } from "Util/outfront";
 
 const TYPE_TO_COMPONENT = {
   screen_normal: NormalScreen,
@@ -126,9 +125,9 @@ const App = (): JSX.Element => {
     <CurrentPageProvider>
       <MappingContext.Provider value={TYPE_TO_COMPONENT}>
         <ResponseMapperContext.Provider value={responseMapper}>
-          {isDup() ? (
+          {playerName ? (
             <Viewport>
-              <ScreenPage id={`DUP-${playerName!.trim()}`} />
+              <ScreenPage id={`DUP-${playerName.trim()}`} />
             </Viewport>
           ) : (
             <Router basename="v2/screen">

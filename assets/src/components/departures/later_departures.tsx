@@ -37,6 +37,7 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
 
   useLayoutEffect(() => {
     if (ref.current && hasOverflowX(ref.current)) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLimit(Math.max(0, limit - 1));
     }
   }, [limit]);

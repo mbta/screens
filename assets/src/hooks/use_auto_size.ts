@@ -46,6 +46,11 @@ type Value = undefined | null | boolean | number | string | bigint;
  *   could affect the size of the target element's content. Omitting a relevant
  *   value can result in content having the wrong (possibly overflowing) size.
  */
+
+/* eslint-disable react-hooks/set-state-in-effect --
+   Various instances of iterative re-rendering here are intentional and we know
+   this has acceptable performance. */
+
 const useAutoSize = <T extends Value>(
   steps: readonly T[],
   key?: Value,
