@@ -5,6 +5,7 @@ defmodule ScreensWeb.Controllers.UnauthorizedControllerTest do
 
   describe "index/2" do
     @tag :authenticated_not_in_role
+    @tag :capture_log
     test "renders response", %{conn: conn} do
       conn = get(conn, unauthorized_path(conn, :index))
 

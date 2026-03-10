@@ -66,6 +66,7 @@ defmodule Screens.MixProject do
       {:hackney_telemetry, "~> 0.2.0"},
       {:httpoison, "~> 2.3.0"},
       {:jason, "~> 1.0"},
+      {:logster, "~> 2.0.0-rc.5"},
       {:memcachex, "~> 0.5.5"},
       {:nebulex, "~> 2.6"},
       {:phoenix, "~> 1.7.14"},
