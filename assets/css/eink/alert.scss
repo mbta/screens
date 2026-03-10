@@ -62,11 +62,11 @@
     margin-top: 64px;
     margin-left: 40px;
     overflow: hidden;
+    text-overflow: clip;
     font-size: 96px;
     font-weight: 800;
     line-height: 96px;
     color: white;
-    text-overflow: clip;
     letter-spacing: 0;
     white-space: nowrap;
   }

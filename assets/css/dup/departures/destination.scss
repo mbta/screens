@@ -4,9 +4,9 @@
   display: inline-block;
   width: 1176px;
   font-size: 138px;
+  vertical-align: middle;
   color: colors.$cool-black-15;
   white-space: nowrap;
-  vertical-align: middle;
 
   .departures-section--shortened-headsigns & {
     width: 843px;
