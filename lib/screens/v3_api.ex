@@ -3,8 +3,6 @@ defmodule Screens.V3Api do
 
   use Retry.Annotation
 
-  require Logger
-
   alias __MODULE__.Cache
 
   @default_opts [
@@ -60,11 +58,7 @@ defmodule Screens.V3Api do
   end
 
   defp log_api_error(error_type, url, extra_fields) do
-    extra_fields
-    |> Enum.map_join(" ", fn {label, value} -> "#{label}=\"#{value}\"" end)
-    |> then(fn fields ->
-      Logger.error("api_v3_get_json_error url=\"#{url}\" error_type=#{error_type} " <> fields)
-    end)
+    Logster.error(["api_v3_get_json_error", url: url, error_type: error_type] ++ extra_fields)
   end
 
   defp build_url(path, params) do

@@ -2,7 +2,6 @@ defmodule Screens.Health do
   @moduledoc false
 
   use GenServer
-  require Logger
 
   @process_health_interval_ms 300_000
   @process_metrics ~w(memory binary_memory heap_size total_heap_size message_queue_len reductions)a
@@ -21,19 +20,11 @@ defmodule Screens.Health do
   @impl true
   def handle_info(:process_health, state) do
     diagnostic_processes()
-    |> Stream.map(&process_metrics/1)
-    |> Enum.each(fn {name, supervisor, metrics} ->
-      Logger.info([
-        ~c"screens_process_health name=\"#{inspect(name)}\" supervisor=\"#{inspect(supervisor)}\" ",
-        metrics
-      ])
+    |> Enum.each(fn {pid, name, supervisor} ->
+      metrics = safe_recon_info(pid, @process_metrics)
+      Logster.info(["screens_process_health", name: name, supervisor: supervisor] ++ metrics)
     end)
 
-    {:noreply, state}
-  end
-
-  def handle_info(msg, state) do
-    Logger.info("Screens.Health unknown_message msg=#{inspect(msg)}")
     {:noreply, state}
   end
 
@@ -77,20 +68,7 @@ defmodule Screens.Health do
   defp recon_entry({pid, _count, [name | _]}) when is_atom(name), do: {pid, name, nil}
   defp recon_entry({pid, _count, _info}), do: {pid, nil, nil}
 
-  @spec process_metrics({pid(), term() | nil, term() | nil}) :: {term(), term(), iodata()}
-  defp process_metrics({pid, name, supervisor}) do
-    metrics =
-      pid
-      |> safe_recon_info(@process_metrics)
-      |> Stream.map(fn {metric, value} -> "#{metric}=#{value}" end)
-      |> Enum.intersperse(" ")
-
-    {name, supervisor, metrics}
-  end
-
   # work around https://github.com/ferd/recon/issues/95
-  @spec safe_recon_info(pid(), [atom()]) ::
-          [] | [{:recon.info_type(), [{:recon.info_key(), term()}]}]
   defp safe_recon_info(pid, metrics) do
     :recon.info(pid, metrics)
   rescue
