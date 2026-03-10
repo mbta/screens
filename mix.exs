@@ -97,7 +97,7 @@ defmodule Screens.MixProject do
 
   defp dev_deps do
     [
-      {:credo, "~> 1.7.7", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7.17", only: [:dev, :test], runtime: false},
       {:dialyxir, "~> 1.4.3", only: [:dev, :test], runtime: false},
       {:lcov_ex, "~> 0.2", only: [:dev, :test], runtime: false},
       {:mox, "~> 1.0", only: :test},

@@ -70,6 +70,7 @@ defmodule Screens.V2.WidgetInstance.NormalHeader do
     def priority(_instance), do: [2]
     def serialize(t), do: NormalHeader.serialize(t)
     def slot_names(t), do: NormalHeader.slot_names(t)
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :normal_header
     def valid_candidate?(_instance), do: true
     def audio_serialize(instance), do: NormalHeader.audio_serialize(instance)

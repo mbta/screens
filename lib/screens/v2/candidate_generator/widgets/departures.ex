@@ -105,8 +105,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
 
           slot_names =
             case config do
-              %Screen{app_params: %PreFare{}} -> [:main_content_left]
-              _ -> []
+              %Screen{app_params: %PreFare{template: :duo}} -> [:main_content_left]
+              %Screen{app_params: %PreFare{template: :solo}} -> [:large]
+              _ -> [:main_content]
             end
 
           %DeparturesWidget{screen: config, sections: sections, now: now, slot_names: slot_names}

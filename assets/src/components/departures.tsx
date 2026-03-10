@@ -26,6 +26,7 @@ const Departures: ComponentType<Departures> = ({ sections }) => {
   const [foldedSections, setFoldedSections] = useState(initialSections);
 
   // Restart trimming if the original sections are changed (i.e. new data).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useLayoutEffect(() => setFoldedSections(initialSections), [initialSections]);
 
   // Iteratively trim sections until the container doesn't overflow.
@@ -34,6 +35,7 @@ const Departures: ComponentType<Departures> = ({ sections }) => {
       const newSections = trimSections(foldedSections);
 
       if (foldedSections !== newSections) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         setFoldedSections(newSections);
       } else {
         report("warning", "layout failed: departures will overflow");

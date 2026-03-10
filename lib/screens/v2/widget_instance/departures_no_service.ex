@@ -27,6 +27,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesNoService do
     def priority(instance), do: DeparturesNoService.priority(instance)
     def serialize(instance), do: DeparturesNoService.serialize(instance)
     def slot_names(instance), do: DeparturesNoService.slot_names(instance)
+    def page_groups(_instance), do: []
     def widget_type(instance), do: DeparturesNoService.widget_type(instance)
     def valid_candidate?(instance), do: DeparturesNoService.valid_candidate?(instance)
     def audio_serialize(_instance), do: %{}

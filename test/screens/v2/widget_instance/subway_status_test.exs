@@ -1755,6 +1755,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     end
   end
 
+  describe "page_groups/1" do
+    test "has its own group on Pre-Fare screens" do
+      instance = %SubwayStatus{screen: struct(Screen, app_id: :pre_fare_v2)}
+      assert WidgetInstance.page_groups(instance) == [:subway_status]
+    end
+
+    test "has no groups on other screen types" do
+      instance = %SubwayStatus{screen: struct(Screen, app_id: :bus_shelter_v2)}
+      assert WidgetInstance.page_groups(instance) == []
+    end
+  end
+
   describe "widget_type/1" do
     test "returns subway status" do
       instance = %SubwayStatus{subway_alerts: []}

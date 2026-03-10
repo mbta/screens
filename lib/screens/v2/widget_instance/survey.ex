@@ -28,6 +28,7 @@ defmodule Screens.V2.WidgetInstance.Survey do
     def priority(_instance), do: [2, 10]
     def serialize(instance), do: Survey.serialize(instance)
     def slot_names(_instance), do: [:large, :medium_left, :medium_right]
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :survey
     def valid_candidate?(instance), do: Survey.valid_candidate?(instance)
 

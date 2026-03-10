@@ -21,6 +21,7 @@ defmodule Screens.V2.WidgetInstance.Placeholder do
     def priority(%Placeholder{priority: priority}), do: priority
     def serialize(%Placeholder{color: color, text: text}), do: %{color: color, text: text}
     def slot_names(%Placeholder{slot_names: slot_names}), do: slot_names
+    def page_groups(_instance), do: []
     def widget_type(_), do: :placeholder
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}

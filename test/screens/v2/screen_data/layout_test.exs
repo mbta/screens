@@ -223,6 +223,43 @@ defmodule Screens.V2.ScreenData.LayoutTest do
                {0, :large} => %MockWidget{content: "1"}
              } = actual_instance_placement
     end
+
+    test "respects page groups when placing instances in paged slots" do
+      candidate_template =
+        {:screen, %{normal: [{0, :flex}, {1, :flex}, {2, :flex}, {3, :flex}, {4, :flex}]}}
+
+      candidate_instances = [
+        %MockWidget{slot_names: [:flex], priority: [1], page_groups: [:a, :b], content: "1"},
+        %MockWidget{slot_names: [:flex], priority: [2], page_groups: [:b, :c], content: "2"},
+        %MockWidget{slot_names: [:flex], priority: [3], page_groups: [:a, :c], content: "3"},
+        %MockWidget{slot_names: [:flex], priority: [4], page_groups: [], content: "4"},
+        %MockWidget{slot_names: [:flex], priority: [5], page_groups: [:b, :d], content: "5"}
+      ]
+
+      {_actual_layout, actual_instance_placement} =
+        Layout.pick_instances(candidate_instances, candidate_template)
+
+      assert %{
+               {0, :flex} => %MockWidget{content: "1"},
+               {1, :flex} => %MockWidget{content: "2"},
+               {2, :flex} => %MockWidget{content: "4"},
+               {3, :flex} => %MockWidget{content: "5"}
+             } = actual_instance_placement
+    end
+
+    test "handles entirely non-overlapping page groups" do
+      candidate_template = {:screen, %{normal: [{0, :flex}, {1, :flex}]}}
+
+      candidate_instances = [
+        %MockWidget{slot_names: [:flex], priority: [1], page_groups: [:a], content: "1"},
+        %MockWidget{slot_names: [:flex], priority: [2], page_groups: [:b], content: "2"}
+      ]
+
+      {_actual_layout, actual_instance_placement} =
+        Layout.pick_instances(candidate_instances, candidate_template)
+
+      assert %{{0, :flex} => %MockWidget{content: "1"}} = actual_instance_placement
+    end
   end
 
   describe "resolve_paging/3" do

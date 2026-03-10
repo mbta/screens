@@ -67,6 +67,7 @@ defmodule Screens.V2.WidgetInstance.LineMap do
 
     def priority(_instance), do: [2]
     def slot_names(_instance), do: [:left_sidebar]
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :line_map
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}

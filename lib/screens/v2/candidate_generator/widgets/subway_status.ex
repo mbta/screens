@@ -17,6 +17,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
     relevant_alerts =
       alerts
       |> Enum.filter(&(relevant_alert?(&1) and Alert.happening_now?(&1, now)))
+      |> Alert.consolidate_whole_route_delays()
       |> Enum.map(&append_context(&1, fetch_subway_platforms_for_stop_fn))
 
     [%SubwayStatus{screen: config, subway_alerts: relevant_alerts}]

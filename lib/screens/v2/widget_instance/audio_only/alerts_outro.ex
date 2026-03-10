@@ -62,6 +62,7 @@ defmodule Screens.V2.WidgetInstance.AudioOnly.AlertsOutro do
     def priority(_instance), do: :no_render
     def serialize(_instance), do: %{}
     def slot_names(_instance), do: :no_render
+    def page_groups(_instance), do: :no_render
     def widget_type(_instance), do: :no_render
     def valid_candidate?(_instance), do: false
 

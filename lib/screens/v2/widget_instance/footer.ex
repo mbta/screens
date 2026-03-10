@@ -20,6 +20,7 @@ defmodule Screens.V2.WidgetInstance.Footer do
     def priority(_instance), do: [1]
     def serialize(instance), do: Footer.serialize(instance)
     def slot_names(_instance), do: [:footer]
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :footer
     def valid_candidate?(_instance), do: true
 

@@ -472,4 +472,36 @@ defmodule Screens.Alerts.Alert do
       {directionless_entity, _multiple} -> directionless_entity
     end)
   end
+
+  @doc """
+  Consolidates delay alerts affecting entire routes by keeping only the highest
+  severity delay per route.
+  """
+  @spec consolidate_whole_route_delays(list(t())) :: list(t())
+  def consolidate_whole_route_delays(alerts) do
+    alerts
+    |> Enum.group_by(&Enum.uniq_by(&1.informed_entities, fn ie -> ie.route end))
+    |> Enum.flat_map(fn {_affected_routes, alerts_for_route} ->
+      consolidate_delays_for_route(alerts_for_route)
+    end)
+  end
+
+  @spec consolidate_delays_for_route(list(t())) :: list(t())
+  defp consolidate_delays_for_route(alerts) do
+    # If there are multiple delay alerts on a single route, we only want to
+    # include the delay with the highest severity rather than display multiple.
+    {delay_alerts, other_alerts} = Enum.split_with(alerts, &whole_route_delay?/1)
+
+    delay_alerts
+    |> Enum.max_by(& &1.severity, fn -> nil end)
+    |> List.wrap()
+    |> Enum.concat(other_alerts)
+  end
+
+  @spec whole_route_delay?(t()) :: boolean()
+  defp whole_route_delay?(%__MODULE__{effect: :delay, informed_entities: entities}) do
+    Enum.any?(entities, &InformedEntity.whole_route?/1)
+  end
+
+  defp whole_route_delay?(_), do: false
 end

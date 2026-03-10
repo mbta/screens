@@ -36,6 +36,7 @@ defmodule Screens.V2.WidgetInstance.AlertHeader do
 
     def priority(_instance), do: [2]
     def slot_names(_instance), do: [:header]
+    def page_groups(_instance), do: []
     def widget_type(_instance), do: :alert_header
     def valid_candidate?(_instance), do: true
     def audio_serialize(_instance), do: %{}

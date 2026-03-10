@@ -94,12 +94,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
 
     def slot_names(_instance), do: [:medium, :large]
 
-    def widget_type(_instance), do: :subway_status
+    def page_groups(%SubwayStatus{screen: %Screen{app_id: :pre_fare_v2}}), do: [:subway_status]
+    def page_groups(_instance), do: []
 
+    def widget_type(_instance), do: :subway_status
     def valid_candidate?(_instance), do: true
 
     def audio_serialize(t), do: serialize(t)
-
     def audio_sort_key(_instance), do: [3]
 
     def audio_valid_candidate?(%SubwayStatus{
