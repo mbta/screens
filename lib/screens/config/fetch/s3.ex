@@ -3,8 +3,6 @@ defmodule Screens.Config.Fetch.S3 do
   Functions to work with an S3-hosted copy of the screens config.
   """
 
-  require Logger
-
   @behaviour Screens.Config.Fetch
 
   @impl true
@@ -33,7 +31,7 @@ defmodule Screens.Config.Fetch.S3 do
         {:ok, body, etag}
 
       {:error, err} ->
-        _ = Logger.info("s3_config_fetch_error #{inspect(err)}")
+        Logster.warning(["s3_config_fetch_error", inspect(err)])
         :error
     end
   end

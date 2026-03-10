@@ -10,8 +10,6 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   alias __MODULE__.TaskSupervisor
   alias ScreensConfig.Screen
 
-  require Logger
-
   import Screens.Inject
 
   use GenServer
@@ -75,9 +73,11 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   defp start_refresh([], _rest_ids), do: :ignore
 
   defp start_refresh(ids, rest_ids) do
-    Logger.info(
-      "self_refresh_running screen_ids=#{Enum.join(ids, ",")} remaining_count=#{length(rest_ids)}"
-    )
+    Logster.info([
+      "self_refresh_running",
+      screen_ids: Enum.join(ids, ","),
+      remaining_count: length(rest_ids)
+    ])
 
     runner = self()
 

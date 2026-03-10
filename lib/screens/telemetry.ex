@@ -116,18 +116,16 @@ defmodule Screens.Telemetry do
   end
 
   def handle_event(name, measurements, metadata, config) do
-    measurements = Map.take(measurements, Map.get(config, :measurements, []))
-    metadata = Map.take(metadata, Map.get(config, :metadata, []))
-
-    Logger.info(fn ->
+    Logster.info(fn ->
       measurements =
-        Map.replace_lazy(
-          measurements,
-          :duration,
-          &:erlang.convert_time_unit(&1, :native, :millisecond)
-        )
+        measurements
+        |> Map.take(Map.get(config, :measurements, []))
+        |> Map.replace_lazy(:duration, &:erlang.convert_time_unit(&1, :native, :millisecond))
+        |> Keyword.new()
 
-      ["event=", Enum.join(name, "."), " ", to_log(metadata), " ", to_log(measurements)]
+      metadata = metadata |> Map.take(Map.get(config, :metadata, [])) |> Keyword.new()
+
+      Enum.concat([[event: Enum.join(name, ".")], measurements, metadata])
     end)
   end
 
@@ -185,13 +183,6 @@ defmodule Screens.Telemetry do
       metadata: metadata,
       measurements: measurements
     }
-  end
-
-  defp to_log(enum) do
-    for {k, v} <- enum do
-      [to_string(k), "=", inspect(v)]
-    end
-    |> Enum.intersperse(" ")
   end
 
   defp wrap_event_names([[_ | _] | _] = event_names), do: event_names

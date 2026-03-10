@@ -1,8 +1,7 @@
 defmodule Screens.LogScreenData do
   @moduledoc false
-  require Logger
+
   alias Screens.Config.Cache
-  alias Screens.Util
   alias ScreensConfig.Screen
 
   def log_page_load(screen_id, params) do
@@ -98,27 +97,7 @@ defmodule Screens.LogScreenData do
     :ok
   end
 
-  def log_departures(_screen_id, false, _), do: nil
-
-  def log_departures(screen_id, true, :error) do
-    data = %{screen_id: screen_id, screen_name: screen_name_for_id(screen_id)}
-    log_message("[error fetching departures]", data)
-  end
-
-  def log_departures(screen_id, true, {:ok, []}) do
-    data = %{screen_id: screen_id, screen_name: screen_name_for_id(screen_id)}
-    log_message("[empty departures list]", data)
-  end
-
-  def log_departures(_screen_id, true, {:ok, _}), do: nil
-
-  def log_message(message, data) do
-    data
-    |> Enum.map_join(" ", &Util.format_log_value/1)
-    |> then(fn data_str ->
-      Logger.info("#{message} #{data_str}")
-    end)
-  end
+  def log_message(message, data), do: Logster.info([message | data])
 
   defp screen_name_for_id(screen_id) do
     case Cache.screen(screen_id) do

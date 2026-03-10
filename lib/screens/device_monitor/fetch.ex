@@ -1,8 +1,6 @@
 defmodule Screens.DeviceMonitor.Fetch do
   @moduledoc "Shared data fetching logic for device monitor modules."
 
-  require Logger
-
   @spec make_and_parse_request(
           url :: binary(),
           HTTPoison.headers(),
@@ -18,15 +16,10 @@ defmodule Screens.DeviceMonitor.Fetch do
       {:ok, parsed}
     else
       {:http_request, {:error, e}} ->
-        log_fetch_error(
-          vendor_name,
-          :http_fetch_error,
-          %{message: HTTPoison.Error.message(e)},
-          url
-        )
+        log_fetch_error(vendor_name, :http_fetch_error, url, message: HTTPoison.Error.message(e))
 
       {:response_success, %{status_code: status_code}} ->
-        log_fetch_error(vendor_name, :bad_response_code, %{status_code: status_code}, url)
+        log_fetch_error(vendor_name, :bad_response_code, url, status_code: status_code)
 
       {:parse, _} ->
         log_fetch_error(vendor_name, :parse_error, url)
@@ -36,14 +29,8 @@ defmodule Screens.DeviceMonitor.Fetch do
     end
   end
 
-  defp log_fetch_error(vendor_name, e, url) do
-    Logger.info("#{vendor_name}_fetch_error url=#{url} #{e}")
-    :error
-  end
-
-  defp log_fetch_error(vendor_name, e, data, url) do
-    data_str = Enum.map_join(data, " ", fn {key, value} -> "#{key}=#{value}" end)
-    Logger.info("#{vendor_name}_fetch_error url=#{url} #{e} #{data_str}")
+  defp log_fetch_error(vendor_name, error, url, data \\ []) do
+    Logster.warning(["#{vendor_name}_fetch_error", url: url, error: error] ++ data)
     :error
   end
 end

@@ -3,8 +3,6 @@ defmodule Screens.V2.ScreenData.Layout do
   Coordinates widget generation, selection, and arrangement into a "populated" screen layout.
   """
 
-  require Logger
-
   alias Screens.Util
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
@@ -147,10 +145,8 @@ defmodule Screens.V2.ScreenData.Layout do
       |> Enum.map(&Map.values/1)
       |> Enum.map(&MapSet.new/1)
 
-    _ =
-      if Enum.any?(widget_sets, &(not MapSet.equal?(first_widget_set, &1))) do
-        Logger.info("[mismatched widget placements]")
-      end
+    if Enum.any?(widget_sets, &(not MapSet.equal?(first_widget_set, &1))),
+      do: Logster.warning("mismatched_widget_placements")
 
     placements
   end

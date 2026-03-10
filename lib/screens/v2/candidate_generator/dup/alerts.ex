@@ -85,12 +85,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   def choose_alert([alert]), do: alert
 
   def choose_alert(alerts) do
-    alerts
-    |> Enum.min_by(&{effect_key(&1.effect), -&1.severity, -String.to_integer(&1.id)})
-    |> tap(fn alert ->
-      alert_ids = Enum.map_join(alerts, ",", & &1.id)
-      Logger.info("[dup alert selected] selected_id=#{alert.id} all_relevant_ids=#{alert_ids}")
-    end)
+    Enum.min_by(alerts, &{effect_key(&1.effect), -&1.severity, -String.to_integer(&1.id)})
   end
 
   defp create_alert_widgets({:special, widgets}, _, _, _), do: widgets
