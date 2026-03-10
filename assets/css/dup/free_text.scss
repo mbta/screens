@@ -10,10 +10,10 @@
 .free-text__line {
   display: inline-block;
   overflow: hidden;
+  text-overflow: ellipsis;
 
   // Needed to keep y's from getting cut off!
   line-height: initial;
-  text-overflow: ellipsis;
   vertical-align: middle;
 
   .free-text__element {
@@ -23,8 +23,8 @@
 
 .free-text__icon-container {
   display: inline-block;
-  text-align: center;
   vertical-align: middle;
+  text-align: center;
 
   // Needed if we use a route pill as the leading icon for the row
   // which we do for one-row headways

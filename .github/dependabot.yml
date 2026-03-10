@@ -35,6 +35,9 @@ updates:
           - "eslint*"
           - "*-eslint"
           - "@eslint*"
+      stylelint:
+        patterns:
+          - "stylelint*"
       react:
         patterns:
           - "react"
