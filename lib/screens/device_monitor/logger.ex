@@ -16,6 +16,6 @@ defmodule Screens.DeviceMonitor.Logger do
   end
 
   defp log_device_entry(data, vendor_name) do
-    Logster.info(["#{vendor_name}_data_report" | data])
+    Logster.info(["#{vendor_name}_data_report" | Keyword.new(data)])
   end
 end
