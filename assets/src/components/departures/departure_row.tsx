@@ -10,6 +10,7 @@ type DepartureRow = {
   headsign: Destination;
   times_with_crowding: TimeWithCrowding[];
   direction_id: 0 | 1;
+  is_first_trip: boolean;
   isBeforeDirectionSplit: boolean;
 };
 

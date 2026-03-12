@@ -291,7 +291,7 @@ defmodule Screens.V2.RDS do
          departures_for_headsign,
          _scheduled_departures_by_headsign,
          _stop_id,
-         _route_ids_for_section,
+         _routes_for_section,
          _headway_for_stop,
          _now
        ) do
