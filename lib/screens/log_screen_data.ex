@@ -97,7 +97,7 @@ defmodule Screens.LogScreenData do
     :ok
   end
 
-  def log_message(message, data), do: Logster.info([message | data])
+  def log_message(message, data), do: Logster.info([message | Keyword.new(data)])
 
   defp screen_name_for_id(screen_id) do
     case Cache.screen(screen_id) do
