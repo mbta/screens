@@ -28,5 +28,6 @@ export const timeWithCrowding = Factory.define<TimeWithCrowding>(
     id: sequence.toString(),
     time: { type: "minutes", minutes: sequence },
     crowding: null,
+    is_live: true,
   }),
 );

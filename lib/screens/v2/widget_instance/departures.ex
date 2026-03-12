@@ -103,6 +103,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
            required(:time) => serialized_time(),
            required(:scheduled_time) => serialized_timestamp() | nil,
            required(:crowding) => pos_integer() | nil,
+           required(:is_live) => boolean(),
            optional(:time_in_epoch) => integer()
          }
 
@@ -536,7 +537,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @spec serialize_time(Departure.t(), Screen.t(), DateTime.t()) ::
           %{time: serialized_time(), time_in_epoch: integer()}
-          | %{time: serialized_time() | nil, scheduled_time: serialized_timestamp() | nil}
+          | %{
+              time: serialized_time() | nil,
+              scheduled_time: serialized_timestamp() | nil,
+              is_live: boolean()
+            }
   defp serialize_time(departure, %Screen{app_id: app_id} = screen, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
@@ -551,7 +556,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
       end
 
     # See `docs/mercury_api.md`
-    %{time: time, time_in_epoch: DateTime.to_unix(departure_time)}
+    # Live Data icon not implemented yet for e-inks, just pass false for now
+    %{time: time, time_in_epoch: DateTime.to_unix(departure_time), is_live: false}
   end
 
   defp serialize_time(
@@ -559,7 +565,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
          _screen,
          _now
        ),
-       do: %{time: %{type: :overnight}}
+       do: %{time: %{type: :overnight}, is_live: false}
 
   defp serialize_time(%Departure{prediction: prediction} = departure, screen, now) do
     scheduled_time = Departure.scheduled_time(departure)
@@ -585,7 +591,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
         end
       end
 
-    %{time: serialized_time, scheduled_time: serialized_scheduled_time}
+    %{
+      time: serialized_time,
+      scheduled_time: serialized_scheduled_time,
+      is_live: predicted?
+    }
   end
 
   @spec serialize_realtime(Departure.t(), Screen.t(), DateTime.t()) :: serialized_time()

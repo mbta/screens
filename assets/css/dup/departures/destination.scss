@@ -2,7 +2,7 @@
 
 .departure-destination {
   display: inline-block;
-  width: 1176px;
+  width: 1070px;
   font-size: 138px;
   vertical-align: middle;
   color: colors.$cool-black-15;
@@ -14,8 +14,9 @@
 }
 
 .departure-destination__headsign {
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 138px;
   font-weight: 600;
-  line-height: 1em;
   color: black;
 }

@@ -1,7 +1,7 @@
 @use "CSS/colors";
 
 .departure-times-with-crowding {
-  width: 256px;
+  width: 328px;
 }
 
 .departure-time-with-crowding {
@@ -12,7 +12,7 @@
   }
 
   .departure-time:not(.departure-time--timestamp) {
-    width: 155px;
+    width: 210px;
   }
 
   .departure-time.departure-time--text {
@@ -42,6 +42,7 @@
 }
 
 .departure-time__text {
+  display: inline-block;
   font-size: 72px;
   font-weight: 800;
   line-height: 64px;
@@ -62,7 +63,15 @@
 }
 
 .departure-time__timestamp {
+  display: inline-block;
   font-size: 72px;
   font-weight: 800;
   line-height: 64px;
+}
+
+.departure-time__live-icon {
+  display: inline-block;
+  width: 40px;
+  height: 40px;
+  margin-right: 8px;
 }
