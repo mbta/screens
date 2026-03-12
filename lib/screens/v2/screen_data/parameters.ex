@@ -36,10 +36,6 @@ defmodule Screens.V2.ScreenData.Parameters do
       refresh_rate: 30,
       variants: %{"new_departures" => CandidateGenerator.DupNew}
     },
-    elevator_v2: %Static{
-      candidate_generator: CandidateGenerator.Elevator,
-      refresh_rate: 30
-    },
     gl_eink_v2: %Static{
       audio_active_time: @all_times,
       candidate_generator: CandidateGenerator.GlEink,
