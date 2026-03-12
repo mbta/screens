@@ -1,5 +1,5 @@
+import { init } from "@fullstory/browser";
 import { getDatasetValue } from "Util/dataset";
-import * as FullStory from "@fullstory/browser";
 import { isRealScreen } from "./utils";
 
 /**
@@ -7,13 +7,10 @@ import { isRealScreen } from "./utils";
  * AND this client is running on a production screen simulation.
  */
 const initFullstory = () => {
-  const screenplayFullstoryOrgId = getDatasetValue("screenplayFullstoryOrgId");
+  const orgId = getDatasetValue("screenplayFullstoryOrgId");
 
-  if (screenplayFullstoryOrgId && !isRealScreen()) {
-    FullStory.init({
-      orgId: screenplayFullstoryOrgId,
-      recordCrossDomainIFrames: true,
-    });
+  if (orgId && !isRealScreen()) {
+    init({ orgId, recordCrossDomainIFrames: true });
   }
 };
 
