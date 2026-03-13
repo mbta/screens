@@ -68,7 +68,7 @@ defmodule Screens.MixProject do
       {:jason, "~> 1.0"},
       {:logster, "~> 2.0.0-rc.5"},
       {:memcachex, "~> 0.5.5"},
-      {:nebulex, "~> 2.6"},
+      {:nebulex, "~> 3.0"},
       {:phoenix, "~> 1.7.14"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_html_helpers, "~> 1.0"},
