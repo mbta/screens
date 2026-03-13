@@ -50,7 +50,7 @@ defmodule Screens.V2.RDSTest do
               long_name: nil,
               direction_names: nil,
               direction_destinations: nil,
-              type: nil,
+              type: :bus,
               line: %Screens.Lines.Line{
                 id: "l1",
                 long_name: nil,
@@ -64,7 +64,7 @@ defmodule Screens.V2.RDSTest do
               long_name: nil,
               direction_names: nil,
               direction_destinations: nil,
-              type: nil,
+              type: :bus,
               line: %Screens.Lines.Line{
                 id: "l2",
                 long_name: nil,
@@ -97,6 +97,17 @@ defmodule Screens.V2.RDSTest do
       }
     end
 
+    defp service_ended(stop_id, line_id, headsign, schedule) do
+      %RDS{
+        stop: %Stop{id: stop_id},
+        line: %Line{id: line_id},
+        headsign: headsign,
+        state: %RDS.ServiceEnded{
+          last_scheduled_departure: %Departure{prediction: nil, schedule: schedule}
+        }
+      }
+    end
+
     defp station(id, child_stop_ids) do
       %Stop{id: id, child_stops: Enum.map(child_stop_ids, &stop/1)}
     end
@@ -116,19 +127,19 @@ defmodule Screens.V2.RDSTest do
            %RoutePattern{
              id: "A",
              headsign: "hA",
-             route: %Route{id: "r1", line: %Line{id: "l1"}},
+             route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
              stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
            },
            %RoutePattern{
              id: "B",
              headsign: "hB",
-             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
              stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
            },
            %RoutePattern{
              id: "C",
              headsign: "hC",
-             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
              stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
            }
          ]}
@@ -191,7 +202,7 @@ defmodule Screens.V2.RDSTest do
                   prediction: %Prediction{
                     # further in the future than the cutoff
                     departure_time: ~U[2024-10-11 14:30:00Z],
-                    route: %Route{id: "r3", line: %Line{id: "l3"}},
+                    route: %Route{id: "r3", line: %Line{id: "l3"}, type: :bus},
                     stop: %Stop{id: "s3"},
                     trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
                   },
@@ -233,7 +244,7 @@ defmodule Screens.V2.RDSTest do
           prediction: %Prediction{
             arrival_time: ~U[2024-10-11 12:27:00Z],
             departure_time: ~U[2024-10-11 12:30:00Z],
-            route: %Route{id: "r1", line: %Line{id: "l1"}},
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
             stop: %Stop{id: "s1"},
             trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
           },
@@ -255,7 +266,7 @@ defmodule Screens.V2.RDSTest do
            %RoutePattern{
              id: "p1",
              headsign: "h2",
-             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
              stops: [%Stop{id: "s1"}, %Stop{id: "s2"}],
              typicality: 1
            }
@@ -292,14 +303,14 @@ defmodule Screens.V2.RDSTest do
       first_schedule =
         %Schedule{
           departure_time: ~U[2024-10-11 10:45:00Z],
-          route: %Route{id: "r1", line: %Line{id: "l1"}},
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
           stop: %Stop{id: "sA"},
           trip: %Trip{headsign: "h1", pattern_headsign: "hA"}
         }
 
       second_schedule = %Schedule{
         departure_time: ~U[2024-10-11 10:45:00Z],
-        route: %Route{id: "r2", line: %Line{id: "l2"}},
+        route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
         stop: %Stop{id: "sB"},
         trip: %Trip{headsign: "h2", pattern_headsign: "hB"}
       }
@@ -307,7 +318,7 @@ defmodule Screens.V2.RDSTest do
       third_schedule =
         %Schedule{
           departure_time: ~U[2024-10-11 10:45:00Z],
-          route: %Route{id: "r2", line: %Line{id: "l2"}},
+          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
           stop: %Stop{id: "sC"},
           trip: %Trip{headsign: "h3", pattern_headsign: "hC"}
         }
@@ -332,19 +343,19 @@ defmodule Screens.V2.RDSTest do
            %RoutePattern{
              id: "A",
              headsign: "hA",
-             route: %Route{id: "r1", line: %Line{id: "l1"}},
+             route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
              stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
            },
            %RoutePattern{
              id: "B",
              headsign: "hB",
-             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
              stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
            },
            %RoutePattern{
              id: "C",
              headsign: "hC",
-             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
              stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
            }
          ]}
@@ -367,14 +378,14 @@ defmodule Screens.V2.RDSTest do
       first_schedule =
         %Schedule{
           departure_time: ~U[2024-10-11 10:45:00Z],
-          route: %Route{id: "r1", line: %Line{id: "l1"}},
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
           stop: %Stop{id: "sA"},
           trip: %Trip{headsign: "h1", pattern_headsign: "hA"}
         }
 
       second_schedule = %Schedule{
         departure_time: ~U[2024-10-11 10:45:00Z],
-        route: %Route{id: "r2", line: %Line{id: "l2"}},
+        route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
         stop: %Stop{id: "sB"},
         trip: %Trip{headsign: "h2", pattern_headsign: "hB"}
       }
@@ -382,7 +393,7 @@ defmodule Screens.V2.RDSTest do
       third_schedule =
         %Schedule{
           departure_time: ~U[2024-10-11 10:45:00Z],
-          route: %Route{id: "r2", line: %Line{id: "l2"}},
+          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
           stop: %Stop{id: "sC"},
           trip: %Trip{headsign: "h3", pattern_headsign: "hC"}
         }
@@ -409,19 +420,19 @@ defmodule Screens.V2.RDSTest do
            %RoutePattern{
              id: "A",
              headsign: "hA",
-             route: %Route{id: "r1", line: %Line{id: "l1"}},
+             route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
              stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
            },
            %RoutePattern{
              id: "B",
              headsign: "hB",
-             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
              stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
            },
            %RoutePattern{
              id: "C",
              headsign: "hC",
-             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
              stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
            }
          ]}
@@ -433,6 +444,83 @@ defmodule Screens.V2.RDSTest do
                   first_trip("sA", "l1", "hA", first_schedule),
                   first_trip("sB", "l2", "hB", second_schedule),
                   first_trip("sC", "l2", "hC", third_schedule)
+                ]}
+             ]
+    end
+
+    test "creates service ended state when after last scheduled departure" do
+      now = ~U[2024-10-11 10:50:00Z]
+      stop_ids = ~w[s0 s1]
+
+      first_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+          stop: %Stop{id: "sA"},
+          trip: %Trip{headsign: "h1", pattern_headsign: "hA"}
+        }
+
+      second_schedule = %Schedule{
+        departure_time: ~U[2024-10-11 10:45:00Z],
+        route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+        stop: %Stop{id: "sB"},
+        trip: %Trip{headsign: "h2", pattern_headsign: "hB"}
+      }
+
+      third_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+          stop: %Stop{id: "sC"},
+          trip: %Trip{headsign: "h3", pattern_headsign: "hC"}
+        }
+
+      all_schedules = [first_schedule, second_schedule, third_schedule]
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      stub(@headways, :get, fn _, _ -> {5, 10} end)
+
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
+      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
+        {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
+      end)
+
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+        {:ok,
+         [
+           %RoutePattern{
+             id: "A",
+             headsign: "hA",
+             route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
+           },
+           %RoutePattern{
+             id: "B",
+             headsign: "hB",
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
+           },
+           %RoutePattern{
+             id: "C",
+             headsign: "hC",
+             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
+           }
+         ]}
+      end)
+
+      assert RDS.get(departures, now) == [
+               {:ok,
+                [
+                  service_ended("sA", "l1", "hA", first_schedule),
+                  service_ended("sB", "l2", "hB", second_schedule),
+                  service_ended("sC", "l2", "hC", third_schedule)
                 ]}
              ]
     end

@@ -362,6 +362,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
     do:
       {Departure.route(first_scheduled_departure), Departure.headsign(first_scheduled_departure)}
 
+  defp row_departure_grouping({last_scheduled_departure, :last_trip}),
+    do: {Departure.route(last_scheduled_departure), Departure.headsign(last_scheduled_departure)}
+
   defp row_departure_grouping(%FreeTextLine{}), do: make_ref()
 
   # When using destination-based grouping, only read out the "next" departure, in line with the
@@ -404,8 +407,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       |> Enum.map(&Departure.id/1)
       |> Enum.sort()
       |> Enum.join("")
-      |> then(&:crypto.hash(:md5, &1))
-      |> Base.encode64()
+      |> hash_and_encode()
 
     %{
       id: row_id,
@@ -426,8 +428,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     row_id =
       first_scheduled_departure
       |> Departure.id()
-      |> then(&:crypto.hash(:md5, &1))
-      |> Base.encode64()
+      |> hash_and_encode()
 
     departures = [first_scheduled_departure]
 
@@ -439,6 +440,33 @@ defmodule Screens.V2.WidgetInstance.Departures do
       times_with_crowding: serialize_times_with_crowding(departures, screen, now),
       direction_id: serialize_direction_id(departures),
       is_first_trip: true
+    }
+  end
+
+  # Overnight Row specifically here instead of showing OvernightSection or OvernightDepartures,
+  # which indicates there are other destinations in the section with upcoming departures.
+  defp serialize_departure_group(
+         [{last_scheduled_departure, :last_trip}],
+         screen,
+         _now,
+         route_pill_serializer
+       ) do
+    departure_id = Departure.id(last_scheduled_departure)
+
+    departures = [last_scheduled_departure]
+
+    %{
+      id: hash_and_encode(departure_id),
+      type: :departure_row,
+      route: serialize_route(departures, route_pill_serializer),
+      headsign: serialize_headsign(departures, screen),
+      times_with_crowding: [
+        %{
+          id: departure_id,
+          time: %{type: :overnight}
+        }
+      ],
+      direction_id: serialize_direction_id(departures)
     }
   end
 
@@ -678,4 +706,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp parse_status_pages(_departure, _screen), do: nil
+
+  defp hash_and_encode(departure_to_encode),
+    do: :crypto.hash(:md5, departure_to_encode) |> Base.encode64()
 end
