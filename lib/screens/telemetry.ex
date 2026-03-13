@@ -4,6 +4,8 @@ defmodule Screens.Telemetry do
   use Supervisor
   require Logger
 
+  alias Screens.V3Api.Cache
+
   def start_link(opts) do
     Supervisor.start_link(__MODULE__, [], opts)
   end
@@ -24,7 +26,7 @@ defmodule Screens.Telemetry do
       ),
       log_event(~w[screens v3_api cache stats]a,
         metadata: ~w[cache]a,
-        measurements: ~w[hits misses writes updates evictions expirations]a
+        measurements: ~w[used total hits misses writes updates evictions expirations]a
       )
     ]
 
@@ -34,17 +36,24 @@ defmodule Screens.Telemetry do
     end
 
     children = [
-      {
-        :telemetry_poller,
-        measurements: [
-          {Screens.V3Api.Cache.Realtime, :dispatch_stats, []},
-          {Screens.V3Api.Cache.Static, :dispatch_stats, []}
-        ],
-        period: 10_000
-      }
+      {:telemetry_poller, measurements: [{__MODULE__, :cache_stats, []}], period: 10_000}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  def cache_stats do
+    for cache <- [Cache.Realtime, Cache.Static] do
+      with {:ok, info} <- cache.info() do
+        :telemetry.execute(
+          ~w[screens v3_api cache stats]a,
+          Map.merge(info.memory, info.stats),
+          %{cache: info.server[:cache_name]}
+        )
+      end
+    end
+
+    :ok
   end
 
   @doc """
