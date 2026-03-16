@@ -142,4 +142,4 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
 };
 
 export default ReconstructedTakeover;
-export { ReconAlertProps };
+export type { ReconAlertProps };

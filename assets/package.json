@@ -8,8 +8,7 @@
     "test:watch": "jest --watch",
     "watch": "concurrently --kill-others --prefix-colors auto npm:watch-*",
     "watch-build": "webpack --mode development --stats minimal --watch",
-    "watch-tsc": "tsc --noEmit --preserveWatchOutput --watch",
-    "tsc:check": "tsc --noEmit",
+    "watch-tsc": "tsc --preserveWatchOutput --watch",
     "lint": "eslint --fix .",
     "lint:check": "eslint .",
     "lint:errors": "eslint --quiet .",
@@ -73,7 +72,7 @@
     "stylelint-config-standard-scss": "^17.0.0",
     "terser-webpack-plugin": "^5.3.17",
     "ts-jest": "^29.4.6",
-    "typescript": "^5.7.2",
+    "typescript": "^5.9.3",
     "typescript-eslint": "^8.56.1",
     "webpack": "^5.105.4",
     "webpack-cli": "^6.0.1"

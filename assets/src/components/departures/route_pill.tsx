@@ -172,6 +172,6 @@ const routePillKey = (pill: Pill): string => {
   }
 };
 
-export { Pill };
+export type { Pill };
 export { routePillKey };
 export default RoutePill;

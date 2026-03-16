@@ -128,4 +128,4 @@ const BodyTextSizer: ComponentType<BodyTextSizerProps> = ({
 };
 
 export default BaseAlert;
-export { Props, AlertCardProps, AlertIcon };
+export type { Props, AlertCardProps, AlertIcon };
