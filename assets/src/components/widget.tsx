@@ -22,4 +22,4 @@ const Widget: ComponentType<Props> = ({ data }) => {
 };
 
 export default Widget;
-export { WidgetData, MappingContext };
+export { type WidgetData, MappingContext };
