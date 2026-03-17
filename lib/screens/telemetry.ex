@@ -4,6 +4,8 @@ defmodule Screens.Telemetry do
   use Supervisor
   require Logger
 
+  alias Screens.V3Api.Cache
+
   def start_link(opts) do
     Supervisor.start_link(__MODULE__, [], opts)
   end
@@ -24,7 +26,7 @@ defmodule Screens.Telemetry do
       ),
       log_event(~w[screens v3_api cache stats]a,
         metadata: ~w[cache]a,
-        measurements: ~w[hits misses writes updates evictions expirations]a
+        measurements: ~w[used total hits misses writes updates evictions expirations]a
       )
     ]
 
@@ -34,17 +36,24 @@ defmodule Screens.Telemetry do
     end
 
     children = [
-      {
-        :telemetry_poller,
-        measurements: [
-          {Screens.V3Api.Cache.Realtime, :dispatch_stats, []},
-          {Screens.V3Api.Cache.Static, :dispatch_stats, []}
-        ],
-        period: 10_000
-      }
+      {:telemetry_poller, measurements: [{__MODULE__, :cache_stats, []}], period: 10_000}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  def cache_stats do
+    for cache <- [Cache.Realtime, Cache.Static] do
+      with {:ok, info} <- cache.info() do
+        :telemetry.execute(
+          ~w[screens v3_api cache stats]a,
+          Map.merge(info.memory, info.stats),
+          %{cache: info.server[:cache_name]}
+        )
+      end
+    end
+
+    :ok
   end
 
   @doc """
@@ -116,18 +125,16 @@ defmodule Screens.Telemetry do
   end
 
   def handle_event(name, measurements, metadata, config) do
-    measurements = Map.take(measurements, Map.get(config, :measurements, []))
-    metadata = Map.take(metadata, Map.get(config, :metadata, []))
-
-    Logger.info(fn ->
+    Logster.info(fn ->
       measurements =
-        Map.replace_lazy(
-          measurements,
-          :duration,
-          &:erlang.convert_time_unit(&1, :native, :millisecond)
-        )
+        measurements
+        |> Map.take(Map.get(config, :measurements, []))
+        |> Map.replace_lazy(:duration, &:erlang.convert_time_unit(&1, :native, :millisecond))
+        |> Keyword.new()
 
-      ["event=", Enum.join(name, "."), " ", to_log(metadata), " ", to_log(measurements)]
+      metadata = metadata |> Map.take(Map.get(config, :metadata, [])) |> Keyword.new()
+
+      Enum.concat([[event: Enum.join(name, ".")], measurements, metadata])
     end)
   end
 
@@ -185,13 +192,6 @@ defmodule Screens.Telemetry do
       metadata: metadata,
       measurements: measurements
     }
-  end
-
-  defp to_log(enum) do
-    for {k, v} <- enum do
-      [to_string(k), "=", inspect(v)]
-    end
-    |> Enum.intersperse(" ")
   end
 
   defp wrap_event_names([[_ | _] | _] = event_names), do: event_names

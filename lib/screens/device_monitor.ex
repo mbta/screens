@@ -63,13 +63,10 @@ defmodule Screens.DeviceMonitor do
         :initialized -> [result: :skipped, reason: :store_initialized]
         :conflict -> [result: :skipped, reason: :store_conflict]
         {:diff, false} -> [result: :skipped, reason: :interval_not_elapsed]
-        {:error, error} -> [result: :error, reason: error]
+        {:error, error} -> [result: :error, reason: inspect(error)]
       end
 
-    Logger.info(
-      "device_monitor " <>
-        Enum.map_join(log_fields, " ", fn {key, value} -> "#{key}=\"#{value}\"" end)
-    )
+    Logster.info(["device_monitor" | log_fields])
   end
 
   defp get_or_initialize(store, value) do

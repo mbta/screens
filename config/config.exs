@@ -22,7 +22,13 @@ config :logger,
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:client_ip, :remote_ip, :request_id]
+  metadata: [:remote_ip, :request_id]
+
+# Disable default Phoenix logger; using Logster instead
+config :phoenix, :logger, false
+
+# Disable Logster default logging of request params
+config :logster, excludes: [:params]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
@@ -481,8 +487,8 @@ config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Sto
 
 config :screens, Screens.V3Api.Cache.Realtime,
   allocated_memory: 50 * 1024 * 1024,
-  gc_cleanup_min_timeout: :timer.seconds(5),
   gc_interval: :timer.seconds(30),
+  gc_memory_check_interval: :timer.seconds(5),
   stats: true,
   telemetry_prefix: ~w[screens v3_api cache]a
 

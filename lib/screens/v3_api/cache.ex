@@ -26,26 +26,32 @@ defmodule Screens.V3Api.Cache do
   @type key :: {path :: String.t(), params :: map()}
   @type result :: {:fresh, term()} | {:stale, term()} | nil
 
-  @doc "Get a response from the cache."
+  @doc """
+  Get a response from the cache. Returns `nil` if either the key doesn't exist or there was an
+  error retrieving it.
+  """
   @spec get(key()) :: result()
   @spec get(key(), now :: DateTime.t()) :: result()
   def get(key, now \\ DateTime.utc_now()) do
-    case cache_for(key).get(key) do
-      {stale_at, value} ->
+    case cache_for(key).fetch(key) do
+      {:ok, {stale_at, value}} ->
         if DateTime.before?(now, stale_at), do: {:fresh, value}, else: {:stale, value}
 
-      nil ->
+      {:error, _} ->
         nil
     end
   end
 
-  @doc "Put a response in the cache."
+  @doc """
+  Put a response in the cache. Ignores any error storing the response and always returns `:ok`.
+  """
   @spec put(key(), term()) :: :ok
   @spec put(key(), term(), now :: DateTime.t()) :: :ok
   def put(key, value, now \\ DateTime.utc_now()) do
     cache = cache_for(key)
     stale_at = DateTime.add(now, cache.unconditional_ttl(), :millisecond)
-    cache.put(key, {stale_at, value})
+    _ = cache.put(key, {stale_at, value})
+    :ok
   end
 
   # Imperfectly check whether a request could return any data derived from GTFS-RT, and assign

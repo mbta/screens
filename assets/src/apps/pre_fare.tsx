@@ -74,7 +74,7 @@ const TYPE_TO_COMPONENT = {
 };
 
 const DISABLED_LAYOUT = {
-  full_screen: {
+  full_duo_screen: {
     type: "no_data",
     show_alternatives: true,
   },

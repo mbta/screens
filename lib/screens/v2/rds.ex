@@ -18,6 +18,7 @@ defmodule Screens.V2.RDS do
   alias Screens.Lines.Line
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
+  alias Screens.RouteType
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Util
@@ -74,6 +75,15 @@ defmodule Screens.V2.RDS do
     defstruct ~w[first_scheduled_departure]a
   end
 
+  defmodule ServiceEnded do
+    @moduledoc """
+    State for after the end of the last scheduled departure
+    or if we observe a departure that is the Last Trip of the Day
+    """
+    @type t :: %__MODULE__{last_scheduled_departure: Departure.t()}
+    defstruct ~w[last_scheduled_departure]a
+  end
+
   @alert injected(Alert)
   @departure injected(Departure)
   @headways injected(Headways)
@@ -99,11 +109,7 @@ defmodule Screens.V2.RDS do
 
   @spec from_section(Section.t(), DateTime.t()) :: section_t()
   defp from_section(
-         %Section{
-           query: %Query{
-             params: %Query.Params{stop_ids: stop_ids, route_ids: route_id_params} = params
-           }
-         },
+         %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids} = params}},
          now
        )
        when stop_ids != [] do
@@ -129,7 +135,7 @@ defmodule Screens.V2.RDS do
              departures,
              scheduled_departures,
              typical_patterns,
-             route_id_params
+             params
            ) do
         {[_ | _] = enabled_routes_for_section, _} ->
           create_section_rds(
@@ -299,11 +305,17 @@ defmodule Screens.V2.RDS do
            headway_for_stop,
            now
          ) do
-      :before_scheduled_start -> %FirstTrip{first_scheduled_departure: first_scheduled_departure}
-      # Add Service Ended logic here in future work
-      :after_scheduled_end -> %NoService{}
-      :active_period -> %Countdowns{departures: departures_for_headsign}
-      :no_service -> %NoService{routes: routes_for_section}
+      :before_scheduled_start ->
+        %FirstTrip{first_scheduled_departure: first_scheduled_departure}
+
+      :after_scheduled_end ->
+        %ServiceEnded{last_scheduled_departure: last_scheduled_departure}
+
+      :active_period ->
+        %Countdowns{departures: departures_for_headsign}
+
+      :no_service ->
+        %NoService{routes: routes_for_section}
     end
   end
 
@@ -311,7 +323,7 @@ defmodule Screens.V2.RDS do
          departures_for_headsign,
          _scheduled_departures_by_headsign,
          _stop_id,
-         _route_ids_for_section,
+         _routes_for_section,
          _headway_for_stop,
          _impacted_by_alert,
          _now
@@ -340,7 +352,7 @@ defmodule Screens.V2.RDS do
          departures,
          scheduled_departures,
          typical_patterns,
-         route_id_params
+         %Query.Params{route_ids: route_id_params, route_type: route_type} = _params
        ) do
     routes_for_section =
       (departures ++ scheduled_departures ++ typical_patterns)
@@ -350,6 +362,7 @@ defmodule Screens.V2.RDS do
       end)
       |> Enum.uniq()
       |> filter_for_route_id_params(route_id_params)
+      |> filter_for_route_type_param(route_type)
 
     enabled_routes_for_section =
       reject_disabled_modes(routes_for_section, @config_cache.disabled_modes())
@@ -357,10 +370,17 @@ defmodule Screens.V2.RDS do
     {enabled_routes_for_section, routes_for_section}
   end
 
+  @spec filter_for_route_id_params([Route.t()], [String.t()]) :: [Route.t()]
   defp filter_for_route_id_params(all_routes, []), do: all_routes
 
   defp filter_for_route_id_params(all_routes, route_id_params),
     do: Enum.filter(all_routes, fn route -> route.id in route_id_params end)
+
+  @spec filter_for_route_type_param([Route.t()], RouteType.t()) :: [Route.t()]
+  defp filter_for_route_type_param(all_routes, nil), do: all_routes
+
+  defp filter_for_route_type_param(all_routes, route_type),
+    do: Enum.filter(all_routes, fn route -> route.type == route_type end)
 
   defp reject_disabled_modes(all_routes, []), do: all_routes
 

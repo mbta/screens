@@ -152,7 +152,7 @@ const ScreenContainer = ({ id }) => {
 };
 
 export default ScreenContainer;
-export { ResponseMapper, ResponseMapperContext, LOADING_LAYOUT };
-export { BlinkConfig, BlinkConfigContext };
-export { AudioConfig, AudioConfigContext };
+export { type ResponseMapper, ResponseMapperContext, LOADING_LAYOUT };
+export { type BlinkConfig, BlinkConfigContext };
+export { type AudioConfig, AudioConfigContext };
 export { LastFetchContext };

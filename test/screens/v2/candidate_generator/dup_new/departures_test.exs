@@ -12,6 +12,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
   alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService}
+  alias Screens.V2.WidgetInstance.OvernightDepartures
   alias ScreensConfig.{Alerts, Departures, Header}
   alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Screen
@@ -62,44 +63,88 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
     }
   end
 
-  defp expected_departures_widget(config, expected_primary_sections, expected_secondary_sections) do
+  defp first_trip(stop_id, line_id, headsign, first_scheduled) do
+    %RDS{
+      stop: %Stop{id: stop_id},
+      line: %Line{id: line_id},
+      headsign: headsign,
+      state: %RDS.FirstTrip{
+        first_scheduled_departure: %Departure{
+          prediction: nil,
+          schedule: first_scheduled
+        }
+      }
+    }
+  end
+
+  defp service_ended(stop_id, line_id, headsign, last_scheduled) do
+    %RDS{
+      stop: %Stop{id: stop_id},
+      line: %Line{id: line_id},
+      headsign: headsign,
+      state: %RDS.ServiceEnded{
+        last_scheduled_departure: %Departure{
+          prediction: nil,
+          schedule: last_scheduled
+        }
+      }
+    }
+  end
+
+  defp expected_departures_widget(
+         config,
+         expected_primary_sections,
+         expected_secondary_sections,
+         now \\ @now
+       ) do
     [
       %DeparturesWidget{
         screen: config,
         slot_names: [:main_content_zero],
-        now: @now,
+        now: now,
         sections: expected_primary_sections
       },
       %DeparturesWidget{
         screen: config,
         slot_names: [:main_content_one],
-        now: @now,
+        now: now,
         sections: expected_primary_sections
       },
       %DeparturesWidget{
         screen: config,
         slot_names: [:main_content_reduced_zero],
-        now: @now,
+        now: now,
         sections: expected_primary_sections
       },
       %DeparturesWidget{
         screen: config,
         slot_names: [:main_content_reduced_one],
-        now: @now,
+        now: now,
         sections: expected_primary_sections
       },
       %DeparturesWidget{
         screen: config,
         slot_names: [:main_content_two],
-        now: @now,
+        now: now,
         sections: expected_secondary_sections
       },
       %DeparturesWidget{
         screen: config,
         slot_names: [:main_content_reduced_two],
-        now: @now,
+        now: now,
         sections: expected_secondary_sections
       }
+    ]
+  end
+
+  defp expected_overnight_departures_widget(config) do
+    [
+      %OvernightDepartures{screen: config, slot_names: [:main_content_zero]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_one]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_zero]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_one]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_two]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_two]}
     ]
   end
 
@@ -594,6 +639,318 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
         expected_departures_widget(config, expected_sections, expected_sections)
 
       actual_instances = DupNew.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections with First Departure rows for early morning scheduled departures" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      secondary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s4"]}}}
+      ]
+
+      expected_primary_schedule =
+        %Schedule{
+          arrival_time: ~U[2024-10-11 10:27:00Z],
+          departure_time: ~U[2024-10-11 10:30:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s1"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+
+      expected_secondary_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:15:00Z],
+          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          stop: %Stop{id: "s3"},
+          trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+        }
+
+      expected_primary_departures = [
+        {%Departure{prediction: nil, schedule: expected_primary_schedule}, :first_trip}
+      ]
+
+      expected_secondary_departures = [
+        {%Departure{prediction: nil, schedule: expected_secondary_schedule}, :first_trip}
+      ]
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_primary_departures
+        }
+      ]
+
+      expected_secondary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_secondary_departures
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [{:ok, [first_trip("s1", "l1", "other1", expected_primary_schedule)]}]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now ->
+        [{:ok, [first_trip("s3", "l3", "other3", expected_secondary_schedule)]}]
+      end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_secondary_sections)
+
+      actual_instances = DupNew.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections with Overnight Departure rows for service ended destinations" do
+      now = ~U[2024-10-11 10:40:00Z]
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}}
+      ]
+
+      expected_first_schedule =
+        %Schedule{
+          arrival_time: ~U[2024-10-11 10:27:00Z],
+          departure_time: ~U[2024-10-11 10:30:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s1"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+
+      expected_last_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:50:00Z],
+          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          stop: %Stop{id: "s3"},
+          trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+        }
+
+      expected_departures = [
+        {%Departure{prediction: nil, schedule: expected_first_schedule}, :first_trip},
+        {%Departure{prediction: nil, schedule: expected_last_schedule}, :last_trip}
+      ]
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, _now ->
+        [
+          {:ok,
+           [
+             service_ended("s1", "l1", "other1", expected_last_schedule),
+             first_trip("s3", "l3", "other3", expected_first_schedule)
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _primary_departures, _now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(
+          config,
+          expected_primary_sections,
+          expected_primary_sections,
+          now
+        )
+
+      actual_instances = DupNew.Departures.instances(config, now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates OvernightSection for service ended in a section" do
+      now = ~U[2024-10-11 10:40:00Z]
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}}
+      ]
+
+      expected_first_schedule =
+        %Schedule{
+          arrival_time: ~U[2024-10-11 10:50:00Z],
+          departure_time: ~U[2024-10-11 10:52:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s1"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+
+      expected_last_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:38:00Z],
+          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          stop: %Stop{id: "s3"},
+          trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+        }
+
+      expected_departures = [
+        {%Departure{
+           prediction: nil,
+           schedule: expected_first_schedule
+         }, :first_trip}
+      ]
+
+      expected_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        },
+        %Screens.V2.WidgetInstance.Departures.OvernightSection{
+          routes: [
+            %Screens.Routes.Route{id: "r3", type: :subway, line: %Screens.Lines.Line{id: "l3"}}
+          ]
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, _now ->
+        [
+          {:ok,
+           [
+             first_trip("s1", "l3", "other3", expected_first_schedule)
+           ]},
+          {:ok,
+           [
+             service_ended("s3", "l1", "other1", expected_last_schedule)
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, _now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(
+          config,
+          expected_sections,
+          expected_sections,
+          now
+        )
+
+      actual_instances = DupNew.Departures.instances(config, now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates OvernightDepartures when all modes have service ended" do
+      now = ~U[2024-10-11 10:40:00Z]
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}}
+      ]
+
+      expected_last_schedule_one =
+        %Schedule{
+          arrival_time: ~U[2024-10-11 10:38:00Z],
+          departure_time: ~U[2024-10-11 10:39:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s1"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+
+      expected_last_schedule_two =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:38:00Z],
+          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          stop: %Stop{id: "s3"},
+          trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+        }
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, _now ->
+        [
+          {:ok,
+           [
+             service_ended("s1", "l1", "other1", expected_last_schedule_one)
+           ]},
+          {:ok,
+           [
+             service_ended("s3", "l3", "other3", expected_last_schedule_two)
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, _now -> [{:ok, []}] end)
+
+      expected_instances = expected_overnight_departures_widget(config)
+
+      actual_instances = DupNew.Departures.instances(config, now)
 
       assert actual_instances == expected_instances
     end

@@ -3,8 +3,6 @@ defmodule Screens.PendingConfig.Fetch.S3 do
   Functions to work with an S3-hosted copy of the pending screens config.
   """
 
-  require Logger
-
   @behaviour Screens.PendingConfig.Fetch
 
   @impl true
@@ -22,7 +20,7 @@ defmodule Screens.PendingConfig.Fetch.S3 do
         {:ok, body}
 
       {:error, err} ->
-        _ = Logger.info("s3_config_fetch_error #{inspect(err)}")
+        Logster.warning(["s3_config_fetch_error", inspect(err)])
         :error
     end
   end

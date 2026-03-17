@@ -186,19 +186,4 @@ defmodule Screens.Util do
       fun.()
     end
   end
-
-  @spec format_log_value({term(), term()}) :: String.t()
-  def format_log_value({key, value}) do
-    value_str =
-      case value do
-        nil -> "null"
-        _ -> "#{value}"
-      end
-
-    if String.contains?(value_str, " ") do
-      "#{key}=\"#{value_str}\""
-    else
-      "#{key}=#{value_str}"
-    end
-  end
 end

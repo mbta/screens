@@ -5,7 +5,7 @@ on:
 
 jobs:
   asana:
-    uses: mbta/workflows/.github/workflows/asana.yml@v4
+    uses: mbta/workflows/.github/workflows/asana.yml@v5
     with:
       attach-pr: true
       trigger-phrase: "\\*\\*Asana task\\*\\*:"

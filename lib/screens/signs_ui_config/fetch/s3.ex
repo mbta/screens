@@ -3,8 +3,6 @@ defmodule Screens.SignsUiConfig.Fetch.S3 do
   Functions to work with an S3-hosted copy of the Signs UI config.
   """
 
-  require Logger
-
   @behaviour Screens.SignsUiConfig.Fetch
 
   @impl true
@@ -33,7 +31,7 @@ defmodule Screens.SignsUiConfig.Fetch.S3 do
         {:ok, body, etag}
 
       {:error, err} ->
-        _ = Logger.info("s3_signs_ui_config_fetch_error #{inspect(err)}")
+        Logster.info(["s3_signs_ui_config_fetch_error", inspect(err)])
         :error
     end
   end

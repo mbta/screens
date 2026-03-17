@@ -872,6 +872,5 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
 
 /* eslint-enable react-hooks/exhaustive-deps */
 
-export { DisruptionDiagramData };
-
+export type { DisruptionDiagramData };
 export default DisruptionDiagram;
