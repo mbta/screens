@@ -335,11 +335,11 @@ defmodule Screens.V2.RDSTest do
         ]
       }
 
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
       expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
         {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
       end)
-
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
 
       expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
         {:ok,
