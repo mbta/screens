@@ -1,6 +1,7 @@
 defmodule Screens.V2.RDSTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Config.Cache
   alias Screens.Headways
   alias Screens.Lines.Line
@@ -16,9 +17,11 @@ defmodule Screens.V2.RDSTest do
   alias ScreensConfig.Departures.{Query, Section}
 
   import Screens.Inject
+  import Screens.TestSupport.InformedEntityBuilder
   import Mox
   setup :verify_on_exit!
 
+  @alert injected(Alert)
   @departure injected(Departure)
   @headways injected(Headways)
   @route_pattern injected(RoutePattern)
@@ -27,6 +30,7 @@ defmodule Screens.V2.RDSTest do
   @config_cache injected(Cache)
 
   setup do
+    stub(@alert, :fetch, fn _ -> {:ok, []} end)
     stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
     stub(@headways, :get, fn _, _ -> nil end)
     stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
@@ -433,6 +437,66 @@ defmodule Screens.V2.RDSTest do
                   first_trip("sA", "l1", "hA", first_schedule),
                   first_trip("sB", "l2", "hB", second_schedule),
                   first_trip("sC", "l2", "hC", third_schedule)
+                ]}
+             ]
+    end
+
+    test "does not create NoService destinations for destinations with no departures affected by an alert" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2021-01-01T00:00:00Z]
+
+      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
+        {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
+      end)
+
+      expect(@alert, :fetch, fn [activities: [:board], stop_id: ["s0", "s1"], include_all?: true] ->
+        {:ok,
+         [
+           %Alert{
+             id: "1",
+             effect: :stop_closure,
+             informed_entities: [ie(stop_id: "s0", route: "r1"), ie(stop_id: "sA", route: "r1")],
+             active_period: [{now, nil}]
+           }
+         ]}
+      end)
+
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+        {:ok,
+         [
+           %RoutePattern{
+             id: "A",
+             headsign: "hA",
+             route: %Route{id: "r1", line: %Line{id: "l1"}},
+             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
+           },
+           %RoutePattern{
+             id: "B",
+             headsign: "hB",
+             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
+           },
+           %RoutePattern{
+             id: "C",
+             headsign: "hC",
+             route: %Route{id: "r2", line: %Line{id: "l2"}},
+             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
+           }
+         ]}
+      end)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  countdowns("sA", "l1", "hA", []),
+                  no_service("sB", "l2", "hB"),
+                  no_service("sC", "l2", "hC")
                 ]}
              ]
     end

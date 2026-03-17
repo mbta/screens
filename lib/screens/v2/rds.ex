@@ -11,6 +11,8 @@ defmodule Screens.V2.RDS do
 
   import Screens.Inject
 
+  alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.Config.Cache
   alias Screens.Headways
   alias Screens.Lines.Line
@@ -72,6 +74,7 @@ defmodule Screens.V2.RDS do
     defstruct ~w[first_scheduled_departure]a
   end
 
+  @alert injected(Alert)
   @departure injected(Departure)
   @headways injected(Headways)
   @route_pattern injected(RoutePattern)
@@ -113,6 +116,8 @@ defmodule Screens.V2.RDS do
            fetch_child_stops(stop_ids),
          {:ok, scheduled} <-
            @schedule.fetch(%{stop_ids: stop_ids}, Util.service_date(now)),
+         {:ok, alerts} <-
+           fetch_relevant_alerts(stop_ids),
          {:ok, departures} <-
            params
            |> Map.from_struct()
@@ -133,6 +138,7 @@ defmodule Screens.V2.RDS do
             typical_patterns,
             child_stops,
             enabled_routes_for_section,
+            alerts,
             now
           )
 
@@ -170,21 +176,29 @@ defmodule Screens.V2.RDS do
          typical_patterns,
          child_stops,
          routes_for_section,
+         alerts,
          now
        ) do
     departures_by_destination = group_by_destination(departures)
     scheduled_departures_by_destination = group_by_destination(scheduled_departures)
 
-    section_rds =
+    destinations =
       (tuples_from_departures(departures, now) ++
          tuples_from_patterns(typical_patterns, child_stops))
       |> Enum.uniq()
-      |> Enum.map(fn rds ->
+
+    # Destinations that are affected by current alerts at the present stop ID
+    impacted_destinations = informed_destinations(destinations, alerts, typical_patterns)
+
+    section_rds =
+      destinations
+      |> Enum.map(fn destination ->
         create_destination_rds(
-          rds,
+          destination,
           departures_by_destination,
           scheduled_departures_by_destination,
           routes_for_section,
+          impacted_destinations,
           now
         )
       end)
@@ -193,10 +207,11 @@ defmodule Screens.V2.RDS do
   end
 
   defp create_destination_rds(
-         {%Stop{id: stop_id} = stop, line, headsign},
+         {%Stop{id: stop_id} = stop, line, headsign} = destination,
          departures_by_destination,
          scheduled_departures_by_destination,
          routes_for_section,
+         impacted_destinations,
          now
        ) do
     headway_for_stop = @headways.get(stop_id, now)
@@ -211,6 +226,8 @@ defmodule Screens.V2.RDS do
     scheduled_departures =
       scheduled_departures_by_destination |> Map.get({stop.id, line.id, headsign}, [])
 
+    impacted_by_alert = destination in impacted_destinations
+
     %__MODULE__{
       stop: stop,
       line: line,
@@ -222,6 +239,7 @@ defmodule Screens.V2.RDS do
           stop_id,
           routes_for_section,
           headway_for_stop,
+          impacted_by_alert,
           now
         )
     }
@@ -255,6 +273,7 @@ defmodule Screens.V2.RDS do
          _stop_id,
          routes_for_section,
          _headway_for_stop,
+         false = _impacted_by_alert,
          _now
        ) do
     %NoService{routes: routes_for_section}
@@ -266,6 +285,7 @@ defmodule Screens.V2.RDS do
          _stop_id,
          routes_for_section,
          headway_for_stop,
+         _impacted_by_alert,
          now
        ) do
     {first_scheduled_departure, last_scheduled_departure} =
@@ -293,6 +313,7 @@ defmodule Screens.V2.RDS do
          _stop_id,
          _route_ids_for_section,
          _headway_for_stop,
+         _impacted_by_alert,
          _now
        ) do
     %Countdowns{departures: departures_for_headsign}
@@ -375,4 +396,100 @@ defmodule Screens.V2.RDS do
         :active_period
     end
   end
+
+  @spec fetch_relevant_alerts([Stop.id()]) :: {:ok, [Alert.t()]} | :error
+  defp fetch_relevant_alerts(stop_ids) do
+    with {:ok, alerts} <-
+           @alert.fetch(activities: [:board], stop_id: stop_ids, include_all?: true) do
+      relevant_alerts =
+        alerts
+        |> Stream.filter(&Alert.happening_now?/1)
+        |> Stream.filter(&relevant_alert_effect?/1)
+        |> Enum.to_list()
+
+      {:ok, relevant_alerts}
+    end
+  end
+
+  defp relevant_alert_effect?(%Alert{effect: effect}) do
+    # Shuttle, Suspension, Station/Stop/Dock Closure, Stop Move, Snow Route, or Detour
+    # These alert types eliminate service to a destination.
+    effect in [
+      :detour,
+      :dock_closure,
+      :no_service,
+      :shuttle,
+      :snow_route,
+      :station_closure,
+      :stop_closure,
+      :stop_move,
+      :suspension
+    ]
+  end
+
+  @spec informed_destinations([destination()], [Alert.t()], [RoutePattern.t()]) :: [destination()]
+  defp informed_destinations(destinations, alerts, typical_patterns) do
+    # Filters destinations to return only those that are affected by at least one alert.
+    # Stops checking as soon as an alert is found that affects the destination.
+    Enum.filter(destinations, fn {stop, _line, _headsign} = destination ->
+      case pattern_for_destination(destination, typical_patterns) do
+        nil ->
+          nil
+
+        pattern ->
+          Enum.any?(alerts, fn alert ->
+            Enum.any?(alert.informed_entities, fn ie ->
+              ie_affects_destination?(ie, pattern, stop)
+            end)
+          end)
+      end
+    end)
+  end
+
+  @spec pattern_for_destination(destination(), [RoutePattern.t()]) :: RoutePattern.t() | nil
+  defp pattern_for_destination(destination, typical_patterns) do
+    Enum.find(typical_patterns, fn %RoutePattern{
+                                     headsign: headsign,
+                                     route: %Route{line: line},
+                                     stops: stops
+                                   } ->
+      line == elem(destination, 1) and
+        headsign == elem(destination, 2) and
+        Enum.any?(stops, fn stop -> stop.id == elem(destination, 0).id end)
+    end)
+  end
+
+  @spec ie_affects_destination?(InformedEntity.t(), Route.t(), Stop.t()) :: boolean()
+  # Alert effects the entire route
+  def ie_affects_destination?(
+        %InformedEntity{route: route_id, direction_id: nil, stop: nil},
+        %RoutePattern{route: %Route{id: route_id}},
+        _home_stop
+      ),
+      do: true
+
+  # Alert effects the entire route in the direction of the destination
+  def ie_affects_destination?(
+        %InformedEntity{route: route_id, direction_id: direction_id, stop: nil},
+        %RoutePattern{route: %Route{id: route_id}, direction_id: direction_id},
+        _home_stop
+      ),
+      do: true
+
+  def ie_affects_destination?(
+        %InformedEntity{route: route_type, stop: nil},
+        %RoutePattern{route: %Route{type: route_type}},
+        _home_stop
+      ),
+      do: true
+
+  # Alert effects the child stop
+  def ie_affects_destination?(
+        %InformedEntity{stop: informed_stop},
+        _pattern,
+        home_stop
+      ),
+      do: informed_stop.id == home_stop.id
+
+  def ie_affects_destination?(_, _, _), do: false
 end

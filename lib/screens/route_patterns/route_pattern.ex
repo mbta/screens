@@ -56,6 +56,8 @@ defmodule Screens.RoutePatterns.RoutePattern do
     end
   end
 
+  defp apply_filter({:route_type, nil}, patterns), do: patterns
+
   defp apply_filter({:route_type, type}, patterns),
     do: Enum.filter(patterns, &(&1.route.type == type))
 
