@@ -398,7 +398,7 @@ defmodule Screens.V2.RDS do
        when first_departure == nil and last_departure == nil,
        do: :no_service
 
-  defp time_period_for_state(first_departure, last_departure, headway_for_stop, now) do
+  defp time_period_for_state(first_departure, last_departure, headway_for_stop, _in_alert, now) do
     first_departure_time =
       case headway_for_stop do
         nil ->
@@ -486,7 +486,7 @@ defmodule Screens.V2.RDS do
     end)
   end
 
-  @spec ie_affects_destination?(InformedEntity.t(), Route.t(), Stop.t()) :: boolean()
+  @spec ie_affects_destination?(InformedEntity.t(), RoutePattern.t(), Stop.t()) :: boolean()
   # Alert effects the entire route
   def ie_affects_destination?(
         %InformedEntity{route: route_id, direction_id: nil, stop: nil},
