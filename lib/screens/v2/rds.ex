@@ -291,7 +291,7 @@ defmodule Screens.V2.RDS do
          _stop_id,
          routes_for_section,
          headway_for_stop,
-         _impacted_by_alert,
+         impacted_by_alert,
          now
        ) do
     {first_scheduled_departure, last_scheduled_departure} =
@@ -303,6 +303,7 @@ defmodule Screens.V2.RDS do
            first_scheduled_departure,
            last_scheduled_departure,
            headway_for_stop,
+           impacted_by_alert,
            now
          ) do
       :before_scheduled_start ->
@@ -312,6 +313,9 @@ defmodule Screens.V2.RDS do
         %ServiceEnded{last_scheduled_departure: last_scheduled_departure}
 
       :active_period ->
+        %Countdowns{departures: departures_for_headsign}
+
+      :service_impacted ->
         %Countdowns{departures: departures_for_headsign}
 
       :no_service ->
@@ -387,7 +391,10 @@ defmodule Screens.V2.RDS do
   defp reject_disabled_modes(all_routes, disabled_modes),
     do: Enum.reject(all_routes, fn route -> route.type in disabled_modes end)
 
-  defp time_period_for_state(first_departure, last_departure, _headway_for_stop, _now)
+  defp time_period_for_state(_first_departure, _last_departure, _headway_for_stop, true, _now),
+    do: :service_impacted
+
+  defp time_period_for_state(first_departure, last_departure, _headway_for_stop, _in_alert, _now)
        when first_departure == nil and last_departure == nil,
        do: :no_service
 
