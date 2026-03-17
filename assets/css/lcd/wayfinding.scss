@@ -1,0 +1,10 @@
+@use "CSS/colors";
+@use "CSS/lcd/section_header";
+
+.wayfinding-header {
+  @include section_header.base;
+}
+
+.wayfinding-image {
+  width: 1080px;
+}

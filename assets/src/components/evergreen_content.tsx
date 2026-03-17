@@ -1,6 +1,7 @@
 import type { ComponentType } from "react";
 
 import LoopingVideoPlayer from "Components/looping_video_player";
+import { extensionForAsset } from "Util/utils";
 
 const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "svg", "gif", "webp"];
 const VIDEO_EXTENSIONS = ["mp4", "ogg", "ogv", "webm"];
@@ -14,8 +15,7 @@ const EvergreenContent: ComponentType<Props> = ({
   asset_url: assetUrl,
   isPlaying = true,
 }) => {
-  const parts = assetUrl.split(".");
-  const extension = parts[parts.length - 1].toLowerCase();
+  const extension = extensionForAsset(assetUrl);
 
   if (IMAGE_EXTENSIONS.includes(extension)) {
     return <Image assetUrl={assetUrl} />;

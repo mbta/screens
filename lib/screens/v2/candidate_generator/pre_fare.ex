@@ -19,7 +19,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     &CandidateGenerator.PreFare.ElevatorStatus.instances/2,
     &Widgets.FullLineMap.full_line_map_instances/2,
     &Widgets.Evergreen.evergreen_content_instances/2,
-    &Widgets.Departures.departures_instances/2
+    &Widgets.Departures.departures_instances/2,
+    &Widgets.Wayfinding.wayfinding_instances/2
   ]
 
   @body_right_layout {:body_right,
@@ -48,7 +49,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
                %{
                  body_left_normal: [:main_content_left],
                  body_left_takeover: [:full_body_left],
-                 body_left_flex: Builder.with_paging(:paged_main_content_left, 4)
+                 body_left_flex: Builder.with_paging(:paged_main_content_left, 4),
+                 body_left_split: [:body_left_top, :body_left_bottom]
                }},
               @body_right_layout
             ],

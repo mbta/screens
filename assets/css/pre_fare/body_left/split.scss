@@ -1,0 +1,18 @@
+.body-left-split {
+  display: flex;
+  flex-direction: column;
+  width: 1080px;
+  height: 1720px;
+}
+
+.body-left-top:has(.wayfinding-container),
+.body-left-bottom:has(.wayfinding-container) {
+  flex: 0 0 auto;
+  overflow: hidden;
+}
+
+.body-left-top:has(.departures-container),
+.body-left-bottom:has(.departures-container) {
+  flex: 1 1 auto;
+  overflow: hidden;
+}

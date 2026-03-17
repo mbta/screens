@@ -210,6 +210,7 @@ export const APP_FIELDS: { [key in AppId]: Field[] } = {
     headerField,
     departuresField,
     { label: "Line Map", path: "app_params.full_line_map", ...filteredJson },
+    { label: "Wayfinding", path: "app_params.wayfinding", ...filteredJson },
     {
       label: "Content Summary Station ID",
       path: "app_params.content_summary.parent_station_id",
