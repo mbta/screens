@@ -46,6 +46,8 @@ config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
 config :hackney, mod_metrics: :hackney_telemetry
 config :hackney_telemetry, report_interval: 10_000
 
+config :sentry, client: Sentry.HackneyClient
+
 config :screens,
   redirect_http?: true,
   keycloak_role: "screens-admin"
