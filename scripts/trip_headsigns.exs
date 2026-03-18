@@ -3,17 +3,27 @@
 # Script to find all common headsigns for representative trips of route patterns.
 # Creates a CSV file in the project's root directory.
 
-# To use this script: `elixir scripts/trip_headsigns.exs`
+# To use this script:
+#    - `elixir scripts/trip_headsigns.exs` (defaults to including all typicality levels)
+#    - `elixir scripts/trip_headsigns.exs --typicality 1`
+#    - `elixir scripts/trip_headsigns.exs --typicality all --output all_headsigns.csv`
 
 # Prevents info logs from the application
 Logger.configure(level: :warning)
 
 Mix.install([{:csv, "~> 3.2"}, {:httpoison, "~> 2.3"}, {:jason, "~> 1.4"}])
 
+{opts, _, _} =
+  System.argv()
+  |> OptionParser.parse(strict: [typicality: :string, output: :string])
+
+typicality = Keyword.get(opts, :typicality, "all")
+output_file = Keyword.get(opts, :output, "trip_headsigns.csv")
+
 defmodule RouteHeadsigns do
   @route_type_mapping %{0 => :light_rail, 1 => :subway, 2 => :rail, 3 => :bus, 4 => :ferry}
 
-  def find_headsigns() do
+  def find_headsigns(typicality_filter, output_file) do
     api_v3_key = System.get_env("API_V3_KEY")
     headers = [{"x-api-key", api_v3_key}]
 
@@ -32,7 +42,7 @@ defmodule RouteHeadsigns do
 
     csv_data =
       data
-      |> Enum.filter(fn %{"attributes" => %{"typicality" => typicality}} -> typicality == 1 end)
+      |> filter_patterns_by_typicality(typicality_filter)
       |> Enum.map(fn %{
                        "relationships" => %{
                          "representative_trip" => %{"data" => %{"id" => trip_id}},
@@ -48,10 +58,7 @@ defmodule RouteHeadsigns do
       |> Enum.uniq()
       |> Enum.sort_by(fn [_route_type, _route_id, headsign] -> headsign end)
 
-    create_csv_file(
-      [["Route Type", "Route ID", "Headsign"]] ++ csv_data,
-      "trip_headsigns.csv"
-    )
+    create_csv_file([["Route Type", "Route ID", "Headsign"]] ++ csv_data, output_file)
   end
 
   defp process_included_routes(included) do
@@ -72,6 +79,14 @@ defmodule RouteHeadsigns do
     |> Enum.into(%{})
   end
 
+  defp filter_patterns_by_typicality(patterns, "all"), do: patterns
+
+  defp filter_patterns_by_typicality(patterns, typicality_filter) do
+    Enum.filter(patterns, fn %{"attributes" => %{"typicality" => typicality}} ->
+      typicality == String.to_integer(typicality_filter)
+    end)
+  end
+
   defp create_csv_file(data, filename) do
     file = File.open!(filename, [:write, :utf8])
 
@@ -84,4 +99,4 @@ defmodule RouteHeadsigns do
 end
 
 # Actually run the function to find headsigns and create the CSV file
-RouteHeadsigns.find_headsigns()
+RouteHeadsigns.find_headsigns(typicality, output_file)
