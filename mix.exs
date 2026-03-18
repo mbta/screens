@@ -59,7 +59,7 @@ defmodule Screens.MixProject do
       {:ex_aws, "~> 2.1"},
       {:ex_aws_polly, "~> 0.5.0"},
       {:ex_aws_s3, "~> 2.1"},
-      {:ex_cldr_messages, "~> 1.0"},
+      {:ex_cldr_messages, "~> 2.0"},
       {:gettext, "~> 0.26.1"},
       {:guardian, "~> 2.4.0"},
       {:hackney, "~> 1.25.0"},
