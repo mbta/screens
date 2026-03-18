@@ -31,6 +31,7 @@ defmodule Screens.V2.RDS do
   alias __MODULE__.Countdowns
   alias __MODULE__.FirstTrip
   alias __MODULE__.NoService
+  alias __MODULE__.ServiceEnded
 
   @type t ::
           %__MODULE__{
@@ -45,6 +46,7 @@ defmodule Screens.V2.RDS do
   @type section_t :: {:ok, [t()]} | :error
   @type destination :: {Stop.t(), Line.t(), String.t()}
   @type destination_key :: {Stop.id(), Line.id(), String.t()}
+  @type rds_state :: NoService.t() | Countdowns.t() | FirstTrip.t() | ServiceEnded.t()
 
   defmodule NoService do
     @moduledoc """
@@ -273,6 +275,15 @@ defmodule Screens.V2.RDS do
     )
   end
 
+  @spec state(
+          [Departure.t()],
+          [Departure.t()],
+          Stop.id(),
+          [Route.t()],
+          Headways.range() | nil,
+          boolean(),
+          DateTime.t()
+        ) :: rds_state()
   defp state(
          [] = _departures_for_headsign,
          [] = _scheduled_departures_for_headsign,
