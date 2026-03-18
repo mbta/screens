@@ -466,6 +466,9 @@ defmodule Screens.V2.RDS do
         pattern ->
           Enum.any?(alerts, fn alert ->
             Enum.any?(alert.informed_entities, fn ie ->
+              # IO.inspect(ie,
+              #   label: "IE for destination #{inspect(destination)} and alert #{alert.id}"
+              # ) &&
               ie_affects_destination?(ie, pattern, stop)
             end)
           end)
@@ -503,20 +506,21 @@ defmodule Screens.V2.RDS do
       ),
       do: true
 
+  # Alert effects the entire route in both directions
   def ie_affects_destination?(
-        %InformedEntity{route: route_type, stop: nil},
+        %InformedEntity{route_type: informed_route_type, stop: nil},
         %RoutePattern{route: %Route{type: route_type}},
         _home_stop
       ),
-      do: true
+      do: RouteType.to_id(route_type) == informed_route_type
+
+  # Alert does not affect the route or a specific stop
+  def ie_affects_destination?(%InformedEntity{stop: nil}, _pattern, _home_stop),
+    do: false
 
   # Alert effects the child stop
-  def ie_affects_destination?(
-        %InformedEntity{stop: informed_stop},
-        _pattern,
-        home_stop
-      ),
-      do: informed_stop.id == home_stop.id
+  def ie_affects_destination?(%InformedEntity{stop: informed_stop}, _pattern, home_stop),
+    do: informed_stop.id == home_stop.id
 
   def ie_affects_destination?(_, _, _), do: false
 end
