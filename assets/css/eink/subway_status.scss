@@ -49,6 +49,42 @@
       }
     }
   }
+
+
+  .subway-status__normal-service {
+    position: relative;
+  }
+
+.subway-status__normal-service-rule {
+  position: absolute;
+  right: 10px;
+  width: 1116px;
+  content: "";
+  background: #000;
+  border-radius: 1px;
+
+  &--top {
+    top: 42px;
+    height: 2px;
+  } 
+
+  &--bottom {
+    top: 940px;
+    height: 4px;
+  } 
+}
+
+  .subway-status__normal-service-icon {
+    position: absolute;
+    top: 108px;
+  }
+
+  .subway-status__normal-service-text {
+    position: absolute;
+    top: 448px;
+    font-size: 56px;
+    font-weight: 400;
+  }
 }
 
 .subway-status_route-pill-container {

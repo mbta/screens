@@ -13,22 +13,38 @@ import {
   useSubwayStatusTextResizer,
 } from "./subway_status_common";
 
+import NormalServiceIcon from "Images/normal-service.svg";
+
 ////////////////
 // COMPONENTS //
 ////////////////
 
 const LcdSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
   const { blue, orange, red, green } = cleanUpServerData(props);
+  const allNormal = isAllNormalService([blue, orange, red, green]);
 
   return (
     <div className="subway-status">
       {showHeader([blue, orange, red, green]) && (
-        <div className="subway-status__header">Subway Status</div>
+        <div
+          className={classWithModifier(
+            "subway-status__header",
+            allNormal && "normal",
+          )}
+        >
+          Subway Status
+        </div>
       )}
-      <LineStatus section={blue} />
-      <LineStatus section={orange} />
-      <LineStatus section={red} />
-      <LineStatus section={green} />
+      {allNormal ? (
+        <AllNormalService />
+      ) : (
+        <>
+          <LineStatus section={blue} />
+          <LineStatus section={orange} />
+          <LineStatus section={red} />
+          <LineStatus section={green} />
+        </>
+      )}
     </div>
   );
 };
@@ -103,9 +119,34 @@ const RoutePill = ({
   );
 };
 
+const AllNormalService: ComponentType = () => {
+  return (
+    <div className="subway-status__normal-service">
+      <NormalServiceIcon
+        className="subway-status__normal-service-icon"
+        width={160}
+        height={160}
+        fill="#00803b"
+      />
+      <div className="subway-status__normal-service-text">Normal service</div>
+    </div>
+  );
+};
+
 /////////////
 // HELPERS //
 /////////////
+
+/**
+ * Checks if all subway lines have normal service
+ */
+const isAllNormalService = (sections: Section[]): boolean => {
+  return sections.every(
+    (section) =>
+      section.type === "contracted" &&
+      section.alerts.every((alert) => alert.status === NORMAL_STATUS),
+  );
+};
 
 /**
  * Tweaks the widget data received from the server to avoid awkward presentation in exceptional cases:

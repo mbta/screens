@@ -16,6 +16,8 @@ import {
   useSubwayStatusTextResizer,
 } from "./subway_status_common";
 
+import NormalServiceIcon from "Images/normal-service.svg";
+
 ////////////////
 // COMPONENTS //
 ////////////////
@@ -28,10 +30,16 @@ const EinkSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
       {shouldShowHeader(props) && (
         <span className="subway-status__header">Current Subway Service</span>
       )}
-      <LineStatus section={blue} color={LineColor.Blue} />
-      <LineStatus section={orange} color={LineColor.Orange} />
-      <LineStatus section={red} color={LineColor.Red} />
-      <LineStatus section={green} color={LineColor.Green} />
+      {isAllNormalService([blue, orange, red, green]) ? (
+        <AllNormalService />
+      ) :   (
+        <>
+          <LineStatus section={blue} color={LineColor.Blue} />
+          <LineStatus section={orange} color={LineColor.Orange} />
+          <LineStatus section={red} color={LineColor.Red} />
+          <LineStatus section={green} color={LineColor.Green} />
+        </>
+      )}
     </div>
   );
 };
@@ -177,9 +185,46 @@ const BranchPillGroup: ComponentType<
   );
 };
 
+const AllNormalService: ComponentType = () => {
+  return (
+    <div className="subway-status__normal-service">
+      <div
+        className={classWithModifier(
+          "subway-status__normal-service-rule",
+          "top",
+        )}
+      />
+      <NormalServiceIcon
+        className="subway-status__normal-service-icon"
+        width={276}
+        height={276}
+        fill="#000000"
+      />
+      <div className="subway-status__normal-service-text">{NORMAL_STATUS}</div>
+      <div
+        className={classWithModifier(
+          "subway-status__normal-service-rule",
+          "bottom",
+        )}
+      />
+    </div>
+  );
+};
+
 /////////////
 // HELPERS //
 /////////////
+
+/**
+ * Checks if all subway lines have normal service
+ */
+const isAllNormalService = (sections: Section[]): boolean => {
+  return sections.every(
+    (section) =>
+      section.type === "contracted" &&
+      section.alerts.every((alert) => alert.status === NORMAL_STATUS),
+  );
+};
 
 // The header is displayed when every section has exactly 1 alert.
 const shouldShowHeader = ({ blue, orange, red, green }: SubwayStatusData) => {

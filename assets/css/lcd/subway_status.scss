@@ -16,6 +16,23 @@
 
   margin-bottom: 6px;
 }
+.subway-status__normal-service {
+  position: relative;
+}
+
+.subway-status__normal-service-icon {
+  position: absolute;
+  top: 50px;
+  left: 48px;
+}
+
+.subway-status__normal-service-text {
+  position: absolute;
+  top: 249px;
+  left: 48px;
+  font-size: 66px;
+  font-weight: 400;
+}
 
 .subway-status__line {
   position: relative;
