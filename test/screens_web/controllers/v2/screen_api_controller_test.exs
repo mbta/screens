@@ -5,10 +5,10 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   alias Screens.TestSupport.CandidateGeneratorStub, as: Stub
   alias ScreensConfig.Screen
 
-  import Screens.Inject
   import Mox
   setup :verify_on_exit!
 
+  import Screens.Inject
   @cache injected(Screens.Config.Cache)
   @parameters injected(Screens.V2.ScreenData.Parameters)
 

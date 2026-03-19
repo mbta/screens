@@ -12,10 +12,9 @@ import { WidgetData } from "Components/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import { getDatasetValue } from "Util/dataset";
 import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
-import { isDup } from "Util/outfront";
+import { getRotationIndex, isDup } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/utils";
 import { report } from "Util/sentry";
-import { ROTATION_INDEX } from "Components/dup/rotation_index";
 import { DUP_VERSION } from "Components/dup/version";
 import useRefreshRate from "./use_refresh_rate";
 
@@ -121,17 +120,6 @@ const isSuccess = (
 ): response is Success | SimulationSuccess =>
   ["success", "simulation_success"].includes(response.state);
 
-const loggingParams = () => {
-  if (isDup()) {
-    return {
-      rotation_index: ROTATION_INDEX.toString(),
-      version: DUP_VERSION,
-    };
-  } else {
-    return {};
-  }
-};
-
 const useApiPath = (screenId: string, appendPath?: string): string => {
   return useMemo(() => {
     const base = isDup() ? OUTFRONT_BASE_URI : document.baseURI;
@@ -146,17 +134,17 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
 
     const url = new URL(path, base);
 
-    const datasetParams: Record<string, string | null | undefined> = {
+    const params: Record<string, string | null | undefined> = {
       is_real_screen: isRealScreen() ? "true" : null,
       last_refresh: getDatasetValue("lastRefresh"),
-      requestor:
-        getDatasetValue("requestor") ?? (isRealScreen() ? "real_screen" : null),
+      requestor: getDatasetValue("requestor"),
+      rotation_index: getRotationIndex(),
       screen_side: getScreenSide(),
       variant: getDatasetValue("variant"),
-      ...loggingParams(),
+      version: isDup() ? DUP_VERSION : null,
     };
 
-    for (const [key, value] of Object.entries(datasetParams)) {
+    for (const [key, value] of Object.entries(params)) {
       if (value) url.searchParams.append(key, value);
     }
 

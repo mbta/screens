@@ -34,7 +34,7 @@ defmodule ScreensWeb.Router do
   end
 
   pipeline :ensure_screens_group do
-    plug(ScreensWeb.EnsureScreensGroup)
+    plug(ScreensWeb.Plug.EnsureScreensGroup)
   end
 
   scope "/", ScreensWeb do
@@ -87,6 +87,10 @@ defmodule ScreensWeb.Router do
 
     scope "/screen" do
       pipe_through [:redirect_prod_http, :browser]
+
+      for app_id <- ~w[bus_eink_v2 bus_shelter_v2 busway_v2 dup_v2 gl_eink_v2 pre_fare_v2]a do
+        get "/#{app_id}", ScreenController, :index_multi, assigns: %{app_id: app_id}
+      end
 
       get "/:id", ScreenController, :index
       get "/:id/simulation", ScreenController, :simulation

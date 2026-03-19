@@ -36,11 +36,8 @@ defmodule Screens.V2.ScreenAudioDataTest do
     }
   end
 
-  describe "by_screen_id/3" do
-    test "returns a list of {audio_view, view_assigns_map} tuples", %{
-      config_bus_shelter: config_bus_shelter
-    } do
-      screen_id = "123"
+  describe "get/1" do
+    test "returns a list of {audio_view, view_assigns_map} tuples", %{config_bus_shelter: config} do
       now = ~U[2021-10-18T05:00:00Z]
 
       selected_instances = %{
@@ -64,26 +61,21 @@ defmodule Screens.V2.ScreenAudioDataTest do
         }
       }
 
-      get_config_fn = fn _screen_id -> config_bus_shelter end
       generate_layout_fn = fn _config_valid_audio -> {:layout, selected_instances} end
       get_audio_only_instances_fn = fn _widgets, _config -> [] end
       audio_view = ScreensWeb.V2.Audio.MockWidgetView
       expected_data = [{audio_view, %{content: "Header"}}, {audio_view, %{content: "Departures"}}]
 
       assert expected_data ==
-               ScreenAudioData.by_screen_id(
-                 screen_id,
-                 get_config_fn,
+               ScreenAudioData.get(
+                 config,
                  generate_layout_fn,
                  get_audio_only_instances_fn,
                  now
                )
     end
 
-    test "returns empty list if screen type does not have audio enabled", %{
-      config_dup: config_dup
-    } do
-      screen_id = "123"
+    test "returns empty list if screen type does not have audio enabled", %{config_dup: config} do
       now = ~U[2021-10-18T15:00:00Z]
 
       selected_instances = %{
@@ -107,14 +99,12 @@ defmodule Screens.V2.ScreenAudioDataTest do
         }
       }
 
-      get_config_fn = fn _screen_id -> config_dup end
       generate_layout_fn = fn _config_eink -> {:layout, selected_instances} end
       get_audio_only_instances_fn = fn _widgets, _config -> [] end
 
       assert [] ==
-               ScreenAudioData.by_screen_id(
-                 screen_id,
-                 get_config_fn,
+               ScreenAudioData.get(
+                 config,
                  generate_layout_fn,
                  get_audio_only_instances_fn,
                  now
@@ -122,8 +112,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
     end
 
     test "adds audio-only widgets to the readout data as defined by the audio_only_instances candidate generator function",
-         %{config_bus_shelter: config_bus_shelter} do
-      screen_id = "123"
+         %{config_bus_shelter: config} do
       now = ~U[2021-10-18T05:00:00Z]
 
       selected_instances = %{
@@ -147,7 +136,6 @@ defmodule Screens.V2.ScreenAudioDataTest do
         }
       }
 
-      get_config_fn = fn _screen_id -> config_bus_shelter end
       generate_layout_fn = fn _config_valid_audio -> {:layout, selected_instances} end
 
       get_audio_only_instances_fn = fn _widgets, _config ->
@@ -184,9 +172,8 @@ defmodule Screens.V2.ScreenAudioDataTest do
       ]
 
       assert expected_data ==
-               ScreenAudioData.by_screen_id(
-                 screen_id,
-                 get_config_fn,
+               ScreenAudioData.get(
+                 config,
                  generate_layout_fn,
                  get_audio_only_instances_fn,
                  now

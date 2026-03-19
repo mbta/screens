@@ -4,6 +4,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
   alias Screens.ScreensByAlert
   alias Screens.ScreensByAlert.SelfRefreshRunner
   alias Screens.V2.ScreenData
+  alias ScreensConfig.Screen
 
   import Mox
   setup :verify_on_exit!
@@ -19,15 +20,22 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
     end)
 
     # Only the 2 most-outdated screens should be refreshed, per the batch size in test
-    expect(ScreenData.Mock, :get, fn "1401", [update_visible_alerts?: true] -> %{type: :x} end)
-    expect(ScreenData.Mock, :get, fn "1301", [update_visible_alerts?: true] -> raise "oops" end)
+    expect(ScreenData.Mock, :get, fn %Screen{app_id: :bus_shelter_v2},
+                                     [update_visible_alerts_for_screen_id: "1401"] ->
+      %{type: :x}
+    end)
+
+    expect(ScreenData.Mock, :get, fn %Screen{app_id: :busway_v2},
+                                     [update_visible_alerts_for_screen_id: "1301"] ->
+      raise "oops"
+    end)
 
     screen_ids = MapSet.new(~w[1301 1401])
     assert {:noreply, ^screen_ids} = SelfRefreshRunner.handle_info(:check, MapSet.new())
 
     # Wait longer than the default 100ms to avoid occasional timeouts
-    assert_receive({:done, "1401"}, 200)
-    assert_receive({:done, "1301"}, 200)
+    assert_receive({:done, :ok, "1401"}, 200)
+    assert_receive({:done, :exit, "1301"}, 200)
   end
 
   test "skips refreshing if any refreshes are in progress" do
@@ -40,6 +48,6 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
     new_screen_ids = MapSet.new(~w[1002])
 
     assert {:noreply, ^new_screen_ids} =
-             SelfRefreshRunner.handle_info({:done, "1001"}, screen_ids)
+             SelfRefreshRunner.handle_info({:done, :ok, "1001"}, screen_ids)
   end
 end
