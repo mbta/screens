@@ -23,6 +23,7 @@ defmodule ScreensWeb do
     quote do
       use Phoenix.Controller,
         namespace: ScreensWeb,
+        formats: [html: "View", json: "View"],
         layouts: [html: {ScreensWeb.LayoutView, :app}]
 
       import Plug.Conn

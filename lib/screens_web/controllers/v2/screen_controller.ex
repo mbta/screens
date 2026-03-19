@@ -191,7 +191,7 @@ defmodule ScreensWeb.V2.ScreenController do
   defp render_not_found(conn) do
     conn
     |> put_status(:not_found)
-    |> put_layout(html: :error)
+    |> put_layout(html: {ScreensWeb.LayoutView, :error})
     |> put_view(ScreensWeb.ErrorView)
     |> render("404.html")
   end
