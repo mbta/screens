@@ -70,7 +70,7 @@ defmodule Screens.MixProject do
       {:memcachex, "~> 0.5.5"},
       {:nebulex, "~> 3.0.2"},
       {:nebulex_local, "~> 3.0.0"},
-      {:phoenix, "~> 1.7.14"},
+      {:phoenix, "~> 1.8.5"},
       {:phoenix_html, "~> 4.0"},
       {:phoenix_html_helpers, "~> 1.0"},
       {:phoenix_live_dashboard, "~> 0.8.4"},
