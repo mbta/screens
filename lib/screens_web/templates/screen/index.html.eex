@@ -1,8 +1,0 @@
-<div
-  id="app"
-  data-last-refresh="<%= @last_refresh %>"
-  data-environment-name="<%= @environment_name %>"
-  data-is-real-screen="<%= @is_real_screen %>"
-  data-requestor="<%= @requestor %>"
-  data-sentry="<%= @sentry_dsn %>"
-></div>

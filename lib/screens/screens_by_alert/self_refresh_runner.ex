@@ -8,9 +8,8 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   """
 
   alias __MODULE__.TaskSupervisor
+  alias Screens.Config.Cache
   alias ScreensConfig.Screen
-
-  import Screens.Inject
 
   use GenServer
 
@@ -24,6 +23,8 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
 
   @batch_size Application.compile_env!(:screens, [__MODULE__, :batch_size])
   @max_concurrency Application.compile_env!(:screens, [__MODULE__, :concurrency])
+
+  import Screens.Inject
   @screens_by_alert injected(Screens.ScreensByAlert)
   @screen_data injected(Screens.V2.ScreenData)
 
@@ -68,7 +69,9 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   end
 
   # Screen refresh completed or crashed
-  def handle_info({:done, id}, refreshing_ids), do: {:noreply, MapSet.delete(refreshing_ids, id)}
+  def handle_info({:done, _status, id}, refreshing_ids) do
+    {:noreply, MapSet.delete(refreshing_ids, id)}
+  end
 
   defp start_refresh([], _rest_ids), do: :ignore
 
@@ -90,7 +93,10 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
         TaskSupervisor
         |> Task.Supervisor.async_stream_nolink(
           ids,
-          fn id -> tap(id, &@screen_data.get(&1, update_visible_alerts?: true)) end,
+          fn id ->
+            id |> Cache.screen() |> @screen_data.get(update_visible_alerts_for_screen_id: id)
+            id
+          end,
           max_concurrency: @max_concurrency,
           on_timeout: :kill_task,
           ordered: false,
@@ -100,18 +106,14 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
         |> Enum.each(fn
           # We don't care whether the simulated request succeeds, crashes, or times out, just that
           # the relevant screen ID is now eligible for another refresh
-          {:ok, id} -> send(runner, {:done, id})
-          {:exit, {id, _reason}} -> send(runner, {:done, id})
+          {:ok, id} -> send(runner, {:done, :ok, id})
+          {:exit, {id, _reason}} -> send(runner, {:done, :exit, id})
         end)
       end)
   end
 
   defp relevant_screen_ids do
-    Screens.Config.Cache.screen_ids(fn {_id,
-                                        %Screen{
-                                          disabled: disabled,
-                                          hidden_from_screenplay: hidden
-                                        }} ->
+    Cache.screen_ids(fn {_id, %Screen{disabled: disabled, hidden_from_screenplay: hidden}} ->
       not disabled and not hidden
     end)
   end

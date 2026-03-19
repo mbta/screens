@@ -3,54 +3,23 @@ defmodule ScreensWeb.V2.AudioController do
   require Logger
 
   alias Phoenix.View
-  alias Screens.Config.Cache
   alias Screens.V2.ScreenAudioData
+  alias ScreensConfig.Screen
+  alias ScreensWeb.Plug.{LegacyLogging, ScreenRequest}
 
-  plug(:check_config)
+  plug ScreenRequest, [type: :audio] when action == :show
+  plug ScreenRequest, [type: :volume] when action == :show_volume
+  plug ScreenRequest when action == :debug
+  plug LegacyLogging, :audio when action == :show
 
-  defp check_config(conn, _) do
-    if Cache.ok?(), do: conn, else: not_found(conn)
-  end
+  def show(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _params), do: not_found(conn)
 
-  def show(conn, %{"id" => screen_id} = params) do
-    real_screen? = Map.get(params, "is_real_screen", false)
+  def show(%{assigns: %{screen: screen}} = conn, params) do
     disposition = if Map.has_key?(params, "inline"), do: :inline, else: :attachment
 
-    _ = Screens.LogScreenData.log_audio_request(screen_id, params)
-
-    cond do
-      not screen_exists?(screen_id) -> not_found(conn)
-      Cache.disabled?(screen_id) -> disabled(conn)
-      true -> readout(conn, screen_id, real_screen?, disposition)
-    end
-  end
-
-  def show_volume(conn, %{"id" => screen_id}) do
-    cond do
-      not screen_exists?(screen_id) ->
-        not_found(conn)
-
-      Cache.disabled?(screen_id) ->
-        json(conn, %{volume: 0.0})
-
-      true ->
-        {:ok, volume} = ScreenAudioData.volume_by_screen_id(screen_id)
-        json(conn, %{volume: volume})
-    end
-  end
-
-  def debug(conn, %{"id" => screen_id}) do
-    cond do
-      not screen_exists?(screen_id) -> not_found(conn)
-      Cache.disabled?(screen_id) -> text(conn, "Screen #{screen_id} is disabled.")
-      true -> text(conn, fetch_ssml(screen_id))
-    end
-  end
-
-  defp readout(conn, screen_id, real_screen?, disposition) do
-    screen_id
+    screen
     |> fetch_ssml()
-    |> Screens.Audio.synthesize(screen_id: screen_id, is_screen: real_screen?)
+    |> Screens.Audio.synthesize()
     |> case do
       {:ok, audio_data} ->
         send_download(conn, {:binary, audio_data},
@@ -63,25 +32,27 @@ defmodule ScreensWeb.V2.AudioController do
     end
   end
 
-  defp fetch_ssml(screen_id) do
-    widget_audio_data = ScreenAudioData.by_screen_id(screen_id)
+  def show_volume(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _params),
+    do: json(conn, %{volume: 0.0})
 
-    render_ssml(widget_audio_data: widget_audio_data)
+  def show_volume(%{assigns: %{screen: screen}} = conn, _params) do
+    {:ok, volume} = ScreenAudioData.get_volume(screen)
+    json(conn, %{volume: volume})
   end
 
-  defp render_ssml(template_assigns) do
-    View.render_to_string(ScreensWeb.V2.AudioView, "index.ssml", template_assigns)
+  def debug(%{assigns: %{screen: screen}} = conn, _params) do
+    text(conn, fetch_ssml(screen))
   end
 
-  defp disabled(conn) do
-    not_found(conn)
+  defp fetch_ssml(screen) do
+    View.render_to_string(
+      ScreensWeb.V2.AudioView,
+      "index.ssml",
+      widget_audio_data: ScreenAudioData.get(screen)
+    )
   end
 
   defp not_found(conn) do
     send_resp(conn, 404, "Not found")
-  end
-
-  defp screen_exists?(screen_id) do
-    not is_nil(Cache.screen(screen_id))
   end
 end

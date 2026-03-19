@@ -21,8 +21,23 @@ config :logger,
 
 # Configures Elixir's Logger
 config :logger, :console,
-  format: "$time $metadata[$level] $message\n",
-  metadata: [:remote_ip, :request_id]
+  format: "$time [$level] $message $metadata\n",
+  metadata: ~w[
+    app_id
+    is_pending
+    is_real_screen
+    ofm_app_package_version
+    remote_ip
+    requestor
+    request_id
+    request_type
+    response_type
+    rotation_index
+    screen_id
+    screen_side
+    variant
+    vendor
+  ]a
 
 # Disable default Phoenix logger; using Logster instead
 config :phoenix, :logger, false

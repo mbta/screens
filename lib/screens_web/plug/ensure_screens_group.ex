@@ -1,4 +1,4 @@
-defmodule ScreensWeb.EnsureScreensGroup do
+defmodule ScreensWeb.Plug.EnsureScreensGroup do
   @moduledoc false
 
   import Plug.Conn

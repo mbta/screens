@@ -3,197 +3,43 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   alias Phoenix.View
   alias Screens.Config.Cache
-  alias Screens.LogScreenData
-  alias Screens.Util
   alias Screens.V2.{ScreenAudioData, ScreenData}
   alias ScreensConfig.Screen
+  alias ScreensWeb.Plug.{LegacyLogging, ScreenRequest}
 
   @base_response %{data: nil, disabled: false, force_reload: false}
-  @disabled_response %{@base_response | disabled: true}
-  @outdated_response %{@base_response | force_reload: true}
 
-  plug(:check_config)
+  @non_pending_show_actions [:show, :show_dup, :simulation]
+  @pending_show_actions [:show_pending, :simulation_pending]
 
   plug Corsica, [origins: "*"] when action in [:show_dup, :log_frontend_error]
+  plug ScreenRequest, [type: :data] when action in @non_pending_show_actions
+  plug ScreenRequest, [type: :data, pending?: true] when action in @pending_show_actions
+  plug LegacyLogging, :data when action in [:show, :show_dup]
+  plug :disabled_response when action in @non_pending_show_actions
+  plug :outdated_response when action in @non_pending_show_actions
 
-  defp check_config(conn, _) do
-    if Cache.ok?() do
-      conn
-    else
-      conn
-      |> not_found_response()
-      |> halt()
-    end
-  end
+  def show(%{assigns: %{screen_id: screen_id, screen: screen, variant: variant}} = conn, _params) do
+    response =
+      screen
+      |> screen_response(variant, update_visible_alerts_for_screen_id: screen_id)
+      |> put_extra_fields(screen)
 
-  def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    variant = params["variant"]
-    screen = Cache.screen(screen_id)
-
-    LogScreenData.log_data_request(
-      screen_id,
-      last_refresh,
-      params
-    )
-
-    cond do
-      nonexistent_screen?(screen_id) ->
-        LogScreenData.log_api_response(
-          :nonexistent,
-          screen_id,
-          last_refresh,
-          params
-        )
-
-        not_found_response(conn)
-
-      Util.outdated?(screen_id, last_refresh) ->
-        LogScreenData.log_api_response(
-          :outdated,
-          screen_id,
-          last_refresh,
-          params
-        )
-
-        json(conn, @outdated_response)
-
-      disabled?(screen_id) ->
-        LogScreenData.log_api_response(
-          :disabled,
-          screen_id,
-          last_refresh,
-          params
-        )
-
-        json(conn, @disabled_response)
-
-      true ->
-        LogScreenData.log_api_response(
-          :success,
-          screen_id,
-          last_refresh,
-          params
-        )
-
-        response =
-          screen_id
-          |> screen_response(screen, variant, update_visible_alerts?: true)
-          |> put_extra_fields(screen_id, screen)
-
-        json(conn, response)
-    end
-  end
-
-  defp screen_response(screen_id, _, "all" = variant, opts) do
-    {default, variants} = ScreenData.variants(screen_id, merge_options(variant, opts))
-    Map.put(%{@base_response | data: default}, :variants, variants)
-  end
-
-  # See `docs/mercury_api.md`
-  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, opts) do
-    %{full_page: data, flex_zone: flex_zone} =
-      ScreenData.simulation(screen_id, merge_options(variant, opts))
-
-    Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
-  end
-
-  defp screen_response(screen_id, _, variant, opts) do
-    data = ScreenData.get(screen_id, merge_options(variant, opts))
-    %{@base_response | data: data}
-  end
-
-  defp merge_options(variant, opts) do
-    opts
-    |> Keyword.put(:generator_variant, variant)
-  end
-
-  # See `docs/mercury_api.md`
-  defp put_extra_fields(response, screen_id, %Screen{vendor: :mercury}) do
-    response
-    |> Map.put(:audio_data, fetch_ssml(screen_id))
-    |> Map.put(:last_deploy_timestamp, Cache.last_deploy_timestamp())
-  end
-
-  defp put_extra_fields(response, _, _), do: response
-
-  defp fetch_ssml(screen_id) do
-    case ScreenAudioData.by_screen_id(screen_id) do
-      [] ->
-        ""
-
-      data ->
-        View.render_to_string(ScreensWeb.V2.AudioView, "index.ssml", widget_audio_data: data)
-    end
+    json(conn, response)
   end
 
   def show_dup(conn, params), do: show(conn, params)
 
-  def simulation(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    variant = params["variant"]
-
-    LogScreenData.log_data_request(
-      screen_id,
-      last_refresh,
-      params
-    )
-
-    cond do
-      nonexistent_screen?(screen_id) ->
-        not_found_response(conn)
-
-      Util.outdated?(screen_id, last_refresh) ->
-        json(conn, @outdated_response)
-
-      disabled?(screen_id) ->
-        json(conn, @disabled_response)
-
-      true ->
-        json(conn, simulation_response(screen_id, variant))
-    end
+  def simulation(%{assigns: %{screen: screen, variant: variant}} = conn, _params) do
+    json(conn, simulation_response(screen, variant))
   end
 
-  defp simulation_response(screen_id, "all") do
-    {default, variants} = ScreenData.simulation_variants(screen_id)
-    Map.put(%{@base_response | data: default}, :variants, variants)
+  def show_pending(%{assigns: %{screen: screen}} = conn, _params) do
+    json(conn, %{@base_response | data: ScreenData.get(screen)})
   end
 
-  defp simulation_response(screen_id, variant) do
-    %{@base_response | data: ScreenData.simulation(screen_id, generator_variant: variant)}
-  end
-
-  def show_pending(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    LogScreenData.log_data_request(
-      screen_id,
-      last_refresh,
-      params
-    )
-
-    case get_pending_screen_config(screen_id) do
-      nil ->
-        not_found_response(conn)
-
-      config ->
-        screen_data = ScreenData.get(screen_id, pending_config: config)
-
-        json(conn, %{@base_response | data: screen_data})
-    end
-  end
-
-  def simulation_pending(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
-    LogScreenData.log_data_request(
-      screen_id,
-      last_refresh,
-      params
-    )
-
-    case get_pending_screen_config(screen_id) do
-      nil ->
-        not_found_response(conn)
-
-      config ->
-        screen_data = ScreenData.simulation(screen_id, pending_config: config)
-        json(conn, %{@base_response | data: screen_data})
-    end
+  def simulation_pending(%{assigns: %{screen: screen}} = conn, _params) do
+    json(conn, %{@base_response | data: ScreenData.simulation(screen)})
   end
 
   def log_frontend_error(conn, params) do
@@ -211,7 +57,13 @@ defmodule ScreensWeb.V2.ScreenApiController do
     true = is_binary(stacktrace)
     stacktrace = String.slice(stacktrace, 0..999)
 
-    LogScreenData.log_frontend_error(id, error_message, stacktrace)
+    Logster.warning([
+      "[screen frontend error]",
+      screen_id: id,
+      error_message: inspect(error_message),
+      stack_trace: inspect(stacktrace)
+    ])
+
     json(conn, %{success: true})
   end
 
@@ -226,27 +78,95 @@ defmodule ScreensWeb.V2.ScreenApiController do
     )
   end
 
-  defp get_pending_screen_config(screen_id) do
-    with {:ok, config_json} <- Screens.PendingConfig.Fetch.fetch_config(),
-         {:ok, raw_map} <- Jason.decode(config_json) do
-      config = ScreensConfig.PendingConfig.from_json(raw_map)
-      config.screens[screen_id]
-    else
-      _ -> nil
+  defp screen_response(screen, "all", _opts) do
+    {default, variants} = ScreenData.variants(screen)
+    Map.put(%{@base_response | data: default}, :variants, variants)
+  end
+
+  # See `docs/mercury_api.md`
+  defp screen_response(%Screen{vendor: :mercury} = screen, variant, opts) do
+    %{full_page: data, flex_zone: flex_zone} =
+      ScreenData.simulation(screen, merge_options(variant, opts))
+
+    Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
+  end
+
+  defp screen_response(screen, variant, opts) do
+    data = ScreenData.get(screen, merge_options(variant, opts))
+    %{@base_response | data: data}
+  end
+
+  defp merge_options(variant, opts) do
+    Keyword.put(opts, :generator_variant, variant)
+  end
+
+  # See `docs/mercury_api.md`
+  defp put_extra_fields(response, %Screen{vendor: :mercury} = screen) do
+    response
+    |> Map.put(:audio_data, fetch_ssml(screen))
+    |> Map.put(:last_deploy_timestamp, Cache.last_deploy_timestamp())
+  end
+
+  defp put_extra_fields(response, _screen), do: response
+
+  defp fetch_ssml(screen) do
+    case ScreenAudioData.get(screen) do
+      [] ->
+        ""
+
+      data ->
+        View.render_to_string(ScreensWeb.V2.AudioView, "index.ssml", widget_audio_data: data)
     end
   end
 
-  defp nonexistent_screen?(screen_id) do
-    is_nil(Cache.screen(screen_id))
+  defp simulation_response(screen, "all") do
+    {default, variants} = ScreenData.simulation_variants(screen)
+    Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
-  defp disabled?(screen_id) do
-    Cache.disabled?(screen_id)
+  defp simulation_response(screen, variant) do
+    %{@base_response | data: ScreenData.simulation(screen, generator_variant: variant)}
   end
 
-  defp not_found_response(conn) do
-    conn
-    |> put_status(:not_found)
-    |> text("Not found")
+  defp disabled_response(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _) do
+    Logger.metadata(response_type: :disabled)
+    conn |> json(%{@base_response | disabled: true}) |> halt()
+  end
+
+  defp disabled_response(conn, _), do: conn
+
+  # Never tell a DUP client to reload, since it would just reload its local copy of the client
+  # code, not changing anything, resulting in an infinite loop. TODO: Rework this once we support
+  # non-Outfront-managed DUPs (should not rely on IDs having a specific format).
+  defp outdated_response(%{assigns: %{screen_id: "DUP-" <> _}} = conn, _), do: conn
+
+  defp outdated_response(
+         %{
+           assigns: %{screen: %Screen{refresh_if_loaded_before: refresh_if_loaded_before}},
+           params: params
+         } = conn,
+         _
+       ) do
+    with param when is_binary(param) <- params["last_refresh"],
+         {:ok, last_refresh_at, _offset} <- DateTime.from_iso8601(param) do
+      should_refresh_at =
+        [Cache.last_deploy_timestamp(), refresh_if_loaded_before]
+        |> Enum.reject(&is_nil/1)
+        |> Enum.max(DateTime, fn -> nil end)
+
+      if not is_nil(should_refresh_at) and
+           DateTime.compare(last_refresh_at, should_refresh_at) == :lt do
+        Logger.metadata(response_type: :outdated)
+        conn |> json(%{@base_response | force_reload: true}) |> halt()
+      else
+        conn
+      end
+    else
+      _ ->
+        conn
+        |> put_status(400)
+        |> text("last_refresh parameter missing or not a valid ISO8601 datetime")
+        |> halt()
+    end
   end
 end

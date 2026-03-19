@@ -16,45 +16,10 @@ defmodule Screens.Config.Cache do
 
   def ok?, do: table_exists?()
 
-  def refresh_if_loaded_before(screen_id) do
-    with_table default: nil do
-      [[last_deploy_timestamp]] = :ets.match(@table, {:last_deploy_timestamp, :"$1"})
-
-      refresh_if_loaded_before =
-        case :ets.match(@table, {screen_id, %{refresh_if_loaded_before: :"$1"}}) do
-          [[timestamp]] -> timestamp
-          [] -> nil
-        end
-
-      case {last_deploy_timestamp, refresh_if_loaded_before} do
-        {nil, nil} ->
-          nil
-
-        {nil, refresh_if_loaded_before} ->
-          refresh_if_loaded_before
-
-        {last_deploy_timestamp, nil} ->
-          last_deploy_timestamp
-
-        {last_deploy_timestamp, refresh_if_loaded_before} ->
-          Enum.max([last_deploy_timestamp, refresh_if_loaded_before], DateTime)
-      end
-    end
-  end
-
   def last_deploy_timestamp do
     with_table do
       [[last_deploy_timestamp]] = :ets.match(@table, {:last_deploy_timestamp, :"$1"})
       last_deploy_timestamp
-    end
-  end
-
-  def disabled?(screen_id) do
-    with_table default: false do
-      case :ets.match(@table, {{:screen, screen_id}, %{disabled: :"$1"}}) do
-        [[disabled]] -> disabled
-        [] -> false
-      end
     end
   end
 
