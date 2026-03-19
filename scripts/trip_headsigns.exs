@@ -1,5 +1,3 @@
-#!/usr/bin/env -S ERL_FLAGS=+B elixir
-
 # Script to find all common headsigns for representative trips of route patterns.
 # Creates a CSV file in the project's root directory.
 
@@ -7,9 +5,6 @@
 #    - `elixir scripts/trip_headsigns.exs` (defaults to including all typicality levels)
 #    - `elixir scripts/trip_headsigns.exs --typicality 1`
 #    - `elixir scripts/trip_headsigns.exs --typicality all --output all_headsigns.csv`
-
-# Prevents info logs from the application
-Logger.configure(level: :warning)
 
 Mix.install([{:csv, "~> 3.2"}, {:httpoison, "~> 2.3"}, {:jason, "~> 1.4"}])
 
