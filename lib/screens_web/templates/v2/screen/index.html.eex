@@ -1,23 +1,27 @@
 <div
   id="app"
-  data-last-refresh="<%= @last_refresh %>"
-  data-environment-name="<%= @environment_name %>"
-  data-refresh-rate="<%= @refresh_rate %>"
-  data-audio-readout-interval="<%= @audio_readout_interval %>"
   data-audio-interval-offset-seconds="<%= @audio_interval_offset_seconds %>"
-  data-refresh-rate-offset="<%= @refresh_rate_offset %>"
-  data-variant="<%= @variant %>"
-  data-is-real-screen="<%= @is_real_screen %>"
+  data-audio-readout-interval="<%= @audio_readout_interval %>"
+  data-environment-name="<%= @environment_name %>"
   data-is-pending="<%= @is_pending %>"
-  data-sentry="<%= @sentry_dsn %>"
-  <%= if not is_nil(@screen_side) do %>
-    data-screen-side="<%= @screen_side %>"
+  data-is-real-screen="<%= @is_real_screen %>"
+  data-last-refresh="<%= @last_refresh %>"
+  data-refresh-rate-offset="<%= @refresh_rate_offset %>"
+  data-refresh-rate="<%= @refresh_rate %>"
+  <%= if assigns[:requestor] do %>
+    data-requestor="<%= @requestor %>"
   <% end %>
-  <%= if not is_nil(@rotation_index) do %>
+  <%= if assigns[:rotation_index] do %>
     data-rotation-index="<%= @rotation_index %>"
+  <% end %>
+  <%= if assigns[:screen_side] do %>
+    data-screen-side="<%= @screen_side %>"
   <% end %>
   <%= if assigns[:screenplay_fullstory_org_id] do %>
     data-screenplay-fullstory-org-id="<%= assigns[:screenplay_fullstory_org_id] %>"
   <% end %>
-  data-requestor="<%= @requestor %>"
+  data-sentry="<%= @sentry_dsn %>"
+  <%= if assigns[:variant] do %>
+    data-variant="<%= @variant %>"
+  <% end %>
 ></div>
