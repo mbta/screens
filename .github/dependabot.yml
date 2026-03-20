@@ -17,7 +17,7 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     groups:
-      mix-patches:
+      mix-minor:
         patterns:
           - "*"
         update-types:
@@ -32,7 +32,7 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     groups:
-      npm-patches:
+      npm-minor:
         patterns:
           - "*"
         update-types:
