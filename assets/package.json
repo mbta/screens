@@ -19,7 +19,7 @@
     "format:check": "prettier --check ."
   },
   "dependencies": {
-    "@fullstory/browser": "^2.0.6",
+    "@fullstory/browser": "^2.0.8",
     "@sentry/react": "^10.32.1",
     "classnames": "^2.5.1",
     "core-js": "^3.48.0",
