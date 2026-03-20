@@ -33,7 +33,7 @@ updates:
     open-pull-requests-limit: 5
     groups:
       npm-patches:
-        patterns:
+        patterns:git
           - "*"
         update-types:
           - "patch"
@@ -43,8 +43,6 @@ updates:
           - "eslint*"
           - "*-eslint"
           - "@eslint*"
-        update-types:
-          - "major"
       stylelint:
         patterns:
           - "stylelint*"
