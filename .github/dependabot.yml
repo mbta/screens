@@ -17,7 +17,7 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     groups:
-      mix-patches:
+      mix-patches-and-minor:
         patterns:
           - "*"
         update-types:
