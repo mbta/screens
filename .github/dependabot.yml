@@ -3,14 +3,18 @@ updates:
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
       time: "10:00"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
   - package-ecosystem: mix
     directory: "/"
     schedule:
-      interval: daily
+      interval: weekly
       time: "10:00"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     groups:
       mix-patches:
@@ -18,11 +22,14 @@ updates:
           - "*"
         update-types:
           - "patch"
+          - "minor"
   - package-ecosystem: npm
     directory: "/assets"
     schedule:
-      interval: daily
+      interval: weekly
       time: "10:00"
+    cooldown:
+      default-days: 7
     open-pull-requests-limit: 5
     groups:
       npm-patches:
@@ -30,6 +37,7 @@ updates:
           - "*"
         update-types:
           - "patch"
+          - "minor"
       eslint:
         patterns:
           - "eslint*"
