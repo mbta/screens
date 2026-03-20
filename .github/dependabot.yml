@@ -45,26 +45,23 @@ updates:
           - "@eslint*"
         update-types:
           - "major"
+      stylelint:
+        patterns:
+          - "stylelint*"
       react:
         patterns:
           - "react"
           - "react-dom"
           - "@types/react"
           - "@types/react-dom"
-        update-types:
-          - "major"
       testing-tools:
         patterns:
           - "ts-jest"
           - "jest*"
           - "@jest*"
-        update-types:
-          - "major"
       babel:
         patterns:
           - "@babel*"
-        update-types:
-          - "major"
       webpack:
         patterns:
           - "webpack*"
@@ -73,10 +70,6 @@ updates:
           - "@types/webpack-env"
           - "*-loader"
           - "terser*"
-        update-types:
-          - "major"
       moment:
         patterns:
           - "moment*"
-        update-types:
-          - "major"
