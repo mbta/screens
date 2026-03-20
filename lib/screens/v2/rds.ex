@@ -48,6 +48,19 @@ defmodule Screens.V2.RDS do
   @type destination_key :: {Stop.id(), Line.id(), String.t()}
   @type rds_state :: NoService.t() | Countdowns.t() | FirstTrip.t() | ServiceEnded.t()
 
+  # These alert types eliminate service to a destination.
+  @relevant_alert_effects [
+    :detour,
+    :dock_closure,
+    :no_service,
+    :shuttle,
+    :snow_route,
+    :station_closure,
+    :stop_closure,
+    :stop_move,
+    :suspension
+  ]
+
   defmodule NoService do
     @moduledoc """
     The state that represents when a given destination
@@ -439,31 +452,15 @@ defmodule Screens.V2.RDS do
   defp fetch_relevant_alerts(stop_ids) do
     with {:ok, alerts} <-
            @alert.fetch(activities: [:board], stop_id: stop_ids, include_all?: true) do
-      relevant_alerts =
-        alerts
-        |> Stream.filter(&Alert.happening_now?/1)
-        |> Stream.filter(&relevant_alert_effect?/1)
-        |> Enum.to_list()
-
-      {:ok, relevant_alerts}
+      {:ok, Enum.filter(alerts, &(Alert.happening_now?(&1) and relevant_alert_effect?(&1)))}
     end
   end
 
-  defp relevant_alert_effect?(%Alert{effect: effect}) do
-    # Shuttle, Suspension, Station/Stop/Dock Closure, Stop Move, Snow Route, or Detour
-    # These alert types eliminate service to a destination.
-    effect in [
-      :detour,
-      :dock_closure,
-      :no_service,
-      :shuttle,
-      :snow_route,
-      :station_closure,
-      :stop_closure,
-      :stop_move,
-      :suspension
-    ]
-  end
+  @spec relevant_alert_effect?(Alert.t()) :: boolean()
+  defp relevant_alert_effect?(%Alert{effect: effect}) when effect in @relevant_alert_effects,
+    do: true
+
+  defp relevant_alert_effect?(_), do: false
 
   @spec informed_destinations([destination()], [Alert.t()], [RoutePattern.t()]) :: [destination()]
   defp informed_destinations(destinations, alerts, typical_patterns) do
@@ -477,9 +474,6 @@ defmodule Screens.V2.RDS do
         pattern ->
           Enum.any?(alerts, fn alert ->
             Enum.any?(alert.informed_entities, fn ie ->
-              # IO.inspect(ie,
-              #   label: "IE for destination #{inspect(destination)} and alert #{alert.id}"
-              # ) &&
               ie_affects_destination?(ie, pattern, stop)
             end)
           end)
@@ -488,15 +482,14 @@ defmodule Screens.V2.RDS do
   end
 
   @spec pattern_for_destination(destination(), [RoutePattern.t()]) :: RoutePattern.t() | nil
-  defp pattern_for_destination(destination, typical_patterns) do
+  defp pattern_for_destination({stop, line, headsign}, typical_patterns) do
     Enum.find(typical_patterns, fn %RoutePattern{
-                                     headsign: headsign,
-                                     route: %Route{line: line},
-                                     stops: stops
+                                     headsign: pattern_headsign,
+                                     route: %Route{line: pattern_line},
+                                     stops: pattern_stops
                                    } ->
-      line == elem(destination, 1) and
-        headsign == elem(destination, 2) and
-        Enum.any?(stops, fn stop -> stop.id == elem(destination, 0).id end)
+      line == pattern_line and headsign == pattern_headsign and
+        Enum.any?(pattern_stops, fn pattern_stop -> stop.id == pattern_stop.id end)
     end)
   end
 
@@ -530,8 +523,8 @@ defmodule Screens.V2.RDS do
     do: false
 
   # Alert effects the child stop
-  def ie_affects_destination?(%InformedEntity{stop: informed_stop}, _pattern, home_stop),
-    do: informed_stop.id == home_stop.id
+  def ie_affects_destination?(%InformedEntity{stop: %Stop{id: id}}, _pattern, %Stop{id: id}),
+    do: true
 
   def ie_affects_destination?(_, _, _), do: false
 end
