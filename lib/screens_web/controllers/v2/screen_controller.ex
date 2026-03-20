@@ -5,9 +5,11 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.Report
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
+  alias ScreensWeb.Plug
 
-  plug ScreensWeb.Plug.ScreenRequest when action in [:index]
-  plug ScreensWeb.Plug.ScreenRequest, :pending when action in [:index_pending]
+  plug Plug.LegacyLogging, :page when action == :index
+  plug Plug.ScreenRequest when action == :index
+  plug Plug.ScreenRequest, :pending when action == :index_pending
   plug :environment_name
   plug :last_refresh
 
@@ -41,6 +43,24 @@ defmodule ScreensWeb.V2.ScreenController do
     |> assign(:refresh_rate, refresh_rate)
     |> assign(:screen_ids_with_offset_map, screen_ids(app_id, refresh_rate))
     |> render("index_multi.html")
+  end
+
+  def simulation(conn, params) do
+    conn
+    |> assign(
+      :screenplay_fullstory_org_id,
+      Application.get_env(:screens, :screenplay_fullstory_org_id)
+    )
+    |> index(params)
+  end
+
+  def simulation_pending(conn, params) do
+    conn
+    |> assign(
+      :screenplay_fullstory_org_id,
+      Application.get_env(:screens, :screenplay_fullstory_org_id)
+    )
+    |> index_pending(params)
   end
 
   # Handles widget page GET requests with widget data as a query param.
@@ -78,24 +98,6 @@ defmodule ScreensWeb.V2.ScreenController do
     conn
     |> put_status(:bad_request)
     |> text("POST /v2/widget/#{app_id} request must contain a JSON body with `widget` key")
-  end
-
-  def simulation(conn, params) do
-    conn
-    |> assign(
-      :screenplay_fullstory_org_id,
-      Application.get_env(:screens, :screenplay_fullstory_org_id)
-    )
-    |> index(params)
-  end
-
-  def simulation_pending(conn, params) do
-    conn
-    |> assign(
-      :screenplay_fullstory_org_id,
-      Application.get_env(:screens, :screenplay_fullstory_org_id)
-    )
-    |> index_pending(params)
   end
 
   defp page_assigns(

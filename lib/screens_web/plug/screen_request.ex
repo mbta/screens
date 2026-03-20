@@ -14,8 +14,6 @@ defmodule ScreensWeb.Plug.ScreenRequest do
   alias Screens.Config.Cache
   alias ScreensConfig.Screen
 
-  require Logger
-
   def init(options), do: options
 
   def call(conn, :pending) do
@@ -24,10 +22,10 @@ defmodule ScreensWeb.Plug.ScreenRequest do
          {:ok, decoded} = Jason.decode!(fetched),
          pending_config = ScreensConfig.PendingConfig.from_json(decoded),
          {:screen, {:ok, screen}} <- {:screen, Map.fetch(pending_config, id)} do
-      conn |> Conn.fetch_query_params() |> assign(id, screen)
+      handle_request(conn, id, screen)
     else
       {:params, _conn} -> error(conn, 400)
-      {:screen, nil} -> error(conn, 404)
+      {:screen, :error} -> error(conn, 404)
     end
   end
 
@@ -35,12 +33,16 @@ defmodule ScreensWeb.Plug.ScreenRequest do
     with {:params, %Conn{path_params: %{"id" => id}}} <- {:params, conn},
          {:cache, true} <- {:cache, Cache.ok?()},
          {:screen, %Screen{} = screen} <- {:screen, Cache.screen(id)} do
-      conn |> Conn.fetch_query_params() |> assign(id, screen)
+      handle_request(conn, id, screen)
     else
       {:params, _conn} -> error(conn, 400)
       {:cache, false} -> error(conn, 503)
       {:screen, nil} -> error(conn, 404)
     end
+  end
+
+  defp handle_request(conn, screen_id, screen) do
+    conn |> Conn.fetch_query_params() |> assign(screen_id, screen)
   end
 
   defp assign(%Conn{params: params} = conn, screen_id, screen) do
@@ -64,7 +66,7 @@ defmodule ScreensWeb.Plug.ScreenRequest do
   defp error(conn, status) do
     conn
     |> Conn.put_status(status)
-    |> Controller.put_layout(html: :error)
+    |> Controller.put_layout(html: {ScreensWeb.LayoutView, :error})
     |> Controller.put_view(ScreensWeb.ErrorView)
     |> Controller.render("#{status}.html")
     |> Conn.halt()

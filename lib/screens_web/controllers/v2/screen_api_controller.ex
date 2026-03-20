@@ -12,19 +12,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   @disabled_response %{@base_response | disabled: true}
   @outdated_response %{@base_response | force_reload: true}
 
-  plug(:check_config)
-
   plug Corsica, [origins: "*"] when action in [:show_dup, :log_frontend_error]
-
-  defp check_config(conn, _) do
-    if Cache.ok?() do
-      conn
-    else
-      conn
-      |> not_found_response()
-      |> halt()
-    end
-  end
 
   def show(conn, %{"id" => screen_id, "last_refresh" => last_refresh} = params) do
     variant = params["variant"]
@@ -37,16 +25,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
     )
 
     cond do
-      nonexistent_screen?(screen_id) ->
-        LogScreenData.log_api_response(
-          :nonexistent,
-          screen_id,
-          last_refresh,
-          params
-        )
-
-        not_found_response(conn)
-
       Util.outdated?(screen_id, last_refresh) ->
         LogScreenData.log_api_response(
           :outdated,
@@ -138,9 +116,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
     )
 
     cond do
-      nonexistent_screen?(screen_id) ->
-        not_found_response(conn)
-
       Util.outdated?(screen_id, last_refresh) ->
         json(conn, @outdated_response)
 
@@ -234,10 +209,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
     else
       _ -> nil
     end
-  end
-
-  defp nonexistent_screen?(screen_id) do
-    is_nil(Cache.screen(screen_id))
   end
 
   defp disabled?(screen_id) do
