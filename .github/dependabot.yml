@@ -32,7 +32,7 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     groups:
-      npm-patches:
+      npm-patches-and-minor:
         patterns:
           - "*"
         update-types:
