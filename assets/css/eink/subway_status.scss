@@ -50,29 +50,28 @@
     }
   }
 
-
   .subway-status__normal-service {
     position: relative;
   }
 
-.subway-status__normal-service-rule {
-  position: absolute;
-  right: 10px;
-  width: 1116px;
-  content: "";
-  background: #000;
-  border-radius: 1px;
+  .subway-status__normal-service-rule {
+    position: absolute;
+    right: 10px;
+    width: 1116px;
+    content: "";
+    background: #000;
+    border-radius: 1px;
 
-  &--top {
-    top: 42px;
-    height: 2px;
-  } 
+    &--top {
+      top: 42px;
+      height: 2px;
+    }
 
-  &--bottom {
-    top: 940px;
-    height: 4px;
-  } 
-}
+    &--bottom {
+      top: 940px;
+      height: 4px;
+    }
+  }
 
   .subway-status__normal-service-icon {
     position: absolute;

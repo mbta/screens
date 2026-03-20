@@ -32,7 +32,7 @@ const EinkSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
       )}
       {isAllNormalService([blue, orange, red, green]) ? (
         <AllNormalService />
-      ) :   (
+      ) : (
         <>
           <LineStatus section={blue} color={LineColor.Blue} />
           <LineStatus section={orange} color={LineColor.Orange} />
