@@ -195,7 +195,6 @@ export const useSubwayStatusTextResizer = (alert: Alert, type: SectionType) => {
  * Checks if all subway lines have normal service
  */
 export const isAllNormalService = (data: SubwayStatusData): boolean => {
-  // return true;
   return [data.blue, data.orange, data.red, data.green].every(
     (route_section) =>
       route_section.type === "contracted" &&
