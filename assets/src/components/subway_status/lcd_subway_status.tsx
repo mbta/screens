@@ -4,11 +4,13 @@ import { classWithModifier } from "Util/utils";
 import {
   Alert,
   ExtendedSection,
+  NORMAL_STATUS,
   Section,
   SectionType,
   SubwayStatusData,
   SubwayStatusPill,
   adjustAlertForContractedStatus,
+  isAllNormalService,
   isExtended,
   useSubwayStatusTextResizer,
 } from "./subway_status_common";
@@ -21,7 +23,7 @@ import NormalServiceIcon from "Images/normal-service.svg";
 
 const LcdSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
   const { blue, orange, red, green } = cleanUpServerData(props);
-  const allNormal = isAllNormalService([blue, orange, red, green]);
+  const allNormal = isAllNormalService({ blue, orange, red, green });
 
   return (
     <div className="subway-status">
@@ -29,7 +31,7 @@ const LcdSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
         <div
           className={classWithModifier(
             "subway-status__header",
-            allNormal && "normal",
+            allNormal && "all-normal",
           )}
         >
           Subway Status
@@ -65,8 +67,6 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section }) => {
     </div>
   );
 };
-
-const NORMAL_STATUS = "Normal Service";
 
 interface BasicAlertProps {
   alert: Alert;
@@ -136,17 +136,6 @@ const AllNormalService: ComponentType = () => {
 /////////////
 // HELPERS //
 /////////////
-
-/**
- * Checks if all subway lines have normal service
- */
-const isAllNormalService = (sections: Section[]): boolean => {
-  return sections.every(
-    (section) =>
-      section.type === "contracted" &&
-      section.alerts.every((alert) => alert.status === NORMAL_STATUS),
-  );
-};
 
 /**
  * Tweaks the widget data received from the server to avoid awkward presentation in exceptional cases:

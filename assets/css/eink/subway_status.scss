@@ -51,36 +51,21 @@
   }
 
   .subway-status__normal-service {
-    position: relative;
-  }
-
-  .subway-status__normal-service-rule {
-    position: absolute;
-    right: 10px;
-    width: 1116px;
-    content: "";
-    background: #000;
-    border-radius: 1px;
-
-    &--top {
-      top: 42px;
-      height: 2px;
-    }
-
-    &--bottom {
-      top: 940px;
-      height: 4px;
-    }
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 900px;
+    padding-top: 44px;
+    padding-bottom: 32px;
+    border-top: 2px solid #000;
+    border-bottom: 4px solid #000;
   }
 
   .subway-status__normal-service-icon {
-    position: absolute;
-    top: 108px;
+    margin-bottom: 64px;
   }
 
   .subway-status__normal-service-text {
-    position: absolute;
-    top: 448px;
     font-size: 56px;
     font-weight: 400;
   }

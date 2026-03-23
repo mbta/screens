@@ -5,10 +5,12 @@ import {
   Alert,
   MultiPill,
   LineColor,
+  NORMAL_STATUS,
   Section,
   SubwayStatusData,
   SubwayStatusPill,
   adjustAlertForContractedStatus,
+  isAllNormalService,
   isContracted,
   isContractedWith1Alert,
   isExtended,
@@ -30,7 +32,7 @@ const EinkSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
       {shouldShowHeader(props) && (
         <span className="subway-status__header">Current Subway Service</span>
       )}
-      {isAllNormalService([blue, orange, red, green]) ? (
+      {isAllNormalService(props) ? (
         <AllNormalService />
       ) : (
         <>
@@ -83,8 +85,6 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
     </div>
   );
 };
-
-const NORMAL_STATUS = "Normal Service";
 
 interface BasicAlertProps {
   alert: Alert;
@@ -188,25 +188,13 @@ const BranchPillGroup: ComponentType<
 const AllNormalService: ComponentType = () => {
   return (
     <div className="subway-status__normal-service">
-      <div
-        className={classWithModifier(
-          "subway-status__normal-service-rule",
-          "top",
-        )}
-      />
       <NormalServiceIcon
         className="subway-status__normal-service-icon"
         width={276}
         height={276}
         fill="#000000"
       />
-      <div className="subway-status__normal-service-text">{NORMAL_STATUS}</div>
-      <div
-        className={classWithModifier(
-          "subway-status__normal-service-rule",
-          "bottom",
-        )}
-      />
+      <div className="subway-status__normal-service-text">Normal service</div>
     </div>
   );
 };
@@ -214,17 +202,6 @@ const AllNormalService: ComponentType = () => {
 /////////////
 // HELPERS //
 /////////////
-
-/**
- * Checks if all subway lines have normal service
- */
-const isAllNormalService = (sections: Section[]): boolean => {
-  return sections.every(
-    (section) =>
-      section.type === "contracted" &&
-      section.alerts.every((alert) => alert.status === NORMAL_STATUS),
-  );
-};
 
 // The header is displayed when every section has exactly 1 alert.
 const shouldShowHeader = ({ blue, orange, red, green }: SubwayStatusData) => {
