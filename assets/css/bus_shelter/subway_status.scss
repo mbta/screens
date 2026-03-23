@@ -8,7 +8,7 @@
 }
 
 .subway-status__header {
-  &:not(&--normal) {
+  &:not(&--all-normal) {
     display: none;
   }
 }
