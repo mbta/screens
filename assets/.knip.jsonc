@@ -1,5 +1,11 @@
 {
-  "$schema": "https://unpkg.com/knip@5/schema-jsonc.json",
+  "$schema": "https://unpkg.com/knip@6/schema-jsonc.json",
   // Used only by the Phoenix `watchers` configuration, not detectable by Knip
   "ignoreDependencies": ["exit_on_eof"],
+  // Ignore stylesheets for now due to issues with the built-in Knip SCSS parser
+  // (doesn't use Webpack aliases, doesn't recognize imports without extension)
+  "ignoreFiles": ["css/**/*.scss"],
+  "ignoreIssues": {
+    "css/**/*.scss": ["unresolved"],
+  },
 }
