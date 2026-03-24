@@ -47,6 +47,12 @@ defmodule Screens.V2.RDS do
   @type destination :: {Stop.t(), Line.t(), String.t()}
   @type destination_key :: {Stop.id(), Line.id(), String.t()}
   @type rds_state :: NoService.t() | Countdowns.t() | FirstTrip.t() | ServiceEnded.t()
+  @type service_state ::
+          :before_scheduled_start
+          | :after_scheduled_end
+          | :active_period
+          | :service_impacted
+          | :no_service
 
   # These alert types eliminate service to a destination.
   @relevant_alert_effects [
@@ -323,7 +329,7 @@ defmodule Screens.V2.RDS do
       |> Enum.sort_by(&Departure.time(&1), DateTime)
       |> then(&{List.first(&1), List.last(&1)})
 
-    case time_period_for_state(
+    case classify_service_state(
            first_scheduled_departure,
            last_scheduled_departure,
            headway_for_stop,
@@ -415,14 +421,21 @@ defmodule Screens.V2.RDS do
   defp reject_disabled_modes(all_routes, disabled_modes),
     do: Enum.reject(all_routes, fn route -> route.type in disabled_modes end)
 
-  defp time_period_for_state(_first_departure, _last_departure, _headway_for_stop, true, _now),
+  @spec classify_service_state(
+          Departure.t(),
+          Departure.t(),
+          Headways.range() | nil,
+          boolean(),
+          DateTime.t()
+        ) :: service_state()
+  defp classify_service_state(_first_departure, _last_departure, _headway_for_stop, true, _now),
     do: :service_impacted
 
-  defp time_period_for_state(first_departure, last_departure, _headway_for_stop, _in_alert, _now)
+  defp classify_service_state(first_departure, last_departure, _headway_for_stop, _in_alert, _now)
        when first_departure == nil and last_departure == nil,
        do: :no_service
 
-  defp time_period_for_state(first_departure, last_departure, headway_for_stop, _in_alert, now) do
+  defp classify_service_state(first_departure, last_departure, headway_for_stop, _in_alert, now) do
     first_departure_time =
       case headway_for_stop do
         nil ->
