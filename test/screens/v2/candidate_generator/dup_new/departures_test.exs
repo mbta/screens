@@ -91,6 +91,23 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
     }
   end
 
+  defp headways(stop_id, line_id, headsign, first_scheduled, route_id, direction_name, range) do
+    %RDS{
+      stop: %Stop{id: stop_id},
+      line: %Line{id: line_id},
+      headsign: headsign,
+      state: %RDS.Headways{
+        departure: %Departure{
+          prediction: nil,
+          schedule: first_scheduled
+        },
+        route_id: route_id,
+        direction_name: direction_name,
+        range: range
+      }
+    }
+  end
+
   defp expected_departures_widget(
          config,
          expected_primary_sections,
@@ -951,6 +968,224 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
       expected_instances = expected_overnight_departures_widget(config)
 
       actual_instances = DupNew.Departures.instances(config, now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates HeadwaySections for destinations with headways" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_route_id = "r1"
+      expected_time_range = {6, 10}
+      expected_headsign = "headsign"
+
+      schedule = %Schedule{
+        departure_time: ~U[2024-10-11 13:15:00Z],
+        route: %Route{id: "r3", line: %Line{id: "l3"}, type: :ferry},
+        stop: %Stop{id: "s3"},
+        trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+      }
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.HeadwaySection{
+          headsign: expected_headsign,
+          route: expected_route_id,
+          time_range: expected_time_range
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             headways(
+               "s1",
+               "l1",
+               "headsign",
+               schedule,
+               expected_route_id,
+               "Northbound",
+               expected_time_range
+             ),
+             headways(
+               "s1",
+               "l1",
+               "headsign",
+               schedule,
+               expected_route_id,
+               "Northbound",
+               expected_time_range
+             )
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _primary_departures, @now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = DupNew.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates HeadwaySections for destinations with headways with different headsigns" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_route_id = "r1"
+      expected_time_range = {6, 10}
+      expected_direction_name = "Northbound"
+
+      schedule = %Schedule{
+        departure_time: ~U[2024-10-11 13:15:00Z],
+        route: %Route{id: "r3", line: %Line{id: "l3"}, type: :ferry},
+        stop: %Stop{id: "s3"},
+        trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+      }
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.HeadwaySection{
+          headsign: expected_direction_name,
+          route: expected_route_id,
+          time_range: expected_time_range
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             headways(
+               "s1",
+               "l1",
+               "headsign",
+               schedule,
+               expected_route_id,
+               expected_direction_name,
+               expected_time_range
+             ),
+             headways(
+               "s1",
+               "l1",
+               "other_headsign",
+               schedule,
+               expected_route_id,
+               expected_direction_name,
+               expected_time_range
+             )
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _primary_departures, @now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = DupNew.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections for departures and headways" do
+      expected_route_id = "r1"
+      expected_time_range = {6, 10}
+      expected_direction_name = "Northbound"
+
+      schedule = %Schedule{
+        departure_time: ~U[2024-10-11 13:15:00Z],
+        route: %Route{
+          id: "r3",
+          line: %Line{id: "l3"},
+          type: :ferry,
+          direction_names: ["Northbound", "Southbound"]
+        },
+        stop: %Stop{id: "s3"},
+        trip: %Trip{headsign: "other3", pattern_headsign: "h3", direction_id: 0}
+      }
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_primary_departure =
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+          },
+          schedule: nil
+        }
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: [
+            expected_primary_departure,
+            {%Departure{prediction: nil, schedule: schedule}, {6, 10}, nil, :headways}
+          ]
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             rds_countdown("s1", "l1", "other1", [expected_primary_departure]),
+             headways(
+               "s1",
+               "l1",
+               "other_headsign",
+               schedule,
+               expected_route_id,
+               expected_direction_name,
+               expected_time_range
+             )
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = DupNew.Departures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end

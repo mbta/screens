@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Provides real-time departure information, consisting of an ordered list of "sections".
   """
 
+  alias Screens.Headways
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -22,7 +23,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     @type special_trip_type :: :first_trip | :last_trip
 
-    @type row :: Departure.t() | {Departure.t(), special_trip_type()} | FreeTextLine.t()
+    @type headway_row :: {Departure.t(), Headways.range(), String.t() | nil, :headways}
+
+    @type row ::
+            Departure.t()
+            | {Departure.t(), special_trip_type()}
+            | headway_row()
+            | FreeTextLine.t()
 
     @type t :: %__MODULE__{
             header: Header.t(),
@@ -471,6 +478,38 @@ defmodule Screens.V2.WidgetInstance.Departures do
         %{
           id: departure_id,
           time: %{type: :overnight}
+        }
+      ],
+      direction_id: serialize_direction_id(departures)
+    }
+  end
+
+  defp serialize_departure_group(
+         [
+           {departure, {lo, hi}, headsign, :headways}
+           | _
+         ],
+         screen,
+         _now,
+         route_pill_serializer
+       ) do
+    departure_id = Departure.id(departure)
+    departures = [departure]
+
+    %{
+      id: hash_and_encode(departure_id),
+      type: :departure_row,
+      route: serialize_route(departures, route_pill_serializer),
+      headsign:
+        if headsign do
+          %{headsign: headsign}
+        else
+          serialize_headsign(departures, screen)
+        end,
+      times_with_crowding: [
+        %{
+          id: departure_id,
+          time: %{type: :status, pages: ["every #{lo}-#{hi}m"]}
         }
       ],
       direction_id: serialize_direction_id(departures)
