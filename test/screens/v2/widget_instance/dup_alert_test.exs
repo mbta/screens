@@ -8,6 +8,8 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
   alias Screens.V2.WidgetInstance.DupAlert
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
 
+  import Screens.TestSupport.InformedEntityBuilder
+
   defp build_alert(fields) do
     struct!(%Alert{cause: :construction, effect: :suspension, severity: 5}, fields)
   end
@@ -322,7 +324,16 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
           effect: :station_closure,
           cause: :unknown,
           severity: 7,
-          informed_entities: stop_informed_entities("Blue", ~w[place-x child_plat_b0])
+          informed_entities:
+            stop_informed_entities("Blue", ~w[place-x]) ++
+              [
+                ie(route: "Blue", stop: %Stop{id: "place-x"}, route_type: 1),
+                ie(
+                  route: "Blue",
+                  stop: %Stop{id: "child_plat_b0", platform_name: "Northbound"},
+                  route_type: 1
+                )
+              ]
         )
 
       banner = %{

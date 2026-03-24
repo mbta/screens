@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   use ExUnit.Case, async: true
 
   alias Screens.Alerts.Alert
+  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias ScreensConfig.{Audio, Screen}
@@ -1227,8 +1228,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-portr", route_type: 1),
-                ie(route: "Red", stop_id: "70065", route_type: 1)
+                ie(
+                  route: "Red",
+                  stop: %Stop{id: "place-portr"},
+                  route_type: 1
+                ),
+                ie(
+                  route: "Red",
+                  stop: %Stop{id: "70065", platform_name: "Ashmont/Braintree"},
+                  route_type: 1
+                )
               ]
             },
             context: %{
@@ -1266,8 +1275,12 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-D", stop_id: "place-eliot", route_type: 1),
-                ie(route: "Green-D", stop_id: "70166", route_type: 1)
+                ie(route: "Green-D", stop: %Stop{id: "place-eliot"}, route_type: 1),
+                ie(
+                  route: "Green-D",
+                  stop: %Stop{id: "70166", platform_name: "Park Street & North"},
+                  route_type: 1
+                )
               ]
             },
             context: %{
@@ -1299,6 +1312,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     end
 
     test "handles GL partial station closure for multiple branches" do
+      closed_child_stop = %Stop{id: "70201", platform_name: "North Station & North"}
+
       instance = %SubwayStatus{
         subway_alerts: [
           %{
@@ -1309,10 +1324,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                 ie(route: "Green-C", stop_id: "place-gover"),
                 ie(route: "Green-D", stop_id: "place-gover"),
                 ie(route: "Green-E", stop_id: "place-gover"),
-                ie(route: "Green-B", stop_id: "70201"),
-                ie(route: "Green-C", stop_id: "70201"),
-                ie(route: "Green-D", stop_id: "70201"),
-                ie(route: "Green-E", stop_id: "70201")
+                ie(route: "Green-B", stop: closed_child_stop),
+                ie(route: "Green-C", stop: closed_child_stop),
+                ie(route: "Green-D", stop: closed_child_stop),
+                ie(route: "Green-E", stop: closed_child_stop)
               ]
             },
             context: %{
