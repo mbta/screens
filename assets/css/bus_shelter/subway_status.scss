@@ -8,7 +8,9 @@
 }
 
 .subway-status__header {
-  display: none;
+  &:not(&--all-normal) {
+    display: none;
+  }
 }
 
 .subway-status__alert {
@@ -50,4 +52,8 @@
   &__main {
     min-width: 144px;
   }
+}
+
+.subway-status__normal-service-text {
+  font-size: 48px;
 }
