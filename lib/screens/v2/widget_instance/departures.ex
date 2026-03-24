@@ -470,6 +470,38 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
+  defp serialize_departure_group(
+         [
+           {%{departure: departure, range: {lo, hi}, headsign: headsign}, :headways}
+           | _
+         ],
+         screen,
+         _now,
+         route_pill_serializer
+       ) do
+    departure_id = Departure.id(departure)
+    departures = [departure]
+
+    %{
+      id: hash_and_encode(departure_id),
+      type: :departure_row,
+      route: serialize_route(departures, route_pill_serializer),
+      headsign:
+        if headsign do
+          %{headsign: headsign}
+        else
+          serialize_headsign(departures, screen)
+        end,
+      times_with_crowding: [
+        %{
+          id: departure_id,
+          time: %{type: :status, pages: ["every #{lo}-#{hi}m"]}
+        }
+      ],
+      direction_id: serialize_direction_id(departures)
+    }
+  end
+
   defp serialize_departure_group([%FreeTextLine{} = text], _screen, _now, _pill_serializer) do
     %{
       type: :notice_row,

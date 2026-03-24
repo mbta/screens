@@ -14,7 +14,7 @@ defmodule Screens.V2.RDS do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Config.Cache
-  alias Screens.Headways
+  alias Screens.Headways, as: Headway
   alias Screens.Lines.Line
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
@@ -105,9 +105,25 @@ defmodule Screens.V2.RDS do
     defstruct ~w[last_scheduled_departure]a
   end
 
+  defmodule Headways do
+    @moduledoc """
+    State for if we're in an active period, but we have no predictions
+    and there are no alerts associated with the destination.
+
+    Shows an every “X-Y” minutes message. 
+    """
+    @type t :: %__MODULE__{
+            departure: Departure.t(),
+            route_id: Route.id(),
+            direction_name: String.t(),
+            range: Headway.range()
+          }
+    defstruct ~w[departure route_id direction_name range]a
+  end
+
   @alert injected(Alert)
   @departure injected(Departure)
-  @headways injected(Headways)
+  @headways injected(Headway)
   @route_pattern injected(RoutePattern)
   @schedule injected(Schedule)
   @stop injected(Stop)
@@ -342,14 +358,25 @@ defmodule Screens.V2.RDS do
       :after_scheduled_end ->
         %ServiceEnded{last_scheduled_departure: last_scheduled_departure}
 
-      :active_period ->
-        %Countdowns{departures: departures_for_headsign}
-
       :service_impacted ->
         %Countdowns{departures: departures_for_headsign}
 
       :no_service ->
         %NoService{routes: routes_for_section}
+
+      :active_period ->
+        route = Departure.route(first_scheduled_departure)
+        direction_id = Departure.direction_id(first_scheduled_departure)
+
+        %Headways{
+          departure: first_scheduled_departure,
+          route_id: route.id,
+          direction_name:
+            route
+            |> Route.normalized_direction_names()
+            |> Enum.at(direction_id, nil),
+          range: headway_for_stop
+        }
     end
   end
 
