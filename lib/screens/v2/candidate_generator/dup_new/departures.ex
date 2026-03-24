@@ -3,15 +3,17 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   import Screens.Inject
 
+  alias Screens.Headways, as: Headway
   alias Screens.Routes.Route
 
   alias Screens.V2.Departure
   alias Screens.V2.RDS
-  alias Screens.V2.RDS.{Countdowns, FirstTrip, NoService, ServiceEnded}
+  alias Screens.V2.RDS.{Countdowns, FirstTrip, Headways, NoService, ServiceEnded}
 
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
 
   alias Screens.V2.WidgetInstance.Departures.{
+    HeadwaySection,
     NoDataSection,
     NormalSection,
     NoServiceSection,
@@ -117,7 +119,9 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     num_departures_per_section = div(@max_departures_per_rotation, section_count)
 
     cond do
-      # all headways -> HeadwaySection()
+      headways?(rds_list) ->
+        create_headway_section(rds_list)
+
       no_service?(rds_list) ->
         %NoServiceSection{
           routes:
@@ -158,6 +162,67 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   defp service_ended?(rds_list) do
     Enum.all?(rds_list, &is_struct(&1.state, ServiceEnded))
+  end
+
+  defp headways?(rds_list) do
+    Enum.all?(rds_list, &is_struct(&1.state, Headways))
+  end
+
+  @spec create_headway_section([RDS.t()]) :: HeadwaySection.t()
+
+  # Bidirectional -> Use no headsign for the trains message
+  defp create_headway_section([
+         %RDS{state: %{route_id: route_id, direction_name: direction_name_one, range: range}}
+         | [%RDS{state: %{route_id: route_id, direction_name: direction_name_two, range: range}}]
+       ])
+       when direction_name_one != direction_name_two do
+    %HeadwaySection{
+      route: route_id,
+      time_range: range,
+      headsign: nil
+    }
+  end
+
+  # Use the headsign if the destinations have the same headsign,
+  # use the direction name if they have the same direction name,
+  # otherwise default to no headsign
+  defp create_headway_section(
+         [
+           %RDS{
+             headsign: first_headsign,
+             state: %Headways{
+               route_id: first_route_id,
+               direction_name: first_direction_name,
+               range: first_range
+             }
+           }
+           | _
+         ] = destinations
+       ) do
+    %HeadwaySection{
+      route: first_route_id,
+      time_range: first_range,
+      headsign:
+        cond do
+          Enum.all?(destinations, fn %RDS{headsign: headsign} ->
+            headsign == first_headsign
+          end) ->
+            first_headsign
+
+          Enum.all?(
+            destinations,
+            fn %RDS{
+                 state: %Headways{route_id: other_route_id, direction_name: other_direction_name}
+               } ->
+              other_direction_name == first_direction_name and other_route_id == first_route_id
+            end
+          ) ->
+            first_direction_name
+
+          true ->
+            nil
+        end
+    }
   end
 
   defp build_instances(
@@ -238,10 +303,14 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   @spec create_and_sort_rows([RDS.t()]) :: [NormalSection.row()]
   defp create_and_sort_rows(rds_list) do
-    {service_ended_rds, rds} =
+    {service_ended_rds, partially_filtered_rds} =
       Enum.split_with(rds_list, &match?(%RDS{state: %ServiceEnded{}}, &1))
 
+    {headway_rds, rds} =
+      Enum.split_with(partially_filtered_rds, &match?(%RDS{state: %Headways{}}, &1))
+
     sorted_departures_from_rds(rds) ++
+      headways_from_rds(headway_rds) ++
       sorted_departures_from_rds(service_ended_rds, true)
   end
 
@@ -268,7 +337,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
       end
 
     rds
-    |> Enum.flat_map(&departures_from_state(&1))
+    |> Enum.flat_map(&departure_rows_from_state(&1))
     |> Enum.sort_by(
       &departure_time(&1),
       {
@@ -278,22 +347,48 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     )
   end
 
-  @spec departures_from_state(RDS.t()) :: [Departure.t()]
-  defp departures_from_state(%RDS{state: %Countdowns{departures: departures}}), do: departures
+  @spec headways_from_rds([RDS.t()]) :: [{Departure.t(), Headway.range(), String.t(), :headways}]
+  defp headways_from_rds(headway_rds) do
+    headway_rds
+    |> Enum.group_by(fn %RDS{line: line, state: %Headways{departure: departure}} ->
+      direction_id = Departure.direction_id(departure)
+      route = Departure.route(departure)
 
-  defp departures_from_state(%RDS{
+      direction_name =
+        route
+        |> Route.normalized_direction_names()
+        |> Enum.at(direction_id, nil)
+
+      {line, direction_name}
+    end)
+    |> Enum.flat_map(fn
+      {{_line, _direction_name}, [%RDS{state: %Headways{departure: departure, range: range}}]} ->
+        [{departure, range, nil, :headways}]
+
+      # If there are multiple headways with the same line but different headsigns,
+      # combine them and use the direction name
+      {{_line, direction_name}, [%RDS{state: %Headways{departure: departure, range: range}} | _]} ->
+        [{departure, range, direction_name, :headways}]
+    end)
+  end
+
+  @spec departure_rows_from_state(RDS.t()) ::
+          [Departure.t()] | [{Departure.t(), NormalSection.special_trip_type()}]
+  defp departure_rows_from_state(%RDS{state: %Countdowns{departures: departures}}), do: departures
+
+  defp departure_rows_from_state(%RDS{
          state: %FirstTrip{first_scheduled_departure: first_scheduled_departure}
        }) do
     [{first_scheduled_departure, :first_trip}]
   end
 
-  defp departures_from_state(%RDS{
+  defp departure_rows_from_state(%RDS{
          state: %ServiceEnded{last_scheduled_departure: last_scheduled_departure}
        }) do
     [{last_scheduled_departure, :last_trip}]
   end
 
-  defp departures_from_state(%RDS{state: %NoService{}}), do: []
+  defp departure_rows_from_state(%RDS{state: %NoService{}}), do: []
 
   @spec departure_time(Departure.t()) :: DateTime.t()
   defp departure_time(%Departure{} = departure), do: Departure.time(departure)
@@ -311,4 +406,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   defp departure_direction_id({last_scheduled_departure, :last_trip}),
     do: Departure.direction_id(last_scheduled_departure)
+
+  defp departure_direction_id({departure, _range, _headsign, :headways}),
+    do: Departure.direction_id(departure)
 end
