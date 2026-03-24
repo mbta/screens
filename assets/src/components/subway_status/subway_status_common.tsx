@@ -67,6 +67,8 @@ enum Branch {
   M = "m",
 }
 
+export const NORMAL_STATUS = "Normal Service";
+
 /////////////////
 // TYPE GUARDS //
 /////////////////
@@ -187,4 +189,15 @@ export const useSubwayStatusTextResizer = (alert: Alert, type: SectionType) => {
       : alert.status;
 
   return { ref, location, status };
+};
+
+/**
+ * Checks if all subway lines have normal service
+ */
+export const isAllNormalService = (data: SubwayStatusData): boolean => {
+  return [data.blue, data.orange, data.red, data.green].every(
+    (route_section) =>
+      route_section.type === "contracted" &&
+      route_section.alerts.every((alert) => alert.status === NORMAL_STATUS),
+  );
 };

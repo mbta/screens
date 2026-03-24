@@ -5,16 +5,20 @@ import {
   Alert,
   MultiPill,
   LineColor,
+  NORMAL_STATUS,
   Section,
   SubwayStatusData,
   SubwayStatusPill,
   adjustAlertForContractedStatus,
+  isAllNormalService,
   isContracted,
   isContractedWith1Alert,
   isExtended,
   isMultiPill,
   useSubwayStatusTextResizer,
 } from "./subway_status_common";
+
+import NormalServiceIcon from "Images/normal-service.svg";
 
 ////////////////
 // COMPONENTS //
@@ -28,10 +32,16 @@ const EinkSubwayStatus: ComponentType<SubwayStatusData> = (props) => {
       {shouldShowHeader(props) && (
         <span className="subway-status__header">Current Subway Service</span>
       )}
-      <LineStatus section={blue} color={LineColor.Blue} />
-      <LineStatus section={orange} color={LineColor.Orange} />
-      <LineStatus section={red} color={LineColor.Red} />
-      <LineStatus section={green} color={LineColor.Green} />
+      {isAllNormalService(props) ? (
+        <AllNormalService />
+      ) : (
+        <>
+          <LineStatus section={blue} color={LineColor.Blue} />
+          <LineStatus section={orange} color={LineColor.Orange} />
+          <LineStatus section={red} color={LineColor.Red} />
+          <LineStatus section={green} color={LineColor.Green} />
+        </>
+      )}
     </div>
   );
 };
@@ -75,8 +85,6 @@ const LineStatus: ComponentType<LineStatusProps> = ({ section, color }) => {
     </div>
   );
 };
-
-const NORMAL_STATUS = "Normal Service";
 
 interface BasicAlertProps {
   alert: Alert;
@@ -174,6 +182,20 @@ const BranchPillGroup: ComponentType<
         );
       })}
     </>
+  );
+};
+
+const AllNormalService: ComponentType = () => {
+  return (
+    <div className="subway-status__normal-service">
+      <NormalServiceIcon
+        className="subway-status__normal-service-icon"
+        width={276}
+        height={276}
+        fill="#000000"
+      />
+      <div className="subway-status__normal-service-text">Normal service</div>
+    </div>
   );
 };
 

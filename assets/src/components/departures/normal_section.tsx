@@ -50,7 +50,7 @@ type FoldedRows = {
   belowFold: DepartureRow[];
 };
 
-const NormalSection: ComponentType<FoldedSection> = ({
+export const NormalSection: ComponentType<FoldedSection> = ({
   header,
   layout: { include_later: includeLater },
   grouping_type: groupingType,
@@ -94,5 +94,3 @@ const NormalSection: ComponentType<FoldedSection> = ({
     </div>
   );
 };
-
-export default NormalSection;

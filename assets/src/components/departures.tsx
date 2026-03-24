@@ -7,7 +7,7 @@ import {
 } from "react";
 import weakKey from "weak-key";
 
-import NormalSection from "./departures/normal_section";
+import { NormalSection } from "./departures/normal_section";
 import { Section, trimSections, toFoldedSection } from "./departures/section";
 
 import { report } from "Util/sentry";
