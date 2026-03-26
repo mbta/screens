@@ -5,11 +5,11 @@ defmodule ScreensWeb.V2.ScreenController do
   alias Screens.Report
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
-  alias ScreensWeb.Plug
+  alias ScreensWeb.Plug.{LegacyLogging, ScreenRequest}
 
-  plug Plug.LegacyLogging, :page when action == :index
-  plug Plug.ScreenRequest when action == :index
-  plug Plug.ScreenRequest, :pending when action == :index_pending
+  plug LegacyLogging, :page when action == :index
+  plug ScreenRequest when action == :index
+  plug ScreenRequest, :pending when action == :index_pending
   plug :environment_name
   plug :last_refresh
 

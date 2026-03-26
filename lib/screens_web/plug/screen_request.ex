@@ -48,15 +48,14 @@ defmodule ScreensWeb.Plug.ScreenRequest do
   defp assign(%Conn{params: params} = conn, screen_id, screen) do
     %Screen{app_id: app_id, app_params: app_params, vendor: vendor} = screen
 
-    logged_assigns =
-      params
-      |> Map.take(~w[requestor rotation_index variant])
-      |> Keyword.new()
-      |> Keyword.merge(
-        is_real_screen: match?(%{"is_real_screen" => "true"}, params),
-        screen_id: screen_id,
-        screen_side: screen_side(app_params, params)
-      )
+    logged_assigns = [
+      is_real_screen: match?(%{"is_real_screen" => "true"}, params),
+      requestor: params["requestor"],
+      rotation_index: params["rotation_index"],
+      screen_id: screen_id,
+      screen_side: screen_side(app_params, params),
+      variant: params["variant"]
+    ]
 
     Logger.metadata([app_id: app_id, vendor: vendor] ++ logged_assigns)
 

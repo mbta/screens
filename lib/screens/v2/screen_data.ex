@@ -19,7 +19,7 @@ defmodule Screens.V2.ScreenData do
   @type variants(data) :: {data, %{String.t() => data}}
   @type screen_id :: String.t()
   @type options :: [
-          generator_variant: String.t(),
+          generator_variant: String.t() | nil,
           pending_config: Screen.t(),
           run_all_variants?: boolean(),
           update_visible_alerts?: boolean()

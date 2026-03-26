@@ -1,8 +1,8 @@
 defmodule ScreensWeb.Plug.LegacyLogging do
   @moduledoc """
   Logs information on screen page/data requests in a format expected by Splunk reports/alerts.
-  These should eventually be migrated to use the Logster request logs, which should have the same
-  metadata attached, at which point this module can be removed.
+  These should eventually be migrated to use the Logster request logs, which should have all the
+  same data attached, at which point this module can be removed.
 
   ## Options
 
@@ -21,8 +21,33 @@ defmodule ScreensWeb.Plug.LegacyLogging do
     conn
   end
 
-  defp log(%Conn{assigns: %{is_real_screen: true}} = conn, :data) do
+  defp log(
+         %Conn{assigns: %{is_real_screen: true, screen: %Screen{name: name}}, params: params} =
+           conn,
+         :data
+       ) do
+    Logster.info([
+      "[screen data request]",
+      last_refresh: params["last_refresh"],
+      screen_name: inspect(name),
+      ofm_app_package_version: params["version"]
+    ])
 
+    status = Logger.metadata() |> Keyword.get(:response_type)
+
+    if not is_nil(status) do
+      Logster.info([
+        "[screen api response #{if(status == :ok, do: :success, else: status)}]",
+        last_refresh: params["last_refresh"],
+        screen_name: inspect(name)
+      ])
+    end
+
+    conn
+  end
+
+  defp log(%Conn{assigns: %{is_real_screen: true, screen: %Screen{name: name}}} = conn, :audio) do
+    Logster.info(["[screen audio request]", screen_name: inspect(name)])
     conn
   end
 

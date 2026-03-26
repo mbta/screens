@@ -5,8 +5,8 @@ defmodule Screens.Audio do
 
   @lexicon_names ["mbtalexicon"]
 
-  @spec synthesize(String.t(), keyword()) :: {:ok, binary()} | :error
-  def synthesize(ssml_string, log_meta) do
+  @spec synthesize(String.t()) :: {:ok, binary()} | :error
+  def synthesize(ssml_string) do
     result =
       ssml_string
       |> ExAws.Polly.synthesize_speech(lexicon_names: @lexicon_names, text_type: "ssml")
@@ -17,7 +17,7 @@ defmodule Screens.Audio do
         {:ok, audio_data}
 
       {:error, error} ->
-        Report.error("synthesize_ssml_failed", [error: error, string: ssml_string] ++ log_meta)
+        Report.error("synthesize_ssml_failed", error: error, string: ssml_string)
         :error
     end
   end

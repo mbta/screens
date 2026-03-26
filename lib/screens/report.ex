@@ -4,10 +4,11 @@ defmodule Screens.Report do
   def error(tag, data \\ []), do: log(:error, tag, data)
   def warning(tag, data \\ []), do: log(:warning, tag, data)
 
-  @spec log(:error | :warning, String.t(), Enumerable.t({String.Chars.t(), term()})) :: :ok
+  @spec log(:error | :warning, String.t(), keyword()) :: :ok
   defp log(level, tag, data) do
     Logster.log(level, [tag | data])
-    _ = Sentry.capture_message(tag, extra: Map.new(data), level: level, result: :none)
+    extra = Logger.metadata() |> Keyword.merge(data) |> Map.new()
+    _ = Sentry.capture_message(tag, extra: extra, level: level, result: :none)
     :ok
   end
 end
