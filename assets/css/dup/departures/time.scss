@@ -22,6 +22,7 @@
 }
 
 .departure-time__text {
+  display: inline-block;
   font-size: 1em;
   font-weight: 700;
   line-height: 1.185em;
@@ -36,6 +37,7 @@
 }
 
 .departure-time__status {
+  display: inline-block;
   font-size: 104px;
   line-height: 128px;
 }
@@ -48,6 +50,8 @@
 }
 
 .departure-time__timestamp {
+  display: inline-block;
+  text-decoration: inherit;
   direction: rtl;
 }
 
@@ -63,4 +67,11 @@
   font-weight: 400;
   line-height: 108px;
   letter-spacing: 2px;
+}
+
+.departure-time__live-icon {
+  display: inline-block;
+  width: 60px;
+  height: 60px;
+  margin-right: 16px;
 }
