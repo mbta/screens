@@ -146,7 +146,7 @@ defmodule Screens.Alerts.Alert do
   @type result :: {:ok, [t()]} | :error
   @type fetch :: (options() -> result())
 
-  @base_includes ~w[facilities stops]
+  @base_includes ~w[facilities stops stops.child_stops]
   @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops stops]
 
   @callback fetch(options()) :: result()
@@ -400,9 +400,7 @@ defmodule Screens.Alerts.Alert do
   end
 
   @spec informed_parent_stations(t()) :: [InformedEntity.t()]
-  def informed_parent_stations(%__MODULE__{
-        informed_entities: informed_entities
-      }) do
+  def informed_parent_stations(%__MODULE__{informed_entities: informed_entities}) do
     informed_entities
     |> Enum.filter(&InformedEntity.parent_station?/1)
     |> InformedEntity.uniq_by_stop()
@@ -410,6 +408,8 @@ defmodule Screens.Alerts.Alert do
 
   @spec station_closure_type(__MODULE__.t(), list(Stop.t())) ::
           :partial_closure | :full_station_closure | :partial_closure_multiple_stops
+  def station_closure_type(_alert, []), do: :full_station_closure
+
   def station_closure_type(
         %__MODULE__{effect: :station_closure, informed_entities: informed_entities} = alert,
         platforms_at_informed_stations

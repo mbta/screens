@@ -235,13 +235,16 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
 
   @spec get_closed_platform_name(DupAlert.t()) :: String.t() | nil
   defp get_closed_platform_name(t) do
-    stops_in_alert = Enum.map(t.alert.informed_entities, & &1.stop.id)
-
-    platform_names =
+    child_stop_ids =
       t
       |> DupAlert.child_stops_for_affected_line()
-      |> Enum.filter(&(&1.id in stops_in_alert and &1.platform_name))
-      |> Enum.map(& &1.platform_name)
+      |> Enum.map(& &1.id)
+      |> MapSet.new()
+
+    platform_names =
+      t.alert.informed_entities
+      |> Enum.filter(&(MapSet.member?(child_stop_ids, &1.stop.id) and &1.stop.platform_name))
+      |> Enum.map(& &1.stop.platform_name)
 
     case platform_names do
       [platform_name] ->
