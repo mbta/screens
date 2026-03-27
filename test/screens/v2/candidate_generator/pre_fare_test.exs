@@ -75,7 +75,8 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                            {1, :paged_main_content_left},
                            {2, :paged_main_content_left},
                            {3, :paged_main_content_left}
-                         ]
+                         ],
+                         body_left_split: [:body_left_top, :body_left_bottom]
                        },
                        body_right: @body_right
                      ],

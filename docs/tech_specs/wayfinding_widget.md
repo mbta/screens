@@ -2,7 +2,7 @@
 - Start Date: 2025-01-30
 - RFC PR: [RFC: Wayfinding Widget](https://github.com/mbta/screens/pull/2845)
 - Asana task: [Wayfinding Widget: Basic Functionality](https://app.asana.com/1/15492006741476/project/1185117109217422/task/1211428585696977)
-- Status: Proposed
+- Status: Implemented
 
 # Summary
 
@@ -57,7 +57,7 @@ The ScreenConfig values to pass through to use for CSS values would look like th
 %WayfindingItem{
   asset_url: String.t(),
   placement: :top | :bottom,
-  header_text: Header.t() | nil,
+  header_text: String.t() | nil,
   text_for_audio: String.t(),
 }
 ```
@@ -67,9 +67,9 @@ which would eventually pass through to the Candidate Generator
 ```
 %Wayfinding{
   screen: Screen.t(),
+  slot_names: list(atom()),
   asset_url: String.t(),
-  placement: :top | :bottom,
-  header_text: Header.t() | nil,
+  header_text: String.t() | nil,
   text_for_audio: String.t(),
 }
 ```

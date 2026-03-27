@@ -23,6 +23,7 @@ import Placeholder from "Components/placeholder";
 import NormalScreen from "Components/pre_fare/normal_screen";
 import NormalBody from "Components/pre_fare/normal_body";
 import NormalBodyLeft from "Components/pre_fare/normal_body_left";
+import BodyLeftSplit from "Components/pre_fare/body_left_split";
 import NormalBodyRight from "Components/pre_fare/normal_body_right";
 import EvergreenContent from "Components/evergreen_content";
 import NormalHeader from "Components/lcd/normal_header";
@@ -44,6 +45,7 @@ import MultiScreenPage from "Components/multi_screen_page";
 import SimulationScreenPage from "Components/pre_fare/simulation_screen_page";
 import PreFareSingleScreenAlert from "Components/pre_fare_single_screen_alert";
 import Departures from "Components/departures";
+import Wayfinding from "Components/wayfinding";
 
 const TYPE_TO_COMPONENT = {
   // Slots
@@ -55,6 +57,7 @@ const TYPE_TO_COMPONENT = {
   body_left_normal: NormalBodyLeft,
   body_left_takeover: BodyLeftTakeover,
   body_left_flex: BodyLeftFlex,
+  body_left_split: BodyLeftSplit,
   body_right_normal: NormalBodyRight,
   body_right_takeover: BodyRightTakeover,
   normal_header: NormalHeader,
@@ -71,6 +74,7 @@ const TYPE_TO_COMPONENT = {
   single_screen_alert: PreFareSingleScreenAlert,
   reconstructed_takeover: ReconstructedTakeover,
   departures: Departures,
+  wayfinding: Wayfinding,
 };
 
 const DISABLED_LAYOUT = {
