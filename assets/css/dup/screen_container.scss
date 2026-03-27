@@ -3,11 +3,26 @@
   margin: 0 auto;
 }
 
+@keyframes blink-sequence {
+  0% {
+    background-color: black;
+  }
+  50% {
+    background-color: black;
+  }
+  51% {
+    background-color: white;
+  }
+  100% {
+    background-color: white;
+  }
+}
+
 .screen-container-blink {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: black;
+  animation: blink-sequence var(--blink-duration, 34ms) steps(1, end);
 }
