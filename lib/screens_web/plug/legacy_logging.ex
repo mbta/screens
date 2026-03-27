@@ -37,7 +37,7 @@ defmodule ScreensWeb.Plug.LegacyLogging do
 
     if not is_nil(status) do
       Logster.info([
-        "[screen api response #{if(status == :ok, do: :success, else: status)}]",
+        "[screen api response #{if(is_nil(status), do: :success, else: status)}]",
         last_refresh: params["last_refresh"],
         screen_name: inspect(name)
       ])

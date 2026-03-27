@@ -1,8 +1,6 @@
 defmodule Screens.Util do
   @moduledoc false
 
-  alias Screens.Config.Cache
-
   @doc """
   Similar to Enum.group_by, except it returns a list of {key, value} tuples instead of a map to maintain order.
   Order of the groups is determined by the position of the first occurrence of a member of that group.
@@ -139,18 +137,6 @@ defmodule Screens.Util do
   def route_type_from_id("CR-" <> _), do: :rail
   def route_type_from_id("Boat-" <> _), do: :ferry
   def route_type_from_id(_), do: :bus
-
-  def outdated?("DUP-" <> _, _), do: false
-
-  def outdated?(screen_id, client_refresh_timestamp) do
-    {:ok, client_refresh_time, _} = DateTime.from_iso8601(client_refresh_timestamp)
-    refresh_if_loaded_before_time = Cache.refresh_if_loaded_before(screen_id)
-
-    case refresh_if_loaded_before_time do
-      nil -> false
-      _ -> DateTime.compare(client_refresh_time, refresh_if_loaded_before_time) == :lt
-    end
-  end
 
   def to_set(nil), do: MapSet.new([])
   def to_set(id) when is_binary(id), do: MapSet.new([id])

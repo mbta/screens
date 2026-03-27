@@ -3,43 +3,26 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   alias Phoenix.View
   alias Screens.Config.Cache
-  alias Screens.Util
   alias Screens.V2.{ScreenAudioData, ScreenData}
   alias ScreensConfig.Screen
   alias ScreensWeb.Plug.{LegacyLogging, ScreenRequest}
 
   @base_response %{data: nil, disabled: false, force_reload: false}
 
+  @non_pending_show_actions [:show, :show_dup, :simulation]
+
   plug Corsica, [origins: "*"] when action in [:show_dup, :log_frontend_error]
   plug LegacyLogging, :data when action in [:show, :show_dup]
-  plug ScreenRequest when action in [:show, :show_dup, :simulation]
+  plug ScreenRequest when action in @non_pending_show_actions
   plug ScreenRequest, :pending when action in [:show_pending, :simulation_pending]
-  plug :special_response when action in [:show, :show_dup, :simulation]
-
-  defp special_response(
-         %{assigns: %{screen_id: screen_id}, params: %{"last_refresh" => last_refresh}} = conn,
-         _
-       ) do
-    cond do
-      Cache.disabled?(screen_id) ->
-        Logger.metadata(response_type: :disabled)
-        conn |> json(%{@base_response | disabled: true}) |> halt()
-
-      Util.outdated?(screen_id, last_refresh) ->
-        Logger.metadata(response_type: :outdated)
-        conn |> json(%{@base_response | force_reload: true}) |> halt()
-
-      true ->
-        Logger.metadata(response_type: :ok)
-        conn
-    end
-  end
+  plug :disabled_response when action in @non_pending_show_actions
+  plug :outdated_response when action in @non_pending_show_actions
 
   def show(%{assigns: %{screen_id: screen_id, screen: screen, variant: variant}} = conn, _params) do
     response =
       screen_id
       |> screen_response(screen, variant, update_visible_alerts?: true)
-      |> put_extra_fields(screen_id, screen)
+      |> put_extra_fields(screen)
 
     json(conn, response)
   end
@@ -119,16 +102,16 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   # See `docs/mercury_api.md`
-  defp put_extra_fields(response, screen_id, %Screen{vendor: :mercury}) do
+  defp put_extra_fields(response, %Screen{vendor: :mercury} = screen) do
     response
-    |> Map.put(:audio_data, fetch_ssml(screen_id))
+    |> Map.put(:audio_data, fetch_ssml(screen))
     |> Map.put(:last_deploy_timestamp, Cache.last_deploy_timestamp())
   end
 
-  defp put_extra_fields(response, _, _), do: response
+  defp put_extra_fields(response, _screen), do: response
 
-  defp fetch_ssml(screen_id) do
-    case ScreenAudioData.by_screen_id(screen_id) do
+  defp fetch_ssml(screen) do
+    case ScreenAudioData.get(screen) do
       [] ->
         ""
 
@@ -144,5 +127,43 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   defp simulation_response(screen_id, variant) do
     %{@base_response | data: ScreenData.simulation(screen_id, generator_variant: variant)}
+  end
+
+  defp disabled_response(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _) do
+    Logger.metadata(response_type: :disabled)
+    conn |> json(%{@base_response | disabled: true}) |> halt()
+  end
+
+  defp disabled_response(conn, _), do: conn
+
+  # Never tell a DUP client to reload, since it would just reload its local copy of the client
+  # code, not changing anything, resulting in an infinite loop. TODO: Rework this once we have
+  # non-Outfront-managed DUPs.
+  defp outdated_response(%{assigns: %{screen_id: "DUP-" <> _}} = conn, _), do: conn
+
+  defp outdated_response(
+         %{
+           assigns: %{screen: %Screen{refresh_if_loaded_before: refresh_if_loaded_before}},
+           params: params
+         } = conn,
+         _
+       ) do
+    with param when is_binary(param) <- params["last_refresh"],
+         {:ok, last_refresh_at, _offset} <- DateTime.from_iso8601(param) do
+      should_refresh_at =
+        [Cache.last_deploy_timestamp(), refresh_if_loaded_before]
+        |> Enum.reject(&is_nil/1)
+        |> Enum.max(DateTime, fn -> nil end)
+
+      if not is_nil(should_refresh_at) and
+           DateTime.compare(last_refresh_at, should_refresh_at) == :lt do
+        Logger.metadata(response_type: :outdated)
+        conn |> json(%{@base_response | force_reload: true}) |> halt()
+      else
+        conn
+      end
+    else
+      _ -> conn |> put_status(400) |> halt()
+    end
   end
 end

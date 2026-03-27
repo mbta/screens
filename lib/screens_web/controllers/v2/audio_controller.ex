@@ -3,42 +3,19 @@ defmodule ScreensWeb.V2.AudioController do
   require Logger
 
   alias Phoenix.View
-  alias Screens.Config.Cache
   alias Screens.V2.ScreenAudioData
+  alias ScreensConfig.Screen
   alias ScreensWeb.Plug.{LegacyLogging, ScreenRequest}
 
   plug LegacyLogging, :audio when action == :show
   plug ScreenRequest when action in [:show, :show_volume, :debug]
 
-  def show(%{assigns: %{screen_id: screen_id}} = conn, params) do
+  def show(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _params), do: not_found(conn)
+
+  def show(%{assigns: %{screen: screen}} = conn, params) do
     disposition = if Map.has_key?(params, "inline"), do: :inline, else: :attachment
 
-    cond do
-      Cache.disabled?(screen_id) -> not_found(conn)
-      true -> readout(conn, screen_id, disposition)
-    end
-  end
-
-  def show_volume(%{assigns: %{screen_id: screen_id}} = conn, _params) do
-    cond do
-      Cache.disabled?(screen_id) ->
-        json(conn, %{volume: 0.0})
-
-      true ->
-        {:ok, volume} = ScreenAudioData.volume_by_screen_id(screen_id)
-        json(conn, %{volume: volume})
-    end
-  end
-
-  def debug(%{assigns: %{screen_id: screen_id}} = conn, _params) do
-    cond do
-      Cache.disabled?(screen_id) -> text(conn, "Screen #{screen_id} is disabled.")
-      true -> text(conn, fetch_ssml(screen_id))
-    end
-  end
-
-  defp readout(conn, screen_id, disposition) do
-    screen_id
+    screen
     |> fetch_ssml()
     |> Screens.Audio.synthesize()
     |> case do
@@ -53,11 +30,23 @@ defmodule ScreensWeb.V2.AudioController do
     end
   end
 
-  defp fetch_ssml(screen_id) do
+  def show_volume(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _params),
+    do: json(conn, %{volume: 0.0})
+
+  def show_volume(%{assigns: %{screen: screen}} = conn, _params) do
+    {:ok, volume} = ScreenAudioData.get_volume(screen)
+    json(conn, %{volume: volume})
+  end
+
+  def debug(%{assigns: %{screen_id: screen_id}} = conn, _params) do
+    text(conn, fetch_ssml(screen_id))
+  end
+
+  defp fetch_ssml(screen) do
     View.render_to_string(
       ScreensWeb.V2.AudioView,
       "index.ssml",
-      widget_audio_data: ScreenAudioData.by_screen_id(screen_id)
+      widget_audio_data: ScreenAudioData.get(screen)
     )
   end
 
