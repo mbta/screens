@@ -11,7 +11,6 @@ defmodule Screens.V2.ScreenDataTest do
   import Mox
   setup :verify_on_exit!
 
-  @config_cache injected(Screens.Config.Cache)
   @parameters injected(Screens.V2.ScreenData.Parameters)
 
   require Stub
@@ -30,15 +29,15 @@ defmodule Screens.V2.ScreenDataTest do
       :ok
     end
 
-    defp build_config(attrs) do
+    defp build_screen(attrs) do
       struct!(
         %Screen{app_id: :test_app, app_params: %{}, device_id: "", name: "", vendor: ""},
         attrs
       )
     end
 
-    test "gets widget data for a screen ID" do
-      expect(@config_cache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+    test "gets widget data for a screen" do
+      screen = build_screen(%{app_id: :test_app})
 
       expect(
         @parameters,
@@ -46,25 +45,12 @@ defmodule Screens.V2.ScreenDataTest do
         fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
       )
 
-      assert ScreenData.get("test_id") ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
-    end
-
-    test "generates widget data from a pending config" do
-      deny(@config_cache, :screen, 1)
-
-      expect(
-        @parameters,
-        :candidate_generator,
-        fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
-      )
-
-      assert ScreenData.get("test_id", pending_config: build_config(%{app_id: :test_app})) ==
+      assert ScreenData.get(screen) ==
                %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
 
     test "selects a variant candidate generator" do
-      expect(@config_cache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+      screen = build_screen(%{app_id: :test_app})
 
       expect(
         @parameters,
@@ -72,15 +58,12 @@ defmodule Screens.V2.ScreenDataTest do
         fn %Screen{app_id: :test_app}, "test_variant" -> GrayGenerator end
       )
 
-      assert ScreenData.get("test_id", generator_variant: "test_variant") ==
+      assert ScreenData.get(screen, generator_variant: "test_variant") ==
                %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
 
     test "runs all variant generators in the background" do
-      expect(@config_cache, :screen, fn "test_id" ->
-        build_config(%{app_id: :test_app, app_params: %{test_pid: self()}})
-      end)
-
+      screen = build_screen(%{app_id: :test_app, app_params: %{test_pid: self()}})
       expect(@parameters, :variants, fn %Screen{app_id: :test_app} -> ["crash"] end)
 
       stub(
@@ -93,7 +76,7 @@ defmodule Screens.V2.ScreenDataTest do
       )
 
       capture_log(fn ->
-        assert %{type: :normal} = ScreenData.get("test_id", run_all_variants?: true)
+        assert %{type: :normal} = ScreenData.get(screen, run_all_variants?: true)
 
         receive do
           {:crash_running, pid} ->
@@ -112,7 +95,7 @@ defmodule Screens.V2.ScreenDataTest do
     end
 
     test "gets widget data for all variants" do
-      expect(@config_cache, :screen, fn "test_id" -> build_config(%{app_id: :test_app}) end)
+      screen = build_screen(%{app_id: :test_app})
       expect(@parameters, :variants, fn %Screen{app_id: :test_app} -> ["green"] end)
 
       stub(
@@ -125,7 +108,7 @@ defmodule Screens.V2.ScreenDataTest do
       )
 
       assert {%{main: %{color: :gray}}, %{"green" => %{main: %{color: :green}}}} =
-               ScreenData.variants("test_id")
+               ScreenData.variants(screen)
     end
   end
 

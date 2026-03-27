@@ -20,8 +20,8 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   def show(%{assigns: %{screen_id: screen_id, screen: screen, variant: variant}} = conn, _params) do
     response =
-      screen_id
-      |> screen_response(screen, variant, update_visible_alerts?: true)
+      screen
+      |> screen_response(variant, update_visible_alerts_for_screen_id: screen_id)
       |> put_extra_fields(screen)
 
     json(conn, response)
@@ -29,18 +29,16 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   def show_dup(conn, params), do: show(conn, params)
 
-  def simulation(%{assigns: %{screen_id: screen_id, variant: variant}} = conn, _params) do
-    json(conn, simulation_response(screen_id, variant))
+  def simulation(%{assigns: %{screen: screen, variant: variant}} = conn, _params) do
+    json(conn, simulation_response(screen, variant))
   end
 
-  def show_pending(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
-    screen_data = ScreenData.get(screen_id, pending_config: screen)
-    json(conn, %{@base_response | data: screen_data})
+  def show_pending(%{assigns: %{screen: screen}} = conn, _params) do
+    json(conn, %{@base_response | data: ScreenData.get(screen)})
   end
 
-  def simulation_pending(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
-    screen_data = ScreenData.simulation(screen_id, pending_config: screen)
-    json(conn, %{@base_response | data: screen_data})
+  def simulation_pending(%{assigns: %{screen: screen}} = conn, _params) do
+    json(conn, %{@base_response | data: ScreenData.simulation(screen)})
   end
 
   def log_frontend_error(conn, params) do
@@ -79,21 +77,21 @@ defmodule ScreensWeb.V2.ScreenApiController do
     )
   end
 
-  defp screen_response(screen_id, _, "all" = variant, opts) do
-    {default, variants} = ScreenData.variants(screen_id, merge_options(variant, opts))
+  defp screen_response(screen, "all", _opts) do
+    {default, variants} = ScreenData.variants(screen)
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
   # See `docs/mercury_api.md`
-  defp screen_response(screen_id, %Screen{vendor: :mercury}, variant, opts) do
+  defp screen_response(%Screen{vendor: :mercury} = screen, variant, opts) do
     %{full_page: data, flex_zone: flex_zone} =
-      ScreenData.simulation(screen_id, merge_options(variant, opts))
+      ScreenData.simulation(screen, merge_options(variant, opts))
 
     Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
   end
 
-  defp screen_response(screen_id, _, variant, opts) do
-    data = ScreenData.get(screen_id, merge_options(variant, opts))
+  defp screen_response(screen, variant, opts) do
+    data = ScreenData.get(screen, merge_options(variant, opts))
     %{@base_response | data: data}
   end
 
@@ -120,13 +118,13 @@ defmodule ScreensWeb.V2.ScreenApiController do
     end
   end
 
-  defp simulation_response(screen_id, "all") do
-    {default, variants} = ScreenData.simulation_variants(screen_id)
+  defp simulation_response(screen, "all") do
+    {default, variants} = ScreenData.simulation_variants(screen)
     Map.put(%{@base_response | data: default}, :variants, variants)
   end
 
-  defp simulation_response(screen_id, variant) do
-    %{@base_response | data: ScreenData.simulation(screen_id, generator_variant: variant)}
+  defp simulation_response(screen, variant) do
+    %{@base_response | data: ScreenData.simulation(screen, generator_variant: variant)}
   end
 
   defp disabled_response(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _) do

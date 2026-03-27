@@ -11,8 +11,10 @@ defmodule ScreensWeb.Plug.ScreenRequest do
 
   alias Phoenix.Controller
   alias Plug.Conn
-  alias Screens.Config.Cache
   alias ScreensConfig.Screen
+
+  import Screens.Inject
+  @cache injected(Screens.Config.Cache)
 
   def init(options), do: options
 
@@ -31,8 +33,8 @@ defmodule ScreensWeb.Plug.ScreenRequest do
 
   def call(conn, _opts) do
     with {:params, %Conn{path_params: %{"id" => id}}} <- {:params, conn},
-         {:cache, true} <- {:cache, Cache.ok?()},
-         {:screen, %Screen{} = screen} <- {:screen, Cache.screen(id)} do
+         {:cache, true} <- {:cache, Screens.Config.Cache.ok?()},
+         {:screen, %Screen{} = screen} <- {:screen, @cache.screen(id)} do
       handle_request(conn, id, screen)
     else
       {:params, _conn} -> error(conn, 400)
