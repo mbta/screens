@@ -86,13 +86,11 @@ const LastFetchContext = createContext<number | null>(null);
 interface ScreenLayoutProps {
   apiResponse: ApiResponse;
   showBlink: boolean;
-  blinkDurationMs?: number;
 }
 
 const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   apiResponse,
   showBlink,
-  blinkDurationMs,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
   const ErrorBoundaryOrFragment = isDup() ? Fragment : WidgetTreeErrorBoundary;
@@ -109,16 +107,7 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
       <ErrorBoundaryOrFragment>
         {apiResponse && <Widget data={widgetData} />}
       </ErrorBoundaryOrFragment>
-      {showBlink && (
-        <div
-          className="screen-container-blink"
-          style=
-            {blinkDurationMs
-              ? ({ "--blink-duration": `${blinkDurationMs}ms` } as React.CSSProperties)
-              : undefined
-            }
-        />
-      )}
+      {showBlink && <div className="screen-container-blink" />}
     </div>
   );
 };
@@ -157,11 +146,7 @@ const ScreenContainer = ({ id }) => {
 
   return (
     <LastFetchContext.Provider value={lastSuccess}>
-      <ScreenLayout
-        apiResponse={apiResponse}
-        showBlink={showBlink}
-        blinkDurationMs={blinkConfig?.durationMs}
-      />
+      <ScreenLayout apiResponse={apiResponse} showBlink={showBlink} />
     </LastFetchContext.Provider>
   );
 };
