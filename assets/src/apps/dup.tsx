@@ -31,6 +31,8 @@ import PartialAlert from "Components/dup/partial_alert";
 import TakeoverAlert from "Components/dup/takeover_alert";
 import SimulationScreenPage from "Components/simulation_screen_page";
 import {
+  BlinkConfig,
+  BlinkConfigContext,
   ResponseMapper,
   ResponseMapperContext,
 } from "Components/screen_container";
@@ -118,6 +120,11 @@ const responseMapper: ResponseMapper = (apiResponse) => {
   }
 };
 
+const blinkConfig: BlinkConfig = {
+  refreshesPerBlink: 15,
+  durationMs: 34,
+};
+
 const App = (): JSX.Element => {
   const playerName = usePlayerName();
 
@@ -130,27 +137,29 @@ const App = (): JSX.Element => {
               <ScreenPage id={`DUP-${playerName.trim()}`} />
             </Viewport>
           ) : (
-            <Router basename="v2/screen">
-              <Routes>
-                <Route path="dup_v2" element={<MultiScreenPage />} />
+            <BlinkConfigContext.Provider value={blinkConfig}>
+              <Router basename="v2/screen">
+                <Routes>
+                  <Route path="dup_v2" element={<MultiScreenPage />} />
 
-                <Route
-                  path="pending?/:id"
-                  element={
-                    <Viewport>
-                      <ScreenPage />
-                    </Viewport>
-                  }
-                />
+                  <Route
+                    path="pending?/:id"
+                    element={
+                      <Viewport>
+                        <ScreenPage />
+                      </Viewport>
+                    }
+                  />
 
-                <Route
-                  path="pending?/:id/simulation"
-                  element={
-                    <SimulationScreenPage opts={{ alternateView: true }} />
-                  }
-                />
-              </Routes>
-            </Router>
+                  <Route
+                    path="pending?/:id/simulation"
+                    element={
+                      <SimulationScreenPage opts={{ alternateView: true }} />
+                    }
+                  />
+                </Routes>
+              </Router>
+            </BlinkConfigContext.Provider>
           )}
         </ResponseMapperContext.Provider>
       </MappingContext.Provider>
