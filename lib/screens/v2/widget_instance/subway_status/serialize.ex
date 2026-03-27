@@ -244,13 +244,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
   end
 
   def serialize_alert(
-        %{
-          alert: %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
-          context: %{all_platforms_at_informed_stations: all_platforms_at_informed_stations}
-        },
+        %{alert: %Alert{effect: :station_closure, informed_entities: informed_entities} = alert},
         route_id
       ) do
-    case Alert.station_closure_type(alert, all_platforms_at_informed_stations) do
+    child_platforms_at_informed_stations =
+      alert
+      |> Alert.informed_parent_stations()
+      |> Enum.flat_map(
+        &case &1.stop.child_stops do
+          nil -> []
+          child_stops -> child_stops
+        end
+      )
+      |> Enum.filter(&(&1.location_type == 0))
+
+    case Alert.station_closure_type(alert, child_platforms_at_informed_stations) do
       # Logic for partial_station_closure will remove any alerts that apply to more than
       # a single parent platform.
       :partial_closure ->

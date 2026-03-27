@@ -34,30 +34,79 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           direction_destinations: nil,
           long_name: nil,
           short_name: nil,
-          type: :subway
+          type: :subways
         }
       ]
 
       happening_now_active_period = [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
 
+      oak_grove_sb = %Stop{
+        id: "70036",
+        name: "Oak Grove - Southbound",
+        platform_name: "Southbound",
+        location_type: "0"
+      }
+
+      oak_grove_nb = %Stop{
+        id: "70035",
+        name: "Oak Grove - Northbound",
+        platform_name: "Northbound",
+        location_type: "0"
+      }
+
+      oak_grove_parent = %Stop{
+        id: "place-ogmnl",
+        name: "Oak Grove",
+        location_type: "1",
+        child_stops: [oak_grove_nb, oak_grove_sb]
+      }
+
+      malden_center_sb = %Stop{
+        id: "70034",
+        name: "Malden Center - Southbound",
+        platform_name: "Southbound",
+        location_type: "0"
+      }
+
+      malden_center_nb = %Stop{
+        id: "70033",
+        name: "Malden Center - Northbound",
+        platform_name: "Northbound",
+        location_type: "0"
+      }
+
+      malden_center_parent = %Stop{
+        id: "place-mlmnl",
+        name: "Malden Center",
+        location_type: "1",
+        child_stops: [malden_center_nb, malden_center_sb]
+      }
+
       alerts = [
         %Alert{
           id: "1",
           effect: :station_closure,
-          informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+          informed_entities: [
+            ie(stop: oak_grove_parent, route: "Orange", route_type: 1),
+            ie(stop: oak_grove_sb)
+          ],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :station_closure,
-          informed_entities: [ie(stop: %Stop{id: "place-mlmnl", name: "Malden Center"})],
+          informed_entities: [
+            ie(stop: malden_center_parent),
+            ie(stop: malden_center_nb),
+            ie(stop: malden_center_sb)
+          ],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "3",
           effect: :delay,
           severity: 5,
-          informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+          informed_entities: [ie(stop: oak_grove_parent)],
           active_period: happening_now_active_period
         }
       ]
@@ -118,11 +167,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: ~U[2021-01-01T00:00:00Z],
         happening_now_active_period: happening_now_active_period,
+        malden_center_nb: malden_center_nb,
+        malden_center_sb: malden_center_sb,
+        oak_grove_nb: oak_grove_nb,
+        oak_grove_sb: oak_grove_sb,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
         fetch_directional_alerts_fn: fn _ -> {:ok, directional_alerts} end,
         fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fn _, _, _ -> {:ok, location_context} end,
-        fetch_subway_platforms_for_stop_fn: fn _ -> [] end,
         x_fetch_alerts_fn: fn _ -> :error end,
         x_fetch_stop_name_fn: fn _ -> nil end,
         x_fetch_location_context_fn: fn _, _, _ -> :error end
@@ -137,20 +189,43 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         happening_now_active_period: happening_now_active_period,
         fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fetch_location_context_fn,
-        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
+        oak_grove_sb: oak_grove_sb,
+        oak_grove_nb: oak_grove_nb,
+        malden_center_sb: malden_center_sb,
+        malden_center_nb: malden_center_nb
       } = context
 
       alerts = [
         %Alert{
           id: "1",
           effect: :station_closure,
-          informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+          informed_entities: [
+            ie(
+              stop: %Stop{
+                id: "place-ogmnl",
+                name: "Oak Grove",
+                location_type: "1",
+                child_stops: [oak_grove_sb, oak_grove_nb]
+              }
+            ),
+            ie(stop: oak_grove_sb)
+          ],
           active_period: happening_now_active_period
         },
         %Alert{
           id: "2",
           effect: :station_closure,
-          informed_entities: [ie(stop: %Stop{id: "place-mlmnl", name: "Malden Center"})],
+          informed_entities: [
+            ie(
+              stop: %Stop{
+                id: "place-mlmnl",
+                name: "Malden Center",
+                location_type: "1",
+                child_stops: [malden_center_sb, malden_center_nb]
+              }
+            ),
+            ie(stop: malden_center_sb)
+          ],
           active_period: happening_now_active_period
         },
         %Alert{
@@ -169,8 +244,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         is_terminal_station: true,
-        home_station_name: "Oak Grove",
-        all_platforms_at_informed_stations: []
+        home_station_name: "Oak Grove"
       }
 
       expected_widgets = [
@@ -179,11 +253,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+              informed_entities: [
+                ie(
+                  stop: %Stop{
+                    id: "place-ogmnl",
+                    name: "Oak Grove",
+                    location_type: "1",
+                    child_stops: [oak_grove_sb, oak_grove_nb]
+                  }
+                ),
+                ie(stop: oak_grove_sb)
+              ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            informed_station_names: ["Oak Grove"]
+            informed_station_names: ["Oak Grove"],
+            partial_closure_platform_names: ["Southbound"]
           },
           expected_common_data
         ),
@@ -192,11 +277,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: %Stop{id: "place-mlmnl", name: "Malden Center"})],
+              informed_entities: [
+                ie(
+                  stop: %Stop{
+                    id: "place-mlmnl",
+                    name: "Malden Center",
+                    location_type: "1",
+                    child_stops: [malden_center_sb, malden_center_nb]
+                  }
+                ),
+                ie(stop: malden_center_sb)
+              ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
-            informed_station_names: ["Malden Center"]
+            informed_station_names: ["Malden Center"],
+            partial_closure_platform_names: ["Southbound"]
           },
           expected_common_data
         ),
@@ -222,8 +318,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_alerts_fn,
                  fetch_stop_name_fn,
-                 fetch_location_context_fn,
-                 fetch_subway_platforms_for_stop_fn
+                 fetch_location_context_fn
                )
     end
 
@@ -235,8 +330,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         happening_now_active_period: happening_now_active_period,
         fetch_stop_name_fn: fetch_stop_name_fn,
-        fetch_location_context_fn: fetch_location_context_fn,
-        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
+        fetch_location_context_fn: fetch_location_context_fn
       } = context
 
       alerts = [
@@ -270,8 +364,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         is_terminal_station: true,
-        home_station_name: "Oak Grove",
-        all_platforms_at_informed_stations: []
+        home_station_name: "Oak Grove"
       }
 
       expected_widgets = [
@@ -284,7 +377,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            informed_station_names: ["Malden Center"]
+            informed_station_names: ["Malden Center"],
+            partial_closure_platform_names: []
           },
           expected_common_data
         ),
@@ -312,7 +406,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: %Stop{id: "place-astao", name: "Assembly"})],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_station_names: ["Assembly"]
+            informed_station_names: ["Assembly"],
+            partial_closure_platform_names: []
           },
           expected_common_data
         )
@@ -324,8 +419,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_alerts_fn,
                  fetch_stop_name_fn,
-                 fetch_location_context_fn,
-                 fetch_subway_platforms_for_stop_fn
+                 fetch_location_context_fn
                )
     end
 
@@ -357,8 +451,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         is_terminal_station: true,
-        home_station_name: "Oak Grove",
-        all_platforms_at_informed_stations: []
+        home_station_name: "Oak Grove"
       }
 
       expected_widgets = [
@@ -443,10 +536,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         config: config,
         location_context: location_context,
         now: now,
+        oak_grove_sb: oak_grove_sb,
+        oak_grove_nb: oak_grove_nb,
+        malden_center_sb: malden_center_sb,
+        malden_center_nb: malden_center_nb,
         fetch_location_context_fn: fetch_location_context_fn,
         fetch_alerts_fn: fetch_alerts_fn,
-        x_fetch_stop_name_fn: x_fetch_stop_name_fn,
-        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
+        x_fetch_stop_name_fn: x_fetch_stop_name_fn
       } = context
 
       expected_common_data = %{
@@ -454,7 +550,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         location_context: location_context,
         now: now,
         home_station_name: nil,
-        all_platforms_at_informed_stations: [],
         is_terminal_station: true
       }
 
@@ -464,11 +559,24 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "1",
               effect: :station_closure,
-              informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+              informed_entities: [
+                ie(
+                  stop: %Stop{
+                    id: "place-ogmnl",
+                    name: "Oak Grove",
+                    location_type: "1",
+                    child_stops: [oak_grove_nb, oak_grove_sb]
+                  },
+                  route: "Orange",
+                  route_type: 1
+                ),
+                ie(stop: oak_grove_sb)
+              ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: ["Oak Grove"],
-            is_priority: true
+            is_priority: true,
+            partial_closure_platform_names: ["Southbound"]
           },
           expected_common_data
         ),
@@ -477,10 +585,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: %Stop{id: "place-mlmnl", name: "Malden Center"})],
+              informed_entities: [
+                ie(
+                  stop: %Stop{
+                    id: "place-mlmnl",
+                    name: "Malden Center",
+                    location_type: "1",
+                    child_stops: [malden_center_nb, malden_center_sb]
+                  }
+                ),
+                ie(stop: malden_center_nb),
+                ie(stop: malden_center_sb)
+              ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_station_names: ["Malden Center"]
+            informed_station_names: ["Malden Center"],
+            partial_closure_platform_names: []
           },
           expected_common_data
         ),
@@ -490,7 +610,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               id: "3",
               effect: :delay,
               severity: 5,
-              informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+              informed_entities: [
+                ie(
+                  stop: %Stop{
+                    id: "place-ogmnl",
+                    name: "Oak Grove",
+                    location_type: "1",
+                    child_stops: [oak_grove_nb, oak_grove_sb]
+                  }
+                )
+              ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false
@@ -505,8 +634,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_alerts_fn,
                  x_fetch_stop_name_fn,
-                 fetch_location_context_fn,
-                 fetch_subway_platforms_for_stop_fn
+                 fetch_location_context_fn
                )
     end
 
@@ -526,8 +654,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         is_terminal_station: true,
         is_priority: true,
-        home_station_name: "Oak Grove",
-        all_platforms_at_informed_stations: []
+        home_station_name: "Oak Grove"
       }
 
       expected_widgets = [
@@ -579,7 +706,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         happening_now_active_period: happening_now_active_period,
         fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fetch_location_context_fn,
-        fetch_subway_platforms_for_stop_fn: fetch_subway_platforms_for_stop_fn
+        malden_center_nb: malden_center_nb,
+        malden_center_sb: malden_center_sb
       } = context
 
       alerts = [
@@ -592,7 +720,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         %Alert{
           id: "2",
           effect: :station_closure,
-          informed_entities: [ie(stop: %Stop{id: "place-mlmnl", name: "Malden Center"})],
+          informed_entities: [
+            ie(
+              stop: %Stop{
+                id: "place-mlmnl",
+                name: "Malden Center",
+                location_type: "1",
+                child_stops: [malden_center_sb, malden_center_nb]
+              }
+            ),
+            ie(stop: malden_center_sb)
+          ],
           active_period: happening_now_active_period
         }
       ]
@@ -605,8 +743,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         now: now,
         is_terminal_station: true,
         is_priority: true,
-        home_station_name: "Oak Grove",
-        all_platforms_at_informed_stations: []
+        home_station_name: "Oak Grove"
       }
 
       expected_widgets = [
@@ -615,11 +752,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             alert: %Alert{
               id: "2",
               effect: :station_closure,
-              informed_entities: [ie(stop: %Stop{id: "place-mlmnl", name: "Malden Center"})],
+              informed_entities: [
+                ie(
+                  stop: %Stop{
+                    id: "place-mlmnl",
+                    name: "Malden Center",
+                    location_type: "1",
+                    child_stops: [malden_center_sb, malden_center_nb]
+                  }
+                ),
+                ie(stop: malden_center_sb)
+              ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
-            informed_station_names: ["Malden Center"]
+            informed_station_names: ["Malden Center"],
+            partial_closure_platform_names: ["Southbound"]
           },
           expected_common_data
         )
@@ -631,8 +779,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                  now,
                  fetch_alerts_fn,
                  fetch_stop_name_fn,
-                 fetch_location_context_fn,
-                 fetch_subway_platforms_for_stop_fn
+                 fetch_location_context_fn
                )
     end
   end

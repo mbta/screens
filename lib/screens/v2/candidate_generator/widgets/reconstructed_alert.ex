@@ -54,8 +54,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         now \\ DateTime.utc_now(),
         fetch_alerts_fn \\ &Alert.fetch/1,
         fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
-        fetch_location_context_fn \\ &LocationContext.fetch/3,
-        fetch_subway_platforms_for_stop_fn \\ &Stop.fetch_subway_platforms_for_stop/1
+        fetch_location_context_fn \\ &LocationContext.fetch/3
       ) do
     with {:ok, location_context} <- fetch_location_context_fn.(PreFare, stop_id, now),
          route_ids = LocationContext.route_ids(location_context),
@@ -95,7 +94,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
           |> List.flatten()
           |> Enum.map(fn alert ->
             all_platforms_names_at_informed_station =
-              get_platform_names_at_informed_station(alert, fetch_subway_platforms_for_stop_fn)
+              get_platform_names_at_informed_station(alert)
 
             %ReconstructedAlert{
               screen: config,
@@ -157,19 +156,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp relevance(_alert, _location, _distance), do: nil
 
-  @spec get_platform_names_at_informed_station(Alert.t(), (String.t() -> [Stop.t()])) :: [
-          String.t()
-        ]
+  @spec get_platform_names_at_informed_station(Alert.t()) :: [String.t()]
   defp get_platform_names_at_informed_station(
-         %Alert{effect: :station_closure, informed_entities: informed_entities} = alert,
-         fetch_subway_platforms_for_stop_fn
+         %Alert{effect: :station_closure, informed_entities: informed_entities} = alert
        ) do
     # Given informed entities representing an alert at a single station,
     # finds the corresponding platform names for those child stops included.
     with [informed_parent_station] <- Alert.informed_parent_stations(alert),
-         platforms <- fetch_subway_platforms_for_stop_fn.(informed_parent_station.stop.id),
-         :partial_closure <- Alert.station_closure_type(alert, platforms) do
-      platform_ids = Enum.map(platforms, & &1.id)
+         [_ | _] = child_platforms <- informed_parent_station.stop.child_stops,
+         :partial_closure <- Alert.station_closure_type(alert, child_platforms) do
+      platform_ids = child_platforms |> Enum.map(& &1.id) |> MapSet.new()
 
       informed_entities
       |> Enum.filter(&(&1.stop.id in platform_ids))
@@ -180,7 +176,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     end
   end
 
-  defp get_platform_names_at_informed_station(_, _), do: []
+  defp get_platform_names_at_informed_station(_), do: []
 
   defp build_distance_map(home_stop_id, stop_sequences) do
     Enum.reduce(stop_sequences, %{}, fn stop_sequence, distances_by_stop ->

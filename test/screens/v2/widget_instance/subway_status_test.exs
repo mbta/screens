@@ -11,7 +11,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
   import Screens.TestSupport.InformedEntityBuilder
 
   defp subway_alerts(alerts),
-    do: Enum.map(alerts, &%{alert: &1, context: %{all_platforms_at_informed_stations: []}})
+    do: Enum.map(alerts, &%{alert: &1})
 
   describe "priority/1" do
     test "returns high priority for a flex zone widget" do
@@ -1230,7 +1230,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               informed_entities: [
                 ie(
                   route: "Red",
-                  stop: %Stop{id: "place-portr"},
+                  stop: %Stop{
+                    id: "place-portr",
+                    child_stops: [
+                      %Stop{id: "70065", platform_name: "Ashmont/Braintree", location_type: 0},
+                      %Stop{id: "70066", platform_name: "Alewife", location_type: 0}
+                    ]
+                  },
                   route_type: 1
                 ),
                 ie(
@@ -1238,12 +1244,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                   stop: %Stop{id: "70065", platform_name: "Ashmont/Braintree"},
                   route_type: 1
                 )
-              ]
-            },
-            context: %{
-              all_platforms_at_informed_stations: [
-                %{id: "70065", platform_name: "Ashmont/Braintree"},
-                %{id: "70066", platform_name: "Alewife"}
               ]
             }
           }
@@ -1275,18 +1275,22 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-D", stop: %Stop{id: "place-eliot"}, route_type: 1),
                 ie(
                   route: "Green-D",
-                  stop: %Stop{id: "70166", platform_name: "Park Street & North"},
+                  stop: %Stop{
+                    id: "place-eliot",
+                    child_stops: [
+                      %Stop{id: "70166", platform_name: "Park Street & North", location_type: 0},
+                      %Stop{id: "70167", platform_name: "Riverside", location_type: 0}
+                    ]
+                  },
+                  route_type: 1
+                ),
+                ie(
+                  route: "Green-D",
+                  stop: %Stop{id: "70166", platform_name: "Park Street & North", location_type: 0},
                   route_type: 1
                 )
-              ]
-            },
-            context: %{
-              all_platforms_at_informed_stations: [
-                %{id: "70166", platform_name: "Park Street & North"},
-                %{id: "70167", platform_name: "Riverside"}
               ]
             }
           }
@@ -1312,7 +1316,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     end
 
     test "handles GL partial station closure for multiple branches" do
-      closed_child_stop = %Stop{id: "70201", platform_name: "North Station & North"}
+      closed_child_stop = %Stop{
+        id: "70201",
+        platform_name: "North Station & North",
+        location_type: 0
+      }
+
+      child_stops = [
+        %Stop{id: "70201", platform_name: "North Station & North", location_type: 0},
+        closed_child_stop
+      ]
 
       instance = %SubwayStatus{
         subway_alerts: [
@@ -1320,20 +1333,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-B", stop_id: "place-gover"),
-                ie(route: "Green-C", stop_id: "place-gover"),
-                ie(route: "Green-D", stop_id: "place-gover"),
-                ie(route: "Green-E", stop_id: "place-gover"),
+                ie(route: "Green-B", stop: %Stop{id: "place-gover", child_stops: child_stops}),
+                ie(route: "Green-C", stop: %Stop{id: "place-gover", child_stops: child_stops}),
+                ie(route: "Green-D", stop: %Stop{id: "place-gover", child_stops: child_stops}),
+                ie(route: "Green-E", stop: %Stop{id: "place-gover", child_stops: child_stops}),
                 ie(route: "Green-B", stop: closed_child_stop),
                 ie(route: "Green-C", stop: closed_child_stop),
                 ie(route: "Green-D", stop: closed_child_stop),
                 ie(route: "Green-E", stop: closed_child_stop)
-              ]
-            },
-            context: %{
-              all_platforms_at_informed_stations: [
-                %{id: "70201", platform_name: "North Station & North"},
-                %{id: "70202", platform_name: "Copley & West"}
               ]
             }
           }
@@ -1359,24 +1366,48 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
     end
 
     test "handles single platform closure alert at multiple stops" do
+      porter_to_ashmont_stop = %Stop{
+        id: "70065",
+        platform_name: "Ashmont/Braintree",
+        location_type: 0
+      }
+
+      porter_to_alewife_stop = %Stop{id: "70066", platform_name: "Alewife", location_type: 0}
+
+      davis_to_ashmont_stop = %Stop{
+        id: "70063",
+        platform_name: "Ashmont/Braintree",
+        location_type: 0
+      }
+
+      davis_to_alewife_stop = %Stop{id: "70064", platform_name: "Alewife", location_type: 0}
+
       instance = %SubwayStatus{
         subway_alerts: [
           %{
             alert: %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-portr", route_type: 1),
-                ie(route: "Red", stop_id: "70065", route_type: 1),
-                ie(route: "Red", stop_id: "place-davis", route_type: 1),
-                ie(route: "Red", stop_id: "70063", route_type: 1)
-              ]
-            },
-            context: %{
-              all_platforms_at_informed_stations: [
-                %{id: "70063", platform_name: "Ashmont/Braintree"},
-                %{id: "70064", platform_name: "Alewife"},
-                %{id: "70065", platform_name: "Ashmont/Braintree"},
-                %{id: "70066", platform_name: "Alewife"}
+                ie(
+                  route: "Red",
+                  route_type: 1,
+                  stop: %Stop{
+                    id: "place-portr",
+                    location_type: 1,
+                    child_stops: [porter_to_ashmont_stop, porter_to_alewife_stop]
+                  }
+                ),
+                ie(route: "Red", route_type: 1, stop: porter_to_ashmont_stop),
+                ie(
+                  route: "Red",
+                  route_type: 1,
+                  stop: %Stop{
+                    id: "place-davis",
+                    location_type: 1,
+                    child_stops: [davis_to_ashmont_stop, davis_to_alewife_stop]
+                  }
+                ),
+                ie(route: "Red", route_type: 1, stop: davis_to_ashmont_stop)
               ]
             }
           }
@@ -1411,12 +1442,6 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               informed_entities: [
                 ie(route: "Red", stop_id: "place-portr", route_type: 1),
                 ie(route: "Red", stop_id: "70065", route_type: 1)
-              ]
-            },
-            context: %{
-              all_platforms_at_informed_stations: [
-                %{id: "70065", platform_name: "Ashmont/Braintree"},
-                %{id: "70066", platform_name: "Alewife"}
               ]
             }
           }
@@ -1511,17 +1536,30 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-jfk", route_type: 1),
+                ie(
+                  route: "Red",
+                  route_type: 1,
+                  stop: %Stop{
+                    id: "place-jfk",
+                    child_stops: [
+                      %Stop{id: "70085", platform_name: "Ashmont", location_type: 0},
+                      %Stop{
+                        id: "70086",
+                        platform_name: "Alewife (from Ashmont)",
+                        location_type: 0
+                      },
+                      %Stop{id: "70095", platform_name: "Braintree", location_type: 0},
+                      %Stop{
+                        id: "70096",
+                        platform_name: "Alewife (from Braintree)",
+                        location_type: 0
+                      }
+                    ],
+                    location_type: 1
+                  }
+                ),
                 ie(route: "Red", stop_id: "70085", route_type: 1),
                 ie(route: "Red", stop_id: "70095", route_type: 1)
-              ]
-            },
-            context: %{
-              all_platforms_at_informed_stations: [
-                %{id: "70085", platform_name: "Ashmont"},
-                %{id: "70086", platform_name: "Alewife (from Ashmont)"},
-                %{id: "70095", platform_name: "Braintree"},
-                %{id: "70096", platform_name: "Alewife (from Braintree)"}
               ]
             }
           }
