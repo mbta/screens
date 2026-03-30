@@ -146,7 +146,7 @@ defmodule Screens.Alerts.Alert do
   @type result :: {:ok, [t()]} | :error
   @type fetch :: (options() -> result())
 
-  @base_includes ~w[facilities stops stops.child_stops]
+  @base_includes ~w[facilities stops.child_stops]
   @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops stops]
 
   @callback fetch(options()) :: result()
