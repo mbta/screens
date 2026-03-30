@@ -8,6 +8,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Util
+  alias Screens.Util.Assets
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
@@ -194,7 +195,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(
         %NormalSection{
           rows: rows,
-          header: header,
+          header: %Header{image_path: image_path} = header,
           layout: %Layout{max: max},
           grouping_type: :destination
         },
@@ -218,13 +219,18 @@ defmodule Screens.V2.WidgetInstance.Departures do
           min: 2,
           include_later: false
         }),
-      header: Header.to_json(header),
+      header: Map.put(header, :image_path, Assets.s3_asset_url(image_path)) |> Header.to_json(),
       grouping_type: :destination
     }
   end
 
   def serialize_section(
-        %NormalSection{rows: rows, layout: layout, header: header, grouping_type: grouping_type},
+        %NormalSection{
+          rows: rows,
+          layout: layout,
+          header: %Header{image_path: image_path} = header,
+          grouping_type: grouping_type
+        },
         screen,
         now,
         _is_only_section
@@ -239,7 +245,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :normal_section,
       rows: serialized_rows,
       layout: Layout.to_json(layout),
-      header: Header.to_json(header),
+      header: Map.put(header, :image_path, Assets.s3_asset_url(image_path)) |> Header.to_json(),
       grouping_type: grouping_type
     }
   end

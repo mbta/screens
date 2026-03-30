@@ -5,6 +5,7 @@ import DepartureRow from "./departure_row";
 import NoticeRow from "./notice_row";
 import Header from "./header";
 import LaterDepartures, { MIN_LATER_DEPARTURES } from "./later_departures";
+import { classWithModifier } from "Util/utils";
 
 export type Layout = {
   base: number | null;
@@ -70,6 +71,12 @@ export const NormalSection: ComponentType<FoldedSection> = ({
 
   return (
     <div className="departures-section">
+      <div
+        className={classWithModifier(
+          "departures-section-divider",
+          !header.title && header.image_path ? "only-image-header" : "",
+        )}
+      ></div>
       <Header {...header} />
       {aboveFold.map((row, index) => {
         if (row.type === "departure_row") {
