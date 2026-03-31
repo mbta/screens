@@ -1,4 +1,3 @@
-
 # Script to find connecting routes for stops along a given route pattern.
 # Used to determine which connections should be shown on vehicle screens.
 #
