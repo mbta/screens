@@ -1,6 +1,7 @@
 defmodule Screens.V2.RDSTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Config.Cache
   alias Screens.Headways
   alias Screens.Lines.Line
@@ -16,9 +17,11 @@ defmodule Screens.V2.RDSTest do
   alias ScreensConfig.Departures.{Query, Section}
 
   import Screens.Inject
+  import Screens.TestSupport.InformedEntityBuilder
   import Mox
   setup :verify_on_exit!
 
+  @alert injected(Alert)
   @departure injected(Departure)
   @headways injected(Headways)
   @route_pattern injected(RoutePattern)
@@ -27,6 +30,7 @@ defmodule Screens.V2.RDSTest do
   @config_cache injected(Cache)
 
   setup do
+    stub(@alert, :fetch, fn _ -> {:ok, []} end)
     stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
     stub(@headways, :get, fn _, _ -> nil end)
     stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
@@ -114,36 +118,49 @@ defmodule Screens.V2.RDSTest do
 
     defp stop(id), do: %Stop{id: id, location_type: 0}
 
-    test "creates no service destinations from typical route patterns with no departures" do
-      stop_ids = ~w[s0 s1]
+    # Standard test fixture: 3 route patterns across 2 routes and 2 lines
+    defp standard_route_patterns do
+      [
+        %RoutePattern{
+          id: "A",
+          headsign: "hA",
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+          stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
+        },
+        %RoutePattern{
+          id: "B",
+          headsign: "hB",
+          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+          stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
+        },
+        %RoutePattern{
+          id: "C",
+          headsign: "hC",
+          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+          stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
+        }
+      ]
+    end
 
+    defp expect_standard_stations(stop_ids) do
       expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
         {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
       end)
+    end
+
+    defp expect_standard_route_patterns(stop_ids, patterns \\ nil) do
+      patterns = patterns || standard_route_patterns()
 
       expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
-        {:ok,
-         [
-           %RoutePattern{
-             id: "A",
-             headsign: "hA",
-             route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
-             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
-           },
-           %RoutePattern{
-             id: "B",
-             headsign: "hB",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
-           },
-           %RoutePattern{
-             id: "C",
-             headsign: "hC",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
-           }
-         ]}
+        {:ok, patterns}
       end)
+    end
+
+    test "creates no service destinations from typical route patterns with no departures" do
+      stop_ids = ~w[s0 s1]
+
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
 
       departures = %Departures{
         sections: [
@@ -332,34 +349,8 @@ defmodule Screens.V2.RDSTest do
       }
 
       expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
-
-      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
-        {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
-      end)
-
-      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
-        {:ok,
-         [
-           %RoutePattern{
-             id: "A",
-             headsign: "hA",
-             route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
-             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
-           },
-           %RoutePattern{
-             id: "B",
-             headsign: "hB",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
-           },
-           %RoutePattern{
-             id: "C",
-             headsign: "hC",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
-           }
-         ]}
-      end)
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
 
       assert RDS.get(departures, now) == [
                {:ok,
@@ -409,34 +400,8 @@ defmodule Screens.V2.RDSTest do
       stub(@headways, :get, fn _, _ -> {5, 10} end)
 
       expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
-
-      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
-        {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
-      end)
-
-      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
-        {:ok,
-         [
-           %RoutePattern{
-             id: "A",
-             headsign: "hA",
-             route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
-             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
-           },
-           %RoutePattern{
-             id: "B",
-             headsign: "hB",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
-           },
-           %RoutePattern{
-             id: "C",
-             headsign: "hC",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
-           }
-         ]}
-      end)
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
 
       assert RDS.get(departures, now) == [
                {:ok,
@@ -486,10 +451,108 @@ defmodule Screens.V2.RDSTest do
       stub(@headways, :get, fn _, _ -> {5, 10} end)
 
       expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
 
-      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
-        {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
+      assert RDS.get(departures, now) == [
+               {:ok,
+                [
+                  service_ended("sA", "l1", "hA", first_schedule),
+                  service_ended("sB", "l2", "hB", second_schedule),
+                  service_ended("sC", "l2", "hC", third_schedule)
+                ]}
+             ]
+    end
+
+    test "does not create NoService destinations for those affected by an alert that affects the home stop" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+
+      expect(@alert, :fetch, fn [activities: [:board], stop_id: ["s0", "s1"], include_all?: true] ->
+        {:ok,
+         [
+           %Alert{
+             id: "1",
+             effect: :stop_closure,
+             informed_entities: [ie(stop_id: "s0", route: "r1"), ie(stop_id: "sA", route: "r1")],
+             active_period: [{now, nil}]
+           }
+         ]}
       end)
+
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  countdowns("sA", "l1", "hA", []),
+                  no_service("sB", "l2", "hB"),
+                  no_service("sC", "l2", "hC")
+                ]}
+             ]
+    end
+
+    test "does not create NoService for destinations affected by alert on entire route" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+
+      # Alert affects entire route r1 (no direction_id, no stop)
+      expect(@alert, :fetch, fn [activities: [:board], stop_id: ["s0", "s1"], include_all?: true] ->
+        {:ok,
+         [
+           %Alert{
+             id: "1",
+             effect: :suspension,
+             informed_entities: [ie(route: "r1")],
+             active_period: [{now, nil}]
+           }
+         ]}
+      end)
+
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  countdowns("sA", "l1", "hA", []),
+                  no_service("sB", "l2", "hB"),
+                  no_service("sC", "l2", "hC")
+                ]}
+             ]
+    end
+
+    test "does not create NoService for destinations affected by alert on route in one direction" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+
+      # Alert affects route r2 in direction 0 only
+      expect(@alert, :fetch, fn [activities: [:board], stop_id: ["s0", "s1"], include_all?: true] ->
+        {:ok,
+         [
+           %Alert{
+             id: "1",
+             effect: :shuttle,
+             informed_entities: [ie(route: "r2", direction_id: 0)],
+             active_period: [{now, nil}]
+           }
+         ]}
+      end)
+
+      expect_standard_stations(stop_ids)
 
       expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
         {:ok,
@@ -498,29 +561,112 @@ defmodule Screens.V2.RDSTest do
              id: "A",
              headsign: "hA",
              route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
-             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
+             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}],
+             direction_id: 1
            },
            %RoutePattern{
              id: "B",
              headsign: "hB",
              route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
+             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}],
+             direction_id: 0
            },
            %RoutePattern{
              id: "C",
              headsign: "hC",
              route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
+             stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}],
+             direction_id: 1
            }
          ]}
       end)
 
-      assert RDS.get(departures, now) == [
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      assert RDS.get(departures) == [
                {:ok,
                 [
-                  service_ended("sA", "l1", "hA", first_schedule),
-                  service_ended("sB", "l2", "hB", second_schedule),
-                  service_ended("sC", "l2", "hC", third_schedule)
+                  no_service("sA", "l1", "hA"),
+                  countdowns("sB", "l2", "hB", []),
+                  no_service("sC", "l2", "hC")
+                ]}
+             ]
+    end
+
+    test "does not create NoService for destinations affected by alert on route type" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+
+      # Alert affects all bus routes (route_type 3)
+      expect(@alert, :fetch, fn [activities: [:board], stop_id: ["s0", "s1"], include_all?: true] ->
+        {:ok,
+         [
+           %Alert{
+             id: "1",
+             effect: :detour,
+             informed_entities: [ie(route_type: 3)],
+             active_period: [{now, nil}]
+           }
+         ]}
+      end)
+
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      # All destinations are affected since the alert targets the entire bus route type
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  countdowns("sA", "l1", "hA", []),
+                  countdowns("sB", "l2", "hB", []),
+                  countdowns("sC", "l2", "hC", [])
+                ]}
+             ]
+    end
+
+    test "creates NoService for destinations not affected by alerts" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+
+      # Alert that affects another route type, another route, and another stop
+      # None of the destinations should be affected
+      expect(@alert, :fetch, fn [activities: [:board], stop_id: ["s0", "s1"], include_all?: true] ->
+        {:ok,
+         [
+           %Alert{
+             id: "1",
+             effect: :detour,
+             informed_entities: [ie(route: 4), ie(route: "otherRoute"), ie(stop_id: "otherStop")],
+             active_period: [{now, nil}]
+           }
+         ]}
+      end)
+
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  no_service("sA", "l1", "hA"),
+                  no_service("sB", "l2", "hB"),
+                  no_service("sC", "l2", "hC")
                 ]}
              ]
     end

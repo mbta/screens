@@ -2,6 +2,7 @@ import type { ComponentType } from "react";
 
 import { useCurrentPage } from "Context/dup_page";
 import MoonIcon from "Images/moon.svg";
+import LiveDataSvg from "Images/live-data-small.svg";
 import { classWithModifier, classWithModifiers } from "Util/utils";
 
 type DepartureTime =
@@ -59,14 +60,27 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
 interface Props {
   time?: DepartureTime;
   scheduled_time?: DepartureTime;
+  is_live: boolean;
 }
 
-const DepartureTime: ComponentType<Props> = ({ time, scheduled_time }) => {
+const DepartureTime: ComponentType<Props> = ({
+  time,
+  scheduled_time,
+  is_live: isLive,
+}) => {
   const currentPage = useCurrentPage();
-
   if (time && (currentPage === 0 || !scheduled_time)) {
     return (
       <div className={classWithModifier("departure-time", time.type)}>
+        {showLiveIcon(isLive, time.type, currentPage) && (
+          <LiveDataSvg
+            color="gray"
+            width="36"
+            height="36"
+            viewBox="0 0 32 32"
+            className="departure-time__live-icon"
+          />
+        )}
         <DepartureTimePart currentPage={currentPage} time={time} />
       </div>
     );
@@ -85,5 +99,11 @@ const DepartureTime: ComponentType<Props> = ({ time, scheduled_time }) => {
     throw new Error("DepartureTime has neither time nor scheduled_time");
   }
 };
+
+const showLiveIcon = (
+  isLiveData: boolean,
+  timeType: string,
+  currentPage: number,
+) => isLiveData && (currentPage === 0 || timeType !== "status");
 
 export default DepartureTime;

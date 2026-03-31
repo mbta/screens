@@ -850,7 +850,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         id: nil,
         crowding: nil,
         time: %{text: "Now", type: :text},
-        time_in_epoch: DateTime.to_unix(departure_time)
+        time_in_epoch: DateTime.to_unix(departure_time),
+        is_live: false
       }
 
       serialized_now = [now_timestamp]
@@ -1168,6 +1169,44 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert [%{time: %{type: :minutes}}] =
                Departures.serialize_times_with_crowding([departure], bus_shelter_screen, now)
+    end
+
+    test "is not live data for scheduled rail", %{dup_screen: screen} do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      departure = %Departure{
+        schedule: %Schedule{
+          arrival_time: nil,
+          departure_time: ~U[2020-01-01T00:00:15Z],
+          route: %Route{type: :rail},
+          stop: %Stop{}
+        }
+      }
+
+      assert [%{time: %{type: :timestamp, am_pm: nil, hour: 7, minute: 0}, is_live: false}] =
+               Departures.serialize_times_with_crowding([departure], screen, now)
+    end
+
+    test "is live data for rail that has predictions and scheduled data", %{dup_screen: screen} do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      departure = %Departure{
+        prediction: %Prediction{
+          arrival_time: ~U[2020-01-01T02:20:00Z],
+          departure_time: ~U[2020-01-01T02:20:00Z],
+          route: %Route{type: :rail},
+          stop: %Stop{}
+        },
+        schedule: %Schedule{
+          arrival_time: ~U[2020-01-01T02:20:00Z],
+          departure_time: ~U[2020-01-01T02:20:00Z],
+          route: %Route{type: :rail},
+          stop: %Stop{}
+        }
+      }
+
+      assert [%{is_live: true}] =
+               Departures.serialize_times_with_crowding([departure], screen, now)
     end
   end
 
