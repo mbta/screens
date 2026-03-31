@@ -34,7 +34,7 @@ route_patterns = [
 
 defmodule RouteConnections do
  def calculate(route_pattern_id, service_date) do
- 
+
   api_v3_key = System.get_env("API_V3_KEY")
   headers = [{"x-api-key", api_v3_key}]
 
@@ -131,6 +131,15 @@ defmodule RouteConnections do
       {String.to_atom(station_id), connecting_routes}
     end)
   end
+
+  def print_routes_by_station(route, routes_by_station) do
+    IO.puts("#{route}: [")
+    routes_by_station
+    |> Enum.map(fn {station_id, routes} ->
+      IO.puts("\t#{station_id}: [#{Enum.join(routes, ", ")}]")
+    end)
+    IO.puts("]")
+  end
 end
 
 if single_route_pattern == nil do
@@ -138,15 +147,12 @@ if single_route_pattern == nil do
   |> Enum.each(fn route ->
     IO.puts("Calculating connections for: #{route}")
     routes_by_station = RouteConnections.calculate(route, service_date)
-    IO.puts(routes_by_station, width: 240)
-
+    RouteConnections.print_routes_by_station(route, routes_by_station)
     # To avoid getting rate limited
     :timer.sleep(1000)
   end)
 else
   IO.puts("Calculating connections for: #{single_route_pattern}")
   routes_by_station = RouteConnections.calculate(single_route_pattern, service_date)
-  IO.puts(routes_by_station, width: 240)
+  RouteConnections.print_routes_by_station(single_route_pattern, routes_by_station)
 end
-
-
