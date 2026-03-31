@@ -2,14 +2,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
   @moduledoc false
 
   alias Screens.Alerts.Alert
-  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
 
-  def subway_status_instances(
-        config,
-        now \\ DateTime.utc_now(),
-        fetch_subway_platforms_for_stop_fn \\ &Stop.fetch_subway_platforms_for_stop/1
-      ) do
+  def subway_status_instances(config, now \\ DateTime.utc_now()) do
     route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E", "Mattapan"]
 
     {:ok, alerts} = Screens.Alerts.Alert.fetch(route_ids: route_ids)
@@ -18,7 +13,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
       alerts
       |> Enum.filter(&(relevant_alert?(&1) and Alert.happening_now?(&1, now)))
       |> Alert.consolidate_whole_route_delays()
-      |> Enum.map(&append_context(&1, fetch_subway_platforms_for_stop_fn))
+      |> Enum.map(&%SubwayStatus.SubwayStatusAlert{alert: &1})
 
     [%SubwayStatus{screen: config, subway_alerts: relevant_alerts}]
   end
@@ -35,21 +30,4 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
        do: true
 
   defp relevant_alert?(%Alert{}), do: false
-
-  defp append_context(
-         %Alert{effect: :station_closure} = alert,
-         fetch_subway_platforms_for_stop_fn
-       ) do
-    informed_parent_stations = Alert.informed_parent_stations(alert)
-
-    all_platforms_at_informed_stations =
-      Enum.flat_map(informed_parent_stations, &fetch_subway_platforms_for_stop_fn.(&1.stop.id))
-
-    %SubwayStatus.SubwayStatusAlert{
-      alert: alert,
-      context: %{all_platforms_at_informed_stations: all_platforms_at_informed_stations}
-    }
-  end
-
-  defp append_context(alert, _), do: struct(SubwayStatus.SubwayStatusAlert, alert: alert)
 end

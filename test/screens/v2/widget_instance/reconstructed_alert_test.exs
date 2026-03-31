@@ -3031,16 +3031,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          }}
       end
 
-      fetch_subway_platforms_for_stop_fn = fn _ -> [] end
-
       alert_widget =
         config
         |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           now,
           fetch_alerts_fn,
           fetch_stop_name_fn,
-          fetch_location_context_fn,
-          fetch_subway_platforms_for_stop_fn
+          fetch_location_context_fn
         )
         |> List.first()
 
@@ -3231,16 +3228,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
          }}
       end
 
-      fetch_subway_platforms_for_stop_fn = fn _ -> [] end
-
       alert_widget =
         config
         |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
           now,
           fetch_alerts_fn,
           fetch_stop_name_fn,
-          fetch_location_context_fn,
-          fetch_subway_platforms_for_stop_fn
+          fetch_location_context_fn
         )
         |> List.first()
 

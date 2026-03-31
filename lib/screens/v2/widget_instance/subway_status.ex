@@ -14,16 +14,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus do
     @moduledoc false
 
     @type t :: %__MODULE__{
-            alert: Alert.t(),
-            context: context()
+            alert: Alert.t()
           }
 
     @enforce_keys [:alert]
-    defstruct @enforce_keys ++ [context: %{}]
-
-    @type context :: %{
-            optional(:all_platforms_at_informed_stations) => list(String.t())
-          }
+    defstruct @enforce_keys
   end
 
   defstruct screen: nil,
