@@ -35,11 +35,11 @@ path
 
     {
       id,
-      Jason.OrderedObject.new([
+      Jason.OrderedObject.new(
         alternate_ids: alternate_ids,
         category: category |> String.trim() |> String.to_integer(),
         summary: if(summary == "", do: nil, else: summary)
-      ])
+      )
     }
 end)
 |> Enum.reject(&is_nil/1)

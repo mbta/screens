@@ -17,11 +17,13 @@
 # To prevent info logs from the application
 Logger.configure(level: :warning)
 
-{opts, _, _ } =
+{opts, _, _} =
   System.argv()
   |> OptionParser.parse(strict: [service_date: :string, route_pattern: :string])
+
 service_date = Keyword.get(opts, :service_date)
 single_route_pattern = Keyword.get(opts, :route_pattern)
+
 route_patterns = [
   "Red-3-0",
   "Red-1-0",
@@ -29,96 +31,109 @@ route_patterns = [
   "Green-B-812-0",
   "Green-C-832-0",
   "Green-D-855-0",
-  "Green-E-886-0",
+  "Green-E-886-0"
 ]
 
 defmodule RouteConnections do
- def calculate(route_pattern_id, service_date) do
- 
-  api_v3_key = System.get_env("API_V3_KEY")
-  headers = [{"x-api-key", api_v3_key}]
+  def calculate(route_pattern_id, service_date) do
+    api_v3_key = System.get_env("API_V3_KEY")
+    headers = [{"x-api-key", api_v3_key}]
 
-  {:ok, %{status_code: 200, body: body}} = HTTPoison.get("https://api-v3.mbta.com/trips?filter[route_pattern]=#{route_pattern_id}&filter[date]=#{service_date}&include=stops.parent_station.connecting_stops,stops.parent_station.child_stops", headers)
-  {:ok, parsed} = Jason.decode(body)
+    {:ok, %{status_code: 200, body: body}} =
+      HTTPoison.get(
+        "https://api-v3.mbta.com/trips?filter[route_pattern]=#{route_pattern_id}&filter[date]=#{service_date}&include=stops.parent_station.connecting_stops,stops.parent_station.child_stops",
+        headers
+      )
 
-  %{"included" => included} = parsed
+    {:ok, parsed} = Jason.decode(body)
 
-  included_stops =
-    included
-    |> Enum.filter(fn %{"type" => type} -> type == "stop" end)
-    |> Enum.map(fn %{"id" => id} = stop -> {id, stop} end)
-    |> Enum.into(%{})
+    %{"included" => included} = parsed
 
-  route_pattern_station_ids =
-    included
-    |> Enum.filter(fn %{"relationships" => relationships} -> Map.has_key?(relationships, "connecting_stops") end)
-    |> Enum.map(fn %{"id" => id} -> id end)
+    included_stops =
+      included
+      |> Enum.filter(fn %{"type" => type} -> type == "stop" end)
+      |> Enum.map(fn %{"id" => id} = stop -> {id, stop} end)
+      |> Enum.into(%{})
 
-  # This bit makes sense for us: we need all the routes for all stops at this station
-  # including child stops and nearby stops (called connecting stops)
-  transfer_stops_by_station = Enum.map(route_pattern_station_ids, fn station_id ->
-    station = Map.get(included_stops, station_id)
-
-    connecting_stop_ids =
-      station
-      |> Kernel.get_in(["relationships", "connecting_stops", "data"])
+    route_pattern_station_ids =
+      included
+      |> Enum.filter(fn %{"relationships" => relationships} ->
+        Map.has_key?(relationships, "connecting_stops")
+      end)
       |> Enum.map(fn %{"id" => id} -> id end)
 
-    child_stop_ids =
-      station
-      |> Kernel.get_in(["relationships", "child_stops", "data"])
-      |> Enum.map(fn %{"id" => id} -> id end)
+    # This bit makes sense for us: we need all the routes for all stops at this station
+    # including child stops and nearby stops (called connecting stops)
+    transfer_stops_by_station =
+      Enum.map(route_pattern_station_ids, fn station_id ->
+        station = Map.get(included_stops, station_id)
 
-    connecting_stops =
-      connecting_stop_ids
-      |> Enum.map(&Map.get(included_stops, &1))
-      |> Enum.filter(fn stop -> Kernel.get_in(stop, ["attributes", "location_type"]) == 0 end)
+        connecting_stop_ids =
+          station
+          |> Kernel.get_in(["relationships", "connecting_stops", "data"])
+          |> Enum.map(fn %{"id" => id} -> id end)
 
-    child_stops =
-      child_stop_ids
-      |> Enum.map(&Map.get(included_stops, &1))
-      |> Enum.filter(fn stop -> Kernel.get_in(stop, ["attributes", "location_type"]) == 0 end)
+        child_stop_ids =
+          station
+          |> Kernel.get_in(["relationships", "child_stops", "data"])
+          |> Enum.map(fn %{"id" => id} -> id end)
 
-    stops = connecting_stops ++ child_stops
-    {station_id, Enum.map(stops, fn %{"id" => id} -> id end)}
-  end)
-  |> Enum.sort()
+        connecting_stops =
+          connecting_stop_ids
+          |> Enum.map(&Map.get(included_stops, &1))
+          |> Enum.filter(fn stop -> Kernel.get_in(stop, ["attributes", "location_type"]) == 0 end)
 
-  transfer_stop_list = Enum.flat_map(transfer_stops_by_station, fn {_station_id, stops} -> stops end)
+        child_stops =
+          child_stop_ids
+          |> Enum.map(&Map.get(included_stops, &1))
+          |> Enum.filter(fn stop -> Kernel.get_in(stop, ["attributes", "location_type"]) == 0 end)
 
-  get_typical_routes = fn (stop) ->
-    url = "https://api-v3.mbta.com/route_patterns?filter[stop]=#{URI.encode(stop)}"
-    headers = [{"x-api-key", api_v3_key}]
-    {:ok, %{status_code: 200, body: body}} = HTTPoison.get(url, headers)
-    {:ok, %{"data" => route_patterns_data}} = Jason.decode(body)
+        stops = connecting_stops ++ child_stops
+        {station_id, Enum.map(stops, fn %{"id" => id} -> id end)}
+      end)
+      |> Enum.sort()
 
-    routes =
-      route_patterns_data
-      |> Enum.filter(fn route_pattern -> Kernel.get_in(route_pattern, ["attributes", "typicality"]) < 3 end)
-      |> Enum.map(fn route_pattern -> Kernel.get_in(route_pattern, ["relationships", "route", "data", "id"]) end)
-      |> Enum.uniq()
+    transfer_stop_list =
+      Enum.flat_map(transfer_stops_by_station, fn {_station_id, stops} -> stops end)
 
-    {stop, routes}
-  end
+    get_typical_routes = fn stop ->
+      url = "https://api-v3.mbta.com/route_patterns?filter[stop]=#{URI.encode(stop)}"
+      headers = [{"x-api-key", api_v3_key}]
+      {:ok, %{status_code: 200, body: body}} = HTTPoison.get(url, headers)
+      {:ok, %{"data" => route_patterns_data}} = Jason.decode(body)
 
-  fetch_all_routes = fn ->
-    url = "https://api-v3.mbta.com/routes?filter[listed_route]=true"
-    headers = [{"x-api-key", api_v3_key}]
-    {:ok, %{status_code: 200, body: body}} = HTTPoison.get(url, headers)
-    {:ok, %{"data" => routes_data}} = Jason.decode(body)
+      routes =
+        route_patterns_data
+        |> Enum.filter(fn route_pattern ->
+          Kernel.get_in(route_pattern, ["attributes", "typicality"]) < 3
+        end)
+        |> Enum.map(fn route_pattern ->
+          Kernel.get_in(route_pattern, ["relationships", "route", "data", "id"])
+        end)
+        |> Enum.uniq()
 
-    routes_data
-    |> Enum.map(fn %{"id" => id} = route -> {id, route} end)
-    |> Enum.into(%{})
-  end
+      {stop, routes}
+    end
 
-  all_routes_by_id = fetch_all_routes.()
+    fetch_all_routes = fn ->
+      url = "https://api-v3.mbta.com/routes?filter[listed_route]=true"
+      headers = [{"x-api-key", api_v3_key}]
+      {:ok, %{status_code: 200, body: body}} = HTTPoison.get(url, headers)
+      {:ok, %{"data" => routes_data}} = Jason.decode(body)
 
-  routes_by_stop = transfer_stop_list
-    |> Enum.map(&get_typical_routes.(&1))
-    |> Enum.into(%{})
+      routes_data
+      |> Enum.map(fn %{"id" => id} = route -> {id, route} end)
+      |> Enum.into(%{})
+    end
 
-  transfer_stops_by_station
+    all_routes_by_id = fetch_all_routes.()
+
+    routes_by_stop =
+      transfer_stop_list
+      |> Enum.map(&get_typical_routes.(&1))
+      |> Enum.into(%{})
+
+    transfer_stops_by_station
     |> Enum.map(fn {station_id, stop_ids} ->
       connecting_routes =
         stop_ids
@@ -131,6 +146,17 @@ defmodule RouteConnections do
       {String.to_atom(station_id), connecting_routes}
     end)
   end
+
+  def print_routes_by_station(route, routes_by_station) do
+    IO.puts("#{route}: [")
+
+    routes_by_station
+    |> Enum.map(fn {station_id, routes} ->
+      IO.puts("\t#{station_id}: [#{Enum.join(routes, ", ")}]")
+    end)
+
+    IO.puts("]")
+  end
 end
 
 if single_route_pattern == nil do
@@ -138,15 +164,12 @@ if single_route_pattern == nil do
   |> Enum.each(fn route ->
     IO.puts("Calculating connections for: #{route}")
     routes_by_station = RouteConnections.calculate(route, service_date)
-    IO.puts(routes_by_station, width: 240)
-
+    RouteConnections.print_routes_by_station(route, routes_by_station)
     # To avoid getting rate limited
     :timer.sleep(1000)
   end)
 else
   IO.puts("Calculating connections for: #{single_route_pattern}")
   routes_by_station = RouteConnections.calculate(single_route_pattern, service_date)
-  IO.puts(routes_by_station, width: 240)
+  RouteConnections.print_routes_by_station(single_route_pattern, routes_by_station)
 end
-
-
