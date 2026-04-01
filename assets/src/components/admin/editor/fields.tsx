@@ -101,7 +101,7 @@ const inOutField: Field = {
   path: "app_params.in_out",
   cell: buildSelectInput([null, "inside", "outside"]),
   filter: buildSelectFilter(["inside", "outside"]),
-}
+};
 
 /**
  * The fields used when editing "all" screens (across multiple App IDs).

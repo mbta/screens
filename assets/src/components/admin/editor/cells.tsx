@@ -46,8 +46,20 @@ export const buildSelectInput =
   ({ value, update }) => {
     const selectValue = (value as string | null) ?? undefined;
 
+    // Min-width based on longest dropdown option + 2 chars for the dropdown arrow
+    const stringOpts = options.map((opt) => opt ?? "");
+    const longestOpt = stringOpts.reduce(
+      (a, b) => (a.length > b.length ? a : b),
+      "",
+    );
+    const minWidth = `${longestOpt.length + 2}ch`;
+
     return (
-      <select onChange={(e) => update(e.target.value)} value={selectValue}>
+      <select
+        onChange={(e) => update(e.target.value)}
+        value={selectValue}
+        style={{ "--select-min-width": minWidth } as React.CSSProperties}
+      >
         {options.map((opt) => (
           <option key={opt} value={opt ?? undefined}>
             {opt}

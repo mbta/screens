@@ -95,6 +95,10 @@
       border: 0;
     }
 
+    select {
+      min-width: var(--select-min-width, auto);
+    }
+
     input[type="number"] {
       appearance: textfield;
     }
