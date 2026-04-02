@@ -2,7 +2,7 @@
 
 - Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the DUP-relevant routes). It should already be configured in [the API controller](/lib/screens_web/controllers/v2/screen_api_controller.ex) -- if it is, you don't need to do anything for this step.
 - Double check that any behavior specific to the DUP screen environment happens inside of an `isDup()` check. This includes:
-[//]: # TODO(NOW): Remove this comment after I ask the team about these 1) linking these file paths and updating their content. Note that use_api_response.tsx is referred to further in the doc as well
+  [//]: # TODO(NOW): Remove this comment after I ask the team about these 1) linking these file paths and updating their content. Note that use_api_response.tsx is referred to further in the doc as well
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
 
