@@ -1,6 +1,8 @@
 @use "CSS/colors";
 
 .departures-section {
+  background-color: colors.$warm-neutral-95;
+
   & > .departure-row:not(:last-child)::after {
     position: absolute;
     bottom: 0;
@@ -16,5 +18,22 @@
     left: 0;
     width: 100%;
     background-color: colors.$true-grey-70;
+  }
+
+  .departures-section-divider {
+    border-top: 4px solid colors.$true-grey-70;
+  }
+
+  &:not(:first-child) {
+    & > .departures-section-divider--only-image-header {
+      height: 24px;
+      background-color: colors.$warm-neutral-80;
+    }
+  }
+}
+
+.departures-section:first-child {
+  & > .departures-section-divider {
+    border: none;
   }
 }
