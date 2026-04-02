@@ -96,6 +96,13 @@ const headerField: Field = {
   ...filteredJson,
 };
 
+const emergencyMessagingLocationField: Field = {
+  label: "In/Out?",
+  path: "app_params.emergency_messaging_location",
+  cell: buildSelectInput([null, "inside", "outside"]),
+  filter: buildSelectFilter(["inside", "outside"]),
+};
+
 /**
  * The fields used when editing "all" screens (across multiple App IDs).
  */
@@ -151,6 +158,7 @@ export const APP_FIELDS: { [key in AppId]: Field[] } = {
 
   busway_v2: [
     ...baseFields,
+    emergencyMessagingLocationField,
     evergreenField,
     {
       label: "Logo?",
@@ -163,6 +171,7 @@ export const APP_FIELDS: { [key in AppId]: Field[] } = {
 
   dup_v2: [
     ...baseFields,
+    emergencyMessagingLocationField,
     evergreenField,
     headerField,
     alertsField,
@@ -206,6 +215,7 @@ export const APP_FIELDS: { [key in AppId]: Field[] } = {
       cell: buildSelectInput(["duo", "solo"]),
       filter: buildSelectFilter(["duo", "solo"]),
     },
+    emergencyMessagingLocationField,
     evergreenField,
     headerField,
     departuresField,
