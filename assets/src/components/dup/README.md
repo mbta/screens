@@ -1,7 +1,8 @@
 # DUP app packaging
 
-- Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the DUP-relevant routes). It should already be configured at [this line](/lib/screens_web/controllers/v2/screen_api_controller.ex#L9) in the API controller--if it is, you don't need to do anything for this step.
+- Ensure [Corsica](https://hexdocs.pm/corsica/Corsica.html) is used on the server to allow CORS requests (ideally limited to just the DUP-relevant routes). It should already be configured in [the API controller](/lib/screens_web/controllers/v2/screen_api_controller.ex) -- if it is, you don't need to do anything for this step.
 - Double check that any behavior specific to the DUP screen environment happens inside of an `isDup()` check. This includes:
+[//]: # TODO(NOW): Remove this comment after I ask the team about these 1) linking these file paths and updating their content. Note that use_api_response.tsx is referred to further in the doc as well
   - `buildApiPath` in use_api_response.tsx should return a full URL for the API path: prefix `apiPath` string with "https://screens.mbta.com".
   - `imagePath` in util.tsx should return relative paths (no leading `/`).
 
@@ -13,7 +14,7 @@
 - To test the created package locally or in Browserstack, you need to add any query param with key `test` to the `index.html`, such as `index.html?test=`.
   - Setting this query param sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
   - You can also set `playerName` and `station` within the URL params to change which screen is emulated.
-  - If you are testing multiple iterations locally and don't want to add the URL params with each rebuild of the package, temporarily modify the if statment and/or defaults within `outfront.tsx`'s `initFakeMRAID` function. Just make sure to remove before sending client packages to Outfront to test.
+  - If you are testing multiple iterations locally and don't want to add the URL params with each rebuild of the package, temporarily modify the if statement and/or defaults within `outfront.tsx`'s `initFakeMRAID` function. Just make sure to remove before sending client packages to Outfront to test.
 - When testing is complete, commit the version bump on a branch, push it, and create a PR to mark the deploy.
 
 ## Working with Outfront
