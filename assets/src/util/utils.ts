@@ -59,6 +59,9 @@ const isScreenSide = (value: any): value is ScreenSide => {
  * - `duo`: show both sides of a duo screen.
  * - `solo`: show "the only side" of a solo screen.
  */
+
+export const IMAGE_EXTENSIONS = ["png", "jpg", "jpeg", "svg", "gif", "webp"];
+
 export const getScreenSide = (): ScreenSide | null => {
   const screenSide = getDatasetValue("screenSide");
   return isScreenSide(screenSide) ? screenSide : null;
@@ -68,3 +71,8 @@ export const firstWord = (str: string): string => str.split(" ")[0];
 
 export const formatCause = (cause: string) =>
   (cause.charAt(0).toUpperCase() + cause.substring(1)).replace("_", " ");
+
+export const extensionForAsset = (assetPath: string) => {
+  const parts = assetPath.split(".");
+  return parts[parts.length - 1].toLowerCase();
+};

@@ -2,12 +2,14 @@ import cx from "classnames";
 import { type JSX } from "react";
 
 import Arrow45 from "Images/arrow-45.svg";
+import { IMAGE_EXTENSIONS, extensionForAsset } from "Util/utils";
 
 type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 
 type Header = {
   title: string | null;
   arrow: CardinalDirection | null;
+  image_path: string | null;
   subtitle: string | null;
 };
 
@@ -25,13 +27,18 @@ const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
   />
 );
 
-const Header = ({ title, arrow, subtitle }: Header) => {
+const Header = ({ title, arrow, subtitle, image_path: imagePath }: Header) => {
   return (
     <>
       <header className="departures-header">
         {(title || arrow) && <span>{title}</span>}
         {arrow && <DirectionArrow arrow={arrow} />}
       </header>
+      {imagePath && IMAGE_EXTENSIONS.includes(extensionForAsset(imagePath)) && (
+        <div className="departures-header__image-container">
+          <img className="departures-header__image" src={imagePath} />
+        </div>
+      )}
       {subtitle && (
         <div className="departures-header__subtitle">
           {formatSubtitle(subtitle)}

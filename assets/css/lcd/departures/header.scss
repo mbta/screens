@@ -9,10 +9,6 @@
   align-items: center;
   justify-content: space-between;
   white-space: pre-line;
-}
-
-.departures-section:first-of-type .departures-header:empty {
-  height: 8px;
   border: none;
 }
 
@@ -32,4 +28,8 @@
   margin: 0 32px;
   content: "";
   background-color: colors.$true-grey-70;
+}
+
+.departures-header__image {
+  vertical-align: middle;
 }
