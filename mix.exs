@@ -82,7 +82,7 @@ defmodule Screens.MixProject do
       {:retry, "~> 0.19.0"},
       # {:screens_config, path: "../screens-config-lib"},
       {:screens_config,
-       github: "mbta/screens-config-lib", ref: "1eb134a87a04c39717d75968017e5efb7b0bfd39"},
+       github: "mbta/screens-config-lib", ref: "0af19d693767423046b34a2de283c121d1c6cf12"},
       {:sentry, "~> 12.0.3"},
       {:sweet_xml, "~> 0.7.0"},
       {:telemetry, "~> 1.2"},
