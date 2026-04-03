@@ -42,6 +42,7 @@ defmodule Screens.Alerts.Alert do
           | :disabled_bus
           | :disabled_train
           | :drawbridge_being_raised
+          | :drawbridge_issue
           | :electrical_work
           | :fire
           | :fire_department_activity
@@ -290,6 +291,7 @@ defmodule Screens.Alerts.Alert do
     disabled_bus: :a,
     disabled_train: :a,
     drawbridge_being_raised: :a,
+    drawbridge_issue: :a,
     electrical_work: nil,
     fire: :a,
     fire_department_activity: nil,

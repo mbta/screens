@@ -100,6 +100,7 @@ defmodule Screens.Alerts.Parser do
     "DISABLED_BUS" => :disabled_bus,
     "DISABLED_TRAIN" => :disabled_train,
     "DRAWBRIDGE_BEING_RAISED" => :drawbridge_being_raised,
+    "DRAWBRIDGE_ISSUE" => :drawbridge_issue,
     "ELECTRICAL_WORK" => :electrical_work,
     "FIRE" => :fire,
     "FIRE_DEPARTMENT_ACTIVITY" => :fire_department_activity,
