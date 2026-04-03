@@ -31,7 +31,7 @@ Check out [ARCHITECTURE.md](/ARCHITECTURE.md) for an overview of the application
 
 The DUP screens require the client app to be packaged into a single HTML file rather than dynamically served from our Phoenix server.
 
-You can find instructions on the DUP packaging process [here](assets/src/components/v2/dup/README.md).
+You can find instructions on the DUP packaging process [here](assets/src/components/dup/README.md).
 
 ## Version upgrade guide
 

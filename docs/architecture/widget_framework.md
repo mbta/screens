@@ -31,7 +31,7 @@ See the [`WidgetInstance` protocol](/lib/screens/v2/widget_instance.ex)'s inline
 ## Request data flow / how the framework logic works
 
 Screens team members can see this as a [flowchart in Miro](https://miro.com/app/board/o9J_lDRaax4=/).
-The module where most of this logic lives is [`Screens.V2.ScreenData`](/lib/screens/screen_data.ex), starting with `by_screen_id/2`.
+The module where most of this logic lives is [`Screens.V2.ScreenData`](/lib/screens/v2/screen_data.ex), starting with `by_screen_id/2`.
 
 1. Client requests `/v2/api/screen/{id}`. Subsequent steps take place on the server.
 1. We get the config stored under `id` in the screen configuration file. The file lives in S3 and the Screens application caches its contents locally in an [ETS Table](/lib/screens/config/cache.ex).
