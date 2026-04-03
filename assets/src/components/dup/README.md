@@ -5,7 +5,7 @@
   - `useApiPath` in [`use_api_response.ts`][use_api_response.ts] should return a full URL for the API path: the URL base should be "https://screens.mbta.com".
   - `imagePath` in [`util.ts`][util.ts] should return relative paths (no leading `/`).
 
-- Set the version string in [`version.tsx`][version.tsx]. Refer to this file's JSDoc for instructions on how to set the version string value.
+- Set the version string in [`version.ts`][version.ts]. Refer to this file's JSDoc for instructions on how to set the version string value.
 - If you've renamed / removed image assets, you might want to delete the corresponding folder in `/priv/static`. The folder accumulates assets without clearing old ones out, and these will be included in the built bundle!
 - **Only if you are packaging for local testing:** To test against your local screens backend instead of production, then replace the definition of `OUTFRONT_BASE_URI` in [`use_api_response.ts`][use_api_response.ts] with `"http://localhost:4000"`.
 - `cd` to `scripts` and run the following shell script: `sh build_dup_client_package.sh`
@@ -71,6 +71,6 @@ console.log = function (...msgs) {
 ```
 
 [outfront.tsx]: /assets/src/util/outfront.tsx
-[version.tsx]: /assets/src/components/dup/version.tsx
+[version.ts]: /assets/src/components/dup/version.ts
 [use_api_response.ts]: /assets/src/hooks/use_api_response.ts
 [util.ts]: /assets/src/util/utils.ts
