@@ -22,12 +22,14 @@
   white-space: pre-line;
 }
 
-.departures-header__subtitle + .departure-row::before {
-  display: block;
-  height: 4px;
+.departures-header__separator {
   margin: 0 32px;
-  content: "";
-  background-color: colors.$true-grey-70;
+  border: 0;
+  border-bottom: 4px solid colors.$true-grey-70;
+}
+
+.departures-header + .departures-header__separator {
+  display: none;
 }
 
 .departures-header__image {
