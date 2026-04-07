@@ -166,9 +166,9 @@ defmodule Screens.V2.ScreenData do
     end
   end
 
-  def update_visible_alerts(_, _, %Screen{hidden_from_screenplay: true}, _opts), do: :ok
+  defp update_visible_alerts(_, %Screen{hidden_from_screenplay: true}, _opts), do: :ok
 
-  def update_visible_alerts({_layout, instance_map}, _screen, opts) do
+  defp update_visible_alerts({_layout, instance_map}, _screen, opts) do
     screen_id = Keyword.get(opts, :update_visible_alerts_for_screen_id, nil)
 
     if not is_nil(screen_id) do
