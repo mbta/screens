@@ -44,6 +44,7 @@ const Header = ({ title, arrow, subtitle, image_path: imagePath }: Header) => {
           {formatSubtitle(subtitle)}
         </div>
       )}
+      <hr className="departures-header__separator" />
     </>
   );
 };
