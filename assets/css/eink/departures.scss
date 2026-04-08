@@ -1,3 +1,7 @@
 .departures-container {
   height: 100%;
 }
+
+.departures-header + .departures-header__separator {
+  display: none;
+}
