@@ -22,6 +22,9 @@ config :screens, ScreensWeb.Endpoint,
 # Do not print debug messages in production
 config :logger, level: :info
 
+# Emit all HTTP logs at info level regardless of status
+config :logster, status_4xx_level: :info, status_5xx_level: :info
+
 config :ex_aws, json_codec: Jason
 
 config :ehmon, :report_mf, {:ehmon, :info_report}
