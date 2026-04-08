@@ -454,6 +454,11 @@
     "category": 2,
     "summary": "Passengers may use the elevators located at 2 Washington Sq for ADA access to the platform."
   },
+  "783": {
+    "alternate_ids": [],
+    "category": 2,
+    "summary": "Use the elevator at the 45 Shrewsbury St. parking lot entrance for accessible access to the platform."
+  },
   "802": {
     "alternate_ids": [
       "967",
@@ -1754,5 +1759,65 @@
     ],
     "category": 1,
     "summary": "Use nearby Downtown Crossing Elevator 998."
+  },
+  "elev_3b81_7260_395": {
+    "alternate_ids": [],
+    "category": 1,
+    "summary": "Please use nearby Wickford Junction garage elevator."
+  },
+  "elev_3b81_7260_396": {
+    "alternate_ids": [],
+    "category": 1,
+    "summary": "Please use nearby Wickford Junction garage elevator."
+  },
+  "elev_3b81_c387_397": {
+    "alternate_ids": [],
+    "category": 1,
+    "summary": "Use the elevators at the south end of the garage."
+  },
+  "elev_5a7e_af2a_392": {
+    "alternate_ids": [],
+    "category": 100,
+    "summary": null
+  },
+  "elev_7a57_3d92_393": {
+    "alternate_ids": [],
+    "category": 100,
+    "summary": null
+  },
+  "elev_7a57_3d92_394": {
+    "alternate_ids": [],
+    "category": 100,
+    "summary": null
+  },
+  "elev_99c7_af2a_390": {
+    "alternate_ids": [],
+    "category": 4,
+    "summary": null
+  },
+  "elev_99c7_c4e9_389": {
+    "alternate_ids": [],
+    "category": 4,
+    "summary": null
+  },
+  "elev_b748_c4e7_398": {
+    "alternate_ids": [],
+    "category": 1,
+    "summary": "Please use the elevator located directly across the hallway."
+  },
+  "elev_b748_c4e7_399": {
+    "alternate_ids": [],
+    "category": 1,
+    "summary": "Please use the elevator located directly across the hallway."
+  },
+  "elev_c2ed_07bd_390": {
+    "alternate_ids": [],
+    "category": 100,
+    "summary": null
+  },
+  "elev_c2ed_e7ea_391": {
+    "alternate_ids": [],
+    "category": 100,
+    "summary": null
   }
 }
