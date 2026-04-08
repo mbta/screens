@@ -50,12 +50,10 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
     case "status": {
       const pages = time.pages;
       if (pages.length === 1) {
-        return <div className="departure-time__status">{time.pages[0]}</div>;
+        return <div className="departure-time__status">{pages[0]}</div>;
       } else {
         return (
-          <div className="departure-time__status">
-            {time.pages[currentPage]}
-          </div>
+          <div className="departure-time__status">{pages[currentPage]}</div>
         );
       }
     }

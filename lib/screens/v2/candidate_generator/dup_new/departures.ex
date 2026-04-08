@@ -303,11 +303,16 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   @spec create_and_sort_rows([RDS.t()]) :: [NormalSection.row()]
   defp create_and_sort_rows(rds_list) do
-    {service_ended_rds, partially_filtered_rds} =
-      Enum.split_with(rds_list, &match?(%RDS{state: %ServiceEnded{}}, &1))
+    grouped_rds =
+      Enum.group_by(rds_list, fn
+        %RDS{state: %ServiceEnded{}} -> :service_ended
+        %RDS{state: %Headways{}} -> :headways
+        _ -> :other
+      end)
 
-    {headway_rds, rds} =
-      Enum.split_with(partially_filtered_rds, &match?(%RDS{state: %Headways{}}, &1))
+    service_ended_rds = Map.get(grouped_rds, :service_ended, [])
+    headway_rds = Map.get(grouped_rds, :headways, [])
+    rds = Map.get(grouped_rds, :other, [])
 
     sorted_departures_from_rds(rds) ++
       headways_from_rds(headway_rds) ++

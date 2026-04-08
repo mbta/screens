@@ -25,7 +25,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     @type row ::
             Departure.t()
             | {Departure.t(), special_trip_type()}
-            | {Departure.t(), Headways.range(), String.t(), :headways}
+            | {Departure.t(), Headways.range(), String.t() | nil, :headways}
             | FreeTextLine.t()
 
     @type t :: %__MODULE__{
