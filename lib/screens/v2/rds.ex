@@ -15,6 +15,7 @@ defmodule Screens.V2.RDS do
   alias Screens.Alerts.InformedEntity
   alias Screens.Config.Cache
   alias Screens.Headways, as: Headway
+  alias Screens.LastTrip.LastTrip
   alias Screens.Lines.Line
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
@@ -66,6 +67,11 @@ defmodule Screens.V2.RDS do
     :stop_move,
     :suspension
   ]
+
+  @red_trunk [70_061..70_061, 70_063..70_084]
+             |> Enum.flat_map(& &1)
+             |> Enum.map(&Integer.to_string(&1))
+  @last_trip_buffer_seconds 3
 
   defmodule NoService do
     @moduledoc """
@@ -128,6 +134,7 @@ defmodule Screens.V2.RDS do
   @schedule injected(Schedule)
   @stop injected(Stop)
   @config_cache injected(Cache)
+  @last_trip injected(LastTrip)
 
   @max_departure_minutes 120
 
@@ -250,7 +257,7 @@ defmodule Screens.V2.RDS do
   end
 
   defp create_destination_rds(
-         {%Stop{id: stop_id} = stop, line, headsign} = destination,
+         {%Stop{id: stop_id} = stop, %Line{id: line_id} = line, headsign} = destination,
          departures_by_destination,
          scheduled_departures_by_destination,
          routes_for_section,
@@ -258,16 +265,17 @@ defmodule Screens.V2.RDS do
          now
        ) do
     headway_for_stop = @headways.get(stop_id, now)
+    destination_key = {stop_id, line_id, headsign}
 
     departures =
-      Map.get(departures_by_destination, {stop.id, line.id, headsign}, [])
+      Map.get(departures_by_destination, destination_key, [])
       |> Enum.filter(fn
         %{prediction: nil} -> headway_for_stop == nil
         _ -> true
       end)
 
     scheduled_departures =
-      scheduled_departures_by_destination |> Map.get({stop.id, line.id, headsign}, [])
+      scheduled_departures_by_destination |> Map.get(destination_key, [])
 
     impacted_by_alert = destination in impacted_destinations
 
@@ -279,7 +287,7 @@ defmodule Screens.V2.RDS do
         state(
           departures,
           scheduled_departures,
-          stop_id,
+          destination_key,
           routes_for_section,
           headway_for_stop,
           impacted_by_alert,
@@ -313,7 +321,7 @@ defmodule Screens.V2.RDS do
   @spec state(
           [Departure.t()],
           [Departure.t()],
-          Stop.id(),
+          destination_key(),
           [Route.t()],
           Headway.range() | nil,
           boolean(),
@@ -322,7 +330,7 @@ defmodule Screens.V2.RDS do
   defp state(
          [] = _departures_for_headsign,
          [] = _scheduled_departures_for_headsign,
-         _stop_id,
+         _destination_key,
          routes_for_section,
          _headway_for_stop,
          false = _impacted_by_alert,
@@ -334,7 +342,7 @@ defmodule Screens.V2.RDS do
   defp state(
          [] = departures_for_headsign,
          [_ | _] = scheduled_departures_for_headsign,
-         _stop_id,
+         destination_key,
          routes_for_section,
          headway_for_stop,
          impacted_by_alert,
@@ -350,6 +358,7 @@ defmodule Screens.V2.RDS do
            last_scheduled_departure,
            headway_for_stop,
            impacted_by_alert,
+           after_last_trip?(destination_key, now),
            now
          ) do
       :before_scheduled_start ->
@@ -383,13 +392,38 @@ defmodule Screens.V2.RDS do
   defp state(
          departures_for_headsign,
          _scheduled_departures_by_headsign,
-         _stop_id,
+         _destination_key,
          _routes_for_section,
          _headway_for_stop,
          _impacted_by_alert,
          _now
        ) do
     %Countdowns{departures: departures_for_headsign}
+  end
+
+  @spec after_last_trip?(destination_key(), DateTime.t()) :: boolean()
+  # Red Trunk stops need two last trip departures in order to classify as Service Ended
+  defp after_last_trip?({stop_id, _line_id, "Alewife"} = destination_key, now)
+       when stop_id in @red_trunk do
+    case @last_trip.last_trip_departure_times(destination_key) do
+      [_departure_time_one, _departure_time_two] = departure_times ->
+        departure_times
+        |> Enum.max()
+        |> after_last_trip_with_buffer?(now)
+
+      _ ->
+        false
+    end
+  end
+
+  defp after_last_trip?(destination_key, now) do
+    case @last_trip.last_trip_departure_times(destination_key) do
+      [departure_time] ->
+        after_last_trip_with_buffer?(departure_time, now)
+
+      _ ->
+        false
+    end
   end
 
   @spec group_by_destination([Departure.t()]) :: %{destination_key() => [Departure.t()]}
@@ -453,16 +487,48 @@ defmodule Screens.V2.RDS do
           Departure.t(),
           Headway.range() | nil,
           boolean(),
+          boolean(),
           DateTime.t()
         ) :: service_state()
-  defp classify_service_state(_first_departure, _last_departure, _headway_for_stop, true, _now),
-    do: :service_impacted
+  defp classify_service_state(
+         _first_departure,
+         _last_departure,
+         _headway_for_stop,
+         true,
+         _after_last_trip,
+         _now
+       ),
+       do: :service_impacted
 
-  defp classify_service_state(first_departure, last_departure, _headway_for_stop, _in_alert, _now)
+  defp classify_service_state(
+         _first_departure,
+         _last_departure,
+         _headway_for_stop,
+         _in_alert,
+         true,
+         _now
+       ),
+       do: :after_scheduled_end
+
+  defp classify_service_state(
+         first_departure,
+         last_departure,
+         _headway_for_stop,
+         _in_alert,
+         _after_last_trip,
+         _now
+       )
        when first_departure == nil and last_departure == nil,
        do: :no_service
 
-  defp classify_service_state(first_departure, last_departure, headway_for_stop, _in_alert, now) do
+  defp classify_service_state(
+         first_departure,
+         last_departure,
+         headway_for_stop,
+         _in_alert,
+         _after_last_trip,
+         now
+       ) do
     first_departure_time =
       case headway_for_stop do
         nil ->
@@ -535,36 +601,47 @@ defmodule Screens.V2.RDS do
 
   @spec ie_affects_destination?(InformedEntity.t(), RoutePattern.t(), Stop.t()) :: boolean()
   # Alert effects the entire route
-  def ie_affects_destination?(
-        %InformedEntity{route: route_id, direction_id: nil, stop: nil},
-        %RoutePattern{route: %Route{id: route_id}},
-        _home_stop
-      ),
-      do: true
+  defp ie_affects_destination?(
+         %InformedEntity{route: route_id, direction_id: nil, stop: nil},
+         %RoutePattern{route: %Route{id: route_id}},
+         _home_stop
+       ),
+       do: true
 
   # Alert effects the entire route in the direction of the destination
-  def ie_affects_destination?(
-        %InformedEntity{route: route_id, direction_id: direction_id, stop: nil},
-        %RoutePattern{route: %Route{id: route_id}, direction_id: direction_id},
-        _home_stop
-      ),
-      do: true
+  defp ie_affects_destination?(
+         %InformedEntity{route: route_id, direction_id: direction_id, stop: nil},
+         %RoutePattern{route: %Route{id: route_id}, direction_id: direction_id},
+         _home_stop
+       ),
+       do: true
 
   # Alert effects the entire route in both directions
-  def ie_affects_destination?(
-        %InformedEntity{route_type: informed_route_type, stop: nil},
-        %RoutePattern{route: %Route{type: route_type}},
-        _home_stop
-      ),
-      do: RouteType.to_id(route_type) == informed_route_type
+  defp ie_affects_destination?(
+         %InformedEntity{route_type: informed_route_type, stop: nil},
+         %RoutePattern{route: %Route{type: route_type}},
+         _home_stop
+       ),
+       do: RouteType.to_id(route_type) == informed_route_type
 
   # Alert does not affect the route or a specific stop
-  def ie_affects_destination?(%InformedEntity{stop: nil}, _pattern, _home_stop),
+  defp ie_affects_destination?(%InformedEntity{stop: nil}, _pattern, _home_stop),
     do: false
 
   # Alert effects the child stop
-  def ie_affects_destination?(%InformedEntity{stop: %Stop{id: id}}, _pattern, %Stop{id: id}),
+  defp ie_affects_destination?(%InformedEntity{stop: %Stop{id: id}}, _pattern, %Stop{id: id}),
     do: true
 
-  def ie_affects_destination?(_, _, _), do: false
+  defp ie_affects_destination?(_, _, _), do: false
+
+  defp after_last_trip_with_buffer?(last_trip_departure_time, now) do
+    departure_time_with_buffer =
+      DateTime.add(
+        last_trip_departure_time,
+        @last_trip_buffer_seconds,
+        :second
+      )
+
+    DateTime.after?(now, departure_time_with_buffer)
+  end
 end
