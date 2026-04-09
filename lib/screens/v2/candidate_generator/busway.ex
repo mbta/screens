@@ -32,7 +32,7 @@ defmodule Screens.V2.CandidateGenerator.Busway do
         instance_fns \\ @instance_fns
       ) do
     instance_fns
-    |> Task.async_stream(& &1.(config, now), timeout: 15_000)
+    |> Task.async_stream(& &1.(config, now), timeout: 10_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
