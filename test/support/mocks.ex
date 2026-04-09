@@ -4,6 +4,7 @@ injected_modules = [
   Screens.Elevator,
   Screens.Facilities.Facility,
   Screens.Headways,
+  Screens.LastTrip.LastTrip,
   Screens.PendingConfig.Fetch,
   Screens.RoutePatterns.RoutePattern,
   Screens.Routes.Route,

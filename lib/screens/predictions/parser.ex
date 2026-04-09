@@ -10,6 +10,7 @@ defmodule Screens.Predictions.Parser do
           "attributes" => %{
             "arrival_time" => arrival_time_string,
             "departure_time" => departure_time_string,
+            "last_trip" => last_trip,
             "schedule_relationship" => schedule_relationship,
             "status" => status,
             "trip_headsign" => trip_headsign
@@ -34,6 +35,7 @@ defmodule Screens.Predictions.Parser do
       arrival_time: parse_time(arrival_time_string),
       departure_time: parse_time(departure_time_string),
       track_number: stop.platform_code,
+      last_trip: last_trip,
       schedule_relationship: ScheduleRelationship.parse(schedule_relationship),
       status: status,
       trip_headsign: trip_headsign
