@@ -83,7 +83,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
       fn -> departures_instances_fn.(config, now) end,
       fn -> evergreen_content_instances_fn.(config, now) end
     ]
-    |> Task.async_stream(& &1.(), timeout: 30_000)
+    |> Task.async_stream(& &1.(), timeout: 20_000)
     |> Enum.flat_map(fn {:ok, instances} -> instances end)
   end
 
