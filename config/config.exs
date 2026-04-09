@@ -503,14 +503,14 @@ config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Sto
 # should be tweaked as the V3 API usage patterns and requirements of the app change over time.
 
 config :screens, Screens.V3Api.Cache.Realtime,
-  allocated_memory: 50 * 1024 * 1024,
+  allocated_memory: 100 * 1024 * 1024,
   gc_interval: :timer.seconds(30),
   gc_memory_check_interval: :timer.seconds(5),
   stats: true,
   telemetry_prefix: ~w[screens v3_api cache]a
 
 config :screens, Screens.V3Api.Cache.Static,
-  allocated_memory: 150 * 1024 * 1024,
+  allocated_memory: 250 * 1024 * 1024,
   gc_interval: :timer.hours(1),
   stats: true,
   telemetry_prefix: ~w[screens v3_api cache]a
