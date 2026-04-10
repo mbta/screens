@@ -53,15 +53,9 @@ config :phoenix, :format_encoders,
   html: Phoenix.HTML.Engine,
   ssml: Phoenix.HTML.Engine
 
-# Use Jason for JSON parsing in ExAws
-config :ex_aws, json_codec: Jason
+config :ex_aws, http_client: ExAws.Request.Req, json_codec: Jason
 
 config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
-
-config :hackney, mod_metrics: :hackney_telemetry
-config :hackney_telemetry, report_interval: 10_000
-
-config :sentry, client: Sentry.HackneyClient
 
 config :screens,
   redirect_http?: true,

@@ -3,26 +3,25 @@ defmodule Screens.DeviceMonitor.Fetch do
 
   @spec make_and_parse_request(
           url :: binary(),
-          HTTPoison.headers(),
-          http_opts :: Keyword.t(),
-          parse_fn :: (binary() -> {:ok, parsed} | {:error, term()}),
+          options :: keyword(),
+          decode_fn :: (binary() -> {:ok, decoded} | {:error, term()}),
           vendor_name :: atom()
-        ) :: {:ok, parsed} | :error
-        when parsed: any()
-  def make_and_parse_request(url, headers, opts, parse_fn, vendor_name) do
-    with {:http_request, {:ok, response}} <- {:http_request, HTTPoison.get(url, headers, opts)},
-         {:response_success, %{status_code: 200, body: body}} <- {:response_success, response},
-         {:parse, {:ok, parsed}} <- {:parse, parse_fn.(body)} do
-      {:ok, parsed}
+        ) :: {:ok, decoded} | :error
+        when decoded: any()
+  def make_and_parse_request(url, options, decode_fn, vendor_name) do
+    with {:response, {:ok, %Req.Response{status: 200, body: body}}} <-
+           {:response, Req.get(url, Keyword.put(options, :decode_body, false))},
+         {:decode, {:ok, decoded}} <- {:decode, decode_fn.(body)} do
+      {:ok, decoded}
     else
-      {:http_request, {:error, e}} ->
-        log_fetch_error(vendor_name, :http_fetch_error, url, message: HTTPoison.Error.message(e))
+      {:response, {:ok, %Req.Response{status: status}}} ->
+        log_fetch_error(vendor_name, :status_not_ok, url, status: status)
 
-      {:response_success, %{status_code: status_code}} ->
-        log_fetch_error(vendor_name, :bad_response_code, url, status_code: status_code)
+      {:response, {:error, e}} ->
+        log_fetch_error(vendor_name, :fetch_error, url, exception: inspect(e))
 
-      {:parse, _} ->
-        log_fetch_error(vendor_name, :parse_error, url)
+      {:decode, _} ->
+        log_fetch_error(vendor_name, :decode_error, url)
 
       _ ->
         log_fetch_error(vendor_name, :error, url)

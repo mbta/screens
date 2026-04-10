@@ -20,13 +20,13 @@ defmodule Screens.Telemetry do
       # log_span(~w[screens v3_api get_json]a, metadata: ~w[path query cache]a),
 
       # events
-      log_event(~w[hackney_pool]a,
-        metadata: ~w[pool]a,
-        measurements: ~w[free_count in_use_count no_socket queue_count take_rate]a
-      ),
       log_event(~w[screens v3_api cache stats]a,
         metadata: ~w[cache]a,
         measurements: ~w[used total hits misses writes updates evictions expirations]a
+      ),
+      log_event(~w[screens v3_api pool stats]a,
+        metadata: ~w[host]a,
+        measurements: ~w[pool_size available_connections in_use_connections in_flight_requests]a
       )
     ]
 
@@ -36,7 +36,11 @@ defmodule Screens.Telemetry do
     end
 
     children = [
-      {:telemetry_poller, measurements: [{__MODULE__, :cache_stats, []}], period: 10_000}
+      {
+        :telemetry_poller,
+        measurements: [{__MODULE__, :cache_stats, []}, {__MODULE__, :pool_stats, []}],
+        period: 10_000
+      }
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
@@ -52,8 +56,14 @@ defmodule Screens.Telemetry do
         )
       end
     end
+  end
 
-    :ok
+  def pool_stats do
+    with {:ok, status} <- Finch.get_pool_status(Screens.V3Api.Finch, :default) do
+      for {{_scheme, host, _port}, pools} <- status, metrics <- pools do
+        :telemetry.execute(~w[screens v3_api pool stats]a, metrics, %{host: host})
+      end
+    end
   end
 
   @doc """

@@ -45,7 +45,7 @@ defmodule Screens.DeviceMonitor.Gds do
 
     @token_url_base
     |> build_url(params)
-    |> Fetch.make_and_parse_request([], [], &parse_token/1, @vendor_name)
+    |> Fetch.make_and_parse_request([], &parse_token/1, @vendor_name)
   end
 
   defp parse_token(xml) do
@@ -68,7 +68,7 @@ defmodule Screens.DeviceMonitor.Gds do
 
     @device_list_url_base
     |> build_url(params)
-    |> Fetch.make_and_parse_request([], [], &parse_devices_data(&1, now), @vendor_name)
+    |> Fetch.make_and_parse_request([], &parse_devices_data(&1, now), @vendor_name)
   end
 
   defp parse_devices_data(xml, now) do
