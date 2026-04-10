@@ -24,7 +24,7 @@ defmodule Screens.MixProject do
   #
   # Type `mix help compile.app` for more information.
   def application do
-    apps = [:logger, :runtime_tools, :hackney_telemetry]
+    apps = [:logger, :runtime_tools]
 
     apps =
       case Mix.env() do
@@ -62,9 +62,6 @@ defmodule Screens.MixProject do
       {:ex_cldr_messages, "~> 2.0"},
       {:gettext, "~> 0.26.1"},
       {:guardian, "~> 2.4.0"},
-      {:hackney, "~> 1.25.0"},
-      {:hackney_telemetry, "~> 0.2.0"},
-      {:httpoison, "~> 2.3.0"},
       {:jason, "~> 1.0"},
       {:logster, "~> 2.0.0-rc.5"},
       {:memcachex, "~> 0.5.5"},
@@ -79,7 +76,7 @@ defmodule Screens.MixProject do
       {:plug_cowboy, "~> 2.6"},
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
-      {:retry, "~> 0.19.0"},
+      {:req, "~> 0.5.0"},
       {:screens_config, github: "mbta/screens-config-lib"},
       {:sentry, "~> 12.0.3"},
       {:sweet_xml, "~> 0.7.0"},
