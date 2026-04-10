@@ -1,17 +1,13 @@
 defmodule Screens.V3Api do
   @moduledoc false
 
-  use Retry.Annotation
-
   alias __MODULE__.Cache
 
-  @default_opts [
-    timeout: 5000,
-    recv_timeout: 5000,
-    hackney: [pool: :api_v3_pool, checkout_timeout: 4000]
-  ]
+  @request_opts [finch: __MODULE__.Finch]
 
-  def get_json(path, params \\ %{}, opts \\ []) do
+  @spec get_json(path :: String.t(), params :: %{String.t() => String.t()}) ::
+          {:ok, term()} | {:error, Exception.t()}
+  def get_json(path, params) do
     ctx = Screens.Telemetry.context()
     meta = Map.merge(ctx, %{path: path, query: URI.encode_query(params)})
 
@@ -21,44 +17,34 @@ defmodule Screens.V3Api do
           {{:ok, response}, %{cache: "local"}}
 
         {:stale, {last_modified, response}} ->
-          fetch_json_with_meta(path, params, opts, last_modified, response)
+          fetch_json_with_meta(path, params, last_modified, response)
 
         nil ->
-          fetch_json_with_meta(path, params, opts)
+          fetch_json_with_meta(path, params)
       end
     end)
   end
 
-  @retry with: Stream.take(constant_backoff(500), 3), atoms: [:bad_response_code]
-  defp fetch_json_with_meta(path, params, opts, last_modified \\ nil, cached_response \\ nil) do
+  defp fetch_json_with_meta(path, params, last_modified \\ nil, cached_body \\ nil) do
     url = build_url(path, params)
     api_key = Application.get_env(:screens, :api_v3_key)
     headers = api_key_headers(api_key) ++ cache_headers(last_modified)
 
-    case HTTPoison.get(url, headers, Keyword.merge(@default_opts, opts)) do
-      {:ok, %{status_code: 200, body: body, headers: headers}} ->
-        response = Jason.decode!(body)
-        last_modified = headers |> Map.new() |> Map.fetch!("last-modified")
-        Cache.put({path, params}, {last_modified, response})
-        {{:ok, response}, %{cache: "none"}}
+    case Req.get(url, Keyword.put(@request_opts, :headers, headers)) do
+      {:ok, %Req.Response{status: 200, body: body, headers: headers}} ->
+        [last_modified] = Map.fetch!(headers, "last-modified")
+        Cache.put({path, params}, {last_modified, body})
+        {{:ok, body}, %{cache: "none"}}
 
-      {:ok, %{status_code: 304}} ->
+      {:ok, %Req.Response{status: 304}} ->
         # Refresh unconditional TTL on the cache entry
-        Cache.put({path, params}, {last_modified, cached_response})
-        {{:ok, cached_response}, %{cache: "http"}}
-
-      {:ok, %{status_code: status_code}} ->
-        log_api_error(:bad_response_code, url, status_code: status_code)
-        {:bad_response_code, %{}}
+        Cache.put({path, params}, {last_modified, cached_body})
+        {{:ok, cached_body}, %{cache: "http"}}
 
       {:error, error} ->
-        log_api_error(:http_fetch_error, url, message: Exception.message(error))
-        {{:http_fetch_error, error}, %{}}
+        Logster.error(["api_v3_fetch_error", url: url, error: inspect(error)])
+        {{:error, error}, %{}}
     end
-  end
-
-  defp log_api_error(error_type, url, extra_fields) do
-    Logster.error(["api_v3_get_json_error", url: url, error_type: error_type] ++ extra_fields)
   end
 
   defp build_url(path, params) do

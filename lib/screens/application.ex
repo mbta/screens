@@ -11,7 +11,7 @@ defmodule Screens.Application do
       [
         {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
         {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
-        :hackney_pool.child_spec(:api_v3_pool, max_connections: 50),
+        {Finch, name: Screens.V3Api.Finch, pools: %{:default => [start_pool_metrics?: true]}},
         Screens.V3Api.Cache.Realtime,
         Screens.V3Api.Cache.Static,
         # Task supervisor for ScreensByAlert async updates

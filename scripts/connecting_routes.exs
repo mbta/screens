@@ -12,7 +12,7 @@
 #
 # Example usages:
 # mix run scripts/connecting_routes.exs --service-date 2022-06-25
-# mix run scripts/connecting_routes.exs --service-date 2022-06-25 --route-pattern "Red-3-0"
+# mix run scripts/connecting_routes.exs --service-date 2022-06-25 --route-pattern Red-3-0
 
 # To prevent info logs from the application
 Logger.configure(level: :warning)
@@ -36,18 +36,13 @@ route_patterns = [
 
 defmodule RouteConnections do
   def calculate(route_pattern_id, service_date) do
-    api_v3_key = System.get_env("API_V3_KEY")
-    headers = [{"x-api-key", api_v3_key}]
+    req_options = [headers: [{"x-api-key", System.get_env("API_V3_KEY")}]]
 
-    {:ok, %{status_code: 200, body: body}} =
-      HTTPoison.get(
+    {:ok, %{status: 200, body: %{"included" => included}}} =
+      Req.get(
         "https://api-v3.mbta.com/trips?filter[route_pattern]=#{route_pattern_id}&filter[date]=#{service_date}&include=stops.parent_station.connecting_stops,stops.parent_station.child_stops",
-        headers
+        req_options
       )
-
-    {:ok, parsed} = Jason.decode(body)
-
-    %{"included" => included} = parsed
 
     included_stops =
       included
@@ -97,10 +92,11 @@ defmodule RouteConnections do
       Enum.flat_map(transfer_stops_by_station, fn {_station_id, stops} -> stops end)
 
     get_typical_routes = fn stop ->
-      url = "https://api-v3.mbta.com/route_patterns?filter[stop]=#{URI.encode(stop)}"
-      headers = [{"x-api-key", api_v3_key}]
-      {:ok, %{status_code: 200, body: body}} = HTTPoison.get(url, headers)
-      {:ok, %{"data" => route_patterns_data}} = Jason.decode(body)
+      {:ok, %{status: 200, body: %{"data" => route_patterns_data}}} =
+        Req.get(
+          "https://api-v3.mbta.com/route_patterns?filter[stop]=#{URI.encode(stop)}",
+          req_options
+        )
 
       routes =
         route_patterns_data
@@ -116,10 +112,8 @@ defmodule RouteConnections do
     end
 
     fetch_all_routes = fn ->
-      url = "https://api-v3.mbta.com/routes?filter[listed_route]=true"
-      headers = [{"x-api-key", api_v3_key}]
-      {:ok, %{status_code: 200, body: body}} = HTTPoison.get(url, headers)
-      {:ok, %{"data" => routes_data}} = Jason.decode(body)
+      {:ok, %{status: 200, body: %{"data" => routes_data}}} =
+        Req.get("https://api-v3.mbta.com/routes?filter[listed_route]=true", req_options)
 
       routes_data
       |> Enum.map(fn %{"id" => id} = route -> {id, route} end)
