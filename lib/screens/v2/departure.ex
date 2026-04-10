@@ -12,6 +12,8 @@ defmodule Screens.V2.Departure do
   alias Screens.V3Api
   alias Screens.Vehicles.Vehicle
 
+  @hour_in_seconds 3600
+
   @type t :: %__MODULE__{
           prediction: Screens.Predictions.Prediction.t() | nil,
           schedule: Screens.Schedules.Schedule.t() | nil
@@ -110,10 +112,12 @@ defmodule Screens.V2.Departure do
 
   def cancelled?(%__MODULE__{}), do: false
 
-  def crowding_level(%__MODULE__{prediction: p}) when not is_nil(p) do
+  @spec crowding_level(t, DateTime.t()) :: non_neg_integer() | nil
+  def crowding_level(%__MODULE__{prediction: p}, now) when not is_nil(p) do
     case p do
       %Prediction{trip: %Trip{} = trip, vehicle: %Vehicle{occupancy_status: status} = vehicle} ->
-        if crowding_data_relevant?(trip, vehicle) do
+        if crowding_data_relevant?(trip, vehicle) and
+             not departure_too_far_in_future?(p.departure_time, now) do
           crowding_level_from_occupancy_status(status)
         else
           nil
@@ -124,7 +128,7 @@ defmodule Screens.V2.Departure do
     end
   end
 
-  def crowding_level(%__MODULE__{prediction: nil, schedule: _}), do: nil
+  def crowding_level(%__MODULE__{prediction: nil, schedule: _}, _now), do: nil
 
   def direction_id(%__MODULE__{prediction: %Prediction{trip: %Trip{direction_id: direction_id}}}) do
     direction_id
@@ -242,10 +246,14 @@ defmodule Screens.V2.Departure do
 
   def vehicle_status(_), do: nil
 
-  defp crowding_data_relevant?(%Trip{id: trip_trip_id, stops: [first_stop | _]}, %Vehicle{
-         trip_id: vehicle_trip_id,
-         stop_id: next_stop
-       })
+  @spec crowding_data_relevant?(Trip.t(), Vehicle.t()) :: boolean()
+  defp crowding_data_relevant?(
+         %Trip{id: trip_trip_id, stops: [first_stop | _]},
+         %Vehicle{
+           trip_id: vehicle_trip_id,
+           stop_id: next_stop
+         }
+       )
        when not is_nil(trip_trip_id) and not is_nil(vehicle_trip_id) do
     vehicle_on_prediction_trip? = trip_trip_id == vehicle_trip_id
     vehicle_started_trip? = not (next_stop == first_stop)
@@ -253,6 +261,14 @@ defmodule Screens.V2.Departure do
   end
 
   defp crowding_data_relevant?(_trip, _vehicle), do: false
+
+  @spec departure_too_far_in_future?(DateTime.t() | nil, DateTime.t()) :: boolean()
+  defp departure_too_far_in_future?(departure_time, now)
+       when not is_nil(departure_time) do
+    DateTime.diff(Util.to_eastern(departure_time), Util.to_eastern(now)) > @hour_in_seconds
+  end
+
+  defp departure_too_far_in_future?(_departure_time, _now), do: false
 
   defp crowding_level_from_occupancy_status(:many_seats_available), do: 1
   defp crowding_level_from_occupancy_status(:few_seats_available), do: 2

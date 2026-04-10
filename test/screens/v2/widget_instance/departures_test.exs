@@ -657,7 +657,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
-  describe "serialize_times_with_crowding/2" do
+  describe "serialize_times_with_crowding/3" do
     setup do
       bus_eink_screen = %Screen{
         app_id: :bus_eink_v2,
@@ -1206,6 +1206,82 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       }
 
       assert [%{is_live: true}] =
+               Departures.serialize_times_with_crowding([departure], screen, now)
+    end
+
+    test "hides crowding information for departures greater than an hour in the future", %{
+      bus_shelter_screen: screen
+    } do
+      now = ~U[2020-01-01T00:00:00Z]
+
+      over_an_hour_in_future =
+        now
+        |> DateTime.add(1, :hour)
+        |> DateTime.add(1, :second)
+
+      current_stop = "stop-a"
+      trip_id = "trip_id"
+
+      departure = %Departure{
+        prediction: %Prediction{
+          trip: %Trip{id: trip_id, stops: ["stop-b"]},
+          departure_time: over_an_hour_in_future,
+          route: %Route{type: :bus},
+          vehicle: %Vehicle{
+            current_status: :stopped_at,
+            stop_id: current_stop,
+            occupancy_status: :many_seats_available,
+            trip_id: trip_id
+          },
+          stop: %Stop{id: current_stop}
+        }
+      }
+
+      assert [
+               %{
+                 time: %{type: :timestamp, am_pm: nil, hour: 8, minute: 0},
+                 crowding: nil,
+                 id: nil,
+                 is_live: true,
+                 scheduled_time: nil
+               }
+             ] =
+               Departures.serialize_times_with_crowding([departure], screen, now)
+    end
+
+    test "shows crowding information for departure exactly than an hour in the future", %{
+      bus_shelter_screen: screen
+    } do
+      now = ~U[2020-01-01T00:00:00Z]
+      over_an_hour_in_future = DateTime.add(now, 1, :hour)
+
+      current_stop = "stop-a"
+      trip_id = "trip_id"
+
+      departure = %Departure{
+        prediction: %Prediction{
+          trip: %Trip{id: trip_id, stops: ["stop-b"]},
+          departure_time: over_an_hour_in_future,
+          route: %Route{type: :bus},
+          vehicle: %Vehicle{
+            current_status: :stopped_at,
+            stop_id: current_stop,
+            occupancy_status: :many_seats_available,
+            trip_id: trip_id
+          },
+          stop: %Stop{id: current_stop}
+        }
+      }
+
+      assert [
+               %{
+                 time: %{type: :timestamp, am_pm: nil, hour: 8, minute: 0},
+                 crowding: 1,
+                 id: nil,
+                 is_live: true,
+                 scheduled_time: nil
+               }
+             ] =
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
   end

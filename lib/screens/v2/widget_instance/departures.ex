@@ -528,7 +528,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
           serialized_time_with_crowding()
   defp serialize_time_with_crowding(departure, screen, now) do
     serialize_time(departure, screen, now)
-    |> Map.merge(%{id: Departure.id(departure), crowding: serialize_crowding(departure, screen)})
+    |> Map.merge(%{
+      id: Departure.id(departure),
+      crowding: serialize_crowding(departure, screen, now)
+    })
   end
 
   def serialize_direction_id([first_departure | _]) do
@@ -536,10 +539,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   # DUPs don't display crowding information (space constraints, no design implemented for it).
-  defp serialize_crowding(_departure, %Screen{app_id: :dup_v2}), do: nil
+  defp serialize_crowding(_departure, %Screen{app_id: :dup_v2}, _now), do: nil
   # Otherwise, include crowding information for any valid departure.
   # Will return nil for schedules or predictions without crowding data.
-  defp serialize_crowding(departure, _screen), do: Departure.crowding_level(departure)
+  defp serialize_crowding(departure, _screen, now), do: Departure.crowding_level(departure, now)
 
   @spec serialize_time(Departure.t(), Screen.t(), DateTime.t()) ::
           %{time: serialized_time(), time_in_epoch: integer()}
