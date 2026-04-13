@@ -542,7 +542,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp serialize_crowding(departure, _screen), do: Departure.crowding_level(departure)
 
   @spec serialize_time(Departure.t(), Screen.t(), DateTime.t()) ::
-          %{time: serialized_time(), time_in_epoch: integer()}
+          %{time: serialized_time(), time_in_epoch: integer(), is_live: boolean()}
           | %{
               time: serialized_time() | nil,
               scheduled_time: serialized_timestamp() | nil,
