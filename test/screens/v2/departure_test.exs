@@ -8,10 +8,8 @@ defmodule Screens.V2.DepartureTest do
   alias Screens.V2.Departure
   alias Screens.Vehicles.Vehicle
 
-  describe "crowding_level/2" do
+  describe "crowding_level/1" do
     test "returns relevant crowding levels" do
-      now = ~U[2024-08-28 17:00:00.116713Z]
-
       trip = %Trip{id: "trip-1", stops: ["1", "2", "3"]}
 
       vehicle = %Vehicle{
@@ -25,12 +23,10 @@ defmodule Screens.V2.DepartureTest do
       schedule = %Schedule{id: "schedule"}
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert 2 == Departure.crowding_level(departure, now)
+      assert 2 == Departure.crowding_level(departure)
     end
 
     test "returns nil when the vehicle trip is nil" do
-      now = ~U[2024-08-28 17:00:00.116713Z]
-
       trip = %Trip{id: "trip-1", stops: ["1", "2", "3"]}
 
       vehicle = %Vehicle{
@@ -44,16 +40,14 @@ defmodule Screens.V2.DepartureTest do
       schedule = %Schedule{id: "schedule"}
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert nil == Departure.crowding_level(departure, now)
+      assert nil == Departure.crowding_level(departure)
 
       prediction = %{prediction | vehicle: nil}
       departure = %{departure | prediction: prediction}
-      assert nil == Departure.crowding_level(departure, now)
+      assert nil == Departure.crowding_level(departure)
     end
 
     test "returns nil when the prediction trip is nil" do
-      now = ~U[2024-08-28 17:00:00.116713Z]
-
       trip = %Trip{id: nil, stops: ["1", "2", "3"]}
 
       vehicle = %Vehicle{
@@ -67,16 +61,14 @@ defmodule Screens.V2.DepartureTest do
       schedule = %Schedule{id: "schedule"}
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert nil == Departure.crowding_level(departure, now)
+      assert nil == Departure.crowding_level(departure)
 
       prediction = %{prediction | trip: nil}
       departure = %{departure | prediction: prediction}
-      assert nil == Departure.crowding_level(departure, now)
+      assert nil == Departure.crowding_level(departure)
     end
 
     test "returns nil when the vehicle and prediction trips differ" do
-      now = ~U[2024-08-28 17:00:00.116713Z]
-
       trip = %Trip{id: "trip-1", stops: ["1", "2", "3"]}
 
       vehicle = %Vehicle{
@@ -90,7 +82,7 @@ defmodule Screens.V2.DepartureTest do
       schedule = %Schedule{id: "schedule"}
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert nil == Departure.crowding_level(departure, now)
+      assert nil == Departure.crowding_level(departure)
     end
 
     test "returns nil when the vehicle is at the first stop" do
@@ -103,22 +95,18 @@ defmodule Screens.V2.DepartureTest do
         stop_id: "1"
       }
 
-      now = ~U[2024-08-28 17:00:00.116713Z]
-      departure_time = ~U[2024-08-28 18:01:14.116713Z]
-
-      prediction = %Prediction{trip: trip, vehicle: vehicle, departure_time: departure_time}
+      prediction = %Prediction{trip: trip, vehicle: vehicle}
       schedule = %Schedule{id: "schedule"}
       departure = %Departure{prediction: prediction, schedule: schedule}
 
-      assert nil == Departure.crowding_level(departure, now)
+      assert nil == Departure.crowding_level(departure)
     end
 
     test "returns nil when no prediction is present" do
-      now = ~U[2024-08-28 17:00:00.116713Z]
       schedule = %Schedule{id: "schedule"}
       departure = %Departure{schedule: schedule}
 
-      assert nil == Departure.crowding_level(departure, now)
+      assert nil == Departure.crowding_level(departure)
     end
   end
 
