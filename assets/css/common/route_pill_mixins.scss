@@ -1,0 +1,55 @@
+@use "CSS/colors";
+
+@mixin pill-background-colors {
+  &--blue {
+    background-color: colors.$line-blue;
+  }
+
+  &--green {
+    background-color: colors.$line-green;
+  }
+
+  &--ocean_blue {
+    background-color: colors.$line-capeflyer;
+  }
+
+  &--orange {
+    background-color: colors.$line-orange;
+  }
+
+  &--purple {
+    background-color: colors.$line-cr;
+  }
+
+  &--red {
+    background-color: colors.$line-red;
+  }
+
+  &--silver {
+    background-color: colors.$line-silver;
+  }
+
+  &--teal {
+    background-color: colors.$line-ferry;
+  }
+
+  &--yellow {
+    background-color: colors.$line-bus;
+  }
+}
+
+@mixin pill-text-colors {
+  &--yellow {
+    color: black;
+  }
+
+  &--blue,
+  &--green,
+  &--orange,
+  &--purple,
+  &--red,
+  &--silver,
+  &--teal {
+    color: white;
+  }
+}

@@ -8,8 +8,18 @@
   color: colors.$cool-black-15;
   white-space: nowrap;
 
-  .departures-section--shortened-headsigns & {
+  // The width of the destination is reduced if either/both of the
+  // route pill and time columns need to take up more space.
+   .departure-row--extended-route_pill & {
+    width: 970px;
+  }
+
+  .departures-section--extended-times & {
     width: 843px;
+  }
+
+  .departure-row--extended-route_pill.departures-section--extended-times & {
+    width: 743px;
   }
 }
 
