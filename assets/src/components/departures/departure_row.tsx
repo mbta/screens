@@ -40,7 +40,7 @@ const departureRowClassName = (
   route: Pill,
   isBeforeDirectionSplit: boolean,
 ) => {
-  let modifiers: String[] = [];
+  const modifiers: string[] = [];
   if (route.type === "dual") {
     modifiers.push("wide-pill");
   }

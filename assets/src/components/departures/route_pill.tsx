@@ -143,7 +143,7 @@ type Props = {
 };
 
 const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
-  const modifiers: string[] = pill.type == "dual" ? ["dual"] : [pill.color];
+  const modifiers: string[] = pill.type === "dual" ? ["dual"] : [pill.color];
   if (outline) modifiers.push("outline");
 
   let innerContent: JSX.Element | null = null;
