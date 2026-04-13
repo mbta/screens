@@ -108,7 +108,7 @@ const DualRouteIconPill: ComponentType<DualPill> = ({
   } else {
     textModifiers.push("large");
   }
-  classWithModifiers("route-pill__dual-text-pill", textModifiers);
+  classWithModifiers("route-pill__dual-primary-pill", textModifiers);
   return (
     <div className="route-pill__dual-container">
       <div
@@ -143,22 +143,11 @@ type Props = {
 };
 
 const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
-  // TODO: Remove debug log
-  console.log(
-    "Rendering RoutePill with pill:",
-    pill,
-    "outline:",
-    outline,
-    "useRouteAbbrev:",
-    useRouteAbbrev,
-  );
-
   const modifiers: string[] = pill.type == "dual" ? ["dual"] : [pill.color];
   if (outline) modifiers.push("outline");
 
   let innerContent: JSX.Element | null = null;
   let branches: JSX.Element[] | null = null;
-  let secondaryIcon: JSX.Element | null = null;
 
   if (useRouteAbbrev && pill.route_abbrev) {
     innerContent = (

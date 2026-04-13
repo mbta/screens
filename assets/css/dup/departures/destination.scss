@@ -10,7 +10,7 @@
 
   // The width of the destination is reduced if either/both of the
   // route pill and time columns need to take up more space.
-   .departure-row--extended-route_pill & {
+  .departure-row--extended-route_pill & {
     width: 970px;
   }
 
