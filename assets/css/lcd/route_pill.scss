@@ -1,45 +1,15 @@
 @use "CSS/colors";
+@use "CSS/common/route_pill_mixins" as mixins;
 
 .route-pill {
   position: relative;
-  width: 144px;
-  height: 74px;
+  width: 100%;
+  height: 100%;
   border-radius: 100px;
 
-  &--blue {
-    background-color: colors.$line-blue;
-  }
-
-  &--green {
-    background-color: colors.$line-green;
-  }
-
-  &--ocean_blue {
-    background-color: colors.$line-capeflyer;
-  }
-
-  &--orange {
-    background-color: colors.$line-orange;
-  }
-
-  &--purple {
-    background-color: colors.$line-cr;
-  }
-
-  &--red {
-    background-color: colors.$line-red;
-  }
-
-  &--silver {
-    background-color: colors.$line-silver;
-  }
-
-  &--teal {
-    background-color: colors.$line-ferry;
-  }
+  @include mixins.pill-background-colors;
 
   &--yellow {
-    background-color: colors.$line-bus;
     box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
   }
 
@@ -62,19 +32,7 @@
   line-height: 74px;
   text-align: center;
 
-  &--yellow {
-    color: black;
-  }
-
-  &--blue,
-  &--green,
-  &--orange,
-  &--purple,
-  &--red,
-  &--silver,
-  &--teal {
-    color: white;
-  }
+  @include mixins.pill-text-colors;
 
   &--outline {
     color: colors.$cool-black-30;
@@ -107,6 +65,52 @@
 
 .route-pill__slashed-part-2 {
   display: inline-block;
+}
+
+.route-pill__dual-container {
+  width: 100%;
+  height: 100%;
+}
+
+.route-pill__dual-text {
+  position: absolute;
+  width: 144px;
+  font-size: 48px;
+  font-weight: 700;
+  line-height: 74px;
+  text-align: center;
+  clip-path: path(
+    "M 0 37 C 0 16.565 16.565 0 37 0 L 112 0 C 119.386 0 126.189 2.195 131.857 5.961 C 124.053 13.51 119.201 24.087 119.201 35.797 C 119.201 47.506 124.053 58.083 131.857 65.632 C 126.189 69.399 119.386 71.593 112 71.593 L 37 71.593 C 16.565 71.593 0 55.028 0 34.593 Z"
+  );
+
+  @include mixins.pill-text-colors;
+  @include mixins.pill-background-colors;
+
+  &--small {
+    font-size: 42px;
+  }
+
+  &--large {
+    font-size: 48px;
+  }
+}
+
+.route-pill__dual-secondary {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
+
+  @include mixins.pill-background-colors;
+}
+
+.route-pill__dual-secondary-image {
+  height: 52px;
 }
 
 .alert-widget__content__route-pills--small {

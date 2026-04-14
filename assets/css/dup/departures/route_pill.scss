@@ -1,43 +1,14 @@
 @use "CSS/colors";
+@use "CSS/common/route_pill_mixins" as mixins;
 
 .route-pill {
   position: relative;
-  width: 248px;
-  height: 144px;
-  margin: 32px;
+  width: 100%;
+  height: 100%;
+  font-family: Helvetica, sans-serif;
   border-radius: 100px;
 
-  &--blue {
-    background-color: colors.$line-blue;
-  }
-
-  &--green {
-    background-color: colors.$line-green;
-  }
-
-  &--ocean_blue {
-    background-color: colors.$line-capeflyer;
-  }
-
-  &--orange {
-    background-color: colors.$line-orange;
-  }
-
-  &--purple {
-    background-color: colors.$line-cr;
-  }
-
-  &--red {
-    background-color: colors.$line-red;
-  }
-
-  &--silver {
-    background-color: colors.$line-silver;
-  }
-
-  &--teal {
-    background-color: colors.$line-ferry;
-  }
+  @include mixins.pill-background-colors;
 
   &--yellow {
     width: 280px;
@@ -56,18 +27,17 @@
 .route-pill__text {
   position: absolute;
   width: 100%;
-  font-family: Helvetica, sans-serif;
   font-size: 96px;
   font-weight: 700;
   line-height: 144px;
-  color: white;
   text-align: center;
   letter-spacing: 0.0277em;
+
+  @include mixins.pill-text-colors;
 
   &--yellow {
     font-size: 128px;
     line-height: 168px;
-    color: black;
   }
 
   &--green,
@@ -90,7 +60,6 @@
 .route-pill__slashed-text {
   position: absolute;
   width: 100%;
-  font-family: Helvetica, sans-serif;
   font-size: 32px;
   font-weight: 700;
   line-height: 74px;
@@ -125,4 +94,48 @@
     font-size: 28px;
     line-height: 64px;
   }
+}
+
+.route-pill__dual-container {
+  width: 100%;
+  height: 100%;
+  padding-top: 8px;
+}
+
+.route-pill__dual-text {
+  position: absolute;
+  width: 248px;
+  height: 128px;
+  font-size: 96px;
+  font-weight: 700;
+  line-height: 128px;
+  text-align: center;
+  clip-path: path(
+    "M235.745 10.6577C225.611 3.92349 213.448 0 200.368 0H64C28.6538 0 0 28.6538 0 64C0 99.3462 28.6537 128 63.9999 128H200.368C213.448 128 225.611 124.076 235.745 117.342C221.792 103.846 213.118 84.9349 213.118 63.9999C213.118 43.065 221.791 24.1539 235.745 10.6577Z"
+  );
+
+  @include mixins.pill-text-colors;
+  @include mixins.pill-background-colors;
+
+  &--small {
+    font-size: 84px;
+  }
+}
+
+.route-pill__dual-secondary {
+  position: absolute;
+  right: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 128px;
+  height: 128px;
+  border-radius: 50%;
+  box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
+
+  @include mixins.pill-background-colors;
+}
+
+.route-pill__dual-secondary-image {
+  height: 104px;
 }

@@ -11,9 +11,7 @@ import { classWithModifier } from "Util/utils";
 const NormalSection: ComponentType<Props> = ({ rows }) => {
   if (rows.length === 0) return null;
 
-  const classModifier = shortenHeadsignsForSection(rows)
-    ? "shortened-headsigns"
-    : "";
+  const classModifier = sectionHasWideTimeCol(rows) ? "extended-times" : "";
 
   return (
     <div className={classWithModifier("departures-section", classModifier)}>
@@ -30,8 +28,8 @@ const NormalSection: ComponentType<Props> = ({ rows }) => {
   );
 };
 
-const shortenHeadsignsForSection = (rows: Row[]) => {
-  // Stop away messages and First Trip text take up a larger block of space,
+const sectionHasWideTimeCol = (rows: Row[]) => {
+  // Stop away messages, headway information, and First Trip text take up a larger block of space,
   // so we need to shorten the space designated for headsigns.
   return rows.some(
     (row) =>

@@ -3,6 +3,7 @@ import type { ComponentType } from "react";
 import RoutePill, { Pill } from "./route_pill";
 import Destination from "./destination";
 import DepartureTimes, { TimeWithCrowding } from "./departure_times";
+import { classWithModifiers } from "Util/utils";
 
 type DepartureRow = {
   id: string;
@@ -21,11 +22,7 @@ const DepartureRow: ComponentType<DepartureRow> = ({
   times_with_crowding: timesWithCrowding,
 }) => {
   return (
-    <div
-      className={
-        "departure-row" + (isBeforeDirectionSplit ? " direction-split" : "")
-      }
-    >
+    <div className={departureRowClassName(route, isBeforeDirectionSplit)}>
       <div className="departure-row__route">
         <RoutePill pill={route} />
       </div>
@@ -37,6 +34,20 @@ const DepartureRow: ComponentType<DepartureRow> = ({
       </div>
     </div>
   );
+};
+
+const departureRowClassName = (
+  route: Pill,
+  isBeforeDirectionSplit: boolean,
+) => {
+  const modifiers: string[] = [];
+  if (route.type === "dual") {
+    modifiers.push("wide-pill");
+  }
+  if (isBeforeDirectionSplit) {
+    modifiers.push("direction-split");
+  }
+  return classWithModifiers("departure-row", modifiers);
 };
 
 export default DepartureRow;

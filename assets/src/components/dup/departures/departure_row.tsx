@@ -4,6 +4,7 @@ import type DepartureRowBase from "Components/departures/departure_row";
 import DepartureTimes from "Components/departures/departure_times";
 import RoutePill from "Components/departures/route_pill";
 import Destination from "./destination";
+import { classWithModifier } from "Util/utils";
 
 const DepartureRow: ComponentType<DepartureRowBase> = ({
   headsign,
@@ -11,8 +12,11 @@ const DepartureRow: ComponentType<DepartureRowBase> = ({
   times_with_crowding: timesWithCrowding,
   is_first_trip: isFirstTrip,
 }) => {
+  const parentClassModifier =
+    route.type === "dual" ? "extended-route_pill" : "";
+
   return (
-    <div className="departure-row">
+    <div className={classWithModifier("departure-row", parentClassModifier)}>
       <div className="departure-row__route">
         <RoutePill pill={route} />
       </div>

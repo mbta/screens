@@ -17,7 +17,14 @@
 
 .departure-row__route {
   display: inline-block;
+  width: 248px;
+  height: 144px;
+  margin: 32px;
   vertical-align: middle;
+
+  .departure-row--extended-route_pill & {
+    width: 351px;
+  }
 }
 
 .departure-row__destination {
@@ -34,7 +41,7 @@
   color: colors.$cool-black-15;
   text-align: right;
 
-  .departures-section--shortened-headsigns & {
+  .departures-section--extended-times & {
     width: 733px;
   }
 }

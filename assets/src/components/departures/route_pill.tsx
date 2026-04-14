@@ -5,7 +5,8 @@ import { imagePath, classWithModifiers } from "Util/utils";
 type Pill =
   | (TextPill & { type: "text" })
   | (IconPill & { type: "icon" })
-  | (SlashedPill & { type: "slashed" });
+  | (SlashedPill & { type: "slashed" })
+  | (DualPill & { type: "dual" });
 
 interface BasePill {
   color: Color;
@@ -20,6 +21,12 @@ interface TextPill extends BasePill {
 
 interface IconPill extends BasePill {
   icon: PillIcon;
+}
+
+interface DualPill extends BasePill {
+  text: string;
+  icon: PillIcon;
+  secondary_color: Color;
 }
 
 interface SlashedPill extends BasePill {
@@ -87,6 +94,40 @@ const IconRoutePill: ComponentType<IconPill> = ({ icon }) => {
   );
 };
 
+const DualRouteIconPill: ComponentType<DualPill> = ({
+  text,
+  icon,
+  color,
+  secondary_color: secondaryColor,
+}) => {
+  const iconSrc = imagePath(pathForIcon[icon]);
+
+  const routeNum = Number(text);
+  const textModifiers: string[] = [color];
+  if (isNaN(routeNum)) {
+    textModifiers.push(text.length > 3 ? "small" : "large");
+  } else {
+    textModifiers.push("large");
+  }
+
+  return (
+    <div className="route-pill__dual-container">
+      <div
+        className={classWithModifiers("route-pill__dual-text", textModifiers)}
+      >
+        {text}
+      </div>
+      <div
+        className={classWithModifiers("route-pill__dual-secondary", [
+          secondaryColor,
+        ])}
+      >
+        <img className="route-pill__dual-secondary-image" src={iconSrc} />
+      </div>
+    </div>
+  );
+};
+
 const SlashedRoutePill: ComponentType<SlashedPill> = ({ part1, part2 }) => {
   return (
     <div className="route-pill__slashed-text">
@@ -103,7 +144,7 @@ type Props = {
 };
 
 const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
-  const modifiers: string[] = [pill.color];
+  const modifiers: string[] = pill.type === "dual" ? ["dual"] : [pill.color];
   if (outline) modifiers.push("outline");
 
   let innerContent: JSX.Element | null = null;
@@ -125,6 +166,10 @@ const RoutePill: ComponentType<Props> = ({ pill, outline, useRouteAbbrev }) => {
 
       case "icon":
         innerContent = <IconRoutePill {...pill} />;
+        break;
+
+      case "dual":
+        innerContent = <DualRouteIconPill {...pill} />;
         break;
 
       case "slashed":
@@ -167,6 +212,8 @@ const routePillKey = (pill: Pill): string => {
       return pill.text;
     case "icon":
       return pill.icon;
+    case "dual":
+      return `${pill.text}-${pill.icon}`;
     case "slashed":
       return `${pill.part1}-${pill.part2}`;
   }
