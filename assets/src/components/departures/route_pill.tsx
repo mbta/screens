@@ -101,14 +101,15 @@ const DualRouteIconPill: ComponentType<DualPill> = ({
   secondary_color: secondaryColor,
 }) => {
   const iconSrc = imagePath(pathForIcon[icon]);
-  const textModifiers: string[] = [color];
+
   const routeNum = Number(text);
+  const textModifiers: string[] = [color];
   if (isNaN(routeNum)) {
     textModifiers.push(text.length > 3 ? "small" : "large");
   } else {
     textModifiers.push("large");
   }
-  classWithModifiers("route-pill__dual-primary-pill", textModifiers);
+
   return (
     <div className="route-pill__dual-container">
       <div
