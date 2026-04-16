@@ -17,13 +17,16 @@
 
 .departure-row__route {
   display: inline-block;
-  width: 248px;
-  height: 144px;
-  margin: 32px;
   vertical-align: middle;
 
   .departure-row--extended-route_pill & {
     width: 351px;
+  }
+
+  &:not(.departure-row__route--yellow) {
+    width: 248px;
+    height: 144px;
+    margin: 32px;
   }
 }
 
