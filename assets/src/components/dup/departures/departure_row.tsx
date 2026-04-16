@@ -17,7 +17,7 @@ const DepartureRow: ComponentType<DepartureRowBase> = ({
 
   return (
     <div className={classWithModifier("departure-row", parentClassModifier)}>
-      <div className="departure-row__route">
+      <div className={classWithModifier("departure-row__route", route.color)}>
         <RoutePill pill={route} />
       </div>
       <div className="departure-row__destination">
