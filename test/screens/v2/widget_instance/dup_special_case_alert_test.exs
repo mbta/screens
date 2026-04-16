@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
 
   alias Screens.LocationContext
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
+  alias Screens.V2.WidgetInstance.DupAlert
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
   alias ScreensConfig.{Alerts, Departures, FreeTextLine, Screen}
   alias ScreensConfig.Screen.Dup
@@ -297,6 +298,65 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         }
       ]
 
+      # WB B / C / D shuttle alert with Kenmore inside
+      kenmore_inside_alert =
+        %Screens.Alerts.Alert{
+          active_period: [{~U[2023-04-14 10:53:53Z], ~U[2023-04-14 21:53:59Z]}],
+          cause: :unknown,
+          created_at: ~U[2023-04-14 10:53:54Z],
+          description:
+            "Affected stops:\r\nHynes\r\nKenmore\r\nBlandford Street\r\nSaint Mary's Street\r\nFenway",
+          effect: :shuttle,
+          header: "Shuttle buses replacing Green Line service",
+          id: "137273",
+          informed_entities: [
+            ie(stop_id: "70187", route: "Green-E", route_type: 0),
+            ie(stop_id: "70149", route: "Green-D", route_type: 0),
+            ie(stop_id: "71151", route: "Green-B", route_type: 0),
+            ie(stop_id: "70148", route: "Green-D", route_type: 0),
+            ie(stop_id: "70149", route: "Green-C", route_type: 0),
+            ie(stop_id: "71150", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-D", route_type: 0),
+            ie(stop_id: "place-fenwy", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
+            ie(stop_id: "70187", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-E", route_type: 0),
+            ie(stop_id: "70151", route: "Green-E", route_type: 0),
+            ie(stop_id: "70148", route: "Green-E", route_type: 0),
+            ie(stop_id: "70186", route: "Green-D", route_type: 0),
+            ie(stop_id: "70150", route: "Green-B", route_type: 0),
+            ie(stop_id: "71151", route: "Green-C", route_type: 0),
+            ie(stop_id: "71150", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-bland", route: "Green-C", route_type: 0),
+            ie(stop_id: "70148", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-fenwy", route: "Green-C", route_type: 0),
+            ie(stop_id: "70151", route: "Green-B", route_type: 0),
+            ie(stop_id: "71151", route: "Green-D", route_type: 0),
+            ie(stop_id: "70212", route: "Green-D", route_type: 0),
+            ie(stop_id: "70151", route: "Green-C", route_type: 0),
+            ie(stop_id: "70212", route: "Green-C", route_type: 0),
+            ie(stop_id: "70211", route: "Green-D", route_type: 0),
+            ie(stop_id: "71151", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-kencl", route: "Green-D", route_type: 0),
+            ie(stop_id: "70149", route: "Green-B", route_type: 0),
+            ie(stop_id: "71150", route: "Green-D", route_type: 0),
+            ie(stop_id: "70212", route: "Green-E", route_type: 0),
+            ie(stop_id: "70211", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-smary", route: "Green-E", route_type: 0),
+            ie(stop_id: "place-hymnl", route: "Green-B", route_type: 0),
+            ie(stop_id: "place-hymnl", route: "Green-C", route_type: 0),
+            ie(stop_id: "place-hymnl", route: "Green-D", route_type: 0)
+          ],
+          lifecycle: "NEW",
+          severity: 7,
+          timeframe: nil,
+          updated_at: ~U[2023-04-14 19:53:54Z],
+          url: nil
+        }
+
       wtc_alerts = [
         %Screens.Alerts.Alert{
           active_period: [{~U[2023-04-14 10:48:05Z], ~U[2023-04-14 16:53:05Z]}],
@@ -347,6 +407,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         now: now,
         fetch_stop_name_fn: fn _ -> "Test" end,
         kenmore_alerts: kenmore_alerts,
+        kenmore_inside_alert: kenmore_inside_alert,
         wtc_alerts: wtc_alerts,
         fetch_location_context_fn: fn
           _, stop_id, _ ->
@@ -608,6 +669,23 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
 
       assert Enum.at(expected_serialized_json, 2) ==
                DupSpecialCaseAlert.serialize(Enum.at(actual_widgets, 2))
+    end
+
+    test "serialize DupAlert for alerts inside Kenmore, bypasses special case", context do
+      alerts = [context.kenmore_inside_alert]
+
+      fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
+
+      actual_widgets =
+        DupAlerts.alert_instances(
+          context.config_kenmore,
+          context.now,
+          context.fetch_stop_name_fn,
+          fetch_alerts_fn,
+          context.fetch_location_context_fn
+        )
+
+      assert Enum.all?(actual_widgets, &match?(%DupAlert{}, &1))
     end
 
     test "serializes WTC special case: WTC is detoured", context do
