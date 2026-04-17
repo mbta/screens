@@ -6,4 +6,4 @@
  * to help determine which version of the client a given DUP data request is
  * coming from.
  */
-export const DUP_VERSION = "26.02.11.1";
+export const DUP_VERSION = "26.04.16.1";
