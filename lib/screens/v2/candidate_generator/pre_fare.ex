@@ -19,7 +19,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
     &CandidateGenerator.PreFare.ElevatorStatus.instances/2,
     &Widgets.FullLineMap.full_line_map_instances/2,
     &Widgets.Evergreen.evergreen_content_instances/2,
-    &Widgets.Departures.departures_instances/2
+    &Widgets.Departures.departures_instances/2,
+    &Widgets.EmergencyTakeover.emergency_takeover_instances/2
   ]
 
   @body_right_layout {:body_right,

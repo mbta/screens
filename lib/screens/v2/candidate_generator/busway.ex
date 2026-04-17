@@ -10,7 +10,8 @@ defmodule Screens.V2.CandidateGenerator.Busway do
   @instance_fns [
     &Widgets.Departures.departures_instances/2,
     &Widgets.Evergreen.evergreen_content_instances/2,
-    &Widgets.Header.instances/2
+    &Widgets.Header.instances/2,
+    &Widgets.EmergencyTakeover.emergency_takeover_instances/2
   ]
 
   @impl CandidateGenerator
