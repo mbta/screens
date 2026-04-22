@@ -31,7 +31,8 @@ See the [`WidgetInstance` protocol](/lib/screens/v2/widget_instance.ex)'s inline
 ## Request data flow / how the framework logic works
 
 Screens team members can see this as a [flowchart in Miro](https://miro.com/app/board/o9J_lDRaax4=/).
-The module where most of this logic lives is [`Screens.V2.ScreenData`](/lib/screens/v2/screen_data.ex), starting with `by_screen_id/2`.
+
+The module where most of this logic lives is server-side in [`Screens.V2.ScreenData`](/lib/screens/v2/screen_data.ex), starting with `generate/2`.
 
 1. Client requests `/v2/api/screen/{id}`. Subsequent steps take place on the server.
 1. We get the config stored under `id` in the screen configuration file. The file lives in S3 and the Screens application caches its contents locally in an [ETS Table](/lib/screens/config/cache.ex).
@@ -123,8 +124,8 @@ This breaks the isolation that we enforce on all other widgets, but audio-only w
 | **Widget** | A self-contained and isolated "mini-app" that displays some info on a screen. | Departures list, alert, subway status, header, evergreen content |
 | **Candidate generator** | A backend module responsible for fetching real-time data and converting it to **candidate** widgets. Each screen type has one candidate generator module. | [Pre-fare candidate generator](/lib/screens/v2/candidate_generator/pre_fare.ex) |
 | **Candidate** | A **widget** that has not yet been definitively placed in the **layout**. | A piece of evergreen content that may or may not get "bumped" off the screen by higher-priority widgets like alerts. |
-| **Template** | A tree-like data structure that describes the **regions** and **slots** of a screen type, and resolves to one of several possible **layouts** when combined with **candidate** widgets. Each screen type has one template, defined in its **candidate generator** module. | [Bus shelter template](/lib/screens/v2/candidate_generator/bus_shelter.ex#L18) |
-| **Region** | An area of a screen that contains one or more **layout variations**. | [`:body` region on the pre-fare template](/lib/screens/v2/candidate_generator/pre_fare.ex#L24-L53) |
-| **Layout variation** | One way to fill a **region** with **slots**, or even further nested **regions**. | [`:body_normal` and `:body_takeover` on the pre-fare template](/lib/screens/v2/candidate_generator/pre_fare.ex#L26-L52) are two layout variations. |
+| **Template** | A tree-like data structure that describes the **regions** and **slots** of a screen type, and resolves to one of several possible **layouts** when combined with **candidate** widgets. Each screen type has one template, defined in its **candidate generator** module. | [Bus shelter template](/lib/screens/v2/candidate_generator/bus_shelter.ex) |
+| **Region** | An area of a screen that contains one or more **layout variations**. | [`:body` region on the pre-fare template](/lib/screens/v2/candidate_generator/pre_fare.ex) |
+| **Layout variation** | One way to fill a **region** with **slots**, or even further nested **regions**. | [`:body_normal` and `:body_takeover` on the pre-fare template](/lib/screens/v2/candidate_generator/pre_fare.ex) are two layout variations. |
 | **Layout** | A tree-like data structure produced by resolving all of a **template**'s **layout variations** to a defined set of **slots**. The layout is selected by placing **widgets** into the **template** one at a time in priority order, removing **layout variations** that each one cannot fit in. | Pre-fare template with selected layout variations: `:body_normal`, `:body_left_normal`, `:body_right_takeover`. |
-| **Slot** | A uniquely labeled space with fixed pixel dimensions and position, which one **widget** can occupy. Slots are the "leaf nodes" of a **template**'s tree structure. | On pre-fare screens, `:header`, `main_content_left`, `:full_body_left`, `:large`, `:medium_left`, `:full_screen`, and so on. |
+| **Slot** | A uniquely labeled space with fixed pixel dimensions and position, which one **widget** can occupy. Slots are the "leaf nodes" of a **template**'s tree structure. | On [pre-fare screens](/lib/screens/v2/candidate_generator/pre_fare.ex), `:header`, `main_content_left`, `:full_body_left`, `:large`, `:medium_left`, `:full_body`, and so on. |
