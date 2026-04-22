@@ -55,7 +55,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
            {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
         alerts
         |> relevant_alerts(config, location_context, now)
-        |> alert_special_cases(config)
+        |> alert_special_cases(config, location_context)
         |> create_alert_widgets(config, location_context, stop_name)
       else
         :error -> []
@@ -157,25 +157,49 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   # If this is a special case, this function returns the widgets that should be used for it.
   # Otherwise, returns the alerts unchanged.
-  @spec alert_special_cases(list(Alert.t()), ScreensConfig.Screen.t()) ::
+  #
+  # In the case where we are inside of any of the alerts, we assume that it will create
+  # the full screen alert rather than use the special case. In this case, we bypass
+  # the special case altogether.
+  @spec alert_special_cases(list(Alert.t()), ScreensConfig.Screen.t(), LocationContext.t()) ::
           {:normal, list(Alert.t())} | {:special, list(Screens.V2.WidgetInstance.t())}
-  defp alert_special_cases([], _), do: {:normal, []}
+  defp alert_special_cases([], _, _), do: {:normal, []}
 
   defp alert_special_cases(
          alerts,
-         %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}}
+         %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}},
+         location_context
        ) do
     case stop_id do
-      "place-kencl" -> kenmore_special_case(alerts)
-      "place-wtcst" -> wtc_special_case(alerts)
-      _ -> {:normal, alerts}
+      "place-kencl" ->
+        inside_alert = Enum.any?(alerts, &inside_alert?(&1, location_context))
+        kenmore_special_case(alerts, inside_alert)
+
+      "place-wtcst" ->
+        wtc_special_case(alerts)
+
+      _ ->
+        {:normal, alerts}
     end
+  end
+
+  @spec inside_alert?(Alert.t(), LocationContext.t()) :: boolean()
+  defp inside_alert?(alert, location_context) do
+    LocalizedAlert.location(%{alert: alert, location_context: location_context}) == :inside
   end
 
   # In the case where Kenmore has 2 or more boundary shuttles / suspensions to the west,
   # don't only select 1 alert; instead look at all alerts and make custom text
-  @spec kenmore_special_case(list(Alert.t())) :: {:special, list(Screens.V2.WidgetInstance.t())}
-  defp kenmore_special_case(alerts) do
+  #
+  # In cases where we are inside any of the alerts, assume that we will just use the
+  # full screen presentation of the alert and bypass this special case altogether
+  @spec kenmore_special_case(list(Alert.t()), boolean()) ::
+          {:normal, list(Alert.t())}
+          | {:special, list(Screens.V2.WidgetInstance.t())}
+
+  defp kenmore_special_case(alerts, true), do: {:normal, alerts}
+
+  defp kenmore_special_case(alerts, _inside_location) do
     branches =
       alerts
       |> Enum.filter(fn a -> a.effect === :shuttle end)
