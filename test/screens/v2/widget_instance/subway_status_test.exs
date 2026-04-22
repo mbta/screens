@@ -1233,8 +1233,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                   stop: %Stop{
                     id: "place-portr",
                     child_stops: [
-                      %Stop{id: "70065", platform_name: "Ashmont/Braintree", location_type: 0},
-                      %Stop{id: "70066", platform_name: "Alewife", location_type: 0}
+                      %Stop{
+                        id: "70065",
+                        platform_name: "Ashmont/Braintree",
+                        location_type: 0,
+                        vehicle_type: :subway
+                      },
+                      %Stop{
+                        id: "70066",
+                        platform_name: "Alewife",
+                        location_type: 0,
+                        vehicle_type: :subway
+                      }
                     ]
                   },
                   route_type: 1
@@ -1280,15 +1290,30 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                   stop: %Stop{
                     id: "place-eliot",
                     child_stops: [
-                      %Stop{id: "70166", platform_name: "Park Street & North", location_type: 0},
-                      %Stop{id: "70167", platform_name: "Riverside", location_type: 0}
+                      %Stop{
+                        id: "70166",
+                        platform_name: "Park Street & North",
+                        location_type: 0,
+                        vehicle_type: :subway
+                      },
+                      %Stop{
+                        id: "70167",
+                        platform_name: "Riverside",
+                        location_type: 0,
+                        vehicle_type: :subway
+                      }
                     ]
                   },
                   route_type: 1
                 ),
                 ie(
                   route: "Green-D",
-                  stop: %Stop{id: "70166", platform_name: "Park Street & North", location_type: 0},
+                  stop: %Stop{
+                    id: "70166",
+                    platform_name: "Park Street & North",
+                    location_type: 0,
+                    vehicle_type: :subway
+                  },
                   route_type: 1
                 )
               ]
@@ -1319,11 +1344,17 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       closed_child_stop = %Stop{
         id: "70201",
         platform_name: "North Station & North",
-        location_type: 0
+        location_type: 0,
+        vehicle_type: :subway
       }
 
       child_stops = [
-        %Stop{id: "70201", platform_name: "North Station & North", location_type: 0},
+        %Stop{
+          id: "70201",
+          platform_name: "North Station & North",
+          location_type: 0,
+          vehicle_type: :subway
+        },
         closed_child_stop
       ]
 
@@ -1369,18 +1400,30 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       porter_to_ashmont_stop = %Stop{
         id: "70065",
         platform_name: "Ashmont/Braintree",
-        location_type: 0
+        location_type: 0,
+        vehicle_type: :subway
       }
 
-      porter_to_alewife_stop = %Stop{id: "70066", platform_name: "Alewife", location_type: 0}
+      porter_to_alewife_stop = %Stop{
+        id: "70066",
+        platform_name: "Alewife",
+        location_type: 0,
+        vehicle_type: :subway
+      }
 
       davis_to_ashmont_stop = %Stop{
         id: "70063",
         platform_name: "Ashmont/Braintree",
-        location_type: 0
+        location_type: 0,
+        vehicle_type: :subway
       }
 
-      davis_to_alewife_stop = %Stop{id: "70064", platform_name: "Alewife", location_type: 0}
+      davis_to_alewife_stop = %Stop{
+        id: "70064",
+        platform_name: "Alewife",
+        location_type: 0,
+        vehicle_type: :subway
+      }
 
       instance = %SubwayStatus{
         subway_alerts: [
@@ -1546,13 +1589,15 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                       %Stop{
                         id: "70086",
                         platform_name: "Alewife (from Ashmont)",
-                        location_type: 0
+                        location_type: 0,
+                        vehicle_type: :subway
                       },
                       %Stop{id: "70095", platform_name: "Braintree", location_type: 0},
                       %Stop{
                         id: "70096",
                         platform_name: "Alewife (from Braintree)",
-                        location_type: 0
+                        location_type: 0,
+                        vehicle_type: :subway
                       }
                     ],
                     location_type: 1

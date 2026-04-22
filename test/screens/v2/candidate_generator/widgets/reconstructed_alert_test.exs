@@ -44,20 +44,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         id: "70036",
         name: "Oak Grove - Southbound",
         platform_name: "Southbound",
-        location_type: "0"
+        location_type: 0,
+        vehicle_type: :subway
       }
 
       oak_grove_nb = %Stop{
         id: "70035",
         name: "Oak Grove - Northbound",
         platform_name: "Northbound",
-        location_type: "0"
+        location_type: 0,
+        vehicle_type: :subway
       }
 
       oak_grove_parent = %Stop{
         id: "place-ogmnl",
         name: "Oak Grove",
-        location_type: "1",
+        location_type: 1,
         child_stops: [oak_grove_nb, oak_grove_sb]
       }
 
@@ -65,20 +67,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         id: "70034",
         name: "Malden Center - Southbound",
         platform_name: "Southbound",
-        location_type: "0"
+        location_type: 0,
+        vehicle_type: :subway
       }
 
       malden_center_nb = %Stop{
         id: "70033",
         name: "Malden Center - Northbound",
         platform_name: "Northbound",
-        location_type: "0"
+        location_type: 0,
+        vehicle_type: :subway
       }
 
       malden_center_parent = %Stop{
         id: "place-mlmnl",
         name: "Malden Center",
-        location_type: "1",
+        location_type: 1,
         child_stops: [malden_center_nb, malden_center_sb]
       }
 
@@ -204,7 +208,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               stop: %Stop{
                 id: "place-ogmnl",
                 name: "Oak Grove",
-                location_type: "1",
+                location_type: 1,
                 child_stops: [oak_grove_sb, oak_grove_nb]
               }
             ),
@@ -220,7 +224,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               stop: %Stop{
                 id: "place-mlmnl",
                 name: "Malden Center",
-                location_type: "1",
+                location_type: 1,
                 child_stops: [malden_center_sb, malden_center_nb]
               }
             ),
@@ -258,7 +262,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                   stop: %Stop{
                     id: "place-ogmnl",
                     name: "Oak Grove",
-                    location_type: "1",
+                    location_type: 1,
                     child_stops: [oak_grove_sb, oak_grove_nb]
                   }
                 ),
@@ -282,7 +286,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                   stop: %Stop{
                     id: "place-mlmnl",
                     name: "Malden Center",
-                    location_type: "1",
+                    location_type: 1,
                     child_stops: [malden_center_sb, malden_center_nb]
                   }
                 ),
@@ -564,7 +568,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                   stop: %Stop{
                     id: "place-ogmnl",
                     name: "Oak Grove",
-                    location_type: "1",
+                    location_type: 1,
                     child_stops: [oak_grove_nb, oak_grove_sb]
                   },
                   route: "Orange",
@@ -590,7 +594,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                   stop: %Stop{
                     id: "place-mlmnl",
                     name: "Malden Center",
-                    location_type: "1",
+                    location_type: 1,
                     child_stops: [malden_center_nb, malden_center_sb]
                   }
                 ),
@@ -615,7 +619,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                   stop: %Stop{
                     id: "place-ogmnl",
                     name: "Oak Grove",
-                    location_type: "1",
+                    location_type: 1,
                     child_stops: [oak_grove_nb, oak_grove_sb]
                   }
                 )
@@ -725,7 +729,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               stop: %Stop{
                 id: "place-mlmnl",
                 name: "Malden Center",
-                location_type: "1",
+                location_type: 1,
                 child_stops: [malden_center_sb, malden_center_nb]
               }
             ),
@@ -757,7 +761,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                   stop: %Stop{
                     id: "place-mlmnl",
                     name: "Malden Center",
-                    location_type: "1",
+                    location_type: 1,
                     child_stops: [malden_center_sb, malden_center_nb]
                   }
                 ),

@@ -35,12 +35,14 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
       %Screens.Stops.Stop{
         id: "child_plat_b0",
         platform_name: "Northbound",
-        location_type: 0
+        location_type: 0,
+        vehicle_type: :subway
       },
       %Screens.Stops.Stop{
         id: "child_plat_b1",
         platform_name: "Southbound",
-        location_type: 0
+        location_type: 0,
+        vehicle_type: :subway
       }
     ]
   }
@@ -330,7 +332,12 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
                 ie(route: "Blue", stop: %Stop{id: "place-x"}, route_type: 1),
                 ie(
                   route: "Blue",
-                  stop: %Stop{id: "child_plat_b0", platform_name: "Northbound"},
+                  stop: %Stop{
+                    id: "child_plat_b0",
+                    platform_name: "Northbound",
+                    location_type: 0,
+                    vehicle_type: :subway
+                  },
                   route_type: 1
                 )
               ]
