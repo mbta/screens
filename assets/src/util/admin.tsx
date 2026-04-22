@@ -38,7 +38,7 @@ export const SCREEN_APPS: { [key in AppId]: AppInfo } = {
   bus_eink_v2: { name: "Bus E-ink", hasAudio: true, variants: [] },
   bus_shelter_v2: { name: "Bus Shelter", hasAudio: true, variants: [] },
   busway_v2: { name: "Sectional", hasAudio: true, variants: [] },
-  dup_v2: { name: "DUP", hasAudio: false, variants: ["new_departures"] },
+  dup_v2: { name: "DUP", hasAudio: false, variants: ["old_departures"] },
   gl_eink_v2: { name: "GL E-ink", hasAudio: true, variants: [] },
   pre_fare_v2: { name: "Pre-Fare", hasAudio: true, variants: [] },
 };
