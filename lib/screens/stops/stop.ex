@@ -85,7 +85,12 @@ defmodule Screens.Stops.Stop do
   def fetch_subway_platforms_for_stop(stop_id) do
     {:ok, [%__MODULE__{child_stops: child_stops}]} = fetch(%{ids: [stop_id]}, true)
 
-    Enum.filter(child_stops, fn
+    filter_subway_platforms(child_stops)
+  end
+
+  @spec filter_subway_platforms(list(t())) :: list(t())
+  def filter_subway_platforms(stops) do
+    Enum.filter(stops, fn
       %__MODULE__{location_type: 0, vehicle_type: vt} when vt in ~w[light_rail subway]a -> true
       _ -> false
     end)
