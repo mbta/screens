@@ -2,7 +2,9 @@ import { type ComponentType, useLayoutEffect, useRef, useState } from "react";
 
 import type DestinationBase from "Components/departures/destination";
 import { useCurrentPage } from "Context/dup_page";
-import { hasOverflowX } from "Util/utils";
+import { classWithModifier, hasOverflowX } from "Util/utils";
+
+type DupDestination = DestinationBase & { classModifier: string };
 
 // Global abbreviations
 const ABBREVIATIONS = {
@@ -30,7 +32,7 @@ enum PHASES {
   DONE,
 }
 
-const RenderedDestination = ({ parts, index1, index2 }) => {
+const RenderedDestination = ({ parts, index1, index2, classModifier }) => {
   const currentPage = useCurrentPage();
 
   let pageContent: string;
@@ -46,13 +48,16 @@ const RenderedDestination = ({ parts, index1, index2 }) => {
   }
 
   return (
-    <div className="departure-destination">
+    <div className={classWithModifier("departure-destination", classModifier)}>
       <div className="departure-destination__headsign">{pageContent}</div>
     </div>
   );
 };
 
-const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
+const Destination: ComponentType<DupDestination> = ({
+  headsign,
+  classModifier,
+}) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
@@ -134,7 +139,12 @@ const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
   // Render paged version when done determining breaks
   if (phase === PHASES.DONE) {
     return (
-      <RenderedDestination index1={index1} index2={index2} parts={parts} />
+      <RenderedDestination
+        index1={index1}
+        index2={index2}
+        parts={parts}
+        classModifier={classModifier}
+      />
     );
   }
 
@@ -150,7 +160,7 @@ const Destination: ComponentType<DestinationBase> = ({ headsign }) => {
   }
 
   return (
-    <div className="departure-destination">
+    <div className={classWithModifier("departure-destination", classModifier)}>
       <div className="departure-destination__headsign" ref={firstLineRef}>
         {firstLine}
       </div>

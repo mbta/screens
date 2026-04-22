@@ -15,15 +15,21 @@ const DepartureRow: ComponentType<DepartureRowBase> = ({
   const parentClassModifier =
     route.type === "dual" ? "extended-route_pill" : "";
 
+  const classModifier = timesWithCrowding.some(
+    (time) => time.time?.type === "timestamp" && time?.time.am_pm,
+  )
+    ? "shortened-headsign"
+    : "";
+
   return (
     <div className={classWithModifier("departure-row", parentClassModifier)}>
-      <div className="departure-row__route">
+      <div className={classWithModifier("departure-row__route", route.color)}>
         <RoutePill pill={route} />
       </div>
       <div className="departure-row__destination">
-        <Destination {...headsign} />
+        <Destination {...headsign} classModifier={classModifier} />
       </div>
-      <div className="departure-row__time">
+      <div className={classWithModifier("departure-row__time", classModifier)}>
         {isFirstTrip && <div className="departure-row__first">First</div>}
         <DepartureTimes timesWithCrowding={timesWithCrowding} />
       </div>
