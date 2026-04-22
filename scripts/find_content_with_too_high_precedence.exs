@@ -22,14 +22,14 @@ config_file = Keyword.get(opts, :config, "./priv/local.json")
 defmodule ValidateConfig do
   # This guard makes assumptions about the returned values from
   # `lib/screens/v2/widget_instance/alert.ex#priority/1`
-  defguard is_too_high_priority(val) when is_list(val) and val in [[0], [1], [0, 1], [1, 0]]
+  defguard is_too_high_priority(val) when is_list(val) and val in [[0], [0, 1], [1, 0]]
 
   def find_evergreen_with_too_high_priority(config_file) do
     with {:ok, body} <- File.read(config_file),
          {:ok, json} <- Jason.decode(body, keys: :atoms) do
       IO.puts("Sign_ID,Asset_Path")
 
-      Enum.map(json.screens, &evergreen_with_high_priorities/1)
+      Enum.map(json.screens, &bus_screen_evergreen_with_high_priorities/1)
       |> Enum.filter(fn content -> length(content) != 0 end)
       |> List.flatten()
       |> Enum.sort()
@@ -40,15 +40,18 @@ defmodule ValidateConfig do
     end
   end
 
-  def evergreen_with_high_priorities(
+  def bus_screen_evergreen_with_high_priorities(
         {screen_id, %{app_params: %{evergreen_content: all_evergreen_content}}}
       ) do
     all_evergreen_content
+    |> Enum.filter(fn _ ->
+      screen_id |> Atom.to_string() |> String.downcase() |> String.starts_with?("bus-")
+    end)
     |> Enum.filter(&too_high_priorities/1)
     |> Enum.map(fn evergreen_content -> {screen_id, evergreen_content.asset_path} end)
   end
 
-  def evergreen_with_high_priorities(_), do: []
+  def bus_screen_evergreen_with_high_priorities(_), do: []
 
   def too_high_priorities(%{priority: priorities}) when is_too_high_priority(priorities), do: true
   def too_high_priorities(_), do: false
