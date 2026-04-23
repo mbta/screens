@@ -165,7 +165,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     with [informed_parent_station] <- Alert.informed_parent_stations(alert),
          [_ | _] = child_platforms <- informed_parent_station.stop.child_stops,
          :partial_closure <- Alert.station_closure_type(alert, child_platforms) do
-      platform_ids = child_platforms |> Enum.map(& &1.id) |> MapSet.new()
+      platform_ids =
+        child_platforms |> Stop.filter_subway_platforms() |> Enum.map(& &1.id) |> MapSet.new()
 
       informed_entities
       |> Enum.filter(&(&1.stop.id in platform_ids))

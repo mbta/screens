@@ -158,6 +158,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     t
     |> LocalizedAlert.informed_routes_at_home_stop()
     |> Enum.flat_map(&Map.get(t.location_context.child_stops_at_station, &1, []))
+    |> Stop.filter_subway_platforms()
     |> Enum.uniq()
   end
 

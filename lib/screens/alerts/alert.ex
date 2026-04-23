@@ -420,16 +420,13 @@ defmodule Screens.Alerts.Alert do
     # Typically, these partial closures affecting child stops will only affect a single station.
     # However, we do want to consider the case in which multiple stations have closures,
     # but not every child stop at those parent stations are closed.
-
-    informed_parent_stations = informed_parent_stations(alert)
-
     platforms_affected_by_alert =
       informed_platforms_from_entities(informed_entities, platforms_at_informed_stations)
 
-    case informed_parent_stations do
+    case informed_parent_stations(alert) do
       [_single_parent_station] ->
         # Compare number of platforms in alert to total number of child platforms at station
-        if length(platforms_affected_by_alert) != length(platforms_at_informed_stations) do
+        if length(platforms_affected_by_alert) < length(platforms_at_informed_stations) do
           :partial_closure
         else
           :full_station_closure
