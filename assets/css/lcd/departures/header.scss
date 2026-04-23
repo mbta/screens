@@ -32,6 +32,10 @@
   display: none;
 }
 
+.departures-header__separator:last-child {
+  display: none;
+}
+
 .departures-header__image {
   vertical-align: middle;
 }
