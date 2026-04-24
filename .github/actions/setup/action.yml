@@ -9,7 +9,7 @@ runs:
       with:
         path: ~/.asdf
         key: asdf-${{ hashFiles('.tool-versions') }}
-    - uses: asdf-vm/actions/install@v3
+    - uses: asdf-vm/actions/install@v4
       if: steps.asdf-cache.outputs.cache-hit != 'true'
     - uses: mbta/actions/reshim-asdf@v2
       if: steps.asdf-cache.outputs.cache-hit == 'true'
