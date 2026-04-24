@@ -315,6 +315,4 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   defp serialize_shuttle_line("line-Red", _), do: %{text: "RL", color: :red}
   defp serialize_shuttle_line("line-CR-" <> _line, _), do: %{text: "CR", color: :purple}
   defp serialize_shuttle_line(_, _), do: %{text: "CR", color: :purple}
-
-  def shuttle_pill_enabled_screens, do: @shuttle_pill_enabled_screens
 end
