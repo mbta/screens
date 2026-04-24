@@ -81,11 +81,11 @@ defmodule Screens.LastTrip.LastTripTest do
     LastTrip.update_last_trip_cache(departures, DateTime.utc_now())
 
     assert LastTrip.last_trip_departure_times({"s1", "l1", "h1"}) == [
-             ~U[2024-10-11 12:30:00Z],
-             ~U[2024-10-11 12:20:00Z]
+             ~U[2024-10-11 12:20:00Z],
+             ~U[2024-10-11 12:30:00Z]
            ]
 
     assert LastTrip.last_trip_departure_times({"s2", "l2", "h2"}) == [~U[2024-10-11 12:20:00Z]]
-    assert LastTrip.last_trip_departure_times({"s3", "l3", "h3"}) == nil
+    assert LastTrip.last_trip_departure_times({"s3", "l3", "h3"}) == []
   end
 end

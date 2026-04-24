@@ -402,28 +402,20 @@ defmodule Screens.V2.RDS do
   end
 
   @spec after_last_trip?(destination_key(), DateTime.t()) :: boolean()
-  # Red Trunk stops need two last trip departures in order to classify as Service Ended
-  defp after_last_trip?({stop_id, _line_id, "Alewife"} = destination_key, now)
-       when stop_id in @red_trunk do
-    case @last_trip.last_trip_departure_times(destination_key) do
-      [_departure_time_one, _departure_time_two] = departure_times ->
-        departure_times
-        |> Enum.max()
-        |> after_last_trip_with_buffer?(now)
+  defp after_last_trip?({stop_id, _line_id, headsign} = destination_key, now) do
+    departure_times = @last_trip.last_trip_departure_times(destination_key)
+
+    case {red_trunk_to_alewife?(stop_id, headsign), departure_times} do
+      {true, [_last_departure_time_one, _last_departure_time_two] = departure_times} ->
+        Enum.max(departure_times, DateTime)
+
+      {false, [last_departure_time]} ->
+        last_departure_time
 
       _ ->
-        false
+        nil
     end
-  end
-
-  defp after_last_trip?(destination_key, now) do
-    case @last_trip.last_trip_departure_times(destination_key) do
-      [departure_time] ->
-        after_last_trip_with_buffer?(departure_time, now)
-
-      _ ->
-        false
-    end
+    |> after_last_trip_with_buffer?(now)
   end
 
   @spec group_by_destination([Departure.t()]) :: %{destination_key() => [Departure.t()]}
@@ -633,6 +625,12 @@ defmodule Screens.V2.RDS do
     do: true
 
   defp ie_affects_destination?(_, _, _), do: false
+
+  defp red_trunk_to_alewife?(stop_id, "Alewife") when stop_id in @red_trunk, do: true
+
+  defp red_trunk_to_alewife?(_stop_id, _headsign), do: false
+
+  defp after_last_trip_with_buffer?(nil, _now), do: false
 
   defp after_last_trip_with_buffer?(last_trip_departure_time, now) do
     departure_time_with_buffer =

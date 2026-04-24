@@ -17,19 +17,29 @@ defmodule Screens.LastTrip.LastTrip do
       fn %Departure{prediction: %Prediction{departure_time: departure_time}} -> departure_time end
     )
     |> Enum.each(fn {destination_key, new_departure_times} ->
-      if Cache.get(destination_key, nil) != new_departure_times do
-        Cache.put(destination_key, new_departure_times, ttl: time_to_service_end(now))
+      last_trip_times =
+        case Cache.get(destination_key) do
+          {:ok, %MapSet{} = departure_times} -> departure_times
+          _ -> MapSet.new()
+        end
+
+      new_last_trip_times = MapSet.new(new_departure_times)
+
+      unless MapSet.subset?(new_last_trip_times, last_trip_times) do
+        combined_last_trip_times = MapSet.union(new_last_trip_times, last_trip_times)
+
+        Cache.put(destination_key, combined_last_trip_times, ttl: time_to_service_end(now))
       end
     end)
 
     :ok
   end
 
-  @callback last_trip_departure_times(RDS.destination_key()) :: DateTime.t() | nil
+  @callback last_trip_departure_times(RDS.destination_key()) :: [DateTime.t()]
   def last_trip_departure_times(destination_key) do
     case Cache.get(destination_key) do
-      {:ok, nil} -> nil
-      {:ok, departure_times} -> departure_times
+      {:ok, nil} -> []
+      {:ok, departure_times} -> MapSet.to_list(departure_times)
     end
   end
 
@@ -42,9 +52,9 @@ defmodule Screens.LastTrip.LastTrip do
     if DateTime.compare(now, service_end_time) == :gt do
       service_end_time
       |> DateTime.add(1, :day)
-      |> DateTime.diff(now, :millisecond)
     else
-      DateTime.diff(service_end_time, now, :millisecond)
+      service_end_time
     end
+    |> DateTime.diff(now, :millisecond)
   end
 end
