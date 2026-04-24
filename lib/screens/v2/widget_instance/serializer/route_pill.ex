@@ -1,9 +1,11 @@
 defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @moduledoc false
 
+  alias Screens.Lines.Line
   alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.RouteType
+  alias ScreensConfig.Screen
 
   @type t :: text_pill() | icon_pill() | slashed_route_pill()
 
@@ -27,6 +29,14 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
           part1: String.t(),
           part2: String.t(),
           color: Route.color()
+        }
+
+  @type dual_route_pill :: %{
+          type: :dual,
+          text: String.t(),
+          icon: icon(),
+          color: Route.color(),
+          secondary_color: Route.color()
         }
 
   @type audio_route :: %{
@@ -65,29 +75,48 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
     "708" => "CT3"
   }
 
+  @shuttle_pill_enabled_screens [:bus_shelter_v2, :busway_v2, :dup_v2, :pre_fare_v2]
+
   # Any text longer than this max is not designed to appear correctly in our Pill Components
   @maximum_pill_text_length 3
 
-  @spec serialize_for_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) :: t()
-  def serialize_for_departure(route_id, route_name, route_type, track_number) do
-    route =
-      if route_type == :bus and String.contains?(route_name, "/") do
+  @spec serialize_for_departure(Route.t(), pos_integer() | nil, Screen.t()) :: t()
+  def serialize_for_departure(
+        %Route{id: route_id, type: route_type, line: %Line{id: line_id}} = route,
+        track_number,
+        screen
+      ) do
+    route_name = Route.name(route)
+
+    cond do
+      # Dual pills for shuttles replacing regular service routes
+      shuttle_route?(route, screen) ->
+        do_serialize_shuttle_pill(line_id)
+
+      # Slashed bus routes
+      route_type == :bus and String.contains?(route_name, "/") ->
         [part1, part2] = String.split(route_name, "/")
-        %{type: :slashed, part1: part1, part2: part2}
-      else
-        do_serialize(route_id, %{
+        %{type: :slashed, part1: part1, part2: part2, color: Route.color(route_id, route_type)}
+
+      true ->
+        route_id
+        |> do_serialize(%{
           route_name: route_name,
           track_number: track_number,
           gl_branch: true
         })
-      end
-
-    Map.put(route, :color, Route.color(route_id, route_type))
+        |> Map.put(:color, Route.color(route_id, route_type))
+    end
   end
 
-  @spec serialize_for_audio_departure(Route.id(), String.t(), RouteType.t(), pos_integer() | nil) ::
-          audio_route()
-  def serialize_for_audio_departure(route_id, route_name, route_type, track_number) do
+  @spec serialize_for_audio_departure(Route.t(), pos_integer() | nil, Screen.t()) :: audio_route()
+  def serialize_for_audio_departure(
+        %Route{id: route_id, type: route_type} = route,
+        track_number,
+        _screen
+      ) do
+    route_name = Route.name(route)
+
     vehicle_type =
       case route_type do
         :light_rail -> :train
@@ -254,4 +283,36 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   defp valid_text_for_pill?(text) do
     text != "" and String.length(text) <= @maximum_pill_text_length
   end
+
+  @spec shuttle_route?(Route.t() | nil, Screen.t()) :: boolean()
+  def shuttle_route?(%Route{id: route_id, line: %Line{id: line_id}}, %Screen{app_id: app_id}) do
+    # Shuttle routes have special pills on specific screens
+    # We only show special pills for shuttles replacing subway or CR lines
+    route_id |> String.downcase() |> String.contains?("shuttle") and
+      rail_line?(line_id) and
+      app_id in @shuttle_pill_enabled_screens
+  end
+
+  def shuttle_route?(_, _), do: false
+
+  defp rail_line?("line-Blue"), do: true
+  defp rail_line?("line-Orange"), do: true
+  defp rail_line?("line-Red"), do: true
+  defp rail_line?("line-CR-" <> _line), do: true
+  defp rail_line?(_), do: false
+
+  @spec do_serialize_shuttle_pill(Line.id()) :: dual_route_pill()
+  defp do_serialize_shuttle_pill(line_id) do
+    serialize_shuttle_line(line_id, nil)
+    |> Map.put(:type, :dual)
+    |> Map.put(:icon, :bus)
+    |> Map.put(:secondary_color, :yellow)
+  end
+
+  @spec serialize_shuttle_line(Line.id(), any()) :: map()
+  defp serialize_shuttle_line("line-Blue", _), do: %{text: "BL", color: :blue}
+  defp serialize_shuttle_line("line-Orange", _), do: %{text: "OL", color: :orange}
+  defp serialize_shuttle_line("line-Red", _), do: %{text: "RL", color: :red}
+  defp serialize_shuttle_line("line-CR-" <> _line, _), do: %{text: "CR", color: :purple}
+  defp serialize_shuttle_line(_, _), do: %{text: "CR", color: :purple}
 end
