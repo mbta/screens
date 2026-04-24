@@ -11,4 +11,12 @@ defmodule Screens.Lines.Line do
           short_name: String.t(),
           sort_order: integer()
         }
+
+  def color("line-Red"), do: :red
+  def color("line-Mattapan"), do: :red
+  def color("line-Orange"), do: :orange
+  def color("line-Green" <> _), do: :green
+  def color("line-Blue"), do: :blue
+  def color("line-CR-" <> _), do: :purple
+  def color(_), do: :yellow
 end

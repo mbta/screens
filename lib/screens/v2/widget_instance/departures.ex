@@ -115,6 +115,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
            optional(:time_in_epoch) => integer()
          }
 
+  @type serialized_headsign :: %{
+          headsign: String.t(),
+          variation: String.t() | nil
+        }
+
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
   @sl_route_ids ~w[741 742 743 746 749 751]
@@ -303,7 +308,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         departures,
         screen,
         now,
-        &RoutePill.serialize_for_audio_departure/4
+        &RoutePill.serialize_for_audio_departure/3
       )
     }
   end
@@ -407,7 +412,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
          rows,
          screen,
          now,
-         route_pill_serializer \\ &RoutePill.serialize_for_departure/4
+         route_pill_serializer \\ &RoutePill.serialize_for_departure/3
        )
 
   defp serialize_departure_group(
@@ -426,7 +431,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       id: row_id,
       type: :departure_row,
-      route: serialize_route(departures, route_pill_serializer),
+      route: serialize_route(departures, route_pill_serializer, screen),
       headsign: serialize_headsign(departures, screen),
       times_with_crowding: serialize_times_with_crowding(departures, screen, now),
       direction_id: serialize_direction_id(departures)
@@ -449,7 +454,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       id: row_id,
       type: :departure_row,
-      route: serialize_route(departures, route_pill_serializer),
+      route: serialize_route(departures, route_pill_serializer, screen),
       headsign: serialize_headsign(departures, screen),
       times_with_crowding: serialize_times_with_crowding(departures, screen, now),
       direction_id: serialize_direction_id(departures),
@@ -472,7 +477,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       id: hash_and_encode(departure_id),
       type: :departure_row,
-      route: serialize_route(departures, route_pill_serializer),
+      route: serialize_route(departures, route_pill_serializer, screen),
       headsign: serialize_headsign(departures, screen),
       times_with_crowding: [
         %{
@@ -499,7 +504,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       id: hash_and_encode(departure_id),
       type: :departure_row,
-      route: serialize_route(departures, route_pill_serializer),
+      route: serialize_route(departures, route_pill_serializer, screen),
       headsign:
         if headsign do
           %{headsign: headsign}
@@ -523,24 +528,67 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  def serialize_route([first_departure | _], route_pill_serializer) do
+  @spec serialize_route(
+          [Departure.t()],
+          (Departure.t(), pos_integer() | nil, Screen.t() -> RoutePill.t()),
+          Screen.t()
+        ) ::
+          RoutePill.t()
+  def serialize_route([first_departure | _], route_pill_serializer, screen) do
     route = Departure.route(first_departure)
-    %Route{id: route_id, type: route_type} = route
     track_number = Departure.track_number(first_departure)
 
-    route_pill_serializer.(route_id, Route.name(route), route_type, track_number)
+    route_pill_serializer.(route, track_number, screen)
   end
 
-  def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2}) do
-    headsign = Departure.headsign(first_departure)
+  @spec serialize_headsign([Departure.t()], Screen.t()) :: serialized_headsign()
+  def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2} = screen) do
+    headsign =
+      first_departure
+      |> Departure.headsign()
+      |> simplify_shuttle_headsign(first_departure, screen)
+
     headsign_replacements = Application.get_env(:screens, :dup_headsign_replacements)
 
     %{headsign: Map.get(headsign_replacements, headsign, headsign)}
   end
 
-  def serialize_headsign([first_departure | _], _) do
-    headsign = Departure.headsign(first_departure)
+  def serialize_headsign([first_departure | _], screen) do
+    first_departure
+    |> Departure.headsign()
+    |> simplify_shuttle_headsign(first_departure, screen)
+    |> headsign_with_variation()
+  end
 
+  @doc """
+  Removes "Shuttle" from parenthetical suffixes for routes showing a special shuttle pill.
+  If the parentheses contain only "Shuttle", removes the entire parenthetical.
+  If the parentheses contain a descriptor like "Express Shuttle" or "Local Shuttle",
+  keeps the descriptor but removes "Shuttle".
+  """
+  @spec simplify_shuttle_headsign(String.t(), Departure.t(), Screen.t()) :: String.t()
+  def simplify_shuttle_headsign(headsign, departure, screen) do
+    if RoutePill.shuttle_route?(Departure.route(departure), screen) do
+      case Regex.run(~r/^(.*?)\s*\(([^)]*?)\s*shuttle\s*\)\s*$/i, headsign) do
+        [_, base, prefix] ->
+          trimmed_prefix = String.trim(prefix)
+
+          if trimmed_prefix == "" do
+            String.trim(base)
+          else
+            String.trim(base) <> " (" <> trimmed_prefix <> ")"
+          end
+
+        nil ->
+          headsign
+      end
+    else
+      headsign
+    end
+  end
+
+  @spec headsign_with_variation(String.t()) :: serialized_headsign()
+  def headsign_with_variation(headsign) do
     via_pattern = ~r/(.+) (via .+)/
     paren_pattern = ~r/(.+) (\(.+)/
 
