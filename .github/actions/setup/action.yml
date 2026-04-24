@@ -4,7 +4,7 @@ description: Installs tools and dependencies
 runs:
   using: composite
   steps:
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: asdf-cache
       with:
         path: ~/.asdf
@@ -20,7 +20,7 @@ runs:
         mix local.rebar --force
         mix local.hex --force
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: ex-deps-cache
       with:
         path: |
@@ -34,7 +34,7 @@ runs:
         mix deps.get
         mix deps.compile
 
-    - uses: actions/cache@v4
+    - uses: actions/cache@v5
       id: js-deps-cache
       with:
         path: assets/node_modules
