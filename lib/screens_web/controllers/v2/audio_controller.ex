@@ -4,6 +4,7 @@ defmodule ScreensWeb.V2.AudioController do
 
   alias Phoenix.View
   alias Screens.V2.ScreenAudioData
+  alias ScreensConfig.EmergencyTakeover
   alias ScreensConfig.Screen
   alias ScreensWeb.Plug.{LegacyLogging, ScreenRequest}
 
@@ -13,6 +14,22 @@ defmodule ScreensWeb.V2.AudioController do
   plug LegacyLogging, :audio when action == :show
 
   def show(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _params), do: not_found(conn)
+
+  def show(
+        %{
+          assigns: %{
+            screen: %Screen{
+              app_params: %_app{
+                emergency_takeover: %EmergencyTakeover{audio_asset_path: audio_asset_path}
+              }
+            }
+          }
+        } = conn,
+        _params
+      )
+      when audio_asset_path != nil do
+    redirect(conn, external: audio_asset_path)
+  end
 
   def show(%{assigns: %{screen: screen}} = conn, params) do
     disposition = if Map.has_key?(params, "inline"), do: :inline, else: :attachment

@@ -76,6 +76,7 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
       departures_instances_fn = fn ^config, ^now -> [:departures] end
       evergreen_content_instances_fn = fn ^config, ^now -> [:evergreen] end
       alerts_instances_fn = fn ^config, ^now -> [:alert] end
+      emergency_takeover_instances_fn = fn ^config, ^now -> [:emergency_takeover] end
 
       actual_instances =
         Dup.candidate_instances(
@@ -84,10 +85,12 @@ defmodule Screens.V2.CandidateGenerator.DupTest do
           header_instances_fn,
           evergreen_content_instances_fn,
           departures_instances_fn,
-          alerts_instances_fn
+          alerts_instances_fn,
+          emergency_takeover_instances_fn
         )
 
-      assert Enum.sort(actual_instances) == ~w[alert departures evergreen header]a
+      assert Enum.sort(actual_instances) ==
+               ~w[alert departures emergency_takeover evergreen header]a
     end
   end
 end
