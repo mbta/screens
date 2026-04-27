@@ -1,0 +1,59 @@
+.wayfinding-point-container {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.direction-beam {
+  position: absolute;
+  bottom: 50%;
+  transform-origin: bottom center;
+}
+
+.wayfinding-point {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background-color: #fff;
+  border-radius: 50%;
+}
+
+.wayfinding-point--animated {
+  animation: ripple 2s linear infinite;
+}
+
+.inner-dot {
+  width: 30px;
+  height: 30px;
+  background-color: #4285f4;
+  border-radius: 50%;
+}
+
+.inner-dot--animated {
+  animation: breathing 3s infinite ease-in-out;
+}
+
+@keyframes breathing {
+  0%,
+  100% {
+    transform: scale(0.9);
+  }
+
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    box-shadow: 0 0 0 0 rgb(66 133 244 / 40%);
+  }
+
+  100% {
+    box-shadow: 0 0 0 2rem rgb(66 133 244 / 0%);
+  }
+}
