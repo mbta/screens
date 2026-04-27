@@ -53,17 +53,19 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/2,
         subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
-    [
-      fn -> header_instances_fn.(config, now) end,
-      fn -> departures_instances_fn.(config, now) end,
-      fn -> alert_instances_fn.(config, now) end,
-      fn -> footer_instances(config) end,
-      fn -> subway_status_instances_fn.(config, now) end,
-      fn -> evergreen_content_instances_fn.(config, now) end,
-      fn -> survey_instances(config) end
-    ]
-    |> Task.async_stream(& &1.(), timeout: 15_000)
-    |> Enum.flat_map(fn {:ok, instances} -> instances end)
+    CandidateGenerator.async_stream(
+      [
+        fn -> header_instances_fn.(config, now) end,
+        fn -> departures_instances_fn.(config, now) end,
+        fn -> alert_instances_fn.(config, now) end,
+        fn -> footer_instances(config) end,
+        fn -> subway_status_instances_fn.(config, now) end,
+        fn -> evergreen_content_instances_fn.(config, now) end,
+        fn -> survey_instances(config) end
+      ],
+      & &1.(),
+      timeout: 15_000
+    )
   end
 
   @impl CandidateGenerator
