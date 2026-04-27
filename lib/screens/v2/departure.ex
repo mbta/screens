@@ -12,6 +12,9 @@ defmodule Screens.V2.Departure do
   alias Screens.V3Api
   alias Screens.Vehicles.Vehicle
 
+  import Screens.Inject
+  @last_trip injected(Screens.LastTrip.LastTrip)
+
   @type t :: %__MODULE__{
           prediction: Screens.Predictions.Prediction.t() | nil,
           schedule: Screens.Schedules.Schedule.t() | nil
@@ -46,7 +49,9 @@ defmodule Screens.V2.Departure do
 
     with {:ok, predictions} <- fetch_predictions_fn.(params),
          {:ok, schedules} <- fetch_schedules(params, opts) do
-      {:ok, Builder.build(predictions, schedules, now, opts)}
+      departures = Builder.build(predictions, schedules, now, opts)
+      @last_trip.update_last_trip_cache(departures, now)
+      {:ok, departures}
     else
       _ -> :error
     end
@@ -161,6 +166,9 @@ defmodule Screens.V2.Departure do
 
   def id(%__MODULE__{prediction: %Prediction{id: prediction_id}}), do: prediction_id
   def id(%__MODULE__{schedule: %Schedule{id: schedule_id}}), do: schedule_id
+
+  def last_trip?(%__MODULE__{prediction: %Prediction{last_trip: last_trip}}), do: last_trip
+  def last_trip?(_), do: false
 
   @spec representative_headsign(t()) :: String.t() | nil
   def representative_headsign(%__MODULE__{prediction: %Prediction{trip: trip}}),
