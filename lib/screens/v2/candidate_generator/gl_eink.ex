@@ -76,20 +76,22 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/1,
         subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
-    [
-      fn -> header_instances(config, now, fetch_destination_fn) end,
-      fn ->
-        departures_instances_fn.(config, now, post_process_fn: &departures_post_processing/2)
-      end,
-      fn -> alert_instances_fn.(config) end,
-      fn -> footer_instances(config) end,
-      fn -> line_map_instances_fn.(config, now) end,
-      fn -> evergreen_content_instances_fn.(config) end,
-      fn -> bottom_screen_filler_instances(config) end,
-      fn -> subway_status_instances_fn.(config, now) end
-    ]
-    |> Task.async_stream(& &1.(), timeout: 20_000)
-    |> Enum.flat_map(fn {:ok, instances} -> instances end)
+    CandidateGenerator.async_stream(
+      [
+        fn -> header_instances(config, now, fetch_destination_fn) end,
+        fn ->
+          departures_instances_fn.(config, now, post_process_fn: &departures_post_processing/2)
+        end,
+        fn -> alert_instances_fn.(config) end,
+        fn -> footer_instances(config) end,
+        fn -> line_map_instances_fn.(config, now) end,
+        fn -> evergreen_content_instances_fn.(config) end,
+        fn -> bottom_screen_filler_instances(config) end,
+        fn -> subway_status_instances_fn.(config, now) end
+      ],
+      & &1.(),
+      timeout: 20_000
+    )
   end
 
   @impl CandidateGenerator
