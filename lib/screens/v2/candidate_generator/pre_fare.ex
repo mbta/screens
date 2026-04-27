@@ -75,9 +75,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   @impl CandidateGenerator
   def candidate_instances(config, now \\ DateTime.utc_now(), instance_fns \\ @instance_fns) do
-    instance_fns
-    |> Task.async_stream(& &1.(config, now), timeout: 15_000)
-    |> Enum.flat_map(fn {:ok, instances} -> instances end)
+    CandidateGenerator.async_stream(instance_fns, & &1.(config, now), timeout: 15_000)
   end
 
   @impl CandidateGenerator

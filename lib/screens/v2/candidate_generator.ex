@@ -4,6 +4,10 @@ defmodule Screens.V2.CandidateGenerator do
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
 
+  defmodule Timeout do
+    defexception message: "Candidate generation timed out", plug_status: 503
+  end
+
   @doc """
   Returns the template for this screen.
   """
@@ -22,4 +26,20 @@ defmodule Screens.V2.CandidateGenerator do
   """
   @callback audio_only_instances(widgets :: [WidgetInstance.t()], config :: Screen.t()) ::
               [WidgetInstance.t()]
+
+  @doc """
+  Convenience wrapper around `Task.async_stream/3` for running several candidate generation
+  functions in parallel, raising `Screens.Timeout` if any exceed a timeout.
+  """
+  @spec async_stream(Enumerable.t(), (term() -> term())) :: Enumerable.t()
+  @spec async_stream(Enumerable.t(), (term() -> term()), [Task.async_stream_option()]) ::
+          Enumerable.t()
+  def async_stream(enum, func, options \\ []) do
+    enum
+    |> Task.async_stream(func, Keyword.merge(options, on_timeout: :kill_task))
+    |> Enum.flat_map(fn
+      {:ok, instances} -> instances
+      {:exit, :timeout} -> raise Timeout
+    end)
+  end
 end

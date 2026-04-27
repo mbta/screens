@@ -78,15 +78,17 @@ defmodule Screens.V2.CandidateGenerator.Dup do
         alerts_instances_fn \\ &AlertsInstances.alert_instances/2,
         emergency_takeover_instances_fn \\ &Widgets.EmergencyTakeover.emergency_takeover_instances/2
       ) do
-    [
-      fn -> header_instances_fn.(config, now) end,
-      fn -> alerts_instances_fn.(config, now) end,
-      fn -> departures_instances_fn.(config, now) end,
-      fn -> evergreen_content_instances_fn.(config, now) end,
-      fn -> emergency_takeover_instances_fn.(config, now) end
-    ]
-    |> Task.async_stream(& &1.(), timeout: 20_000)
-    |> Enum.flat_map(fn {:ok, instances} -> instances end)
+    CandidateGenerator.async_stream(
+      [
+        fn -> header_instances_fn.(config, now) end,
+        fn -> alerts_instances_fn.(config, now) end,
+        fn -> departures_instances_fn.(config, now) end,
+        fn -> evergreen_content_instances_fn.(config, now) end,
+        fn -> emergency_takeover_instances_fn.(config, now) end
+      ],
+      & &1.(),
+      timeout: 20_000
+    )
   end
 
   @impl CandidateGenerator
