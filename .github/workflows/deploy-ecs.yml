@@ -44,7 +44,7 @@ jobs:
     needs: call-workflow
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      id-token: write # required to authenticate with AWS
       contents: read
     steps:
       - name: Configure AWS Credentials
