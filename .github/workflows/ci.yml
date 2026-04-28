@@ -11,6 +11,8 @@ on:
       - "*.md"
       - LICENSE
 
+permissions: {}
+
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
