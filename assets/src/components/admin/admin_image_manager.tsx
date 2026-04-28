@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState, type JSX } from "react";
+import { useCallback, useState, type JSX } from "react";
 import { useDropzone } from "react-dropzone";
 import _ from "lodash";
 
@@ -122,6 +122,7 @@ const ImageUpload = ({ onUploaded, selectedPrefix }): JSX.Element => {
 };
 
 const ImageManager = (): JSX.Element => {
+  const [didInit, setDidInit] = useState(false);
   const [images, setImages] = useState<ImageEntry[]>([]);
   const [selectedKey, setSelectedKey] = useState<string | undefined>(undefined);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -134,10 +135,10 @@ const ImageManager = (): JSX.Element => {
     setSelectedKey(selectKey);
   };
 
-  useEffect(() => {
+  if (!didInit) {
     loadImages();
-    return;
-  }, []);
+    setDidInit(true);
+  }
 
   const imageUrls = Object.fromEntries(
     images.map(({ key, url }) => [key, url]),
