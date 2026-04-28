@@ -4,15 +4,20 @@ description: Installs tools and dependencies
 runs:
   using: composite
   steps:
+    - uses: asdf-vm/actions/setup@v4
     - uses: actions/cache@v5
       id: asdf-cache
       with:
-        path: ~/.asdf
         key: asdf-${{ hashFiles('.tool-versions') }}
-    - uses: asdf-vm/actions/install@v4
-      if: steps.asdf-cache.outputs.cache-hit != 'true'
-    - uses: mbta/actions/reshim-asdf@v2
-      if: steps.asdf-cache.outputs.cache-hit == 'true'
+        restore-keys: asdf-
+        path: |
+          ${{ env.ASDF_DIR }}/plugins
+          ${{ env.ASDF_DIR }}/installs
+    - if: steps.asdf-cache.outputs.cache-hit != 'true'
+      uses: asdf-vm/actions/install@v4
+    - if: steps.asdf-cache.outputs.cache-hit == 'true'
+      shell: bash
+      run: asdf reshim
     - name: Elixir tools
       if: steps.asdf-cache.outputs.cache-hit != 'true'
       shell: bash
