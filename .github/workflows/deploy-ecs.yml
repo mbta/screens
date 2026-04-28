@@ -18,6 +18,7 @@ concurrency:
 
 jobs:
   sentry-upload:
+    name: "Upload sourcemaps to Sentry"
     runs-on: ubuntu-latest
     env:
       SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
