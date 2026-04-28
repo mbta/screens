@@ -2,9 +2,9 @@
 
 import {
   type ComponentType,
+  type RefCallback,
   useCallback,
   useEffect,
-  useRef,
   useState,
 } from "react";
 import { classWithModifier, classWithModifiers } from "Util/utils";
@@ -610,10 +610,10 @@ Client is responsible for:
 - sizing, spacing, positioning of edges/end arrows/shuttle dashes/the diagram as a whole within its container
 */
 
-/* eslint-disable react-hooks/exhaustive-deps --
+/* eslint-disable react-hooks/exhaustive-deps,react-hooks/set-state-in-effect --
  * TODO: There are many places where this component breaks the Rules of Hooks.
  * We know it (mostly) works in its current form and have no pressing need to
- * change it, so this lint warning is disabled for now. Trying to change this
+ * change it, so these warnings are disabled for now. Trying to change this
  * logic without fully understanding and extensively testing everything going
  * on here is likely to break something.
  */
@@ -630,19 +630,15 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const [diagramContainerHeight, setDiagramContainerHeight] = useState(0);
   const [simulationTransform, setSimulationTransform] = useState(1);
 
-  const ref = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    if (!ref.current) return;
-    const resizeObserver = new ResizeObserver(() => {
-      if (ref?.current) {
-        setDiagramContainerHeight(
-          ref.current.clientHeight * simulationTransform,
-        );
-      }
-    });
-    resizeObserver.observe(ref.current);
-    return () => resizeObserver.disconnect();
-  }, [ref?.current]);
+  const ref: RefCallback<HTMLDivElement> = useCallback((elem) => {
+    if (elem) {
+      const resizeObserver = new ResizeObserver(() => {
+        setDiagramContainerHeight(elem.clientHeight * simulationTransform);
+      });
+      resizeObserver.observe(elem);
+      return () => resizeObserver.disconnect();
+    }
+  }, []);
 
   // Measures line-map svg when the scaleFactor changes, updates state
   const measureLineMapNode = useCallback(
@@ -686,6 +682,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const middleSlots = middle.map((s, i) => {
     // Add 1 to the index to counteract the offset caused by removing `beginning` from the original `slots` array.
     const slotIndex = i + 1;
+    /* eslint-disable react-hooks/immutability */
     x = (spaceBetween + SLOT_WIDTH) * slotIndex;
     const slot = s as MiddleSlot;
     const key = slot.label === "…" ? i : slot.label.full;

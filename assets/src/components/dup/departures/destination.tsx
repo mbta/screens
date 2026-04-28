@@ -72,6 +72,11 @@ const Destination: ComponentType<DupDestination> = ({
     parts = parts.map((p) => ABBREVIATIONS[p] || p);
   }
 
+  /* eslint-disable react-hooks/set-state-in-effect --
+   * Similar to `useAutoSize`, setting state in an effect here is intentional
+   * and a required part of the iterative approach to auto-sizing.
+   */
+
   /* eslint-disable-next-line react-hooks/exhaustive-deps --
    * TODO: Replace this with `useAutoSize`. For now, we know this logic cannot
    * cause infinite update loops, so we don't need to be warned that it might.
@@ -135,6 +140,8 @@ const Destination: ComponentType<DupDestination> = ({
       }
     }
   });
+
+  /* eslint-enable react-hooks/set-state-in-effect */
 
   // Render paged version when done determining breaks
   if (phase === PHASES.DONE) {
