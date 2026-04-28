@@ -19,6 +19,8 @@ jobs:
       SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
     steps:
       - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run deploy
