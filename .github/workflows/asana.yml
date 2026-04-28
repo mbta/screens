@@ -3,6 +3,8 @@ on:
   pull_request:
     types: [edited, opened]
 
+permissions: {}
+
 jobs:
   asana:
     uses: mbta/workflows/.github/workflows/asana.yml@ead2d40fcc0c546bd6f099a6d8fcd9f9950eab03 #v5.0.0
