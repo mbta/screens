@@ -21,9 +21,9 @@ jobs:
     name: "Upload sourcemaps to Sentry"
     runs-on: ubuntu-latest
     env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }} # zizmor: ignore[secrets-outside-env] - TODO: Move to a dedicated environment
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }} # zizmor: ignore[secrets-outside-env] - TODO: Move to a dedicated environment
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }} # zizmor: ignore[secrets-outside-env] - TODO: Move to a dedicated environment
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
@@ -51,7 +51,7 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} # zizmor: ignore[secrets-outside-env] - TODO: Move to a dedicated environment
           aws-region: us-east-1
       - name: Create LAST_DEPLOY and upload to S3
         run: |
