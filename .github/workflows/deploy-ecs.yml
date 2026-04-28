@@ -40,6 +40,7 @@ jobs:
       docker-repo: ${{ secrets.DOCKER_REPO }}
       slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
   refresh:
+    name: "Update last successful deploy timestamp"
     needs: call-workflow
     runs-on: ubuntu-latest
     permissions:
