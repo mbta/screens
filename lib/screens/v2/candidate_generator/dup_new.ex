@@ -2,6 +2,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
+  alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
   alias Screens.V2.CandidateGenerator.Widgets
 
   alias __MODULE__.Departures
@@ -11,7 +12,9 @@ defmodule Screens.V2.CandidateGenerator.DupNew do
   @instance_generators [
     &Widgets.Header.instances/2,
     &Departures.instances/2,
-    &Widgets.Evergreen.evergreen_content_instances/2
+    &Widgets.Evergreen.evergreen_content_instances/2,
+    &AlertsInstances.alert_instances/2,
+    &Widgets.EmergencyTakeover.emergency_takeover_instances/2
   ]
 
   @impl CandidateGenerator
