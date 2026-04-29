@@ -16,17 +16,16 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   require Logger
 
+  import Screens.Inject
+  @alert injected(Alert)
+  @stop injected(Stop)
+  @location_context injected(LocationContext)
+
   @doc """
   Fetches alerts + related data from the API and transforms them to candidate
   widgets for a DUP screen.
   """
-  def alert_instances(
-        config,
-        now \\ DateTime.utc_now(),
-        fetch_stop_name_fn \\ &Stop.fetch_stop_name/1,
-        fetch_alerts_fn \\ &Alert.fetch/1,
-        fetch_location_context_fn \\ &LocationContext.fetch/3
-      ) do
+  def alert_instances(config, now \\ DateTime.utc_now()) do
     # In this function:
     # - Fetch relevant alerts for all SUBWAY/LIGHT RAIL routes serving this stop
     # - Check for special cases. If there is one, just use that. Otherwise:
@@ -41,7 +40,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       stop_name =
         case header_config do
           %{stop_id: stop_id} ->
-            case fetch_stop_name_fn.(stop_id) do
+            case @stop.fetch_stop_name(stop_id) do
               nil -> []
               stop_name -> stop_name
             end
@@ -50,9 +49,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
             stop_name
         end
 
-      with {:ok, location_context} <- fetch_location_context_fn.(Dup, stop_id, now),
+      with {:ok, location_context} <- @location_context.fetch(Dup, stop_id, now),
            route_ids <- LocationContext.route_ids(location_context),
-           {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
+           {:ok, alerts} <- @alert.fetch(route_ids: route_ids) do
         alerts
         |> relevant_alerts(config, location_context, now)
         |> alert_special_cases(config, location_context)

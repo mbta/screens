@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.LocationContext
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: DupAlerts
   alias Screens.V2.WidgetInstance.DupAlert
@@ -9,6 +10,14 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   alias ScreensConfig.Screen.Dup
 
   import Screens.TestSupport.InformedEntityBuilder
+
+  import Screens.Inject
+  @alert injected(Alert)
+  @stop injected(Screens.Stops.Stop)
+  @location_context injected(Screens.LocationContext)
+
+  import Mox
+  setup :verify_on_exit!
 
   defp routes("place-kencl") do
     [
@@ -136,8 +145,37 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
     }
   end
 
+  defp expect_alerts(_route_ids, alerts) do
+    expect(@alert, :fetch, fn _route_ids -> {:ok, alerts} end)
+  end
+
+  defp expect_stop_name do
+    expect(@stop, :fetch_stop_name, fn _ -> "Test" end)
+  end
+
+  defp expect_location_context do
+    expect(@location_context, :fetch, fn _, stop_id, _ ->
+      tagged_stop_sequences = tagged_stop_sequences(stop_id)
+      stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
+
+      {:ok,
+       %LocationContext{
+         home_stop: stop_id,
+         tagged_stop_sequences: tagged_stop_sequences,
+         upstream_stops: LocationContext.upstream_stop_id_set([stop_id], stop_sequences),
+         downstream_stops: LocationContext.downstream_stop_id_set([stop_id], stop_sequences),
+         routes: routes(stop_id),
+         alert_route_types: LocationContext.route_type_filter(Dup, [stop_id])
+       }}
+    end)
+  end
+
   describe "dup alert_instances/6 > serialize/1" do
     setup do
+      stub(@alert, :fetch, fn _ -> [] end)
+      expect_stop_name()
+      expect_location_context()
+
       config_kenmore =
         struct(Screen, %{
           app_params: %Dup{
@@ -408,39 +446,16 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         fetch_stop_name_fn: fn _ -> "Test" end,
         kenmore_alerts: kenmore_alerts,
         kenmore_inside_alert: kenmore_inside_alert,
-        wtc_alerts: wtc_alerts,
-        fetch_location_context_fn: fn
-          _, stop_id, _ ->
-            tagged_stop_sequences = tagged_stop_sequences(stop_id)
-            stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
-
-            {:ok,
-             %LocationContext{
-               home_stop: stop_id,
-               tagged_stop_sequences: tagged_stop_sequences,
-               upstream_stops: LocationContext.upstream_stop_id_set([stop_id], stop_sequences),
-               downstream_stops:
-                 LocationContext.downstream_stop_id_set([stop_id], stop_sequences),
-               routes: routes(stop_id),
-               alert_route_types: LocationContext.route_type_filter(Dup, [stop_id])
-             }}
-        end
+        wtc_alerts: wtc_alerts
       }
     end
 
     test "serializes Kenmore special case: B / C, multiple alerts", context do
       alerts = Enum.drop(context.kenmore_alerts, -2)
 
-      fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
+      expect_alerts(["Green-B", "Green-C", "Green-D"], alerts)
 
-      actual_widgets =
-        DupAlerts.alert_instances(
-          context.config_kenmore,
-          context.now,
-          context.fetch_stop_name_fn,
-          fetch_alerts_fn,
-          context.fetch_location_context_fn
-        )
+      actual_widgets = DupAlerts.alert_instances(context.config_kenmore, context.now)
 
       expected_serialized_json = [
         %{
@@ -494,16 +509,9 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         |> Enum.drop(1)
         |> Enum.drop(-1)
 
-      fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
+      expect_alerts(["Green-B", "Green-C", "Green-D"], alerts)
 
-      actual_widgets =
-        DupAlerts.alert_instances(
-          context.config_kenmore,
-          context.now,
-          context.fetch_stop_name_fn,
-          fetch_alerts_fn,
-          context.fetch_location_context_fn
-        )
+      actual_widgets = DupAlerts.alert_instances(context.config_kenmore, context.now)
 
       expected_serialized_json = [
         %{
@@ -554,16 +562,9 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
     test "serializes Kenmore special case: B / D, single alert ", context do
       alerts = [Enum.at(context.kenmore_alerts, 0)] ++ [Enum.at(context.kenmore_alerts, 2)]
 
-      fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
+      expect_alerts(["Green-B", "Green-C", "Green-D"], alerts)
 
-      actual_widgets =
-        DupAlerts.alert_instances(
-          context.config_kenmore,
-          context.now,
-          context.fetch_stop_name_fn,
-          fetch_alerts_fn,
-          context.fetch_location_context_fn
-        )
+      actual_widgets = DupAlerts.alert_instances(context.config_kenmore, context.now)
 
       expected_serialized_json = [
         %{
@@ -614,16 +615,9 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
     test "serializes Kenmore special case: B / C / D, single alert", context do
       alerts = [Enum.at(context.kenmore_alerts, 3)]
 
-      fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
+      expect_alerts(["Green-B", "Green-C", "Green-D"], alerts)
 
-      actual_widgets =
-        DupAlerts.alert_instances(
-          context.config_kenmore,
-          context.now,
-          context.fetch_stop_name_fn,
-          fetch_alerts_fn,
-          context.fetch_location_context_fn
-        )
+      actual_widgets = DupAlerts.alert_instances(context.config_kenmore, context.now)
 
       expected_serialized_json = [
         %{
@@ -674,16 +668,9 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
     test "serialize DupAlert for alerts inside Kenmore, bypasses special case", context do
       alerts = [context.kenmore_inside_alert]
 
-      fetch_alerts_fn = fn route_ids: ["Green-B", "Green-C", "Green-D"] -> {:ok, alerts} end
+      expect_alerts(["Green-B", "Green-C", "Green-D"], alerts)
 
-      actual_widgets =
-        DupAlerts.alert_instances(
-          context.config_kenmore,
-          context.now,
-          context.fetch_stop_name_fn,
-          fetch_alerts_fn,
-          context.fetch_location_context_fn
-        )
+      actual_widgets = DupAlerts.alert_instances(context.config_kenmore, context.now)
 
       assert Enum.all?(actual_widgets, &match?(%DupAlert{}, &1))
     end
@@ -691,16 +678,9 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
     test "serializes WTC special case: WTC is detoured", context do
       alerts = context.wtc_alerts
 
-      fetch_alerts_fn = fn route_ids: ["741", "742", "743"] -> {:ok, alerts} end
+      expect_alerts(["741", "742", "743"], alerts)
 
-      actual_widgets =
-        DupAlerts.alert_instances(
-          context.config_wtc,
-          context.now,
-          context.fetch_stop_name_fn,
-          fetch_alerts_fn,
-          context.fetch_location_context_fn
-        )
+      actual_widgets = DupAlerts.alert_instances(context.config_wtc, context.now)
 
       expected_serialized_json = %{
         text: %FreeTextLine{icon: :warning, text: ["Building closed"]},

@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.DupNewTest do
   use ExUnit.Case, async: true
 
+  alias Screens.LocationContext
   alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator.DupNew
   alias Screens.V2.RDS
@@ -14,10 +15,18 @@ defmodule Screens.V2.CandidateGenerator.DupNewTest do
 
   import Screens.Inject
   @alert injected(Screens.Alerts.Alert)
+  @stop injected(Screens.Stops.Stop)
+  @location_context injected(LocationContext)
   @rds injected(RDS)
 
   setup do
     stub(@alert, :fetch, fn _ -> {:ok, []} end)
+    stub(@stop, :fetch_stop_name, fn _ -> "" end)
+
+    stub(@location_context, :fetch, fn _, _, _ ->
+      {:ok, %LocationContext{home_stop: "Test", routes: []}}
+    end)
+
     stub(@rds, :get, fn _, _ -> [{:ok, []}] end)
     :ok
   end
