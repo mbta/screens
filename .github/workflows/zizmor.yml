@@ -5,6 +5,8 @@ on:
     branches: ['main']
   pull_request:
     branches: ['**']
+  workflow_dispatch:
+    # TODO(NOW): Remove this
 
 permissions: {}
 
