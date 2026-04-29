@@ -127,6 +127,14 @@ defmodule Screens.V2.DepartureTest do
       assert "Heath St" == Departure.headsign(departure)
     end
 
+    test "overrides stop_headsign from schedule with trip_headsign from prediction" do
+      prediction = %Prediction{trip: %Trip{headsign: "Jackson"}, trip_headsign: "Kenmore"}
+      schedule = %Schedule{trip: %Trip{headsign: "Ruggles"}, stop_headsign: "Heath St"}
+      departure = %Departure{prediction: prediction, schedule: schedule}
+
+      assert "Kenmore" == Departure.headsign(departure)
+    end
+
     test "returns schedule headsign when no prediction is present" do
       schedule = %Schedule{trip: %Trip{headsign: "Ruggles"}}
       departure = %Departure{prediction: nil, schedule: schedule}

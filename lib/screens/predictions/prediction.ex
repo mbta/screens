@@ -12,10 +12,10 @@ defmodule Screens.Predictions.Prediction do
             vehicle: nil,
             arrival_time: nil,
             departure_time: nil,
-            stop_headsign: nil,
             track_number: nil,
             schedule_relationship: :scheduled,
-            status: nil
+            status: nil,
+            trip_headsign: nil
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -25,10 +25,10 @@ defmodule Screens.Predictions.Prediction do
           vehicle: Screens.Vehicles.Vehicle.t() | nil,
           arrival_time: DateTime.t() | nil,
           departure_time: DateTime.t() | nil,
-          stop_headsign: String.t() | nil,
           track_number: String.t() | nil,
           schedule_relationship: ScheduleRelationship.t(),
-          status: String.t() | nil
+          status: String.t() | nil,
+          trip_headsign: String.t() | nil
         }
 
   @includes ~w[route.line stop trip.route_pattern.representative_trip trip.stops vehicle]
