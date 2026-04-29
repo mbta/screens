@@ -1,7 +1,6 @@
 name: GitHub Actions Security Check
 
 on:
-  merge_group:
   push:
     branches: ['main']
   pull_request:
