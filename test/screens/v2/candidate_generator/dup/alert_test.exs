@@ -11,6 +11,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.Dup
 
+  import Mox
+  setup :verify_on_exit!
+
+  import Screens.Inject
+  @alert injected(Screens.Alerts.Alert)
+  @location_context injected(Screens.LocationContext)
+
   @stop_id "place-bbsta"
   @base_alert %Alert{
     active_period: [{~U[2025-09-18 02:30:00Z], nil}],
@@ -52,15 +59,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
 
   @now ~U[2025-09-18 02:30:00Z]
 
-  defp fetch_stop_name_fn(_) do
-    "Back Bay"
+  defp expect_alerts(options \\ %{}) do
+    expect(@alert, :fetch, fn _ -> {:ok, [Map.merge(@base_alert, options)]} end)
   end
 
-  defp fetch_alerts_fn(options \\ %{}) do
-    {:ok, [Map.merge(@base_alert, options)]}
-  end
-
-  defp fetch_location_context_fn(stop_id \\ "place-bbsta") do
+  defp expect_location_context(stop_id \\ "place-bbsta") do
     tagged_stop_sequences = %{
       "Orange" => [["place-tumnl", "place-bbsta", "place-masta"]]
     }
@@ -78,27 +81,26 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
       }
     ]
 
-    {:ok,
-     %LocationContext{
-       home_stop: stop_id,
-       tagged_stop_sequences: tagged_stop_sequences,
-       upstream_stops: LocationContext.upstream_stop_id_set([stop_id], stop_sequences),
-       downstream_stops: LocationContext.downstream_stop_id_set([stop_id], stop_sequences),
-       routes: routes_at_stop,
-       alert_route_types: LocationContext.route_type_filter(Dup, [stop_id])
-     }}
+    location_context =
+      {:ok,
+       %LocationContext{
+         home_stop: stop_id,
+         tagged_stop_sequences: tagged_stop_sequences,
+         upstream_stops: LocationContext.upstream_stop_id_set([stop_id], stop_sequences),
+         downstream_stops: LocationContext.downstream_stop_id_set([stop_id], stop_sequences),
+         routes: routes_at_stop,
+         alert_route_types: LocationContext.route_type_filter(Dup, [stop_id])
+       }}
+
+    expect(@location_context, :fetch, fn _, _, _ -> location_context end)
   end
 
   describe "alert_instances/5" do
     test "returns alert instances" do
-      actual_widgets =
-        Alerts.alert_instances(
-          @config,
-          @now,
-          &fetch_stop_name_fn/1,
-          fn _ -> fetch_alerts_fn() end,
-          fn _, _, _ -> fetch_location_context_fn() end
-        )
+      expect_alerts()
+      expect_location_context()
+
+      actual_widgets = Alerts.alert_instances(@config, @now)
 
       assert [
                %{
@@ -190,62 +192,37 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
   end
 
   test "does not return alert for informational single tracking" do
-    actual_widgets =
-      Alerts.alert_instances(
-        @config,
-        @now,
-        &fetch_stop_name_fn/1,
-        fn _ ->
-          fetch_alerts_fn(%{
-            severity: 1,
-            cause: :single_tracking
-          })
-        end,
-        fn _, _, _ -> fetch_location_context_fn() end
-      )
+    expect_alerts(%{severity: 1, cause: :single_tracking})
+    expect_location_context()
+
+    actual_widgets = Alerts.alert_instances(@config, @now)
 
     assert [] == actual_widgets
   end
 
   test "does not return DUP alert for alerts that are not happening now" do
-    actual_widgets =
-      Alerts.alert_instances(
-        @config,
-        ~U[2025-09-16 02:30:00Z],
-        &fetch_stop_name_fn/1,
-        fn _ -> fetch_alerts_fn() end,
-        fn _, _, _ -> fetch_location_context_fn() end
-      )
+    expect_alerts()
+    expect_location_context()
+
+    actual_widgets = Alerts.alert_instances(@config, ~U[2025-09-16 02:30:00Z])
 
     assert [] == actual_widgets
   end
 
   test "does not return DUP alert for alerts not happening here" do
-    actual_widgets =
-      Alerts.alert_instances(
-        @config,
-        @now,
-        &fetch_stop_name_fn/1,
-        fn _ -> fetch_alerts_fn() end,
-        fn _, _, _ -> fetch_location_context_fn("place-masta") end
-      )
+    expect_alerts()
+    expect_location_context("place-masta")
+
+    actual_widgets = Alerts.alert_instances(@config, @now)
 
     assert [] == actual_widgets
   end
 
   test "does not return alert for alerts that are not severe enough" do
-    actual_widgets =
-      Alerts.alert_instances(
-        @config,
-        @now,
-        &fetch_stop_name_fn/1,
-        fn _ ->
-          fetch_alerts_fn(%{
-            severity: 4
-          })
-        end,
-        fn _, _, _ -> fetch_location_context_fn() end
-      )
+    expect_alerts(%{severity: 4})
+    expect_location_context()
+
+    actual_widgets = Alerts.alert_instances(@config, @now)
 
     assert [] == actual_widgets
   end
