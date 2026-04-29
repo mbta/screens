@@ -142,7 +142,16 @@ config :screens, ScreensWeb.AuthManager, secret_key: "test key"
 
 config :ueberauth, Ueberauth,
   providers: [
-    keycloak: {Screens.Ueberauth.Strategy.Fake, [roles: ["screens-admin"]]}
+    keycloak:
+      {Ueberauth.Strategy.FakeOidcc,
+       [
+         auto_redirect: true,
+         client_id: "test-client",
+         roles: [
+           "screens-admin"
+         ],
+         ttl: System.system_time(:second) + 60 * 60
+       ]}
   ]
 
 config :ueberauth_oidcc,

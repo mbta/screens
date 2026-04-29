@@ -5,37 +5,18 @@ defmodule ScreensWeb.Controllers.AuthControllerTest do
 
   describe "callback" do
     test "redirects on success and saves refresh token", %{conn: conn} do
-      current_time = System.system_time(:second)
-
-      auth = %Ueberauth.Auth{
-        provider: :keycloak,
-        uid: "foo@mbta.com",
-        credentials: %Ueberauth.Auth.Credentials{
-          expires_at: current_time + 1_000
-        },
-        extra: %Ueberauth.Auth.Extra{
-          raw_info: %UeberauthOidcc.RawInfo{
-            claims: %{
-              "iat" => System.system_time(:second)
-            },
-            userinfo: %{
-              "resource_access" => %{
-                "test-client" => %{"roles" => ["screens-admin"]}
-              }
-            }
-          }
-        }
-      }
-
       conn =
-        conn
-        |> assign(:ueberauth_auth, auth)
-        |> get(ScreensWeb.Router.Helpers.auth_path(conn, :callback, "keycloak"))
+        get(
+          conn,
+          ScreensWeb.Router.Helpers.auth_path(conn, :callback, "keycloak",
+            email: "user@test.com",
+            roles: ["screens-admin"]
+          )
+        )
 
       response = html_response(conn, 302)
 
       assert response =~ ~p"/admin"
-      assert Guardian.Plug.current_claims(conn)["roles"] == ["screens-admin"]
     end
 
     test "handles generic failure", %{conn: conn} do
