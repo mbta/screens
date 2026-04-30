@@ -137,27 +137,22 @@ defmodule Screens.V2.Departure do
     end
   end
 
-  def headsign(%__MODULE__{prediction: p, schedule: s}) when not is_nil(p) do
-    %Prediction{trip: %Trip{headsign: headsign}} = p
+  # The headsign to display in order of preference.
+  # May be updated in the schedule/prediction data w/ the trip's or stop's final destination.
+  @spec headsign(t()) :: String.t()
+  def headsign(%__MODULE__{prediction: %Prediction{trip_headsign: trip_headsign}})
+      when not is_nil(trip_headsign),
+      do: trip_headsign
 
-    case s do
-      %Schedule{stop_headsign: stop_headsign} when not is_nil(stop_headsign) ->
-        stop_headsign
+  def headsign(%__MODULE__{schedule: %Schedule{stop_headsign: stop_headsign}})
+      when not is_nil(stop_headsign),
+      do: stop_headsign
 
-      _ ->
-        headsign
-    end
-  end
+  def headsign(%__MODULE__{prediction: %Prediction{trip: %Trip{headsign: headsign}}}),
+    do: headsign
 
-  def headsign(%__MODULE__{prediction: nil, schedule: s}) do
-    case s do
-      %Schedule{stop_headsign: stop_headsign} when not is_nil(stop_headsign) ->
-        stop_headsign
-
-      %Schedule{trip: %Trip{headsign: headsign}} ->
-        headsign
-    end
-  end
+  def headsign(%__MODULE__{schedule: %Schedule{trip: %Trip{headsign: headsign}}}),
+    do: headsign
 
   def id(%__MODULE__{prediction: %Prediction{id: prediction_id}}), do: prediction_id
   def id(%__MODULE__{schedule: %Schedule{id: schedule_id}}), do: schedule_id
