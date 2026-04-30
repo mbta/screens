@@ -8,10 +8,7 @@ defmodule ScreensWeb.Controllers.AuthControllerTest do
       conn =
         get(
           conn,
-          ScreensWeb.Router.Helpers.auth_path(conn, :callback, "keycloak",
-            email: "user@test.com",
-            roles: ["screens-admin"]
-          )
+          ~p"/auth/keycloak/callback?#{[email: "user@test.com", roles: ["screens-admin"]]}"
         )
 
       response = html_response(conn, 302)
