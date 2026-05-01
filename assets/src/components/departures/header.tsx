@@ -3,6 +3,9 @@ import { type JSX } from "react";
 
 import Arrow45 from "Images/arrow-45.svg";
 import { IMAGE_EXTENSIONS, extensionForAsset } from "Util/utils";
+import WayfindingPoint, {
+  WayfindingPointProps,
+} from "./header/wayfinding_point";
 
 type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 
@@ -11,6 +14,7 @@ type Header = {
   arrow: CardinalDirection | null;
   image_path: string | null;
   subtitle: string | null;
+  wayfinding_point: WayfindingPointProps | null;
 };
 
 const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
@@ -27,7 +31,13 @@ const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
   />
 );
 
-const Header = ({ title, arrow, subtitle, image_path: imagePath }: Header) => {
+const Header = ({
+  title,
+  arrow,
+  subtitle,
+  image_path: imagePath,
+  wayfinding_point: wayfindingPoint,
+}: Header) => {
   return (
     <>
       <header className="departures-header">
@@ -36,6 +46,7 @@ const Header = ({ title, arrow, subtitle, image_path: imagePath }: Header) => {
       </header>
       {imagePath && IMAGE_EXTENSIONS.includes(extensionForAsset(imagePath)) && (
         <div className="departures-header__image-container">
+          {wayfindingPoint && <WayfindingPoint {...wayfindingPoint} />}
           <img className="departures-header__image" src={imagePath} />
         </div>
       )}
