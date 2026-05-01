@@ -8,7 +8,6 @@
 
     "noEmit": true,
 
-    "strict": true,
     "jsx": "react-jsx",
     "isolatedModules": true,
     "moduleDetection": "force",
