@@ -12,6 +12,7 @@ module.exports = {
   preset: "ts-jest",
   errorOnDeprecated: true,
   resetMocks: true,
-  modulePaths: [compilerOptions.baseUrl],
-  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths),
+  moduleNameMapper: pathsToModuleNameMapper(compilerOptions.paths, {
+    prefix: "<rootDir>/",
+  }),
 };

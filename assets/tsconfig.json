@@ -8,7 +8,6 @@
 
     "noEmit": true,
 
-    "strict": true,
     "jsx": "react-jsx",
     "isolatedModules": true,
     "moduleDetection": "force",
@@ -20,15 +19,13 @@
     "noUncheckedIndexedAccess": false,
     "noUncheckedSideEffectImports": false,
     "verbatimModuleSyntax": false,
-
-    "baseUrl": ".",
     "paths": {
-      "CSS/*": ["css/*"],
-      "Components/*": ["src/components/*"],
-      "Context/*": ["src/context/*"],
-      "Hooks/*": ["src/hooks/*"],
-      "Images/*": ["images/*"],
-      "Util/*": ["src/util/*"]
+      "CSS/*": ["./css/*"],
+      "Components/*": ["./src/components/*"],
+      "Context/*": ["./src/context/*"],
+      "Hooks/*": ["./src/hooks/*"],
+      "Images/*": ["./images/*"],
+      "Util/*": ["./src/util/*"]
     }
   }
 }
