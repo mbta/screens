@@ -15,7 +15,8 @@ defmodule Screens.Predictions.Prediction do
             track_number: nil,
             schedule_relationship: :scheduled,
             status: nil,
-            trip_headsign: nil
+            trip_headsign: nil,
+            last_trip: false
 
   @type t :: %__MODULE__{
           id: String.t(),
@@ -28,7 +29,8 @@ defmodule Screens.Predictions.Prediction do
           track_number: String.t() | nil,
           schedule_relationship: ScheduleRelationship.t(),
           status: String.t() | nil,
-          trip_headsign: String.t() | nil
+          trip_headsign: String.t() | nil,
+          last_trip: boolean()
         }
 
   @includes ~w[route.line stop trip.route_pattern.representative_trip trip.stops vehicle]

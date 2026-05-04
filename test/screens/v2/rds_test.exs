@@ -4,6 +4,7 @@ defmodule Screens.V2.RDSTest do
   alias Screens.Alerts.Alert
   alias Screens.Config.Cache
   alias Screens.Headways
+  alias Screens.LastTrip.LastTrip
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.RoutePatterns.RoutePattern
@@ -28,6 +29,7 @@ defmodule Screens.V2.RDSTest do
   @schedule injected(Schedule)
   @stop injected(Stop)
   @config_cache injected(Cache)
+  @last_trip injected(LastTrip)
 
   setup do
     stub(@alert, :fetch, fn _ -> {:ok, []} end)
@@ -37,6 +39,7 @@ defmodule Screens.V2.RDSTest do
     stub(@schedule, :fetch, fn _, _ -> {:ok, []} end)
     stub(@stop, :fetch, fn %{ids: ids}, true -> {:ok, Enum.map(ids, &stop/1)} end)
     stub(@config_cache, :disabled_modes, fn -> [] end)
+    stub(@last_trip, :last_trip_departure_times, fn _ -> [] end)
     :ok
   end
 
@@ -478,6 +481,142 @@ defmodule Screens.V2.RDSTest do
              ]
     end
 
+    test "creates service ended state before last scheduled departure with last trip flagged" do
+      now = ~U[2024-10-11 10:44:53Z]
+      stop_ids = ~w[s0 s1]
+
+      first_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{
+            id: "r1",
+            line: %Line{id: "l1"},
+            type: :bus,
+            direction_names: ["Northbound", "Southbound"]
+          },
+          stop: %Stop{id: "sA"},
+          trip: %Trip{headsign: "h1", pattern_headsign: "hA", direction_id: 0}
+        }
+
+      second_schedule = %Schedule{
+        departure_time: ~U[2024-10-11 10:45:00Z],
+        route: %Route{
+          id: "r2",
+          line: %Line{id: "l2"},
+          type: :bus,
+          direction_names: ["Northbound", "Southbound"]
+        },
+        stop: %Stop{id: "sB"},
+        trip: %Trip{headsign: "h2", pattern_headsign: "hB", direction_id: 0}
+      }
+
+      third_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{
+            id: "r2",
+            line: %Line{id: "l2"},
+            type: :bus,
+            direction_names: ["Northbound", "Southbound"]
+          },
+          stop: %Stop{id: "sC"},
+          trip: %Trip{headsign: "hC", pattern_headsign: "hC", direction_id: 0}
+        }
+
+      all_schedules = [first_schedule, second_schedule, third_schedule]
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      stub(@headways, :get, fn _, _ -> {5, 10} end)
+
+      expect(@departure, :fetch, fn
+        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [now: ^now] ->
+          {:ok, []}
+      end)
+
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
+
+      expect(@last_trip, :last_trip_departure_times, fn {"sA", "l1", "hA"} ->
+        [~U[2024-10-11 10:43:50Z]]
+      end)
+
+      expect(@last_trip, :last_trip_departure_times, fn {"sB", "l2", "hB"} ->
+        [~U[2024-10-11 10:43:50Z]]
+      end)
+
+      expect(@last_trip, :last_trip_departure_times, fn {"sC", "l2", "hC"} ->
+        [~U[2024-10-11 10:43:50Z]]
+      end)
+
+      assert RDS.get(departures, now) == [
+               {:ok,
+                [
+                  service_ended("sA", "l1", "hA", first_schedule),
+                  service_ended("sB", "l2", "hB", second_schedule),
+                  service_ended("sC", "l2", "hC", third_schedule)
+                ]}
+             ]
+    end
+
+    test "creates service ended state before last scheduled departure with last trip flagged for Red Trunk" do
+      now = ~U[2024-10-11 10:44:53Z]
+      stop_ids = ~w[70061 70063]
+
+      first_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+          stop: %Stop{id: "70061"},
+          trip: %Trip{headsign: "Alewife", pattern_headsign: "Alewife", direction_id: 0}
+        }
+
+      all_schedules = [first_schedule]
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      expect(@departure, :fetch, fn
+        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [now: ^now] ->
+          {:ok, []}
+      end)
+
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
+      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
+        {:ok, [station("70061", ~w[70061])]}
+      end)
+
+      patterns = [
+        %RoutePattern{
+          id: "A",
+          headsign: "Alewife",
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stops: [%Stop{id: "70061"}, %Stop{id: "last_stop"}]
+        }
+      ]
+
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+        {:ok, patterns}
+      end)
+
+      expect(@last_trip, :last_trip_departure_times, fn {"70061", "l1", "Alewife"} ->
+        [~U[2024-10-11 10:43:50Z], ~U[2024-10-11 10:42:50Z]]
+      end)
+
+      assert RDS.get(departures, now) == [
+               {:ok, [service_ended("70061", "l1", "Alewife", first_schedule)]}
+             ]
+    end
+
     test "does not create NoService destinations for those affected by an alert that affects the home stop" do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
@@ -832,7 +971,9 @@ defmodule Screens.V2.RDSTest do
       now = ~U[2024-10-11 12:00:00Z]
       stop_ids = ~w[s0]
 
-      expect(@departure, :fetch, fn %{stop_ids: ^stop_ids}, [now: ^now] -> :error end)
+      expect(@departure, :fetch, fn %{stop_ids: ^stop_ids}, [now: ^now] ->
+        :error
+      end)
 
       departures = %Departures{
         sections: [

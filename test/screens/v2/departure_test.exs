@@ -8,6 +8,15 @@ defmodule Screens.V2.DepartureTest do
   alias Screens.V2.Departure
   alias Screens.Vehicles.Vehicle
 
+  import Screens.Inject
+  import Mox
+  @last_trip injected(Screens.LastTrip.LastTrip)
+
+  setup do
+    stub(@last_trip, :update_last_trip_cache, fn _, _ -> [] end)
+    :ok
+  end
+
   describe "crowding_level/1" do
     test "returns relevant crowding levels" do
       trip = %Trip{id: "trip-1", stops: ["1", "2", "3"]}
