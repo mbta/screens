@@ -4,7 +4,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
-  alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.Stops.{Stop, Subway}
   alias Screens.Util
@@ -1327,11 +1326,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp serialize_flex_zone(t, location), do: flex_zone_fields(t, location)
 
   defp report_diagram_error(%__MODULE__{} = t, reason) do
-    Report.warning("disruption_diagram_error",
+    Logster.warning([
+      "disruption_diagram_error",
       alert_id: t.alert.id,
       home_stop: t.location_context.home_stop,
       reason: reason
-    )
+    ])
 
     t
   end
