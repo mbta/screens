@@ -2,7 +2,7 @@ defmodule Screens.Util.AdminTest do
   use ExUnit.Case, async: true
 
   alias Screens.Util.Admin
-  alias ScreensConfig.{EvergreenContentItem, RecurrentSchedule, Schedule, Screen}
+  alias ScreensConfig.{AlertSchedule, EvergreenContentItem, RecurrentSchedule, Schedule, Screen}
   alias ScreensConfig.Screen.BusShelter
 
   describe "cleanup_evergreen_content/2" do
@@ -32,25 +32,22 @@ defmodule Screens.Util.AdminTest do
         ])
 
       recurring_all_ended =
-        build_item([
-          %RecurrentSchedule{
-            dates: [
-              %{start_date: ~D[2024-10-01], end_date: ~D[2024-10-03]},
-              %{start_date: ~D[2024-11-01], end_date: ~D[2024-11-03]}
-            ]
-          },
-          %Schedule{start_dt: ~U[2024-12-01T00:00:00Z], end_dt: ~U[2024-12-03T00:00:00Z]}
-        ])
+        build_item(%RecurrentSchedule{
+          dates: [
+            %{start_date: ~D[2024-10-01], end_date: ~D[2024-10-03]},
+            %{start_date: ~D[2024-11-01], end_date: ~D[2024-11-03]}
+          ]
+        })
 
       recurring_some_ended =
-        build_item([
-          %RecurrentSchedule{
-            dates: [
-              %{start_date: ~D[2024-10-01], end_date: ~D[2024-10-03]},
-              %{start_date: ~D[2024-11-01], end_date: nil}
-            ]
-          }
-        ])
+        build_item(%RecurrentSchedule{
+          dates: [
+            %{start_date: ~D[2024-10-01], end_date: ~D[2024-10-03]},
+            %{start_date: ~D[2024-11-01], end_date: nil}
+          ]
+        })
+
+      alert_linked = build_item(%AlertSchedule{alert_ids: ["1"]})
 
       screen =
         build_screen([
@@ -58,13 +55,14 @@ defmodule Screens.Util.AdminTest do
           some_ended,
           indefinite,
           recurring_all_ended,
-          recurring_some_ended
+          recurring_some_ended,
+          alert_linked
         ])
 
       cleaned_screen = Admin.cleanup_evergreen_content(screen, ~D[2025-01-01])
 
       assert cleaned_screen.app_params.evergreen_content ==
-               [some_ended, indefinite, recurring_some_ended]
+               [some_ended, indefinite, recurring_some_ended, alert_linked]
     end
   end
 end

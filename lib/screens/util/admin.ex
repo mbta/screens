@@ -14,22 +14,25 @@ defmodule Screens.Util.Admin do
 
   def cleanup_evergreen_content(screen, _before_date), do: screen
 
-  defp should_cleanup_evergreen_item?(
-         %EvergreenContentItem{schedule: schedule_items},
-         before_date
-       ) do
-    Enum.all?(schedule_items, fn
-      %Schedule{end_dt: nil} ->
-        false
-
-      %Schedule{end_dt: datetime} ->
-        Date.compare(datetime, before_date) == :lt
-
-      %RecurrentSchedule{dates: date_ranges} ->
-        Enum.all?(date_ranges, fn
-          %{end_date: nil} -> false
-          %{end_date: end_date} -> Date.compare(end_date, before_date) == :lt
-        end)
+  defp should_cleanup_evergreen_item?(%EvergreenContentItem{schedule: schedules}, before_date)
+       when is_list(schedules) do
+    Enum.all?(schedules, fn
+      %Schedule{end_dt: nil} -> false
+      %Schedule{end_dt: datetime} -> Date.compare(datetime, before_date) == :lt
     end)
   end
+
+  defp should_cleanup_evergreen_item?(
+         %EvergreenContentItem{schedule: %RecurrentSchedule{dates: date_ranges}},
+         before_date
+       ) do
+    Enum.all?(date_ranges, fn
+      %{end_date: nil} -> false
+      %{end_date: end_date} -> Date.compare(end_date, before_date) == :lt
+    end)
+  end
+
+  # Cleaning up alert-linked content is not supported
+  defp should_cleanup_evergreen_item?(%EvergreenContentItem{schedule: _other}, _before_date),
+    do: false
 end
