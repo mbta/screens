@@ -43,7 +43,7 @@ defmodule Screens.LocationContext do
   where we know it will not cause major issues, and has intentionally minimal support on those
   screen types (e.g. "does this alert affect the home stop" conditions will always be false).
   """
-  @spec fetch(screen_type(), Stop.id() | [Stop.id()], DateTime.t()) :: {:ok, t()} | :error
+  @callback fetch(screen_type(), Stop.id() | [Stop.id()], DateTime.t()) :: {:ok, t()} | :error
   def fetch(app, stop_id, now) when is_binary(stop_id), do: do_fetch(app, [stop_id], now)
   def fetch(app, [_] = stop_ids, now), do: do_fetch(app, stop_ids, now)
   def fetch(BusEink = app, [_ | _] = stop_ids, now), do: do_fetch(app, stop_ids, now)
