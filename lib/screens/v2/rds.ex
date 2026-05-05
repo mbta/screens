@@ -44,6 +44,14 @@ defmodule Screens.V2.RDS do
   @enforce_keys ~w[stop line headsign state]a
   defstruct @enforce_keys
 
+  @type stop_id_result :: {:ok, [Stop.id()]} | :error
+  @type data_results :: %{
+          :alerts => Alert.result(),
+          :child_stops => stop_id_result(),
+          :departures => Departure.result(),
+          :scheduled => Schedule.result(),
+          :typical_patterns => RoutePattern.result()
+        }
   @type section_t :: {:ok, [t()]} | :error
   @type destination :: {Stop.t(), Line.t(), String.t()}
   @type destination_key :: {Stop.id(), Line.id(), String.t()}
@@ -157,21 +165,13 @@ defmodule Screens.V2.RDS do
          now
        )
        when stop_ids != [] do
-    with {:ok, typical_patterns} <-
-           params
-           |> Map.from_struct()
-           |> Map.put(:typicality, 1)
-           |> @route_pattern.fetch(),
-         {:ok, child_stops} <-
-           fetch_child_stops(stop_ids),
-         {:ok, scheduled} <-
-           @schedule.fetch(%{stop_ids: stop_ids}, Util.service_date(now)),
-         {:ok, alerts} <-
-           fetch_relevant_alerts(stop_ids),
-         {:ok, departures} <-
-           params
-           |> Map.from_struct()
-           |> @departure.fetch(now: now) do
+    with %{
+           typical_patterns: {:ok, typical_patterns},
+           child_stops: {:ok, child_stops},
+           scheduled: {:ok, scheduled},
+           alerts: {:ok, alerts},
+           departures: {:ok, departures}
+         } <- fetch_data(params, now) do
       scheduled_departures =
         Enum.map(scheduled, fn schedule -> %Departure{prediction: nil, schedule: schedule} end)
 
@@ -201,7 +201,39 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  @spec fetch_child_stops([Stop.id()]) :: {:ok, [Stop.id()]} | :error
+  @spec fetch_data(Query.Params.t(), DateTime.t()) :: data_results()
+  defp fetch_data(params, now) do
+    data_fetch_fns = [
+      typical_patterns: fn params, _now ->
+        params |> Map.from_struct() |> Map.put(:typicality, 1) |> @route_pattern.fetch()
+      end,
+      child_stops: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
+        fetch_child_stops(stop_ids)
+      end,
+      scheduled: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
+        @schedule.fetch(%{stop_ids: stop_ids}, Util.service_date(now))
+      end,
+      alerts: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
+        fetch_relevant_alerts(stop_ids)
+      end,
+      departures: fn params, _now ->
+        params |> Map.from_struct() |> @departure.fetch(now: now)
+      end
+    ]
+
+    data_fetch_fns
+    |> Task.async_stream(fn {key, func} -> {key, func.(params, now)} end, timeout: 30_000)
+    |> Enum.into(%{}, fn {:ok, {key, value}} -> {key, value} end)
+    |> then(fn results ->
+      if Enum.all?(results, fn {_key, value} -> match?({:ok, _}, value) end) do
+        results
+      else
+        :error
+      end
+    end)
+  end
+
+  @spec fetch_child_stops([Stop.id()]) :: stop_id_result()
   defp fetch_child_stops(stop_ids) do
     with {:ok, stops} <- @stop.fetch(%{ids: stop_ids}, _include_related? = true) do
       stops_by_id = Map.new(stops, fn %Stop{id: id} = stop -> {id, stop} end)

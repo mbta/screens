@@ -22,6 +22,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
           stops: [Stop.t()]
         }
 
+  @type result :: {:ok, [t()]} | :error
   @type params :: %{
           optional(:canonical?) => boolean(),
           optional(:date) => Date.t(),
@@ -33,7 +34,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
           optional(:typicality) => typicality()
         }
 
-  @callback fetch(params()) :: {:ok, [t()]} | :error
+  @callback fetch(params()) :: result()
   def fetch(params, get_json_fn \\ &V3Api.get_json/2) do
     # The API doesn't currently have some of these filters built-in
     {filter_params, fetch_params} = Map.split(params, ~w[route_type typicality]a)
