@@ -149,8 +149,7 @@ config :ueberauth, Ueberauth,
          client_id: "test-client",
          roles: [
            "screens-admin"
-         ],
-         ttl: System.system_time(:second) + 60 * 60
+         ]
        ]}
   ]
 
