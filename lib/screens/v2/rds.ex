@@ -22,6 +22,7 @@ defmodule Screens.V2.RDS do
   alias Screens.RouteType
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
+  alias Screens.Trips.Trip
   alias Screens.Util
 
   alias Screens.V2.Departure
@@ -127,12 +128,13 @@ defmodule Screens.V2.RDS do
     Shows an every “X-Y” minutes message. 
     """
     @type t :: %__MODULE__{
-            departure: Departure.t(),
+            departure_id: String.t(),
             route_id: Route.id(),
             direction_name: String.t(),
+            direction_id: Trip.direction(),
             range: Headway.range()
           }
-    defstruct ~w[departure route_id direction_name range]a
+    defstruct ~w[departure_id route_id direction_name direction_id range]a
   end
 
   @alert injected(Alert)
@@ -410,12 +412,10 @@ defmodule Screens.V2.RDS do
         direction_id = Departure.direction_id(first_scheduled_departure)
 
         %Headways{
-          departure: first_scheduled_departure,
+          departure_id: Departure.id(first_scheduled_departure),
           route_id: route.id,
-          direction_name:
-            route
-            |> Route.normalized_direction_names()
-            |> Enum.at(direction_id, nil),
+          direction_name: route |> Route.normalized_direction_names() |> Enum.at(direction_id),
+          direction_id: direction_id,
           range: headway_for_stop
         }
     end
