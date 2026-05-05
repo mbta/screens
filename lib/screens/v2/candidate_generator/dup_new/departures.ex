@@ -367,12 +367,15 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     end)
     |> Enum.flat_map(fn
       {{_line, _direction_name}, [%RDS{state: %Headways{departure: departure, range: range}}]} ->
-        [{departure, range, nil, :headways}]
+        [{[departure], range, nil, :headways}]
 
       # If there are multiple headways with the same line but different headsigns,
       # combine them and use the direction name
-      {{_line, direction_name}, [%RDS{state: %Headways{departure: departure, range: range}} | _]} ->
-        [{departure, range, direction_name, :headways}]
+      {{_line, direction_name}, [%RDS{state: %Headways{range: range}} | _] = headways} ->
+        [
+          {Enum.map(headways, fn %RDS{state: %Headways{departure: departure}} -> departure end),
+           range, direction_name, :headways}
+        ]
     end)
   end
 

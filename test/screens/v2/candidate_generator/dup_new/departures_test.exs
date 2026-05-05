@@ -1153,7 +1153,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.DeparturesTest do
           grouping_type: :time,
           rows: [
             expected_primary_departure,
-            {%Departure{prediction: nil, schedule: schedule}, {6, 10}, nil, :headways}
+            {[%Departure{prediction: nil, schedule: schedule}], {6, 10}, nil, :headways}
           ]
         }
       ]

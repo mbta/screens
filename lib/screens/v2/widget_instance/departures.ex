@@ -491,20 +491,32 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp serialize_departure_group(
          [
-           {departure, {lo, hi}, headsign, :headways}
+           {[first_departure | _] = departures, {lo, hi}, headsign, :headways}
            | _
          ],
          screen,
          _now,
          route_pill_serializer
        ) do
-    departure_id = Departure.id(departure)
-    departures = [departure]
+    departure_id = Departure.id(first_departure)
+    # Green line has a special case where we might have multiple routes have headways
+    # In these cases, combine them into a single pill for GL
+    multiple_gl_route_ids =
+      departures
+      |> Enum.map(&Departure.route(&1).id)
+      |> Enum.uniq()
+      |> Enum.filter(&String.contains?(&1, "Green"))
+      |> length() > 1
 
     %{
       id: hash_and_encode(departure_id),
       type: :departure_row,
-      route: serialize_route(departures, route_pill_serializer, screen),
+      route:
+        if multiple_gl_route_ids do
+          RoutePill.serialize_icon(:green)
+        else
+          serialize_route(departures, route_pill_serializer, screen)
+        end,
       headsign:
         if headsign do
           %{headsign: headsign}
@@ -532,8 +544,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           [Departure.t()],
           (Departure.t(), pos_integer() | nil, Screen.t() -> RoutePill.t()),
           Screen.t()
-        ) ::
-          RoutePill.t()
+        ) :: RoutePill.t()
   def serialize_route([first_departure | _], route_pill_serializer, screen) do
     route = Departure.route(first_departure)
     track_number = Departure.track_number(first_departure)
