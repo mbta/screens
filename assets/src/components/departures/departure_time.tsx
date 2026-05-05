@@ -8,7 +8,7 @@ import { classWithModifier, classWithModifiers } from "Util/utils";
 type DepartureTime =
   | { type: "text"; text: string }
   | { type: "minutes"; minutes: number }
-  | { type: "timestamp"; hour: number; minute: number; am_pm: string | null }
+  | { type: "timestamp"; hour: number; minute: number }
   | { type: "status"; pages: string[] }
   | { type: "overnight" };
 
@@ -37,14 +37,7 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
       const paddedMinute = time.minute < 10 ? "0" + time.minute : time.minute;
       const timestamp = `${time.hour}:${paddedMinute}`;
 
-      return (
-        <div className="departure-time__timestamp">
-          <span className="departure-time__time">{timestamp}</span>
-          {time.am_pm && (
-            <span className="departure-time__ampm">{time.am_pm}</span>
-          )}
-        </div>
-      );
+      return <span className="departure-time__timestamp">{timestamp}</span>;
     }
 
     case "status": {

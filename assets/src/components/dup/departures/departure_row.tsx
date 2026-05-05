@@ -16,7 +16,7 @@ const DepartureRow: ComponentType<DepartureRowBase> = ({
     route.type === "dual" ? "extended-route_pill" : "";
 
   const classModifier = timesWithCrowding.some(
-    (time) => time.time?.type === "timestamp" && time?.time.am_pm,
+    (time) => time.time?.type === "timestamp",
   )
     ? "shortened-headsign"
     : "";
