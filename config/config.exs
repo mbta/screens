@@ -492,22 +492,26 @@ config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concu
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
 
-# Memory limits for V3 API response caches are based on ETS table memory usage measurements in a
-# deployed environment. To avoid thrashing and overloading the HTTP connection pool, these can and
-# should be tweaked as the V3 API usage patterns and requirements of the app change over time.
-
-config :screens, Screens.V3Api.Cache.Realtime,
-  allocated_memory: 100 * 1024 * 1024,
+v3_api_cache_options = [
+  # Set with reference to the "slowest" refresh rate among screen types. In general should be
+  # chosen to minimize the impact of pruning data that hasn't been accessed in (2 * interval);
+  # see documentation for `Nebulex.Adapters.Local`.
   gc_interval: :timer.seconds(30),
-  gc_memory_check_interval: :timer.seconds(5),
   stats: true,
   telemetry_prefix: ~w[screens v3_api cache]a
+]
 
-config :screens, Screens.V3Api.Cache.Static,
-  allocated_memory: 250 * 1024 * 1024,
-  gc_interval: :timer.hours(1),
-  stats: true,
-  telemetry_prefix: ~w[screens v3_api cache]a
+# Memory limits for V3 API response caches are based on stats measured in a deployed environment.
+# To avoid thrashing and overloading the HTTP connection pool, these can and should be tweaked as
+# the V3 API usage patterns and requirements of the app change over time.
+
+config :screens,
+       Screens.V3Api.Cache.Realtime,
+       Keyword.merge(v3_api_cache_options, allocated_memory: 100 * 1024 * 1024)
+
+config :screens,
+       Screens.V3Api.Cache.Static,
+       Keyword.merge(v3_api_cache_options, allocated_memory: 250 * 1024 * 1024)
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
