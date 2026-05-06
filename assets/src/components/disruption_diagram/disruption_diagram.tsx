@@ -1,4 +1,4 @@
-// SPECIFICATION: https://www.notion.so/mbta-downtown-crossing/Disruption-Diagram-Specification-a779027385b545abbff6fb4b4fd0adc1
+// SPECIFICATION: https://www.notion.so/mbta-downtown-crossing/Disruption-Diagram-Specification-17cf5d8d11ea81c48f8bd380003ef62b
 
 import {
   type ComponentType,

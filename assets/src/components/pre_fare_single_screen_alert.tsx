@@ -150,7 +150,7 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
     <div className="alert-card__content-block">
       <div className="alert-card__issue">
         <NoServiceIcon className="alert-card__icon" />
-        <h3 className="alert-card__content-block__text">
+        <h3>
           <AffectedLinePill
             className="alert-card__content-block__route-pill"
             color={affectedLineColor}
@@ -160,7 +160,7 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
       </div>
       <div className="alert-card__issue">
         <InfoIcon className="alert-card__icon" />
-        <h3 className="alert-card__content-block__text">
+        <h3>
           {unaffected_routes.map((route) => {
             const UnaffectedLinePill = STRING_TO_SVG[route.svg_name];
             const unaffectedLineColor = getHexColor(
@@ -240,11 +240,7 @@ const StandardIssueSection: ComponentType<StandardIssueSectionProps> = ({
       className={classWithModifiers("alert-card__icon", [contentTextSize])}
     />
     <div>
-      {contentTextSize === "large" ? (
-        <h3 className="alert-card__content-block__text">{issue}</h3>
-      ) : (
-        <h4 className="alert-card__content-block__text">{issue}</h4>
-      )}
+      {contentTextSize === "large" ? <h3>{issue}</h3> : <h4>{issue}</h4>}
       {location && (
         <div className="alert-card__issue__location body-4">{location}</div>
       )}
@@ -261,7 +257,7 @@ const DownstreamIssueSection: ComponentType<DownstreamIssueSectionProps> = ({
 }) => (
   <div className="alert-card__issue">
     <NoServiceIcon className="alert-card__icon" />
-    <h4 className="alert-card__content-block__text">
+    <h4>
       No trains between {endpoints[0]} & {endpoints[1]}
     </h4>
   </div>
@@ -293,11 +289,7 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
           />
         </div>
         <div>
-          {contentTextSize === "large" ? (
-            <h3 className="alert-card__content-block__text">{remedy}</h3>
-          ) : (
-            <h4 className="alert-card__content-block__text">{remedy}</h4>
-          )}
+          {contentTextSize === "large" ? <h3>{remedy}</h3> : <h4>{remedy}</h4>}
           <div className="alert-card__body__accessibility-info--text body-4">
             All shuttle buses are accessible
             <ISAIcon className="alert-card__isa-icon" />
