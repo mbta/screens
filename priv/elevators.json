@@ -269,6 +269,20 @@
     "category": 1,
     "summary": "Use nearby Quincy Adams Elevator 806 (platform to lobby)."
   },
+  "739": {
+    "alternate_ids": [
+      "740"
+    ],
+    "category": 1,
+    "summary": "Use nearby North Quincy Elevator 740."
+  },
+  "740": {
+    "alternate_ids": [
+      "739"
+    ],
+    "category": 1,
+    "summary": "Use nearby North Quincy Elevator 739."
+  },
   "743": {
     "alternate_ids": [
       "746"
