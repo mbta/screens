@@ -10,20 +10,29 @@ on:
   push:
     branches: ["main"]
 
+permissions: {}
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.inputs.environment }}
+  cancel-in-progress: true
+
 jobs:
   sentry-upload:
+    name: "Upload sourcemaps to Sentry"
     runs-on: ubuntu-latest
     env:
-      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
-      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }} # zizmor: ignore[secrets-outside-env] - TODO: Move to a dedicated environment
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }} # zizmor: ignore[secrets-outside-env] - TODO: Move to a dedicated environment
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }} # zizmor: ignore[secrets-outside-env] - TODO: Move to a dedicated environment
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          persist-credentials: false
       - uses: ./.github/actions/setup
       - working-directory: ./assets
         run: npm run deploy
   call-workflow:
-    uses: mbta/workflows/.github/workflows/deploy-ecs.yml@v5
+    uses: mbta/workflows/.github/workflows/deploy-ecs.yml@ead2d40fcc0c546bd6f099a6d8fcd9f9950eab03 # v5.0.0
     with:
       app-name: screens
       environment: ${{ github.event.inputs.environment || 'dev' }}
@@ -32,19 +41,22 @@ jobs:
       docker-repo: ${{ secrets.DOCKER_REPO }}
       slack-webhook: ${{ secrets.SLACK_WEBHOOK }}
   refresh:
+    name: "Update last successful deploy timestamp"
     needs: call-workflow
     runs-on: ubuntu-latest
     permissions:
-      id-token: write
+      id-token: write # required to authenticate with AWS
       contents: read
     steps:
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v6
+        uses: aws-actions/configure-aws-credentials@ec61189d14ec14c8efccab744f656cffd0e33f37 # v6.1.0
         with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }} # zizmor: ignore[secrets-outside-env] - TODO: Move to a dedicated environment
           aws-region: us-east-1
       - name: Create LAST_DEPLOY and upload to S3
         run: |
           touch LAST_DEPLOY
           echo "This file's modified date is used by Screens app to determine when the last successful deploy happened" > LAST_DEPLOY
-          aws s3 cp LAST_DEPLOY s3://mbta-screens/screens-${{ github.event.inputs.environment || 'dev' }}/
+          aws s3 cp LAST_DEPLOY s3://mbta-screens/screens-${BUCKET_SUFFIX}/
+        env:
+          BUCKET_SUFFIX: ${{ github.event.inputs.environment || 'dev' }}
