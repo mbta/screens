@@ -36,6 +36,10 @@ jobs:
     with:
       app-name: screens
       environment: ${{ github.event.inputs.environment || 'dev' }}
+    permissions: {
+      contents: read, # Needed to check out the repository
+      id-token: write # Needed to authenticate against AWS
+    }
     secrets:
       aws-role-arn: ${{ secrets.AWS_ROLE_ARN }}
       docker-repo: ${{ secrets.DOCKER_REPO }}
