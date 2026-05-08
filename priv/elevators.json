@@ -223,6 +223,20 @@
     "category": 2,
     "summary": "Use Ruggles Elevator 848 (lobby to lower busway side platform)."
   },
+  "729": {
+    "alternate_ids": [
+      "730"
+    ],
+    "category": 1,
+    "summary": "Please use the elevator next to this one, Braintree elevator 730."
+  },
+  "730": {
+    "alternate_ids": [
+      "729"
+    ],
+    "category": 1,
+    "summary": "Please use the elevator next to this one, Braintree elevator 729."
+  },
   "731": {
     "alternate_ids": [
       "912",
