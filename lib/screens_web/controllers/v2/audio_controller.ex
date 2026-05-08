@@ -6,12 +6,11 @@ defmodule ScreensWeb.V2.AudioController do
   alias Screens.V2.ScreenAudioData
   alias ScreensConfig.EmergencyTakeover
   alias ScreensConfig.Screen
-  alias ScreensWeb.Plug.{LegacyLogging, ScreenRequest}
+  alias ScreensWeb.Plug.ScreenRequest
 
   plug ScreenRequest, [type: :audio] when action == :show
   plug ScreenRequest, [type: :volume] when action == :show_volume
   plug ScreenRequest when action == :debug
-  plug LegacyLogging, :audio when action == :show
 
   def show(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _params), do: not_found(conn)
 
