@@ -81,6 +81,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   @maximum_pill_text_length 3
 
   @spec serialize_for_departure(Route.t(), pos_integer() | nil, Screen.t()) :: t()
+  @spec serialize_for_departure(Line.t(), nil, Screen.t()) :: t()
   def serialize_for_departure(
         %Route{id: route_id, type: route_type, line: %Line{id: line_id}} = route,
         track_number,
@@ -107,6 +108,23 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
         })
         |> Map.put(:color, Route.color(route_id, route_type))
     end
+  end
+
+  def serialize_for_departure(
+        %Line{id: "line-" <> route_id},
+        _track_number,
+        _screen
+      ) do
+    adjusted_route_id =
+      if route_id in Map.keys(@cr_line_abbreviations) do
+        "CR-" <> route_id
+      else
+        route_id
+      end
+
+    adjusted_route_id
+    |> do_serialize(%{})
+    |> Map.merge(%{color: Route.color(adjusted_route_id)})
   end
 
   @spec serialize_for_audio_departure(Route.t(), pos_integer() | nil, Screen.t()) :: audio_route()

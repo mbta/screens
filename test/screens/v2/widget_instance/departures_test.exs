@@ -2,6 +2,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Departures.Departure
+  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -9,7 +10,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Trips.Trip
   alias Screens.V2.{Departure, WidgetInstance}
   alias Screens.V2.WidgetInstance.Departures
-  alias Screens.V2.WidgetInstance.Departures.{HeadwaySection, NoDataSection, NormalSection}
+
+  alias Screens.V2.WidgetInstance.Departures.{
+    HeadwayRow,
+    HeadwaySection,
+    NoDataSection,
+    NormalSection
+  }
+
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias Screens.Vehicles.Vehicle
   alias ScreensConfig.Departures.Header
@@ -354,6 +362,136 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                ]
              } =
                Departures.serialize_section(section, bus_shelter_screen, now, false)
+    end
+
+    test "serializes normal section with countdown and headway rows", %{
+      dup_screen: dup_screen,
+      now: now
+    } do
+      rows = [
+        %Departure{
+          prediction: %Prediction{
+            id: "one",
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: route(id: "Green-E", type: :subway),
+            trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+            stop: %Stop{}
+          }
+        },
+        %HeadwayRow{
+          id: "Test ID",
+          line: %Line{id: "line-Green"},
+          direction_id: 0,
+          range: {20, 30},
+          headsign: %{headsign: "Westbound"}
+        }
+      ]
+
+      section = %NormalSection{
+        rows: rows,
+        layout: %Layout{},
+        header: %Header{title: "Section Header"},
+        grouping_type: :time
+      }
+
+      assert %{
+               type: :normal_section,
+               rows: [
+                 %{headsign: %{headsign: "Medford/Tufts"}},
+                 %{
+                   headsign: %{headsign: %{headsign: "Westbound"}},
+                   direction_id: 0,
+                   route: %{type: :text, text: "GL", color: :green},
+                   times_with_crowding: [
+                     %{id: "Test ID", time: %{type: :status, pages: ["every 20-30m"]}}
+                   ]
+                 }
+               ]
+             } =
+               Departures.serialize_section(section, dup_screen, now, false)
+    end
+
+    test "serializes normal section with first trip row", %{
+      dup_screen: dup_screen,
+      now: now
+    } do
+      rows = [
+        {%Departure{
+           schedule: %Schedule{
+             id: "one",
+             departure_time: ~U[2020-01-01T00:01:10Z],
+             route: route(id: "Green-E", type: :subway),
+             trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+             stop: %Stop{}
+           }
+         }, :first_trip}
+      ]
+
+      section = %NormalSection{
+        rows: rows,
+        layout: %Layout{},
+        header: %Header{title: "Section Header"},
+        grouping_type: :time
+      }
+
+      assert %{
+               rows: [
+                 %{
+                   headsign: %{headsign: "Medford/Tufts"},
+                   is_first_trip: true,
+                   route: %{type: :text, text: "GL·E", color: :green},
+                   times_with_crowding: [
+                     %{
+                       id: "one",
+                       time: %{type: :timestamp, minute: 1, hour: 7}
+                     }
+                   ],
+                   type: :departure_row
+                 }
+               ]
+             } =
+               Departures.serialize_section(section, dup_screen, now, false)
+    end
+
+    test "serializes normal section with last trip row", %{
+      dup_screen: dup_screen,
+      now: now
+    } do
+      rows = [
+        {%Departure{
+           schedule: %Schedule{
+             id: "one",
+             departure_time: ~U[2020-01-01T00:01:10Z],
+             route: route(id: "Green-E", type: :subway),
+             trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+             stop: %Stop{}
+           }
+         }, :last_trip}
+      ]
+
+      section = %NormalSection{
+        rows: rows,
+        layout: %Layout{},
+        header: %Header{title: "Section Header"},
+        grouping_type: :time
+      }
+
+      assert %{
+               rows: [
+                 %{
+                   headsign: %{headsign: "Medford/Tufts"},
+                   route: %{type: :text, text: "GL·E", color: :green},
+                   times_with_crowding: [
+                     %{
+                       id: "one",
+                       time: %{type: :overnight}
+                     }
+                   ],
+                   type: :departure_row
+                 }
+               ]
+             } =
+               Departures.serialize_section(section, dup_screen, now, false)
     end
   end
 

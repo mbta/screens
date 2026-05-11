@@ -1,13 +1,14 @@
 defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Lines.Line
   alias ScreensConfig.Screen
 
   import ExUnit.CaptureLog
   import Screens.TestSupport.RouteBuilder
   import Screens.V2.WidgetInstance.Serializer.RoutePill
 
-  describe "serialize_for_departure/3" do
+  describe "serialize_for_departure/3 with route" do
     setup do
       pre_fare_screen = struct(Screen, %{app_id: :pre_fare_v2})
       gl_eink_screen = struct(Screen, %{app_id: :gl_eink_v2})
@@ -283,6 +284,36 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
     test "Includes branch list and text for Green Line" do
       assert %{type: :text, text: "GL", color: :green, branches: ["B"]} ==
                serialize_route_for_reconstructed_alert({"Green", ["Green-B"]})
+    end
+  end
+
+  describe "serialize_for_departure/3 with line" do
+    setup do
+      dup_screen = struct(Screen, %{app_id: :dup_v2})
+
+      %{
+        dup_screen: dup_screen
+      }
+    end
+
+    test "returns GL for line-Green", %{dup_screen: dup_screen} do
+      assert %{type: :text, text: "GL", color: :green} ==
+               serialize_for_departure(%Line{id: "line-Green"}, nil, dup_screen)
+    end
+
+    test "returns RL for line-Red", %{dup_screen: dup_screen} do
+      assert %{type: :text, text: "RL", color: :red} ==
+               serialize_for_departure(%Line{id: "line-Red"}, nil, dup_screen)
+    end
+
+    test "returns CR pill for commuter rail lines", %{dup_screen: dup_screen} do
+      assert %{type: :icon, icon: :rail, route_abbrev: "FOX", color: :purple} ==
+               serialize_for_departure(%Line{id: "line-Foxboro"}, nil, dup_screen)
+    end
+
+    test "returns Bus pill for numbered lines", %{dup_screen: dup_screen} do
+      assert %{type: :text, text: "90", color: :yellow} ==
+               serialize_for_departure(%Line{id: "line-90"}, nil, dup_screen)
     end
   end
 end

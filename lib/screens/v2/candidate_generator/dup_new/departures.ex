@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   import Screens.Inject
 
+  alias Screens.Lines.Line
   alias Screens.Routes.Route
 
   alias Screens.V2.Departure
@@ -12,6 +13,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
 
   alias Screens.V2.WidgetInstance.Departures.{
+    HeadwayRow,
     HeadwaySection,
     NoDataSection,
     NormalSection,
@@ -171,10 +173,10 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   # Bidirectional -> Use no headsign for the trains message
   defp create_headway_section([
-         %RDS{state: %{route_id: route_id, direction_name: direction_name_one, range: range}}
-         | [%RDS{state: %{route_id: route_id, direction_name: direction_name_two, range: range}}]
+         %RDS{state: %{route_id: route_id, direction_id: direction_id_one, range: range}}
+         | [%RDS{state: %{route_id: route_id, direction_id: direction_id_two, range: range}}]
        ])
-       when direction_name_one != direction_name_two do
+       when direction_id_one != direction_id_two do
     %HeadwaySection{
       route: route_id,
       time_range: range,
@@ -188,35 +190,38 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   defp create_headway_section(
          [
            %RDS{
-             headsign: first_headsign,
+             headsign: headsign,
+             line: %Line{id: first_line_id},
              state: %Headways{
-               route_id: first_route_id,
-               direction_name: first_direction_name,
-               range: first_range
+               route_id: route_id,
+               direction_name: direction_name,
+               direction_id: direction_id,
+               range: range
              }
            }
            | _
          ] = destinations
        ) do
     %HeadwaySection{
-      route: first_route_id,
-      time_range: first_range,
+      route: route_id,
+      time_range: range,
       headsign:
         cond do
-          Enum.all?(destinations, fn %RDS{headsign: headsign} ->
-            headsign == first_headsign
+          Enum.all?(destinations, fn %RDS{headsign: other_headsign} ->
+            headsign == other_headsign
           end) ->
-            first_headsign
+            headsign
 
           Enum.all?(
             destinations,
             fn %RDS{
-                 state: %Headways{route_id: other_route_id, direction_name: other_direction_name}
+                 line: %Line{id: other_line_id},
+                 state: %Headways{direction_id: other_direction_id}
                } ->
-              other_direction_name == first_direction_name and other_route_id == first_route_id
+              first_line_id == other_line_id and direction_id == other_direction_id
             end
           ) ->
-            first_direction_name
+            direction_name
 
           true ->
             nil
@@ -314,7 +319,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     rds = Map.get(grouped_rds, :other, [])
 
     sorted_departures_from_rds(rds) ++
-      headways_from_rds(headway_rds) ++
+      headways_from_rds(rds, headway_rds) ++
       sorted_departures_from_rds(service_ended_rds, true)
   end
 
@@ -351,28 +356,54 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     )
   end
 
-  @spec headways_from_rds([RDS.t()]) :: [NormalSection.headway_row()]
-  defp headways_from_rds(headway_rds) do
+  @spec headways_from_rds([RDS.t()], [RDS.t()]) :: [HeadwayRow.t()]
+  defp headways_from_rds(
+         rds,
+         headway_rds
+       ) do
+    # If there are other similar line/direction_id destinations that are in one of the other states,
+    # disregard the headway for that particular destination
+    lines_in_other_states =
+      rds
+      |> Enum.flat_map(&extract_line_direction_pairs/1)
+      |> MapSet.new()
+
     headway_rds
-    |> Enum.group_by(fn %RDS{line: line, state: %Headways{departure: departure}} ->
-      direction_id = Departure.direction_id(departure)
-      route = Departure.route(departure)
-
-      direction_name =
-        route
-        |> Route.normalized_direction_names()
-        |> Enum.at(direction_id, nil)
-
-      {line, direction_name}
+    |> Enum.reject(fn %RDS{
+                        line: %Line{id: line_id},
+                        state: %Headways{direction_id: direction_id}
+                      } ->
+      MapSet.member?(lines_in_other_states, {line_id, direction_id})
     end)
-    |> Enum.flat_map(fn
-      {{_line, _direction_name}, [%RDS{state: %Headways{departure: departure, range: range}}]} ->
-        [{departure, range, nil, :headways}]
+    |> Enum.group_by(fn %RDS{
+                          line: line,
+                          state: %Headways{direction_id: direction_id}
+                        } ->
+      {line, direction_id}
+    end)
+    |> Enum.flat_map(fn {{line, direction_id}, rds_list} ->
+      %RDS{
+        headsign: headsign,
+        state: %Headways{
+          departure_id: departure_id,
+          direction_name: direction_name,
+          range: range
+        }
+      } = hd(rds_list)
 
       # If there are multiple headways with the same line but different headsigns,
       # combine them and use the direction name
-      {{_line, direction_name}, [%RDS{state: %Headways{departure: departure, range: range}} | _]} ->
-        [{departure, range, direction_name, :headways}]
+      displayed_headsign = if length(rds_list) == 1, do: headsign, else: direction_name
+
+      [
+        %HeadwayRow{
+          id: departure_id,
+          line: line,
+          direction_id: direction_id,
+          range: range,
+          headsign: displayed_headsign
+        }
+      ]
     end)
   end
 
@@ -411,6 +442,24 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   defp departure_direction_id({last_scheduled_departure, :last_trip}),
     do: Departure.direction_id(last_scheduled_departure)
 
-  defp departure_direction_id({departure, _range, _headsign, :headways}),
-    do: Departure.direction_id(departure)
+  defp departure_direction_id(%HeadwayRow{direction_id: direction_id}), do: direction_id
+
+  defp extract_line_direction_pairs(%RDS{line: %Line{id: line_id}, state: state}) do
+    case state do
+      %NoService{} ->
+        [{line_id, 0}, {line_id, 1}]
+
+      %Countdowns{departures: []} ->
+        [{line_id, 0}, {line_id, 1}]
+
+      %Countdowns{departures: [first_departure | _]} ->
+        [{line_id, Departure.direction_id(first_departure)}]
+
+      %FirstTrip{first_scheduled_departure: departure} ->
+        [{line_id, Departure.direction_id(departure)}]
+
+      %ServiceEnded{last_scheduled_departure: departure} ->
+        [{line_id, Departure.direction_id(departure)}]
+    end
+  end
 end

@@ -4,10 +4,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   """
 
   alias Screens.Headways
+  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
+  alias Screens.Trips.Trip
   alias Screens.Util
   alias Screens.Util.Assets
   alias Screens.V2.Departure
@@ -18,17 +20,28 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias ScreensConfig.{FreeTextLine, Screen}
   alias ScreensConfig.Screen.PreFare
 
+  defmodule HeadwayRow do
+    @moduledoc "A row that shows headway values in a NormalSection, X every Y - Z minutes"
+    @type t :: %__MODULE__{
+            id: String.t(),
+            line: Line.t(),
+            direction_id: Trip.direction(),
+            range: Headways.range(),
+            headsign: String.t()
+          }
+
+    defstruct id: nil, line: nil, direction_id: nil, range: nil, headsign: nil
+  end
+
   defmodule NormalSection do
     @moduledoc "Section which includes a number of independent 'rows' or items."
 
     @type special_trip_type :: :first_trip | :last_trip
 
-    @type headway_row :: {Departure.t(), Headways.range(), String.t() | nil, :headways}
-
     @type row ::
             Departure.t()
             | {Departure.t(), special_trip_type()}
-            | headway_row()
+            | HeadwayRow.t()
             | FreeTextLine.t()
 
     @type t :: %__MODULE__{
@@ -490,33 +503,26 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp serialize_departure_group(
          [
-           {departure, {lo, hi}, headsign, :headways}
+           %HeadwayRow{
+             id: id,
+             line: line,
+             direction_id: direction_id,
+             range: {lo, hi},
+             headsign: headsign
+           }
            | _
          ],
          screen,
          _now,
          route_pill_serializer
        ) do
-    departure_id = Departure.id(departure)
-    departures = [departure]
-
     %{
-      id: hash_and_encode(departure_id),
+      id: hash_and_encode(id),
       type: :departure_row,
-      route: serialize_route(departures, route_pill_serializer, screen),
-      headsign:
-        if headsign do
-          %{headsign: headsign}
-        else
-          serialize_headsign(departures, screen)
-        end,
-      times_with_crowding: [
-        %{
-          id: departure_id,
-          time: %{type: :status, pages: ["every #{lo}-#{hi}m"]}
-        }
-      ],
-      direction_id: serialize_direction_id(departures)
+      route: route_pill_serializer.(line, nil, screen),
+      headsign: %{headsign: headsign},
+      times_with_crowding: [%{id: id, time: %{type: :status, pages: ["every #{lo}-#{hi}m"]}}],
+      direction_id: direction_id
     }
   end
 
@@ -531,8 +537,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           [Departure.t()],
           (Departure.t(), pos_integer() | nil, Screen.t() -> RoutePill.t()),
           Screen.t()
-        ) ::
-          RoutePill.t()
+        ) :: RoutePill.t()
   def serialize_route([first_departure | _], route_pill_serializer, screen) do
     route = Departure.route(first_departure)
     track_number = Departure.track_number(first_departure)

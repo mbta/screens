@@ -114,15 +114,24 @@ defmodule Screens.V2.RDSTest do
     }
   end
 
-  defp headways(stop_id, line_id, headsign, first_scheduled_departure, route_id, direction_name) do
+  defp headways(
+         stop_id,
+         line_id,
+         headsign,
+         route_id,
+         direction_name,
+         direction_id,
+         departure_id
+       ) do
     %RDS{
       stop: %Stop{id: stop_id},
       line: %Line{id: line_id},
       headsign: headsign,
       state: %RDS.Headways{
-        departure: %Departure{prediction: nil, schedule: first_scheduled_departure},
+        departure_id: departure_id,
         route_id: route_id,
         direction_name: direction_name,
+        direction_id: direction_id,
         range: {5, 10}
       }
     }
@@ -631,6 +640,7 @@ defmodule Screens.V2.RDSTest do
 
       first_schedule_one =
         %Schedule{
+          id: "Test ID 11",
           departure_time: ~U[2024-10-11 10:45:00Z],
           route: %Route{
             id: "r1",
@@ -644,6 +654,7 @@ defmodule Screens.V2.RDSTest do
 
       last_schedule_one =
         %Schedule{
+          id: "Test ID 12",
           departure_time: ~U[2024-10-12 01:45:00Z],
           route: %Route{
             id: "r1",
@@ -656,6 +667,7 @@ defmodule Screens.V2.RDSTest do
         }
 
       first_schedule_two = %Schedule{
+        id: "Test ID 21",
         departure_time: ~U[2024-10-11 10:45:00Z],
         route: %Route{
           id: "r2",
@@ -669,6 +681,7 @@ defmodule Screens.V2.RDSTest do
 
       last_schedule_two =
         %Schedule{
+          id: "Test ID 22",
           departure_time: ~U[2024-10-12 01:45:00Z],
           route: %Route{
             id: "r2",
@@ -682,6 +695,7 @@ defmodule Screens.V2.RDSTest do
 
       first_schedule_three =
         %Schedule{
+          id: "Test ID 31",
           departure_time: ~U[2024-10-11 10:45:00Z],
           route: %Route{
             id: "r2",
@@ -695,6 +709,7 @@ defmodule Screens.V2.RDSTest do
 
       last_schedule_three =
         %Schedule{
+          id: "Test ID 32",
           departure_time: ~U[2024-10-12 01:45:00Z],
           route: %Route{
             id: "r2",
@@ -729,9 +744,9 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                {:ok,
                 [
-                  headways("sA", "l1", "hA", first_schedule_one, "r1", "Northbound"),
-                  headways("sB", "l2", "hB", first_schedule_two, "r2", "Westbound"),
-                  headways("sC", "l2", "hC", first_schedule_three, "r2", "Eastbound")
+                  headways("sA", "l1", "hA", "r1", "Northbound", 0, "Test ID 11"),
+                  headways("sB", "l2", "hB", "r2", "Westbound", 1, "Test ID 21"),
+                  headways("sC", "l2", "hC", "r2", "Eastbound", 0, "Test ID 31")
                 ]}
              ]
     end
