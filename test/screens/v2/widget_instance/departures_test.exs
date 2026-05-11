@@ -1015,7 +1015,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert [%{time: %{type: :timestamp, am_pm: nil, hour: 7, minute: 0}}] =
+      assert [%{time: %{type: :timestamp, hour: 7, minute: 0}}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
@@ -1055,13 +1055,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert [
-               %{
-                 id: nil,
-                 crowding: nil,
-                 time: %{type: :timestamp, am_pm: nil, hour: 12, minute: 20}
-               }
-             ] =
+      assert [%{id: nil, crowding: nil, time: %{type: :timestamp, hour: 12, minute: 20}}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
@@ -1087,8 +1081,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                %{
                  id: nil,
                  crowding: nil,
-                 time: %{am_pm: nil, hour: 9, minute: 20, type: :timestamp},
-                 scheduled_time: %{am_pm: nil, hour: 9, minute: 15, type: :timestamp}
+                 time: %{hour: 9, minute: 20, type: :timestamp},
+                 scheduled_time: %{hour: 9, minute: 15, type: :timestamp}
                }
              ] =
                Departures.serialize_times_with_crowding([departure], screen, now)
@@ -1252,7 +1246,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert [%{time: %{type: :timestamp, am_pm: nil, hour: 7, minute: 0}, is_live: false}] =
+      assert [%{time: %{type: :timestamp, hour: 7, minute: 0}, is_live: false}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 

@@ -92,8 +92,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @type serialized_timestamp :: %{
           type: :timestamp,
           hour: pos_integer(),
-          minute: non_neg_integer(),
-          am_pm: :am | :pm | nil
+          minute: non_neg_integer()
         }
   @type serialized_status :: %{type: :status, pages: [String.t()]}
   @type serialized_overnight :: %{type: :overnight}
@@ -635,7 +634,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
               scheduled_time: serialized_timestamp() | nil,
               is_live: boolean()
             }
-  defp serialize_time(departure, %Screen{app_id: app_id} = screen, now)
+  defp serialize_time(departure, %Screen{app_id: app_id}, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
     second_diff = DateTime.diff(departure_time, now)
@@ -645,7 +644,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       cond do
         second_diff < 60 -> %{type: :text, text: "Now"}
         minute_diff < 60 -> %{type: :minutes, minutes: minute_diff}
-        true -> serialize_timestamp(departure_time, screen, now)
+        true -> serialize_timestamp(departure_time)
       end
 
     # See `docs/mercury_api.md`
@@ -670,12 +669,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
       cond do
         Departure.cancelled?(departure) -> nil
         predicted? and not include_scheduled_time? -> serialize_realtime(departure, screen, now)
-        true -> departure |> Departure.time() |> serialize_timestamp(screen, now)
+        true -> departure |> Departure.time() |> serialize_timestamp()
       end
 
     serialized_scheduled_time =
       if include_scheduled_time? and not is_nil(scheduled_time) do
-        serialized_scheduled_time = serialize_timestamp(scheduled_time, screen, now)
+        serialized_scheduled_time = serialize_timestamp(scheduled_time)
 
         case serialized_time do
           %{type: :text} -> nil
@@ -705,22 +704,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
       subway? and boarding?(departure, second_diff) -> %{type: :text, text: "BRD"}
       second_diff <= 30 -> %{type: :text, text: if(subway?, do: "ARR", else: "Now")}
       minute_diff < 60 -> %{type: :minutes, minutes: minute_diff}
-      true -> serialize_timestamp(departure_time, screen, now)
+      true -> serialize_timestamp(departure_time)
     end
   end
 
-  @spec serialize_timestamp(DateTime.t(), Screen.t(), DateTime.t()) ::
-          serialized_timestamp()
-  defp serialize_timestamp(datetime, %Screen{app_id: app_id}, now) do
+  @spec serialize_timestamp(DateTime.t()) :: serialized_timestamp()
+  defp serialize_timestamp(datetime) do
     local_time = Util.to_eastern(datetime)
     hour = 1 + Integer.mod(local_time.hour - 1, 12)
     minute = local_time.minute
-    am_pm = if local_time.hour >= 12, do: :pm, else: :am
-    service_date_tomorrow = now |> Util.service_date() |> Date.add(1)
-    # Screen types other than DUPs currently have no implemented design for the AM/PM indicator.
-    show_am_pm = app_id == :dup_v2 and local_time.day == service_date_tomorrow.day
 
-    %{type: :timestamp, hour: hour, minute: minute, am_pm: if(show_am_pm, do: am_pm, else: nil)}
+    %{type: :timestamp, hour: hour, minute: minute}
   end
 
   defp boarding?(

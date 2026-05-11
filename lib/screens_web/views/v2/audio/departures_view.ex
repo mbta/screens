@@ -148,9 +148,9 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<%= minute_diff %> <%= pluralize_minutes(minute_diff) %>|
   end
 
-  defp render_time(%{type: :timestamp, hour: hour, minute: minute, am_pm: am_pm}) do
+  defp render_time(%{type: :timestamp, hour: hour, minute: minute}) do
     minute_string = if minute < 10, do: "0#{minute}", else: "#{minute}"
-    ~E|<%= hour %>:<%= minute_string %><%= am_pm %>|
+    ~E|<%= hour %>:<%= minute_string %>|
   end
 
   defp pluralize_minutes(1), do: "minute"
