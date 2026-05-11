@@ -35,7 +35,7 @@ defmodule Screens.Headways do
     red_braintree: [70095..70105],
     red_trunk: [70061..70061, 70063..70084],
     silver_seaport: [247..247, 17_091..17_095, 27_092..27_092, 30_249..30_251, 31_255..31_259],
-    silver_chelsea: [7096..7097, 74_630..74_637]
+    silver_chelsea: [7096..7097, 74_611..74_617, 74_630..74_637]
   }
 
   # Mapping of parent station IDs and route IDs to headway keys. For brevity, omits the "place-"
