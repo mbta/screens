@@ -66,9 +66,11 @@ defmodule Screens.RoutePatterns.RoutePattern do
     do: Enum.filter(patterns, &(&1.typicality == typicality))
 
   defp encode_param({:ids, ids}), do: [{"filter[id]", Enum.join(ids, ",")}]
+  defp encode_param({:route_ids, []}), do: []
   defp encode_param({:route_ids, ids}), do: [{"filter[route]", Enum.join(ids, ",")}]
   defp encode_param({:direction_id, :both}), do: []
   defp encode_param({:direction_id, id}), do: [{"filter[direction_id]", to_string(id)}]
+  defp encode_param({:stop_ids, []}), do: []
   defp encode_param({:stop_ids, ids}), do: [{"filter[stop]", Enum.join(ids, ",")}]
   defp encode_param({:canonical?, canonical?}), do: [{"filter[canonical]", to_string(canonical?)}]
   defp encode_param({:date, date}), do: [{"filter[date]", Date.to_iso8601(date)}]
