@@ -163,30 +163,18 @@ export const useSubwayStatusTextResizer = (alert: Alert, type: SectionType) => {
       : [FittingStep.FullSize, FittingStep.Abbrev];
   const { ref, step: fittingStep } = useAutoSize(steps, id);
 
-  const isStopsSkipped = /Stops? Skipped/.test(alert.status);
-  const isSuspension = firstWord(alert.status) === "Suspension";
   const isDelays = firstWord(alert.status) === "Delays";
 
-  const location = (() => {
-    if (
-      fittingStep === FittingStep.PerAlertEffect &&
-      (isStopsSkipped || isSuspension)
-    ) {
-      return "mbta.com/alerts";
-    } else if (isAlertLocationMap(alert.location)) {
-      return fittingStep === FittingStep.Abbrev ||
-        fittingStep === FittingStep.PerAlertEffect
-        ? alert.location.abbrev
-        : alert.location.full;
-    } else {
-      return alert.location;
-    }
-  })();
+  let location = getAlertLocationString(alert.location, fittingStep);
+  let status = alert.status;
 
-  const status =
-    fittingStep === FittingStep.PerAlertEffect && isDelays
-      ? "Delays"
-      : alert.status;
+  if (fittingStep === FittingStep.PerAlertEffect) {
+    if (isDelays) {
+      status = "Delays";
+    } else {
+      location = "mbta.com/alerts";
+    }
+  }
 
   return { ref, location, status };
 };
@@ -200,4 +188,17 @@ export const isAllNormalService = (data: SubwayStatusData): boolean => {
       route_section.type === "contracted" &&
       route_section.alerts.every((alert) => alert.status === NORMAL_STATUS),
   );
+};
+
+const getAlertLocationString = (
+  location: AlertLocation,
+  fittingStep: FittingStep,
+) => {
+  if (isAlertLocationMap(location)) {
+    return fittingStep === FittingStep.FullSize
+      ? location.full
+      : location.abbrev;
+  } else {
+    return location;
+  }
 };
