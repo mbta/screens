@@ -120,9 +120,6 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     num_departures_per_section = div(@max_departures_per_rotation, section_count)
 
     cond do
-      headways?(rds_list) ->
-        create_headway_section(rds_list)
-
       no_service?(rds_list) ->
         %NoServiceSection{
           routes:
@@ -145,6 +142,9 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
             |> Enum.uniq()
         }
 
+      headways?(rds_list) ->
+        create_headway_section(rds_list)
+
       true ->
         %NormalSection{
           rows:
@@ -166,7 +166,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   end
 
   defp headways?(rds_list) do
-    Enum.all?(rds_list, &is_struct(&1.state, Headways))
+    Enum.all?(rds_list, &(is_struct(&1.state, Headways) || is_struct(&1.state, NoService)))
   end
 
   @spec create_headway_section([RDS.t()]) :: HeadwaySection.t()
@@ -447,7 +447,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   defp extract_line_direction_pairs(%RDS{line: %Line{id: line_id}, state: state}) do
     case state do
       %NoService{} ->
-        [{line_id, 0}, {line_id, 1}]
+        []
 
       %Countdowns{departures: []} ->
         [{line_id, 0}, {line_id, 1}]

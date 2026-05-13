@@ -217,7 +217,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         text: [%{format: :bold, text: "Alewife"}, %{format: :small, text: "every 12-15m"}]
       }
 
-      assert %{type: :headway_section, text: expected_text, layout: :row} ==
+      assert %{type: :headway_section, text: expected_text, layout: :row_with_headsign} ==
                Departures.serialize_section(section, dup_screen, now, false)
     end
 

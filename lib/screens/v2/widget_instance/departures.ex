@@ -209,7 +209,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
         is_only_section
       ) do
     pill_color = Route.color(route)
-    layout = if is_only_section, do: :full_screen, else: :row
+
+    layout =
+      cond do
+        is_only_section -> :full_screen
+        headsign == nil -> :row
+        true -> :row_with_headsign
+      end
 
     text = get_headway_text(headsign, time_range, pill_color, route, is_only_section)
 
