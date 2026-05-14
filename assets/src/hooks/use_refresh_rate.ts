@@ -1,7 +1,6 @@
 import _ from "lodash";
 import { useMemo } from "react";
 import { fetchDatasetValue, getDatasetValue } from "Util/dataset";
-import { isDup } from "Util/outfront";
 import { useScreenID } from "./use_screen_id";
 
 interface RefreshRateConfig {
@@ -13,9 +12,7 @@ const useRefreshRate = (): RefreshRateConfig => {
   const screenId = useScreenID();
 
   return useMemo(() => {
-    // Live OFM screens ignore any configured refreshRate.
-    // Hardcoding to 0 prevents an interval from being started unnecessarily.
-    const refreshRate = isDup() ? "0" : fetchDatasetValue("refreshRate");
+    const refreshRate = fetchDatasetValue("refreshRate");
     const refreshRateOffset = getDatasetValue("refreshRateOffset") || "0";
     const screenIdsWithOffsetMap = getDatasetValue("screenIdsWithOffsetMap");
 

@@ -3,7 +3,7 @@ import "moment-timezone";
 import cx from "classnames";
 
 import { getDatasetValue } from "Util/dataset";
-import { isDup } from "Util/outfront";
+import { isOutfront } from "Util/outfront";
 
 export const classWithModifier = (baseClass, modifier) => {
   if (!modifier) {
@@ -37,10 +37,9 @@ export const hasOverflow = (elem: Element): boolean =>
   hasOverflowX(elem) || hasOverflowY(elem);
 
 export const imagePath = (fileName: string): string =>
-  isDup() ? `images/${fileName}` : `/images/${fileName}`;
+  isOutfront() ? `images/${fileName}` : `/images/${fileName}`;
 
-export const isRealScreen = () =>
-  isDup() || getDatasetValue("isRealScreen") === "true";
+export const isRealScreen = () => getDatasetValue("isRealScreen") === "true";
 
 type ScreenSide = "left" | "right" | "duo" | "solo";
 const isScreenSide = (value: any): value is ScreenSide => {

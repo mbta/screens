@@ -10,12 +10,12 @@ import {
 import useApiResponse, {
   ApiResponse,
   SimulationData,
-  useDUPApiResponse,
+  useOutfrontApiResponse,
 } from "Hooks/use_api_response";
 import WidgetTreeErrorBoundary from "Components/widget_tree_error_boundary";
 import Widget, { WidgetData } from "Components/widget";
 import useAudioReadout from "Hooks/use_audio_readout";
-import { isDup } from "Util/outfront";
+import { isOutfront } from "Util/outfront";
 import { classWithModifier, getScreenSide } from "Util/utils";
 
 type ResponseMapper = (apiResponse: ApiResponse) => WidgetData | SimulationData;
@@ -93,7 +93,7 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
   showBlink,
 }) => {
   const responseMapper = useContext(ResponseMapperContext);
-  const ErrorBoundaryOrFragment = isDup() ? Fragment : WidgetTreeErrorBoundary;
+  const MaybeErrorBoundary = isOutfront() ? Fragment : WidgetTreeErrorBoundary;
 
   // We know this can only be `WidgetData` and not `SimulationData` here because
   // `ScreenPage` is only used in contexts where a "non-simulation" API response
@@ -104,17 +104,17 @@ const ScreenLayout: ComponentType<ScreenLayoutProps> = ({
 
   return (
     <div className={classWithModifier("screen-container", getScreenSide())}>
-      <ErrorBoundaryOrFragment>
+      <MaybeErrorBoundary>
         {apiResponse && <Widget data={widgetData} />}
-      </ErrorBoundaryOrFragment>
+      </MaybeErrorBoundary>
       {showBlink && <div className="screen-container-blink" />}
     </div>
   );
 };
 
 const getApiResponseHook = () => {
-  if (isDup()) {
-    return useDUPApiResponse;
+  if (isOutfront()) {
+    return useOutfrontApiResponse;
   } else {
     return useApiResponse;
   }
