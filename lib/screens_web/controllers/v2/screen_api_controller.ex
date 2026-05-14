@@ -2,10 +2,12 @@ defmodule ScreensWeb.V2.ScreenApiController do
   use ScreensWeb, :controller
 
   alias Phoenix.View
-  alias Screens.Config.Cache
   alias Screens.V2.{ScreenAudioData, ScreenData}
   alias ScreensConfig.Screen
   alias ScreensWeb.Plug.{ScreenRequest, VariantCanary}
+
+  import Screens.Inject
+  @cache injected(Screens.Config.Cache)
 
   @base_response %{data: nil, disabled: false, force_reload: false}
 
@@ -104,7 +106,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   defp put_extra_fields(response, %Screen{vendor: :mercury} = screen) do
     response
     |> Map.put(:audio_data, fetch_ssml(screen))
-    |> Map.put(:last_deploy_timestamp, Cache.last_deploy_timestamp())
+    |> Map.put(:last_deploy_timestamp, @cache.last_deploy_timestamp())
   end
 
   defp put_extra_fields(response, _screen), do: response
@@ -135,10 +137,15 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   defp disabled_response(conn, _), do: conn
 
-  # Never tell a DUP client to reload, since it would just reload its local copy of the client
-  # code, not changing anything, resulting in an infinite loop. TODO: Rework this once we support
-  # non-Outfront-managed DUPs (should not rely on IDs having a specific format).
-  defp outdated_response(%{assigns: %{screen_id: "DUP-" <> _}} = conn, _), do: conn
+  # The packaged client can't reload the page to update itself; this would just reload the local
+  # copy of the code, resulting in an infinite loop. Compatibility and versioning of the packaged
+  # client is handled manually.
+  defp outdated_response(%{params: %{"last_refresh" => "packaged"}} = conn, _), do: conn
+
+  # Value used in previous releases of the packaged client. Treat as an extra sentinel value for
+  # now, and remove once clients are updated to use `packaged`.
+  defp outdated_response(%{params: %{"last_refresh" => "2020-09-25T17:23:00Z"}} = conn, _),
+    do: conn
 
   defp outdated_response(
          %{
@@ -150,7 +157,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     with param when is_binary(param) <- params["last_refresh"],
          {:ok, last_refresh_at, _offset} <- DateTime.from_iso8601(param) do
       should_refresh_at =
-        [Cache.last_deploy_timestamp(), refresh_if_loaded_before]
+        [@cache.last_deploy_timestamp(), refresh_if_loaded_before]
         |> Enum.reject(&is_nil/1)
         |> Enum.max(DateTime, fn -> nil end)
 

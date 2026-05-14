@@ -1,7 +1,7 @@
 import * as Sentry from "@sentry/react";
 import type { SeverityLevel } from "@sentry/react";
 
-import { isDup } from "Util/outfront";
+import { isOutfront } from "Util/outfront";
 import { isRealScreen } from "Util/utils";
 import { getDataset } from "Util/dataset";
 
@@ -26,7 +26,11 @@ const initSentry = (appString: string) => {
       sendDefaultPii: true,
     });
 
-    if (isDup()) {
+    // Outfront devices load the page anew every time our content is displayed,
+    // so they "initialize" very frequently compared to other screen hardware.
+    // Limit these messages to a specific time of day so they don't exceed our
+    // rate limit, but we still collect the browser/device data.
+    if (isOutfront()) {
       const today = new Date();
       const hour = today.getHours();
       const min = today.getMinutes();

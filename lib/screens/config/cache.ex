@@ -16,6 +16,7 @@ defmodule Screens.Config.Cache do
 
   def ok?, do: table_exists?()
 
+  @callback last_deploy_timestamp() :: DateTime.t() | nil
   def last_deploy_timestamp do
     with_table do
       [[last_deploy_timestamp]] = :ets.match(@table, {:last_deploy_timestamp, :"$1"})

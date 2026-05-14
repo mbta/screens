@@ -1,7 +1,7 @@
 {
   "templates": [
     {
-      "displayName": "MBTA - DUP APP 0",
+      "displayName": "MBTA - DUP APP %rotation%",
       "preview": "dup_preview.png",
       "indexTemplate": "dup-app.html",
       "previewOrientation": "landscape"

@@ -33,7 +33,7 @@ defmodule Screens.V2.ScreenData.Parameters do
     },
     dup_v2: %Static{
       candidate_generator: CandidateGenerator.Dup,
-      refresh_rate: 30,
+      refresh_rate: 20,
       variants: %{"new_departures" => CandidateGenerator.DupNew}
     },
     gl_eink_v2: %Static{

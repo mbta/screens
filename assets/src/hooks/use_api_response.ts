@@ -12,15 +12,13 @@ import { WidgetData } from "Components/widget";
 import useDriftlessInterval from "Hooks/use_driftless_interval";
 import { getDatasetValue } from "Util/dataset";
 import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
-import { getRotationIndex, isDup } from "Util/outfront";
+import { getRotationIndex, getVersion } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/utils";
 import { report } from "Util/sentry";
-import { DUP_VERSION } from "Components/dup/version";
 import useRefreshRate from "./use_refresh_rate";
 
 const BASE_PATH = "/v2/api/screen";
 const MINUTE_IN_MS = 60_000;
-const OUTFRONT_BASE_URI = "https://screens.mbta.com";
 
 type SimulationResponse = { full_page: WidgetData; flex_zone: WidgetData[] };
 
@@ -122,7 +120,7 @@ const isSuccess = (
 
 const useApiPath = (screenId: string, appendPath?: string): string => {
   return useMemo(() => {
-    const base = isDup() ? OUTFRONT_BASE_URI : document.baseURI;
+    const base = getDatasetValue("apiOrigin") ?? document.baseURI;
     const path = [
       BASE_PATH,
       getDatasetValue("isPending") === "true" ? "pending" : null,
@@ -141,7 +139,7 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
       rotation_index: getRotationIndex(),
       screen_side: getScreenSide(),
       variant: getDatasetValue("variant"),
-      version: isDup() ? DUP_VERSION : null,
+      version: getVersion(),
     };
 
     for (const [key, value] of Object.entries(params)) {
@@ -294,15 +292,13 @@ const useApiResponse = ({ id }): UseApiResponseReturn =>
 const useSimulationApiResponse = ({ id }): UseApiResponseReturn =>
   useBaseApiResponse({ id, appendPath: "simulation" });
 
-// For OFM apps--DUPs--we need to request a different
-// route that's more permissive of CORS, since these clients are loaded from a local html file
-// (and thus their data requests to our server are cross-origin).
-//
-// The /dup endpoint only has the CORS stuff, and otherwise runs exactly the same backend logic as
-// the normal one used by `useApiResponse`.
-const useDUPApiResponse = ({ id }): UseApiResponseReturn =>
+// When running the packaged client, use a distinct API route that allows
+// cross-origin requests, since these clients are loaded from a local HTML file
+// (and thus their data requests to our server are cross-origin). This route is
+// otherwise identical to the one used by `useApiResponse`.
+const useOutfrontApiResponse = ({ id }): UseApiResponseReturn =>
   useBaseApiResponse({ id, appendPath: "dup" });
 
 export default useApiResponse;
 export type { ApiResponse, SimulationData };
-export { useSimulationApiResponse, useDUPApiResponse };
+export { useOutfrontApiResponse, useSimulationApiResponse };

@@ -1,12 +1,9 @@
-import { ROTATION_INDEX } from "Components/dup/rotation_index";
 import { getDatasetValue } from "Util/dataset";
 
 /**
- * Returns true if this client is running on a DUP screen.
- *
- * Use this for DUP-specific logic.
+ * True if this is the "packaged" client deployed to Outfront hardware.
  */
-export const isDup = () => /.*dup-app.*/.test(location.href);
+export const isOutfront = () => getDatasetValue("isOutfront") === "true";
 
 type RotationIndex = "0" | "1" | "2";
 const isRotationIndex = (value: any): value is RotationIndex => {
@@ -14,12 +11,11 @@ const isRotationIndex = (value: any): value is RotationIndex => {
 };
 
 export const getRotationIndex = (): RotationIndex | null => {
-  const rotationIndex = isDup()
-    ? ROTATION_INDEX.toString()
-    : getDatasetValue("rotationIndex");
-
+  const rotationIndex = getDatasetValue("rotationIndex");
   return isRotationIndex(rotationIndex) ? rotationIndex : null;
 };
+
+export const getVersion = () => getDatasetValue("packagedVersion");
 
 /**
  * Gets Outfront's unique name/ID for the media player we're running on.
@@ -96,7 +92,6 @@ interface OFMTag {
 }
 
 export const getMRAID = (): MRAID | false => {
-  if (!isDup()) return false;
   return (parent?.parent as OFMWindow)?.mraid ?? false;
 };
 

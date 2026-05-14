@@ -33,6 +33,9 @@ npm-debug.log
 # this depending on your deployment strategy.
 /priv/static/
 
+# packaged client assets
+/priv/packaged/
+
 # Local config files
 /priv/local.json
 /priv/local_pending.json
