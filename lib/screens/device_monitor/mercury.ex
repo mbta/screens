@@ -79,6 +79,7 @@ defmodule Screens.DeviceMonitor.Mercury do
                "State" => state
              }
            ],
+           "serial_number" => serial_number,
            "stop" => %{"stop_id" => stop_id}
          },
          button_press_count
@@ -92,6 +93,7 @@ defmodule Screens.DeviceMonitor.Mercury do
       connectivity_used: connectivity_used,
       last_heartbeat: last_heartbeat,
       name: name,
+      serial_number: serial_number,
       signal_strength: signal_strength,
       state: state,
       stop_id: stop_id,
@@ -99,8 +101,15 @@ defmodule Screens.DeviceMonitor.Mercury do
     }
   end
 
-  defp device_info(%{"device_id" => device_id, "stop" => %{"stop_id" => stop_id}}, _count) do
-    %{device_id: device_id, state: "error", stop_id: stop_id}
+  defp device_info(
+         %{
+           "device_id" => device_id,
+           "serial_number" => serial_number,
+           "stop" => %{"stop_id" => stop_id}
+         },
+         _count
+       ) do
+    %{device_id: device_id, serial_number: serial_number, state: "error", stop_id: stop_id}
   end
 
   defp get_api_key, do: System.fetch_env!("MERCURY_API_KEY")
