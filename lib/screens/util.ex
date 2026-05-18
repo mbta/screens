@@ -156,7 +156,12 @@ defmodule Screens.Util do
   @spec service_date(DateTime.t()) :: Date.t()
   def service_date(datetime) do
     dt = to_eastern(datetime)
-    if dt.hour >= 4, do: DateTime.to_date(dt), else: Date.add(dt, -1)
+    # Late Night work-around for June 13th for the World Cup
+    if DateTime.to_date(datetime) == ~D[2026-06-14] do
+      if dt.hour >= 5, do: DateTime.to_date(dt), else: Date.add(dt, -1)
+    else
+      if dt.hour >= 4, do: DateTime.to_date(dt), else: Date.add(dt, -1)
+    end
   end
 
   @doc """

@@ -139,8 +139,12 @@ defmodule Screens.V2.CandidateGenerator.GlEink.Headways do
       Time.compare(local_time, t_end) == :lt
   end
 
-  defp service_start_or_end(stop_id, direction_id, min_or_max_fn) do
-    with {:ok, schedules} <- Schedule.fetch(%{stop_ids: [stop_id], direction_id: direction_id}),
+  defp service_start_or_end(stop_id, direction_id, min_or_max_fn, now \\ DateTime.utc_now()) do
+    with {:ok, schedules} <-
+           Schedule.fetch(
+             %{stop_ids: [stop_id], direction_id: direction_id},
+             Util.service_date(now)
+           ),
          [_ | _] = arrival_times <- get_arrival_times(schedules) do
       arrival_times |> min_or_max_fn.() |> Util.to_eastern() |> DateTime.to_time()
     else
