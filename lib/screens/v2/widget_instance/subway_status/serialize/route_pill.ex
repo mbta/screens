@@ -25,6 +25,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.RoutePill do
       |> Enum.map(fn "Green-" <> branch ->
         branch |> String.downcase() |> String.to_existing_atom()
       end)
+      |> Enum.uniq()
 
     %{type: :text, color: :green, text: "GL", branches: branches}
   end

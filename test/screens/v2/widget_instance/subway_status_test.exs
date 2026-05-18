@@ -573,6 +573,51 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert expected == WidgetInstance.serialize(instance)
     end
 
+    test "handles 3+ alerts of the same GL branch" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :delay,
+              severity: 9,
+              informed_entities: [
+                ie(route: "Green-C", stop_id: "first_stop")
+              ]
+            },
+            %Alert{
+              effect: :delay,
+              severity: 5,
+              informed_entities: [
+                ie(route: "Green-C", stop_id: "second_stop")
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Green-C", stop_id: "third_stop"),
+                ie(route: "Green-C", stop_id: "fourth_stop")
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            type: :contracted,
+            alerts: [
+              %{
+                route_pill: gl_pill([:c]),
+                status: "3 current alerts",
+                location: "mbta.com/alerts"
+              }
+            ]
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
     test "handles 2 alerts on GL branches and 1 alert on non-GL route" do
       instance = %SubwayStatus{
         subway_alerts:
