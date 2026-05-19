@@ -94,9 +94,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
           screen: Screen.t(),
           sections: [section()],
           slot_names: list(atom()),
+          order: non_neg_integer(),
           now: DateTime.t()
         }
-  defstruct screen: nil, sections: [], slot_names: [], now: nil
+  defstruct screen: nil, sections: [], slot_names: [], order: 0, now: nil
 
   # Possible type representations for predictions and schedules
   # for the client to determine how to display the time until departure.
@@ -158,12 +159,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     def valid_candidate?(_instance), do: true
 
-    def audio_serialize(%Departures{sections: sections, screen: screen, now: now}) do
-      %{sections: Enum.map(sections, &Departures.audio_serialize_section(&1, screen, now))}
+    def audio_serialize(%Departures{sections: sections, screen: screen, order: order, now: now}) do
+      %{
+        order: order,
+        sections: Enum.map(sections, &Departures.audio_serialize_section(&1, screen, now))
+      }
     end
 
-    def audio_sort_key(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [2]
-    def audio_sort_key(_instance), do: [1]
+    def audio_sort_key(%Departures{screen: %Screen{app_params: %PreFare{}}, order: order}),
+      do: [2, order]
+
+    def audio_sort_key(%Departures{order: order}), do: [1, order]
 
     def audio_valid_candidate?(_instance), do: true
 

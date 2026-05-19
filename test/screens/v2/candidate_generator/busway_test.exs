@@ -18,12 +18,33 @@ defmodule Screens.V2.CandidateGenerator.BuswayTest do
   }
 
   describe "screen_template/1" do
-    test "returns correct template" do
+    test "returns template for a solo screen" do
       assert {:screen,
               %{
-                normal: [:header, :main_content],
-                takeover: [:full_screen]
+                screen_normal: [:header, {:body, %{body_normal: [:main_content]}}],
+                screen_split_takeover: [:full_right_screen]
               }} == Busway.screen_template(@config)
+    end
+
+    test "returns template for a duo screen" do
+      config = put_in(@config.app_params.template, :duo)
+
+      assert {:screen,
+              %{
+                screen_normal: [
+                  :header,
+                  {:body,
+                   %{
+                     body_normal_duo: [
+                       {:body_left, %{body_left_normal: [:main_content_left]}},
+                       {:body_right, %{body_right_normal: [:main_content_right]}}
+                     ],
+                     body_takeover: [:full_body_duo]
+                   }}
+                ],
+                screen_takeover: [:full_duo_screen],
+                screen_split_takeover: [:full_left_screen, :full_right_screen]
+              }} == Busway.screen_template(config)
     end
   end
 

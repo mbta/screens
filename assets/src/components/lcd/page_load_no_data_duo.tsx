@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 import LcdPageLoadNoData from "Components/lcd/page_load_no_data";
 
-const PageLoadNoData: ComponentType = () => {
+const PageLoadNoDataDuo: ComponentType = () => {
   return (
     <>
       <div className="no-data-left">
@@ -14,4 +14,4 @@ const PageLoadNoData: ComponentType = () => {
   );
 };
 
-export default PageLoadNoData;
+export default PageLoadNoDataDuo;

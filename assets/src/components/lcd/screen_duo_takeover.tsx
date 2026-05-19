@@ -5,7 +5,7 @@ interface Props {
   full_duo_screen: WidgetData;
 }
 
-const ScreenTakeover: ComponentType<Props> = ({
+const ScreenDuoTakeover: ComponentType<Props> = ({
   full_duo_screen: fullDuoScreen,
 }) => {
   return (
@@ -17,4 +17,4 @@ const ScreenTakeover: ComponentType<Props> = ({
   );
 };
 
-export default ScreenTakeover;
+export default ScreenDuoTakeover;

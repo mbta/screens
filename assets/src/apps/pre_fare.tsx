@@ -20,8 +20,8 @@ import {
 import { MappingContext } from "Components/widget";
 
 import Placeholder from "Components/placeholder";
-import NormalScreen from "Components/pre_fare/normal_screen";
-import NormalBody from "Components/pre_fare/normal_body";
+import NormalScreen from "Components/lcd/normal_screen";
+import NormalBodyDuo from "Components/lcd/normal_body_duo";
 import NormalBodyLeft from "Components/pre_fare/normal_body_left";
 import NormalBodyRight from "Components/pre_fare/normal_body_right";
 import EvergreenContent from "Components/evergreen_content";
@@ -31,14 +31,14 @@ import TwoMedium from "Components/pre_fare/flex/two_medium";
 import BodyLeftTakeover from "Components/pre_fare/body_left_takeover";
 import BodyLeftFlex from "Components/pre_fare/body_left_flex";
 import BodyRightTakeover from "Components/pre_fare/body_right_takeover";
-import BodyTakeover from "Components/pre_fare/body_takeover";
-import ScreenTakeover from "Components/pre_fare/screen_takeover";
-import ScreenSplitTakeover from "Components/pre_fare/screen_split_takeover";
+import BodyTakeoverDuo from "Components/lcd/body_takeover_duo";
+import ScreenDuoTakeover from "Components/lcd/screen_duo_takeover";
+import ScreenSplitTakeover from "Components/lcd/screen_split_takeover";
 import ElevatorStatus from "Components/elevator_status";
 import LcdSubwayStatus from "Components/subway_status/lcd_subway_status";
 import ReconstructedAlert from "Components/reconstructed_alert";
-import NoData from "Components/pre_fare/no_data";
-import PageLoadNoData from "Components/pre_fare/page_load_no_data";
+import NoDataDuo from "Components/lcd/no_data_duo";
+import PageLoadNoDataDuo from "Components/lcd/page_load_no_data_duo";
 import ReconstructedTakeover from "Components/reconstructed_takeover";
 import MultiScreenPage from "Components/multi_screen_page";
 import SimulationScreenPage from "Components/pre_fare/simulation_screen_page";
@@ -48,10 +48,10 @@ import Departures from "Components/departures";
 const TYPE_TO_COMPONENT = {
   // Slots
   screen_normal: NormalScreen,
-  screen_takeover: ScreenTakeover,
+  screen_takeover: ScreenDuoTakeover,
   screen_split_takeover: ScreenSplitTakeover,
-  body_normal: NormalBody,
-  body_takeover: BodyTakeover,
+  body_normal: NormalBodyDuo,
+  body_takeover: BodyTakeoverDuo,
   body_left_normal: NormalBodyLeft,
   body_left_takeover: BodyLeftTakeover,
   body_left_flex: BodyLeftFlex,
@@ -65,15 +65,15 @@ const TYPE_TO_COMPONENT = {
   evergreen_content: EvergreenContent,
   elevator_status: ElevatorStatus,
   subway_status: LcdSubwayStatus,
-  no_data: NoData,
-  page_load_no_data: PageLoadNoData,
+  no_data: NoDataDuo,
+  page_load_no_data: PageLoadNoDataDuo,
   reconstructed_large_alert: ReconstructedAlert,
   single_screen_alert: PreFareSingleScreenAlert,
   reconstructed_takeover: ReconstructedTakeover,
   departures: Departures,
 };
 
-const DISABLED_LAYOUT = {
+const NO_DATA_LAYOUT = {
   full_duo_screen: {
     type: "no_data",
     show_alternatives: true,
@@ -81,17 +81,14 @@ const DISABLED_LAYOUT = {
   type: "screen_takeover",
 };
 
-const FAILURE_LAYOUT = DISABLED_LAYOUT;
-
 const responseMapper: ResponseMapper = (apiResponse) => {
   switch (apiResponse.state) {
     case "success":
     case "simulation_success":
       return apiResponse.data;
     case "disabled":
-      return DISABLED_LAYOUT;
     case "failure":
-      return FAILURE_LAYOUT;
+      return NO_DATA_LAYOUT;
     case "loading":
       return LOADING_LAYOUT;
   }

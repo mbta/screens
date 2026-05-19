@@ -3,31 +3,55 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
 
   alias ScreensWeb.V2.Audio.DeparturesView
 
-  describe "no sections" do
-    test "renders an empty state" do
-      assigns = %{sections: []}
+  describe "intro" do
+    @empty_section %{type: :normal_section, departure_groups: []}
+
+    @non_empty_section %{
+      type: :normal_section,
+      header: nil,
+      departure_groups: [
+        normal: %{
+          type: :departure_row,
+          times_with_crowding: [
+            %{
+              id: "test1",
+              time: %{type: :minutes, minutes: 1},
+              crowding: nil
+            }
+          ],
+          route: %{
+            id: "Red",
+            vehicle_type: :train,
+            track_number: nil,
+            route_text: "Red Line"
+          },
+          headsign: %{headsign: "Ashmont", variation: nil}
+        }
+      ]
+    }
+
+    test "announces no content when it is the first departures widget" do
+      assigns = %{order: 0, sections: [@empty_section, @empty_section]}
 
       assert render(assigns) =~ "There are no upcoming trips at this time"
     end
-  end
 
-  describe "only empty sections" do
-    test "renders an empty state" do
-      assigns = %{
-        sections: [
-          %{type: :normal_section, departure_groups: []},
-          %{type: :normal_section, departure_groups: []},
-          %{type: :normal_section, departure_groups: []}
-        ]
-      }
+    test "announces upcoming trips when it is the first departures widget" do
+      assigns = %{order: 0, sections: [@non_empty_section]}
 
-      assert render(assigns) =~ "There are no upcoming trips at this time"
+      assert render(assigns) =~ "Upcoming trips"
+    end
+
+    test "does not announce when it is not the first widget" do
+      assert render(%{order: 1, sections: [@empty_section]}) == ""
+      refute render(%{order: 1, sections: [@non_empty_section]}) =~ "Upcoming trips"
     end
   end
 
   describe "section with a header" do
     test "renders the header content" do
       assigns = %{
+        order: 0,
         sections: [
           %{
             type: :normal_section,
@@ -46,6 +70,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
   describe "normal sections" do
     test "always read GL headsign" do
       assigns = %{
+        order: 0,
         sections: [
           %{
             type: :normal_section,
@@ -115,6 +140,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
 
     test "reads track_number as 'at berth' for bus and 'on track' for CR" do
       assigns = %{
+        order: 0,
         sections: [
           %{
             type: :normal_section,
@@ -168,5 +194,6 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
     "_widget.ssml"
     |> DeparturesView.render(data)
     |> Phoenix.HTML.safe_to_string()
+    |> String.trim()
   end
 end

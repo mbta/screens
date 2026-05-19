@@ -111,13 +111,47 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeoverTest do
              ]
     end
 
-    test "returns emergency takeover with Busway full screen slots" do
+    test "returns emergency takeover with Busway solo full screen slots" do
       screen = build_screen(Screen.Busway)
 
       assert Generator.emergency_takeover_instances(screen, @now) == [
                %EvergreenContent{
                  screen: screen,
-                 slot_names: [:full_screen],
+                 slot_names: [:full_right_screen],
+                 asset_url: "visual_asset_path",
+                 text_for_audio: "audio_text",
+                 priority: [0],
+                 audio_priority: [0],
+                 now: @now,
+                 is_emergency_takeover: true
+               }
+             ]
+    end
+
+    test "returns emergency takeover with Busway duo full screen slots" do
+      screen =
+        struct(Screen,
+          app_params:
+            struct(Screen.Busway, %{
+              template: :duo,
+              emergency_takeover: @default_emergency_takeover
+            })
+        )
+
+      assert Generator.emergency_takeover_instances(screen, @now) == [
+               %EvergreenContent{
+                 screen: screen,
+                 slot_names: [:full_left_screen],
+                 asset_url: "visual_asset_path",
+                 text_for_audio: "audio_text",
+                 priority: [0],
+                 audio_priority: [0],
+                 now: @now,
+                 is_emergency_takeover: true
+               },
+               %EvergreenContent{
+                 screen: screen,
+                 slot_names: [:full_right_screen],
                  asset_url: "visual_asset_path",
                  text_for_audio: "audio_text",
                  priority: [0],

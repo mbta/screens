@@ -1712,9 +1712,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   end
 
   describe "audio_sort_key/1" do
-    test "returns [1]" do
-      instance = %Departures{}
-      assert [1] == WidgetInstance.audio_sort_key(instance)
+    test "uses instance order as secondary value" do
+      instance = %Departures{order: 8}
+      assert [1, 8] == WidgetInstance.audio_sort_key(instance)
     end
   end
 

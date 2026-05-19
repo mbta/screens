@@ -21,12 +21,18 @@
   }
 
   .simulation__full-page {
+    --screen-width: 193.5px;
+
     z-index: 999;
-    width: 193.5px;
+    width: var(--screen-width);
     height: 344px;
     margin-right: 24px;
     overflow: hidden;
     box-shadow: 0 0 32px 0 #00000040;
+
+    &--duo {
+      width: calc(var(--screen-width) * 2);
+    }
 
     & > * {
       transform: scale(17.92%);

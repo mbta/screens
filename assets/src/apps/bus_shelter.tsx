@@ -21,7 +21,7 @@ import {
 } from "Components/screen_container";
 import { MappingContext } from "Components/widget";
 
-import NormalScreen from "Components/bus_shelter/normal_screen";
+import NormalScreen from "Components/lcd/normal_screen";
 import TakeoverScreen from "Components/takeover_screen";
 
 import NormalBody from "Components/bus_shelter/normal_body";
