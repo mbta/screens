@@ -10,14 +10,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
   alias ScreensConfig.Departures.{Filters, Query, Section}
   alias ScreensConfig.Departures.Filters.{RouteDirections, RouteDirections.RouteDirection}
-  alias ScreensConfig.Screen.{BusEink, BusShelter, Busway, GlEink, PreFare}
+  alias ScreensConfig.Screen.{Busway, PreFare}
 
   @type options :: [
           departure_fetch_fn: Departure.fetch(),
           disabled_modes_fn: (-> RouteType.t()),
           post_process_fn: (Departure.result(), Screen.t() -> Departure.result() | :overnight),
-          route_fetch_fn: (Route.params() -> {:ok, [Route.t()]} | :error),
-          now: DateTime.t()
+          route_fetch_fn: (Route.params() -> {:ok, [Route.t()]} | :error)
         ]
 
   @type widget ::
@@ -27,39 +26,46 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           | OvernightDepartures.t()
 
   @spec departures_instances(Screen.t(), options()) :: [widget()]
-  def departures_instances(%Screen{app_params: %app{}} = config, now, options \\ [])
-      when app in [BusEink, BusShelter, Busway, GlEink, PreFare] do
+  def departures_instances(%Screen{app_params: app_params} = screen, now, options \\ []) do
     disabled_modes =
       Keyword.get(options, :disabled_modes_fn, &Screens.Config.Cache.disabled_modes/0).()
 
-    if screen_devops_mode(config) in disabled_modes do
-      [%DeparturesNoData{screen: config, show_alternatives?: false}]
+    if screen_devops_mode(screen) in disabled_modes do
+      [%DeparturesNoData{screen: screen, show_alternatives?: false}]
     else
-      do_departures_instances(
-        config,
-        disabled_modes,
-        Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2),
-        Keyword.get(options, :post_process_fn, fn results, _config -> results end),
-        Keyword.get(options, :route_fetch_fn, &Route.fetch/1),
-        now
-      )
+      app_params
+      |> departures_slots()
+      |> Enum.with_index()
+      |> Enum.flat_map(fn {{departures, slots}, index} ->
+        generate_instances(departures, slots, index, screen, disabled_modes, now, options)
+      end)
     end
   end
 
-  defp do_departures_instances(%Screen{app_params: %{departures: departures}}, _, _, _, _, _)
-       when is_nil(departures) or departures.sections == [] do
-    []
-  end
+  defp departures_slots(%Busway{departures: d1, secondary_departures: d2}),
+    do: [{d1, [:main_content, :main_content_left]}, {d2, [:main_content_right]}]
 
-  defp do_departures_instances(
-         %Screen{app_params: %{departures: %Departures{sections: sections}}, app_id: app_id} =
-           config,
+  defp departures_slots(%PreFare{departures: d, template: :duo}), do: [{d, [:main_content_left]}]
+  defp departures_slots(%PreFare{departures: d, template: :solo}), do: [{d, [:large]}]
+  defp departures_slots(%_app{departures: d}), do: [{d, [:main_content]}]
+
+  defp generate_instances(departures, _slot_names, _order, _screen, _disabled_modes, _now, _opts)
+       when is_nil(departures) or departures.sections == [],
+       do: []
+
+  defp generate_instances(
+         %Departures{sections: sections},
+         slot_names,
+         order,
+         %Screen{app_id: app_id} = screen,
          disabled_modes,
-         departure_fetch_fn,
-         post_process_fn,
-         route_fetch_fn,
-         now
+         now,
+         options
        ) do
+    departure_fetch_fn = Keyword.get(options, :departure_fetch_fn, &Departure.fetch/2)
+    post_process_fn = Keyword.get(options, :post_process_fn, fn results, _config -> results end)
+    route_fetch_fn = Keyword.get(options, :route_fetch_fn, &Route.fetch/1)
+
     has_multiple_sections = match?([_, _ | _], sections)
 
     sections_data =
@@ -70,7 +76,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           result:
             &1
             |> fetch_section_departures(disabled_modes, departure_fetch_fn)
-            |> post_process_fn.(config)
+            |> post_process_fn.(screen)
             |> post_process_no_data(&1, has_multiple_sections, route_fetch_fn)
         },
         timeout: 30_000
@@ -80,13 +86,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     departures_instance =
       cond do
         Enum.any?(sections_data, &(&1.result == :error)) ->
-          %DeparturesNoData{screen: config, show_alternatives?: true}
+          %DeparturesNoData{screen: screen, show_alternatives?: true}
 
         match?([%{result: :overnight}], sections_data) ->
           %OvernightDepartures{}
 
         match?([%{result: {:ok, []}}], sections_data) and app_id == :bus_eink_v2 ->
-          %DeparturesNoService{screen: config}
+          %DeparturesNoService{screen: screen}
 
         true ->
           sections =
@@ -103,14 +109,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
                 }
             end)
 
-          slot_names =
-            case config do
-              %Screen{app_params: %PreFare{template: :duo}} -> [:main_content_left]
-              %Screen{app_params: %PreFare{template: :solo}} -> [:large]
-              _ -> [:main_content]
-            end
-
-          %DeparturesWidget{screen: config, sections: sections, now: now, slot_names: slot_names}
+          %DeparturesWidget{
+            now: now,
+            order: order,
+            screen: screen,
+            sections: sections,
+            slot_names: slot_names
+          }
       end
 
     [departures_instance]

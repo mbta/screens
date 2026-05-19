@@ -93,9 +93,9 @@ defmodule ScreensWeb.Plug.ScreenRequest do
     |> Conn.halt()
   end
 
-  defp screen_side(%Screen.PreFare{template: :duo}, %{"screen_side" => "left"}), do: "left"
-  defp screen_side(%Screen.PreFare{template: :duo}, %{"screen_side" => "right"}), do: "right"
-  defp screen_side(%Screen.PreFare{template: :duo}, _query_params), do: "duo"
-  defp screen_side(%Screen.PreFare{template: :solo}, _query_params), do: "solo"
+  defp screen_side(%_app{template: :duo}, %{"screen_side" => "left"}), do: "left"
+  defp screen_side(%_app{template: :duo}, %{"screen_side" => "right"}), do: "right"
+  defp screen_side(%_app{template: :duo}, _query_params), do: "duo"
+  defp screen_side(%_app{template: :solo}, _query_params), do: "solo"
   defp screen_side(_app_params, _params), do: nil
 end

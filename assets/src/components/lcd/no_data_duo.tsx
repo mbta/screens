@@ -5,7 +5,7 @@ interface Props {
   show_alternatives: boolean;
 }
 
-const NoData: ComponentType<Props> = ({
+const NoDataDuo: ComponentType<Props> = ({
   show_alternatives: showAlternatives,
 }) => {
   return (
@@ -20,4 +20,4 @@ const NoData: ComponentType<Props> = ({
   );
 };
 
-export default NoData;
+export default NoDataDuo;

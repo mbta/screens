@@ -15,7 +15,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
   alias ScreensConfig.FreeTextLine
   alias ScreensConfig.Screen
-  alias ScreensConfig.Screen.BusShelter
+  alias ScreensConfig.Screen.{BusShelter, Busway}
 
   defp build_departure(
          route_id,
@@ -36,19 +36,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     defp build_config(sections_or_route_ids) do
       %Screen{
         app_params: %BusShelter{
-          departures: %DeparturesConfig{
-            sections:
-              case sections_or_route_ids do
-                [%Section{} | _] = sections ->
-                  sections
-
-                route_ids ->
-                  Enum.map(
-                    route_ids,
-                    &%Section{query: %Query{params: %Query.Params{route_ids: [&1]}}}
-                  )
-              end
-          },
+          departures: build_departures_config(sections_or_route_ids),
           header: nil,
           footer: nil,
           alerts: nil
@@ -57,6 +45,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         device_id: nil,
         name: nil,
         app_id: :bus_shelter_v2
+      }
+    end
+
+    defp build_departures_config(sections_or_route_ids) do
+      %DeparturesConfig{
+        sections:
+          case sections_or_route_ids do
+            [%Section{} | _] = sections ->
+              sections
+
+            route_ids ->
+              Enum.map(
+                route_ids,
+                &%Section{query: %Query{params: %Query.Params{route_ids: [&1]}}}
+              )
+          end
       }
     end
 
@@ -93,6 +97,34 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                    %NormalSection{rows: ^departures_a},
                    %NormalSection{rows: ^departures_b}
                  ]
+               }
+             ] = departures_instances(config, departure_fetch_fn: fetch_fn)
+    end
+
+    test "returns two widgets with appropriate order values for Busway duos" do
+      config =
+        struct(Screen,
+          app_id: :busway_v2,
+          app_params: %Busway{
+            header: nil,
+            departures: build_departures_config(["A"]),
+            secondary_departures: build_departures_config(["B"])
+          }
+        )
+
+      {departures_a, departures_b} = {[build_departure("A", 0)], [build_departure("B", 1)]}
+      fetch_fn = build_fetch_fn(%{"A" => {:ok, departures_a}, "B" => {:ok, departures_b}})
+
+      assert [
+               %DeparturesWidget{
+                 screen: ^config,
+                 sections: [%NormalSection{rows: ^departures_a}],
+                 order: 0
+               },
+               %DeparturesWidget{
+                 screen: ^config,
+                 sections: [%NormalSection{rows: ^departures_b}],
+                 order: 1
                }
              ] = departures_instances(config, departure_fetch_fn: fetch_fn)
     end

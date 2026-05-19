@@ -18,8 +18,17 @@ import {
 } from "Components/screen_container";
 import { MappingContext } from "Components/widget";
 
-import NormalScreen from "Components/busway/normal_screen";
 import TakeoverScreen from "Components/takeover_screen";
+
+import BodyTakeoverDuo from "Components/lcd/body_takeover_duo";
+import NormalBodyDuo from "Components/lcd/normal_body_duo";
+import NormalScreen from "Components/lcd/normal_screen";
+import ScreenDuoTakeover from "Components/lcd/screen_duo_takeover";
+import ScreenSplitTakeover from "Components/lcd/screen_split_takeover";
+
+import NormalBody from "Components/busway/normal_body";
+import NormalBodyLeft from "Components/busway/normal_body_left";
+import NormalBodyRight from "Components/busway/normal_body_right";
 
 import EvergreenContent from "Components/evergreen_content";
 import Placeholder from "Components/placeholder";
@@ -27,38 +36,48 @@ import Placeholder from "Components/placeholder";
 import NormalHeader from "Components/lcd/normal_header";
 import Departures from "Components/departures";
 
-import NoData from "Components/lcd/no_data";
+import NoDataDuo from "Components/lcd/no_data_duo";
 import DeparturesNoData from "Components/lcd/departures_no_data";
-import PageLoadNoData from "Components/lcd/page_load_no_data";
+import PageLoadNoDataDuo from "Components/lcd/page_load_no_data_duo";
 
 import MultiScreenPage from "Components/multi_screen_page";
 import SimulationScreenPage from "Components/simulation_screen_page";
 
 const TYPE_TO_COMPONENT = {
-  normal: NormalScreen,
-  takeover: TakeoverScreen,
-  evergreen_content: EvergreenContent,
-  placeholder: Placeholder,
-  normal_header: NormalHeader,
+  // Layouts
+  body_left_normal: NormalBodyLeft,
+  body_normal: NormalBody,
+  body_normal_duo: NormalBodyDuo,
+  body_right_normal: NormalBodyRight,
+  body_takeover: BodyTakeoverDuo,
+  screen_normal: NormalScreen,
+  screen_split_takeover: ScreenSplitTakeover,
+  screen_duo_takeover: ScreenDuoTakeover,
+  screen_solo_takeover: TakeoverScreen,
+
+  // Widgets
   departures: Departures,
-  no_data: NoData,
-  page_load_no_data: PageLoadNoData,
   departures_no_data: DeparturesNoData,
+  evergreen_content: EvergreenContent,
+  no_data: NoDataDuo,
+  normal_header: NormalHeader,
+  page_load_no_data: PageLoadNoDataDuo,
+  placeholder: Placeholder,
 };
 
-const FAILURE_LAYOUT = {
-  full_screen: {
+const NO_DATA_LAYOUT = {
+  full_duo_screen: {
     type: "no_data",
     show_alternatives: true,
   },
-  type: "takeover",
+  type: "screen_duo_takeover",
 };
 
 const LOADING_LAYOUT = {
-  full_screen: {
+  full_duo_screen: {
     type: "page_load_no_data",
   },
-  type: "takeover",
+  type: "screen_duo_takeover",
 };
 
 const responseMapper: ResponseMapper = (apiResponse) => {
@@ -68,7 +87,7 @@ const responseMapper: ResponseMapper = (apiResponse) => {
       return apiResponse.data;
     case "disabled":
     case "failure":
-      return FAILURE_LAYOUT;
+      return NO_DATA_LAYOUT;
     case "loading":
       return LOADING_LAYOUT;
   }

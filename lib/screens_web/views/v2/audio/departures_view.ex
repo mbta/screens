@@ -1,17 +1,22 @@
 defmodule ScreensWeb.V2.Audio.DeparturesView do
   use ScreensWeb, :view
 
-  def render("_widget.ssml", %{sections: []}) do
-    ~E|<p>There are no upcoming trips at this time</p>|
+  def render("_widget.ssml", %{sections: sections, order: order}) do
+    ~E|
+      <%= render_intro(sections, order) %>
+      <%= Enum.map(sections, &render_section/1) %>
+    |
   end
 
-  def render("_widget.ssml", %{sections: sections}) do
+  defp render_intro(sections, 0 = _order) do
     if Enum.all?(sections, &match?(%{type: :normal_section, departure_groups: []}, &1)) do
       ~E|<p>There are no upcoming trips at this time</p>|
     else
-      ~E|<p>Upcoming trips:</p><%= Enum.map(sections, &render_section/1) %>|
+      ~E|<p>Upcoming trips:</p>|
     end
   end
+
+  defp render_intro(_sections, _order), do: ~E||
 
   defp render_section(%{type: :normal_section, header: header, departure_groups: departure_groups})
        when is_binary(header) do

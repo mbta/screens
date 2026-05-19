@@ -6,7 +6,7 @@ interface Props {
   body_right: WidgetData;
 }
 
-const NormalBody: ComponentType<Props> = ({
+const NormalBodyDuo: ComponentType<Props> = ({
   body_left: bodyLeft,
   body_right: bodyRight,
 }) => {
@@ -22,4 +22,4 @@ const NormalBody: ComponentType<Props> = ({
   );
 };
 
-export default NormalBody;
+export default NormalBodyDuo;

@@ -1,15 +1,20 @@
 import { type ComponentType, useContext } from "react";
+
 import {
   LastFetchContext,
   ResponseMapperContext,
 } from "Components/screen_container";
-import Widget, { WidgetData } from "./widget";
+import WidgetTreeErrorBoundary from "Components/widget_tree_error_boundary";
+
 import {
   ApiResponse,
   SimulationData,
   useSimulationApiResponse,
 } from "Hooks/use_api_response";
-import WidgetTreeErrorBoundary from "Components/widget_tree_error_boundary";
+
+import { classWithModifier, getScreenSide } from "Util/utils";
+
+import Widget, { WidgetData } from "./widget";
 
 interface SimulationScreenLayoutProps {
   apiResponse: ApiResponse;
@@ -35,10 +40,22 @@ const SimulationScreenLayout: ComponentType<SimulationScreenLayoutProps> = ({
     <div className="simulation-screen-centering-container">
       <div className="simulation-screen-scrolling-container">
         {apiResponse && (
-          <div className="simulation__full-page">
-            <WidgetTreeErrorBoundary>
-              <Widget data={widgetData} />
-            </WidgetTreeErrorBoundary>
+          <div
+            className={classWithModifier(
+              "simulation__full-page",
+              getScreenSide(),
+            )}
+          >
+            <div
+              className={classWithModifier(
+                "simulation-viewport",
+                getScreenSide(),
+              )}
+            >
+              <WidgetTreeErrorBoundary>
+                <Widget data={widgetData} />
+              </WidgetTreeErrorBoundary>
+            </div>
           </div>
         )}
         {flexZone?.length > 0 && (

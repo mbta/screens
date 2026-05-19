@@ -4,17 +4,22 @@
 @use "common/placeholder";
 @use "common/simulation" as *;
 
+@use "lcd/body/duo_normal" as *;
+@use "lcd/body/duo_takeover" as *;
 @use "lcd/departures" as *;
 @use "lcd/departures_no_data" as *;
-@use "lcd/no_data" as *;
+@use "lcd/no_data";
+@use "lcd/no_data_duo";
 @use "lcd/normal_header";
 @use "lcd/page_load_no_data";
 @use "lcd/route_pill";
+@use "lcd/screen/duo_normal" as *;
+@use "lcd/screen/duo_takeover" as *;
+@use "lcd/screen/split_takeover";
 @use "lcd/subway_status";
+@use "lcd/viewport";
 
 @use "pre_fare/alert-banner";
-@use "pre_fare/body/normal" as *;
-@use "pre_fare/body/takeover" as *;
 @use "pre_fare/body_left/flex";
 @use "pre_fare/body_left/normal" as *;
 @use "pre_fare/body_left/takeover" as *;
@@ -29,15 +34,10 @@
 @use "pre_fare/flex/paging_indicator";
 @use "pre_fare/flex/two_medium";
 @use "pre_fare/free_text";
-@use "pre_fare/no_data" as *;
 @use "pre_fare/prefare_single_screen_alert";
 @use "pre_fare/reconstructed_alert";
-@use "pre_fare/screen/normal" as *;
-@use "pre_fare/screen/split_takeover";
-@use "pre_fare/screen/takeover" as *;
 @use "pre_fare/screen_container";
 @use "pre_fare/simulation" as *;
-@use "pre_fare/viewport";
 @use "pre_fare/text" as *;
 
 @import "https://rsms.me/inter/inter.css";

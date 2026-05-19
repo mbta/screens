@@ -73,9 +73,16 @@ const alertsField: Field = {
 };
 
 const departuresField: Field = {
-  label: "Departures Sections",
-  path: "app_params.departures.sections",
+  label: "Departures",
+  path: "app_params.departures",
   ...filteredJson,
+};
+
+const emergencyMessagingLocationField: Field = {
+  label: "In/Out?",
+  path: "app_params.emergency_messaging_location",
+  cell: buildSelectInput([null, "inside", "outside"]),
+  filter: buildSelectFilter(["inside", "outside"]),
 };
 
 const evergreenField: Field = {
@@ -96,11 +103,11 @@ const headerField: Field = {
   ...filteredJson,
 };
 
-const emergencyMessagingLocationField: Field = {
-  label: "In/Out?",
-  path: "app_params.emergency_messaging_location",
-  cell: buildSelectInput([null, "inside", "outside"]),
-  filter: buildSelectFilter(["inside", "outside"]),
+const templateField: Field = {
+  label: "Template",
+  path: "app_params.template",
+  cell: buildSelectInput(["duo", "solo"]),
+  filter: buildSelectFilter(["duo", "solo"]),
 };
 
 /**
@@ -158,6 +165,7 @@ export const APP_FIELDS: { [key in AppId]: Field[] } = {
 
   busway_v2: [
     ...baseFields,
+    templateField,
     emergencyMessagingLocationField,
     evergreenField,
     {
@@ -166,7 +174,16 @@ export const APP_FIELDS: { [key in AppId]: Field[] } = {
       ...filteredBoolean,
     },
     headerField,
-    departuresField,
+    {
+      label: "Departures (Left/Solo)",
+      path: "app_params.departures",
+      ...filteredJson,
+    },
+    {
+      label: "Departures (Right)",
+      path: "app_params.secondary_departures",
+      ...filteredJson,
+    },
   ],
 
   dup_v2: [
@@ -209,12 +226,7 @@ export const APP_FIELDS: { [key in AppId]: Field[] } = {
 
   pre_fare_v2: [
     ...baseFields,
-    {
-      label: "Template",
-      path: "app_params.template",
-      cell: buildSelectInput(["duo", "solo"]),
-      filter: buildSelectFilter(["duo", "solo"]),
-    },
+    templateField,
     emergencyMessagingLocationField,
     evergreenField,
     headerField,

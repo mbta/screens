@@ -3,23 +3,29 @@
 @use "common/placeholder";
 @use "common/simulation" as *;
 
+@use "lcd/body/duo_normal" as *;
 @use "lcd/departures" as *;
 @use "lcd/departures_no_data" as *;
 @use "lcd/departures/header";
 @use "lcd/evergreen";
 @use "lcd/free_text";
 @use "lcd/no_data";
+@use "lcd/no_data_duo";
 @use "lcd/normal_header";
 @use "lcd/page_load_no_data";
 @use "lcd/route_pill";
+@use "lcd/screen/duo_normal" as *;
+@use "lcd/screen/duo_takeover";
 @use "lcd/screen_container";
 @use "lcd/simulation" as *;
 @use "lcd/subway_status";
+@use "lcd/viewport";
 
+@use "busway/body_left_normal";
+@use "busway/body_normal";
+@use "busway/body_right_normal";
 @use "busway/departures" as *;
 @use "busway/departures_no_data" as *;
-@use "busway/screen/normal";
-@use "busway/screen/takeover";
 
 @import "https://rsms.me/inter/inter.css";
 

@@ -4,7 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeover do
   alias Screens.V2.WidgetInstance.EvergreenContent
   alias ScreensConfig.EmergencyTakeover
   alias ScreensConfig.Screen
-  alias ScreensConfig.Screen.{Busway, Dup, PreFare}
+  alias ScreensConfig.Screen.Dup
 
   @spec emergency_takeover_instances(Screen.t(), DateTime.t()) :: [EvergreenContent.t()]
   def emergency_takeover_instances(config, now \\ DateTime.utc_now())
@@ -22,9 +22,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeover do
         now
       ) do
     case app do
-      %PreFare{template: :duo} -> [:full_left_screen, :full_right_screen]
-      %PreFare{template: :solo} -> [:full_right_screen]
-      %Busway{} -> [:full_screen]
+      %_app{template: :duo} -> [:full_left_screen, :full_right_screen]
+      %_app{template: :solo} -> [:full_right_screen]
       %Dup{} -> [:full_rotation_zero, :full_rotation_one, :full_rotation_two]
     end
     |> Enum.map(&evergreen_content_for_emergency_takeover(emergency_takeover, config, now, &1))
