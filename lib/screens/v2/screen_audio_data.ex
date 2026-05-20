@@ -1,10 +1,10 @@
 defmodule Screens.V2.ScreenAudioData do
   @moduledoc false
 
+  alias Screens.V2.Precedence
   alias Screens.V2.ScreenData
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.WidgetInstance
-  alias Screens.V2.WidgetInstance.Precedence
   alias ScreensConfig.Screen
 
   @spec get(Screen.t()) :: list({module(), map()})

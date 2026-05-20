@@ -1,4 +1,4 @@
-defprotocol Screens.V2.WidgetInstance.Precedence do
+defprotocol Screens.V2.Precedence do
   @doc """
   A protocol for determining the precedence of widgets with the same priority competing for the same slot.
 
@@ -11,13 +11,6 @@ defprotocol Screens.V2.WidgetInstance.Precedence do
   def rank(instance)
 end
 
-defimpl Screens.V2.WidgetInstance.Precedence, for: Any do
+defimpl Screens.V2.Precedence, for: Any do
   def rank(_instance), do: 1
-end
-
-defimpl Screens.V2.WidgetInstance.Precedence,
-  for: Screens.V2.WidgetInstance.EvergreenContent do
-  alias Screens.V2.WidgetInstance.EvergreenContent
-
-  def rank(instance), do: EvergreenContent.precedence_rank(instance)
 end

@@ -35,10 +35,6 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
 
   def priority(%__MODULE__{} = instance), do: instance.priority
 
-  # Guarantee emergency takeovers take precedence over other priority 0 evergreen content
-  def precedence_rank(%__MODULE__{is_emergency_takeover: true}), do: 0
-  def precedence_rank(%__MODULE__{}), do: 1
-
   def serialize(%__MODULE__{asset_url: asset_url}), do: %{asset_url: asset_url}
 
   def slot_names(%__MODULE__{slot_names: slot_names}), do: slot_names
@@ -178,5 +174,13 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
     end
 
     def alert_ids(_instance), do: []
+  end
+
+  defimpl Screens.V2.Precedence do
+    alias Screens.V2.WidgetInstance.EvergreenContent
+
+    # Guarantee emergency takeovers take precedence over other priority 0 evergreen content
+    def rank(%EvergreenContent{is_emergency_takeover: true}), do: 0
+    def rank(%EvergreenContent{}), do: 1
   end
 end
