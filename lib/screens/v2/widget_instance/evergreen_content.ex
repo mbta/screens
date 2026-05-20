@@ -16,7 +16,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
             schedule: [%Schedule{}],
             now: nil,
             text_for_audio: nil,
-            audio_priority: nil
+            audio_priority: nil,
+            is_emergency_takeover: false
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
@@ -28,10 +29,15 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
           schedule: list(Schedule.t()) | RecurrentSchedule.t() | AlertSchedule.t(),
           now: DateTime.t(),
           text_for_audio: String.t(),
-          audio_priority: WidgetInstance.priority()
+          audio_priority: WidgetInstance.priority(),
+          is_emergency_takeover: boolean()
         }
 
   def priority(%__MODULE__{} = instance), do: instance.priority
+
+  # Guarantee emergency takeovers take precedence over other priority 0 evergreen content
+  def precedence_rank(%__MODULE__{is_emergency_takeover: true}), do: 0
+  def precedence_rank(%__MODULE__{}), do: 1
 
   def serialize(%__MODULE__{asset_url: asset_url}), do: %{asset_url: asset_url}
 

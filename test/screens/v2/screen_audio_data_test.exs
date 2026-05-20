@@ -2,6 +2,7 @@ defmodule Screens.V2.ScreenAudioDataTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.ScreenAudioData
+  alias Screens.V2.WidgetInstance.EvergreenContent
   alias Screens.V2.WidgetInstance.MockWidget
   alias ScreensConfig, as: Config
   alias ScreensConfig.Screen
@@ -178,6 +179,53 @@ defmodule Screens.V2.ScreenAudioDataTest do
                  get_audio_only_instances_fn,
                  now
                )
+    end
+
+    test "prefers emergency takeover evergreen content over configured evergreen content at equal audio priority",
+         %{config_bus_shelter: config} do
+      now = ~U[2026-05-20T05:00:00Z]
+
+      selected_instances = %{
+        :configured_evergreen => %EvergreenContent{
+          screen: config,
+          slot_names: [:main_content],
+          asset_url: "configured",
+          priority: [0],
+          audio_priority: [0],
+          now: now,
+          text_for_audio: "Configured evergreen audio.",
+          is_emergency_takeover: false
+        },
+        :emergency_evergreen => %EvergreenContent{
+          screen: config,
+          slot_names: [:main_content],
+          asset_url: "emergency",
+          priority: [0],
+          audio_priority: [0],
+          now: now,
+          text_for_audio: "Configured audio but it's an emergency!",
+          is_emergency_takeover: true
+        }
+      }
+
+      generate_layout_fn = fn _config -> {:layout, selected_instances} end
+      get_audio_only_instances_fn = fn _widgets, _config -> [] end
+      emergency_view = ScreensWeb.V2.Audio.EvergreenContentView
+
+      result =
+        ScreenAudioData.get(
+          config,
+          generate_layout_fn,
+          get_audio_only_instances_fn,
+          now
+        )
+
+      # Both instances should be in the result, but emergency should come first
+      # since Precedence.rank returns 0 for emergency and 1 for configured
+      assert [
+               {^emergency_view, %{text_for_audio: "Configured audio but it's an emergency!"}},
+               {^emergency_view, %{text_for_audio: "Configured evergreen audio."}}
+             ] = result
     end
   end
 end

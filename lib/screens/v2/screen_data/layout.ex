@@ -6,6 +6,7 @@ defmodule Screens.V2.ScreenData.Layout do
   alias Screens.Util
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.Precedence
   alias ScreensConfig.Screen
 
   import Screens.Inject
@@ -39,7 +40,10 @@ defmodule Screens.V2.ScreenData.Layout do
 
   @spec pick_instances([WidgetInstance.t()], Template.template()) :: t()
   def pick_instances(candidate_instances, screen_template) do
-    prioritized_instances = Enum.sort_by(candidate_instances, &WidgetInstance.priority/1)
+    prioritized_instances =
+      Enum.sort_by(candidate_instances, fn instance ->
+        {WidgetInstance.priority(instance), Precedence.rank(instance)}
+      end)
 
     # N.B. Each template can place each instance it contains in a different place, so we need to
     # store a mapping from slot_id to instance for each template.

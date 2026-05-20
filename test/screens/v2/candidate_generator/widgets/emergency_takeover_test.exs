@@ -34,7 +34,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeoverTest do
                  text_for_audio: "audio_text",
                  priority: [0],
                  audio_priority: [0],
-                 now: @now
+                 now: @now,
+                 is_emergency_takeover: true
                },
                %EvergreenContent{
                  screen: screen,
@@ -43,7 +44,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeoverTest do
                  text_for_audio: "audio_text",
                  priority: [0],
                  audio_priority: [0],
-                 now: @now
+                 now: @now,
+                 is_emergency_takeover: true
                }
              ]
     end
@@ -66,7 +68,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeoverTest do
                  text_for_audio: "audio_text",
                  priority: [0],
                  audio_priority: [0],
-                 now: @now
+                 now: @now,
+                 is_emergency_takeover: true
                }
              ]
     end
@@ -82,7 +85,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeoverTest do
                  text_for_audio: "audio_text",
                  priority: [0],
                  audio_priority: [0],
-                 now: @now
+                 now: @now,
+                 is_emergency_takeover: true
                },
                %EvergreenContent{
                  screen: screen,
@@ -91,7 +95,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeoverTest do
                  text_for_audio: "audio_text",
                  priority: [0],
                  audio_priority: [0],
-                 now: @now
+                 now: @now,
+                 is_emergency_takeover: true
                },
                %EvergreenContent{
                  screen: screen,
@@ -100,7 +105,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeoverTest do
                  text_for_audio: "audio_text",
                  priority: [0],
                  audio_priority: [0],
-                 now: @now
+                 now: @now,
+                 is_emergency_takeover: true
                }
              ]
     end
@@ -116,7 +122,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeoverTest do
                  text_for_audio: "audio_text",
                  priority: [0],
                  audio_priority: [0],
-                 now: @now
+                 now: @now,
+                 is_emergency_takeover: true
                }
              ]
     end

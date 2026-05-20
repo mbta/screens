@@ -2,6 +2,7 @@ defmodule Screens.V2.ScreenData.LayoutTest do
   use ExUnit.Case, async: true
 
   alias Screens.V2.ScreenData.Layout
+  alias Screens.V2.WidgetInstance.EvergreenContent
   alias Screens.V2.WidgetInstance.MockWidget
 
   describe "pick_instances/2" do
@@ -259,6 +260,39 @@ defmodule Screens.V2.ScreenData.LayoutTest do
         Layout.pick_instances(candidate_instances, candidate_template)
 
       assert %{{0, :flex} => %MockWidget{content: "1"}} = actual_instance_placement
+    end
+
+    test "prefers emergency takeover evergreen content over configured evergreen content at equal priority" do
+      candidate_template = {:screen, %{takeover: [:full_right_screen]}}
+
+      candidate_instances = [
+        %EvergreenContent{
+          screen: nil,
+          slot_names: [:full_right_screen],
+          asset_url: "configured",
+          priority: [0],
+          now: ~U[2026-05-20 12:00:00Z],
+          is_emergency_takeover: false
+        },
+        %EvergreenContent{
+          screen: nil,
+          slot_names: [:full_right_screen],
+          asset_url: "emergency",
+          priority: [0],
+          now: ~U[2025-01-01 12:00:00Z],
+          is_emergency_takeover: true
+        }
+      ]
+
+      {_actual_layout, actual_instance_placement} =
+        Layout.pick_instances(candidate_instances, candidate_template)
+
+      assert %{
+               full_right_screen: %EvergreenContent{
+                 asset_url: "emergency",
+                 is_emergency_takeover: true
+               }
+             } = actual_instance_placement
     end
   end
 
