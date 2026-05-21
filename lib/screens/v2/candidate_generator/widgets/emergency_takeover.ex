@@ -50,7 +50,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EmergencyTakeover do
       priority: [0],
       now: now,
       text_for_audio: text_for_audio,
-      audio_priority: [0]
+      audio_priority: [0],
+      is_emergency_takeover: true
     }
   end
 end
