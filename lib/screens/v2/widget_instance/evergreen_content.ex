@@ -33,6 +33,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
           is_emergency_takeover: boolean()
         }
 
+  # Ensure emergency takeover content is always prioritized above other evergreen content
+  def priority(%__MODULE__{is_emergency_takeover: false, priority: [0]}), do: [0, 0]
   def priority(%__MODULE__{} = instance), do: instance.priority
 
   def serialize(%__MODULE__{asset_url: asset_url}), do: %{asset_url: asset_url}
@@ -133,6 +135,8 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   def audio_serialize(%__MODULE__{text_for_audio: text_for_audio}),
     do: %{text_for_audio: text_for_audio}
 
+  # Ensure emergency takeover content is always prioritized above other evergreen content
+  def audio_sort_key(%__MODULE__{is_emergency_takeover: false, audio_priority: [0]}), do: [0, 0]
   def audio_sort_key(%__MODULE__{} = instance), do: instance.audio_priority
 
   def audio_valid_candidate?(%__MODULE__{text_for_audio: text_for_audio})
@@ -174,13 +178,5 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
     end
 
     def alert_ids(_instance), do: []
-  end
-
-  defimpl Screens.V2.Precedence do
-    alias Screens.V2.WidgetInstance.EvergreenContent
-
-    # Guarantee emergency takeovers take precedence over other priority 0 evergreen content
-    def rank(%EvergreenContent{is_emergency_takeover: true}), do: 0
-    def rank(%EvergreenContent{}), do: 1
   end
 end

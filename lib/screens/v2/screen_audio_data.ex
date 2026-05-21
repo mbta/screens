@@ -1,7 +1,6 @@
 defmodule Screens.V2.ScreenAudioData do
   @moduledoc false
 
-  alias Screens.V2.Precedence
   alias Screens.V2.ScreenData
   alias Screens.V2.ScreenData.Parameters
   alias Screens.V2.WidgetInstance
@@ -28,9 +27,7 @@ defmodule Screens.V2.ScreenAudioData do
         |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
 
       (visual_widgets_with_audio_equivalence ++ audio_only_widgets)
-      |> Enum.sort_by(fn instance ->
-        {WidgetInstance.audio_sort_key(instance), Precedence.rank(instance)}
-      end)
+      |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
       |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
     else
       []

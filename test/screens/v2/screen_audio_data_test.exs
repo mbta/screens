@@ -220,8 +220,6 @@ defmodule Screens.V2.ScreenAudioDataTest do
           now
         )
 
-      # Both instances should be in the result, but emergency should come first
-      # since Precedence.rank returns 0 for emergency and 1 for configured
       assert [
                {^emergency_view, %{text_for_audio: "Configured audio but it's an emergency!"}},
                {^emergency_view, %{text_for_audio: "Configured evergreen audio."}}
