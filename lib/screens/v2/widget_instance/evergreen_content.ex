@@ -135,8 +135,6 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   def audio_serialize(%__MODULE__{text_for_audio: text_for_audio}),
     do: %{text_for_audio: text_for_audio}
 
-  # Ensure emergency takeover content is always prioritized above other evergreen content
-  def audio_sort_key(%__MODULE__{is_emergency_takeover: false, audio_priority: [0]}), do: [0, 0]
   def audio_sort_key(%__MODULE__{} = instance), do: instance.audio_priority
 
   def audio_valid_candidate?(%__MODULE__{text_for_audio: text_for_audio})

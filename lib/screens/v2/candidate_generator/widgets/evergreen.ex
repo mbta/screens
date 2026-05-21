@@ -49,8 +49,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
       schedule: schedule,
       now: now,
       text_for_audio: text_for_audio,
-      audio_priority: audio_priority,
-      is_emergency_takeover: false
+      audio_priority: audio_priority
     }
   end
 end
