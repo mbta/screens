@@ -44,20 +44,16 @@ defmodule Screens.V2.WidgetInstance.EvergreenContentTest do
       assert [2, 3, 1] == WidgetInstance.priority(widget)
     end
 
-    test "returns [0, 0] for non-emergency takeover content with priority [0]", %{
-      widget: widget
-    } do
-      widget = %{widget | is_emergency_takeover: false, priority: [0]}
+    test "returns [0, 0] for non-emergency takeover content with priority [0]", %{widget: widget} do
+      non_emergency_widget = %{widget | is_emergency_takeover: false, priority: [0]}
 
-      assert [0, 0] == WidgetInstance.priority(widget)
+      assert [0, 0] == WidgetInstance.priority(non_emergency_widget)
     end
 
-    test "returns [0] for emergency takeover content with priority [0]", %{
-      widget: widget
-    } do
-      widget = %{widget | is_emergency_takeover: true, priority: [0]}
+    test "returns [0] for emergency takeover content with priority [0]", %{widget: widget} do
+      emergency_widget = %{widget | is_emergency_takeover: true, priority: [0]}
 
-      assert [0] == WidgetInstance.priority(widget)
+      assert [0] == WidgetInstance.priority(emergency_widget)
     end
   end
 
