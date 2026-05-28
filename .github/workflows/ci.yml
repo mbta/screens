@@ -48,7 +48,7 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - uses: mbta/actions/dialyzer@20a677d22e01056a0ea63ff3b996bbc774188770 # v2.17
+      - uses: mbta/actions/dialyzer@6cff1d5eef7e0d780190353278bc84fdf6177dab # v2.18
 
   ex-format:
     name: Elixir Format
