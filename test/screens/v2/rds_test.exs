@@ -1,5 +1,6 @@
 defmodule Screens.V2.RDSTest do
   use ExUnit.Case, async: true
+  import ExUnit.CaptureLog
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Cache
@@ -958,6 +959,120 @@ defmodule Screens.V2.RDSTest do
                   no_service("sC", "l2", "hC")
                 ]}
              ]
+    end
+  end
+
+  describe "get/1 error for state" do
+    test "logs and returns nil for fallback creating state" do
+      now = ~U[2024-10-11 11:44:00Z]
+      stop_ids = ~w[s0 s1]
+
+      first_schedule_one =
+        %Schedule{
+          id: "Test ID 11",
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{
+            id: "r1",
+            line: %Line{id: "l1"},
+            type: :bus,
+            direction_names: ["Northbound", "Southbound"]
+          },
+          stop: %Stop{id: "sA"},
+          trip: %Trip{headsign: "h1", pattern_headsign: "hA", direction_id: 0}
+        }
+
+      last_schedule_one =
+        %Schedule{
+          id: "Test ID 12",
+          departure_time: ~U[2024-10-12 01:45:00Z],
+          route: %Route{
+            id: "r1",
+            line: %Line{id: "l1"},
+            type: :bus,
+            direction_names: ["Northbound", "Southbound"]
+          },
+          stop: %Stop{id: "sA"},
+          trip: %Trip{headsign: "h1", pattern_headsign: "hA", direction_id: 0}
+        }
+
+      first_schedule_two = %Schedule{
+        id: "Test ID 21",
+        departure_time: ~U[2024-10-11 10:45:00Z],
+        route: %Route{
+          id: "r2",
+          line: %Line{id: "l2"},
+          type: :bus,
+          direction_names: ["Eastbound", "Westbound"]
+        },
+        stop: %Stop{id: "sB"},
+        trip: %Trip{headsign: "h2", pattern_headsign: "hB", direction_id: 1}
+      }
+
+      last_schedule_two =
+        %Schedule{
+          id: "Test ID 22",
+          departure_time: ~U[2024-10-12 01:45:00Z],
+          route: %Route{
+            id: "r2",
+            line: %Line{id: "l2"},
+            type: :bus,
+            direction_names: ["Eastbound", "Westbound"]
+          },
+          stop: %Stop{id: "sB"},
+          trip: %Trip{headsign: "h2", pattern_headsign: "hB", direction_id: 1}
+        }
+
+      first_schedule_three =
+        %Schedule{
+          id: "Test ID 31",
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{
+            id: "r2",
+            line: %Line{id: "l2"},
+            type: :bus,
+            direction_names: ["Eastbound", "Westbound"]
+          },
+          stop: %Stop{id: "sC"},
+          trip: %Trip{headsign: "h3", pattern_headsign: "hC", direction_id: 0}
+        }
+
+      last_schedule_three =
+        %Schedule{
+          id: "Test ID 32",
+          departure_time: ~U[2024-10-12 01:45:00Z],
+          route: %Route{
+            id: "r2",
+            line: %Line{id: "l2"},
+            type: :bus,
+            direction_names: ["Eastbound", "Westbound"]
+          },
+          stop: %Stop{id: "sC"},
+          trip: %Trip{headsign: "h3", pattern_headsign: "hC", direction_id: 0}
+        }
+
+      all_schedules = [
+        first_schedule_one,
+        last_schedule_one,
+        first_schedule_two,
+        last_schedule_two,
+        first_schedule_three,
+        last_schedule_three
+      ]
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      stub(@headways, :get, fn _, _ -> nil end)
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
+      {result, log} = with_log(fn -> RDS.get(departures, now) end)
+
+      assert result == [{:ok, []}]
+      assert log =~ "rds_state_creation_failed"
     end
   end
 

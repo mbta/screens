@@ -63,6 +63,7 @@ defmodule Screens.V2.RDS do
           | :active_period
           | :service_impacted
           | :no_service
+          | :error
 
   # These alert types eliminate service to a destination.
   @relevant_alert_effects [
@@ -286,6 +287,7 @@ defmodule Screens.V2.RDS do
           now
         )
       end)
+      |> Enum.reject(&is_nil(&1.state))
 
     {:ok, section_rds}
   end
@@ -418,6 +420,17 @@ defmodule Screens.V2.RDS do
           direction_id: direction_id,
           range: headway_for_stop
         }
+
+      :error ->
+        Logster.warning([
+          "rds_state_creation_failed",
+          destination_key: destination_key,
+          now: now,
+          first_scheduled_departure: first_scheduled_departure.schedule.id,
+          last_scheduled_departure: last_scheduled_departure.schedule.id
+        ])
+
+        nil
     end
   end
 
@@ -573,8 +586,11 @@ defmodule Screens.V2.RDS do
           Util.service_date(now) == Util.service_date(Departure.time(last_departure)) ->
         :after_scheduled_end
 
-      true ->
+      headway_for_stop != nil ->
         :active_period
+
+      true ->
+        :error
     end
   end
 
