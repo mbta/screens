@@ -61,6 +61,20 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
     }
   end
 
+  defp build_location_context_with_tagged_stops(home_stop, tagged_stop_sequences) do
+    stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
+
+    %LocationContext{
+      home_stop: home_stop,
+      tagged_stop_sequences: tagged_stop_sequences,
+      upstream_stops: LocationContext.upstream_stop_id_set([home_stop], stop_sequences),
+      downstream_stops: LocationContext.downstream_stop_id_set([home_stop], stop_sequences),
+      routes: tagged_stop_sequences |> Map.keys() |> Enum.map(&%{active?: true, route_id: &1}),
+      alert_route_types: LocationContext.route_type_filter(Screen.Dup, [home_stop]),
+      child_stops_at_station: @child_stops
+    }
+  end
+
   defp build_screen(primary_sections_count \\ 1, has_secondary_departures? \\ false) do
     struct(Screen,
       app_id: :dup_v2,
@@ -155,6 +169,68 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
       alert =
         build_alert(
           informed_entities: stop_informed_entities("Red", ~w[place-r1 place-r2 place-r3])
+        )
+
+      assert widget_types(screen, context, alert) ==
+               [:partial_alert, :takeover_alert, :partial_alert]
+    end
+
+    test "one branch of Green Line has service eliminated" do
+      screen = build_screen()
+
+      tagged_stop_sequences = %{
+        "Green-B" => [~w[place-g1 place-g2 place-g3 place-x place-g4]],
+        "Green-C" => [~w[place-g1 place-g2 place-g3 place-x place-g4]]
+      }
+
+      context = build_location_context_with_tagged_stops("place-x", tagged_stop_sequences)
+
+      alert =
+        build_alert(
+          informed_entities: stop_informed_entities("Green-B", ~w[place-g1 place-g2 place-g3])
+        )
+
+      assert widget_types(screen, context, alert) ==
+               [:partial_alert, :takeover_alert, :partial_alert]
+    end
+
+    test "all branches of Green Line service eliminated" do
+      screen = build_screen()
+
+      tagged_stop_sequences = %{
+        "Green-B" => [~w[place-g1 place-g2 place-g3 place-x place-g4]],
+        "Green-C" => [~w[place-g1 place-g2 place-g3 place-x place-g4]]
+      }
+
+      context = build_location_context_with_tagged_stops("place-g2", tagged_stop_sequences)
+
+      alert =
+        build_alert(
+          informed_entities:
+            stop_informed_entities("Green-B", ~w[place-g1 place-g2 place-g3]) ++
+              stop_informed_entities("Green-C", ~w[place-g1 place-g2 place-g3])
+        )
+
+      assert widget_types(screen, context, alert) ==
+               [:takeover_alert, :takeover_alert, :takeover_alert]
+    end
+
+    test "all branches of Green Line service eliminated but other service remains" do
+      screen = build_screen()
+
+      tagged_stop_sequences = %{
+        "Green-B" => [~w[place-g1 place-x place-g2 place-g3 place-g4]],
+        "Green-C" => [~w[place-g1 place-x place-g2 place-g3 place-g4]],
+        "Orange" => [~w[place-o1 place-o2 place-x place-o3 place-o4]]
+      }
+
+      context = build_location_context_with_tagged_stops("place-x", tagged_stop_sequences)
+
+      alert =
+        build_alert(
+          informed_entities:
+            stop_informed_entities("Green-B", ~w[place-r1 place-r2 place-r3]) ++
+              stop_informed_entities("Green-C", ~w[place-r1 place-r2 place-r3])
         )
 
       assert widget_types(screen, context, alert) ==

@@ -133,6 +133,42 @@ const TextRoutePill = ({ route }: { route: string }) => {
   );
 };
 
+const BranchRoutePill = ({
+  branches,
+  color,
+  text,
+}: {
+  branches: string[];
+  color?: string;
+  text?: string;
+}) => {
+  return (
+    <span className="free-text__element">
+      <span className="free-text__branch-route-pill">
+        <span
+          className={classWithModifier(
+            "free-text__branch-route-pill__main-line",
+            color,
+          )}
+        >
+          {text}
+        </span>
+        {branches?.map((branch) => (
+          <span
+            className={classWithModifier(
+              "free-text__branch-route-pill__branch",
+              color,
+            )}
+            key={branch}
+          >
+            {branch.toUpperCase()}
+          </span>
+        ))}
+      </span>
+    </span>
+  );
+};
+
 const IconRoutePill = ({ route }: { route: string }) => {
   return (
     <span className="free-text__element">
@@ -168,6 +204,7 @@ interface FreeTextElementType {
   color?: string;
   special?: string;
   icon?: string;
+  branches?: string[];
 }
 
 const FreeTextElement = ({ elt }: { elt: string | FreeTextElementType }) => {
@@ -175,6 +212,14 @@ const FreeTextElement = ({ elt }: { elt: string | FreeTextElementType }) => {
     return <FormatString text={elt} format={null} />;
   } else if (elt.format !== undefined) {
     return <FormatString text={elt.text} format={elt.format} />;
+  } else if (elt.branches !== undefined) {
+    return (
+      <BranchRoutePill
+        color={elt.color}
+        branches={elt.branches}
+        text={elt.text}
+      />
+    );
   } else if (elt.route !== undefined) {
     return <TextRoutePill route={elt.route} />;
   } else if (elt.color !== undefined) {
