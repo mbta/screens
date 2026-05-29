@@ -52,7 +52,9 @@
 }
 
 .free-text__route-pill,
-.free-text__text-pill {
+.free-text__text-pill,
+.free-text__branch-route-pill__main-line,
+.free-text__branch-route-pill__branch {
   display: inline-block;
   text-align: center;
 
@@ -103,12 +105,42 @@
 }
 
 .free-text__route-pill__text,
-.free-text__text-pill__text {
+.free-text__text-pill__text,
+.free-text__branch-route-pill {
   font-family: Helvetica, sans-serif;
   font-weight: 700;
 
   &--branch {
     font-size: 84px;
+  }
+}
+
+.free-text__branch-route-pill {
+  display: inline-flex;
+  align-items: center;
+  overflow: hidden;
+  font-size: 96px;
+  line-height: 144px;
+
+  &__main-line,
+  &__branch {
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 80px;
+  }
+
+  &__main-line {
+    width: 248px;
+    height: 144px;
+  }
+
+  &__branch {
+    min-width: 158px;
+    height: 158px;
+    margin: 0 0 0 -28px;
+    border: 6px solid colors.$cool-black-15;
   }
 }
 

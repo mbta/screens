@@ -81,6 +81,12 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     |> String.to_existing_atom()
   end
 
+  defp green_route_to_pill_atom(route_string) do
+    route_string
+    |> String.downcase()
+    |> String.replace("-", "_")
+  end
+
   defp get_affected_lines_as_strings(t) do
     t
     |> DupAlert.get_affected_lines()
@@ -106,7 +112,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
         [bold(line), "delays"]
 
       {[line], _, :inside, nil} ->
-        ["No", bold(line), "trains"]
+        get_banner_text_for_single_line(t, line)
 
       {[_line], _, boundary, nil} when boundary in [:boundary_upstream, :boundary_downstream] ->
         headsign = get_headsign(t)
@@ -124,6 +130,31 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
         ["No", bold(platform_name)]
     end
   end
+
+  defp get_banner_text_for_single_line(t, "Green" <> _ = line) do
+    if DupAlert.all_green_line_routes_affected?(t) do
+      ["No", bold(line), "trains"]
+    else
+      t
+      |> LocalizedAlert.informed_routes_at_home_stop()
+      |> Enum.map(fn route_id -> get_abbreviated_green_line(route_id) end)
+      |> case do
+        [abbr_route] ->
+          ["No", bold(abbr_route), "trains"]
+
+        [abbr_route_one, abbr_route_two] ->
+          ["No", bold(abbr_route_one), "and", bold(abbr_route_two), "svc"]
+
+        [abbr_route_one, abbr_route_two, abbr_route_three] ->
+          ["No", bold(abbr_route_one <> ","), bold(abbr_route_two <> ","), bold(abbr_route_three)]
+      end
+    end
+  end
+
+  defp get_banner_text_for_single_line(_t, line),
+    do: ["No", bold(line), "trains"]
+
+  defp get_abbreviated_green_line("Green-" <> route), do: "GL·" <> route
 
   defp banner_icon(t) when t.alert.effect == :delay,
     do: if(line_color(t) == :yellow, do: :delay_negative, else: :delay)
@@ -146,7 +177,12 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
     case {affected_platform_name, affected_lines} do
       # All platforms for a single line
       {nil, [line_pill]} ->
-        no_trains = [bold("No"), line_pill, bold("trains")]
+        no_trains =
+          get_full_screen_single_line_no_trains_text(
+            line_pill,
+            get_affected_lines_as_strings(t),
+            t
+          )
 
         if LocalizedAlert.location(t) in [:boundary_upstream, :boundary_downstream] do
           headsign = get_headsign(t)
@@ -169,6 +205,30 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
       {platform_name, [_line_pill]} ->
         [bold("#{platform_name} platform closed")]
     end
+  end
+
+  defp get_full_screen_single_line_no_trains_text(line_pill, ["Green" <> _], t) do
+    if DupAlert.all_green_line_routes_affected?(t) do
+      [bold("No"), line_pill, bold("trains")]
+    else
+      case LocalizedAlert.informed_routes_at_home_stop(t) do
+        [single_route] ->
+          single_route_pill =
+            single_route
+            |> green_route_to_pill_atom()
+            |> free_text_pill()
+
+          [bold("No"), single_route_pill, bold("trains")]
+
+        [_ | _] = route_ids ->
+          branches = Enum.map(route_ids, fn "Green-" <> route_letter -> route_letter end)
+          [bold("No"), %{text: "GL", color: :green, branches: branches}, bold("trains")]
+      end
+    end
+  end
+
+  defp get_full_screen_single_line_no_trains_text(line_pill, _line, _t) do
+    [bold("No"), line_pill, bold("trains")]
   end
 
   defp cause_description(%Alert{cause: :unknown}), do: []

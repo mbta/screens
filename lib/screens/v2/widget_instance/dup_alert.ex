@@ -106,7 +106,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
     # some is (either we're at a boundary and there's still service in one direction, or we're at
     # a transfer station and the alert only affects one line).
     if LocalizedAlert.location(t) == :inside and not partial_station_closure?(t) and
-         length(get_affected_lines(t)) == length(primary_sections),
+         length(get_affected_lines(t)) == length(primary_sections) and
+         green_line_with_routes_affected?(get_affected_lines(t), t),
        do: :all,
        else: :some
   end
@@ -126,6 +127,28 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   end
 
   defp eliminated_service_type(_other), do: :none
+
+  defp green_line_with_routes_affected?(lines, t) do
+    if Enum.any?(lines, &String.contains?(&1, "Green")) do
+      all_green_line_routes_affected?(t)
+    else
+      true
+    end
+  end
+
+  @spec all_green_line_routes_affected?(__MODULE__.t()) :: boolean()
+  def all_green_line_routes_affected?(%__MODULE__{location_context: location_context} = t) do
+    affected_routes =
+      t |> LocalizedAlert.informed_routes_at_home_stop() |> MapSet.new()
+
+    all_green_line_routes =
+      location_context
+      |> LocationContext.route_ids()
+      |> Enum.filter(&String.contains?(&1, "Green"))
+      |> MapSet.new()
+
+    MapSet.equal?(affected_routes, all_green_line_routes)
+  end
 
   def get_affected_lines(t) do
     t
