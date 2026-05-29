@@ -60,7 +60,7 @@ defmodule Screens.Telemetry do
 
   def pool_stats do
     with {:ok, status} <- Finch.get_pool_status(Screens.V3Api.Finch, :default) do
-      for {{_scheme, host, _port}, pools} <- status, metrics <- pools do
+      for {%Finch.Pool{host: host}, pools} <- status, metrics <- pools do
         :telemetry.execute(~w[screens v3_api pool stats]a, metrics, %{host: host})
       end
     end
