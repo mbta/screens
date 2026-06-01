@@ -166,7 +166,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
   end
 
   defp headways?(rds_list) do
-    Enum.all?(rds_list, &(is_struct(&1.state, Headways) || is_struct(&1.state, NoService)))
+    Enum.all?(rds_list, &is_struct(&1.state, Headways))
   end
 
   @spec create_headway_section([RDS.t()]) :: HeadwaySection.t()
@@ -319,7 +319,7 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
     rds = Map.get(grouped_rds, :other, [])
 
     sorted_departures_from_rds(rds) ++
-      headways_from_rds(rds, headway_rds) ++
+      headways_from_rds(rds ++ service_ended_rds, headway_rds) ++
       sorted_departures_from_rds(service_ended_rds, true)
   end
 
@@ -446,14 +446,17 @@ defmodule Screens.V2.CandidateGenerator.DupNew.Departures do
 
   defp extract_line_direction_pairs(%RDS{line: %Line{id: line_id}, state: state}) do
     case state do
-      %NoService{} ->
+      %NoService{direction_id: nil} ->
         []
 
-      %Countdowns{departures: []} ->
-        [{line_id, 0}, {line_id, 1}]
+      %NoService{direction_id: direction_id} ->
+        [{line_id, direction_id}]
 
       %Countdowns{departures: [first_departure | _]} ->
         [{line_id, Departure.direction_id(first_departure)}]
+
+      %Countdowns{departures: [], direction_id: direction_id} ->
+        [{line_id, direction_id}]
 
       %FirstTrip{first_scheduled_departure: departure} ->
         [{line_id, Departure.direction_id(departure)}]
