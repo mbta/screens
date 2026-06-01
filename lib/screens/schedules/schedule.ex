@@ -2,6 +2,7 @@ defmodule Screens.Schedules.Schedule do
   @moduledoc false
 
   alias Screens.Trips.Trip
+  alias Screens.Util
   alias Screens.V2.Departure
 
   defstruct id: nil,
@@ -29,15 +30,13 @@ defmodule Screens.Schedules.Schedule do
 
   @includes ~w[route.line stop trip.route_pattern.representative_trip trip.stops]
 
-  @type date_param :: DateTime.t() | Date.t() | String.t() | nil
-
   @type result :: {:ok, [t()]} | :error
-  @type fetch_with_date :: (Departure.params(), date_param() -> result())
+  @type fetch_with_date :: (Departure.params(), Date.t() -> result())
 
   @callback fetch(Departure.params()) :: result()
-  @callback fetch(Departure.params(), date_param()) :: result()
-  def fetch(%{} = params, date \\ nil) do
-    params = if is_nil(date), do: params, else: Map.put(params, :date, date)
+  @callback fetch(Departure.params(), Date.t()) :: result()
+  def fetch(%{} = params, date \\ current_service_date()) do
+    params = Map.put(params, :date, date)
     result = Departure.do_fetch("schedules", Map.put(params, :include, @includes))
 
     case result do
@@ -45,4 +44,6 @@ defmodule Screens.Schedules.Schedule do
       :error -> :error
     end
   end
+
+  defp current_service_date(now \\ DateTime.utc_now()), do: Util.service_date(now)
 end
