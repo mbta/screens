@@ -92,7 +92,13 @@ interface OFMTag {
 }
 
 export const getMRAID = (): MRAID | false => {
-  return (parent?.parent as OFMWindow)?.mraid ?? false;
+  // We wrap this in a try catch because Screenplay shows
+  // Screens via an iframe and tries to get this value for DUPs
+  try {
+    return (parent?.parent as OFMWindow)?.mraid ?? false;
+  } catch {
+    return false;
+  }
 };
 
 /**
