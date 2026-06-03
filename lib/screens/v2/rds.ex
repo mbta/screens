@@ -89,8 +89,8 @@ defmodule Screens.V2.RDS do
     has no relevant live data (alerts or predictions)
     and no scheduled departures for the day.
     """
-    @type t :: %__MODULE__{routes: [Route.t()]}
-    defstruct ~w[routes]a
+    @type t :: %__MODULE__{routes: [Route.t()], direction_id: Trip.direction() | nil}
+    defstruct ~w[routes direction_id]a
   end
 
   defmodule Countdowns do
@@ -98,8 +98,8 @@ defmodule Screens.V2.RDS do
     State when there is upcoming service to a destination
     and/or alerts which affect service to the destination.
     """
-    @type t :: %__MODULE__{departures: [Departure.t()]}
-    defstruct ~w[departures]a
+    @type t :: %__MODULE__{departures: [Departure.t()], direction_id: Trip.direction() | nil}
+    defstruct ~w[departures direction_id]a
   end
 
   defmodule FirstTrip do
@@ -404,7 +404,10 @@ defmodule Screens.V2.RDS do
         %ServiceEnded{last_scheduled_departure: last_scheduled_departure}
 
       :service_impacted ->
-        %Countdowns{departures: departures_for_headsign}
+        %Countdowns{
+          departures: departures_for_headsign,
+          direction_id: Departure.direction_id(first_scheduled_departure)
+        }
 
       :no_service ->
         %NoService{routes: routes_for_section}
@@ -417,7 +420,7 @@ defmodule Screens.V2.RDS do
           departure_id: Departure.id(first_scheduled_departure),
           route_id: route.id,
           direction_name: route |> Route.normalized_direction_names() |> Enum.at(direction_id),
-          direction_id: direction_id,
+          direction_id: Departure.direction_id(first_scheduled_departure),
           range: headway_for_stop
         }
 
