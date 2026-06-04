@@ -6,7 +6,7 @@
     "deploy:dup": "webpack --mode production --env package=dup",
     "test": "jest",
     "test:watch": "jest --watch",
-    "watch": "concurrently --kill-others --prefix-colors auto npm:watch-*",
+    "watch": "concurrently --kill-others npm:watch-*",
     "watch-build": "webpack --mode development --stats minimal --watch",
     "watch-tsc": "tsc --preserveWatchOutput --watch",
     "lint": "eslint --fix .",
