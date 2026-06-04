@@ -613,12 +613,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp serialize_crowding(departure, _screen), do: Departure.crowding_level(departure)
 
   @spec serialize_time(Departure.t(), Screen.t(), DateTime.t()) ::
-          %{time: serialized_time(), time_in_epoch: integer(), is_live: boolean()}
-          | %{
-              time: serialized_time() | nil,
-              scheduled_time: serialized_timestamp() | nil,
-              is_live: boolean()
-            }
+          %{
+            :time => serialized_time() | nil,
+            optional(:time_in_epoch) => integer(),
+            optional(:scheduled_time) => serialized_timestamp() | nil,
+            :is_live => boolean()
+          }
   defp serialize_time(departure, %Screen{app_id: app_id}, now)
        when app_id in [:bus_eink_v2, :gl_eink_v2] do
     departure_time = Departure.time(departure)
@@ -640,29 +640,33 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp serialize_time(%Departure{prediction: prediction} = departure, screen, now) do
     scheduled_time = Departure.scheduled_time(departure)
     %Route{type: route_type} = Departure.route(departure)
-    include_scheduled_time? = route_type in [:ferry, :rail]
+    always_timestamp? = route_type in [:ferry, :rail]
     predicted? = not is_nil(prediction)
 
-    serialized_time =
+    serialized_predicted_time =
       cond do
         Departure.cancelled?(departure) -> nil
-        predicted? and not include_scheduled_time? -> serialize_realtime(departure, screen, now)
+        predicted? and not always_timestamp? -> serialize_realtime(departure, screen, now)
         true -> departure |> Departure.time() |> serialize_timestamp()
       end
 
+    # Only the DUP app supports displaying the originally-scheduled time of a departure, either
+    # alongside a predicted time or as a "cancelled" time. Guard against use on other screens so,
+    # in the latter case, the client will crash rather than show misleading data (but this should
+    # be handled by "producers" of this widget not including cancelled departures at all).
     serialized_scheduled_time =
-      if include_scheduled_time? and not is_nil(scheduled_time) do
-        serialized_scheduled_time = serialize_timestamp(scheduled_time)
-
-        case serialized_time do
-          %{type: :text} -> nil
-          ^serialized_scheduled_time -> nil
-          _ -> serialized_scheduled_time
-        end
+      with %Screen{app_id: :dup_v2} <- screen,
+           true <- not is_nil(scheduled_time),
+           time when is_nil(time) or time.type == :timestamp <- serialized_predicted_time,
+           serialized = serialize_timestamp(scheduled_time),
+           true <- serialized != serialized_predicted_time do
+        serialized
+      else
+        _ -> nil
       end
 
     %{
-      time: serialized_time,
+      time: serialized_predicted_time,
       scheduled_time: serialized_scheduled_time,
       is_live: predicted?
     }

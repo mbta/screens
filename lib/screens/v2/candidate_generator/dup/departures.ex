@@ -428,11 +428,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       %NoService{direction_id: direction_id} ->
         [{line_id, direction_id}]
 
-      %Countdowns{departures: [first_departure | _]} ->
-        [{line_id, Departure.direction_id(first_departure)}]
-
-      %Countdowns{departures: [], direction_id: direction_id} ->
-        [{line_id, direction_id}]
+      %Countdowns{departures: [departure | _]} ->
+        [{line_id, Departure.direction_id(departure)}]
 
       %FirstTrip{first_schedule: %Schedule{trip: %Trip{direction_id: direction_id}}} ->
         [{line_id, direction_id}]
