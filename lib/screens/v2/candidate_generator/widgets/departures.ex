@@ -75,7 +75,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           section: &1,
           result:
             &1
-            |> fetch_section_departures(disabled_modes, departure_fetch_fn)
+            |> fetch_section_departures(disabled_modes, departure_fetch_fn, now)
             |> post_process_fn.(screen)
             |> post_process_no_data(&1, has_multiple_sections, route_fetch_fn)
         },
@@ -190,34 +190,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   defp no_departures_message, do: "No departures currently available"
   defp no_departures_message(direction_name), do: "No #{direction_name} departures available"
 
-  @spec fetch_section_departures(Section.t()) :: Departure.result()
-  @spec fetch_section_departures(Section.t(), [RouteType.t()]) :: Departure.result()
-  @spec fetch_section_departures(Section.t(), [RouteType.t()], Departure.fetch()) ::
-          Departure.result()
-  @spec fetch_section_departures(Section.t(), [RouteType.t()], Departure.fetch(), DateTime.t()) ::
-          Departure.result()
-  def fetch_section_departures(
-        _,
-        disabled_route_types \\ [],
-        departure_fetch_fn \\ &Departure.fetch/2,
-        now \\ DateTime.utc_now()
-      )
+  defp fetch_section_departures(%Section{header_only: true}, _, _, _), do: {:ok, []}
 
-  def fetch_section_departures(%Section{header_only: true}, _, _, _) do
-    {:ok, []}
-  end
-
-  def fetch_section_departures(
-        %Section{
-          query: %Query{params: params},
-          filters: filters,
-          bidirectional: is_bidirectional,
-          grouping_type: grouping_type
-        },
-        disabled_route_types,
-        departure_fetch_fn,
-        now
-      ) do
+  defp fetch_section_departures(
+         %Section{
+           query: %Query{params: params},
+           filters: filters,
+           bidirectional: is_bidirectional,
+           grouping_type: grouping_type
+         },
+         disabled_route_types,
+         departure_fetch_fn,
+         now
+       ) do
     fetch_params = Map.from_struct(params)
     fetch_opts = [schedule_route_type_filter: [:ferry, :rail]]
 

@@ -1,96 +1,81 @@
 defmodule Screens.V2.CandidateGenerator.DupTest do
   use ExUnit.Case, async: true
 
+  alias Screens.LocationContext
+  alias Screens.Util.Assets
   alias Screens.V2.CandidateGenerator.Dup
-  alias ScreensConfig.{Alerts, Departures, Header}
+  alias Screens.V2.RDS
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, EvergreenContent}
+  alias ScreensConfig.{Alerts, Departures, EvergreenContentItem, Header, Schedule}
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.Dup, as: DupConfig
 
+  import Mox
+  setup :verify_on_exit!
+
+  import Screens.Inject
+  @alert injected(Screens.Alerts.Alert)
+  @stop injected(Screens.Stops.Stop)
+  @location_context injected(LocationContext)
+  @rds injected(RDS)
+
   setup do
-    config = %Screen{
+    stub(@alert, :fetch, fn _ -> {:ok, []} end)
+    stub(@stop, :fetch_stop_name, fn _ -> "" end)
+
+    stub(@location_context, :fetch, fn _, _, _ ->
+      {:ok, %LocationContext{home_stop: "Test", routes: []}}
+    end)
+
+    stub(@rds, :get, fn _, _ -> [{:ok, []}] end)
+    :ok
+  end
+
+  describe "candidate_instances/2" do
+    @config %Screen{
+      app_id: :dup_v2,
       app_params: %DupConfig{
-        header: %Header.StopId{stop_id: "place-gover"},
-        primary_departures: struct(Departures),
-        secondary_departures: struct(Departures),
-        alerts: struct(Alerts)
+        alerts: %Alerts{stop_id: "place-abcde"},
+        header: %Header.StopName{stop_name: "Test Stop"},
+        primary_departures: %Departures{sections: []},
+        secondary_departures: %Departures{sections: []}
       },
       vendor: :outfront,
       device_id: "TEST",
-      name: "TEST",
-      app_id: :dup_v2
+      name: "TEST"
     }
+    @now ~U[2024-01-15 11:45:30Z]
 
-    %{config: config}
-  end
+    test "returns evergreen content when scheduled" do
+      schedule = %Schedule{start_dt: ~U[2024-01-01 00:00:00Z], end_dt: ~U[2024-02-01 00:00:00Z]}
 
-  describe "screen_template/1" do
-    test "returns template", %{config: config} do
-      assert {:screen,
-              %{
-                screen_normal: [
-                  {:rotation_zero,
-                   %{
-                     rotation_normal_zero: [
-                       :header_zero,
-                       {:body_zero,
-                        %{
-                          body_normal_zero: [:main_content_zero],
-                          body_split_zero: [:main_content_reduced_zero, :bottom_pane_zero]
-                        }}
-                     ],
-                     rotation_takeover_zero: [:full_rotation_zero]
-                   }},
-                  {:rotation_one,
-                   %{
-                     rotation_normal_one: [
-                       :header_one,
-                       {:body_one,
-                        %{
-                          body_normal_one: [:main_content_one],
-                          body_split_one: [:main_content_reduced_one, :bottom_pane_one]
-                        }}
-                     ],
-                     rotation_takeover_one: [:full_rotation_one]
-                   }},
-                  {:rotation_two,
-                   %{
-                     rotation_normal_two: [
-                       :header_two,
-                       {:body_two,
-                        %{
-                          body_normal_two: [:main_content_two],
-                          body_split_two: [:main_content_reduced_two, :bottom_pane_two]
-                        }}
-                     ],
-                     rotation_takeover_two: [:full_rotation_two]
-                   }}
-                ]
-              }} == Dup.screen_template(config)
+      item = %EvergreenContentItem{
+        asset_path: "test.png",
+        priority: [1],
+        schedule: [schedule],
+        slot_names: ["bottom_pane_zero"]
+      }
+
+      config = put_in(@config.app_params.evergreen_content, [item])
+      now_active = ~U[2024-01-10 00:00:00Z]
+      now_inactive = ~U[2024-02-02 00:00:00Z]
+
+      expected_instance = %EvergreenContent{
+        screen: config,
+        asset_url: Assets.s3_asset_url("test.png"),
+        now: now_active,
+        priority: [1],
+        schedule: [schedule],
+        slot_names: [:bottom_pane_zero]
+      }
+
+      assert expected_instance in Dup.candidate_instances(config, now_active)
+      assert expected_instance not in Dup.candidate_instances(config, now_inactive)
     end
-  end
 
-  describe "candidate_instances/6" do
-    test "returns expected instances", %{config: config} do
-      now = ~U[2020-04-06T10:00:00Z]
-      header_instances_fn = fn ^config, ^now -> [:header] end
-      departures_instances_fn = fn ^config, ^now -> [:departures] end
-      evergreen_content_instances_fn = fn ^config, ^now -> [:evergreen] end
-      alerts_instances_fn = fn ^config, ^now -> [:alert] end
-      emergency_takeover_instances_fn = fn ^config, ^now -> [:emergency_takeover] end
-
-      actual_instances =
-        Dup.candidate_instances(
-          config,
-          now,
-          header_instances_fn,
-          evergreen_content_instances_fn,
-          departures_instances_fn,
-          alerts_instances_fn,
-          emergency_takeover_instances_fn
-        )
-
-      assert Enum.sort(actual_instances) ==
-               ~w[alert departures emergency_takeover evergreen header]a
+    test "stub: always returns no-data state for departures" do
+      expected_instance = %DeparturesNoData{screen: @config, slot_name: :main_content_zero}
+      assert expected_instance in Dup.candidate_instances(@config, @now)
     end
   end
 end

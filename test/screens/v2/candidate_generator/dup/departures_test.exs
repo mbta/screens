@@ -1,7 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Alerts.Alert
+  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -9,2887 +9,1330 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.Trips.Trip
   alias Screens.V2.CandidateGenerator.Dup
   alias Screens.V2.Departure
+  alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.Departures.{NoDataSection, NormalSection}
-  alias Screens.V2.WidgetInstance.DeparturesNoData
+  alias Screens.V2.WidgetInstance.Departures.HeadwayRow
+  alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService}
   alias Screens.V2.WidgetInstance.OvernightDepartures
-  alias Screens.Vehicles.Vehicle
   alias ScreensConfig.{Alerts, Departures, Header}
-  alias ScreensConfig.Departures.Header, as: SectionHeader
-  alias ScreensConfig.Departures.{Layout, Query, Section}
+  alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.Dup, as: DupConfig
 
-  import Screens.Inject
-  import Screens.TestSupport.InformedEntityBuilder
   import Mox
+  import Screens.Inject
+
   setup :verify_on_exit!
 
-  @headways injected(Screens.Headways)
+  @rds injected(RDS)
 
-  defp put_primary_departures(widget, primary_departures_sections) do
+  @now ~U[2020-04-06T10:00:00Z]
+  @config %Screen{
+    app_params: %DupConfig{
+      header: %Header.StopId{stop_id: "place-test"},
+      primary_departures: %Departures{
+        sections: []
+      },
+      secondary_departures: %Departures{
+        sections: []
+      },
+      alerts: struct(Alerts)
+    },
+    vendor: :outfront,
+    device_id: "TEST",
+    name: "TEST",
+    app_id: :dup_v2
+  }
+
+  defp rds_countdown(stop_id, line_id, headsign, expected_departures) do
+    %RDS{
+      stop: %Stop{id: stop_id},
+      line: %Line{id: line_id},
+      headsign: headsign,
+      state: %RDS.Countdowns{
+        departures: expected_departures
+      }
+    }
+  end
+
+  defp no_service(stop_id, line_id, headsign, routes \\ []) do
+    %RDS{
+      stop: %Stop{id: stop_id},
+      line: %Line{id: line_id},
+      headsign: headsign,
+      state: %RDS.NoService{routes: routes, direction_id: 0}
+    }
+  end
+
+  defp first_trip(stop_id, line_id, headsign, first_scheduled) do
+    %RDS{
+      stop: %Stop{id: stop_id},
+      line: %Line{id: line_id},
+      headsign: headsign,
+      state: %RDS.FirstTrip{
+        first_scheduled_departure: %Departure{
+          prediction: nil,
+          schedule: first_scheduled
+        }
+      }
+    }
+  end
+
+  defp service_ended(stop_id, line_id, headsign, last_scheduled) do
+    %RDS{
+      stop: %Stop{id: stop_id},
+      line: %Line{id: line_id},
+      headsign: headsign,
+      state: %RDS.ServiceEnded{
+        last_scheduled_departure: %Departure{
+          prediction: nil,
+          schedule: last_scheduled
+        }
+      }
+    }
+  end
+
+  defp headways(stop_id, line_id, headsign, route_id, direction_name, direction_id, range) do
+    %RDS{
+      stop: %Stop{id: stop_id},
+      line: %Line{id: line_id},
+      headsign: headsign,
+      state: %RDS.Headways{
+        departure_id: "Test ID",
+        route_id: route_id,
+        direction_name: direction_name,
+        direction_id: direction_id,
+        range: range
+      }
+    }
+  end
+
+  defp expected_departures_widget(
+         config,
+         expected_primary_sections,
+         expected_secondary_sections,
+         now \\ @now
+       ) do
+    [
+      %DeparturesWidget{
+        screen: config,
+        slot_names: [:main_content_zero],
+        now: now,
+        sections: expected_primary_sections
+      },
+      %DeparturesWidget{
+        screen: config,
+        slot_names: [:main_content_one],
+        now: now,
+        sections: expected_primary_sections
+      },
+      %DeparturesWidget{
+        screen: config,
+        slot_names: [:main_content_reduced_zero],
+        now: now,
+        sections: expected_primary_sections
+      },
+      %DeparturesWidget{
+        screen: config,
+        slot_names: [:main_content_reduced_one],
+        now: now,
+        sections: expected_primary_sections
+      },
+      %DeparturesWidget{
+        screen: config,
+        slot_names: [:main_content_two],
+        now: now,
+        sections: expected_secondary_sections
+      },
+      %DeparturesWidget{
+        screen: config,
+        slot_names: [:main_content_reduced_two],
+        now: now,
+        sections: expected_secondary_sections
+      }
+    ]
+  end
+
+  defp expected_overnight_departures_widget(config) do
+    [
+      %OvernightDepartures{screen: config, slot_names: [:main_content_zero]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_one]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_zero]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_one]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_two]},
+      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_two]}
+    ]
+  end
+
+  defp put_primary_departures(config, primary_departures_sections) do
     %{
-      widget
+      config
       | app_params: %{
-          widget.app_params
+          config.app_params
           | primary_departures: %Departures{sections: primary_departures_sections}
         }
     }
   end
 
-  defp put_secondary_departures_sections(widget, secondary_departures_sections) do
+  defp put_secondary_departures_sections(config, secondary_departures_sections) do
     %{
-      widget
+      config
       | app_params: %{
-          widget.app_params
+          config.app_params
           | secondary_departures: %Departures{sections: secondary_departures_sections}
         }
     }
   end
 
   setup do
-    stub(Screens.Headways.Mock, :get_with_route, fn _, _, _ -> nil end)
-
-    config = %Screen{
-      app_params: %DupConfig{
-        header: %Header.StopId{stop_id: "place-test"},
-        primary_departures: %Departures{
-          sections: []
-        },
-        secondary_departures: %Departures{
-          sections: []
-        },
-        alerts: struct(Alerts)
-      },
-      vendor: :outfront,
-      device_id: "TEST",
-      name: "TEST",
-      app_id: :dup_v2
-    }
-
-    fetch_departures_fn = fn
-      %{stop_ids: ["place-A"]}, _opts ->
-        {:ok,
-         [
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "A",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           }
-         ]}
-
-      %{stop_ids: ["place-B"]}, _opts ->
-        {:ok,
-         [
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "B1",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           },
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "B2",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           },
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "B3",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           },
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "B4",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           },
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "B5",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           }
-         ]}
-
-      %{stop_ids: ["place-C"]}, _opts ->
-        {:ok,
-         [
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "C",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           }
-         ]}
-
-      %{stop_ids: ["place-D"]}, _opts ->
-        {:ok,
-         [
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "D",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           }
-         ]}
-
-      %{stop_ids: ["place-F"]}, _opts ->
-        {:ok,
-         [
-           %Departure{
-             prediction: %Prediction{
-               id: "F1",
-               trip: %Trip{direction_id: 0},
-               stop: struct(Stop),
-               route: %Route{id: "Test"}
-             }
-           },
-           %Departure{
-             prediction: %Prediction{
-               id: "F2",
-               trip: %Trip{direction_id: 0},
-               stop: struct(Stop),
-               route: %Route{id: "Test"}
-             }
-           },
-           %Departure{
-             prediction: %Prediction{
-               id: "F3",
-               trip: %Trip{direction_id: 0},
-               stop: struct(Stop),
-               route: %Route{id: "Test"}
-             }
-           },
-           %Departure{
-             prediction: %Prediction{
-               id: "F4",
-               trip: %Trip{direction_id: 1},
-               stop: struct(Stop),
-               route: %Route{id: "Test"}
-             }
-           },
-           %Departure{
-             prediction: %Prediction{
-               id: "F5",
-               trip: %Trip{direction_id: 1},
-               stop: struct(Stop),
-               route: %Route{id: "Test"}
-             }
-           }
-         ]}
-
-      %{stop_ids: ["place-G"]}, _opts ->
-        {:ok,
-         [
-           %Departure{
-             prediction: %Prediction{
-               id: "G1",
-               trip: %Trip{direction_id: 1},
-               stop: struct(Stop),
-               route: %Route{id: "Test"}
-             }
-           }
-         ]}
-
-      %{stop_ids: ["place-kencl"]}, _opts ->
-        {:ok,
-         [
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "Kenmore",
-                 route: %Route{id: "Test"},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           }
-         ]}
-
-      %{stop_ids: ["bus-A", "bus-B"]}, _opts ->
-        {:ok,
-         [
-           %Departure{
-             prediction:
-               struct(Prediction,
-                 id: "Bus A",
-                 route: %Route{id: "Bus A", type: :bus},
-                 stop: struct(Stop),
-                 trip: struct(Trip)
-               )
-           }
-         ]}
-
-      _, _ ->
-        {:ok, []}
-    end
-
-    fetch_alerts_fn = fn
-      _ -> []
-    end
-
-    fetch_schedules_fn = fn
-      _, _ ->
-        []
-    end
-
-    fetch_vehicles_fn = fn _, _ -> [struct(Vehicle)] end
-
-    fetch_routes_fn = fn
-      %{ids: ids} ->
-        {
-          :ok,
-          ids
-          |> Enum.flat_map(fn
-            "Ferry" -> [%{id: "Ferry", type: :ferry}]
-            "Orange" -> [%{id: "Orange", type: :subway}]
-            "Green" -> [%{id: "Green", type: :light_rail}]
-            "Bus A" -> [%{id: "Bus A", type: :bus}]
-            "Bus B" -> [%{id: "Bus B", type: :bus}]
-            "Bus C" -> [%{id: "Bus C", type: :bus}]
-            "Red" -> [%{id: "Red", type: :subway}]
-          end)
-          |> Enum.uniq()
-        }
-
-      %{stop_ids: stop_ids} ->
-        {
-          :ok,
-          stop_ids
-          |> Enum.flat_map(fn
-            "Boat" -> [%{id: "Ferry", type: :ferry}]
-            "place-A" -> [%{id: "Orange", type: :subway}, %{id: "Green", type: :light_rail}]
-            "bus-A" -> [%{id: "Bus A", type: :bus}]
-            "bus-B" -> [%{id: "Bus B", type: :bus}]
-            "bus-C" -> [%{id: "Bus C", type: :bus}]
-            "bus-C+D" -> [%{id: "Bus C", type: :bus}, %{id: "Bus D", type: :bus}]
-            "place-overnight" -> [%{id: "Red", type: :subway}]
-            "place-closed" -> [%{id: "Red", type: :subway}, %{id: "Bus A", type: :bus}]
-            _ -> [%{id: "test", type: :test}]
-          end)
-          |> Enum.uniq()
-        }
-    end
-
-    %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    }
+    stub(@rds, :get, fn _, _ -> [{:ok, []}] end)
+    :ok
   end
 
-  describe "departures_instances/4" do
-    test "returns primary and secondary departures", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}},
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
-        ])
-        |> put_secondary_departures_sections([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}},
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}}
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "C",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "D",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
+  describe "instances/3" do
+    test "returns DeparturesNoData on RDS returning errors" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
       ]
 
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns only primary departures if secondary is missing", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        put_primary_departures(config, [
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}},
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
+      secondary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}}
       ]
 
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
 
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
+      expect(@rds, :get, fn _primary_departures, @now -> [:error, :error] end)
+      expect(@rds, :get, fn _secondary_departures, @now -> [:error, :error] end)
+
+      expected_instances = [
+        %DeparturesNoData{screen: config, slot_name: :main_content_zero},
+        %DeparturesNoData{screen: config, slot_name: :main_content_one},
+        %DeparturesNoData{screen: config, slot_name: :main_content_reduced_zero},
+        %DeparturesNoData{screen: config, slot_name: :main_content_reduced_one},
+        %DeparturesNoData{screen: config, slot_name: :main_content_two},
+        %DeparturesNoData{screen: config, slot_name: :main_content_reduced_two}
+      ]
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
     end
 
-    test "returns only primary departures if secondary has no data", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
+    test "returns DeparturesNoService on RDS returning NoService states" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
+      ]
+
+      secondary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["place-C"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["place-D"]}}}
+      ]
+
       config =
-        config
-        |> put_primary_departures([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}}
-        ])
-        |> put_secondary_departures_sections([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["nonexist"]}}}
-        ])
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
 
-      now = ~U[2020-04-06T10:00:00Z]
-
-      primary_section = %NormalSection{
-        layout: %Layout{},
-        header: %SectionHeader{},
-        rows: [
-          %Screens.V2.Departure{
-            prediction:
-              struct(Prediction,
-                id: "A",
-                route: %Route{id: "Test"},
-                stop: struct(Stop),
-                trip: struct(Trip)
-              ),
-            schedule: nil
-          }
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok, [no_service("place-A", "line-A", "headsign")]},
+          {:ok, [no_service("place-B", "line-B", "headsign2")]}
         ]
-      }
+      end)
 
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [primary_section],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [primary_section],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [primary_section],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns only bidirectional departures if configured for that", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        put_primary_departures(config, [
-          %Section{
-            bidirectional: true,
-            query: %Query{params: %Query.Params{stop_ids: ["place-F"]}}
-          },
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}}
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "F1",
-                      trip: struct(Trip, direction_id: 0),
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"}
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "F4",
-                      trip: struct(Trip, direction_id: 1),
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"}
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"},
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "F1",
-                      trip: struct(Trip, direction_id: 0),
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"}
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "F4",
-                      trip: struct(Trip, direction_id: 1),
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"}
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"},
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "F1",
-                      trip: struct(Trip, direction_id: 0),
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"}
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "F4",
-                      trip: struct(Trip, direction_id: 1),
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"}
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"},
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns one row for bidirectional departures if only one departure exists", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        put_primary_departures(config, [
-          %Section{
-            bidirectional: true,
-            query: %Query{params: %Query.Params{stop_ids: ["place-G"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "G1",
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"},
-                      trip: struct(Trip, direction_id: 1)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "G1",
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"},
-                      trip: struct(Trip, direction_id: 1)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "G1",
-                      stop: struct(Stop),
-                      route: %Route{id: "Test"},
-                      trip: struct(Trip, direction_id: 1)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns 4 departures if only one section", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        put_primary_departures(config, [
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B3",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B4",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B3",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B4",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B3",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B4",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns normal sections for upcoming alert", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        put_primary_departures(config, [
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-B"]}}}
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_alerts_fn = fn
-        [
-          direction_id: :both,
-          route_ids: [],
-          stop_ids: ["place-B"],
-          route_types: [:light_rail, :subway]
-        ] ->
-          [
-            struct(Alert,
-              effect: :suspension,
-              informed_entities: [
-                ie(stop_id: "place-B", route: "Red"),
-                ie(stop_id: "place-C", route: "Red")
-              ],
-              active_period: [{~U[2020-05-06T09:00:00Z], nil}]
-            )
-          ]
-      end
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B3",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B4",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B3",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B4",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B1",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B2",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B3",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "B4",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns normal sections for branch station for alert with branch terminal headsign", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        put_primary_departures(config, [
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-kencl"]}}}
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_alerts_fn = fn
-        [
-          direction_id: :both,
-          route_ids: [],
-          stop_ids: ["place-kencl"],
-          route_types: [:light_rail, :subway]
-        ] ->
-          [
-            # Suspension alert from Kenmore to Saint Mary's Street
-            struct(Alert,
-              effect: :suspension,
-              informed_entities: [
-                ie(stop_id: "place-kencl", route: "Green-C"),
-                ie(stop_id: "place-smary", route: "Green-C"),
-                ie(stop_id: "70150", route: "Green-C"),
-                ie(stop_id: "70151", route: "Green-C"),
-                ie(stop_id: "70211", route: "Green-C"),
-                ie(stop_id: "70212", route: "Green-C")
-              ],
-              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
-            )
-          ]
-      end
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "Kenmore",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "Kenmore",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "Kenmore",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns no data sections for disabled mode", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["Boat"]}}},
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}}
-          }
-        ])
-        |> put_secondary_departures_sections([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Orange"]}}
-          },
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: ["Green"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NoDataSection{route: %{id: "Ferry", type: :ferry}},
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NoDataSection{route: %{id: "Ferry", type: :ferry}},
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            },
-            %NoDataSection{route: %{id: "Green", type: :light_rail}}
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "consolidates into DeparturesNoData only when all rotations have no data", %{
-      config: config,
-      fetch_departures_fn: fetch_departures_fn,
-      fetch_alerts_fn: fetch_alerts_fn,
-      fetch_schedules_fn: fetch_schedules_fn,
-      fetch_routes_fn: fetch_routes_fn,
-      fetch_vehicles_fn: fetch_vehicles_fn
-    } do
-      now = ~U[2020-04-06T10:00:00Z]
-
-      instances_partial_data =
-        config
-        |> put_primary_departures([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["place-A"], route_ids: []}}}
-        ])
-        |> put_secondary_departures_sections([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["nonexist"], route_ids: []}}}
-        ])
-        |> Dup.Departures.departures_instances(
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      instances_no_data =
-        config
-        |> put_primary_departures([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["nonexist1"], route_ids: []}}}
-        ])
-        |> put_secondary_departures_sections([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["nonexist2"], route_ids: []}}}
-        ])
-        |> Dup.Departures.departures_instances(
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(instances_partial_data, &match?(%DeparturesWidget{}, &1))
-      assert Enum.all?(instances_no_data, &match?(%DeparturesNoData{}, &1))
-    end
-  end
-
-  describe "overnight mode" do
-    test "returns normal sections with normal rows and overnight rows for routes in overnight mode",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_alerts_fn: fetch_alerts_fn,
-           fetch_routes_fn: fetch_routes_fn,
-           fetch_vehicles_fn: fetch_vehicles_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
-          }
-        ])
-        |> put_secondary_departures_sections([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-A", "bus-B"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_schedules_fn = fn
-        _, nil ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             }
-           ]}
-
-        _, _ ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             }
-           ]}
-      end
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "Bus A",
-                      route: %Route{id: "Bus A", type: :bus},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction: nil,
-                  schedule:
-                    struct(Schedule,
-                      departure_time: ~U[2020-04-07T09:00:00Z],
-                      route: %Route{id: "Bus B"},
-                      stop: struct(Stop, id: "bus-B")
-                    )
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns normal sections with normal rows and overnight rows with nil scheduled times for routes in overnight mode with no scheduled trips tomorrow",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_alerts_fn: fetch_alerts_fn,
-           fetch_routes_fn: fetch_routes_fn,
-           fetch_vehicles_fn: fetch_vehicles_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
-          }
-        ])
-        |> put_secondary_departures_sections([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-A", "bus-B"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_schedules_fn = fn
-        _, ^now ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             }
-           ]}
-
-        _, _ ->
-          {:ok, []}
-      end
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "Bus A",
-                      route: %Route{id: "Bus A", type: :bus},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                },
-                %Screens.V2.Departure{
-                  prediction: nil,
-                  schedule:
-                    struct(Schedule,
-                      departure_time: nil,
-                      route: %Route{id: "Bus B"},
-                      stop: struct(Stop, id: "bus-B")
-                    )
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    @tag capture_log: true
-    test "returns no-data if now is after tomorrow's first schedule",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_alerts_fn: fetch_alerts_fn,
-           fetch_routes_fn: fetch_routes_fn,
-           fetch_vehicles_fn: fetch_vehicles_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_schedules_fn = fn
-        _, nil ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             }
-           ]}
-
-        _, _ ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-03-07T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             }
-           ]}
-      end
+      expect(@rds, :get, fn _secondary_departures, @now -> [] end)
 
       expected_instances = [
-        %DeparturesNoData{screen: config, slot_name: :main_content_zero},
-        %DeparturesNoData{screen: config, slot_name: :main_content_one},
-        %DeparturesNoData{screen: config, slot_name: :main_content_two}
+        %DeparturesNoService{screen: config, slot_name: :main_content_zero},
+        %DeparturesNoService{screen: config, slot_name: :main_content_one},
+        %DeparturesNoService{screen: config, slot_name: :main_content_reduced_zero},
+        %DeparturesNoService{screen: config, slot_name: :main_content_reduced_one},
+        %DeparturesNoService{screen: config, slot_name: :main_content_two},
+        %DeparturesNoService{screen: config, slot_name: :main_content_reduced_two}
       ]
 
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
+      actual_instances = Dup.Departures.instances(config, @now)
 
-      assert Enum.all?(expected_instances, &Enum.member?(actual_instances, &1))
+      assert actual_instances == expected_instances
     end
 
-    test "returns no-data if now is before today's last schedule and there are no schedules tomorrow",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_alerts_fn: fetch_alerts_fn,
-           fetch_routes_fn: fetch_routes_fn,
-           fetch_vehicles_fn: fetch_vehicles_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T08:00:00Z]
-
-      fetch_schedules_fn = fn
-        _, nil ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             }
-           ]}
-
-        _, _ ->
-          {:ok, []}
-      end
-
-      expected_instances = [
-        %DeparturesNoData{screen: config, slot_name: :main_content_zero},
-        %DeparturesNoData{screen: config, slot_name: :main_content_one},
-        %DeparturesNoData{screen: config, slot_name: :main_content_two}
+    test "secondary departures fallback to primary departures when empty" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
       ]
 
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_instances, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns OvernightDepartures if all routes in section are overnight",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_alerts_fn: fetch_alerts_fn,
-           fetch_routes_fn: fetch_routes_fn,
-           fetch_vehicles_fn: fetch_vehicles_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
-          }
-        ])
-        |> put_secondary_departures_sections([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_schedules_fn = fn
-        _, nil ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             }
-           ]}
-
-        _, _ ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             }
-           ]}
-      end
+      secondary_departures = []
 
       expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %OvernightDepartures{screen: config, routes: [:bus], slot_names: [:main_content_two]}
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns OvernightDepartures with no routes if all rotations are overnight",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_alerts_fn: fetch_alerts_fn,
-           fetch_routes_fn: fetch_routes_fn,
-           fetch_vehicles_fn: fetch_vehicles_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["bus-B", "bus-C"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_schedules_fn = fn
-        _, nil ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             },
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:30:00Z],
-               route: %Route{id: "Bus C"},
-               stop: struct(Stop, id: "bus-C")
-             }
-           ]}
-
-        _, _ ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Bus B"},
-               stop: struct(Stop, id: "bus-B")
-             },
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Bus C"},
-               stop: struct(Stop, id: "bus-C")
-             }
-           ]}
-      end
-
-      expected_departures = [
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_zero]},
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_one]},
-        %OvernightDepartures{screen: config, routes: [], slot_names: [:main_content_two]}
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "doesn't return OvernightDepartures for rail sections without active vehicles but with an active alert",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_routes_fn: fetch_routes_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-overnight"]}}
-          }
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-      stub(@headways, :get_with_route, fn "place-overnight", "Red", ^now -> {5, 8} end)
-
-      fetch_schedules_fn = fn
-        _, nil ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Red"},
-               stop: struct(Stop, id: "place-overnight")
-             }
-           ]}
-
-        _, _ ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Red"},
-               stop: struct(Stop, id: "place-overnight")
-             }
-           ]}
-      end
-
-      fetch_alerts_fn = fn
-        [
-          direction_id: :both,
-          route_ids: [],
-          stop_ids: ["place-overnight"],
-          route_types: [:light_rail, :subway]
-        ] ->
-          [
-            struct(Alert,
-              effect: :suspension,
-              informed_entities: [ie(stop_id: "place-overnight", route: "Red", route_type: 0)],
-              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
-            )
-          ]
-      end
-
-      fetch_vehicles_fn = fn _, _ -> [] end
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: []
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: []
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: []
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns primary section Departures if not all routes in secondary section are overnight, but none have upcoming predictions",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_alerts_fn: fetch_alerts_fn,
-           fetch_routes_fn: fetch_routes_fn,
-           fetch_vehicles_fn: fetch_vehicles_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
-          }
-        ])
-        |> put_secondary_departures_sections([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["bus-C+D"]}}}
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_schedules_fn = fn
-        %{direction_id: :both, route_ids: [], route_type: nil, stop_ids: ["bus-C+D"]},
-        ~D[2020-04-07] ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Bus C"},
-               stop: struct(Stop, id: "bus-C+D")
-             },
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Bus D"},
-               stop: struct(Stop, id: "bus-C+D")
-             }
-           ]}
-
-        _, _ ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus C"},
-               stop: struct(Stop, id: "bus-C+D")
-             },
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus D"},
-               stop: struct(Stop, id: "bus-C+D")
-             },
-             %Schedule{
-               departure_time: ~U[2020-04-06T11:01:00Z],
-               route: %Route{id: "Bus D"},
-               stop: struct(Stop, id: "bus-C+D")
-             }
-           ]}
-      end
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-
-    test "returns primary section Departures if routes in secondary section have no predictions for today or schedules for tomorrow",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_alerts_fn: fetch_alerts_fn,
-           fetch_routes_fn: fetch_routes_fn,
-           fetch_vehicles_fn: fetch_vehicles_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["place-A"]}}
-          }
-        ])
-        |> put_secondary_departures_sections([
-          %Section{query: %Query{params: %Query.Params{stop_ids: ["bus-C"]}}}
-        ])
-
-      now = ~U[2020-04-06T10:00:00Z]
-
-      fetch_schedules_fn = fn
-        %{direction_id: :both, route_ids: [], route_type: nil, stop_ids: ["bus-C"]},
-        ~D[2020-04-07] ->
-          {:ok, []}
-
-        _, _ ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Bus C"},
-               stop: struct(Stop, id: "bus-C")
-             },
-             %Schedule{
-               departure_time: ~U[2020-04-06T11:00:00Z],
-               route: %Route{id: "Bus C"},
-               stop: struct(Stop, id: "bus-C")
-             }
-           ]}
-      end
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_zero],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_one],
-          now: now
-        },
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "A",
-                      route: %Route{id: "Test"},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          slot_names: [:main_content_two],
-          now: now
-        }
-      ]
-
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
-
-      assert Enum.all?(expected_departures, &Enum.member?(actual_instances, &1))
-    end
-  end
-
-  describe "departures_instances/4 alert handling" do
-    test "returns no departures for a section when alerts indicate that all routes are expected to be closed",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_routes_fn: fetch_routes_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{
-              params: %Query.Params{stop_ids: ["place-closed"], route_ids: ["Red"]}
-            }
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
           },
-          %Section{
-            query: %Query{
-              params: %Query.Params{stop_ids: ["bus-A", "bus-B"], route_ids: ["Bus A"]}
-            }
-          }
-        ])
-
-      now = ~U[2020-04-06T18:00:00Z]
-
-      fetch_schedules_fn = fn
-        _, ~D[2020-04-07] ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Red"},
-               stop: struct(Stop, id: "place-closed")
-             }
-           ]}
-
-        _, ^now ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Red"},
-               stop: struct(Stop, id: "place-closed")
-             },
-             %Schedule{
-               departure_time: ~U[2020-04-07T03:00:00Z],
-               route: %Route{id: "Red"},
-               stop: struct(Stop, id: "place-closed")
-             }
-           ]}
-      end
-
-      fetch_alerts_fn = fn
-        [
-          direction_id: :both,
-          route_ids: ["Red"],
-          stop_ids: ["place-closed"],
-          route_types: [:light_rail, :subway]
-        ] ->
-          [
-            struct(Alert,
-              effect: :suspension,
-              informed_entities: [ie(stop_id: "place-closed", route: "Red", route_type: 0)],
-              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
-            )
-          ]
-
-        _ ->
-          []
-      end
-
-      fetch_vehicles_fn = fn _, _ -> [] end
-
-      expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: []
-            },
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "Bus A",
-                      route: %Route{id: "Bus A", type: :bus},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          now: now,
-          slot_names: [:main_content_reduced_two]
+          schedule: nil
         }
       ]
 
-      actual_instances =
-        Dup.Departures.departures_instances(
-          config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
-        )
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        }
+      ]
 
-      assert(Enum.all?(expected_departures, &Enum.member?(actual_instances, &1)))
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok, [rds_countdown("s1", "l1", "other1", expected_departures)]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
     end
 
-    test "returns NoDataSection when alerts do not cover all directions for which we are missing departures",
-         %{
-           config: config,
-           fetch_departures_fn: fetch_departures_fn,
-           fetch_routes_fn: fetch_routes_fn
-         } do
-      config =
-        config
-        |> put_primary_departures([
-          %Section{
-            query: %Query{
-              params: %Query.Params{stop_ids: ["place-closed"], route_ids: ["Red"]}
-            }
-          },
-          %Section{
-            query: %Query{
-              params: %Query.Params{stop_ids: ["bus-A", "bus-B"], route_ids: ["Bus A"]}
-            }
-          }
-        ])
+    test "creates no service sections for no service states" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
 
-      now = ~U[2020-04-06T18:00:00Z]
-
-      fetch_schedules_fn = fn
-        _, ~D[2020-04-07] ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-07T09:00:00Z],
-               route: %Route{id: "Red"},
-               stop: struct(Stop, id: "place-closed")
-             }
-           ]}
-
-        _, ^now ->
-          {:ok,
-           [
-             %Schedule{
-               departure_time: ~U[2020-04-06T09:00:00Z],
-               route: %Route{id: "Red"},
-               stop: struct(Stop, id: "place-closed")
-             },
-             %Schedule{
-               departure_time: ~U[2020-04-07T03:00:00Z],
-               route: %Route{id: "Red"},
-               stop: struct(Stop, id: "place-closed")
-             }
-           ]}
-      end
-
-      fetch_alerts_fn = fn
-        [
-          direction_id: :both,
-          route_ids: ["Red"],
-          stop_ids: ["place-closed"],
-          route_types: [:light_rail, :subway]
-        ] ->
-          [
-            struct(Alert,
-              effect: :suspension,
-              informed_entities: [
-                ie(stop_id: "place-closed", route: "Red", route_type: 0, direction_id: 0)
-              ],
-              active_period: [{~U[2020-04-06T09:00:00Z], nil}]
-            )
-          ]
-
-        _ ->
-          []
-      end
-
-      fetch_vehicles_fn = fn _, _ -> [] end
+      secondary_departures = []
 
       expected_departures = [
-        %DeparturesWidget{
-          screen: config,
-          sections: [
-            %NoDataSection{route: %{id: "Red", type: :subway}},
-            %NormalSection{
-              layout: %Layout{},
-              header: %SectionHeader{},
-              rows: [
-                %Screens.V2.Departure{
-                  prediction:
-                    struct(Prediction,
-                      id: "Bus A",
-                      route: %Route{id: "Bus A", type: :bus},
-                      stop: struct(Stop),
-                      trip: struct(Trip)
-                    ),
-                  schedule: nil
-                }
-              ]
-            }
-          ],
-          now: now,
-          slot_names: [:main_content_zero]
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+          },
+          schedule: nil
         }
       ]
 
-      actual_instances =
-        Dup.Departures.departures_instances(
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        },
+        %Screens.V2.WidgetInstance.Departures.NoServiceSection{routes: []}
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             rds_countdown("s1", "l1", "other1", expected_departures)
+           ]},
+          {:ok, [no_service("s2", "l2", "other2")]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates no service section with routes for no service states that have routes" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_route = %Route{id: "r1", line: %Line{id: "l1"}, type: :bus}
+
+      secondary_departures = []
+
+      expected_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: expected_route,
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+          },
+          schedule: nil
+        }
+      ]
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        },
+        %Screens.V2.WidgetInstance.Departures.NoServiceSection{routes: [expected_route]}
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok, [rds_countdown("s1", "l1", "other1", expected_departures)]},
+          {:ok, [no_service("s2", "l2", "other2", [expected_route])]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections for upcoming predictions and schedules" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      secondary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s4"]}}}
+      ]
+
+      expected_primary_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+          },
+          schedule: nil
+        }
+      ]
+
+      expected_secondary_departures = [
+        %Departure{
+          prediction: nil,
+          schedule: %Schedule{
+            departure_time: ~U[2024-10-11 13:15:00Z],
+            route: %Route{id: "r3", line: %Line{id: "l3"}, type: :ferry},
+            stop: %Stop{id: "s3"},
+            trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+          }
+        }
+      ]
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_primary_departures
+        }
+      ]
+
+      expected_secondary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_secondary_departures
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [{:ok, [rds_countdown("s1", "l1", "other1", expected_primary_departures)]}]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now ->
+        [{:ok, [rds_countdown("s3", "l3", "other3", expected_secondary_departures)]}]
+      end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_secondary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "handles bidirectional flag while creating departure sections" do
+      primary_departures = [
+        %Section{bidirectional: true, query: %Query{params: %Query.Params{stop_ids: ["s1"]}}}
+      ]
+
+      expected_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 0}
+          },
+          schedule: nil
+        },
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:30:00Z],
+            departure_time: ~U[2024-10-11 12:32:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other3", pattern_headsign: "h3", direction_id: 1}
+          },
+          schedule: nil
+        }
+      ]
+
+      all_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 0}
+          },
+          schedule: nil
+        },
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 0}
+          },
+          schedule: nil
+        },
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 0}
+          },
+          schedule: nil
+        },
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:30:00Z],
+            departure_time: ~U[2024-10-11 12:32:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other3", pattern_headsign: "h3", direction_id: 1}
+          },
+          schedule: nil
+        }
+      ]
+
+      expected_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [{:ok, [rds_countdown("s1", "l1", "other1", all_departures)]}]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now ->
+        [{:ok, []}]
+      end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_sections, expected_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections with First Departure rows for early morning scheduled departures" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      secondary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s4"]}}}
+      ]
+
+      expected_primary_schedule =
+        %Schedule{
+          arrival_time: ~U[2024-10-11 10:27:00Z],
+          departure_time: ~U[2024-10-11 10:30:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s1"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+
+      expected_secondary_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:15:00Z],
+          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          stop: %Stop{id: "s3"},
+          trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+        }
+
+      expected_primary_departures = [
+        {%Departure{prediction: nil, schedule: expected_primary_schedule}, :first_trip}
+      ]
+
+      expected_secondary_departures = [
+        {%Departure{prediction: nil, schedule: expected_secondary_schedule}, :first_trip}
+      ]
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_primary_departures
+        }
+      ]
+
+      expected_secondary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_secondary_departures
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [{:ok, [first_trip("s1", "l1", "other1", expected_primary_schedule)]}]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now ->
+        [{:ok, [first_trip("s3", "l3", "other3", expected_secondary_schedule)]}]
+      end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_secondary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections with Overnight Departure rows for service ended destinations" do
+      now = ~U[2024-10-11 10:40:00Z]
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}}
+      ]
+
+      expected_first_schedule =
+        %Schedule{
+          arrival_time: ~U[2024-10-11 10:27:00Z],
+          departure_time: ~U[2024-10-11 10:30:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s1"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+
+      expected_last_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:50:00Z],
+          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          stop: %Stop{id: "s3"},
+          trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+        }
+
+      expected_departures = [
+        {%Departure{prediction: nil, schedule: expected_first_schedule}, :first_trip},
+        {%Departure{prediction: nil, schedule: expected_last_schedule}, :last_trip}
+      ]
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, _now ->
+        [
+          {:ok,
+           [
+             service_ended("s1", "l1", "other1", expected_last_schedule),
+             first_trip("s3", "l3", "other3", expected_first_schedule)
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _primary_departures, _now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(
           config,
-          now,
-          fetch_departures_fn,
-          fetch_alerts_fn,
-          fetch_schedules_fn,
-          fetch_routes_fn,
-          fetch_vehicles_fn
+          expected_primary_sections,
+          expected_primary_sections,
+          now
         )
 
-      assert(Enum.all?(expected_departures, &Enum.member?(actual_instances, &1)))
+      actual_instances = Dup.Departures.instances(config, now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates OvernightSection for service ended in a section" do
+      now = ~U[2024-10-11 10:40:00Z]
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}}
+      ]
+
+      expected_first_schedule =
+        %Schedule{
+          arrival_time: ~U[2024-10-11 10:50:00Z],
+          departure_time: ~U[2024-10-11 10:52:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s1"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+
+      expected_last_schedule =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:38:00Z],
+          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          stop: %Stop{id: "s3"},
+          trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+        }
+
+      expected_departures = [
+        {%Departure{
+           prediction: nil,
+           schedule: expected_first_schedule
+         }, :first_trip}
+      ]
+
+      expected_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        },
+        %Screens.V2.WidgetInstance.Departures.OvernightSection{
+          routes: [
+            %Screens.Routes.Route{id: "r3", type: :subway, line: %Screens.Lines.Line{id: "l3"}}
+          ]
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, _now ->
+        [
+          {:ok,
+           [
+             first_trip("s1", "l3", "other3", expected_first_schedule)
+           ]},
+          {:ok,
+           [
+             service_ended("s3", "l1", "other1", expected_last_schedule)
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, _now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(
+          config,
+          expected_sections,
+          expected_sections,
+          now
+        )
+
+      actual_instances = Dup.Departures.instances(config, now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates OvernightDepartures when all modes have service ended" do
+      now = ~U[2024-10-11 10:40:00Z]
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s3"]}}}
+      ]
+
+      expected_last_schedule_one =
+        %Schedule{
+          arrival_time: ~U[2024-10-11 10:38:00Z],
+          departure_time: ~U[2024-10-11 10:39:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s1"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+
+      expected_last_schedule_two =
+        %Schedule{
+          departure_time: ~U[2024-10-11 10:38:00Z],
+          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          stop: %Stop{id: "s3"},
+          trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
+        }
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, _now ->
+        [
+          {:ok,
+           [
+             service_ended("s1", "l1", "other1", expected_last_schedule_one)
+           ]},
+          {:ok,
+           [
+             service_ended("s3", "l3", "other3", expected_last_schedule_two)
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, _now -> [{:ok, []}] end)
+
+      expected_instances = expected_overnight_departures_widget(config)
+
+      actual_instances = Dup.Departures.instances(config, now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates HeadwaySections for destinations with headways" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_route_id = "r1"
+      expected_time_range = {6, 10}
+      expected_headsign = "headsign"
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.HeadwaySection{
+          headsign: expected_headsign,
+          route: expected_route_id,
+          time_range: expected_time_range
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             headways(
+               "s1",
+               "l1",
+               "headsign",
+               expected_route_id,
+               "Northbound",
+               0,
+               expected_time_range
+             ),
+             headways(
+               "s1",
+               "l1",
+               "headsign",
+               expected_route_id,
+               "Northbound",
+               0,
+               expected_time_range
+             )
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _primary_departures, @now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates HeadwaySections for destinations with headways with different headsigns" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_route_id = "r1"
+      expected_time_range = {6, 10}
+      expected_direction_name = "Northbound"
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.HeadwaySection{
+          headsign: expected_direction_name,
+          route: expected_route_id,
+          time_range: expected_time_range
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             headways(
+               "s1",
+               "l1",
+               "headsign",
+               expected_route_id,
+               expected_direction_name,
+               0,
+               expected_time_range
+             ),
+             headways(
+               "s1",
+               "l1",
+               "other_headsign",
+               expected_route_id,
+               expected_direction_name,
+               0,
+               expected_time_range
+             )
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _primary_departures, @now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections for departures and headways" do
+      expected_route_id = "r1"
+      expected_time_range = {6, 10}
+      expected_direction_name = "Northbound"
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_primary_departure =
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 1}
+          },
+          schedule: nil
+        }
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: [
+            expected_primary_departure,
+            %HeadwayRow{
+              id: "Test ID",
+              line: %Line{id: "l1"},
+              direction_id: 0,
+              range: {6, 10},
+              headsign: "other_headsign"
+            }
+          ]
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             rds_countdown("s1", "l1", "other1", [expected_primary_departure]),
+             headways(
+               "s1",
+               "l1",
+               "other_headsign",
+               expected_route_id,
+               expected_direction_name,
+               0,
+               expected_time_range
+             )
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections but removes headways when similar line/direction_id destinations in Countdown state" do
+      expected_route_id = "r1"
+      expected_time_range = {6, 10}
+      expected_direction_name = "Northbound"
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_primary_departure =
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 0}
+          },
+          schedule: nil
+        }
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: [
+            expected_primary_departure
+          ]
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             rds_countdown("s1", "l1", "other1", [expected_primary_departure]),
+             headways(
+               "s1",
+               "l1",
+               "other_headsign",
+               expected_route_id,
+               expected_direction_name,
+               0,
+               expected_time_range
+             )
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
+    test "creates NormalSections but removes headways when similar line/direction_id destinations are in No Service state" do
+      expected_route_id = "r1"
+      expected_time_range = {6, 10}
+      expected_direction_name = "Northbound"
+
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
+      ]
+
+      expected_primary_departure =
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 0}
+          },
+          schedule: nil
+        }
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: [
+            expected_primary_departure
+          ]
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok,
+           [
+             rds_countdown("s1", "l1", "other1", [expected_primary_departure]),
+             no_service("s1", "l2", "some_headsign", [
+               %Screens.Routes.Route{
+                 id: "r1",
+                 short_name: nil,
+                 long_name: nil,
+                 direction_names: nil,
+                 direction_destinations: nil,
+                 type: :bus,
+                 line: %Screens.Lines.Line{
+                   id: "l2",
+                   long_name: nil,
+                   short_name: nil,
+                   sort_order: nil
+                 }
+               }
+             ]),
+             headways(
+               "s1",
+               "l2",
+               "other_headsign",
+               expected_route_id,
+               expected_direction_name,
+               0,
+               expected_time_range
+             )
+           ]}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
     end
   end
 end

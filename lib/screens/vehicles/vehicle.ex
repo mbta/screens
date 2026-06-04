@@ -1,9 +1,7 @@
 defmodule Screens.Vehicles.Vehicle do
   @moduledoc false
 
-  alias Screens.Routes.Route
   alias Screens.Trips.Trip
-  alias Screens.V3Api.Parser
   alias Screens.Vehicles.Carriage
 
   defstruct id: nil,
@@ -36,17 +34,4 @@ defmodule Screens.Vehicles.Vehicle do
           occupancy_status: occupancy_status,
           carriages: list(Carriage.t())
         }
-
-  @type by_route_and_direction :: (Route.id(), Trip.direction() -> [t()])
-
-  @spec by_route_and_direction(Route.id(), Trip.direction()) :: [t()]
-  def by_route_and_direction(route_id, direction_id) do
-    case Screens.V3Api.get_json("vehicles", %{
-           "filter[route]" => route_id,
-           "filter[direction_id]" => direction_id
-         }) do
-      {:ok, result} -> result |> Parser.parse() |> Enum.reject(&is_nil(&1.stop_id))
-      _ -> []
-    end
-  end
 end

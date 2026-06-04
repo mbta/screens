@@ -2,12 +2,20 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   @moduledoc false
 
   alias Screens.V2.CandidateGenerator
-  alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsInstances
-  alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesInstances
+  alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsGenerator
+  alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
 
   @behaviour CandidateGenerator
+
+  @instance_generators [
+    &AlertsGenerator.alert_instances/2,
+    &DeparturesGenerator.instances/2,
+    &Widgets.EmergencyTakeover.emergency_takeover_instances/2,
+    &Widgets.Evergreen.evergreen_content_instances/2,
+    &Widgets.Header.instances/2
+  ]
 
   @impl CandidateGenerator
   def screen_template(_screen) do
@@ -69,26 +77,8 @@ defmodule Screens.V2.CandidateGenerator.Dup do
   end
 
   @impl CandidateGenerator
-  def candidate_instances(
-        config,
-        now \\ DateTime.utc_now(),
-        header_instances_fn \\ &Widgets.Header.instances/2,
-        evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/2,
-        departures_instances_fn \\ &DeparturesInstances.departures_instances/2,
-        alerts_instances_fn \\ &AlertsInstances.alert_instances/2,
-        emergency_takeover_instances_fn \\ &Widgets.EmergencyTakeover.emergency_takeover_instances/2
-      ) do
-    CandidateGenerator.async_stream(
-      [
-        fn -> header_instances_fn.(config, now) end,
-        fn -> alerts_instances_fn.(config, now) end,
-        fn -> departures_instances_fn.(config, now) end,
-        fn -> evergreen_content_instances_fn.(config, now) end,
-        fn -> emergency_takeover_instances_fn.(config, now) end
-      ],
-      & &1.(),
-      timeout: 20_000
-    )
+  def candidate_instances(config, now \\ DateTime.utc_now()) do
+    CandidateGenerator.async_stream(@instance_generators, & &1.(config, now), timeout: 20_000)
   end
 
   @impl CandidateGenerator

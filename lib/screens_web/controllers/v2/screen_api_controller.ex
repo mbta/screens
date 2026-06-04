@@ -4,7 +4,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias Phoenix.View
   alias Screens.V2.{ScreenAudioData, ScreenData}
   alias ScreensConfig.Screen
-  alias ScreensWeb.Plug.{ScreenRequest, VariantCanary}
+  alias ScreensWeb.Plug.ScreenRequest
 
   import Screens.Inject
   @cache injected(Screens.Config.Cache)
@@ -17,7 +17,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
   plug Corsica, [origins: "*"] when action in [:show_dup, :log_frontend_error]
   plug ScreenRequest, [type: :data] when action in @non_pending_show_actions
   plug ScreenRequest, [type: :data, pending?: true] when action in @pending_show_actions
-  plug VariantCanary when action in @non_pending_show_actions
   plug :disabled_response when action in @non_pending_show_actions
   plug :outdated_response when action in @non_pending_show_actions
 
