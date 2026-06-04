@@ -32,6 +32,10 @@ const APP_IDS = new Set(Object.keys(SCREEN_APPS));
 const MAX_SSML_BILLED_CHARS = 3000;
 const MAX_SSML_TOTAL_CHARS = 6000;
 
+const anyVariantsExist = Object.values(SCREEN_APPS).some(
+  ({ variants }) => variants.length > 0,
+);
+
 const buildIframeUrl = (
   screen: ScreenWithId | null,
   isSimulation: boolean,
@@ -235,14 +239,16 @@ const ScreenSelector: ComponentType<{
         Screenplay simulation
       </label>
 
-      <label>
-        <input
-          type="checkbox"
-          checked={isVariantEnabled}
-          onChange={() => setIsVariantEnabled(!isVariantEnabled)}
-        />
-        Enable variant switcher
-      </label>
+      {anyVariantsExist && (
+        <label>
+          <input
+            type="checkbox"
+            checked={isVariantEnabled}
+            onChange={() => setIsVariantEnabled(!isVariantEnabled)}
+          />
+          Enable variant switcher
+        </label>
+      )}
 
       <button onClick={reloadFrame}>🔄 Reload Screen</button>
     </fieldset>

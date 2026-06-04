@@ -7,7 +7,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
-  alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.Util
@@ -503,12 +502,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :departure_row,
       route: serialize_route(departures, route_pill_serializer, screen),
       headsign: serialize_headsign(departures, screen),
-      times_with_crowding: [
-        %{
-          id: departure_id,
-          time: %{type: :overnight}
-        }
-      ],
+      times_with_crowding: [%{id: departure_id, time: %{type: :overnight, is_live: false}}],
       direction_id: serialize_direction_id(departures)
     }
   end
@@ -668,13 +662,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
     # Live Data icon not implemented yet for e-inks, just pass false for now
     %{time: time, time_in_epoch: DateTime.to_unix(departure_time), is_live: false}
   end
-
-  defp serialize_time(
-         %Departure{schedule: %Schedule{arrival_time: nil, departure_time: nil}},
-         _screen,
-         _now
-       ),
-       do: %{time: %{type: :overnight}, is_live: false}
 
   defp serialize_time(%Departure{prediction: prediction} = departure, screen, now) do
     scheduled_time = Departure.scheduled_time(departure)

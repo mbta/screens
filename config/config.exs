@@ -471,16 +471,7 @@ config :screens,
     "Needham Heights" => "Needham Hts",
     "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
     "Houghs Neck via Germantown" => "Houghs Neck via Germntwn"
-  },
-  dup_headway_branch_stations: ["place-kencl", "place-jfk", "place-coecl"],
-  dup_headway_branch_terminals: [
-    "Boston College",
-    "Cleveland Circle",
-    "Riverside",
-    "Heath Street",
-    "Ashmont",
-    "Braintree"
-  ]
+  }
 
 config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,

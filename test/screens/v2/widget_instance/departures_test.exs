@@ -111,44 +111,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       }
     end
 
-    test "returns serialized normal_section for section with row with no scheduled time", %{
-      dup_screen: dup_screen,
-      now: now
-    } do
-      section = %NormalSection{
-        layout: %Layout{},
-        header: %Header{},
-        rows: [
-          %Departure{
-            schedule:
-              struct(Schedule,
-                arrival_time: nil,
-                departure_time: nil,
-                route: route(id: "Orange", type: :subway, name: "Orange Line"),
-                stop: %Stop{id: "70015", name: "Back Bay"},
-                stop_headsign: "Oak Grove"
-              )
-          }
-        ]
-      }
-
-      assert %{
-               rows: [
-                 %{
-                   headsign: %{headsign: "Oak Grove"},
-                   # MD5 hash when the schedule ID is nil. Won't change unless ID does.
-                   id: "1B2M2Y8AsgTpgAmY7PhCfg==",
-                   route: %{color: :orange, text: "OL", type: :text},
-                   times_with_crowding: [%{id: nil, crowding: nil, time: %{type: :overnight}}],
-                   type: :departure_row
-                 }
-               ],
-               type: :normal_section,
-               grouping_type: :time
-             } =
-               Departures.serialize_section(section, dup_screen, now, true)
-    end
-
     test "returns serialized headway_section for one configured section", %{
       dup_screen: dup_screen,
       now: now

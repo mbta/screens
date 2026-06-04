@@ -173,22 +173,6 @@ defmodule Screens.Alerts.Alert do
   end
 
   @doc """
-  Convenience for cases when it's safe to treat an API alert data outage
-  as if there simply aren't any alerts for the given parameters.
-
-  If the query fails for any reason, an empty list is returned.
-
-  Currently used for DUPs
-  """
-  @spec fetch_or_empty_list(keyword()) :: list(t())
-  def fetch_or_empty_list(opts \\ []) do
-    case fetch(opts) do
-      {:ok, alerts} -> alerts
-      :error -> []
-    end
-  end
-
-  @doc """
   Used by V2 e-ink and bus shelter alerts
 
   Fetches:

@@ -73,7 +73,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     defp departures_instances(config, options) do
       Departures.departures_instances(
         config,
-        nil,
+        Keyword.get(options, :now),
         Keyword.merge(
           [
             departure_fetch_fn: fn _, _ -> :error end,
@@ -385,16 +385,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                  route_fetch_fn: route_fetch_fn
                )
     end
-  end
 
-  describe "fetch_section_departures/1" do
     test "filters departures by time when a section has a max_minutes" do
       now = ~U[2024-01-01 12:00:00Z]
 
-      section = %Section{
-        query: %Query{params: %Query.Params{stop_ids: ["S"]}},
-        filters: %Filters{max_minutes: 60}
-      }
+      config =
+        build_config([
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+            filters: %Filters{max_minutes: 60}
+          }
+        ])
 
       included_departures = [
         build_departure("1", 0, nil, DateTime.add(now, 59, :minute)),
@@ -406,23 +407,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
          [build_departure("1", 0, nil, DateTime.add(now, 61, :minute)) | included_departures]}
       end
 
-      assert {:ok, included_departures} ==
-               Departures.fetch_section_departures(section, [], fetch_fn, now)
+      assert [%DeparturesWidget{sections: [%NormalSection{rows: ^included_departures}]}] =
+               departures_instances(config, departure_fetch_fn: fetch_fn, now: now)
     end
 
     test "filters departures with included route-directions" do
-      section = %Section{
-        query: %Query{params: %Query.Params{stop_ids: ["S"]}},
-        filters: %Filters{
-          route_directions: %RouteDirections{
-            action: :include,
-            targets: [
-              %RouteDirection{route_id: "39", direction_id: 0},
-              %RouteDirection{route_id: "41", direction_id: 0}
-            ]
+      config =
+        build_config([
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+            filters: %Filters{
+              route_directions: %RouteDirections{
+                action: :include,
+                targets: [
+                  %RouteDirection{route_id: "39", direction_id: 0},
+                  %RouteDirection{route_id: "41", direction_id: 0}
+                ]
+              }
+            }
           }
-        }
-      }
+        ])
 
       included_departure = build_departure("41", 0)
 
@@ -430,23 +434,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         {:ok, [build_departure("41", 1), included_departure, build_departure("1", 1)]}
       end
 
-      assert {:ok, [included_departure]} ==
-               Departures.fetch_section_departures(section, [], fetch_fn)
+      assert [%DeparturesWidget{sections: [%NormalSection{rows: [^included_departure]}]}] =
+               departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
     test "rejects departures with excluded route-directions" do
-      section = %Section{
-        query: %Query{params: %Query.Params{stop_ids: ["S"]}},
-        filters: %Filters{
-          route_directions: %RouteDirections{
-            action: :exclude,
-            targets: [
-              %RouteDirection{route_id: "39", direction_id: 0},
-              %RouteDirection{route_id: "41", direction_id: 0}
-            ]
+      config =
+        build_config([
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+            filters: %Filters{
+              route_directions: %RouteDirections{
+                action: :exclude,
+                targets: [
+                  %RouteDirection{route_id: "39", direction_id: 0},
+                  %RouteDirection{route_id: "41", direction_id: 0}
+                ]
+              }
+            }
           }
-        }
-      }
+        ])
 
       included_departures = [build_departure("41", 1), build_departure("1", 1)]
 
@@ -454,8 +461,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
         {:ok, [build_departure("41", 0) | included_departures]}
       end
 
-      assert {:ok, included_departures} ==
-               Departures.fetch_section_departures(section, [], fetch_fn)
+      assert [%DeparturesWidget{sections: [%NormalSection{rows: ^included_departures}]}] =
+               departures_instances(config, departure_fetch_fn: fetch_fn)
     end
 
     test "filters departures for sections configured as bidirectional" do
