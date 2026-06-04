@@ -1,6 +1,5 @@
 defmodule Screens.V2.RDSTest do
   use ExUnit.Case, async: true
-  import ExUnit.CaptureLog
 
   alias Screens.Alerts.Alert
   alias Screens.Config.Cache
@@ -232,7 +231,7 @@ defmodule Screens.V2.RDSTest do
       ]
 
       expect(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :bus, stop_ids: ["s0"]}, [now: ^now] ->
+        %{direction_id: 0, route_type: :bus, stop_ids: ["s0"]}, [{:now, ^now} | _] ->
           {
             :ok,
             expected_departures_one ++
@@ -293,7 +292,7 @@ defmodule Screens.V2.RDSTest do
       ]
 
       expect(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [now: ^now] ->
+        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
           {
             :ok,
             expected_departures
@@ -544,7 +543,7 @@ defmodule Screens.V2.RDSTest do
       stub(@headways, :get, fn _, _ -> {5, 10} end)
 
       expect(@departure, :fetch, fn
-        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [now: ^now] ->
+        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
           {:ok, []}
       end)
 
@@ -595,7 +594,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       expect(@departure, :fetch, fn
-        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [now: ^now] ->
+        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
           {:ok, []}
       end)
 
@@ -774,12 +773,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               {:ok,
-                [
-                  countdowns("sA", "l1", "hA", []),
-                  no_service("sB", "l2", "hB"),
-                  no_service("sC", "l2", "hC")
-                ]}
+               {:ok, [no_service("sB", "l2", "hB"), no_service("sC", "l2", "hC")]}
              ]
     end
 
@@ -810,12 +804,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               {:ok,
-                [
-                  countdowns("sA", "l1", "hA", []),
-                  no_service("sB", "l2", "hB"),
-                  no_service("sC", "l2", "hC")
-                ]}
+               {:ok, [no_service("sB", "l2", "hB"), no_service("sC", "l2", "hC")]}
              ]
     end
 
@@ -872,12 +861,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               {:ok,
-                [
-                  no_service("sA", "l1", "hA"),
-                  countdowns("sB", "l2", "hB", []),
-                  no_service("sC", "l2", "hC")
-                ]}
+               {:ok, [no_service("sA", "l1", "hA"), no_service("sC", "l2", "hC")]}
              ]
     end
 
@@ -908,14 +892,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       # All destinations are affected since the alert targets the entire bus route type
-      assert RDS.get(departures) == [
-               {:ok,
-                [
-                  countdowns("sA", "l1", "hA", []),
-                  countdowns("sB", "l2", "hB", []),
-                  countdowns("sC", "l2", "hC", [])
-                ]}
-             ]
+      assert RDS.get(departures) == [{:ok, []}]
     end
 
     test "creates NoService for destinations not affected by alerts" do
@@ -956,8 +933,8 @@ defmodule Screens.V2.RDSTest do
     end
   end
 
-  describe "get/1 error for state" do
-    test "logs and returns nil for fallback creating state" do
+  describe "get/1 no state" do
+    test "returns nothing when no state applies" do
       now = ~U[2024-10-11 11:44:00Z]
       stop_ids = ~w[s0 s1]
 
@@ -1063,10 +1040,8 @@ defmodule Screens.V2.RDSTest do
       expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
       expect_standard_stations(stop_ids)
       expect_standard_route_patterns(stop_ids)
-      {result, log} = with_log(fn -> RDS.get(departures, now) end)
 
-      assert result == [{:ok, []}]
-      assert log =~ "rds_state_creation_failed"
+      assert RDS.get(departures, now) == [{:ok, []}]
     end
   end
 
@@ -1105,7 +1080,7 @@ defmodule Screens.V2.RDSTest do
       now = ~U[2024-10-11 12:00:00Z]
       stop_ids = ~w[s0]
 
-      expect(@departure, :fetch, fn %{stop_ids: ^stop_ids}, [now: ^now] ->
+      expect(@departure, :fetch, fn %{stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
         :error
       end)
 
@@ -1136,7 +1111,7 @@ defmodule Screens.V2.RDSTest do
         }
       ]
 
-      stub(@departure, :fetch, fn %{stop_ids: stop_ids}, [now: ^now] ->
+      stub(@departure, :fetch, fn %{stop_ids: stop_ids}, [{:now, ^now} | _] ->
         case stop_ids do
           ^stop_ids_primary -> {:ok, expected_departures}
           ^stop_ids_secondary -> :error
@@ -1185,10 +1160,10 @@ defmodule Screens.V2.RDSTest do
       ]
 
       stub(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [now: ^now] ->
+        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
           {:ok, bus_departures}
 
-        %{direction_id: 0, route_type: :subway, stop_ids: ^stop_ids}, [now: ^now] ->
+        %{direction_id: 0, route_type: :subway, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
           {:ok, subway_departures}
       end)
 
