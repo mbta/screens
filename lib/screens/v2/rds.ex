@@ -50,7 +50,7 @@ defmodule Screens.V2.RDS do
           :alerts => Alert.result(),
           :child_stops => stop_id_result(),
           :departures => Departure.result(),
-          :scheduled => Schedule.result(),
+          :schedules => Schedule.result(),
           :typical_patterns => RoutePattern.result()
         }
   @type section_t :: {:ok, [t()]} | :error
@@ -108,8 +108,8 @@ defmodule Screens.V2.RDS do
     showing the first scheduled trip of the day for a
     given destination.
     """
-    @type t :: %__MODULE__{first_scheduled_departure: Departure.t()}
-    defstruct ~w[first_scheduled_departure]a
+    @type t :: %__MODULE__{first_schedule: Schedule.t()}
+    defstruct ~w[first_schedule]a
   end
 
   defmodule ServiceEnded do
@@ -117,8 +117,8 @@ defmodule Screens.V2.RDS do
     State for after the end of the last scheduled departure
     or if we observe a departure that is the Last Trip of the Day
     """
-    @type t :: %__MODULE__{last_scheduled_departure: Departure.t()}
-    defstruct ~w[last_scheduled_departure]a
+    @type t :: %__MODULE__{last_schedule: Schedule.t()}
+    defstruct ~w[last_schedule]a
   end
 
   defmodule Headways do
@@ -129,13 +129,12 @@ defmodule Screens.V2.RDS do
     Shows an every “X-Y” minutes message. 
     """
     @type t :: %__MODULE__{
-            departure_id: String.t(),
             route_id: Route.id(),
             direction_name: String.t(),
             direction_id: Trip.direction(),
             range: Headway.range()
           }
-    defstruct ~w[departure_id route_id direction_name direction_id range]a
+    defstruct ~w[route_id direction_name direction_id range]a
   end
 
   @alert injected(Alert)
@@ -171,23 +170,15 @@ defmodule Screens.V2.RDS do
     with %{
            typical_patterns: {:ok, typical_patterns},
            child_stops: {:ok, child_stops},
-           scheduled: {:ok, scheduled},
+           schedules: {:ok, schedules},
            alerts: {:ok, alerts},
            departures: {:ok, departures}
          } <- fetch_data(params, now) do
-      scheduled_departures =
-        Enum.map(scheduled, fn schedule -> %Departure{prediction: nil, schedule: schedule} end)
-
-      case create_routes_for_section(
-             departures,
-             scheduled_departures,
-             typical_patterns,
-             params
-           ) do
+      case create_routes_for_section(departures, schedules, typical_patterns, params) do
         {[_ | _] = enabled_routes_for_section, _} ->
           create_section_rds(
             departures,
-            scheduled_departures,
+            schedules,
             typical_patterns,
             child_stops,
             enabled_routes_for_section,
@@ -213,7 +204,7 @@ defmodule Screens.V2.RDS do
       child_stops: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
         fetch_child_stops(stop_ids)
       end,
-      scheduled: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
+      schedules: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
         @schedule.fetch(%{stop_ids: stop_ids}, Util.service_date(now))
       end,
       alerts: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
@@ -257,7 +248,7 @@ defmodule Screens.V2.RDS do
 
   defp create_section_rds(
          departures,
-         scheduled_departures,
+         schedules,
          typical_patterns,
          child_stops,
          routes_for_section,
@@ -265,7 +256,7 @@ defmodule Screens.V2.RDS do
          now
        ) do
     departures_by_destination = group_by_destination(departures)
-    scheduled_departures_by_destination = group_by_destination(scheduled_departures)
+    schedules_by_destination = group_by_destination(schedules)
 
     destinations =
       (tuples_from_departures(departures, now) ++
@@ -281,7 +272,7 @@ defmodule Screens.V2.RDS do
         create_destination_rds(
           destination,
           departures_by_destination,
-          scheduled_departures_by_destination,
+          schedules_by_destination,
           routes_for_section,
           impacted_destinations,
           now
@@ -293,15 +284,15 @@ defmodule Screens.V2.RDS do
   end
 
   defp create_destination_rds(
-         {%Stop{id: stop_id} = stop, %Line{id: line_id} = line, headsign} = destination,
+         {%Stop{id: stop_id} = stop, line, headsign} = destination,
          departures_by_destination,
-         scheduled_departures_by_destination,
+         schedules_by_destination,
          routes_for_section,
          impacted_destinations,
          now
        ) do
     headway_for_stop = @headways.get(stop_id, now)
-    destination_key = {stop_id, line_id, headsign}
+    destination_key = to_destination_key(destination)
 
     departures =
       Map.get(departures_by_destination, destination_key, [])
@@ -310,8 +301,7 @@ defmodule Screens.V2.RDS do
         _ -> true
       end)
 
-    scheduled_departures =
-      scheduled_departures_by_destination |> Map.get(destination_key, [])
+    schedules = Map.get(schedules_by_destination, destination_key, [])
 
     impacted_by_alert = destination in impacted_destinations
 
@@ -322,7 +312,7 @@ defmodule Screens.V2.RDS do
       state:
         state(
           departures,
-          scheduled_departures,
+          schedules,
           destination_key,
           routes_for_section,
           headway_for_stop,
@@ -336,7 +326,7 @@ defmodule Screens.V2.RDS do
   defp tuples_from_departures(departures, now) do
     departures
     |> Enum.filter(&(DateTime.diff(Departure.time(&1), now, :minute) <= @max_departure_minutes))
-    |> Enum.map(&destination_from_departure(&1))
+    |> Enum.map(&departure_destination(&1))
   end
 
   @spec tuples_from_patterns([RoutePattern.t()], [Stop.id()]) :: [destination()]
@@ -356,7 +346,7 @@ defmodule Screens.V2.RDS do
 
   @spec state(
           [Departure.t()],
-          [Departure.t()],
+          [Schedule.t()],
           destination_key(),
           [Route.t()],
           Headway.range() | nil,
@@ -364,8 +354,8 @@ defmodule Screens.V2.RDS do
           DateTime.t()
         ) :: rds_state()
   defp state(
-         [] = _departures_for_headsign,
-         [] = _scheduled_departures_for_headsign,
+         [] = _departures_for_destination,
+         [] = _schedules_for_destination,
          _destination_key,
          routes_for_section,
          _headway_for_stop,
@@ -376,51 +366,49 @@ defmodule Screens.V2.RDS do
   end
 
   defp state(
-         [] = departures_for_headsign,
-         [_ | _] = scheduled_departures_for_headsign,
+         [] = departures_for_destination,
+         [_ | _] = schedules_for_destination,
          destination_key,
          routes_for_section,
          headway_for_stop,
          impacted_by_alert,
          now
        ) do
-    {first_scheduled_departure, last_scheduled_departure} =
-      scheduled_departures_for_headsign
-      |> Enum.sort_by(&Departure.time(&1), DateTime)
+    {first_schedule, last_schedule} =
+      schedules_for_destination
+      |> Enum.sort_by(&Schedule.time(&1), DateTime)
       |> then(&{List.first(&1), List.last(&1)})
 
     case classify_service_state(
-           first_scheduled_departure,
-           last_scheduled_departure,
+           first_schedule,
+           last_schedule,
            headway_for_stop,
            impacted_by_alert,
            after_last_trip?(destination_key, now),
            now
          ) do
       :before_scheduled_start ->
-        %FirstTrip{first_scheduled_departure: first_scheduled_departure}
+        %FirstTrip{first_schedule: first_schedule}
 
       :after_scheduled_end ->
-        %ServiceEnded{last_scheduled_departure: last_scheduled_departure}
+        %ServiceEnded{last_schedule: last_schedule}
 
       :service_impacted ->
         %Countdowns{
-          departures: departures_for_headsign,
-          direction_id: Departure.direction_id(first_scheduled_departure)
+          departures: departures_for_destination,
+          direction_id: first_schedule.trip.direction_id
         }
 
       :no_service ->
         %NoService{routes: routes_for_section}
 
       :active_period ->
-        route = Departure.route(first_scheduled_departure)
-        direction_id = Departure.direction_id(first_scheduled_departure)
+        %Schedule{route: route, trip: %Trip{direction_id: direction_id}} = first_schedule
 
         %Headways{
-          departure_id: Departure.id(first_scheduled_departure),
           route_id: route.id,
           direction_name: route |> Route.normalized_direction_names() |> Enum.at(direction_id),
-          direction_id: Departure.direction_id(first_scheduled_departure),
+          direction_id: direction_id,
           range: headway_for_stop
         }
 
@@ -429,8 +417,8 @@ defmodule Screens.V2.RDS do
           "rds_state_creation_failed",
           destination_key: destination_key,
           now: now,
-          first_scheduled_departure: first_scheduled_departure.schedule.id,
-          last_scheduled_departure: last_scheduled_departure.schedule.id
+          first_schedule: first_schedule.id,
+          last_schedule: last_schedule.id
         ])
 
         nil
@@ -438,15 +426,15 @@ defmodule Screens.V2.RDS do
   end
 
   defp state(
-         departures_for_headsign,
-         _scheduled_departures_by_headsign,
+         departures_for_destination,
+         _schedules_for_destination,
          _destination_key,
          _routes_for_section,
          _headway_for_stop,
          _impacted_by_alert,
          _now
        ) do
-    %Countdowns{departures: departures_for_headsign}
+    %Countdowns{departures: departures_for_destination}
   end
 
   @spec after_last_trip?(destination_key(), DateTime.t()) :: boolean()
@@ -466,34 +454,41 @@ defmodule Screens.V2.RDS do
     |> after_last_trip_with_buffer?(now)
   end
 
-  @spec group_by_destination([Departure.t()]) :: %{destination_key() => [Departure.t()]}
-  defp group_by_destination(departures) do
-    Enum.group_by(departures, fn departure ->
-      departure
-      |> destination_from_departure()
-      |> then(fn {%Stop{id: stop_id}, %Line{id: line_id}, headsign} ->
-        {stop_id, line_id, headsign}
-      end)
+  @spec group_by_destination([item]) :: %{destination_key() => [item]}
+        when item: Departure.t() | Schedule.t()
+  defp group_by_destination(items) do
+    Enum.group_by(items, fn
+      %Departure{} = d -> d |> departure_destination() |> to_destination_key()
+      %Schedule{} = s -> s |> schedule_destination() |> to_destination_key()
     end)
   end
 
-  @spec destination_from_departure(Departure.t()) :: destination()
-  defp destination_from_departure(departure) do
+  @spec departure_destination(Departure.t()) :: destination()
+  defp departure_destination(%Departure{} = departure) do
     {Departure.stop(departure), Departure.route(departure).line,
      Departure.representative_headsign(departure)}
   end
 
+  defp schedule_destination(%Schedule{route: %Route{line: line}, trip: trip, stop: stop}) do
+    {stop, line, Trip.representative_headsign(trip)}
+  end
+
+  @spec to_destination_key(destination()) :: destination_key()
+  defp to_destination_key({%Stop{id: stop_id}, %Line{id: line_id}, headsign}),
+    do: {stop_id, line_id, headsign}
+
   defp create_routes_for_section(
          departures,
-         scheduled_departures,
+         schedules,
          typical_patterns,
          %Query.Params{route_ids: route_id_params, route_type: route_type} = _params
        ) do
     routes_for_section =
-      (departures ++ scheduled_departures ++ typical_patterns)
+      (departures ++ schedules ++ typical_patterns)
       |> Enum.map(fn
         %Departure{} = departure -> Departure.route(departure)
         %RoutePattern{route: route} -> route
+        %Schedule{route: route} -> route
       end)
       |> Enum.uniq()
       |> filter_for_route_id_params(route_id_params)
@@ -523,70 +518,67 @@ defmodule Screens.V2.RDS do
     do: Enum.reject(all_routes, fn route -> route.type in disabled_modes end)
 
   @spec classify_service_state(
-          Departure.t(),
-          Departure.t(),
+          Schedule.t(),
+          Schedule.t(),
           Headway.range() | nil,
           boolean(),
           boolean(),
           DateTime.t()
         ) :: service_state()
   defp classify_service_state(
-         _first_departure,
-         _last_departure,
+         _first_schedule,
+         _last_schedule,
          _headway_for_stop,
-         true,
+         true = _in_alert,
          _after_last_trip,
          _now
        ),
        do: :service_impacted
 
   defp classify_service_state(
-         _first_departure,
-         _last_departure,
+         _first_schedule,
+         _last_schedule,
          _headway_for_stop,
          _in_alert,
-         true,
+         true = _after_last_trip,
          _now
        ),
        do: :after_scheduled_end
 
   defp classify_service_state(
-         first_departure,
-         last_departure,
+         nil = _first_schedule,
+         nil = _last_schedule,
          _headway_for_stop,
          _in_alert,
          _after_last_trip,
          _now
-       )
-       when first_departure == nil and last_departure == nil,
+       ),
        do: :no_service
 
   defp classify_service_state(
-         first_departure,
-         last_departure,
+         first_schedule,
+         last_schedule,
          headway_for_stop,
          _in_alert,
          _after_last_trip,
          now
        ) do
-    first_departure_time =
-      case headway_for_stop do
-        nil ->
-          Departure.time(first_departure)
+    first_schedule_time = Schedule.time(first_schedule)
+    last_schedule_time = Schedule.time(last_schedule)
 
-        {_low, high} ->
-          first_departure |> Departure.time() |> DateTime.add(-high, :minute)
+    adjusted_first_schedule_time =
+      case headway_for_stop do
+        nil -> first_schedule_time
+        {_low, high} -> DateTime.add(first_schedule_time, -high, :minute)
       end
 
-    last_departure_time = Departure.time(last_departure)
-
     cond do
-      DateTime.compare(now, first_departure_time) == :lt and
-          Util.service_date(now) == Util.service_date(Departure.time(first_departure)) ->
+      DateTime.compare(now, adjusted_first_schedule_time) == :lt and
+          Util.service_date(now) == Util.service_date(first_schedule_time) ->
         :before_scheduled_start
 
-      DateTime.compare(now, last_departure_time) == :gt and
-          Util.service_date(now) == Util.service_date(Departure.time(last_departure)) ->
+      DateTime.compare(now, last_schedule_time) == :gt and
+          Util.service_date(now) == Util.service_date(last_schedule_time) ->
         :after_scheduled_end
 
       headway_for_stop != nil ->
@@ -611,11 +603,13 @@ defmodule Screens.V2.RDS do
 
   defp relevant_alert_effect?(_), do: false
 
-  @spec informed_destinations([destination()], [Alert.t()], [RoutePattern.t()]) :: [destination()]
+  @spec informed_destinations([destination()], [Alert.t()], [RoutePattern.t()]) ::
+          MapSet.t(destination())
   defp informed_destinations(destinations, alerts, typical_patterns) do
     # Filters destinations to return only those that are affected by at least one alert.
     # Stops checking as soon as an alert is found that affects the destination.
-    Enum.filter(destinations, fn {stop, _line, _headsign} = destination ->
+    destinations
+    |> Enum.filter(fn {stop, _line, _headsign} = destination ->
       case pattern_for_destination(destination, typical_patterns) do
         nil ->
           nil
@@ -628,6 +622,7 @@ defmodule Screens.V2.RDS do
           end)
       end
     end)
+    |> MapSet.new()
   end
 
   @spec pattern_for_destination(destination(), [RoutePattern.t()]) :: RoutePattern.t() | nil

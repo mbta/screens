@@ -5,6 +5,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   alias Screens.Lines.Line
   alias Screens.Routes.Route
+  alias Screens.Schedules.Schedule
+  alias Screens.Trips.Trip
 
   alias Screens.V2.Departure
   alias Screens.V2.RDS
@@ -132,12 +134,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         %OvernightSection{
           routes:
             rds_list
-            |> Enum.map(fn %RDS{
-                             state: %ServiceEnded{
-                               last_scheduled_departure: last_scheduled_departure
-                             }
-                           } ->
-              Departure.route(last_scheduled_departure)
+            |> Enum.map(fn %RDS{state: %ServiceEnded{last_schedule: %Schedule{route: route}}} ->
+              route
             end)
             |> Enum.uniq()
         }
@@ -382,14 +380,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       {line, direction_id}
     end)
     |> Enum.flat_map(fn {{line, direction_id}, rds_list} ->
-      %RDS{
-        headsign: headsign,
-        state: %Headways{
-          departure_id: departure_id,
-          direction_name: direction_name,
-          range: range
-        }
-      } = hd(rds_list)
+      %RDS{headsign: headsign, state: %Headways{direction_name: direction_name, range: range}} =
+        hd(rds_list)
 
       # If there are multiple headways with the same line but different headsigns,
       # combine them and use the direction name
@@ -397,7 +389,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
       [
         %HeadwayRow{
-          id: departure_id,
           line: line,
           direction_id: direction_id,
           range: range,
@@ -408,40 +399,25 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   end
 
   @spec departure_rows_from_state(RDS.t()) ::
-          [Departure.t()] | [{Departure.t(), NormalSection.special_trip_type()}]
+          [Departure.t()] | [NormalSection.special_trip()]
   defp departure_rows_from_state(%RDS{state: %Countdowns{departures: departures}}), do: departures
 
-  defp departure_rows_from_state(%RDS{
-         state: %FirstTrip{first_scheduled_departure: first_scheduled_departure}
-       }) do
-    [{first_scheduled_departure, :first_trip}]
+  defp departure_rows_from_state(%RDS{state: %FirstTrip{first_schedule: first_schedule}}) do
+    [{first_schedule, :first_trip}]
   end
 
-  defp departure_rows_from_state(%RDS{
-         state: %ServiceEnded{last_scheduled_departure: last_scheduled_departure}
-       }) do
-    [{last_scheduled_departure, :last_trip}]
+  defp departure_rows_from_state(%RDS{state: %ServiceEnded{last_schedule: last_schedule}}) do
+    [{last_schedule, :service_ended}]
   end
 
   defp departure_rows_from_state(%RDS{state: %NoService{}}), do: []
 
-  @spec departure_time(Departure.t()) :: DateTime.t()
+  @spec departure_time(Departure.t() | NormalSection.special_trip()) :: DateTime.t()
   defp departure_time(%Departure{} = departure), do: Departure.time(departure)
-
-  defp departure_time({first_scheduled_departure, :first_trip}),
-    do: Departure.time(first_scheduled_departure)
-
-  defp departure_time({last_scheduled_departure, :last_trip}),
-    do: Departure.time(last_scheduled_departure)
+  defp departure_time({%Schedule{} = schedule, _type}), do: Schedule.time(schedule)
 
   defp departure_direction_id(%Departure{} = departure), do: Departure.direction_id(departure)
-
-  defp departure_direction_id({first_scheduled_departure, :first_trip}),
-    do: Departure.direction_id(first_scheduled_departure)
-
-  defp departure_direction_id({last_scheduled_departure, :last_trip}),
-    do: Departure.direction_id(last_scheduled_departure)
-
+  defp departure_direction_id({%Schedule{direction_id: direction_id}, _type}), do: direction_id
   defp departure_direction_id(%HeadwayRow{direction_id: direction_id}), do: direction_id
 
   defp extract_line_direction_pairs(%RDS{line: %Line{id: line_id}, state: state}) do
@@ -458,11 +434,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       %Countdowns{departures: [], direction_id: direction_id} ->
         [{line_id, direction_id}]
 
-      %FirstTrip{first_scheduled_departure: departure} ->
-        [{line_id, Departure.direction_id(departure)}]
+      %FirstTrip{first_schedule: %Schedule{trip: %Trip{direction_id: direction_id}}} ->
+        [{line_id, direction_id}]
 
-      %ServiceEnded{last_scheduled_departure: departure} ->
-        [{line_id, Departure.direction_id(departure)}]
+      %ServiceEnded{last_schedule: %Schedule{trip: %Trip{direction_id: direction_id}}} ->
+        [{line_id, direction_id}]
     end
   end
 end

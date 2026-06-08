@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
+  alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.Util
@@ -22,7 +23,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defmodule HeadwayRow do
     @moduledoc "A row that shows headway values in a NormalSection, X every Y - Z minutes"
     @type t :: %__MODULE__{
-            id: String.t(),
             line: Line.t(),
             direction_id: Trip.direction(),
             range: Headways.range(),
@@ -35,11 +35,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defmodule NormalSection do
     @moduledoc "Section which includes a number of independent 'rows' or items."
 
-    @type special_trip_type :: :first_trip | :last_trip
+    @type special_trip :: {Schedule.t(), :first_trip | :service_ended}
 
     @type row ::
             Departure.t()
-            | {Departure.t(), special_trip_type()}
+            | special_trip()
             | HeadwayRow.t()
             | FreeTextLine.t()
 
@@ -400,12 +400,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp row_departure_grouping(%Departure{} = row),
     do: {Departure.route(row), Departure.headsign(row)}
 
-  defp row_departure_grouping({first_scheduled_departure, :first_trip}),
-    do:
-      {Departure.route(first_scheduled_departure), Departure.headsign(first_scheduled_departure)}
-
-  defp row_departure_grouping({last_scheduled_departure, :last_trip}),
-    do: {Departure.route(last_scheduled_departure), Departure.headsign(last_scheduled_departure)}
+  defp row_departure_grouping({%Schedule{route: route} = schedule, _special_trip_type}),
+    do: {route, Schedule.headsign(schedule)}
 
   defp row_departure_grouping(%FreeTextLine{}), do: make_ref()
 
@@ -462,55 +458,31 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_departure_group(
-         [{first_scheduled_departure, :first_trip}],
+         [{%Schedule{id: id} = schedule, special_trip_type}],
          screen,
          now,
          route_pill_serializer
        ) do
-    row_id =
-      first_scheduled_departure
-      |> Departure.id()
-      |> hash_and_encode()
-
-    departures = [first_scheduled_departure]
+    departures = [%Departure{schedule: schedule}]
 
     %{
-      id: row_id,
+      id: hash_and_encode(id),
       type: :departure_row,
       route: serialize_route(departures, route_pill_serializer, screen),
       headsign: serialize_headsign(departures, screen),
-      times_with_crowding: serialize_times_with_crowding(departures, screen, now),
+      times_with_crowding:
+        case special_trip_type do
+          :first_trip -> serialize_times_with_crowding(departures, screen, now)
+          :service_ended -> [%{id: id, time: %{type: :overnight, is_live: false}}]
+        end,
       direction_id: serialize_direction_id(departures),
-      is_first_trip: true
-    }
-  end
-
-  # Overnight Row specifically here instead of showing OvernightSection or OvernightDepartures,
-  # which indicates there are other destinations in the section with upcoming departures.
-  defp serialize_departure_group(
-         [{last_scheduled_departure, :last_trip}],
-         screen,
-         _now,
-         route_pill_serializer
-       ) do
-    departure_id = Departure.id(last_scheduled_departure)
-
-    departures = [last_scheduled_departure]
-
-    %{
-      id: hash_and_encode(departure_id),
-      type: :departure_row,
-      route: serialize_route(departures, route_pill_serializer, screen),
-      headsign: serialize_headsign(departures, screen),
-      times_with_crowding: [%{id: departure_id, time: %{type: :overnight, is_live: false}}],
-      direction_id: serialize_direction_id(departures)
+      is_first_trip: special_trip_type == :first_trip
     }
   end
 
   defp serialize_departure_group(
          [
            %HeadwayRow{
-             id: id,
              line: line,
              direction_id: direction_id,
              range: {lo, hi},
@@ -522,8 +494,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
          _now,
          route_pill_serializer
        ) do
+    id = hash_and_encode(line.id <> headsign)
+
     %{
-      id: hash_and_encode(id),
+      id: id,
       type: :departure_row,
       route: route_pill_serializer.(line, nil, screen),
       headsign: %{headsign: headsign},

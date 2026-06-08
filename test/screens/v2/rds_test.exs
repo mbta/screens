@@ -98,9 +98,7 @@ defmodule Screens.V2.RDSTest do
       stop: %Stop{id: stop_id},
       line: %Line{id: line_id},
       headsign: headsign,
-      state: %RDS.FirstTrip{
-        first_scheduled_departure: %Departure{prediction: nil, schedule: schedule}
-      }
+      state: %RDS.FirstTrip{first_schedule: schedule}
     }
   end
 
@@ -109,9 +107,7 @@ defmodule Screens.V2.RDSTest do
       stop: %Stop{id: stop_id},
       line: %Line{id: line_id},
       headsign: headsign,
-      state: %RDS.ServiceEnded{
-        last_scheduled_departure: %Departure{prediction: nil, schedule: schedule}
-      }
+      state: %RDS.ServiceEnded{last_schedule: schedule}
     }
   end
 
@@ -121,15 +117,13 @@ defmodule Screens.V2.RDSTest do
          headsign,
          route_id,
          direction_name,
-         direction_id,
-         departure_id
+         direction_id
        ) do
     %RDS{
       stop: %Stop{id: stop_id},
       line: %Line{id: line_id},
       headsign: headsign,
       state: %RDS.Headways{
-        departure_id: departure_id,
         route_id: route_id,
         direction_name: direction_name,
         direction_id: direction_id,
@@ -745,9 +739,9 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                {:ok,
                 [
-                  headways("sA", "l1", "hA", "r1", "Northbound", 0, "Test ID 11"),
-                  headways("sB", "l2", "hB", "r2", "Westbound", 1, "Test ID 21"),
-                  headways("sC", "l2", "hC", "r2", "Eastbound", 0, "Test ID 31")
+                  headways("sA", "l1", "hA", "r1", "Northbound", 0),
+                  headways("sB", "l2", "hB", "r2", "Westbound", 1),
+                  headways("sC", "l2", "hC", "r2", "Eastbound", 0)
                 ]}
              ]
     end

@@ -45,5 +45,13 @@ defmodule Screens.Schedules.Schedule do
     end
   end
 
+  @spec headsign(t()) :: String.t()
+  def headsign(%__MODULE__{stop_headsign: headsign}) when not is_nil(headsign), do: headsign
+  def headsign(%__MODULE__{trip: %Trip{headsign: headsign}}), do: headsign
+
+  @spec time(t()) :: DateTime.t() | nil
+  def time(%__MODULE__{arrival_time: arrival, departure_time: departure}),
+    do: arrival || departure
+
   defp current_service_date(now \\ DateTime.utc_now()), do: Util.service_date(now)
 end
