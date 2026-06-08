@@ -42,6 +42,10 @@ defmodule Screens.Predictions.Prediction do
   def stop_for_vehicle(%__MODULE__{vehicle: %Vehicle{stop_id: stop_id}}), do: stop_id
   def stop_for_vehicle(_), do: nil
 
+  @spec time(t()) :: DateTime.t() | nil
+  def time(%__MODULE__{arrival_time: arrival, departure_time: departure}),
+    do: arrival || departure
+
   def vehicle_status(%__MODULE__{vehicle: %Vehicle{current_status: current_status}}),
     do: current_status
 

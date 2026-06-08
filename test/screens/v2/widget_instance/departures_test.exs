@@ -345,7 +345,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           line: %Line{id: "line-Green"},
           direction_id: 0,
           range: {20, 30},
-          headsign: %{headsign: "Westbound"}
+          headsign: "Westbound"
         }
       ]
 
@@ -361,31 +361,24 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                rows: [
                  %{headsign: %{headsign: "Medford/Tufts"}},
                  %{
-                   headsign: %{headsign: %{headsign: "Westbound"}},
+                   headsign: %{headsign: "Westbound"},
                    direction_id: 0,
                    route: %{type: :text, text: "GL", color: :green},
-                   times_with_crowding: [
-                     %{id: "Test ID", time: %{type: :status, pages: ["every 20-30m"]}}
-                   ]
+                   times_with_crowding: [%{time: %{type: :status, pages: ["every 20-30m"]}}]
                  }
                ]
              } =
                Departures.serialize_section(section, dup_screen, now, false)
     end
 
-    test "serializes normal section with first trip row", %{
-      dup_screen: dup_screen,
-      now: now
-    } do
+    test "serializes normal section with first trip row", %{dup_screen: dup_screen, now: now} do
       rows = [
-        {%Departure{
-           schedule: %Schedule{
-             id: "one",
-             departure_time: ~U[2020-01-01T00:01:10Z],
-             route: route(id: "Green-E", type: :subway),
-             trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
-             stop: %Stop{}
-           }
+        {%Schedule{
+           id: "one",
+           departure_time: ~U[2020-01-01T00:01:10Z],
+           route: route(id: "Green-E", type: :subway),
+           trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+           stop: %Stop{}
          }, :first_trip}
       ]
 
@@ -415,20 +408,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_section(section, dup_screen, now, false)
     end
 
-    test "serializes normal section with last trip row", %{
-      dup_screen: dup_screen,
-      now: now
-    } do
+    test "serializes normal section with service ended row", %{dup_screen: dup_screen, now: now} do
       rows = [
-        {%Departure{
-           schedule: %Schedule{
-             id: "one",
-             departure_time: ~U[2020-01-01T00:01:10Z],
-             route: route(id: "Green-E", type: :subway),
-             trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
-             stop: %Stop{}
-           }
-         }, :last_trip}
+        {%Schedule{
+           id: "one",
+           departure_time: ~U[2020-01-01T00:01:10Z],
+           route: route(id: "Green-E", type: :subway),
+           trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+           stop: %Stop{}
+         }, :service_ended}
       ]
 
       section = %NormalSection{

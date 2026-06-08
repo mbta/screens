@@ -64,31 +64,21 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     }
   end
 
-  defp first_trip(stop_id, line_id, headsign, first_scheduled) do
+  defp first_trip(stop_id, line_id, headsign, first_schedule) do
     %RDS{
       stop: %Stop{id: stop_id},
       line: %Line{id: line_id},
       headsign: headsign,
-      state: %RDS.FirstTrip{
-        first_scheduled_departure: %Departure{
-          prediction: nil,
-          schedule: first_scheduled
-        }
-      }
+      state: %RDS.FirstTrip{first_schedule: first_schedule}
     }
   end
 
-  defp service_ended(stop_id, line_id, headsign, last_scheduled) do
+  defp service_ended(stop_id, line_id, headsign, last_schedule) do
     %RDS{
       stop: %Stop{id: stop_id},
       line: %Line{id: line_id},
       headsign: headsign,
-      state: %RDS.ServiceEnded{
-        last_scheduled_departure: %Departure{
-          prediction: nil,
-          schedule: last_scheduled
-        }
-      }
+      state: %RDS.ServiceEnded{last_schedule: last_schedule}
     }
   end
 
@@ -98,7 +88,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       line: %Line{id: line_id},
       headsign: headsign,
       state: %RDS.Headways{
-        departure_id: "Test ID",
         route_id: route_id,
         direction_name: direction_name,
         direction_id: direction_id,
@@ -687,13 +676,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
         }
 
-      expected_primary_departures = [
-        {%Departure{prediction: nil, schedule: expected_primary_schedule}, :first_trip}
-      ]
-
-      expected_secondary_departures = [
-        {%Departure{prediction: nil, schedule: expected_secondary_schedule}, :first_trip}
-      ]
+      expected_primary_departures = [{expected_primary_schedule, :first_trip}]
+      expected_secondary_departures = [{expected_secondary_schedule, :first_trip}]
 
       expected_primary_sections = [
         %Screens.V2.WidgetInstance.Departures.NormalSection{
@@ -780,8 +764,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         }
 
       expected_departures = [
-        {%Departure{prediction: nil, schedule: expected_first_schedule}, :first_trip},
-        {%Departure{prediction: nil, schedule: expected_last_schedule}, :last_trip}
+        {expected_first_schedule, :first_trip},
+        {expected_last_schedule, :service_ended}
       ]
 
       expected_primary_sections = [
@@ -857,12 +841,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
         }
 
-      expected_departures = [
-        {%Departure{
-           prediction: nil,
-           schedule: expected_first_schedule
-         }, :first_trip}
-      ]
+      expected_departures = [{expected_first_schedule, :first_trip}]
 
       expected_sections = [
         %Screens.V2.WidgetInstance.Departures.NormalSection{
@@ -1127,7 +1106,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           rows: [
             expected_primary_departure,
             %HeadwayRow{
-              id: "Test ID",
               line: %Line{id: "l1"},
               direction_id: 0,
               range: {6, 10},
