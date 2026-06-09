@@ -96,6 +96,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
             all_platforms_names_at_informed_station =
               get_platform_names_at_informed_station(alert)
 
+            location =
+              LocalizedAlert.location(
+                %{alert: alert, location_context: location_context},
+                is_terminal_station
+              )
+
             %ReconstructedAlert{
               screen: config,
               alert: alert,
@@ -106,6 +112,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
               informed_station_names: get_station_names(alert),
               is_terminal_station: is_terminal_station,
               is_priority: is_priority,
+              is_urgent: urgent?(alert, location, all_platforms_names_at_informed_station),
               partial_closure_platform_names: all_platforms_names_at_informed_station
             }
           end)
@@ -285,4 +292,29 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
     end)
   end
+
+  @spec urgent?(Alert.t(), LocalizedAlert.location(), list(String.t())) :: boolean()
+  defp urgent?(%Alert{severity: severity}, _location, _partial_closure_platform_names)
+       when severity <= 1,
+       do: false
+
+  defp urgent?(
+         %Alert{effect: effect, severity: severity},
+         location,
+         _partial_closure_platform_names
+       )
+       when location in @inside_locations and effect == :delay do
+    severity >= 7
+  end
+
+  defp urgent?(%Alert{effect: effect}, location, _partial_closure_platform_names)
+       when location in @inside_locations and effect in ~w[shuttle suspension]a do
+    true
+  end
+
+  defp urgent?(%Alert{effect: :station_closure}, location, partial_closure_platform_names)
+       when partial_closure_platform_names != [],
+       do: location == :inside
+
+  defp urgent?(_, _, _), do: false
 end

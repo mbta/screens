@@ -34,6 +34,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
             informed_station_names: [],
             is_terminal_station: false,
             is_priority: false,
+            is_urgent: false,
             partial_closure_platform_names: []
 
   @type stop_id :: String.t()
@@ -49,6 +50,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           informed_station_names: list(String.t()),
           is_terminal_station: boolean(),
           is_priority: boolean(),
+          is_urgent: boolean(),
           partial_closure_platform_names: list(String.t())
         }
 
@@ -952,7 +954,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp flex_zone_fields(%__MODULE__{alert: %Alert{severity: sev}} = t, location) when sev <= 1 do
     %__MODULE__{
       alert: %Alert{cause: cause, informed_entities: informed_entities},
-      location_context: %LocationContext{home_stop: home_stop}
+      location_context: %LocationContext{home_stop: home_stop},
+      is_urgent: is_urgent
     } = t
 
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
@@ -963,7 +966,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> format_endpoint_string()
 
     if length(affected_routes) > 1 or is_nil(location_text) do
-      flex_zone_fallback_fields(t, location, false)
+      flex_zone_fallback_fields(t, location)
     else
       %{
         issue: format_cause(cause, true),
@@ -972,7 +975,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: location_text,
         routes: get_route_pills(t),
         effect: :information,
-        urgent: false,
+        urgent: is_urgent,
         region: get_region_from_location(location)
       }
     end
@@ -981,11 +984,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp flex_zone_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
        when location in ~w[inside boundary_upstream boundary_downstream]a and
               effect in ~w[delay shuttle suspension]a do
-    %__MODULE__{alert: %Alert{severity: severity} = alert} = t
+    %__MODULE__{alert: %Alert{} = alert, is_urgent: is_urgent} = t
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
 
     if length(affected_routes) > 1 do
-      flex_zone_fallback_fields(t, location, effect != :delay or severity >= 7)
+      flex_zone_fallback_fields(t, location)
     else
       destination = get_destination(t, location)
 
@@ -1016,7 +1019,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: cause_description(alert),
         routes: get_route_pills(t),
         effect: effect,
-        urgent: effect != :delay or severity >= 7,
+        urgent: is_urgent,
         region: get_region_from_location(location)
       }
     end
@@ -1026,7 +1029,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        when location in ~w[upstream downstream]a and effect in ~w[delay shuttle suspension]a do
     %__MODULE__{
       alert: %Alert{informed_entities: informed_entities} = alert,
-      location_context: %LocationContext{home_stop: home_stop}
+      location_context: %LocationContext{home_stop: home_stop},
+      is_urgent: is_urgent
     } = t
 
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
@@ -1037,7 +1041,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> format_endpoint_string()
 
     if is_nil(location_text) or length(affected_routes) > 1 do
-      flex_zone_fallback_fields(t, location, false)
+      flex_zone_fallback_fields(t, location)
     else
       issue =
         case effect do
@@ -1068,7 +1072,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: cause_description(alert),
         routes: get_route_pills(t),
         effect: effect,
-        urgent: false,
+        urgent: is_urgent,
         region: get_region_from_location(location)
       }
     end
@@ -1079,7 +1083,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          %__MODULE__{
            alert: %Alert{effect: :station_closure},
            informed_station_names: [informed_station],
-           partial_closure_platform_names: partial_closure_platform_names
+           partial_closure_platform_names: partial_closure_platform_names,
+           is_urgent: is_urgent
          } = t,
          location
        )
@@ -1105,14 +1110,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: nil,
       routes: get_route_pills(t),
       effect: :station_closure,
-      urgent: location == :inside,
+      urgent: is_urgent,
       region: get_region_from_location(location)
     }
   end
 
   # Full closure
   defp flex_zone_fields(%__MODULE__{alert: %Alert{effect: :station_closure}} = t, location) do
-    %__MODULE__{alert: alert, informed_station_names: informed_station_names} = t
+    %__MODULE__{
+      alert: alert,
+      informed_station_names: informed_station_names,
+      is_urgent: is_urgent
+    } = t
 
     informed_stations_string = Util.format_name_list_to_string(informed_station_names)
 
@@ -1123,15 +1132,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_description(alert),
       routes: get_route_pills(t),
       effect: :station_closure,
-      urgent: false,
+      urgent: is_urgent,
       region: get_region_from_location(location)
     }
   end
 
   defp flex_zone_fallback_fields(
-         %__MODULE__{alert: %Alert{effect: effect, header: header}} = t,
-         location,
-         is_urgent
+         %__MODULE__{alert: %Alert{effect: effect, header: header}, is_urgent: is_urgent} = t,
+         location
        ) do
     %{
       issue: header,
@@ -1379,9 +1387,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   def page_groups(%__MODULE__{} = t) do
-    case placement(t) do
-      :single_screen -> [:alerts]
-      _ -> []
+    case {placement(t), t.is_urgent} do
+      {:single_screen, _} -> [:alerts]
+      {:flex_zone, true} -> [:alerts]
+      {_, _} -> []
     end
   end
 

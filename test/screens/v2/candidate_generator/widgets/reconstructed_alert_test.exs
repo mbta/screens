@@ -182,6 +182,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         malden_center_parent: malden_center_parent,
         oak_grove_nb: oak_grove_nb,
         oak_grove_sb: oak_grove_sb,
+        oak_grove_parent: oak_grove_parent,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
         fetch_directional_alerts_fn: fn _ -> {:ok, directional_alerts} end,
         fetch_stop_name_fn: fetch_stop_name_fn,
@@ -271,6 +272,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
+            is_urgent: true,
             informed_station_names: ["Oak Grove"],
             partial_closure_platform_names: ["Southbound"]
           },
@@ -288,6 +290,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
+            is_urgent: false,
             informed_station_names: ["Malden Center"],
             partial_closure_platform_names: ["Southbound"]
           },
@@ -303,6 +306,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
+            is_urgent: false,
             informed_station_names: []
           },
           expected_common_data
@@ -374,6 +378,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
+            is_urgent: false,
             informed_station_names: ["Malden Center"],
             partial_closure_platform_names: []
           },
@@ -391,6 +396,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
+            is_urgent: false,
             informed_station_names: []
           },
           expected_common_data
@@ -404,7 +410,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: ["Assembly"],
-            partial_closure_platform_names: []
+            partial_closure_platform_names: [],
+            is_priority: false,
+            is_urgent: false
           },
           expected_common_data
         )
@@ -462,6 +470,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
+            is_urgent: false,
             informed_station_names: []
           },
           expected_common_data
@@ -574,6 +583,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             },
             informed_station_names: ["Oak Grove"],
             is_priority: true,
+            is_urgent: true,
             partial_closure_platform_names: ["Southbound"]
           },
           expected_common_data
@@ -591,7 +601,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: ["Malden Center"],
-            partial_closure_platform_names: []
+            partial_closure_platform_names: [],
+            is_urgent: false
           },
           expected_common_data
         ),
@@ -613,7 +624,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_priority: false
+            is_priority: false,
+            is_urgent: false
           },
           expected_common_data
         )
@@ -660,7 +672,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_station_names: []
+            informed_station_names: [],
+            is_priority: false,
+            is_urgent: false
           },
           expected_common_data
         ),
@@ -673,7 +687,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_station_names: []
+            informed_station_names: [],
+            is_priority: false,
+            is_urgent: false
           },
           expected_common_data
         )
@@ -743,8 +759,195 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
+            is_urgent: false,
             informed_station_names: ["Malden Center"],
             partial_closure_platform_names: ["Southbound"]
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn
+               )
+    end
+
+    test "low severity alerts do not create urgent widget instances", context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        happening_now_active_period: happening_now_active_period,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn,
+        oak_grove_parent: oak_grove_parent
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          severity: 1,
+          effect: :shuttle,
+          informed_entities: [
+            ie(stop: oak_grove_parent)
+          ],
+          active_period: happening_now_active_period
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        is_terminal_station: true,
+        home_station_name: "Oak Grove"
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              severity: 1,
+              effect: :shuttle,
+              informed_entities: [
+                ie(stop: oak_grove_parent)
+              ],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_priority: true,
+            is_urgent: false
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn
+               )
+    end
+
+    test "delays with a high severity create urgent widget instances", context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        happening_now_active_period: happening_now_active_period,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn,
+        oak_grove_parent: oak_grove_parent
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          severity: 7,
+          effect: :delay,
+          informed_entities: [
+            ie(stop: oak_grove_parent)
+          ],
+          active_period: happening_now_active_period
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        is_terminal_station: true,
+        home_station_name: "Oak Grove"
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              severity: 7,
+              effect: :delay,
+              informed_entities: [
+                ie(stop: oak_grove_parent)
+              ],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_priority: true,
+            is_urgent: true
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn
+               )
+    end
+
+    test "suspensions create urgent widget instances", context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        happening_now_active_period: happening_now_active_period,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn,
+        oak_grove_parent: oak_grove_parent
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          severity: 7,
+          effect: :suspension,
+          informed_entities: [
+            ie(stop: oak_grove_parent)
+          ],
+          active_period: happening_now_active_period
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        is_terminal_station: true,
+        home_station_name: "Oak Grove"
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              severity: 7,
+              effect: :suspension,
+              informed_entities: [
+                ie(stop: oak_grove_parent)
+              ],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_priority: true,
+            is_urgent: true
           },
           expected_common_data
         )
