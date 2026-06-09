@@ -4,8 +4,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
-  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.SubwayStatus
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.RedLine
@@ -251,13 +251,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
     child_platforms_at_informed_stations =
       alert
       |> Alert.informed_parent_stations()
-      |> Enum.flat_map(
-        &case &1.stop.child_stops do
-          nil -> []
-          child_stops -> child_stops
-        end
-      )
-      |> Stop.filter_subway_platforms()
+      |> InformedEntity.boarding_platforms_from_entities()
 
     case Alert.station_closure_type(alert, child_platforms_at_informed_stations) do
       # Logic for partial_station_closure will remove any alerts that apply to more than
