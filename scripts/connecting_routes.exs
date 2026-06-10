@@ -35,16 +35,9 @@ route_patterns = [
 ]
 
 defmodule RouteConnections do
-  # Routes that we want to omit from the list of connections to show to riders
+  # Routes that we want to omit from the list of connections to show to riders (eg SLW & combined routes)
   # See the Notion for On-Train Screen Rating Update for details
-  @excluded_routes %{
-    "place-sstat": ["746"],
-    "place-alfcl": ["627"],
-    "place-forhl": ["4050"],
-    "place-haecl": ["8993"],
-    "place-sull": ["8993"],
-    "place-balsq": ["8993"]
-  }
+  @excluded_routes ["746", "8993"]
 
   def calculate(route_pattern_id, service_date) do
     req_options = [headers: [{"x-api-key", System.get_env("API_V3_KEY")}]]
@@ -157,16 +150,11 @@ defmodule RouteConnections do
 
     routes_by_station
     |> Enum.map(fn {station_id, routes} ->
-      filtered_routes = exclude_routes_by_station(station_id, routes)
-      IO.puts("\t#{station_id}: [#{Enum.join(filtered_routes, ", ")}]")
+      filtered_route_string = routes |> Enum.reject(&(&1 in @excluded_routes)) |> Enum.join(", ")
+      IO.puts("\t#{station_id}: [#{filtered_route_string}]")
     end)
 
     IO.puts("]")
-  end
-
-  def exclude_routes_by_station(station_id, routes) do
-    excluded_routes_for_station = Map.get(@excluded_routes, station_id, [])
-    Enum.reject(routes, &(&1 in excluded_routes_for_station))
   end
 end
 
