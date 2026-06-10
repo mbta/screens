@@ -76,4 +76,16 @@ defmodule Screens.Alerts.InformedEntity do
     end)
     |> Enum.filter(fn ie -> not is_nil(ie.stop) end)
   end
+
+  @spec boarding_platforms_from_entities([t()]) :: [Stop.t()]
+  def boarding_platforms_from_entities(informed_parent_stations) do
+    informed_parent_stations
+    |> Enum.flat_map(
+      &case &1.stop.child_stops do
+        nil -> []
+        child_stops -> child_stops
+      end
+    )
+    |> Stop.filter_subway_platforms()
+  end
 end

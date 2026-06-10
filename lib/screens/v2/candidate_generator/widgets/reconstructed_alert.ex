@@ -163,10 +163,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     # Given informed entities representing an alert at a single station,
     # finds the corresponding platform names for those child stops included.
     with [informed_parent_station] <- Alert.informed_parent_stations(alert),
-         [_ | _] = child_platforms <- informed_parent_station.stop.child_stops,
+         [_ | _] = child_platforms <-
+           InformedEntity.boarding_platforms_from_entities([informed_parent_station]),
          :partial_closure <- Alert.station_closure_type(alert, child_platforms) do
       platform_ids =
-        child_platforms |> Stop.filter_subway_platforms() |> Enum.map(& &1.id) |> MapSet.new()
+        child_platforms |> Enum.map(& &1.id) |> MapSet.new()
 
       informed_entities
       |> Enum.filter(&(&1.stop.id in platform_ids))
