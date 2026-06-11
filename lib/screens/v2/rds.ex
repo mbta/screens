@@ -193,8 +193,8 @@ defmodule Screens.V2.RDS do
       child_stops: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
         fetch_child_stops(stop_ids)
       end,
-      schedules: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
-        @schedule.fetch(%{stop_ids: stop_ids}, Util.service_date(now))
+      schedules: fn params, _now ->
+        @schedule.fetch(Map.from_struct(params), Util.service_date(now))
       end,
       alerts: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
         fetch_relevant_alerts(stop_ids)
