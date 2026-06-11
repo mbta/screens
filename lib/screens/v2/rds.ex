@@ -207,7 +207,7 @@ defmodule Screens.V2.RDS do
     ]
 
     data_fetch_fns
-    |> Task.async_stream(fn {key, func} -> {key, func.(params, now)} end, timeout: 30_000)
+    |> Task.async_stream(fn {key, func} -> {key, func.(params, now)} end, timeout: 15_000)
     |> Enum.reduce_while(%{}, fn
       {:ok, {key, {:ok, data}}}, results -> {:cont, Map.put(results, key, data)}
       {:ok, {_key, _error}}, _results -> {:halt, :error}

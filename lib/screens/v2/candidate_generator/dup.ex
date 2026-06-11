@@ -78,7 +78,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   @impl CandidateGenerator
   def candidate_instances(config, now \\ DateTime.utc_now()) do
-    CandidateGenerator.async_stream(@instance_generators, & &1.(config, now), timeout: 20_000)
+    CandidateGenerator.async_stream(@instance_generators, & &1.(config, now), timeout: 15_000)
   end
 
   @impl CandidateGenerator
