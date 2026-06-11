@@ -141,11 +141,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
   # client is handled manually.
   defp outdated_response(%{params: %{"last_refresh" => "packaged"}} = conn, _), do: conn
 
-  # Value used in previous releases of the packaged client. Treat as an extra sentinel value for
-  # now, and remove once clients are updated to use `packaged`.
-  defp outdated_response(%{params: %{"last_refresh" => "2020-09-25T17:23:00Z"}} = conn, _),
-    do: conn
-
   defp outdated_response(
          %{
            assigns: %{screen: %Screen{refresh_if_loaded_before: refresh_if_loaded_before}},
