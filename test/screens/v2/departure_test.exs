@@ -505,7 +505,7 @@ defmodule Screens.V2.DepartureTest do
       opts = build_opts(schedule_route_type_filter: [:rail, :ferry])
 
       assert Departure.fetch_schedules(params, opts) ==
-               {:test, %{route_type: [:rail, :ferry], stop_ids: ["place-sstat"]}}
+               {:test, %{route_type: [:ferry, :rail], stop_ids: ["place-sstat"]}}
     end
 
     test "fetches with the intersection of params route_type and opts route_type" do
@@ -529,9 +529,8 @@ defmodule Screens.V2.DepartureTest do
       assert Departure.fetch_schedules(params, opts) == {:ok, []}
     end
 
-    test "defaults to all route types when route_type is not in params or opts" do
-      assert Departure.fetch_schedules(%{}, build_opts()) ==
-               {:test, %{route_type: [:light_rail, :subway, :rail, :bus, :ferry]}}
+    test "defaults to no route type filter when route_type is not in params or opts" do
+      assert Departure.fetch_schedules(%{}, build_opts()) == {:test, %{}}
     end
   end
 end

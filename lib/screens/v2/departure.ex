@@ -63,15 +63,22 @@ defmodule Screens.V2.Departure do
     # Default to include all route_types, unless params or options include ones to filter on. If
     # route_types to filter on are configured in params AND options, we only include route_types
     # that are set in both.
-    all_types = RouteType.all()
-    opt_route_types = Keyword.get(opts, :schedule_route_type_filter, all_types)
-    param_route_types = List.wrap(params[:route_type] || all_types)
+    all_types = RouteType.all() |> Enum.sort()
+    param_types = (params[:route_type] || all_types) |> List.wrap() |> MapSet.new()
+    option_types = Keyword.get(opts, :schedule_route_type_filter, all_types) |> MapSet.new()
 
-    # An empty list here, which we'd intend as "no route types", would encode as an empty string
-    # in the fetch params, which means "no route type *filter*" a.k.a. all route types. Fetching
-    # schedules for "no route types" is just not fetching any schedules at all, so we can skip it.
-    case Enum.filter(opt_route_types, &(&1 in param_route_types)) do
+    final_types =
+      param_types |> MapSet.intersection(option_types) |> MapSet.to_list() |> Enum.sort()
+
+    case final_types do
+      # An empty list here, which we'd intend as "no route types", would encode as an empty string
+      # in the fetch params, which means "no route type *filter*" a.k.a. all route types. Fetching
+      # schedules for "no route types" is just not fetching any schedules, so we can skip it.
       [] -> {:ok, []}
+      # By similar logic, filtering on every route type is the same as not filtering at all, so
+      # normalize this to not include the filter.
+      ^all_types -> params |> Map.delete(:route_type) |> fetch_fn.()
+      # We have a final route type filter that is neither "everything" nor "nothing".
       route_types -> params |> Map.put(:route_type, route_types) |> fetch_fn.()
     end
   end
