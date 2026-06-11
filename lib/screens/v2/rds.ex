@@ -17,6 +17,7 @@ defmodule Screens.V2.RDS do
   alias Screens.Headways, as: Headway
   alias Screens.LastTrip.LastTrip
   alias Screens.Lines.Line
+  alias Screens.Report
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.RouteType
@@ -169,6 +170,7 @@ defmodule Screens.V2.RDS do
           {:ok, []}
 
         _ ->
+          Report.warning("rds_no_section_routes", params: inspect(params))
           :error
       end
     end
