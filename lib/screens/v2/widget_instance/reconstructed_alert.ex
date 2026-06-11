@@ -1402,7 +1402,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     case {placement(t), urgent?(t, location)} do
       {:single_screen, _} -> [:alerts]
-      {:flex_zone, true} -> [:alerts]
+      {:flex_zone, true} -> [:urgent_alerts]
       {_, _} -> []
     end
   end
