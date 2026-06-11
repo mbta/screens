@@ -41,14 +41,6 @@ defmodule Screens.V2.RDS do
   @type section_t :: {:ok, [t()]} | :error
   @type destination_key :: {Stop.id(), Line.id(), String.t()}
 
-  @typep stop_id_result :: {:ok, [Stop.id()]} | :error
-  @typep data_results :: %{
-           :alerts => Alert.result(),
-           :child_stops => stop_id_result(),
-           :departures => Departure.result(),
-           :schedules => Schedule.result(),
-           :typical_patterns => RoutePattern.result()
-         }
   @typep destination :: {Stop.t(), Line.t(), String.t()}
   @typep scheduled_service_state :: :after | :before | :none | :within
 
@@ -155,11 +147,11 @@ defmodule Screens.V2.RDS do
        )
        when stop_ids != [] do
     with %{
-           typical_patterns: {:ok, typical_patterns},
-           child_stops: {:ok, child_stops},
-           schedules: {:ok, schedules},
-           alerts: {:ok, alerts},
-           departures: {:ok, departures}
+           alerts: alerts,
+           child_stops: child_stops,
+           departures: departures,
+           schedules: schedules,
+           typical_patterns: typical_patterns
          } <- fetch_data(params, now) do
       case create_routes_for_section(departures, schedules, typical_patterns, params) do
         {[_ | _] = enabled_routes_for_section, _} ->
@@ -182,7 +174,15 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  @spec fetch_data(Query.Params.t(), DateTime.t()) :: data_results()
+  @spec fetch_data(Query.Params.t(), DateTime.t()) ::
+          %{
+            :alerts => [Alert.t()],
+            :child_stops => [Stop.t()],
+            :departures => [Departure.t()],
+            :schedules => [Schedule.t()],
+            :typical_patterns => [RoutePattern.t()]
+          }
+          | :error
   defp fetch_data(params, now) do
     data_fetch_fns = [
       typical_patterns: fn params, _now ->
@@ -206,22 +206,18 @@ defmodule Screens.V2.RDS do
 
     data_fetch_fns
     |> Task.async_stream(fn {key, func} -> {key, func.(params, now)} end, timeout: 30_000)
-    |> Enum.into(%{}, fn {:ok, {key, value}} -> {key, value} end)
-    |> then(fn results ->
-      if Enum.all?(results, fn {_key, value} -> match?({:ok, _}, value) end) do
-        results
-      else
-        :error
-      end
+    |> Enum.reduce_while(%{}, fn
+      {:ok, {key, {:ok, data}}}, results -> {:cont, Map.put(results, key, data)}
+      {:ok, {_key, _error}}, _results -> {:halt, :error}
     end)
   end
 
-  @spec fetch_child_stops([Stop.id()]) :: stop_id_result()
+  @spec fetch_child_stops([Stop.id()]) :: {:ok, [Stop.t()]} | :error
   defp fetch_child_stops(stop_ids) do
     with {:ok, stops} <- @stop.fetch(%{ids: stop_ids}, _include_related? = true) do
       stops_by_id = Map.new(stops, fn %Stop{id: id} = stop -> {id, stop} end)
 
-      child_stop_ids =
+      child_stops =
         stop_ids
         |> Enum.map(&stops_by_id[&1])
         |> Enum.flat_map(fn
@@ -231,7 +227,7 @@ defmodule Screens.V2.RDS do
           nil -> []
         end)
 
-      {:ok, child_stop_ids}
+      {:ok, child_stops}
     end
   end
 
