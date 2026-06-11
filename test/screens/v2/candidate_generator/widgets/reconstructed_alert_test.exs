@@ -272,7 +272,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            is_urgent: true,
             informed_station_names: ["Oak Grove"],
             partial_closure_platform_names: ["Southbound"]
           },
@@ -290,7 +289,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
-            is_urgent: false,
             informed_station_names: ["Malden Center"],
             partial_closure_platform_names: ["Southbound"]
           },
@@ -306,7 +304,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
-            is_urgent: false,
             informed_station_names: []
           },
           expected_common_data
@@ -378,7 +375,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            is_urgent: false,
             informed_station_names: ["Malden Center"],
             partial_closure_platform_names: []
           },
@@ -396,7 +392,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            is_urgent: false,
             informed_station_names: []
           },
           expected_common_data
@@ -411,8 +406,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             },
             informed_station_names: ["Assembly"],
             partial_closure_platform_names: [],
-            is_priority: false,
-            is_urgent: false
+            is_priority: false
           },
           expected_common_data
         )
@@ -470,7 +464,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: true,
-            is_urgent: false,
             informed_station_names: []
           },
           expected_common_data
@@ -583,7 +576,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             },
             informed_station_names: ["Oak Grove"],
             is_priority: true,
-            is_urgent: true,
             partial_closure_platform_names: ["Southbound"]
           },
           expected_common_data
@@ -601,8 +593,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: ["Malden Center"],
-            partial_closure_platform_names: [],
-            is_urgent: false
+            partial_closure_platform_names: []
           },
           expected_common_data
         ),
@@ -624,8 +615,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_priority: false,
-            is_urgent: false
+            is_priority: false
           },
           expected_common_data
         )
@@ -673,8 +663,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: [],
-            is_priority: false,
-            is_urgent: false
+            is_priority: false
           },
           expected_common_data
         ),
@@ -688,8 +677,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: [],
-            is_priority: false,
-            is_urgent: false
+            is_priority: false
           },
           expected_common_data
         )
@@ -759,7 +747,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             is_priority: false,
-            is_urgent: false,
             informed_station_names: ["Malden Center"],
             partial_closure_platform_names: ["Southbound"]
           },
@@ -822,8 +809,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_priority: true,
-            is_urgent: false
+            is_priority: true
           },
           expected_common_data
         )
@@ -884,8 +870,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_priority: true,
-            is_urgent: true
+            is_priority: true
           },
           expected_common_data
         )
@@ -946,8 +931,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            is_priority: true,
-            is_urgent: true
+            is_priority: true
           },
           expected_common_data
         )

@@ -154,10 +154,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     %{widget | is_priority: is_priority}
   end
 
-  defp put_is_urgent(widget, is_urgent) do
-    %{widget | is_urgent: is_urgent}
-  end
-
   defp put_partial_closure_platform_names(widget, partial_closure_platform_names) do
     %{widget | partial_closure_platform_names: partial_closure_platform_names}
   end
@@ -1724,7 +1720,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
-        |> put_is_urgent(false)
 
       expected = %{
         issue: "Trains may be delayed up to 20 minutes",
@@ -1750,7 +1745,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
-        |> put_is_urgent(true)
 
       expected = %{
         issue: "Trains may be delayed over 60 minutes",
@@ -1777,7 +1771,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_urgent(true)
 
       expected = %{
         issue: "No Alewife trains",
@@ -1834,7 +1827,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_urgent(true)
 
       expected = %{
         issue: "No Alewife trains",
@@ -1860,7 +1852,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
-        |> put_is_urgent(true)
 
       expected = %{
         issue: "No Alewife trains",
@@ -1913,7 +1904,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
-        |> put_is_urgent(true)
 
       expected = %{
         issue: "Alewife trains may be delayed over 60 minutes",
@@ -1940,7 +1930,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         ])
         |> put_cause(:construction)
         |> put_severity(10)
-        |> put_is_urgent(true)
 
       expected = %{
         issue: "Alewife trains may be delayed over 60 minutes",
