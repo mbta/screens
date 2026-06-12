@@ -27,6 +27,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias ScreensConfig.Screen.PreFare
 
   @inside_locations ~w[inside boundary_upstream boundary_downstream]a
+  @service_eliminating_effects ~w[shuttle station_closure suspension]a
 
   defstruct screen: nil,
             alert: nil,
@@ -1408,33 +1409,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   @spec urgent?(t(), LocalizedAlert.location()) :: boolean()
-  defp urgent?(%__MODULE__{alert: %Alert{severity: severity}}, _location)
-       when severity <= 1,
-       do: false
-
-  defp urgent?(
-         %__MODULE__{alert: %Alert{effect: effect, severity: severity}},
-         location
-       )
-       when location in @inside_locations and effect == :delay do
-    severity >= 7
+  defp urgent?(%__MODULE__{alert: %Alert{effect: effect, severity: severity}}, location) do
+    eliminates_service? = effect in @service_eliminating_effects
+    severity > 1 and location in @inside_locations and (eliminates_service? or severity >= 7)
   end
-
-  defp urgent?(%__MODULE__{alert: %Alert{effect: effect}}, location)
-       when location in @inside_locations and effect in ~w[shuttle suspension]a do
-    true
-  end
-
-  defp urgent?(
-         %__MODULE__{
-           alert: %Alert{effect: :station_closure},
-           partial_closure_platform_names: partial_closure_platform_names
-         },
-         location
-       ),
-       do: location == :inside
-
-  defp urgent?(_, _), do: false
 
   def widget_type(%__MODULE__{} = t) do
     case placement(t) do

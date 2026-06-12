@@ -3494,7 +3494,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert [:alerts] == ReconstructedAlert.page_groups(widget)
     end
 
-    test "returns :urgent_alerts for an urgent flex-zone placement", %{widget: widget} do
+    test "returns :urgent_alerts for an alert that eliminates service", %{widget: widget} do
       widget =
         widget
         |> put_home_stop(PreFare, "place-asmnl")
@@ -3502,12 +3502,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           ie(route: "Red", route_type: 1, stop_id: "place-asmnl")
         ])
         |> put_effect(:suspension)
-        |> put_severity(8)
 
       assert [:urgent_alerts] == ReconstructedAlert.page_groups(widget)
     end
 
-    test "returns no page_groups for a non-urgent flex-zone placement", %{widget: widget} do
+    test "returns :urgent_alerts for a high severity alert", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-asmnl")
+        |> put_informed_entities([
+          ie(route: "Red", route_type: 1, stop_id: "place-asmnl")
+        ])
+        |> put_effect(:delay)
+        |> put_severity(7)
+
+      assert [:urgent_alerts] == ReconstructedAlert.page_groups(widget)
+    end
+
+    test "returns no page_groups for a non-urgent alert", %{widget: widget} do
       assert [] == ReconstructedAlert.page_groups(widget)
     end
   end
