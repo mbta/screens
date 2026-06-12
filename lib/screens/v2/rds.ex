@@ -325,9 +325,7 @@ defmodule Screens.V2.RDS do
       |> then(&{List.first(&1), List.last(&1)})
 
     presented_departures =
-      if not is_nil(headways) or impacted_by_alert?,
-        do: Enum.reject(departures, &is_nil(&1.prediction)),
-        else: departures
+      Enum.filter(departures, &presented_departure?(&1, not is_nil(headways), impacted_by_alert?))
 
     service_state =
       scheduled_service_state(first_schedule, last_schedule, headways, last_trip_departed?, now)
@@ -340,6 +338,14 @@ defmodule Screens.V2.RDS do
       service_state == :after -> %ServiceEnded{last_schedule: last_schedule}
       not is_nil(headways) -> headways_state(headways, first_schedule)
       true -> nil
+    end
+  end
+
+  defp presented_departure?(%Departure{prediction: prediction} = departure, headways?, alert?) do
+    cond do
+      is_nil(prediction) -> not headways? and not alert?
+      Departure.cancelled?(departure) -> not headways?
+      true -> true
     end
   end
 
