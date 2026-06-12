@@ -333,10 +333,10 @@ defmodule Screens.V2.RDS do
     cond do
       presented_departures != [] -> %Countdowns{departures: presented_departures}
       impacted_by_alert? -> nil
-      service_state == :none -> %NoService{routes: routes_for_section}
+      departures == [] and service_state == :none -> %NoService{routes: routes_for_section}
+      departures == [] and service_state == :after -> %ServiceEnded{last_schedule: last_schedule}
       service_state == :before -> %FirstTrip{first_schedule: first_schedule}
-      service_state == :after -> %ServiceEnded{last_schedule: last_schedule}
-      not is_nil(headways) -> headways_state(headways, first_schedule)
+      not (is_nil(headways) or is_nil(first_schedule)) -> headways_state(headways, first_schedule)
       true -> nil
     end
   end
