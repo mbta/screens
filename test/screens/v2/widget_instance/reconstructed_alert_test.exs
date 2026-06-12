@@ -3519,7 +3519,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       assert [:urgent_alerts] == ReconstructedAlert.page_groups(widget)
     end
 
-    test "returns no page_groups for a non-urgent alert", %{widget: widget} do
+    test "returns no page_groups for a non-urgent flex zone alert", %{widget: widget} do
       assert [] == ReconstructedAlert.page_groups(widget)
     end
   end
