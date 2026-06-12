@@ -389,6 +389,49 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) ==
                [{:ok, [countdowns("s0", "l1", "h1", expected_departures)]}]
     end
+
+    test "considers cancelled departures in deciding whether to produce no-service states" do
+      now = ~U[2026-01-01 12:00:00Z]
+
+      stub(@headways, :get, fn "s0", ^now -> {5, 10} end)
+
+      skipped_departure = %Departure{
+        prediction: %Prediction{
+          arrival_time: nil,
+          departure_time: nil,
+          schedule_relationship: :skipped,
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s0"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        },
+        schedule: %Schedule{
+          arrival_time: ~U[2026-01-01 12:37:00Z],
+          departure_time: ~U[2026-01-01 12:38:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          stop: %Stop{id: "s0"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+      }
+
+      expect(@departure, :fetch, fn
+        %{direction_id: 0, route_type: :subway, stop_ids: ["s0"]}, [{:now, ^now} | _] ->
+          {:ok, [skipped_departure]}
+      end)
+
+      departures = %Departures{
+        sections: [
+          %Section{
+            query: %Query{
+              params: %Query.Params{direction_id: 0, route_type: :subway, stop_ids: ["s0"]}
+            }
+          }
+        ]
+      }
+
+      # The destination has a cancelled departure which is not presented (due to the stop having
+      # headways); we should not produce "no service today" or "service ended"
+      assert RDS.get(departures, now) == [{:ok, []}]
+    end
   end
 
   describe "get/1 first trip" do
