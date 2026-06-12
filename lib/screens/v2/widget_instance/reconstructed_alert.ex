@@ -1431,8 +1431,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
            partial_closure_platform_names: partial_closure_platform_names
          },
          location
-       )
-       when partial_closure_platform_names != [],
+       ),
        do: location == :inside
 
   defp urgent?(_, _), do: false
