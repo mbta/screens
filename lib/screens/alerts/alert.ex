@@ -506,6 +506,5 @@ defmodule Screens.Alerts.Alert do
 
   defp whole_route_delay?(_), do: false
 
-  @spec is_service_eliminating_effect(effect()) :: boolean()
   defguard is_service_eliminating_effect(effect) when effect in @service_eliminating_effects
 end
