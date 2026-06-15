@@ -1,6 +1,8 @@
 defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
+  import Screens.Alerts.Alert, only: [is_service_eliminating_effect: 1]
+
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
@@ -25,6 +27,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias ScreensConfig.Departures.{Query, Section}
   alias ScreensConfig.Departures.Query.Params
   alias ScreensConfig.Screen.PreFare
+
+  @inside_locations ~w[inside boundary_upstream boundary_downstream]a
 
   defstruct screen: nil,
             alert: nil,
@@ -962,8 +966,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> get_endpoints(hd(affected_routes), home_stop)
       |> format_endpoint_string()
 
+    is_urgent = urgent?(t, location)
+
     if length(affected_routes) > 1 or is_nil(location_text) do
-      flex_zone_fallback_fields(t, location, false)
+      flex_zone_fallback_fields(t, location, is_urgent)
     else
       %{
         issue: format_cause(cause, true),
@@ -972,7 +978,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: location_text,
         routes: get_route_pills(t),
         effect: :information,
-        urgent: false,
+        urgent: is_urgent,
         region: get_region_from_location(location)
       }
     end
@@ -981,11 +987,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp flex_zone_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
        when location in ~w[inside boundary_upstream boundary_downstream]a and
               effect in ~w[delay shuttle suspension]a do
-    %__MODULE__{alert: %Alert{severity: severity} = alert} = t
+    %__MODULE__{alert: %Alert{} = alert} = t
+
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
+    is_urgent = urgent?(t, location)
 
     if length(affected_routes) > 1 do
-      flex_zone_fallback_fields(t, location, effect != :delay or severity >= 7)
+      flex_zone_fallback_fields(t, location, is_urgent)
     else
       destination = get_destination(t, location)
 
@@ -1016,7 +1024,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: cause_description(alert),
         routes: get_route_pills(t),
         effect: effect,
-        urgent: effect != :delay or severity >= 7,
+        urgent: is_urgent,
         region: get_region_from_location(location)
       }
     end
@@ -1036,8 +1044,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> get_endpoints(hd(affected_routes), home_stop)
       |> format_endpoint_string()
 
+    is_urgent = urgent?(t, location)
+
     if is_nil(location_text) or length(affected_routes) > 1 do
-      flex_zone_fallback_fields(t, location, false)
+      flex_zone_fallback_fields(t, location, is_urgent)
     else
       issue =
         case effect do
@@ -1068,7 +1078,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         cause: cause_description(alert),
         routes: get_route_pills(t),
         effect: effect,
-        urgent: false,
+        urgent: is_urgent,
         region: get_region_from_location(location)
       }
     end
@@ -1105,7 +1115,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: nil,
       routes: get_route_pills(t),
       effect: :station_closure,
-      urgent: location == :inside,
+      urgent: urgent?(t, location),
       region: get_region_from_location(location)
     }
   end
@@ -1115,6 +1125,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     %__MODULE__{alert: alert, informed_station_names: informed_station_names} = t
 
     informed_stations_string = Util.format_name_list_to_string(informed_station_names)
+    is_urgent = urgent?(t, location)
 
     %{
       issue: "Trains will skip #{informed_stations_string}",
@@ -1123,7 +1134,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: cause_description(alert),
       routes: get_route_pills(t),
       effect: :station_closure,
-      urgent: false,
+      urgent: is_urgent,
       region: get_region_from_location(location)
     }
   end
@@ -1378,11 +1389,30 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  def page_groups(%__MODULE__{} = t) do
-    case placement(t) do
-      :single_screen -> [:alerts]
-      _ -> []
+  def page_groups(
+        %__MODULE__{
+          alert: %Alert{} = alert,
+          location_context: %LocationContext{} = location_context,
+          is_terminal_station: is_terminal_station
+        } = t
+      ) do
+    location =
+      LocalizedAlert.location(
+        %{alert: alert, location_context: location_context},
+        is_terminal_station
+      )
+
+    case {placement(t), urgent?(t, location)} do
+      {:single_screen, _} -> [:alerts]
+      {:flex_zone, true} -> [:urgent_alerts]
+      {_, _} -> []
     end
+  end
+
+  @spec urgent?(t(), LocalizedAlert.location()) :: boolean()
+  defp urgent?(%__MODULE__{alert: %Alert{effect: effect, severity: severity}}, location) do
+    severity > 1 and location in @inside_locations and
+      (is_service_eliminating_effect(effect) or severity >= 7)
   end
 
   def widget_type(%__MODULE__{} = t) do

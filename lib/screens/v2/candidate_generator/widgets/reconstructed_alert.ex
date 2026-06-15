@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   @moduledoc false
 
+  import Screens.Alerts.Alert, only: [is_service_eliminating_effect: 1]
+
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
@@ -117,7 +119,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   end
 
   @inside_locations ~w[inside boundary_upstream boundary_downstream]a
-  @service_eliminating_effects ~w[shuttle station_closure suspension]a
 
   # Filter out `elsewhere` alerts (should never happen).
   defp relevance(_alert, :elsewhere, _distance), do: nil
@@ -125,14 +126,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # "Immediate disruptions": Service is eliminated in at least one direction at the home stop.
   # Riders may need to take immediate action to continue their trip.
   defp relevance(%Alert{effect: effect}, location, _distance)
-       when effect in @service_eliminating_effects and location in @inside_locations,
+       when is_service_eliminating_effect(effect) and location in @inside_locations,
        do: {0, nil}
 
   # "Downstream disruptions": Service is eliminated starting somewhere downstream of the home
   # stop. Riders may need to take action later to continue their trip. Split into sub-categories
   # based on how close to the home stop the disruption begins (only the closest get "priority").
   defp relevance(%Alert{effect: effect}, _location, distance)
-       when effect in @service_eliminating_effects,
+       when is_service_eliminating_effect(effect),
        do: {1, distance}
 
   # Severe delays are also considered "downstream disruptions".

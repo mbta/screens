@@ -182,6 +182,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         malden_center_parent: malden_center_parent,
         oak_grove_nb: oak_grove_nb,
         oak_grove_sb: oak_grove_sb,
+        oak_grove_parent: oak_grove_parent,
         fetch_alerts_fn: fn _ -> {:ok, alerts} end,
         fetch_directional_alerts_fn: fn _ -> {:ok, directional_alerts} end,
         fetch_stop_name_fn: fetch_stop_name_fn,
@@ -404,7 +405,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
             informed_station_names: ["Assembly"],
-            partial_closure_platform_names: []
+            partial_closure_platform_names: [],
+            is_priority: false
           },
           expected_common_data
         )
@@ -660,7 +662,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               ],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_station_names: []
+            informed_station_names: [],
+            is_priority: false
           },
           expected_common_data
         ),
@@ -673,7 +676,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
               informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
               active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
             },
-            informed_station_names: []
+            informed_station_names: [],
+            is_priority: false
           },
           expected_common_data
         )

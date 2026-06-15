@@ -150,6 +150,10 @@ defmodule Screens.Alerts.Alert do
   @base_includes ~w[facilities stops.child_stops]
   @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops stops]
 
+  @service_eliminating_effects ~w[shuttle station_closure suspension]a
+
+  defguard is_service_eliminating_effect(effect) when effect in @service_eliminating_effects
+
   @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     includes =

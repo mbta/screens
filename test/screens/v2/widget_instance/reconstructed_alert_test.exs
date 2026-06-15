@@ -3485,4 +3485,42 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
                ReconstructedAlert.serialize(widget)
     end
   end
+
+  describe "page_groups/1" do
+    test "returns :alerts for a :single_screen placement", %{widget: widget} do
+      # priority alerts are given a :single_screen placement
+      widget = put_is_priority(widget, true)
+
+      assert [:alerts] == ReconstructedAlert.page_groups(widget)
+    end
+
+    test "returns :urgent_alerts for an alert that eliminates service", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-asmnl")
+        |> put_informed_entities([
+          ie(route: "Red", route_type: 1, stop_id: "place-asmnl")
+        ])
+        |> put_effect(:suspension)
+
+      assert [:urgent_alerts] == ReconstructedAlert.page_groups(widget)
+    end
+
+    test "returns :urgent_alerts for a high severity alert", %{widget: widget} do
+      widget =
+        widget
+        |> put_home_stop(PreFare, "place-asmnl")
+        |> put_informed_entities([
+          ie(route: "Red", route_type: 1, stop_id: "place-asmnl")
+        ])
+        |> put_effect(:delay)
+        |> put_severity(7)
+
+      assert [:urgent_alerts] == ReconstructedAlert.page_groups(widget)
+    end
+
+    test "returns no page_groups for a non-urgent flex zone alert", %{widget: widget} do
+      assert [] == ReconstructedAlert.page_groups(widget)
+    end
+  end
 end
