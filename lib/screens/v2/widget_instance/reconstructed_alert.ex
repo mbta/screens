@@ -1,6 +1,8 @@
 defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
+  import Screens.Alerts.Alert, only: [is_service_eliminating_effect: 1]
+
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
@@ -27,7 +29,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias ScreensConfig.Screen.PreFare
 
   @inside_locations ~w[inside boundary_upstream boundary_downstream]a
-  @service_eliminating_effects ~w[shuttle station_closure suspension]a
 
   defstruct screen: nil,
             alert: nil,
@@ -1410,8 +1411,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @spec urgent?(t(), LocalizedAlert.location()) :: boolean()
   defp urgent?(%__MODULE__{alert: %Alert{effect: effect, severity: severity}}, location) do
-    eliminates_service? = effect in @service_eliminating_effects
-    severity > 1 and location in @inside_locations and (eliminates_service? or severity >= 7)
+    severity > 1 and location in @inside_locations and
+      (is_service_eliminating_effect(effect) or severity >= 7)
   end
 
   def widget_type(%__MODULE__{} = t) do
