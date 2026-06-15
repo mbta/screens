@@ -152,6 +152,8 @@ defmodule Screens.Alerts.Alert do
 
   @service_eliminating_effects ~w[shuttle station_closure suspension]a
 
+  defguard is_service_eliminating_effect(effect) when effect in @service_eliminating_effects
+
   @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     includes =
@@ -505,6 +507,4 @@ defmodule Screens.Alerts.Alert do
   end
 
   defp whole_route_delay?(_), do: false
-
-  defguard is_service_eliminating_effect(effect) when effect in @service_eliminating_effects
 end
