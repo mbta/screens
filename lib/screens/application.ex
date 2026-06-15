@@ -12,7 +12,7 @@ defmodule Screens.Application do
         {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
         {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
         {Finch,
-         name: Screens.V3Api.Finch, pools: %{default: [size: 100, start_pool_metrics?: true]}},
+         name: Screens.V3Api.Finch, pools: %{default: [size: 200, start_pool_metrics?: true]}},
         Screens.V3Api.Cache.Realtime,
         Screens.V3Api.Cache.Static,
         Screens.LastTrip.Cache,
