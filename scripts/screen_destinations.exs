@@ -2,7 +2,11 @@
 # Uses the local.json file to find each relevant screen's departure query params,
 # then makes API calls to find the unique headsigns for those queries,
 
+# This runs based on your local Screens configuration file at local.json, so
+#  make sure to run the `sync_s3_env.sh` script first to test with production screens.
+
 # Example usage:
+# Remember to sync your local.json with production if you want to see production screens and their destinations!
 # To run with no special filters and output to the default file:
 #   `elixir scripts/screen_destinations.exs`
 # To narrow the scope to a set of screens and specify an output file:
