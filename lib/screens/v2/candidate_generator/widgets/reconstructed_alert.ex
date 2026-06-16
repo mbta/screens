@@ -123,37 +123,42 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # Filter out `elsewhere` alerts (should never happen).
   defp relevance(_alert, :elsewhere, _distance), do: nil
 
+  # "Immediate eliminated service": Service is completely eliminated at the rider's station.
+  defp relevance(%Alert{effect: effect}, location, _distance)
+       when effect == :station_closure and location in @inside_locations,
+       do: {0, nil}
+
   # "Immediate disruptions": Service is eliminated in at least one direction at the home stop.
   # Riders may need to take immediate action to continue their trip.
   defp relevance(%Alert{effect: effect}, location, _distance)
        when is_service_eliminating_effect(effect) and location in @inside_locations,
-       do: {0, nil}
+       do: {1, nil}
 
   # "Downstream disruptions": Service is eliminated starting somewhere downstream of the home
   # stop. Riders may need to take action later to continue their trip. Split into sub-categories
   # based on how close to the home stop the disruption begins (only the closest get "priority").
   defp relevance(%Alert{effect: effect}, _location, distance)
        when is_service_eliminating_effect(effect),
-       do: {1, distance}
+       do: {2, distance}
 
   # Severe delays are also considered "downstream disruptions".
   defp relevance(%Alert{effect: :delay, severity: severity}, _location, distance)
        when severity >= 7,
-       do: {1, distance}
+       do: {2, distance}
 
   # "Moderate delays": still important enough to present, but less relevant.
   defp relevance(%Alert{effect: :delay, severity: severity}, _location, _distance)
        when severity >= 5,
-       do: {2, nil}
+       do: {3, nil}
 
   # Low-severity (including "informational") delays are only included when the cause is
   # single-tracking. Relevance is higher when inside the single-tracked segment.
   defp relevance(%Alert{effect: :delay, cause: :single_tracking}, location, _distance)
        when location in @inside_locations,
-       do: {2, nil}
+       do: {3, nil}
 
   defp relevance(%Alert{effect: :delay, cause: :single_tracking}, _location, _distance),
-    do: {3, nil}
+    do: {4, nil}
 
   defp relevance(_alert, _location, _distance), do: nil
 
