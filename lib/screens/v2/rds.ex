@@ -139,7 +139,17 @@ defmodule Screens.V2.RDS do
   @callback get(Departures.t()) :: [section_t()]
   @callback get(Departures.t(), DateTime.t()) :: [section_t()]
   def get(%Departures{sections: sections}, now \\ DateTime.utc_now()),
-    do: Enum.map(sections, &from_section(&1, now))
+    do:
+      sections
+      |> Task.async_stream(&from_section(&1, now), timeout: 15_000)
+      |> Enum.map(fn
+        {:ok, result} ->
+          result
+
+        {:exit, reason} ->
+          Report.warning("rds_async_section_error", [reason])
+          :error
+      end)
 
   @spec from_section(Section.t(), DateTime.t()) :: section_t()
   defp from_section(
@@ -147,13 +157,14 @@ defmodule Screens.V2.RDS do
          now
        )
        when stop_ids != [] do
-    with %{
-           alerts: alerts,
-           child_stops: child_stops,
-           departures: departures,
-           schedules: schedules,
-           typical_patterns: typical_patterns
-         } <- fetch_data(params, now) do
+    with params_struct <- Map.from_struct(params),
+         {:ok, typical_patterns} <-
+           params_struct |> Map.put(:typicality, 1) |> @route_pattern.fetch(),
+         {:ok, child_stops} <- fetch_child_stops(stop_ids),
+         {:ok, schedules} <- @schedule.fetch(params_struct, Util.service_date(now)),
+         {:ok, alerts} <- fetch_relevant_alerts(stop_ids),
+         {:ok, departures} <-
+           params_struct |> @departure.fetch(now: now, include_scheduled_cancelled?: true) do
       case create_routes_for_section(departures, schedules, typical_patterns, params) do
         {[_ | _] = enabled_routes_for_section, _} ->
           create_section_rds(
@@ -174,44 +185,6 @@ defmodule Screens.V2.RDS do
           :error
       end
     end
-  end
-
-  @spec fetch_data(Query.Params.t(), DateTime.t()) ::
-          %{
-            :alerts => [Alert.t()],
-            :child_stops => [Stop.t()],
-            :departures => [Departure.t()],
-            :schedules => [Schedule.t()],
-            :typical_patterns => [RoutePattern.t()]
-          }
-          | :error
-  defp fetch_data(params, now) do
-    data_fetch_fns = [
-      typical_patterns: fn params, _now ->
-        params |> Map.from_struct() |> Map.put(:typicality, 1) |> @route_pattern.fetch()
-      end,
-      child_stops: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
-        fetch_child_stops(stop_ids)
-      end,
-      schedules: fn params, _now ->
-        @schedule.fetch(Map.from_struct(params), Util.service_date(now))
-      end,
-      alerts: fn %Query.Params{stop_ids: stop_ids} = _params, _now ->
-        fetch_relevant_alerts(stop_ids)
-      end,
-      departures: fn params, _now ->
-        params
-        |> Map.from_struct()
-        |> @departure.fetch(now: now, include_scheduled_cancelled?: true)
-      end
-    ]
-
-    data_fetch_fns
-    |> Task.async_stream(fn {key, func} -> {key, func.(params, now)} end, timeout: 15_000)
-    |> Enum.reduce_while(%{}, fn
-      {:ok, {key, {:ok, data}}}, results -> {:cont, Map.put(results, key, data)}
-      {:ok, {_key, _error}}, _results -> {:halt, :error}
-    end)
   end
 
   @spec fetch_child_stops([Stop.id()]) :: {:ok, [Stop.t()]} | :error
