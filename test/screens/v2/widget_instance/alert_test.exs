@@ -189,8 +189,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
   describe "priority/1" do
     setup @valid_alert_setup_group
 
-    test "returns [1, 2] when slot_names(widget) == [:full_body]", %{widget: widget} do
-      assert [1, 2] == AlertWidget.priority(widget)
+    test "returns [1, 2, ...] when slot_names(widget) == [:full_body]", %{widget: widget} do
+      assert [1, 2] == Enum.take(AlertWidget.priority(widget), 2)
     end
 
     test "returns a list of tiebreaker values when widget should be considered for placement", %{
@@ -213,6 +213,15 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget = put_active_period(widget, active_period)
 
       assert :no_render == AlertWidget.priority(widget)
+    end
+
+    test "can rank priorities among two takeover alert effects", %{
+      widget: widget
+    } do
+      closure_widget = put_effect(widget, :station_closure)
+      shuttle_widget = put_effect(widget, :shuttle)
+
+      assert AlertWidget.priority(closure_widget) < AlertWidget.priority(shuttle_widget)
     end
   end
 

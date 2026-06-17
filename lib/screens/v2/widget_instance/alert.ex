@@ -32,7 +32,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   @automated_override_priority [1, 2]
 
   # Keep these in descending order of priority--highest priority (lowest integer value) first
-  @relevant_effects ~w[shuttle stop_closure suspension station_closure detour stop_moved snow_route elevator_closure]a
+  @relevant_effects ~w[station_closure shuttle stop_closure suspension detour stop_moved snow_route elevator_closure]a
 
   @effect_priorities Enum.with_index(@relevant_effects, 1)
 
@@ -82,7 +82,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
     cond do
       Enum.any?(tiebreakers, &(&1 == :no_render)) -> :no_render
-      takeover_alert?(t) -> @automated_override_priority
+      takeover_alert?(t) -> @automated_override_priority ++ tiebreakers
       true -> tiebreakers
     end
   end
