@@ -41,7 +41,7 @@ defmodule Screens.V2.ScreenData.Parameters do
       refresh_rate: 30
     },
     pre_fare_v2: %Static{
-      audio_active_time: {~T[04:45:00], ~T[01:45:00]},
+      audio_active_time: @all_times,
       candidate_generator: CandidateGenerator.PreFare,
       refresh_rate: 20
     }
