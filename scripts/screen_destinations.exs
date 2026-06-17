@@ -2,8 +2,8 @@
 # Uses the local.json file to find each relevant screen's departure query params,
 # then makes API calls to find the unique headsigns for those queries,
 
-# This runs based on your local Screens configuration file at local.json, so
-#  make sure to run the `sync_s3_env.sh` script first to test with production screens.
+# This script runs against your local Screens configuration file at local.json,
+# so to test with production screens run `scripts/pull_configs.sh prod`.
 
 # Example usage:
 # Remember to sync your local.json with production if you want to see production screens and their destinations!
