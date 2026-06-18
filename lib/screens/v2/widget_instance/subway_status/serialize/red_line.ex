@@ -26,25 +26,44 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.RedLine do
   end
 
   defp serialize_mattapan_only(grouped_alerts) do
-    # Serialzes row(s) for the Mattapan branch
-    mattapan_alerts = Map.get(grouped_alerts, "Mattapan", [])
+    grouped_alerts
+    |> Map.get("Mattapan", [])
+    |> serialize_mattapan_only_station_closures()
+  end
 
-    if length(mattapan_alerts) < 3 do
+  defp serialize_mattapan_only_station_closures([
+         %{alert: %{effect: :station_closure}} = alert1,
+         %{alert: %{effect: :station_closure}} = alert2
+       ]) do
+    alert1
+    |> Serialize.consolidate_ies_under_one_subway_alert(alert2)
+    |> serialize_rl_branch_alert()
+    |> then(fn combined_alert ->
       %{
         type: :contracted,
-        alerts: Enum.map(mattapan_alerts, &serialize_rl_branch_alert/1)
+        alerts: [combined_alert]
       }
-    else
-      %{
-        type: :contracted,
-        alerts: [
-          Serialize.serialize_alert_summary(
-            length(mattapan_alerts),
-            RoutePill.serialize_rl_mattapan_pill()
-          )
-        ]
-      }
-    end
+    end)
+  end
+
+  defp serialize_mattapan_only_station_closures(mattapan_alerts)
+       when is_list(mattapan_alerts) and length(mattapan_alerts) < 3 do
+    %{
+      type: :contracted,
+      alerts: Enum.map(mattapan_alerts, &serialize_rl_branch_alert/1)
+    }
+  end
+
+  defp serialize_mattapan_only_station_closures(mattapan_alerts) do
+    %{
+      type: :contracted,
+      alerts: [
+        Serialize.serialize_alert_summary(
+          length(mattapan_alerts),
+          RoutePill.serialize_rl_mattapan_pill()
+        )
+      ]
+    }
   end
 
   defp serialize_red_and_mattapan(red_alerts, mattapan_alerts) do

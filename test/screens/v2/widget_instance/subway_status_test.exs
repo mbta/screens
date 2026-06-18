@@ -182,6 +182,149 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       assert expected == WidgetInstance.serialize(instance)
     end
 
+    test "consolidates two station closure alerts with one stop each as '2 Stops Skipped'" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Blue", stop_id: "place-aport")
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Blue", stop_id: "place-aqucl")
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{
+              location: %{full: "Airport and Aquarium", abbrev: "Airport and Aquarium"},
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              station_count: 2,
+              status: "2 Stops Skipped"
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "consolidates two station closure alerts with the same stops as 'Stop Skipped'" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Blue", stop_id: "place-aqucl")
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Blue", stop_id: "place-aqucl")
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | blue: %{
+            type: :extended,
+            alert: %{
+              location: %{full: "Aquarium", abbrev: "Aquarium"},
+              route_pill: %{type: :text, text: "BL", color: :blue},
+              station_count: 1,
+              status: "Stop Skipped"
+            }
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "consolidates two station closure alerts with same GL Branch as '2 Stops Skipped'" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Green-C", stop_id: "place-hwsst")
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Green-C", stop_id: "place-kntst")
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            alert: %{
+              status: "2 Stops Skipped",
+              location: %{full: "Hawes Street and Kent Street", abbrev: "Hawes St and Kent St"},
+              route_pill: %{type: :text, text: "GL", color: :green, branches: [:c]},
+              station_count: 2
+            },
+            type: :extended
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "consolidates two station closure alerts on GL trunk as '2 Stops Skipped'" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Green", stop_id: "place-gover")
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Green", stop_id: "place-pktrm")
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | green: %{
+            alert: %{
+              status: "2 Stops Skipped",
+              location: %{
+                full: "Government Center and Park Street",
+                abbrev: "Gov't Ctr and Park St"
+              },
+              route_pill: %{type: :text, text: "GL", color: :green},
+              station_count: 2
+            },
+            type: :extended
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
     test "handles 2 alerts, 1 non-GL route" do
       instance = %SubwayStatus{
         subway_alerts:
@@ -1025,6 +1168,76 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                 route_pill: %{type: :text, text: "RL", color: :red, branches: [:m]}
               }
             ]
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "consolidates two station closure alerts on RL trunk as '2 Stops Skipped'" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Red", stop_id: "place-portr")
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Red", stop_id: "place-davis")
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | red: %{
+            alert: %{
+              status: "2 Stops Skipped",
+              location: %{full: "Porter and Davis", abbrev: "Porter and Davis"},
+              route_pill: %{type: :text, text: "RL", color: :red},
+              station_count: 2
+            },
+            type: :extended
+          }
+      }
+
+      assert expected == WidgetInstance.serialize(instance)
+    end
+
+    test "consolidates two Mattapan station closure alerts with the same stops as '2 Stops Skipped'" do
+      instance = %SubwayStatus{
+        subway_alerts:
+          subway_alerts([
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Mattapan", stop_id: "place-valrd")
+              ]
+            },
+            %Alert{
+              effect: :station_closure,
+              informed_entities: [
+                ie(route: "Mattapan", stop_id: "place-capst")
+              ]
+            }
+          ])
+      }
+
+      expected = %{
+        @normal_service
+        | red: %{
+            type: :extended,
+            alert: %{
+              status: "2 Stops Skipped",
+              location: %{full: "Valley Road and Capen Street", abbrev: "Valley Rd and Capen St"},
+              route_pill: %{type: :text, text: "RL", color: :red, branches: [:m]},
+              station_count: 2
+            }
           }
       }
 

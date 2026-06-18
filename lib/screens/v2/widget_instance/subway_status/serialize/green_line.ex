@@ -50,6 +50,20 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
             ]
           }
 
+        {[
+           %{alert: %{effect: :station_closure}} = trunk_alert1,
+           %{alert: %{effect: :station_closure}} = trunk_alert2
+         ], []} ->
+          trunk_alert1
+          |> Serialize.consolidate_ies_under_one_subway_alert(trunk_alert2)
+          |> serialize_trunk_alert()
+          |> then(fn combined_alert ->
+            %{
+              type: :contracted,
+              alerts: [combined_alert]
+            }
+          end)
+
         {[trunk_alert1, trunk_alert2], []} ->
           %{
             type: :contracted,
@@ -90,6 +104,24 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
             )
           ]
         }
+
+      [
+        %{alert: %Alert{effect: :station_closure}} = alert1,
+        %{alert: %Alert{effect: :station_closure}} = alert2
+      ] ->
+        alert1
+        |> Serialize.consolidate_ies_under_one_subway_alert(alert2)
+        |> then(fn combined_alert ->
+          %{
+            type: :contracted,
+            alerts: [
+              serialize_gl_branch_alert(
+                combined_alert,
+                Utils.alert_routes(combined_alert)
+              )
+            ]
+          }
+        end)
 
       [alert1, alert2] ->
         %{
