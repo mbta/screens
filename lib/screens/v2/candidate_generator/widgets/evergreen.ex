@@ -19,9 +19,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Evergreen do
       end)
 
     alerts =
-      case @alert.fetch(ids: alert_ids) do
-        {:ok, alerts} -> alerts
-        :error -> []
+      with [_ | _] <- alert_ids, {:ok, alerts} <- @alert.fetch(ids: alert_ids) do
+        alerts
+      else
+        _ -> []
       end
 
     Enum.map(evergreen_content, &evergreen_content_instance(&1, alerts, config, now))
