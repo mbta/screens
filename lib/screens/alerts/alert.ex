@@ -254,8 +254,6 @@ defmodule Screens.Alerts.Alert do
     ]
   end
 
-  defp format_query_param(_), do: []
-
   def happening_now?(%{active_period: aps}, now \\ DateTime.utc_now()) do
     Enum.any?(aps, &in_active_period(&1, now))
   end

@@ -445,7 +445,7 @@ defmodule Screens.V2.RDS do
   @spec fetch_relevant_alerts([Stop.id()]) :: {:ok, [Alert.t()]} | :error
   defp fetch_relevant_alerts(stop_ids) do
     with {:ok, alerts} <-
-           @alert.fetch(activities: [:board], stop_id: stop_ids, include_all?: true) do
+           @alert.fetch(activities: [:board], stop_ids: stop_ids, include_all?: true) do
       {:ok, Enum.filter(alerts, &(Alert.happening_now?(&1) and relevant_alert_effect?(&1)))}
     end
   end
