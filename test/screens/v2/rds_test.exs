@@ -849,7 +849,7 @@ defmodule Screens.V2.RDSTest do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
 
-      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"], include_all?: true] ->
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
         {:ok,
          [
            %Alert{
@@ -880,7 +880,7 @@ defmodule Screens.V2.RDSTest do
       now = ~U[2024-10-11 10:44:00Z]
 
       # Alert affects entire route r1 (no direction_id, no stop)
-      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"], include_all?: true] ->
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
         {:ok,
          [
            %Alert{
@@ -911,7 +911,7 @@ defmodule Screens.V2.RDSTest do
       now = ~U[2024-10-11 10:44:00Z]
 
       # Alert affects route r2 in direction 0 only
-      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"], include_all?: true] ->
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
         {:ok,
          [
            %Alert{
@@ -968,7 +968,7 @@ defmodule Screens.V2.RDSTest do
       now = ~U[2024-10-11 10:44:00Z]
 
       # Alert affects all bus routes (route_type 3)
-      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"], include_all?: true] ->
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
         {:ok,
          [
            %Alert{
@@ -999,7 +999,7 @@ defmodule Screens.V2.RDSTest do
 
       # Alert that affects another route type, another route, and another stop
       # None of the destinations should be affected
-      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"], include_all?: true] ->
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
         {:ok,
          [
            %Alert{
