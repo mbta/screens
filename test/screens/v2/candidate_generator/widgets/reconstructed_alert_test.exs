@@ -480,6 +480,93 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                )
     end
 
+    test "prioritizes station_closure over other disruptions at the same location",
+         context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        happening_now_active_period: happening_now_active_period,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :shuttle,
+          informed_entities: [
+            ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"}),
+            ie(stop: %Stop{id: "place-mlmnl", name: "Malden Center"}),
+            ie(stop: %Stop{id: "place-welln", name: "Wellington"}),
+            ie(stop: %Stop{id: "place-astao", name: "Assembly"})
+          ],
+          active_period: happening_now_active_period
+        },
+        %Alert{
+          id: "2",
+          effect: :station_closure,
+          informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+          active_period: happening_now_active_period
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        is_terminal_station: true,
+        home_station_name: "Oak Grove"
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :station_closure,
+              informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            is_priority: true,
+            informed_station_names: ["Oak Grove"],
+            partial_closure_platform_names: []
+          },
+          expected_common_data
+        ),
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              effect: :shuttle,
+              informed_entities: [
+                ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"}),
+                ie(stop: %Stop{id: "place-mlmnl", name: "Malden Center"}),
+                ie(stop: %Stop{id: "place-welln", name: "Wellington"}),
+                ie(stop: %Stop{id: "place-astao", name: "Assembly"})
+              ],
+              active_period: [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+            },
+            informed_station_names: [],
+            partial_closure_platform_names: [],
+            is_priority: false
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn
+               )
+    end
+
     test "fails when passed config for an unsupported screen type", context do
       %{
         bad_config: bad_config,
