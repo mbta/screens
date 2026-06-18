@@ -156,13 +156,15 @@ defmodule Screens.Alerts.Alert do
 
   @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
+    {options, filters} = Keyword.split(opts, [:include_all?])
+
     includes =
-      if Keyword.get(opts, :include_all?, false),
+      if Keyword.get(options, :include_all?, false),
         do: @all_includes,
         else: @base_includes
 
     params =
-      opts
+      filters
       |> Enum.flat_map(&format_query_param/1)
       |> Map.new()
       |> Map.put("include", Enum.join(includes, ","))
