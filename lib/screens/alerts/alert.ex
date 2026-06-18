@@ -245,12 +245,12 @@ defmodule Screens.Alerts.Alert do
     format_query_param({:route_types, [route_type]})
   end
 
-  defp format_query_param({:activities, :all}), do: [{"activity", "ALL"}]
+  defp format_query_param({:activities, :all}), do: [{"filter[activity]", "ALL"}]
 
   defp format_query_param({:activities, activities}) when is_list(activities) do
     [
       {
-        "activity",
+        "filter[activity]",
         Enum.map_join(activities, ",", fn value -> value |> to_string() |> String.upcase() end)
       }
     ]
