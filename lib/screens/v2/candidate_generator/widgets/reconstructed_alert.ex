@@ -123,13 +123,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   # Filter out `elsewhere` alerts (should never happen).
   defp relevance(_alert, :elsewhere, _distance), do: nil
 
-  # "Immediate eliminated service": Service is completely eliminated at the rider's station.
+  # "Immediate disruptions": Service is eliminated in at least one direction at the home stop.
+  # Riders may need to take immediate action to continue their trip.
+  # Prioritize station_closure over other disrupting effects
   defp relevance(%Alert{effect: effect}, location, _distance)
        when effect == :station_closure and location in @inside_locations,
        do: {0, nil}
 
-  # "Immediate disruptions": Service is eliminated in at least one direction at the home stop.
-  # Riders may need to take immediate action to continue their trip.
   defp relevance(%Alert{effect: effect}, location, _distance)
        when is_service_eliminating_effect(effect) and location in @inside_locations,
        do: {1, nil}
