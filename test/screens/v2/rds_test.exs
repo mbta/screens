@@ -37,7 +37,7 @@ defmodule Screens.V2.RDSTest do
     stub(@headways, :get, fn _, _ -> nil end)
     stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
     stub(@schedule, :fetch, fn _, _ -> {:ok, []} end)
-    stub(@stop, :fetch, fn %{ids: ids}, true -> {:ok, Enum.map(ids, &stop/1)} end)
+    stub(@stop, :fetch, fn %{ids: ids} -> {:ok, Enum.map(ids, &stop/1)} end)
     stub(@config_cache, :disabled_modes, fn -> [] end)
     stub(@last_trip, :last_trip_departure_times, fn _ -> [] end)
     :ok
@@ -162,7 +162,7 @@ defmodule Screens.V2.RDSTest do
   end
 
   defp expect_standard_stations(stop_ids) do
-    expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
+    expect(@stop, :fetch, fn %{ids: ^stop_ids} ->
       {:ok, [station("s0", ~w[sA sB]), station("s1", ~w[sC])]}
     end)
   end
@@ -698,7 +698,7 @@ defmodule Screens.V2.RDSTest do
 
       expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
 
-      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true ->
+      expect(@stop, :fetch, fn %{ids: ^stop_ids} ->
         {:ok, [station("70061", ~w[70061])]}
       end)
 
@@ -1147,7 +1147,7 @@ defmodule Screens.V2.RDSTest do
     test "returns :error when stop fetch fails" do
       stop_ids = ~w[s0 s1]
 
-      expect(@stop, :fetch, fn %{ids: ^stop_ids}, true -> :error end)
+      expect(@stop, :fetch, fn %{ids: ^stop_ids} -> :error end)
 
       departures = %Departures{
         sections: [

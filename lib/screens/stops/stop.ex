@@ -41,27 +41,18 @@ defmodule Screens.Stops.Stop do
           optional(:route_types) => [RouteType.t()]
         }
 
+  @includes ~w[
+    child_stops connecting_stops parent_station.child_stops parent_station.connecting_stops
+  ]
+
   @callback fetch(params()) :: {:ok, [t()]} | :error
   @callback fetch(params(), boolean()) :: {:ok, [t()]} | :error
-  def fetch(params, include_related? \\ false, get_json_fn \\ &V3Api.get_json/2) do
+  def fetch(params, get_json_fn \\ &V3Api.get_json/2) do
     encoded_params =
       params
       |> Enum.flat_map(&encode_param/1)
       |> Map.new()
-      |> then(fn params ->
-        if include_related? do
-          Map.put(
-            params,
-            "include",
-            Enum.join(
-              ~w[child_stops connecting_stops parent_station.child_stops parent_station.connecting_stops],
-              ","
-            )
-          )
-        else
-          params
-        end
-      end)
+      |> Map.put("include", Enum.join(@includes, ","))
 
     case get_json_fn.("stops", encoded_params) do
       {:ok, response} -> {:ok, V3Api.Parser.parse(response)}
