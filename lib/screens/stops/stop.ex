@@ -81,13 +81,6 @@ defmodule Screens.Stops.Stop do
     end
   end
 
-  @spec fetch_subway_platforms_for_stop(id()) :: [t()]
-  def fetch_subway_platforms_for_stop(stop_id) do
-    {:ok, [%__MODULE__{child_stops: child_stops}]} = fetch(%{ids: [stop_id]}, true)
-
-    filter_subway_platforms(child_stops)
-  end
-
   @spec filter_subway_platforms(list(t())) :: list(t())
   def filter_subway_platforms(stops) do
     Enum.filter(stops, fn
