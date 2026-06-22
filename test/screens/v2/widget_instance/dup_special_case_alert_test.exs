@@ -7,6 +7,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   alias Screens.V2.WidgetInstance.DupAlert
   alias Screens.V2.WidgetInstance.DupSpecialCaseAlert
   alias ScreensConfig.{Alerts, Departures, FreeTextLine, Screen}
+  alias ScreensConfig.Header
   alias ScreensConfig.Screen.Dup
 
   import Screens.TestSupport.InformedEntityBuilder
@@ -149,10 +150,6 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
     expect(@alert, :fetch, fn _route_ids -> {:ok, alerts} end)
   end
 
-  defp expect_stop_name do
-    expect(@stop, :fetch_stop_name, fn _ -> "Test" end)
-  end
-
   defp expect_location_context do
     expect(@location_context, :fetch, fn _, stop_id, _ ->
       tagged_stop_sequences = tagged_stop_sequences(stop_id)
@@ -173,7 +170,6 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
   describe "dup alert_instances/6 > serialize/1" do
     setup do
       stub(@alert, :fetch, fn _ -> [] end)
-      expect_stop_name()
       expect_location_context()
 
       config_kenmore =
@@ -182,7 +178,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
             primary_departures: struct(Departures),
             secondary_departures: struct(Departures),
             alerts: %Alerts{stop_id: "place-kencl"},
-            header: %{stop_id: "place-kencl"}
+            header: %Header.StopId{stop_id: "place-kencl"}
           },
           app_id: :dup_v2
         })
@@ -193,7 +189,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
             primary_departures: struct(Departures),
             secondary_departures: struct(Departures),
             alerts: %Alerts{stop_id: "place-wtcst"},
-            header: %{stop_id: "place-wtcst"}
+            header: %Header.StopId{stop_id: "place-wtcst"}
           },
           app_id: :dup_v2
         })
@@ -669,6 +665,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
       alerts = [context.kenmore_inside_alert]
 
       expect_alerts(["Green-B", "Green-C", "Green-D"], alerts)
+      expect(@stop, :fetch_stop_name, fn _ -> "Test" end)
 
       actual_widgets = DupAlerts.alert_instances(context.config_kenmore, context.now)
 
