@@ -11,6 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
   alias ScreensConfig.Alerts, as: AlertsConfig
+  alias ScreensConfig.Header.{StopId, StopName}
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.Dup
 
@@ -21,50 +22,36 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   @stop injected(Stop)
   @location_context injected(LocationContext)
 
-  @doc """
-  Fetches alerts + related data from the API and transforms them to candidate
-  widgets for a DUP screen.
-  """
-  def alert_instances(config, now \\ DateTime.utc_now()) do
+  def alert_instances(screen, now \\ DateTime.utc_now())
+
+  def alert_instances(%Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: nil}}}, _now),
+    do: []
+
+  def alert_instances(
+        %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}}} = screen,
+        now
+      ) do
     # In this function:
     # - Fetch relevant alerts for all SUBWAY/LIGHT RAIL routes serving this stop
     # - Check for special cases. If there is one, just use that. Otherwise:
     # - Select one alert
     # - Create 3 candidate structs from the alert, one for each rotation
-    %Screen{app_params: %Dup{alerts: %AlertsConfig{stop_id: stop_id}, header: header_config}} =
-      config
 
-    if is_nil(stop_id) do
-      []
+    with {:ok, location_context} <- @location_context.fetch(Dup, stop_id, now),
+         route_ids <- LocationContext.route_ids(location_context),
+         {:ok, alerts} <- @alert.fetch(route_ids: route_ids) do
+      alerts
+      |> relevant_alerts(screen, location_context, now)
+      |> alert_special_cases(screen, location_context)
+      |> create_alert_widgets(screen, location_context)
     else
-      stop_name =
-        case header_config do
-          %{stop_id: stop_id} ->
-            case @stop.fetch_stop_name(stop_id) do
-              nil -> []
-              stop_name -> stop_name
-            end
-
-          %{stop_name: stop_name} ->
-            stop_name
-        end
-
-      with {:ok, location_context} <- @location_context.fetch(Dup, stop_id, now),
-           route_ids <- LocationContext.route_ids(location_context),
-           {:ok, alerts} <- @alert.fetch(route_ids: route_ids) do
-        alerts
-        |> relevant_alerts(config, location_context, now)
-        |> alert_special_cases(config, location_context)
-        |> create_alert_widgets(config, location_context, stop_name)
-      else
-        :error -> []
-      end
+      :error -> []
     end
   end
 
-  def relevant_alerts(alerts, config, location_context, now) do
+  def relevant_alerts(alerts, screen, location_context, now) do
     Enum.filter(alerts, fn alert ->
-      relevant_effect?(alert, config) and Alert.happening_now?(alert, now) and
+      relevant_effect?(alert, screen) and Alert.happening_now?(alert, now) and
         relevant_location?(alert, location_context) and
         not directional_shuttle_or_suspension?(alert)
     end)
@@ -87,23 +74,35 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     Enum.min_by(alerts, &{effect_key(&1.effect), -&1.severity, -String.to_integer(&1.id)})
   end
 
-  defp create_alert_widgets({:special, widgets}, _, _, _), do: widgets
+  defp create_alert_widgets({:special, widgets}, _screen, _location_context), do: widgets
 
-  defp create_alert_widgets({:normal, alerts}, config, location_context, stop_name) do
+  defp create_alert_widgets({:normal, alerts}, screen, location_context) do
     alert = choose_alert(alerts)
 
     if is_nil(alert) do
       []
     else
+      stop_name = fetch_stop_name(screen)
+
       for rotation_index <- [:zero, :one, :two] do
         %DupAlert{
-          screen: config,
+          screen: screen,
           alert: alert,
           location_context: location_context,
           rotation_index: rotation_index,
           stop_name: stop_name
         }
       end
+    end
+  end
+
+  defp fetch_stop_name(%Screen{app_params: %Dup{header: %StopName{stop_name: name}}}), do: name
+
+  defp fetch_stop_name(%Screen{app_params: %Dup{header: %StopId{stop_id: id}}}) do
+    case @stop.fetch_stop_name(id) do
+      # Failure to fetch here, though unlikely, shouldn't block the widget from being displayed
+      nil -> "Alert"
+      stop_name -> stop_name
     end
   end
 

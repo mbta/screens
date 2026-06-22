@@ -8,7 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Dup.Alerts
   alias ScreensConfig.Alerts, as: AlertsConfig
-  alias ScreensConfig.Screen
+  alias ScreensConfig.{Header, Screen}
   alias ScreensConfig.Screen.Dup
 
   import Mox
@@ -53,7 +53,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
       primary_departures: [],
       secondary_departures: [],
       alerts: %AlertsConfig{stop_id: @stop_id},
-      header: %{stop_name: "Back Bay"}
+      header: %Header.StopName{stop_name: "Back Bay"}
     }
   }
 
