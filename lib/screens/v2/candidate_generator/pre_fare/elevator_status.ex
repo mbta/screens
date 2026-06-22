@@ -19,13 +19,13 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
             elevator_status: %ScreensConfig.ElevatorStatus{parent_station_id: station_id}
           }
         },
-        _now
+        now
       ) do
     {:ok, alerts} = @alert.fetch(activities: [:using_wheelchair], include_all?: true)
 
     active_closures =
       alerts
-      |> Enum.filter(&Alert.happening_now?/1)
+      |> Enum.filter(&Alert.active?(&1, now))
       |> Enum.flat_map(fn alert ->
         case Closure.from_alert(alert) do
           {:ok, closure} -> [closure]
