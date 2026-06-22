@@ -71,7 +71,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
       {priority_alert_groups, other_alert_groups} =
         alerts
         |> Enum.filter(
-          &(Alert.happening_now?(&1, now) and relevant_direction?(&1, stop_id, stop_sequences))
+          &(Alert.active?(&1, now) and relevant_direction?(&1, stop_id, stop_sequences))
         )
         |> Alert.consolidate_whole_route_delays()
         |> Enum.group_by(fn alert ->

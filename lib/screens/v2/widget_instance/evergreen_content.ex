@@ -100,7 +100,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
         now: now
       }) do
     Enum.any?(alerts, fn %Alert{id: id} = alert ->
-      id in alert_ids and Alert.happening_now?(alert, now)
+      id in alert_ids and Alert.active?(alert, now)
     end)
   end
 
@@ -171,7 +171,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
           schedule: %AlertSchedule{alert_ids: alert_ids, suppress_alert_widgets: true}
         }) do
       alerts
-      |> Enum.filter(&(&1.id in alert_ids and Alert.happening_now?(&1, now)))
+      |> Enum.filter(&(&1.id in alert_ids and Alert.active?(&1, now)))
       |> Enum.map(& &1.id)
     end
 

@@ -256,9 +256,8 @@ defmodule Screens.Alerts.Alert do
     ]
   end
 
-  def happening_now?(%{active_period: aps}, now \\ DateTime.utc_now()) do
-    Enum.any?(aps, &in_active_period(&1, now))
-  end
+  def active?(%__MODULE__{active_period: periods}, datetime),
+    do: Enum.any?(periods, &in_active_period(&1, datetime))
 
   defp in_active_period({start_t, nil}, t) do
     DateTime.compare(t, start_t) in [:gt, :eq]

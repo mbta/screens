@@ -51,7 +51,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   def relevant_alerts(alerts, screen, location_context, now) do
     Enum.filter(alerts, fn alert ->
-      relevant_effect?(alert, screen) and Alert.happening_now?(alert, now) and
+      relevant_effect?(alert, screen) and Alert.active?(alert, now) and
         relevant_location?(alert, location_context) and
         not directional_shuttle_or_suspension?(alert)
     end)

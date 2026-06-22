@@ -162,7 +162,7 @@ defmodule Screens.V2.RDS do
            params_struct |> Map.put(:typicality, 1) |> @route_pattern.fetch(),
          {:ok, child_stops} <- fetch_child_stops(stop_ids),
          {:ok, schedules} <- @schedule.fetch(params_struct, Util.service_date(now)),
-         {:ok, alerts} <- fetch_relevant_alerts(stop_ids),
+         {:ok, alerts} <- fetch_relevant_alerts(stop_ids, now),
          {:ok, departures} <-
            params_struct |> @departure.fetch(now: now, include_scheduled_cancelled?: true) do
       case create_routes_for_section(departures, schedules, typical_patterns, params) do
@@ -442,10 +442,10 @@ defmodule Screens.V2.RDS do
   defp reject_disabled_modes(all_routes, disabled_modes),
     do: Enum.reject(all_routes, fn route -> route.type in disabled_modes end)
 
-  @spec fetch_relevant_alerts([Stop.id()]) :: {:ok, [Alert.t()]} | :error
-  defp fetch_relevant_alerts(stop_ids) do
+  @spec fetch_relevant_alerts([Stop.id()], DateTime.t()) :: {:ok, [Alert.t()]} | :error
+  defp fetch_relevant_alerts(stop_ids, now) do
     with {:ok, alerts} <- @alert.fetch(activities: [:board], stop_ids: stop_ids) do
-      {:ok, Enum.filter(alerts, &(Alert.happening_now?(&1) and relevant_alert_effect?(&1)))}
+      {:ok, Enum.filter(alerts, &(Alert.active?(&1, now) and relevant_alert_effect?(&1)))}
     end
   end
 

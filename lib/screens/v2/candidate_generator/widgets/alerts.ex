@@ -75,7 +75,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     end
 
     alerts
-    |> Stream.filter(&Alert.happening_now?(&1, now))
+    |> Stream.filter(&Alert.active?(&1, now))
     |> Stream.filter(&(&1.effect in @relevant_effects))
     |> Stream.filter(&Enum.any?(&1.informed_entities, relevant_ie?))
     |> Enum.to_list()
