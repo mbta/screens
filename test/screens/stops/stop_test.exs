@@ -132,7 +132,7 @@ defmodule Screens.Stops.StopTest do
                    }
                  }
                ]
-             } = Stop.fetch(%{ids: ~w[s1 s2 p1 p2 c3]}, true, get_json_fn)
+             } = Stop.fetch(%{ids: ~w[s1 s2 p1 p2 c3]}, get_json_fn)
     end
 
     test "parsing prevents connecting stops from loading more connecting stops" do
@@ -182,7 +182,7 @@ defmodule Screens.Stops.StopTest do
                    vehicle_type: :bus
                  }
                ]
-             } = Stop.fetch(%{ids: ~w[s1 s2]}, true, get_json_fn)
+             } = Stop.fetch(%{ids: ~w[s1 s2]}, get_json_fn)
     end
   end
 end

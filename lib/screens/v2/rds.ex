@@ -189,7 +189,7 @@ defmodule Screens.V2.RDS do
 
   @spec fetch_child_stops([Stop.id()]) :: {:ok, [Stop.t()]} | :error
   defp fetch_child_stops(stop_ids) do
-    with {:ok, stops} <- @stop.fetch(%{ids: stop_ids}, _include_related? = true) do
+    with {:ok, stops} <- @stop.fetch(%{ids: stop_ids}) do
       stops_by_id = Map.new(stops, fn %Stop{id: id} = stop -> {id, stop} end)
 
       child_stops =
