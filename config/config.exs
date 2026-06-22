@@ -502,7 +502,7 @@ config :screens,
 
 config :screens,
        Screens.V3Api.Cache.Static,
-       Keyword.merge(v3_api_cache_options, allocated_memory: 250 * 1024 * 1024)
+       Keyword.merge(v3_api_cache_options, allocated_memory: 300 * 1024 * 1024)
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
