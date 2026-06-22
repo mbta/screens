@@ -56,6 +56,7 @@ const RenderedDestination = ({ parts, index1, index2, classModifier }) => {
 
 const Destination: ComponentType<DupDestination> = ({
   headsign,
+  abbreviations,
   classModifier,
 }) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
@@ -65,11 +66,16 @@ const Destination: ComponentType<DupDestination> = ({
 
   const [index1, setIndex1] = useState(parts.length);
   const [index2, setIndex2] = useState(parts.length);
-  const [abbreviate, setAbbreviate] = useState(false);
+  const [abbreviationIndex, setAbbreviationIndex] = useState(-1);
   const [phase, setPhase] = useState(PHASES.ONE_LINE_FULL);
 
-  if (abbreviate) {
-    parts = parts.map((p) => ABBREVIATIONS[p] || p);
+  if (abbreviationIndex >= 0) {
+    // abbreviationIndex
+    if (abbreviations && abbreviations.length > abbreviationIndex) {
+      parts = abbreviations[abbreviationIndex].split(" ");
+    } else {
+      parts = parts.map((part) => ABBREVIATIONS[part] || part);
+    }
   }
 
   /* eslint-disable react-hooks/set-state-in-effect --
@@ -85,6 +91,7 @@ const Destination: ComponentType<DupDestination> = ({
     if (firstLineRef.current && secondLineRef.current) {
       const firstLineFits = !hasOverflowX(firstLineRef.current);
       const secondLineFits = !hasOverflowX(secondLineRef.current);
+      const hasAbbreviations = abbreviations && abbreviations.length > 0;
 
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
@@ -92,7 +99,7 @@ const Destination: ComponentType<DupDestination> = ({
           if (firstLineFits) {
             setPhase(PHASES.DONE);
           } else {
-            setAbbreviate(true);
+            setAbbreviationIndex(abbreviationIndex + 1);
             setPhase(PHASES.ONE_LINE_ABBREV);
           }
           break;
@@ -102,8 +109,11 @@ const Destination: ComponentType<DupDestination> = ({
           if (firstLineFits) {
             setPhase(PHASES.DONE);
           } else {
-            setAbbreviate(false);
-            setPhase(PHASES.TWO_LINES_FULL);
+            setAbbreviationIndex(abbreviationIndex + 1);
+            if (!abbreviations || abbreviations.length <= abbreviationIndex) {
+              setPhase(PHASES.TWO_LINES_FULL);
+              setAbbreviationIndex(-1);
+            }
           }
           break;
 
@@ -118,7 +128,7 @@ const Destination: ComponentType<DupDestination> = ({
             } else {
               setIndex1(parts.length);
               setIndex2(parts.length);
-              setAbbreviate(true);
+              setAbbreviationIndex(0);
               setPhase(PHASES.TWO_LINES_ABBREV);
             }
           }
@@ -133,7 +143,17 @@ const Destination: ComponentType<DupDestination> = ({
           } else if (!secondLineFits && index2 > index1 + 1) {
             // Find position of second line break
             setIndex2((n) => n - 1);
+          } else if (
+            (!firstLineFits || !secondLineFits) &&
+            hasAbbreviations &&
+            abbreviations.length > abbreviationIndex + 1
+          ) {
+            // If we can't fit on two lines, try abbreviating further
+            setIndex1(parts.length);
+            setIndex2(parts.length);
+            setAbbreviationIndex(abbreviationIndex + 1);
           } else {
+            // If we can't fit on two lines, just show the first two words and an ellipsis.
             setPhase(PHASES.DONE);
           }
           break;
