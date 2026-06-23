@@ -150,7 +150,17 @@ defmodule Screens.Alerts.Alert do
   @base_includes ~w[facilities stops.child_stops]
   @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops stops]
 
-  @service_eliminating_effects ~w[shuttle station_closure suspension]a
+  @service_eliminating_effects ~w[
+    detour
+    dock_closure
+    no_service
+    shuttle
+    snow_route
+    station_closure
+    stop_closure
+    stop_move
+    suspension
+  ]a
 
   defguard is_service_eliminating_effect(effect) when effect in @service_eliminating_effects
 

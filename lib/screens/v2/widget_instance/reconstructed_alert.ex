@@ -1,7 +1,7 @@
 defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @moduledoc false
 
-  import Screens.Alerts.Alert, only: [is_service_eliminating_effect: 1]
+  require Screens.Alerts.Alert
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
@@ -1412,7 +1412,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @spec urgent?(t(), LocalizedAlert.location()) :: boolean()
   defp urgent?(%__MODULE__{alert: %Alert{effect: effect, severity: severity}}, location) do
     severity > 1 and location in @inside_locations and
-      (is_service_eliminating_effect(effect) or severity >= 7)
+      (Alert.is_service_eliminating_effect(effect) or severity >= 7)
   end
 
   def widget_type(%__MODULE__{} = t) do

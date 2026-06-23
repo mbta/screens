@@ -3,6 +3,8 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   A widget that displays an alert (either full-screen or partial-screen banner) on a DUP screen.
   """
 
+  require Screens.Alerts.Alert
+
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
   alias Screens.Stops.Stop
@@ -99,7 +101,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
            }
          } = t
        )
-       when effect in [:shuttle, :station_closure, :suspension] do
+       when Alert.is_service_eliminating_effect(effect) do
     # Assume primary departures is always configured with a section for each subway line at the
     # screen's station. So if we're `inside` a disruption and it affects the same number of lines
     # as the number we show departures for, that means all service is eliminated. Otherwise, only
