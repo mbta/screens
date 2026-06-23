@@ -11,6 +11,8 @@ defmodule Screens.V2.RDS do
 
   import Screens.Inject
 
+  require Screens.Alerts.Alert
+
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Config.Cache
@@ -44,19 +46,6 @@ defmodule Screens.V2.RDS do
 
   @typep destination :: {Stop.t(), Line.t(), String.t()}
   @typep scheduled_service_state :: :after | :before | :none | :within
-
-  # These alert types eliminate service to a destination.
-  @relevant_alert_effects [
-    :detour,
-    :dock_closure,
-    :no_service,
-    :shuttle,
-    :snow_route,
-    :station_closure,
-    :stop_closure,
-    :stop_move,
-    :suspension
-  ]
 
   @red_trunk [70_061..70_061, 70_063..70_084]
              |> Enum.flat_map(& &1)
@@ -445,15 +434,13 @@ defmodule Screens.V2.RDS do
   @spec fetch_relevant_alerts([Stop.id()], DateTime.t()) :: {:ok, [Alert.t()]} | :error
   defp fetch_relevant_alerts(stop_ids, now) do
     with {:ok, alerts} <- @alert.fetch(activities: [:board], stop_ids: stop_ids) do
-      {:ok, Enum.filter(alerts, &(Alert.active?(&1, now) and relevant_alert_effect?(&1)))}
+      {:ok,
+       Enum.filter(
+         alerts,
+         &(Alert.active?(&1, now) and Alert.is_service_eliminating_effect(&1.effect))
+       )}
     end
   end
-
-  @spec relevant_alert_effect?(Alert.t()) :: boolean()
-  defp relevant_alert_effect?(%Alert{effect: effect}) when effect in @relevant_alert_effects,
-    do: true
-
-  defp relevant_alert_effect?(_), do: false
 
   @spec informed_destinations([destination()], [Alert.t()], [RoutePattern.t()]) ::
           MapSet.t(destination())
