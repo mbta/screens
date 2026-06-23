@@ -8,6 +8,8 @@ defmodule Screens.Alerts.AlertTest do
 
   import Screens.TestSupport.InformedEntityBuilder
 
+  @now ~U[2017-08-21T01:00:00Z]
+
   # Minimal valid attributes by V3 API resource definitions.
   @minimal_attributes %{
     "active_period" => [%{"start" => "2017-08-14T14:54:01-04:00", "end" => nil}],
@@ -64,7 +66,7 @@ defmodule Screens.Alerts.AlertTest do
         url: nil
       }
 
-      assert Alert.fetch([route_ids: ["1"]], get_json_fn) == {:ok, [expected]}
+      assert Alert.fetch([now: @now, route_ids: ["1"]], get_json_fn) == {:ok, [expected]}
     end
 
     test "parses related facilities" do
@@ -97,7 +99,7 @@ defmodule Screens.Alerts.AlertTest do
          }}
       end
 
-      {:ok, [alert]} = Alert.fetch([], get_json_fn)
+      {:ok, [alert]} = Alert.fetch([now: @now], get_json_fn)
 
       assert %Alert{
                informed_entities: [
@@ -167,7 +169,7 @@ defmodule Screens.Alerts.AlertTest do
         }
       end
 
-      {:ok, [alert]} = Alert.fetch([route_ids: ["1"]], get_json_fn)
+      {:ok, [alert]} = Alert.fetch([now: @now, route_ids: ["1"]], get_json_fn)
 
       assert %Alert{
                informed_entities: [
@@ -263,7 +265,7 @@ defmodule Screens.Alerts.AlertTest do
         }
       end
 
-      {:ok, [alert]} = Alert.fetch([route_ids: ["1"]], get_json_fn)
+      {:ok, [alert]} = Alert.fetch([now: @now, route_ids: ["1"]], get_json_fn)
 
       assert %Alert{
                informed_entities: [
@@ -286,9 +288,27 @@ defmodule Screens.Alerts.AlertTest do
                ]
              } = alert
     end
+
+    test "filters stale alerts" do
+      five_weeks_ago = @now |> DateTime.shift(week: -5) |> DateTime.to_string()
+
+      attributes = %{
+        @minimal_attributes
+        | "active_period" => [%{"start" => five_weeks_ago, "end" => nil}]
+      }
+
+      get_json_fn = fn "alerts", %{"filter[route]" => "1"} ->
+        {
+          :ok,
+          %{"data" => [%{"id" => "999", "type" => "alert", "attributes" => attributes}]}
+        }
+      end
+
+      assert Alert.fetch([now: @now, route_ids: ["1"]], get_json_fn) == {:ok, []}
+    end
   end
 
-  describe "fetch_by_stop_and_route/3" do
+  describe "fetch_by_stop_and_route/4" do
     defp alert_json(id), do: %{"id" => id, "type" => "alert", "attributes" => @minimal_attributes}
 
     setup do
@@ -339,7 +359,7 @@ defmodule Screens.Alerts.AlertTest do
                 %Alert{id: "3"},
                 %Alert{id: "4"},
                 %Alert{id: "5"}
-              ]} = Alert.fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn)
+              ]} = Alert.fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn, @now)
     end
 
     test "returns :error if fetch function returns :error", context do
@@ -350,8 +370,8 @@ defmodule Screens.Alerts.AlertTest do
         x_get_json_fn2: x_get_json_fn2
       } = context
 
-      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn1)
-      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn2)
+      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn1, @now)
+      assert :error == Alert.fetch_by_stop_and_route(stop_ids, route_ids, x_get_json_fn2, @now)
     end
   end
 

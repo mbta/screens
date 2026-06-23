@@ -137,6 +137,7 @@ defmodule Screens.Alerts.Alert do
           activities: [activity()] | :all,
           ids: [id()],
           include_all?: boolean(),
+          now: DateTime.t(),
           route_id: Route.id(),
           route_ids: [Route.id()],
           route_types: RouteType.t() | [RouteType.t()],
@@ -156,7 +157,10 @@ defmodule Screens.Alerts.Alert do
 
   @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
-    {options, filters} = Keyword.split(opts, [:include_all?])
+    # This is equivalent to an argument with a default value
+    # credo:disable-for-next-line Screens.Checks.UntestableDateTime
+    now = Keyword.get(opts, :now, DateTime.utc_now())
+    {options, filters} = Keyword.split(opts, [:include_all?, :now])
 
     includes =
       if Keyword.get(options, :include_all?, false),
@@ -171,7 +175,11 @@ defmodule Screens.Alerts.Alert do
 
     case get_json_fn.("alerts", params) do
       {:ok, response} ->
-        {:ok, response |> V3Api.Parser.parse() |> Enum.map(&normalize_informed_entities/1)}
+        {:ok,
+         response
+         |> V3Api.Parser.parse()
+         |> Enum.reject(&stale_alert?(&1, now))
+         |> Enum.map(&normalize_informed_entities/1)}
 
       _ ->
         :error
@@ -195,11 +203,22 @@ defmodule Screens.Alerts.Alert do
   you're looking for.
   https://app.asana.com/0/0/1200476247539238/f
   """
-  @spec fetch_by_stop_and_route(list(Stop.id()), list(Route.id())) :: {:ok, list(t())} | :error
-  def fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn \\ &V3Api.get_json/2) do
+  @spec fetch_by_stop_and_route(
+          list(Stop.id()),
+          list(Route.id()),
+          (String.t(), %{String.t() => String.t()} -> {:ok, term()} | {:error, Exception.t()}),
+          DateTime.t()
+        ) ::
+          {:ok, list(t())} | :error
+  def fetch_by_stop_and_route(
+        stop_ids,
+        route_ids,
+        get_json_fn \\ &V3Api.get_json/2,
+        now \\ DateTime.utc_now()
+      ) do
     with {:ok, stop_based_alerts} <-
-           fetch([stop_ids: stop_ids, route_ids: route_ids], get_json_fn),
-         {:ok, route_based_alerts} <- fetch([route_ids: route_ids], get_json_fn) do
+           fetch([now: now, stop_ids: stop_ids, route_ids: route_ids], get_json_fn),
+         {:ok, route_based_alerts} <- fetch([now: now, route_ids: route_ids], get_json_fn) do
       merged_alerts =
         [stop_based_alerts, route_based_alerts]
         |> Enum.concat()
@@ -444,6 +463,17 @@ defmodule Screens.Alerts.Alert do
       _ -> false
     end)
   end
+
+  @spec stale_alert?(t(), DateTime.t()) :: boolean()
+  defp stale_alert?(%__MODULE__{active_period: [next_active_period | _]}, now) do
+    in_active_period(next_active_period, now) &&
+      now
+      |> DateTime.shift(week: -5)
+      |> DateTime.compare(elem(next_active_period, 0))
+      |> then(fn result -> result in [:gt, :eq] end)
+  end
+
+  defp stale_alert?(%__MODULE__{active_period: []}, _), do: false
 
   @spec normalize_informed_entities(t()) :: t()
   defp normalize_informed_entities(%__MODULE__{informed_entities: entities} = alert) do
