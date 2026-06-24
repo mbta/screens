@@ -7,11 +7,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
   alias Screens.Alerts.InformedEntity
   alias Screens.Routes.Route
   alias Screens.V2.WidgetInstance.SubwayStatus
+  alias Screens.V2.WidgetInstance.SubwayStatus
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.RedLine
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.RoutePill
   alias Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils
 
+  @max_rows 5
+  @max_rows_per_line 2
   @mbta_alerts_url "mbta.com/alerts"
   @normal_service_status "Normal Service"
 
@@ -41,10 +44,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
 
   @spec consolidate_alert_sections(serialized_response()) :: serialized_response()
   def consolidate_alert_sections(sections) do
-    # Subway Status section supports a maximum of 5 status rows
-    total_rows = count_total_rows(sections)
-
-    if total_rows > 5 do
+    if count_total_rows(sections) > @max_rows do
       consolidate_sections(sections)
     else
       sections
@@ -67,7 +67,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
         {:green, _section} ->
           {color, section}
 
-        {_color, %{type: :contracted, alerts: alerts}} when length(alerts) == 2 ->
+        {_color, %{type: :contracted, alerts: alerts}}
+        when length(alerts) == @max_rows_per_line ->
           # Consolidate 2-row sections to a single summary row
           {color, consolidate_two_row_section(section, color)}
 
@@ -195,6 +196,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
 
         [alert] ->
           [serialize_alert_with_route_pill(alert, route_id)]
+
+        [
+          %{alert: %Alert{effect: :station_closure}} = alert1,
+          %{alert: %Alert{effect: :station_closure}} = alert2
+        ] ->
+          subway_alert_with_combined_ies = consolidate_ies_under_one_subway_alert(alert1, alert2)
+
+          [serialize_alert_with_route_pill(subway_alert_with_combined_ies, route_id)]
 
         [alert1, alert2] ->
           [serialize_alert_with_route_pill(alert1, route_id), serialize_alert(alert2, route_id)]
@@ -369,6 +378,22 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize do
       ) do
     location = Utils.get_location(informed_entities, route_id)
     %{status: "Service Change", location: location}
+  end
+
+  @spec consolidate_ies_under_one_subway_alert(
+          SubwayStatus.SubwayStatusAlert.t(),
+          SubwayStatus.SubwayStatusAlert.t()
+        ) :: SubwayStatus.SubwayStatusAlert.t()
+  def consolidate_ies_under_one_subway_alert(
+        %{alert: %{} = alert1},
+        %{alert: %{} = alert2}
+      ) do
+    %SubwayStatus.SubwayStatusAlert{
+      alert: %{
+        alert1
+        | informed_entities: alert1.informed_entities ++ alert2.informed_entities
+      }
+    }
   end
 
   @spec serialize_alert_summary(non_neg_integer(), route_pill()) :: alert()
