@@ -457,6 +457,13 @@
     "category": 1,
     "summary": "Use nearby Medford/Tufts Elevator 770."
   },
+  "777": {
+    "alternate_ids": [
+      "866"
+    ],
+    "category": 1,
+    "summary": "Use Kendall/MIT Elevator 866 located inside the station entrance."
+  },
   "778": {
     "alternate_ids": [],
     "category": 2,
@@ -844,14 +851,10 @@
   },
   "866": {
     "alternate_ids": [
-      "863",
-      "821",
-      "973",
-      "951",
-      "952"
+      "777"
     ],
-    "category": 3,
-    "summary": null
+    "category": 1,
+    "summary": "Please use nearby Kendall/MIT Elevator 777."
   },
   "867": {
     "alternate_ids": [
