@@ -11,7 +11,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.Departures.HeadwayRow
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService}
   alias Screens.V2.WidgetInstance.OvernightDepartures
   alias ScreensConfig.{Alerts, Departures, Header}
@@ -1105,12 +1104,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           grouping_type: :time,
           rows: [
             expected_primary_departure,
-            %HeadwayRow{
-              line: %Line{id: "l1"},
-              direction_id: 0,
-              range: {6, 10},
-              headsign: "other_headsign"
-            }
+            {%Line{id: "l1"}, 0, {6, 10}, "other_headsign"}
           ]
         }
       ]
