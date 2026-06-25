@@ -15,7 +15,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
 
   alias Screens.V2.WidgetInstance.Departures.{
-    HeadwayRow,
     HeadwaySection,
     NoDataSection,
     NormalSection,
@@ -354,7 +353,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     )
   end
 
-  @spec headways_from_rds([RDS.t()], [RDS.t()]) :: [HeadwayRow.t()]
+  @spec headways_from_rds([RDS.t()], [RDS.t()]) :: [NormalSection.headway_row()]
   defp headways_from_rds(
          rds,
          headway_rds
@@ -387,14 +386,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       # combine them and use the direction name
       displayed_headsign = if length(rds_list) == 1, do: headsign, else: direction_name
 
-      [
-        %HeadwayRow{
-          line: line,
-          direction_id: direction_id,
-          range: range,
-          headsign: displayed_headsign
-        }
-      ]
+      [{line, direction_id, range, displayed_headsign}]
     end)
   end
 
@@ -418,7 +410,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
   defp departure_direction_id(%Departure{} = departure), do: Departure.direction_id(departure)
   defp departure_direction_id({%Schedule{direction_id: direction_id}, _type}), do: direction_id
-  defp departure_direction_id(%HeadwayRow{direction_id: direction_id}), do: direction_id
+  defp departure_direction_id({_line, direction_id, _range, _headsign}), do: direction_id
 
   defp extract_line_direction_pairs(%RDS{line: %Line{id: line_id}, state: state}) do
     case state do
