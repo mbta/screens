@@ -937,7 +937,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_primary_sections = [
         %Screens.V2.WidgetInstance.Departures.HeadwaySection{
           headsign: expected_headsign,
-          route_id: expected_route_id,
+          route: %Route{id: expected_route_id},
           time_range: expected_time_range
         }
       ]
@@ -983,7 +983,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_primary_sections = [
         %Screens.V2.WidgetInstance.Departures.HeadwaySection{
           headsign: expected_direction_name,
-          route_id: expected_route_id,
+          route: %Route{id: expected_route_id},
           time_range: expected_time_range
         }
       ]

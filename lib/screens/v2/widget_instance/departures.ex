@@ -48,10 +48,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     @type t :: %__MODULE__{
             headsign: String.t() | nil,
-            route_id: Route.id(),
+            route: Route.t(),
             time_range: Headways.range()
           }
-    defstruct ~w[headsign route_id time_range]a
+    defstruct ~w[headsign route time_range]a
   end
 
   defmodule OvernightSection do
@@ -199,7 +199,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %HeadwaySection{route_id: route_id, time_range: time_range, headsign: headsign},
+        %HeadwaySection{
+          route: %Route{id: route_id},
+          time_range: time_range,
+          headsign: headsign
+        },
         _screen,
         _now,
         is_only_section
