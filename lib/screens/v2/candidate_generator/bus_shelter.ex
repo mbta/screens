@@ -48,7 +48,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
         config,
         now \\ DateTime.utc_now(),
         header_instances_fn \\ &Widgets.Header.instances/2,
-        departures_instances_fn \\ &Widgets.Departures.departures_instances/2,
+        departures_instances_fn \\ &Widgets.RealtimeDepartures.departures_instances/2,
         alert_instances_fn \\ &Widgets.Alerts.alert_instances/2,
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/2,
         subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2

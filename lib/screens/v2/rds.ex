@@ -141,6 +141,8 @@ defmodule Screens.V2.RDS do
       end)
 
   @spec from_section(Section.t(), DateTime.t()) :: section_t()
+  defp from_section(%Section{header_only: true}, _now), do: {:ok, []}
+
   defp from_section(
          %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids} = params}},
          now

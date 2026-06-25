@@ -48,6 +48,25 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   defp map_to_departure_section(:error, _, _, _), do: %NoDataSection{}
 
+  # header_only sections are only supported on LCD screens
+  defp map_to_departure_section(
+         _,
+         %Section{
+           header_only: true,
+           header: header,
+           layout: layout,
+           grouping_type: grouping_type
+         },
+         _,
+         _
+       ),
+       do: %NormalSection{
+         rows: [],
+         header: header,
+         layout: layout,
+         grouping_type: grouping_type
+       }
+
   defp map_to_departure_section({:ok, []}, _, _, _), do: %NoDataSection{}
 
   defp(
