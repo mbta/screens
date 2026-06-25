@@ -18,6 +18,11 @@ updates:
     cooldown:
       default-days: 7
     open-pull-requests-limit: 5
+    groups:
+      mix-minor:
+        update-types:
+          - "patch"
+          - "minor"
   - package-ecosystem: npm
     directory: "/assets"
     schedule:
@@ -31,3 +36,8 @@ updates:
       # with the actual Node version used by the project.
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
+    groups:
+      npm-minor:
+        update-types:
+          - "patch"
+          - "minor"
