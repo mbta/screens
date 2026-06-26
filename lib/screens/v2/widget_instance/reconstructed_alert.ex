@@ -280,12 +280,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        do: {direction_id, route}
 
   # Select 1 direction + route from this list of directions + routes for multiple branches
-  defp select_direction_and_route([]), do: {nil, nil}
   defp select_direction_and_route([direction_and_route]), do: direction_and_route
 
   # If there are multiple route ids in that informed entities list, then the alert includes branching
   defp select_direction_and_route([{direction_id, "Red" <> _} | _]), do: {direction_id, "Red"}
-  defp select_direction_and_route([{direction_id, _} | _]), do: {direction_id, "Green-trunk"}
+
+  defp select_direction_and_route([{direction_id, "Green" <> _} | _]),
+    do: {direction_id, "Green-trunk"}
+
+  defp select_direction_and_route(_), do: {nil, nil}
 
   defp get_route_pills(t, location \\ nil)
 
