@@ -54,4 +54,30 @@ defmodule Screens.V3Api.CacheTest do
     rt_params = Map.put(params, "include", "shape,predictions,route_pattern.route")
     assert {:stale, "resp2"} = put_and_get_after({"trips", rt_params}, "resp2", now, 10, :second)
   end
+
+  describe "transaction/2" do
+    test "locks the given key for the duration of a function", %{params: params} do
+      pid = self()
+
+      # Someone is sitting on "one" for a while
+      spawn_link(fn ->
+        Cache.transaction({"one", params}, fn ->
+          send(pid, :got1)
+          Process.sleep(1000)
+        end)
+      end)
+
+      assert_receive :got1
+
+      # Someone else wanting to lock "one" should wait behind the above
+      spawn_link(fn ->
+        Cache.transaction({"one", params}, fn -> send(pid, :waited1) end)
+      end)
+
+      # Meanwhile, someone wanting to lock "two" should have no wait
+      assert {:ok, :got2} = Cache.transaction({"two", params}, fn -> :got2 end)
+
+      refute_receive :waited1
+    end
+  end
 end

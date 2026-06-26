@@ -12,15 +12,27 @@ defmodule Screens.V3Api do
     meta = Map.merge(ctx, %{path: path, query: URI.encode_query(params)})
 
     Screens.Telemetry.span_with_stop_meta([:screens, :v3_api, :get_json], meta, fn ->
-      case Cache.get({path, params}) do
-        {:fresh, {_last_modified, response}} ->
-          {{:ok, response}, %{cache: "local"}}
+      transaction_result =
+        Cache.transaction({path, params}, fn ->
+          case Cache.get({path, params}) do
+            {:fresh, {_last_modified, response}} ->
+              {{:ok, response}, %{cache: "local"}}
 
-        {:stale, {last_modified, response}} ->
-          fetch_json_with_meta(path, params, last_modified, response)
+            {:stale, {last_modified, response}} ->
+              fetch_json_with_meta(path, params, last_modified, response)
 
-        nil ->
-          fetch_json_with_meta(path, params)
+            nil ->
+              fetch_json_with_meta(path, params)
+          end
+        end)
+
+      case transaction_result do
+        {:ok, result_with_meta} ->
+          result_with_meta
+
+        {:error, error} ->
+          Logster.error(["api_v3_cache_error", error: inspect(error)])
+          {{:error, error}, %{}}
       end
     end)
   end
