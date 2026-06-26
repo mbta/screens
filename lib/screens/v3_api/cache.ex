@@ -54,6 +54,14 @@ defmodule Screens.V3Api.Cache do
     :ok
   end
 
+  @doc "Wrap the given function in a transaction with an exclusive lock on the given key."
+  @spec transaction(key(), (-> ret)) :: {:ok, ret} | {:error, Nebulex.Error.t()} when ret: term
+  def transaction(key, func) do
+    # API requests can take a few seconds; wait long enough that if another process is still
+    # holding the lock, the app is probably overloaded and the best thing we can do is fail.
+    cache_for(key).transaction(func, keys: [key], retries: 50, retry_interval: 100)
+  end
+
   # Imperfectly check whether a request could return any data derived from GTFS-RT, and assign
   # it to the appropriate cache. Should err on the side of over-categorizing data as `Realtime`,
   # since we give static data a very long unconditional TTL.
