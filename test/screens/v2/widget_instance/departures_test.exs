@@ -12,7 +12,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.V2.WidgetInstance.Departures
 
   alias Screens.V2.WidgetInstance.Departures.{
-    HeadwayRow,
     HeadwaySection,
     NoDataSection,
     NormalSection
@@ -340,13 +339,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
             stop: %Stop{}
           }
         },
-        %HeadwayRow{
-          id: "Test ID",
-          line: %Line{id: "line-Green"},
-          direction_id: 0,
-          range: {20, 30},
-          headsign: "Westbound"
-        }
+        {%Line{id: "line-Green"}, 0, {20, 30}, "Westbound"}
       ]
 
       section = %NormalSection{

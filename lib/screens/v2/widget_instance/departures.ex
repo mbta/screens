@@ -20,27 +20,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias ScreensConfig.{FreeTextLine, Screen}
   alias ScreensConfig.Screen.PreFare
 
-  defmodule HeadwayRow do
-    @moduledoc "A row that shows headway values in a NormalSection, X every Y - Z minutes"
-    @type t :: %__MODULE__{
-            line: Line.t(),
-            direction_id: Trip.direction(),
-            range: Headways.range(),
-            headsign: String.t()
-          }
-
-    defstruct id: nil, line: nil, direction_id: nil, range: nil, headsign: nil
-  end
-
   defmodule NormalSection do
     @moduledoc "Section which includes a number of independent 'rows' or items."
 
     @type special_trip :: {Schedule.t(), :first_trip | :service_ended}
+    @type headway_row :: {Line.t(), Trip.direction(), Headways.range(), String.t()}
 
     @type row ::
             Departure.t()
             | special_trip()
-            | HeadwayRow.t()
+            | headway_row()
             | FreeTextLine.t()
 
     @type t :: %__MODULE__{
@@ -481,15 +470,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_departure_group(
-         [
-           %HeadwayRow{
-             line: line,
-             direction_id: direction_id,
-             range: {lo, hi},
-             headsign: headsign
-           }
-           | _
-         ],
+         [{line, direction_id, {lo, hi}, headsign} | _],
          screen,
          _now,
          route_pill_serializer
