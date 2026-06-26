@@ -286,6 +286,30 @@ defmodule Screens.Alerts.AlertTest do
                ]
              } = alert
     end
+
+    test "combine informed entities by activity" do
+      attributes = %{
+        @minimal_attributes
+        | "informed_entity" => [
+            %{"activities" => ~w[BOARD], "route" => "1"},
+            %{"activities" => ~w[EXIT], "route" => "1"}
+          ]
+      }
+
+      get_json_fn = fn "alerts", %{"filter[route]" => "1"} ->
+        {
+          :ok,
+          %{
+            "data" => [%{"id" => "999", "type" => "alert", "attributes" => attributes}],
+            "included" => []
+          }
+        }
+      end
+
+      {:ok, [alert]} = Alert.fetch([route_ids: ["1"]], get_json_fn)
+
+      assert %Alert{informed_entities: [%InformedEntity{activities: ~w[exit board]a}]} = alert
+    end
   end
 
   describe "fetch_by_stop_and_route/3" do

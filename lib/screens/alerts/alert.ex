@@ -462,12 +462,26 @@ defmodule Screens.Alerts.Alert do
 
   defp do_normalize_informed_entities(entities) do
     entities
-    |> Enum.group_by(&Map.put(&1, :direction_id, nil))
-    |> Enum.map(fn
-      {_directionless_entity, [entity]} -> entity
-      {directionless_entity, _multiple} -> directionless_entity
+    |> Enum.group_by(&%InformedEntity{&1 | activities: [], direction_id: nil})
+    |> Enum.map(fn {_key, entities} ->
+      Enum.reduce(entities, fn entity, merged ->
+        %InformedEntity{
+          merged
+          | activities: merge_activities(entity.activities, merged.activities),
+            direction_id: merge_direction_ids(entity.direction_id, merged.direction_id)
+        }
+      end)
     end)
   end
+
+  defp merge_activities(same, same), do: same
+  defp merge_activities(a, b), do: Enum.uniq(a ++ b)
+
+  defp merge_direction_ids(0, 1), do: nil
+  defp merge_direction_ids(1, 0), do: nil
+  defp merge_direction_ids(nil, _any), do: nil
+  defp merge_direction_ids(_any, nil), do: nil
+  defp merge_direction_ids(same, same), do: same
 
   @doc """
   Consolidates delay alerts affecting entire routes by keeping only the highest
