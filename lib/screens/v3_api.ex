@@ -3,7 +3,7 @@ defmodule Screens.V3Api do
 
   alias __MODULE__.Cache
 
-  @request_opts [finch: __MODULE__.Finch]
+  @request_opts [compressed: true, finch: __MODULE__.Finch]
 
   @spec get_json(path :: String.t(), params :: %{String.t() => String.t()}) ::
           {:ok, term()} | {:error, Exception.t()}
