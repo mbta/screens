@@ -736,20 +736,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_headsign([departure], bus_shelter_screen)
     end
 
-    test "handles DUPs", %{dup_screen: dup_screen} do
+    test "handles abbreviations", %{dup_screen: dup_screen} do
       departure = %Departure{
         prediction: %Prediction{trip: %Trip{headsign: "Test 1"}}
       }
 
-      assert %{headsign: "T1"} ==
-               Departures.serialize_headsign([departure], dup_screen)
-
-      departure = %Departure{
-        prediction: %Prediction{trip: %Trip{headsign: "Test 2"}}
-      }
-
-      assert %{headsign: "Test 2"} ==
-               Departures.serialize_headsign([departure], dup_screen)
+      assert %{headsign: "Alewife", abbreviations: ["T1"], variation: nil} ==
+               Map.get(Departures.serialize_headsign([departure], dup_screen), :headsign)
     end
 
     test "shortens shuttle headsigns", %{
@@ -765,10 +758,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: nil} ==
+      assert %{headsign: "Alewife", variation: nil, abbreviations: ["Alewife"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
 
-      assert %{headsign: "Alewife"} ==
+      assert %{headsign: "Alewife", abbreviations: ["Alewife"]} ==
                Departures.serialize_headsign([departure], dup_screen)
 
       departure = %Departure{
@@ -780,10 +773,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: "(Express)"} ==
+      assert %{headsign: "Alewife", variation: "(Express)", abbreviations: ["Alewife"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
 
-      assert %{headsign: "Alewife (Express)"} ==
+      assert %{
+               headsign: "Alewife (Express)",
+               abbreviations: ["Alewife (Express)"],
+               variation: nil
+             } ==
                Departures.serialize_headsign([departure], dup_screen)
     end
 
