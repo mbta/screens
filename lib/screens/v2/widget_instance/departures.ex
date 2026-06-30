@@ -130,7 +130,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type serialized_headsign :: %{
           headsign: String.t(),
-          abbreviations: [String.t()] | nil,
+          headsigns: [String.t()] | nil,
           variation: String.t() | nil
         }
 
@@ -587,17 +587,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
           [headsign, nil]
       end
 
-    %{headsign: headsign, variation: variation, abbreviations: nil}
+    %{headsign: headsign, variation: variation, headsigns: nil}
   end
 
   @spec headsign_with_abbreviations(serialized_headsign() | String.t()) :: serialized_headsign()
   defp headsign_with_abbreviations(%{headsign: headsign} = headsign_map) do
-    Map.put(headsign_map, :abbreviations, Headsign.abbreviations(headsign))
+    Map.put(headsign_map, :headsigns, Headsign.abbreviations(headsign))
   end
 
   defp headsign_with_abbreviations(headsign) do
     # DUPs don't break out variations
-    %{headsign: headsign, abbreviations: Headsign.abbreviations(headsign), variation: nil}
+    %{headsign: headsign, headsigns: Headsign.abbreviations(headsign), variation: nil}
   end
 
   def serialize_times_with_crowding(departures, screen, now) do

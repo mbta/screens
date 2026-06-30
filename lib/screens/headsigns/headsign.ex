@@ -17,7 +17,7 @@ defmodule Screens.Headsigns.Headsign do
   end
 
   @spec abbreviate_by_word(String.t()) :: [String.t()]
-  def abbreviate_by_word(base_headsign) do
+  defp abbreviate_by_word(base_headsign) do
     # Fallback case for when we don't have explicitly defined abbreviations for a headsign
     # Returns a single abbreviated headsign in which all words are abbreviated if possible, otherwise the original word is used.
     base_headsign

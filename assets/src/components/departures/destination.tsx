@@ -7,7 +7,7 @@ const abbreviate = (headsign: string): string => {
 
 type Destination = {
   headsign: string;
-  abbreviations?: string[];
+  headsigns: string[];
   variation?: string;
 };
 

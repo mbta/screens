@@ -6,8 +6,8 @@ import { classWithModifier, hasOverflowX } from "Util/utils";
 
 type DupDestination = DestinationBase & { classModifier: string };
 
-// Global abbreviations
-const ABBREVIATIONS = {
+// Global headsigns
+const headsigns = {
   Center: "Ctr",
   Square: "Sq",
   Court: "Crt",
@@ -56,7 +56,7 @@ const RenderedDestination = ({ parts, index1, index2, classModifier }) => {
 
 const Destination: ComponentType<DupDestination> = ({
   headsign,
-  abbreviations,
+  headsigns,
   classModifier,
 }) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
@@ -71,10 +71,10 @@ const Destination: ComponentType<DupDestination> = ({
 
   if (abbreviationIndex >= 0) {
     // abbreviationIndex
-    if (abbreviations && abbreviations.length > abbreviationIndex) {
-      parts = abbreviations[abbreviationIndex].split(" ");
+    if (headsigns && headsigns.length > abbreviationIndex) {
+      parts = headsigns[abbreviationIndex].split(" ");
     } else {
-      parts = parts.map((part) => ABBREVIATIONS[part] || part);
+      parts = parts.map((part) => headsigns[part] || part);
     }
   }
 
@@ -91,7 +91,7 @@ const Destination: ComponentType<DupDestination> = ({
     if (firstLineRef.current && secondLineRef.current) {
       const firstLineFits = !hasOverflowX(firstLineRef.current);
       const secondLineFits = !hasOverflowX(secondLineRef.current);
-      const hasAbbreviations = abbreviations && abbreviations.length > 0;
+      const hasAbbreviations = headsigns && headsigns.length > 0;
 
       switch (phase) {
         case PHASES.ONE_LINE_FULL:
@@ -110,7 +110,7 @@ const Destination: ComponentType<DupDestination> = ({
             setPhase(PHASES.DONE);
           } else {
             setAbbreviationIndex(abbreviationIndex + 1);
-            if (!abbreviations || abbreviations.length <= abbreviationIndex) {
+            if (!headsigns || headsigns.length <= abbreviationIndex) {
               setPhase(PHASES.TWO_LINES_FULL);
               setAbbreviationIndex(-1);
             }
@@ -146,7 +146,7 @@ const Destination: ComponentType<DupDestination> = ({
           } else if (
             (!firstLineFits || !secondLineFits) &&
             hasAbbreviations &&
-            abbreviations.length > abbreviationIndex + 1
+            headsigns.length > abbreviationIndex + 1
           ) {
             // If we can't fit on two lines, try abbreviating further
             setIndex1(parts.length);
