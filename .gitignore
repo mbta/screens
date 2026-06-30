@@ -36,6 +36,9 @@ npm-debug.log
 # packaged client assets
 /priv/packaged/
 
+# Locally generated artifacts from scripts
+/priv/local/
+
 # Local config files
 /priv/local.json
 /priv/local_pending.json

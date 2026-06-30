@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Provides real-time departure information, consisting of an ordered list of "sections".
   """
 
+  alias Screens.Headsigns.Headsign
   alias Screens.Headways
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
@@ -129,6 +130,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type serialized_headsign :: %{
           headsign: String.t(),
+          headsigns: [String.t()],
           variation: String.t() | nil
         }
 
@@ -527,14 +529,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @spec serialize_headsign([Departure.t()], Screen.t()) :: serialized_headsign()
   def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2} = screen) do
-    headsign =
-      first_departure
-      |> Departure.headsign()
-      |> simplify_shuttle_headsign(first_departure, screen)
-
-    headsign_replacements = Application.get_env(:screens, :dup_headsign_replacements)
-
-    %{headsign: Map.get(headsign_replacements, headsign, headsign)}
+    first_departure
+    |> Departure.headsign()
+    |> simplify_shuttle_headsign(first_departure, screen)
+    |> headsign_with_abbreviations()
   end
 
   def serialize_headsign([first_departure | _], screen) do
@@ -542,6 +540,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     |> Departure.headsign()
     |> simplify_shuttle_headsign(first_departure, screen)
     |> headsign_with_variation()
+    |> headsign_with_abbreviations()
   end
 
   @doc """
@@ -588,7 +587,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
           [headsign, nil]
       end
 
-    %{headsign: headsign, variation: variation}
+    %{headsign: headsign, variation: variation, headsigns: nil}
+  end
+
+  @spec headsign_with_abbreviations(serialized_headsign() | String.t()) :: serialized_headsign()
+  defp headsign_with_abbreviations(%{headsign: headsign} = headsign_map) do
+    Map.put(headsign_map, :headsigns, Headsign.abbreviations(headsign))
+  end
+
+  defp headsign_with_abbreviations(headsign) do
+    # DUPs don't break out variations
+    %{headsign: headsign, headsigns: Headsign.abbreviations(headsign), variation: nil}
   end
 
   def serialize_times_with_crowding(departures, screen, now) do
