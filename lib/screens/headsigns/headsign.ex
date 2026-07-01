@@ -24,8 +24,7 @@ defmodule Screens.Headsigns.Headsign do
     |> String.trim()
     |> String.split(" ")
     |> Enum.reject(&(&1 == ""))
-    |> Enum.map(&Map.get(@word_abbreviations, &1, String.trim(&1)))
-    |> Enum.join(" ")
+    |> Enum.map_join(" ", &Map.get(@word_abbreviations, &1, String.trim(&1)))
     |> List.wrap()
   end
 end

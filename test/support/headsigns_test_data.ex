@@ -10,6 +10,7 @@ defmodule Screens.Headsigns.Data.Test do
 
   @word_abbreviations %{
     "Avenue" => "Ave",
+    "Cleveland" => "Clvlnd",
     "East" => "E",
     "Government" => "Gov't",
     "One" => "1",

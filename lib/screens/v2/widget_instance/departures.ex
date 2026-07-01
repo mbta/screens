@@ -587,7 +587,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           [headsign, nil]
       end
 
-    %{headsign: headsign, variation: variation, headsigns: nil}
+    %{headsign: headsign, variation: variation, headsigns: [headsign]}
   end
 
   @spec headsign_with_abbreviations(serialized_headsign() | String.t()) :: serialized_headsign()
