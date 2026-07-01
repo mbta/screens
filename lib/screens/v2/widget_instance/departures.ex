@@ -529,9 +529,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @spec serialize_headsign([Departure.t()], Screen.t()) :: serialized_headsign()
   def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2} = screen) do
-    first_departure
-    |> Departure.headsign()
-    |> simplify_shuttle_headsign(first_departure, screen)
+    headsign =
+      first_departure
+      |> Departure.headsign()
+      |> simplify_shuttle_headsign(first_departure, screen)
+
+    :screens
+    |> Application.get_env(:dup_headsign_replacements)
+    |> Map.get(headsign, headsign)
     |> headsign_with_abbreviations()
   end
 

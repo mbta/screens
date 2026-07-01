@@ -738,10 +738,17 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "handles DUPs", %{dup_screen: dup_screen} do
       departure = %Departure{
-        prediction: %Prediction{trip: %Trip{headsign: "Alewife"}}
+        prediction: %Prediction{trip: %Trip{headsign: "Test 1"}}
       }
 
-      assert %{headsign: "Alewife", headsigns: ["Alewife"], variation: nil} ==
+      assert %{headsign: "T1", headsigns: ["T1"], variation: nil} ==
+               Departures.serialize_headsign([departure], dup_screen)
+
+      departure = %Departure{
+        prediction: %Prediction{trip: %Trip{headsign: "Test 2"}}
+      }
+
+      assert %{headsign: "Test 2", headsigns: ["Test 2"], variation: nil} ==
                Departures.serialize_headsign([departure], dup_screen)
     end
 
