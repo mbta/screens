@@ -55,7 +55,7 @@ config :phoenix, :format_encoders,
 
 config :ex_aws, http_client: ExAws.Request.Req, json_codec: Jason
 
-config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
 config :screens,
   redirect_http?: true,
