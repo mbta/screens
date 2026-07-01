@@ -2,7 +2,6 @@ defmodule Screens.Telemetry do
   @moduledoc "Telemetry logging and polling."
 
   use Supervisor
-  require Logger
 
   alias Screens.V3Api.Cache
 

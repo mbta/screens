@@ -193,7 +193,7 @@ defmodule Screens.V2.ScreenData.Layout do
   def resolve_paging(layout_and_instances, refresh_rate, now \\ DateTime.utc_now())
 
   def resolve_paging(layout_and_instances, nil, _now) do
-    Tuple.append(layout_and_instances, %{})
+    Tuple.insert_at(layout_and_instances, tuple_size(layout_and_instances), %{})
   end
 
   def resolve_paging({layout, instance_map}, refresh_rate, now) do
@@ -307,7 +307,7 @@ defmodule Screens.V2.ScreenData.Layout do
         layout when is_paged(layout) ->
           layout
           |> unpage_layout_and_track_slots()
-          |> Tuple.append(%{})
+          |> Tuple.insert_at(2, %{})
 
         layout ->
           choose_visible_slot_ids(layout, refresh_rate, now)

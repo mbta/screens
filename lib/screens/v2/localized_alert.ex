@@ -151,21 +151,6 @@ defmodule Screens.V2.LocalizedAlert do
     informed_entity_to_zone(Map.put(entity, :route, nil), context)
   end
 
-  # Both stop and route are not nil (route type ignored)
-  defp informed_entity_to_zone(
-         %InformedEntity{stop: stop, route: route} = informed_entity,
-         context
-       )
-       when not is_nil(stop) do
-    route_ids = LocationContext.route_ids(context)
-
-    if route in route_ids do
-      informed_entity_to_zone(%{informed_entity | route: nil}, context)
-    else
-      []
-    end
-  end
-
   @spec location(t()) :: location()
   def location(
         %{

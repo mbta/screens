@@ -462,9 +462,11 @@ defmodule Screens.Alerts.Alert do
 
   defp do_normalize_informed_entities(entities) do
     entities
-    |> Enum.group_by(&%InformedEntity{&1 | activities: [], direction_id: nil})
+    |> Enum.group_by(fn %InformedEntity{} = entity ->
+      %InformedEntity{entity | activities: [], direction_id: nil}
+    end)
     |> Enum.map(fn {_key, entities} ->
-      Enum.reduce(entities, fn entity, merged ->
+      Enum.reduce(entities, fn entity, %InformedEntity{} = merged ->
         %InformedEntity{
           merged
           | activities: merge_activities(entity.activities, merged.activities),

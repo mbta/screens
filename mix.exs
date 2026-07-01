@@ -5,7 +5,7 @@ defmodule Screens.MixProject do
     [
       app: :screens,
       version: "0.1.0",
-      elixir: "~> 1.17",
+      elixir: "~> 1.20",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -77,7 +77,7 @@ defmodule Screens.MixProject do
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
       {:req, "~> 0.6.0"},
-      {:screens_config, github: "mbta/screens-config-lib"},
+      {:screens_config, github: "mbta/screens-config-lib", branch: "rs/upgrade-elixir-20"},
       {:sentry, "~> 13.2.0"},
       {:sweet_xml, "~> 0.7.0"},
       {:telemetry, "~> 1.2"},
