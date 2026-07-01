@@ -43,91 +43,98 @@ defmodule Screens.V2.RDSTest do
     :ok
   end
 
-  defp no_service(stop_id, line_id, headsign) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.NoService{
-        routes: [
-          %Screens.Routes.Route{
-            id: "r1",
-            short_name: nil,
+  defp no_service(destination_keys) do
+    destinations =
+      Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
+        {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+      end)
+
+    %RDS.NoService{
+      destinations: destinations,
+      routes: [
+        %Screens.Routes.Route{
+          id: "r1",
+          short_name: nil,
+          long_name: nil,
+          direction_names: nil,
+          direction_destinations: nil,
+          type: :bus,
+          line: %Screens.Lines.Line{
+            id: "l1",
             long_name: nil,
-            direction_names: nil,
-            direction_destinations: nil,
-            type: :bus,
-            line: %Screens.Lines.Line{
-              id: "l1",
-              long_name: nil,
-              short_name: nil,
-              sort_order: nil
-            }
-          },
-          %Screens.Routes.Route{
-            id: "r2",
             short_name: nil,
-            long_name: nil,
-            direction_names: nil,
-            direction_destinations: nil,
-            type: :bus,
-            line: %Screens.Lines.Line{
-              id: "l2",
-              long_name: nil,
-              short_name: nil,
-              sort_order: nil
-            }
+            sort_order: nil
           }
-        ]
-      }
+        },
+        %Screens.Routes.Route{
+          id: "r2",
+          short_name: nil,
+          long_name: nil,
+          direction_names: nil,
+          direction_destinations: nil,
+          type: :bus,
+          line: %Screens.Lines.Line{
+            id: "l2",
+            long_name: nil,
+            short_name: nil,
+            sort_order: nil
+          }
+        }
+      ]
     }
   end
 
-  defp countdowns(stop_id, line_id, headsign, departures) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.Countdowns{departures: departures}
+  defp countdowns(destination_keys, departures) do
+    destinations =
+      Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
+        {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+      end)
+
+    %RDS.Countdowns{
+      destinations: destinations,
+      departures: departures
     }
   end
 
   defp first_trip(stop_id, line_id, headsign, schedule) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.FirstTrip{first_schedule: schedule}
+    destinations = [{%Stop{id: stop_id}, %Line{id: line_id}, headsign}]
+
+    %RDS.FirstTrip{
+      destinations: destinations,
+      first_schedule: schedule
     }
   end
 
-  defp service_ended(stop_id, line_id, headsign, schedule) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.ServiceEnded{last_schedule: schedule}
+  defp service_ended(destination_keys, schedule, routes) do
+    destinations =
+      Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
+        {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+      end)
+
+    %RDS.ServiceEnded{
+      destinations: destinations,
+      last_schedule: schedule,
+      routes: routes
     }
   end
 
   defp headways(
-         stop_id,
-         line_id,
+         destination_keys,
          headsign,
-         route_id,
-         direction_name,
+         routes,
          direction_id
        ) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.Headways{
-        route_id: route_id,
-        direction_name: direction_name,
-        direction_id: direction_id,
-        range: {5, 10}
-      }
+    destinations =
+      Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
+        {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+      end)
+
+    %RDS.Headways{
+      destinations: destinations,
+      routes: routes,
+      displayed_headsign: headsign,
+      direction_id: direction_id,
+      range: {5, 10}
     }
   end
 
@@ -176,7 +183,7 @@ defmodule Screens.V2.RDSTest do
   end
 
   describe "get/1 no service" do
-    test "creates no service destinations from typical route patterns with no departures" do
+    test "creates no service destination from typical route patterns with no departures" do
       stop_ids = ~w[s0 s1]
 
       expect_standard_stations(stop_ids)
@@ -189,12 +196,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               {:ok,
-                [
-                  no_service("sA", "l1", "hA"),
-                  no_service("sB", "l2", "hB"),
-                  no_service("sC", "l2", "hC")
-                ]}
+               {:ok, [no_service([{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
              ]
     end
   end
@@ -268,8 +270,10 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                {:ok,
                 [
-                  countdowns("s1", "l1", "h1", expected_departures_one),
-                  countdowns("s2", "l2", "h2", expected_departures_two)
+                  countdowns(
+                    [{"s1", "l1", "h1"}, {"s2", "l2", "h2"}],
+                    expected_departures_one ++ expected_departures_two
+                  )
                 ]}
              ]
     end
@@ -329,8 +333,8 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                {:ok,
                 [
-                  countdowns("s1", "l1", "h1", expected_departures),
-                  no_service("s1", "l2", "h2")
+                  countdowns([{"s1", "l1", "h1"}], expected_departures),
+                  no_service([{"s1", "l2", "h2"}])
                 ]}
              ]
     end
@@ -387,7 +391,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures, now) ==
-               [{:ok, [countdowns("s0", "l1", "h1", expected_departures)]}]
+               [{:ok, [countdowns([{"s0", "l1", "h1"}], expected_departures)]}]
     end
 
     test "considers cancelled departures in deciding whether to produce no-service states" do
@@ -566,6 +570,11 @@ defmodule Screens.V2.RDSTest do
 
       all_schedules = [first_schedule, second_schedule, third_schedule]
 
+      expected_routes = [
+        %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+        %Route{id: "r2", line: %Line{id: "l2"}, type: :bus}
+      ]
+
       departures = %Departures{
         sections: [
           %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
@@ -581,9 +590,11 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                {:ok,
                 [
-                  service_ended("sA", "l1", "hA", first_schedule),
-                  service_ended("sB", "l2", "hB", second_schedule),
-                  service_ended("sC", "l2", "hC", third_schedule)
+                  service_ended(
+                    [{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}],
+                    nil,
+                    expected_routes
+                  )
                 ]}
              ]
     end
@@ -630,6 +641,21 @@ defmodule Screens.V2.RDSTest do
           trip: %Trip{headsign: "hC", pattern_headsign: "hC", direction_id: 0}
         }
 
+      expected_routes = [
+        %Route{
+          id: "r1",
+          line: %Line{id: "l1"},
+          type: :bus,
+          direction_names: ["Northbound", "Southbound"]
+        },
+        %Route{
+          id: "r2",
+          line: %Line{id: "l2"},
+          type: :bus,
+          direction_names: ["Northbound", "Southbound"]
+        }
+      ]
+
       all_schedules = [first_schedule, second_schedule, third_schedule]
 
       departures = %Departures{
@@ -664,9 +690,11 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                {:ok,
                 [
-                  service_ended("sA", "l1", "hA", first_schedule),
-                  service_ended("sB", "l2", "hB", second_schedule),
-                  service_ended("sC", "l2", "hC", third_schedule)
+                  service_ended(
+                    [{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}],
+                    nil,
+                    expected_routes
+                  )
                 ]}
              ]
     end
@@ -720,7 +748,12 @@ defmodule Screens.V2.RDSTest do
       end)
 
       assert RDS.get(departures, now) == [
-               {:ok, [service_ended("70061", "l1", "Alewife", first_schedule)]}
+               {:ok,
+                [
+                  service_ended([{"70061", "l1", "Alewife"}], nil, [
+                    %Route{id: "r1", line: %Line{id: "l1"}, type: :bus}
+                  ])
+                ]}
              ]
     end
   end
@@ -822,6 +855,27 @@ defmodule Screens.V2.RDSTest do
         last_schedule_three
       ]
 
+      expected_routes = [
+        %Screens.Routes.Route{
+          direction_destinations: nil,
+          direction_names: ["Northbound", "Southbound"],
+          id: "r1",
+          line: %Screens.Lines.Line{id: "l1", long_name: nil, short_name: nil, sort_order: nil},
+          long_name: nil,
+          short_name: nil,
+          type: :bus
+        },
+        %Screens.Routes.Route{
+          id: "r2",
+          short_name: nil,
+          long_name: nil,
+          direction_names: ["Eastbound", "Westbound"],
+          direction_destinations: nil,
+          type: :bus,
+          line: %Screens.Lines.Line{id: "l2", long_name: nil, short_name: nil, sort_order: nil}
+        }
+      ]
+
       departures = %Departures{
         sections: [
           %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
@@ -836,9 +890,178 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                {:ok,
                 [
-                  headways("sA", "l1", "hA", "r1", "Northbound", 0),
-                  headways("sB", "l2", "hB", "r2", "Westbound", 1),
-                  headways("sC", "l2", "hC", "r2", "Eastbound", 0)
+                  headways(
+                    [{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}],
+                    nil,
+                    expected_routes,
+                    nil
+                  )
+                ]}
+             ]
+    end
+
+    test "removes headways when similar destination with line/direction_id is in Countdowns state" do
+      now = ~U[2024-10-11 11:44:00Z]
+      stop_ids = ~w[s0 s1]
+
+      first_schedule_one =
+        %Schedule{
+          id: "Test ID 11",
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{
+            id: "r1",
+            line: %Line{id: "l1"},
+            type: :bus,
+            direction_names: ["Northbound", "Southbound"]
+          },
+          stop: %Stop{id: "sA"},
+          trip: %Trip{headsign: "h1", pattern_headsign: "hA", direction_id: 0}
+        }
+
+      last_schedule_one =
+        %Schedule{
+          id: "Test ID 12",
+          departure_time: ~U[2024-10-12 01:45:00Z],
+          route: %Route{
+            id: "r1",
+            line: %Line{id: "l1"},
+            type: :bus,
+            direction_names: ["Northbound", "Southbound"]
+          },
+          stop: %Stop{id: "sA"},
+          trip: %Trip{headsign: "h1", pattern_headsign: "hA", direction_id: 0}
+        }
+
+      first_schedule_two = %Schedule{
+        id: "Test ID 21",
+        departure_time: ~U[2024-10-11 10:45:00Z],
+        route: %Route{
+          id: "r2",
+          line: %Line{id: "l2"},
+          type: :bus,
+          direction_names: ["Eastbound", "Westbound"]
+        },
+        stop: %Stop{id: "sB"},
+        trip: %Trip{headsign: "h2", pattern_headsign: "hB", direction_id: 1}
+      }
+
+      last_schedule_two =
+        %Schedule{
+          id: "Test ID 22",
+          departure_time: ~U[2024-10-12 01:45:00Z],
+          route: %Route{
+            id: "r2",
+            line: %Line{id: "l2"},
+            type: :bus,
+            direction_names: ["Eastbound", "Westbound"]
+          },
+          stop: %Stop{id: "sB"},
+          trip: %Trip{headsign: "h2", pattern_headsign: "hB", direction_id: 1}
+        }
+
+      first_schedule_three =
+        %Schedule{
+          id: "Test ID 31",
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{
+            id: "r2",
+            line: %Line{id: "l2"},
+            type: :bus,
+            direction_names: ["Eastbound", "Westbound"]
+          },
+          stop: %Stop{id: "sC"},
+          trip: %Trip{headsign: "h3", pattern_headsign: "hC", direction_id: 0}
+        }
+
+      last_schedule_three =
+        %Schedule{
+          id: "Test ID 32",
+          departure_time: ~U[2024-10-12 01:45:00Z],
+          route: %Route{
+            id: "r2",
+            line: %Line{id: "l2"},
+            type: :bus,
+            direction_names: ["Eastbound", "Westbound"]
+          },
+          stop: %Stop{id: "sC"},
+          trip: %Trip{headsign: "h3", pattern_headsign: "hC", direction_id: 0}
+        }
+
+      all_schedules = [
+        first_schedule_one,
+        last_schedule_one,
+        first_schedule_two,
+        last_schedule_two,
+        first_schedule_three,
+        last_schedule_three
+      ]
+
+      expected_route_a = [
+        %Screens.Routes.Route{
+          direction_destinations: nil,
+          direction_names: ["Northbound", "Southbound"],
+          id: "r1",
+          line: %Screens.Lines.Line{id: "l1", long_name: nil, short_name: nil, sort_order: nil},
+          long_name: nil,
+          short_name: nil,
+          type: :bus
+        }
+      ]
+
+      expected_route_c = [
+        %Screens.Routes.Route{
+          id: "r2",
+          short_name: nil,
+          long_name: nil,
+          direction_names: ["Eastbound", "Westbound"],
+          direction_destinations: nil,
+          type: :bus,
+          line: %Screens.Lines.Line{id: "l2", long_name: nil, short_name: nil, sort_order: nil}
+        }
+      ]
+
+      departures = %Departures{
+        sections: [
+          %Section{query: %Query{params: %Query.Params{route_type: :bus, stop_ids: stop_ids}}}
+        ]
+      }
+
+      departure_overlapping_with_headway = %Departure{
+        prediction: %Prediction{
+          departure_time: ~U[2024-10-11 10:45:00Z],
+          route: %Route{
+            id: "r2",
+            line: %Line{id: "l2"},
+            type: :bus,
+            direction_names: ["Eastbound", "Westbound"]
+          },
+          stop: %Stop{id: "sE"},
+          trip: %Trip{headsign: "h2", pattern_headsign: "hB", direction_id: 1}
+        },
+        schedule: nil
+      }
+
+      expect(@route_pattern, :fetch, fn %{route_type: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+        {:ok, patterns}
+      end)
+
+      stub(@headways, :get, fn _, _ -> {5, 10} end)
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
+      expect(@departure, :fetch, fn
+        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
+          {:ok, [departure_overlapping_with_headway]}
+      end)
+
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids)
+
+      assert RDS.get(departures, now) == [
+               {:ok,
+                [
+                  countdowns([{"sE", "l2", "hB"}], [departure_overlapping_with_headway]),
+                  headways([{"sA", "l1", "hA"}], "hA", expected_route_a, 0),
+                  headways([{"sC", "l2", "hC"}], "hC", expected_route_c, 0)
                 ]}
              ]
     end
@@ -871,7 +1094,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               {:ok, [no_service("sB", "l2", "hB"), no_service("sC", "l2", "hC")]}
+               {:ok, [no_service([{"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
              ]
     end
 
@@ -902,7 +1125,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               {:ok, [no_service("sB", "l2", "hB"), no_service("sC", "l2", "hC")]}
+               {:ok, [no_service([{"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
              ]
     end
 
@@ -959,7 +1182,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               {:ok, [no_service("sA", "l1", "hA"), no_service("sC", "l2", "hC")]}
+               {:ok, [no_service([{"sA", "l1", "hA"}, {"sC", "l2", "hC"}])]}
              ]
     end
 
@@ -1021,12 +1244,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures) == [
-               {:ok,
-                [
-                  no_service("sA", "l1", "hA"),
-                  no_service("sB", "l2", "hB"),
-                  no_service("sC", "l2", "hC")
-                ]}
+               {:ok, [no_service([{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
              ]
     end
   end
@@ -1224,7 +1442,10 @@ defmodule Screens.V2.RDSTest do
       }
 
       assert RDS.get(departures, now) ==
-               [{:ok, [countdowns("s1", "l1", "h1", expected_departures)]}, :error]
+               [
+                 {:ok, [countdowns([{"s1", "l1", "h1"}], expected_departures)]},
+                 :error
+               ]
     end
 
     test "returns :error when a section has a disabled mode" do
@@ -1292,7 +1513,7 @@ defmodule Screens.V2.RDSTest do
 
       assert RDS.get(departures, now) == [
                {:ok, []},
-               {:ok, [countdowns("s1", "l2", "h2", subway_departures)]}
+               {:ok, [countdowns([{"s1", "l2", "h2"}], subway_departures)]}
              ]
     end
   end

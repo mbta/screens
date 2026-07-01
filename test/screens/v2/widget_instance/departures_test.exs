@@ -114,7 +114,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %HeadwaySection{route: "Red", time_range: {1, 2}, headsign: "Test"}
+      section = %HeadwaySection{route_id: "Red", time_range: {1, 2}, headsign: "Test"}
 
       expected_text = %{
         icon: "subway-negative-black",
@@ -136,7 +136,11 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
            dup_screen: dup_screen,
            now: now
          } do
-      section = %HeadwaySection{route: "Red", time_range: {1, 2}, headsign: "Ashmont/Braintree"}
+      section = %HeadwaySection{
+        route_id: "Red",
+        time_range: {1, 2},
+        headsign: "Ashmont/Braintree"
+      }
 
       expected_text = %{
         icon: "subway-negative-black",
@@ -156,7 +160,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %HeadwaySection{route: "Red", time_range: {1, 2}, headsign: nil}
+      section = %HeadwaySection{route_id: "Red", time_range: {1, 2}, headsign: nil}
 
       expected_text = %{
         icon: :red,
@@ -171,7 +175,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %HeadwaySection{route: "Red", time_range: {12, 15}, headsign: "Alewife"}
+      section = %HeadwaySection{route_id: "Red", time_range: {12, 15}, headsign: "Alewife"}
 
       expected_text = %{
         icon: :red,

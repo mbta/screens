@@ -66,7 +66,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       )
 
     secondary_departure_sections =
-      if secondary_rds_sections == [] or Enum.all?(secondary_rds_sections, &(&1 == {:ok, []})) do
+      if secondary_rds_sections == [] or
+           Enum.all?(secondary_rds_sections, &(&1 == {:ok, []})) do
         primary_departure_sections
       else
         RdsDepartures.create_departure_sections(

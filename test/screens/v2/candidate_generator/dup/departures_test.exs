@@ -44,54 +44,52 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   }
 
   defp rds_countdown(stop_id, line_id, headsign, expected_departures) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.Countdowns{
-        departures: expected_departures
-      }
+    destination = {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+
+    %RDS.Countdowns{
+      destinations: [destination],
+      departures: expected_departures
     }
   end
 
   defp no_service(stop_id, line_id, headsign, routes \\ []) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.NoService{routes: routes, direction_id: 0}
+    destination = {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+
+    %RDS.NoService{
+      destinations: [destination],
+      routes: routes,
+      direction_id: 0
     }
   end
 
   defp first_trip(stop_id, line_id, headsign, first_schedule) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.FirstTrip{first_schedule: first_schedule}
+    destination = {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+
+    %RDS.FirstTrip{
+      destinations: [destination],
+      first_schedule: first_schedule
     }
   end
 
   defp service_ended(stop_id, line_id, headsign, last_schedule) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.ServiceEnded{last_schedule: last_schedule}
+    destination = {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+
+    %RDS.ServiceEnded{
+      destinations: [destination],
+      routes: [last_schedule.route],
+      last_schedule: last_schedule
     }
   end
 
-  defp headways(stop_id, line_id, headsign, route_id, direction_name, direction_id, range) do
-    %RDS{
-      stop: %Stop{id: stop_id},
-      line: %Line{id: line_id},
-      headsign: headsign,
-      state: %RDS.Headways{
-        route_id: route_id,
-        direction_name: direction_name,
-        direction_id: direction_id,
-        range: range
-      }
+  defp headways(stop_id, line_id, headsign, route_id, direction_id, range) do
+    destination = {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+
+    %RDS.Headways{
+      destinations: [destination],
+      routes: [%Route{id: route_id}],
+      displayed_headsign: headsign,
+      direction_id: direction_id,
+      range: range
     }
   end
 
@@ -301,7 +299,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         ]
       end)
 
-      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+      expect(@rds, :get, fn _secondary_departures, @now ->
+        [{:ok, []}, {:ok, []}]
+      end)
 
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
@@ -359,15 +359,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       expect(@rds, :get, fn _primary_departures, @now ->
         [
-          {:ok,
-           [
-             rds_countdown("s1", "l1", "other1", expected_departures)
-           ]},
+          {:ok, [rds_countdown("s1", "l1", "other1", expected_departures)]},
           {:ok, [no_service("s2", "l2", "other2")]}
         ]
       end)
 
-      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+      expect(@rds, :get, fn _secondary_departures, @now ->
+        [{:ok, []}, {:ok, []}]
+      end)
 
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
@@ -432,7 +431,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         ]
       end)
 
-      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+      expect(@rds, :get, fn _secondary_departures, @now ->
+        [{:ok, []}, {:ok, []}]
+      end)
 
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
@@ -872,14 +873,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       expect(@rds, :get, fn _primary_departures, _now ->
         [
-          {:ok,
-           [
-             first_trip("s1", "l3", "other3", expected_first_schedule)
-           ]},
-          {:ok,
-           [
-             service_ended("s3", "l1", "other1", expected_last_schedule)
-           ]}
+          {:ok, [first_trip("s1", "l3", "other3", expected_first_schedule)]},
+          {:ok, [service_ended("s3", "l1", "other1", expected_last_schedule)]}
         ]
       end)
 
@@ -929,14 +924,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       expect(@rds, :get, fn _primary_departures, _now ->
         [
-          {:ok,
-           [
-             service_ended("s1", "l1", "other1", expected_last_schedule_one)
-           ]},
-          {:ok,
-           [
-             service_ended("s3", "l3", "other3", expected_last_schedule_two)
-           ]}
+          {:ok, [service_ended("s1", "l1", "other1", expected_last_schedule_one)]},
+          {:ok, [service_ended("s3", "l3", "other3", expected_last_schedule_two)]}
         ]
       end)
 
@@ -962,7 +951,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_primary_sections = [
         %Screens.V2.WidgetInstance.Departures.HeadwaySection{
           headsign: expected_headsign,
-          route: expected_route_id,
+          route_id: expected_route_id,
           time_range: expected_time_range
         }
       ]
@@ -980,16 +969,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                "l1",
                "headsign",
                expected_route_id,
-               "Northbound",
-               0,
-               expected_time_range
-             ),
-             headways(
-               "s1",
-               "l1",
-               "headsign",
-               expected_route_id,
-               "Northbound",
                0,
                expected_time_range
              )
@@ -1007,7 +986,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert actual_instances == expected_instances
     end
 
-    test "creates HeadwaySections for destinations with headways with different headsigns" do
+    test "creates HeadwaySections for only headway sections" do
       primary_departures = [
         %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
         %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
@@ -1020,7 +999,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_primary_sections = [
         %Screens.V2.WidgetInstance.Departures.HeadwaySection{
           headsign: expected_direction_name,
-          route: expected_route_id,
+          route_id: expected_route_id,
           time_range: expected_time_range
         }
       ]
@@ -1036,18 +1015,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
              headways(
                "s1",
                "l1",
-               "headsign",
+               "Northbound",
                expected_route_id,
-               expected_direction_name,
-               0,
-               expected_time_range
-             ),
-             headways(
-               "s1",
-               "l1",
-               "other_headsign",
-               expected_route_id,
-               expected_direction_name,
                0,
                expected_time_range
              )
@@ -1068,7 +1037,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     test "creates NormalSections for departures and headways" do
       expected_route_id = "r1"
       expected_time_range = {6, 10}
-      expected_direction_name = "Northbound"
 
       primary_departures = [
         %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
@@ -1123,173 +1091,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
                "l1",
                "other_headsign",
                expected_route_id,
-               expected_direction_name,
-               0,
-               expected_time_range
-             )
-           ]}
-        ]
-      end)
-
-      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}] end)
-
-      expected_instances =
-        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
-
-      actual_instances = Dup.Departures.instances(config, @now)
-
-      assert actual_instances == expected_instances
-    end
-
-    test "creates NormalSections but removes headways when similar line/direction_id destinations in Countdown state" do
-      expected_route_id = "r1"
-      expected_time_range = {6, 10}
-      expected_direction_name = "Northbound"
-
-      primary_departures = [
-        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
-      ]
-
-      expected_primary_departure =
-        %Departure{
-          prediction: %Prediction{
-            arrival_time: ~U[2024-10-11 12:27:00Z],
-            departure_time: ~U[2024-10-11 12:30:00Z],
-            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
-            stop: %Stop{id: "s1"},
-            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 0}
-          },
-          schedule: nil
-        }
-
-      expected_primary_sections = [
-        %Screens.V2.WidgetInstance.Departures.NormalSection{
-          header: %ScreensConfig.Departures.Header{
-            arrow: nil,
-            read_as: nil,
-            subtitle: nil,
-            title: nil
-          },
-          layout: %ScreensConfig.Departures.Layout{
-            base: nil,
-            include_later: false,
-            max: nil,
-            min: 1
-          },
-          grouping_type: :time,
-          rows: [
-            expected_primary_departure
-          ]
-        }
-      ]
-
-      config =
-        @config
-        |> put_primary_departures(primary_departures)
-
-      expect(@rds, :get, fn _primary_departures, @now ->
-        [
-          {:ok,
-           [
-             rds_countdown("s1", "l1", "other1", [expected_primary_departure]),
-             headways(
-               "s1",
-               "l1",
-               "other_headsign",
-               expected_route_id,
-               expected_direction_name,
-               0,
-               expected_time_range
-             )
-           ]}
-        ]
-      end)
-
-      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}] end)
-
-      expected_instances =
-        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
-
-      actual_instances = Dup.Departures.instances(config, @now)
-
-      assert actual_instances == expected_instances
-    end
-
-    test "creates NormalSections but removes headways when similar line/direction_id destinations are in No Service state" do
-      expected_route_id = "r1"
-      expected_time_range = {6, 10}
-      expected_direction_name = "Northbound"
-
-      primary_departures = [
-        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{stop_ids: ["s2"]}}}
-      ]
-
-      expected_primary_departure =
-        %Departure{
-          prediction: %Prediction{
-            arrival_time: ~U[2024-10-11 12:27:00Z],
-            departure_time: ~U[2024-10-11 12:30:00Z],
-            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
-            stop: %Stop{id: "s1"},
-            trip: %Trip{headsign: "other1", pattern_headsign: "h1", direction_id: 0}
-          },
-          schedule: nil
-        }
-
-      expected_primary_sections = [
-        %Screens.V2.WidgetInstance.Departures.NormalSection{
-          header: %ScreensConfig.Departures.Header{
-            arrow: nil,
-            read_as: nil,
-            subtitle: nil,
-            title: nil
-          },
-          layout: %ScreensConfig.Departures.Layout{
-            base: nil,
-            include_later: false,
-            max: nil,
-            min: 1
-          },
-          grouping_type: :time,
-          rows: [
-            expected_primary_departure
-          ]
-        }
-      ]
-
-      config =
-        @config
-        |> put_primary_departures(primary_departures)
-
-      expect(@rds, :get, fn _primary_departures, @now ->
-        [
-          {:ok,
-           [
-             rds_countdown("s1", "l1", "other1", [expected_primary_departure]),
-             no_service("s1", "l2", "some_headsign", [
-               %Screens.Routes.Route{
-                 id: "r1",
-                 short_name: nil,
-                 long_name: nil,
-                 direction_names: nil,
-                 direction_destinations: nil,
-                 type: :bus,
-                 line: %Screens.Lines.Line{
-                   id: "l2",
-                   long_name: nil,
-                   short_name: nil,
-                   sort_order: nil
-                 }
-               }
-             ]),
-             headways(
-               "s1",
-               "l2",
-               "other_headsign",
-               expected_route_id,
-               expected_direction_name,
                0,
                expected_time_range
              )

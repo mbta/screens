@@ -47,10 +47,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     @type t :: %__MODULE__{
             headsign: String.t() | nil,
-            route: Route.id(),
+            route_id: Route.id(),
             time_range: Headways.range()
           }
-    defstruct ~w[headsign route time_range]a
+    defstruct ~w[headsign route_id time_range]a
   end
 
   defmodule OvernightSection do
@@ -197,12 +197,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %HeadwaySection{route: route, time_range: time_range, headsign: headsign},
+        %HeadwaySection{route_id: route_id, time_range: time_range, headsign: headsign},
         _screen,
         _now,
         is_only_section
       ) do
-    pill_color = Route.color(route)
+    pill_color = Route.color(route_id)
 
     layout =
       cond do
@@ -211,7 +211,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         true -> :row_with_headsign
       end
 
-    text = get_headway_text(headsign, time_range, pill_color, route, is_only_section)
+    text = get_headway_text(headsign, time_range, pill_color, route_id, is_only_section)
 
     %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end

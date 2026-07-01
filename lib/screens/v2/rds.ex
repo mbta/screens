@@ -35,16 +35,15 @@ defmodule Screens.V2.RDS do
 
   alias __MODULE__.{Countdowns, FirstTrip, Headways, NoService, ServiceEnded}
 
-  @type state :: NoService.t() | Countdowns.t() | FirstTrip.t() | ServiceEnded.t() | Headways.t()
+  @type item :: NoService.t() | Countdowns.t() | FirstTrip.t() | ServiceEnded.t() | Headways.t()
 
-  @type t :: %__MODULE__{stop: Stop.t(), line: Line.t(), headsign: String.t(), state: state()}
-  @enforce_keys ~w[stop line headsign state]a
+  @enforce_keys ~w[data]a
   defstruct @enforce_keys
 
-  @type section_t :: {:ok, [t()]} | :error
+  @type data :: {:ok, [item()]} | :error
   @type destination_key :: {Stop.id(), Line.id(), String.t()}
+  @type destination :: {Stop.t(), Line.t(), String.t()}
 
-  @typep destination :: {Stop.t(), Line.t(), String.t()}
   @typep scheduled_service_state :: :after | :before | :none | :within
 
   @red_trunk [70_061..70_061, 70_063..70_084]
@@ -58,8 +57,12 @@ defmodule Screens.V2.RDS do
     has no relevant live data (alerts or predictions)
     and no scheduled departures for the day.
     """
-    @type t :: %__MODULE__{routes: [Route.t()], direction_id: Trip.direction() | nil}
-    defstruct ~w[routes direction_id]a
+    @type t :: %__MODULE__{
+            destinations: [Screens.V2.RDS.destination()],
+            routes: [Route.t()],
+            direction_id: Trip.direction() | nil
+          }
+    defstruct ~w[destinations routes direction_id]a
   end
 
   defmodule Countdowns do
@@ -67,8 +70,11 @@ defmodule Screens.V2.RDS do
     State when there is upcoming service to a destination
     and/or alerts which affect service to the destination.
     """
-    @type t :: %__MODULE__{departures: [Departure.t(), ...]}
-    defstruct ~w[departures]a
+    @type t :: %__MODULE__{
+            destinations: [Screens.V2.RDS.destination()],
+            departures: [Departure.t(), ...]
+          }
+    defstruct ~w[destinations departures]a
   end
 
   defmodule FirstTrip do
@@ -77,17 +83,26 @@ defmodule Screens.V2.RDS do
     showing the first scheduled trip of the day for a
     given destination.
     """
-    @type t :: %__MODULE__{first_schedule: Schedule.t()}
-    defstruct ~w[first_schedule]a
+    @type t :: %__MODULE__{
+            destinations: [Screens.V2.RDS.destination()],
+            first_schedule: Schedule.t()
+          }
+    defstruct ~w[destinations first_schedule]a
   end
 
   defmodule ServiceEnded do
     @moduledoc """
     State for after the end of the last scheduled departure
-    or if we observe a departure that is the Last Trip of the Day
+    or if we observe a departure that is the Last Trip of the Day.
+    If last_schedule is nil, it means that we have consolidated
+    all of the `ServiceEnded` states into one item.
     """
-    @type t :: %__MODULE__{last_schedule: Schedule.t()}
-    defstruct ~w[last_schedule]a
+    @type t :: %__MODULE__{
+            destinations: [Screens.V2.RDS.destination()],
+            routes: [Route.t()],
+            last_schedule: Schedule.t() | nil
+          }
+    defstruct ~w[destinations routes last_schedule]a
   end
 
   defmodule Headways do
@@ -98,12 +113,13 @@ defmodule Screens.V2.RDS do
     Shows an every “X-Y” minutes message. 
     """
     @type t :: %__MODULE__{
-            route_id: Route.id(),
-            direction_name: String.t(),
-            direction_id: Trip.direction(),
-            range: Headway.range()
+            destinations: [Screens.V2.RDS.destination()],
+            routes: [Route.t()],
+            displayed_headsign: String.t(),
+            range: Headway.range(),
+            direction_id: Trip.direction() | nil
           }
-    defstruct ~w[route_id direction_name direction_id range]a
+    defstruct ~w[destinations routes displayed_headsign range direction_id]a
   end
 
   @alert injected(Alert)
@@ -125,8 +141,8 @@ defmodule Screens.V2.RDS do
 
   ⚠️ Enforces that every section's query contains at least one ID in `stop_ids`.
   """
-  @callback get(Departures.t()) :: [section_t()]
-  @callback get(Departures.t(), DateTime.t()) :: [section_t()]
+  @callback get(Departures.t()) :: [data()]
+  @callback get(Departures.t(), DateTime.t()) :: [data()]
   def get(%Departures{sections: sections}, now \\ DateTime.utc_now()),
     do:
       sections
@@ -140,7 +156,7 @@ defmodule Screens.V2.RDS do
           :error
       end)
 
-  @spec from_section(Section.t(), DateTime.t()) :: section_t()
+  @spec from_section(Section.t(), DateTime.t()) :: data()
   defp from_section(
          %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids} = params}},
          now
@@ -215,30 +231,25 @@ defmodule Screens.V2.RDS do
     # Destinations that are affected by current alerts at the present stop ID
     impacted_destinations = informed_destinations(destinations, alerts, typical_patterns)
 
-    section_rds =
+    items =
       destinations
-      |> Enum.map(fn {%Stop{id: stop_id} = stop, line, headsign} = destination ->
+      |> Enum.map(fn destination ->
         key = to_destination_key(destination)
 
-        %__MODULE__{
-          stop: stop,
-          line: line,
-          headsign: headsign,
-          state:
-            destination_state(
-              Map.get(departures_by_destination, key, []),
-              Map.get(schedules_by_destination, key, []),
-              @headways.get(stop_id, now),
-              routes_for_section,
-              last_trip_departed?(key, now),
-              destination in impacted_destinations,
-              now
-            )
-        }
+        destination_state(
+          destination,
+          Map.get(departures_by_destination, key, []),
+          Map.get(schedules_by_destination, key, []),
+          routes_for_section,
+          last_trip_departed?(key, now),
+          destination in impacted_destinations,
+          now
+        )
       end)
-      |> Enum.reject(&is_nil(&1.state))
+      |> Enum.reject(&is_nil(&1))
+      |> maybe_combine_states()
 
-    {:ok, section_rds}
+    {:ok, items}
   end
 
   @spec tuples_from_departures([Departure.t()], DateTime.t()) :: [destination()]
@@ -264,23 +275,25 @@ defmodule Screens.V2.RDS do
   end
 
   @spec destination_state(
+          destination(),
           [Departure.t()],
           [Schedule.t()],
-          Headway.range() | nil,
           [Route.t()],
           boolean(),
           boolean(),
           DateTime.t()
-        ) :: state() | nil
+        ) :: item() | nil
   defp destination_state(
+         {%Stop{id: stop_id}, _line, _headsign} = destination,
          departures,
          schedules,
-         headways,
          routes_for_section,
          last_trip_departed?,
          impacted_by_alert?,
          now
        ) do
+    headways = @headways.get(stop_id, now)
+
     {first_schedule, last_schedule} =
       schedules
       |> Enum.sort_by(&Schedule.time(&1), DateTime)
@@ -293,13 +306,46 @@ defmodule Screens.V2.RDS do
       scheduled_service_state(first_schedule, last_schedule, headways, last_trip_departed?, now)
 
     cond do
-      presented_departures != [] -> %Countdowns{departures: presented_departures}
-      impacted_by_alert? -> nil
-      departures == [] and service_state == :none -> %NoService{routes: routes_for_section}
-      departures == [] and service_state == :after -> %ServiceEnded{last_schedule: last_schedule}
-      service_state == :before -> %FirstTrip{first_schedule: first_schedule}
-      not (is_nil(headways) or is_nil(first_schedule)) -> headways_state(headways, first_schedule)
-      true -> nil
+      presented_departures != [] ->
+        %Countdowns{
+          destinations: [destination],
+          departures: presented_departures
+        }
+
+      impacted_by_alert? ->
+        nil
+
+      departures == [] and service_state == :none ->
+        %NoService{
+          destinations: [destination],
+          routes: routes_for_section,
+          direction_id:
+            case first_schedule || last_schedule do
+              %Schedule{trip: %Trip{direction_id: direction_id}} -> direction_id
+              nil -> nil
+            end
+        }
+
+      departures == [] and service_state == :after ->
+        %Schedule{route: route} = last_schedule
+
+        %ServiceEnded{
+          destinations: [destination],
+          last_schedule: last_schedule,
+          routes: [route]
+        }
+
+      service_state == :before ->
+        %FirstTrip{
+          destinations: [destination],
+          first_schedule: first_schedule
+        }
+
+      not (is_nil(headways) or is_nil(first_schedule)) ->
+        headways_item(destination, headways, first_schedule)
+
+      true ->
+        nil
     end
   end
 
@@ -311,17 +357,194 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  defp headways_state(headways, %Schedule{
-         route: %Route{id: route_id} = route,
-         trip: %Trip{direction_id: direction_id}
-       }) do
+  defp headways_item(
+         {_stop, _line, headsign} = destination,
+         headways,
+         %Schedule{
+           route: route,
+           trip: %Trip{direction_id: direction_id}
+         }
+       ) do
     %Headways{
-      route_id: route_id,
-      direction_name: route |> Route.normalized_direction_names() |> Enum.at(direction_id),
+      destinations: [destination],
+      routes: [route],
+      displayed_headsign: headsign,
       direction_id: direction_id,
       range: headways
     }
   end
+
+  @spec maybe_combine_states([item()]) :: [item()]
+  defp maybe_combine_states(states) do
+    cond do
+      states == [] ->
+        []
+
+      no_service?(states) ->
+        [
+          %NoService{
+            destinations: states |> Enum.flat_map(& &1.destinations) |> Enum.uniq(),
+            routes: states |> Enum.flat_map(& &1.routes) |> Enum.uniq(),
+            direction_id: nil
+          }
+        ]
+
+      service_ended?(states) ->
+        [
+          %ServiceEnded{
+            destinations: states |> Enum.flat_map(& &1.destinations) |> Enum.uniq(),
+            routes: states |> Enum.flat_map(& &1.routes) |> Enum.uniq(),
+            last_schedule: nil
+          }
+        ]
+
+      headways?(states) ->
+        combine_headway_states_for_section(states)
+
+      true ->
+        maybe_combine_multiple_states(states)
+    end
+  end
+
+  defp combine_headway_states_for_section(
+         [
+           %Headways{
+             destinations: [{_stop, %Line{id: line_id}, first_headsign}],
+             routes: [route],
+             range: range
+           }
+           | _
+         ] = states
+       ) do
+    destinations = Enum.flat_map(states, & &1.destinations)
+
+    direction_id =
+      states
+      |> Enum.map(& &1.direction_id)
+      |> Enum.uniq()
+      |> case do
+        [one_direction] -> one_direction
+        _ -> nil
+      end
+
+    displayed_headsign =
+      cond do
+        # Use the headsign if all destinations have the same headsign,
+        Enum.all?(destinations, fn {_stop, _line, other_headsign} ->
+          first_headsign == other_headsign
+        end) ->
+          first_headsign
+
+        # Use the direction name if destinations have the same direction name,
+        direction_id != nil and
+            Enum.all?(
+              destinations,
+              fn {_stop, %Line{id: other_line_id}, _other_headsign} ->
+                line_id == other_line_id
+              end
+            ) ->
+          route |> Route.normalized_direction_names() |> Enum.at(direction_id)
+
+        true ->
+          nil
+      end
+
+    [
+      %Headways{
+        destinations: destinations,
+        routes: states |> Enum.flat_map(& &1.routes) |> Enum.uniq(),
+        displayed_headsign: displayed_headsign,
+        range: range
+      }
+    ]
+  end
+
+  defp maybe_combine_multiple_states(states) do
+    grouped_rds =
+      Enum.group_by(states, fn
+        %Headways{} -> :headways
+        %Countdowns{} -> :countdowns
+        _ -> :other
+      end)
+
+    other_states = Map.get(grouped_rds, :other, [])
+    countdowns_states = Map.get(grouped_rds, :countdowns, [])
+
+    lines_in_other_states =
+      (other_states ++ countdowns_states)
+      |> Enum.flat_map(&extract_line_direction_pairs/1)
+      |> MapSet.new()
+
+    headway_states =
+      grouped_rds
+      |> Map.get(:headways, [])
+      |> maybe_combine_headway_states(lines_in_other_states)
+
+    combined_countdown_state =
+      countdowns_states
+      |> then(fn
+        [] ->
+          []
+
+        [%Countdowns{}] = countdowns ->
+          countdowns
+
+        [%Countdowns{} | _] = countdowns ->
+          [
+            %Countdowns{
+              destinations: countdowns |> Enum.flat_map(& &1.destinations),
+              departures: countdowns |> Enum.flat_map(& &1.departures)
+            }
+          ]
+      end)
+
+    combined_countdown_state ++
+      headway_states ++
+      other_states
+  end
+
+  defp maybe_combine_headway_states(headway_states, lines_in_other_states)
+       when length(headway_states) > 1 do
+    headway_states
+    |> Enum.reject(fn %Headways{
+                        destinations: [
+                          {_stop, %Line{id: line_id}, _headsign}
+                        ],
+                        direction_id: direction_id
+                      } ->
+      MapSet.member?(lines_in_other_states, {line_id, direction_id})
+    end)
+    |> Enum.group_by(fn %Headways{
+                          destinations: [
+                            {_stop, %Line{id: line_id}, _headsign}
+                          ],
+                          direction_id: direction_id
+                        } ->
+      {line_id, direction_id}
+    end)
+    |> Enum.flat_map(fn {{_line_id, direction_id}, states} ->
+      %Headways{routes: [route], displayed_headsign: headsign, range: range} = hd(states)
+
+      # If there are multiple headways with the same line but different headsigns,
+      # combine them and use the direction name
+      displayed_headsign =
+        if length(states) == 1,
+          do: headsign,
+          else: route |> Route.normalized_direction_names() |> Enum.at(direction_id)
+
+      [
+        %Headways{
+          destinations: states |> Enum.flat_map(& &1.destinations),
+          routes: states |> Enum.flat_map(& &1.routes),
+          direction_id: direction_id,
+          range: range,
+          displayed_headsign: displayed_headsign
+        }
+      ]
+    end)
+  end
+
+  defp maybe_combine_headway_states(headways, _line_direction_pairs), do: headways
 
   @spec scheduled_service_state(
           Schedule.t() | nil,
@@ -476,6 +699,18 @@ defmodule Screens.V2.RDS do
     end)
   end
 
+  defp no_service?(states) do
+    Enum.all?(states, &is_struct(&1, NoService))
+  end
+
+  defp service_ended?(states) do
+    Enum.all?(states, &is_struct(&1, ServiceEnded))
+  end
+
+  defp headways?(states) do
+    Enum.all?(states, &is_struct(&1, Headways))
+  end
+
   @spec ie_affects_destination?(InformedEntity.t(), RoutePattern.t(), Stop.t()) :: boolean()
   # Alert effects the entire route
   defp ie_affects_destination?(
@@ -526,5 +761,26 @@ defmodule Screens.V2.RDS do
       )
 
     DateTime.after?(now, departure_time_with_buffer)
+  end
+
+  defp extract_line_direction_pairs(
+         %{destinations: [{_stop, %Line{id: line_id}, _headsign}]} = state
+       ) do
+    case state do
+      %NoService{direction_id: nil} ->
+        []
+
+      %NoService{direction_id: direction_id} ->
+        [{line_id, direction_id}]
+
+      %Countdowns{departures: [departure | _]} ->
+        [{line_id, Departure.direction_id(departure)}]
+
+      %FirstTrip{first_schedule: %Schedule{trip: %Trip{direction_id: direction_id}}} ->
+        [{line_id, direction_id}]
+
+      %ServiceEnded{last_schedule: %Schedule{trip: %Trip{direction_id: direction_id}}} ->
+        [{line_id, direction_id}]
+    end
   end
 end
