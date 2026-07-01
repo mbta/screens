@@ -1,8 +1,9 @@
 # To run this file, create an updated CSV of headsign abbreviations.
 # Format the CSV with the base headsign as column 0, and any abbreviations as columns 1+.
-# Example Run:
-# elixir scripts/generate_headsign_abbreviations.exs --input "priv/local/abbreviations.csv"
-# elixir scripts/generate_headsign_abbreviations.exs --input "priv/local/abbreviations.csv" --output abbreviations.exs
+# Output will be writtent to priv/local/ directory, with a default file name of headsign_abbreviations.exs
+# Example Runs:
+# elixir scripts/generate_headsign_abbreviations.exs --input priv/local/abbreviations.csv
+# elixir scripts/generate_headsign_abbreviations.exs --input priv/local/abbreviations.csv --output abbreviations.exs
 
 {[input: input, output: output], _, _} =
   System.argv()
