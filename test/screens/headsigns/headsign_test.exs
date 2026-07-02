@@ -26,7 +26,7 @@ defmodule Screens.Headsigns.HeadsignTest do
     end
 
     test "single word with abbreviation" do
-      assert Headsign.abbreviations("Street") == ["St"]
+      assert Headsign.abbreviations("Street") == ["Street", "St"]
     end
 
     test "single word without abbreviation" do
@@ -35,32 +35,33 @@ defmodule Screens.Headsigns.HeadsignTest do
 
     test "multiple words, all with abbreviations" do
       assert Headsign.abbreviations("Cleveland Street Avenue South") == [
+               "Cleveland Street Avenue South",
                "Clvlnd St Ave So"
              ]
     end
 
     test "multiple words, mixed abbreviations and non-abbreviations" do
-      assert Headsign.abbreviations("Main Street") == ["Main St"]
+      assert Headsign.abbreviations("Main Street") == ["Main Street", "Main St"]
     end
 
     test "words with leading and trailing whitespace" do
-      assert Headsign.abbreviations(" Tappan Street  ") == ["Tappan St"]
+      assert Headsign.abbreviations(" Tappan Street  ") == ["  Tappan Street  ", "Tappan St"]
     end
 
     test "multiple spaces between words" do
-      assert Headsign.abbreviations("Street  Avenue") == ["St Ave"]
+      assert Headsign.abbreviations("Street  Avenue") == ["Street  Avenue", "St Ave"]
     end
 
     test "special abbreviations with numbers" do
-      assert Headsign.abbreviations("One") == ["1"]
+      assert Headsign.abbreviations("One") == ["One", "1"]
     end
 
     test "special abbreviations with periods" do
-      assert Headsign.abbreviations("Saint") == ["St."]
+      assert Headsign.abbreviations("Saint") == ["Saint", "St."]
     end
 
     test "complex abbreviations with special characters" do
-      assert Headsign.abbreviations("Government") == ["Gov't"]
+      assert Headsign.abbreviations("Government") == ["Government", "Gov't"]
     end
   end
 end

@@ -11,12 +11,15 @@ defmodule Screens.Headsigns.Headsign do
   @spec abbreviations(String.t()) :: [String.t()]
   def abbreviations(base_headsign) do
     case(Map.get(@headsign_abbreviations, base_headsign, [])) do
-      [] -> abbreviate_by_word(base_headsign)
-      abbreviations -> abbreviations |> Enum.uniq()
+      [] ->
+        Enum.uniq([base_headsign, abbreviate_by_word(base_headsign)])
+
+      abbreviations ->
+        abbreviations |> Enum.uniq()
     end
   end
 
-  @spec abbreviate_by_word(String.t()) :: [String.t()]
+  @spec abbreviate_by_word(String.t()) :: String.t()
   defp abbreviate_by_word(base_headsign) do
     # Fallback case for when we don't have explicitly defined abbreviations for a headsign
     # Returns a single abbreviated headsign in which all words are abbreviated if possible, otherwise the original word is used.
@@ -25,6 +28,5 @@ defmodule Screens.Headsigns.Headsign do
     |> String.split(" ")
     |> Enum.reject(&(&1 == ""))
     |> Enum.map_join(" ", &Map.get(@word_abbreviations, &1, String.trim(&1)))
-    |> List.wrap()
   end
 end
