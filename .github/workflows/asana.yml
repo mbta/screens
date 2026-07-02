@@ -3,7 +3,8 @@ on:
   pull_request:
     types: [edited, opened]
 
-permissions: {}
+permissions:
+  pull-requests: read # Needed to read Asana ticket info from PR description
 
 jobs:
   asana:
