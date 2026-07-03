@@ -45,7 +45,7 @@ defmodule Screens.Headsigns.HeadsignTest do
     end
 
     test "words with leading and trailing whitespace" do
-      assert Headsign.abbreviations(" Tappan Street  ") == ["  Tappan Street  ", "Tappan St"]
+      assert Headsign.abbreviations("  Tappan Street  ") == ["  Tappan Street  ", "Tappan St"]
     end
 
     test "multiple spaces between words" do

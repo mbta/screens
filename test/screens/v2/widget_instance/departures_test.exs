@@ -727,6 +727,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_headsign([departure], bus_shelter_screen)
     end
 
+    test "does not handle via on DUPs", %{dup_screen: dup_screen} do
+      departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Nubian via Allston"}}}
+
+      assert %{headsign: "Nubian via Allston", variation: nil, headsigns: ["Nubian via Allston"]} ==
+               Departures.serialize_headsign([departure], dup_screen)
+    end
+
     test "handles parenthesized variations", %{bus_shelter_screen: bus_shelter_screen} do
       departure = %Departure{
         prediction: %Prediction{trip: %Trip{headsign: "Beth Israel (Limited Stops)"}}
@@ -734,22 +741,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert %{headsign: "Beth Israel", variation: "(Limited Stops)", headsigns: ["Beth Israel"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
-    end
-
-    test "handles DUPs", %{dup_screen: dup_screen} do
-      departure = %Departure{
-        prediction: %Prediction{trip: %Trip{headsign: "Test 1"}}
-      }
-
-      assert %{headsign: "T1", headsigns: ["T1"], variation: nil} ==
-               Departures.serialize_headsign([departure], dup_screen)
-
-      departure = %Departure{
-        prediction: %Prediction{trip: %Trip{headsign: "Test 2"}}
-      }
-
-      assert %{headsign: "Test 2", headsigns: ["Test 2"], variation: nil} ==
-               Departures.serialize_headsign([departure], dup_screen)
     end
 
     test "shortens shuttle headsigns", %{

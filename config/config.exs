@@ -458,20 +458,6 @@ config :screens,
       %{informed: "70278", not_informed: "70034", alert_headsign: "Forest Hills"},
       %{informed: "70035", not_informed: "70279", alert_headsign: "Oak Grove"}
     ]
-  },
-  dup_headsign_replacements: %{
-    "Government Center" => "Government Ctr",
-    "Charlestown Navy Yard" => "Charlestown",
-    "Saugus Center via Kennedy Dr & Square One Mall" => "Saugus Center via Kndy Dr & Square One",
-    "Malden via Square One Mall & Kennedy Dr" => "Malden via Square One Mall & Kndy Dr",
-    "Washington St & Pleasant St Weymouth" => "Washington St & Plsnt St Weymouth",
-    "Woodland Rd via Gateway Center" => "Woodland Rd via Gatew'y Center",
-    "Sullivan (Limited Stops)" => "Sullivan",
-    "Ruggles (Limited Stops)" => "Ruggles",
-    "Wickford Junction" => "Wickford Jct",
-    "Needham Heights" => "Needham Hts",
-    "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
-    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn"
   }
 
 config :screens, :screens_by_alert,
