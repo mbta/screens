@@ -75,7 +75,6 @@ describe("nextSizingState", () => {
     });
 
     test("decrements partsIndex2 when second line overflows and canAdjustSecondLine is true", () => {
-      // partsIndex2 - 1 > partsIndex1: 4 - 1 = 3 > 2
       const state = {
         ...twoLinesBase,
         partsIndex1: 2,
@@ -86,7 +85,6 @@ describe("nextSizingState", () => {
     });
 
     test("transitions to DONE when cannot adjust second line", () => {
-      // partsIndex2 - 1 = 3 - 1 = 2 = partsIndex1, so canAdjustSecondLine is false
       const state = {
         ...twoLinesBase,
         partsIndex1: 2,

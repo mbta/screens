@@ -151,8 +151,6 @@ const Destination: ComponentType<DupDestination> = ({
     }
   });
 
-   
-
   // Render paged version when done determining breaks
   if (phase === PHASES.DONE) {
     return (
