@@ -5,8 +5,6 @@ defmodule Screens.Headsigns.HeadsignTest do
 
   describe "abbreviations/1" do
     test "headsign with explicit abbreviations" do
-      assert Headsign.abbreviations("Alewife") == ["Alewife"]
-
       assert Headsign.abbreviations("Back of the Hill") == [
                "Back of the Hill",
                "Back of Hill",
@@ -31,6 +29,10 @@ defmodule Screens.Headsigns.HeadsignTest do
 
     test "single word without abbreviation" do
       assert Headsign.abbreviations("Terminal") == ["Terminal"]
+    end
+
+    test "multiple words without abbreviations" do
+      assert Headsign.abbreviations("Melnea Cass Blvd") == ["Melnea Cass Blvd"]
     end
 
     test "multiple words, all with abbreviations" do
