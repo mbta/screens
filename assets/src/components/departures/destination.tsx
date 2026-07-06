@@ -7,10 +7,15 @@ const abbreviate = (headsign: string): string => {
 
 type Destination = {
   headsign: string;
+  headsigns: string[];
   variation?: string;
 };
 
-const Destination: ComponentType<Destination> = ({ headsign, variation }) => {
+const Destination: ComponentType<Destination> = ({
+  headsign,
+  headsigns,
+  variation,
+}) => {
   return (
     <div className="departure-destination">
       <div className="departure-destination__headsign">
