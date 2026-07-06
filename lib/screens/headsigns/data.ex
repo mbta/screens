@@ -1,7 +1,7 @@
 defmodule Screens.Headsigns.Data do
   @moduledoc """
   Module for storing headsign abbreviations.
-  See the genereate_headsign_abbreviations.exs script
+  See the generate_headsign_abbreviations.exs script
   to see how to generate this data in bulk.
   """
 
