@@ -13,7 +13,6 @@ type Destination = {
 
 const Destination: ComponentType<Destination> = ({
   headsign,
-  headsigns,
   variation,
 }) => {
   return (

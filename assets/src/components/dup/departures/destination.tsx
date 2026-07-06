@@ -6,29 +6,79 @@ import { classWithModifier, hasOverflowX } from "Util/utils";
 
 type DupDestination = DestinationBase & { classModifier: string };
 
-// Global abbreviations
-const ABBREVIATIONS = {
-  Center: "Ctr",
-  Square: "Sq",
-  Court: "Crt",
-  Circle: "Cir",
-  South: "So",
-  West: "W",
-  Landing: "Ldg",
-  One: "1",
-  Washington: "Wash",
-  Street: "St",
-  College: "Col",
-  Cleveland: "Clvlnd",
-  Government: "Govt",
-  "Medford/Tufts": "Medfd/Tufts",
-};
-
 enum PHASES {
   ONE_LINE,
   TWO_LINES,
   DONE,
 }
+
+type SizingState = {
+  headsignIndex: number;
+  headsignsLength: number;
+  partsIndex1: number;
+  partsIndex2: number;
+  partsLength: number;
+  phase: PHASES;
+  firstLineFits: boolean;
+  secondLineFits: boolean;
+};
+
+// Returns the next state given current state and line-fit measurements,
+// or null if no update is needed (phase is already DONE or refs are absent).
+export const nextSizingState = (state: SizingState): Partial<SizingState> => {
+  const {
+    phase,
+    headsignIndex,
+    headsignsLength,
+    partsIndex1,
+    partsIndex2,
+    partsLength,
+    firstLineFits,
+    secondLineFits,
+  } = state;
+  const canAdjustSecondLine = partsIndex2 - 1 > partsIndex1;
+
+  switch (phase) {
+    case PHASES.ONE_LINE:
+      if (firstLineFits) {
+        return {
+          partsIndex1: partsLength,
+          partsIndex2: partsLength,
+          phase: PHASES.DONE,
+        };
+      } else if (headsignIndex < headsignsLength - 1) {
+        // Try shortened version of the headsign if available
+        return { headsignIndex: headsignIndex + 1 };
+      } else {
+        // No shorter version available; try to fit full headsign on 2 lines.
+        return { headsignIndex: 0, phase: PHASES.TWO_LINES };
+      }
+
+    case PHASES.TWO_LINES:
+      // Don't abbreviate if we fit on two lines either way
+      if (firstLineFits && secondLineFits) {
+        return { phase: PHASES.DONE };
+      } else {
+        if (!firstLineFits && partsIndex1 > 1) {
+          // Try all possible positions for the line break
+          return { partsIndex1: partsIndex1 - 1 };
+        } else if (headsignIndex < headsignsLength - 1) {
+          // Try to fit a full abbreviated headsign on 2 pages
+          return {
+            partsIndex1: partsLength,
+            partsIndex2: partsLength,
+            headsignIndex: headsignIndex + 1,
+          };
+        } else if (!secondLineFits && canAdjustSecondLine) {
+          // The shortest headsign doesn't fit on 2 lines
+          // Adjust the second line break to fit full words onto 2nd page
+          return { partsIndex2: partsIndex2 - 1 };
+        } else {
+          return { phase: PHASES.DONE };
+        }
+      }
+  }
+};
 
 const RenderedDestination = ({ parts, index1, index2, classModifier }) => {
   const currentPage = useCurrentPage();
@@ -64,16 +114,8 @@ const Destination: ComponentType<DupDestination> = ({
   const [partsIndex1, setPartsIndex1] = useState(parts.length);
   const [partsIndex2, setPartsIndex2] = useState(parts.length);
   const [phase, setPhase] = useState(PHASES.ONE_LINE);
-  
-  const resetIndices = () => {
-    setPartsIndex1(parts.length);
-    setPartsIndex2(parts.length);
-  };
 
-  /* eslint-disable react-hooks/set-state-in-effect --
-   * Similar to `useAutoSize`, setting state in an effect here is intentional
-   * and a required part of the iterative approach to auto-sizing.
-   */
+   
 
   /* eslint-disable-next-line react-hooks/exhaustive-deps --
    * TODO: Replace this with `useAutoSize`. For now, we know this logic cannot
@@ -84,54 +126,32 @@ const Destination: ComponentType<DupDestination> = ({
     // headsign on a single line than the full headsign across 2 pages.
     // If that doesn't work, try to fit it on two lines by adjusting
     // between which words we paginate. Move through abbreviations until we find fit.
-    if (firstLineRef.current && secondLineRef.current) {
-      const firstLineFits = !hasOverflowX(firstLineRef.current);
-      const secondLineFits = !hasOverflowX(secondLineRef.current);
-      const canAdjustSecondLine = partsIndex2 > partsIndex1 + 1;
-
-      switch (phase) {
-        case PHASES.ONE_LINE:
-          if (firstLineFits) {
-            resetIndices();
-            setPhase(PHASES.DONE);
-          } else if (headsignIndex < headsigns.length - 1) {
-          // Try shortened version of the headsign if available
-            setHeadsignIndex(headsignIndex + 1);
-          } else {
-          // No shorter version available; try to fit full headsign on 2 lines.
-            setHeadsignIndex(0);
-            setPhase(PHASES.TWO_LINES);
-          }
-          break;
-
-        case PHASES.TWO_LINES:
-          // Don't abbreviate if we fit on two lines either way
-          if (firstLineFits && secondLineFits) {
-            setPhase(PHASES.DONE);
-          } else {
-            // Try all possible positions for the line break
-            if (!firstLineFits && partsIndex1 > 1) {
-              // Adjust position of 1st line break
-              setPartsIndex1((n) => n - 1);
-            } else if (headsignIndex < headsigns.length - 1) {
-              // Try to fit abbreviated headsign on 2 pages
-              resetIndices();
-              setHeadsignIndex(headsignIndex + 1);
-            } else if (!secondLineFits && canAdjustSecondLine) {
-              // The shortest headsign doesn't fit on 2 lines
-              // Adjust the second line break to fit full words onto 2nd page
-              setPartsIndex2((n) => n - 1);
-            }
-            else {
-              setPhase(PHASES.DONE);
-            }
-          }
-          break;
+    if (
+      firstLineRef.current &&
+      secondLineRef.current &&
+      phase !== PHASES.DONE
+    ) {
+      const next = nextSizingState({
+        phase,
+        headsignIndex,
+        partsIndex1,
+        partsIndex2,
+        partsLength: parts.length,
+        headsignsLength: headsigns.length,
+        firstLineFits: !hasOverflowX(firstLineRef.current),
+        secondLineFits: !hasOverflowX(secondLineRef.current),
+      });
+      if (next) {
+        if (next.headsignIndex !== undefined)
+          setHeadsignIndex(next.headsignIndex);
+        if (next.phase !== undefined) setPhase(next.phase);
+        if (next.partsIndex1 !== undefined) setPartsIndex1(next.partsIndex1);
+        if (next.partsIndex2 !== undefined) setPartsIndex2(next.partsIndex2);
       }
     }
   });
 
-  /* eslint-enable react-hooks/set-state-in-effect */
+   
 
   // Render paged version when done determining breaks
   if (phase === PHASES.DONE) {
