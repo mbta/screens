@@ -22,7 +22,7 @@ export const departureRow = Factory.define<Row>(({ sequence }) => ({
   type: "departure_row",
   id: sequence.toString(),
   route: { type: "text", color: "yellow", text: sequence.toString() },
-  headsign: { headsign: `Destination ${sequence}` },
+  headsign: { headsign: `Destination ${sequence}`, headsigns: [`Destination ${sequence}`] },
   times_with_crowding: timeWithCrowding.buildList(1),
   direction_id: 0,
   isBeforeDirectionSplit: false,
