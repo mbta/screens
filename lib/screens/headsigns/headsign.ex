@@ -3,14 +3,11 @@ defmodule Screens.Headsigns.Headsign do
   Module for managing headsign abbreviations.
   """
 
-  @data_module Application.compile_env(:screens, :headsigns_data_module)
-
-  @headsign_abbreviations @data_module.abbreviations()
-  @word_abbreviations @data_module.word_abbreviations()
+  alias Screens.Headsigns.Data, as: HeadsignData
 
   @spec abbreviations(String.t()) :: [String.t()]
   def abbreviations(base_headsign) do
-    case(Map.get(@headsign_abbreviations, base_headsign, [])) do
+    case(Map.get(HeadsignData.abbreviations(), base_headsign, [])) do
       [] ->
         Enum.uniq([base_headsign, abbreviate_by_word(base_headsign)])
 
@@ -27,6 +24,6 @@ defmodule Screens.Headsigns.Headsign do
     |> String.trim()
     |> String.split(" ")
     |> Enum.reject(&(&1 == ""))
-    |> Enum.map_join(" ", &Map.get(@word_abbreviations, &1, String.trim(&1)))
+    |> Enum.map_join(" ", &Map.get(HeadsignData.word_abbreviations(), &1, String.trim(&1)))
   end
 end
