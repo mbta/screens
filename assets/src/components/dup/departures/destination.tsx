@@ -25,7 +25,9 @@ type SizingState = {
 
 // Returns the next state given current state and line-fit measurements,
 // or null if no update is needed (phase is already DONE or refs are absent).
-export const nextSizingState = (state: SizingState): Partial<SizingState> | null => {
+export const nextSizingState = (
+  state: SizingState,
+): Partial<SizingState> | null => {
   const {
     phase,
     headsignIndex,
