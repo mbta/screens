@@ -6,7 +6,7 @@ import { classWithModifier, hasOverflowX } from "Util/utils";
 
 type DupDestination = DestinationBase & { classModifier: string };
 
-enum PHASES {
+export enum PHASES {
   ONE_LINE,
   TWO_LINES,
   DONE,
@@ -114,8 +114,6 @@ const Destination: ComponentType<DupDestination> = ({
   const [partsIndex1, setPartsIndex1] = useState(parts.length);
   const [partsIndex2, setPartsIndex2] = useState(parts.length);
   const [phase, setPhase] = useState(PHASES.ONE_LINE);
-
-   
 
   /* eslint-disable-next-line react-hooks/exhaustive-deps --
    * TODO: Replace this with `useAutoSize`. For now, we know this logic cannot

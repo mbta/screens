@@ -11,7 +11,7 @@ type Destination = {
   variation?: string;
 };
 
-const Destination: ComponentType<Destination> = ({ headsign, variation}) => {
+const Destination: ComponentType<Destination> = ({ headsign, variation }) => {
   return (
     <div className="departure-destination">
       <div className="departure-destination__headsign">
