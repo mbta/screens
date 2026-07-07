@@ -73,6 +73,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         |> Enum.filter(
           &(Alert.active?(&1, now) and relevant_direction?(&1, stop_id, stop_sequences))
         )
+        |> Enum.reject(&suppressable_alert?(&1, location_context, now))
         |> Alert.consolidate_whole_route_delays()
         |> Enum.group_by(fn alert ->
           relevance(
@@ -116,6 +117,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     else
       :error -> []
     end
+  end
+
+  @spec suppressable_alert?(Alert.t(), LocationContext.t(), DateTime.t()) :: boolean()
+  defp suppressable_alert?(alert, location_context, now) do
+    Alert.stale?(alert, now) and
+      !LocalizedAlert.stop_in_alert_boundary?(alert, location_context)
   end
 
   @inside_locations ~w[inside boundary_upstream boundary_downstream]a
