@@ -8,30 +8,30 @@ const secondOverflows = { firstLineFits: true, secondLineFits: false };
 const bothOverflow = { firstLineFits: false, secondLineFits: false };
 
 const oneLineBase = {
-  phase: PHASES.ONE_LINE,
+  phase: PHASES.OneLine,
   headsignIndex: 0,
   partsIndex1: 3,
   partsIndex2: 3,
   partsLength: 3,
   headsignsLength: 1,
-};
+} as const;
 
 const twoLinesBase = {
-  phase: PHASES.TWO_LINES,
+  phase: PHASES.TwoLines,
   headsignIndex: 0,
   partsIndex1: 3,
   partsIndex2: 3,
   partsLength: 3,
   headsignsLength: 1,
-};
+} as const;
 
 describe("nextSizingState", () => {
-  describe("PHASES.ONE_LINE", () => {
+  describe("PHASES.OneLine", () => {
     test("transitions to DONE and resets indices when first line fits", () => {
       expect(nextSizingState({ ...oneLineBase, ...fits })).toEqual({
         partsIndex1: oneLineBase.partsLength,
         partsIndex2: oneLineBase.partsLength,
-        phase: PHASES.DONE,
+        phase: PHASES.Done,
       });
     });
 
@@ -43,15 +43,15 @@ describe("nextSizingState", () => {
     test("transitions to TWO_LINES when overflow and no shorter headsign", () => {
       expect(nextSizingState({ ...oneLineBase, ...bothOverflow })).toEqual({
         headsignIndex: 0,
-        phase: PHASES.TWO_LINES,
+        phase: PHASES.TwoLines,
       });
     });
   });
 
-  describe("PHASES.TWO_LINES", () => {
+  describe("PHASES.TwoLines", () => {
     test("transitions to DONE when both lines fit", () => {
       expect(nextSizingState({ ...twoLinesBase, ...fits })).toEqual({
-        phase: PHASES.DONE,
+        phase: PHASES.Done,
       });
     });
 
@@ -91,7 +91,7 @@ describe("nextSizingState", () => {
         partsIndex2: 3,
         ...secondOverflows,
       };
-      expect(nextSizingState(state)).toEqual({ phase: PHASES.DONE });
+      expect(nextSizingState(state)).toEqual({ phase: PHASES.Done });
     });
 
     test("transitions to DONE when no adjustments are possible", () => {
@@ -102,7 +102,7 @@ describe("nextSizingState", () => {
         partsIndex2: 2,
         ...bothOverflow,
       };
-      expect(nextSizingState(state)).toEqual({ phase: PHASES.DONE });
+      expect(nextSizingState(state)).toEqual({ phase: PHASES.Done });
     });
   });
 });

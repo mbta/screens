@@ -6,11 +6,13 @@ import { classWithModifier, hasOverflowX } from "Util/utils";
 
 type DupDestination = DestinationBase & { classModifier: string };
 
-export enum PHASES {
-  ONE_LINE,
-  TWO_LINES,
-  DONE,
-}
+export const PHASES = {
+  OneLine: "ONE_LINE",
+  TwoLines: "TWO_LINES",
+  Done: "DONE",
+} as const;
+
+export type PHASES = (typeof PHASES)[keyof typeof PHASES];
 
 type SizingState = {
   headsignIndex: number;
@@ -23,11 +25,26 @@ type SizingState = {
   secondLineFits: boolean;
 };
 
+// Types representing state changes as we try different headsign variations
+type FinishedUpdate = {
+  phase: typeof PHASES.Done;
+  partsIndex1?: number;
+  partsIndex2?: number;
+};
+type IndexUpdate = {
+  headsignIndex?: number;
+  partsIndex1?: number;
+  partsIndex2?: number;
+};
+type PhaseUpdate = { phase: typeof PHASES.TwoLines; headsignIndex: number };
+
+export type SizingStateUpdate = FinishedUpdate | PhaseUpdate | IndexUpdate;
+
 // Returns the next state given current state and line-fit measurements,
 // or null if no update is needed (phase is already DONE or refs are absent).
 export const nextSizingState = (
   state: SizingState,
-): Partial<SizingState> | null => {
+): SizingStateUpdate | null => {
   const {
     phase,
     headsignIndex,
@@ -41,25 +58,25 @@ export const nextSizingState = (
   const canAdjustSecondLine = partsIndex2 - 1 > partsIndex1;
 
   switch (phase) {
-    case PHASES.ONE_LINE:
+    case PHASES.OneLine:
       if (firstLineFits) {
         return {
           partsIndex1: partsLength,
           partsIndex2: partsLength,
-          phase: PHASES.DONE,
+          phase: PHASES.Done,
         };
       } else if (headsignIndex < headsignsLength - 1) {
         // Try shortened version of the headsign if available
         return { headsignIndex: headsignIndex + 1 };
       } else {
         // No shorter version available; try to fit full headsign on 2 lines.
-        return { headsignIndex: 0, phase: PHASES.TWO_LINES };
+        return { headsignIndex: 0, phase: PHASES.TwoLines };
       }
 
-    case PHASES.TWO_LINES:
+    case PHASES.TwoLines:
       // Don't abbreviate if we fit on two lines either way
       if (firstLineFits && secondLineFits) {
-        return { phase: PHASES.DONE };
+        return { phase: PHASES.Done };
       } else {
         if (!firstLineFits && partsIndex1 > 1) {
           // Try all possible positions for the line break
@@ -76,7 +93,7 @@ export const nextSizingState = (
           // Adjust the second line break to fit full words onto 2nd page
           return { partsIndex2: partsIndex2 - 1 };
         } else {
-          return { phase: PHASES.DONE };
+          return { phase: PHASES.Done };
         }
       }
     default:
@@ -117,7 +134,7 @@ const Destination: ComponentType<DupDestination> = ({
   const parts = headsigns[headsignIndex].split(" ");
   const [partsIndex1, setPartsIndex1] = useState(parts.length);
   const [partsIndex2, setPartsIndex2] = useState(parts.length);
-  const [phase, setPhase] = useState(PHASES.ONE_LINE);
+  const [phase, setPhase] = useState<PHASES>(PHASES.OneLine);
 
   /* eslint-disable-next-line react-hooks/exhaustive-deps --
    * TODO: Replace this with `useAutoSize`. For now, we know this logic cannot
@@ -131,7 +148,7 @@ const Destination: ComponentType<DupDestination> = ({
     if (
       firstLineRef.current &&
       secondLineRef.current &&
-      phase !== PHASES.DONE
+      phase !== PHASES.Done
     ) {
       const next = nextSizingState({
         phase,
@@ -144,17 +161,25 @@ const Destination: ComponentType<DupDestination> = ({
         secondLineFits: !hasOverflowX(secondLineRef.current),
       });
       if (next) {
-        if (next.headsignIndex !== undefined)
+        // Update the state so we can re-attempt sizing with updated values
+        if ("headsignIndex" in next && next.headsignIndex !== undefined) {
           setHeadsignIndex(next.headsignIndex);
-        if (next.phase !== undefined) setPhase(next.phase);
-        if (next.partsIndex1 !== undefined) setPartsIndex1(next.partsIndex1);
-        if (next.partsIndex2 !== undefined) setPartsIndex2(next.partsIndex2);
+        }
+        if ("phase" in next && next.phase !== undefined) {
+          setPhase(next.phase);
+        }
+        if ("partsIndex1" in next && next.partsIndex1 !== undefined) {
+          setPartsIndex1(next.partsIndex1);
+        }
+        if ("partsIndex2" in next && next.partsIndex2 !== undefined) {
+          setPartsIndex2(next.partsIndex2);
+        }
       }
     }
   });
 
   // Render paged version when done determining breaks
-  if (phase === PHASES.DONE) {
+  if (phase === PHASES.Done) {
     return (
       <RenderedDestination
         index1={partsIndex1}
