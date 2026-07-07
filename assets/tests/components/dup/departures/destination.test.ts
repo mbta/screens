@@ -13,8 +13,8 @@ const oneLineBase = {
   partsIndex1: 3,
   partsIndex2: 3,
   partsLength: 3,
-  headsignsLength: 1,
-} as const;
+  headsigns: ["Wonderland"],
+};
 
 const twoLinesBase = {
   phase: PHASES.TwoLines,
@@ -22,8 +22,8 @@ const twoLinesBase = {
   partsIndex1: 3,
   partsIndex2: 3,
   partsLength: 3,
-  headsignsLength: 1,
-} as const;
+  headsigns: ["Wonderland"],
+};
 
 describe("nextSizingState", () => {
   describe("PHASES.OneLine", () => {
@@ -36,7 +36,11 @@ describe("nextSizingState", () => {
     });
 
     test("advances to next headsign when overflow and a shorter version exists", () => {
-      const state = { ...oneLineBase, headsignsLength: 2, ...bothOverflow };
+      const state = {
+        ...oneLineBase,
+        headsigns: ["Union Square", "Union Sq"],
+        ...bothOverflow,
+      };
       expect(nextSizingState(state)).toEqual({ headsignIndex: 1 });
     });
 
@@ -64,12 +68,12 @@ describe("nextSizingState", () => {
       const state = {
         ...twoLinesBase,
         partsIndex1: 1,
-        headsignsLength: 2,
+        headsigns: ["Union Square", "Union Sq"],
         ...bothOverflow,
       };
       expect(nextSizingState(state)).toEqual({
-        partsIndex1: state.partsLength,
-        partsIndex2: state.partsLength,
+        partsIndex1: state.headsigns.length,
+        partsIndex2: state.headsigns.length,
         headsignIndex: 1,
       });
     });

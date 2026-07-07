@@ -16,7 +16,7 @@ export type PHASES = (typeof PHASES)[keyof typeof PHASES];
 
 type SizingState = {
   headsignIndex: number;
-  headsignsLength: number;
+  headsigns: string[];
   partsIndex1: number;
   partsIndex2: number;
   partsLength: number;
@@ -48,7 +48,7 @@ export const nextSizingState = (
   const {
     phase,
     headsignIndex,
-    headsignsLength,
+    headsigns,
     partsIndex1,
     partsIndex2,
     partsLength,
@@ -65,7 +65,7 @@ export const nextSizingState = (
           partsIndex2: partsLength,
           phase: PHASES.Done,
         };
-      } else if (headsignIndex < headsignsLength - 1) {
+      } else if (headsignIndex < headsigns.length - 1) {
         // Try shortened version of the headsign if available
         return { headsignIndex: headsignIndex + 1 };
       } else {
@@ -81,11 +81,12 @@ export const nextSizingState = (
         if (!firstLineFits && partsIndex1 > 1) {
           // Try all possible positions for the line break
           return { partsIndex1: partsIndex1 - 1 };
-        } else if (headsignIndex < headsignsLength - 1) {
+        } else if (headsignIndex < headsigns.length - 1) {
           // Try to fit a full abbreviated headsign on 2 pages
+          const nextParts = headsigns[headsignIndex + 1].split(" ");
           return {
-            partsIndex1: partsLength,
-            partsIndex2: partsLength,
+            partsIndex1: nextParts.length,
+            partsIndex2: nextParts.length,
             headsignIndex: headsignIndex + 1,
           };
         } else if (!secondLineFits && canAdjustSecondLine) {
@@ -127,6 +128,7 @@ const Destination: ComponentType<DupDestination> = ({
   headsigns,
   classModifier,
 }) => {
+  headsigns = ["Wonderland St Ave The Third", "Wonderland St Ave The"];
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
@@ -156,7 +158,7 @@ const Destination: ComponentType<DupDestination> = ({
         partsIndex1,
         partsIndex2,
         partsLength: parts.length,
-        headsignsLength: headsigns.length,
+        headsigns: headsigns,
         firstLineFits: !hasOverflowX(firstLineRef.current),
         secondLineFits: !hasOverflowX(secondLineRef.current),
       });
@@ -193,10 +195,13 @@ const Destination: ComponentType<DupDestination> = ({
   // Version just for determining line breaks, never visible to riders
   let firstLine: string;
   let secondLine: string;
-  if (partsIndex1 === parts.length) {
-    firstLine = parts.join(" ");
+  if (phase === PHASES.OneLine) {
+    firstLine = headsigns[headsignIndex];
     secondLine = "";
   } else {
+    console.log(
+      `parts: ${parts}, partsIndex1: ${partsIndex1}, partsIndex2: ${partsIndex2}`,
+    );
     firstLine = parts.slice(0, partsIndex1).join(" ") + "…";
     secondLine = "…" + parts.slice(partsIndex1, partsIndex2).join(" ");
   }
