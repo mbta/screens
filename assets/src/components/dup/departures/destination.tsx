@@ -128,7 +128,6 @@ const Destination: ComponentType<DupDestination> = ({
   headsigns,
   classModifier,
 }) => {
-  headsigns = ["Wonderland St Ave The Third", "Wonderland St Ave The"];
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
