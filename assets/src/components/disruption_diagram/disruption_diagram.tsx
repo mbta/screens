@@ -682,7 +682,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const middleSlots = middle.map((s, i) => {
     // Add 1 to the index to counteract the offset caused by removing `beginning` from the original `slots` array.
     const slotIndex = i + 1;
-     
+
     x = (spaceBetween + SLOT_WIDTH) * slotIndex;
     const slot = s as MiddleSlot;
     const key = slot.label === "…" ? i : slot.label.full;
