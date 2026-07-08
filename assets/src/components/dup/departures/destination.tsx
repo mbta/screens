@@ -36,9 +36,14 @@ type IndexUpdate = {
   partsIndex1?: number;
   partsIndex2?: number;
 };
-type PhaseUpdate = { phase: typeof PHASES.TwoLines; headsignIndex: number };
-
-export type SizingStateUpdate = FinishedUpdate | PhaseUpdate | IndexUpdate;
+type TwoLinesPhaseUpdate = {
+  phase: typeof PHASES.TwoLines;
+  headsignIndex: number;
+};
+export type SizingStateUpdate =
+  | FinishedUpdate
+  | IndexUpdate
+  | TwoLinesPhaseUpdate;
 
 // Returns the next state given current state and line-fit measurements,
 // or null if no update is needed (phase is already DONE or refs are absent).
