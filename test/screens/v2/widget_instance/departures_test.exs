@@ -716,15 +716,22 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "handles default", %{bus_shelter_screen: bus_shelter_screen} do
       departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Ruggles"}}}
 
-      assert %{headsign: "Ruggles", variation: nil} ==
+      assert %{headsign: "Ruggles", variation: nil, headsigns: ["Ruggles"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
     end
 
     test "handles via variations", %{bus_shelter_screen: bus_shelter_screen} do
       departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Nubian via Allston"}}}
 
-      assert %{headsign: "Nubian", variation: "via Allston"} ==
+      assert %{headsign: "Nubian", variation: "via Allston", headsigns: ["Nubian"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
+    end
+
+    test "does not handle via on DUPs", %{dup_screen: dup_screen} do
+      departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Nubian via Allston"}}}
+
+      assert %{headsign: "Nubian via Allston", variation: nil, headsigns: ["Nubian via Allston"]} ==
+               Departures.serialize_headsign([departure], dup_screen)
     end
 
     test "handles parenthesized variations", %{bus_shelter_screen: bus_shelter_screen} do
@@ -732,24 +739,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{trip: %Trip{headsign: "Beth Israel (Limited Stops)"}}
       }
 
-      assert %{headsign: "Beth Israel", variation: "(Limited Stops)"} ==
+      assert %{headsign: "Beth Israel", variation: "(Limited Stops)", headsigns: ["Beth Israel"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
-    end
-
-    test "handles DUPs", %{dup_screen: dup_screen} do
-      departure = %Departure{
-        prediction: %Prediction{trip: %Trip{headsign: "Test 1"}}
-      }
-
-      assert %{headsign: "T1"} ==
-               Departures.serialize_headsign([departure], dup_screen)
-
-      departure = %Departure{
-        prediction: %Prediction{trip: %Trip{headsign: "Test 2"}}
-      }
-
-      assert %{headsign: "Test 2"} ==
-               Departures.serialize_headsign([departure], dup_screen)
     end
 
     test "shortens shuttle headsigns", %{
@@ -765,10 +756,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: nil} ==
+      assert %{headsign: "Alewife", variation: nil, headsigns: ["Alewife"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
 
-      assert %{headsign: "Alewife"} ==
+      assert %{headsign: "Alewife", variation: nil, headsigns: ["Alewife"]} ==
                Departures.serialize_headsign([departure], dup_screen)
 
       departure = %Departure{
@@ -780,10 +771,14 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: "(Express)"} ==
+      assert %{headsign: "Alewife", variation: "(Express)", headsigns: ["Alewife"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
 
-      assert %{headsign: "Alewife (Express)"} ==
+      assert %{
+               headsign: "Alewife (Express)",
+               headsigns: ["Alewife (Express)"],
+               variation: nil
+             } ==
                Departures.serialize_headsign([departure], dup_screen)
     end
 
@@ -797,7 +792,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: "(Shuttle)"} ==
+      assert %{headsign: "Alewife", variation: "(Shuttle)", headsigns: ["Alewife"]} ==
                Departures.serialize_headsign([departure], gl_eink_screen)
 
       departure = %Departure{
@@ -809,7 +804,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: "(Express Shuttle)"} ==
+      assert %{headsign: "Alewife", variation: "(Express Shuttle)", headsigns: ["Alewife"]} ==
                Departures.serialize_headsign([departure], gl_eink_screen)
     end
   end
