@@ -317,10 +317,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                  include_later: false
                },
                rows: [
-                 %{headsign: %{headsign: "Medford/Tufts"}},
-                 %{headsign: %{headsign: "Government Center"}},
-                 %{headsign: %{headsign: "Cleveland Circle"}},
-                 %{headsign: %{headsign: "Riverside"}}
+                 %{headsign: %{headsigns: ["Medford/Tufts"]}},
+                 %{headsign: %{headsigns: ["Government Ctr", "Gov’t Center", "Gov't Ctr"]}},
+                 %{headsign: %{headsigns: ["Cleveland Circle", "Cleveland Cir", "Clvlnd Cir"]}},
+                 %{headsign: %{headsigns: ["Riverside"]}}
                ]
              } =
                Departures.serialize_section(section, bus_shelter_screen, now, false)
@@ -359,7 +359,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                type: :normal_section,
                rows: [
-                 %{headsign: %{headsign: "Medford/Tufts"}},
+                 %{headsign: %{headsigns: ["Medford/Tufts"]}},
                  %{
                    headsign: %{headsign: "Westbound"},
                    direction_id: 0,
@@ -392,7 +392,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                rows: [
                  %{
-                   headsign: %{headsign: "Medford/Tufts"},
+                   headsign: %{headsigns: ["Medford/Tufts"]},
                    is_first_trip: true,
                    route: %{type: :text, text: "GL·E", color: :green},
                    times_with_crowding: [
@@ -429,7 +429,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                rows: [
                  %{
-                   headsign: %{headsign: "Medford/Tufts"},
+                   headsign: %{headsigns: ["Medford/Tufts"]},
                    route: %{type: :text, text: "GL·E", color: :green},
                    times_with_crowding: [
                      %{
@@ -716,21 +716,21 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "handles default", %{bus_shelter_screen: bus_shelter_screen} do
       departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Ruggles"}}}
 
-      assert %{headsign: "Ruggles", variation: nil, headsigns: ["Ruggles"]} ==
+      assert %{headsigns: ["Ruggles"], variation: nil} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
     end
 
     test "handles via variations", %{bus_shelter_screen: bus_shelter_screen} do
       departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Nubian via Allston"}}}
 
-      assert %{headsign: "Nubian", variation: "via Allston", headsigns: ["Nubian"]} ==
+      assert %{headsigns: ["Nubian"], variation: "via Allston"} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
     end
 
     test "does not handle via on DUPs", %{dup_screen: dup_screen} do
       departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Nubian via Allston"}}}
 
-      assert %{headsign: "Nubian via Allston", variation: nil, headsigns: ["Nubian via Allston"]} ==
+      assert %{headsigns: ["Nubian via Allston"], variation: nil} ==
                Departures.serialize_headsign([departure], dup_screen)
     end
 
@@ -739,7 +739,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         prediction: %Prediction{trip: %Trip{headsign: "Beth Israel (Limited Stops)"}}
       }
 
-      assert %{headsign: "Beth Israel", variation: "(Limited Stops)", headsigns: ["Beth Israel"]} ==
+      assert %{headsigns: ["Beth Israel"], variation: "(Limited Stops)"} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
     end
 
@@ -756,10 +756,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: nil, headsigns: ["Alewife"]} ==
+      assert %{headsigns: ["Alewife"], variation: nil} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
 
-      assert %{headsign: "Alewife", variation: nil, headsigns: ["Alewife"]} ==
+      assert %{headsigns: ["Alewife"], variation: nil} ==
                Departures.serialize_headsign([departure], dup_screen)
 
       departure = %Departure{
@@ -771,11 +771,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: "(Express)", headsigns: ["Alewife"]} ==
+      assert %{headsigns: ["Alewife"], variation: "(Express)"} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
 
       assert %{
-               headsign: "Alewife (Express)",
                headsigns: ["Alewife (Express)"],
                variation: nil
              } ==
@@ -792,7 +791,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: "(Shuttle)", headsigns: ["Alewife"]} ==
+      assert %{headsigns: ["Alewife"], variation: "(Shuttle)"} ==
                Departures.serialize_headsign([departure], gl_eink_screen)
 
       departure = %Departure{
@@ -804,7 +803,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert %{headsign: "Alewife", variation: "(Express Shuttle)", headsigns: ["Alewife"]} ==
+      assert %{headsigns: ["Alewife"], variation: "(Express Shuttle)"} ==
                Departures.serialize_headsign([departure], gl_eink_screen)
     end
   end
@@ -1534,7 +1533,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                   %{
                     id: "1B2M2Y8AsgTpgAmY7PhCfg==",
                     type: :departure_row,
-                    headsign: %{headsign: "Test", variation: nil},
+                    headsign: %{headsigns: ["Test"], variation: nil},
                     route: %{track_number: nil, vehicle_type: :train, route_text: nil},
                     times_with_crowding: [
                       %{id: nil, time: %{type: :minutes, minutes: 5}, crowding: nil}
@@ -1576,7 +1575,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                   %{
                     id: "1B2M2Y8AsgTpgAmY7PhCfg==",
                     type: :departure_row,
-                    headsign: %{headsign: "Test", variation: nil},
+                    headsign: %{headsigns: ["Test"], variation: nil},
                     route: %{track_number: nil, vehicle_type: :train, route_text: nil},
                     times_with_crowding: [
                       %{id: nil, time: %{type: :minutes, minutes: 1}, crowding: nil},
@@ -1626,7 +1625,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                  {:normal,
                   %{
                     type: :departure_row,
-                    headsign: %{headsign: "Test", variation: nil},
+                    headsign: %{headsigns: ["Test"], variation: nil},
                     route: %{track_number: nil, vehicle_type: :train, route_text: nil},
                     times_with_crowding: [
                       %{id: nil, time: %{type: :minutes, minutes: 5}, crowding: nil},

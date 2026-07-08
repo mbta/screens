@@ -129,7 +129,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
          }
 
   @type serialized_headsign :: %{
-          headsign: String.t(),
           headsigns: [String.t()],
           variation: String.t() | nil
         }
@@ -529,18 +528,22 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @spec serialize_headsign([Departure.t()], Screen.t()) :: serialized_headsign()
   def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2} = screen) do
-    first_departure
-    |> Departure.headsign()
-    |> simplify_shuttle_headsign(first_departure, screen)
-    |> headsign_with_abbreviations()
+    headsign =
+      first_departure
+      |> Departure.headsign()
+      |> simplify_shuttle_headsign(first_departure, screen)
+
+    %{headsigns: Headsign.abbreviations(headsign), variation: nil}
   end
 
   def serialize_headsign([first_departure | _], screen) do
-    first_departure
-    |> Departure.headsign()
-    |> simplify_shuttle_headsign(first_departure, screen)
-    |> headsign_with_variation()
-    |> headsign_with_abbreviations()
+    {base_headsign, variation} =
+      first_departure
+      |> Departure.headsign()
+      |> simplify_shuttle_headsign(first_departure, screen)
+      |> headsign_with_variation()
+
+    %{headsigns: Headsign.abbreviations(base_headsign), variation: variation}
   end
 
   @doc """
@@ -570,12 +573,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
   end
 
-  @spec headsign_with_variation(String.t()) :: serialized_headsign()
+  @spec headsign_with_variation(String.t()) :: {String.t(), String.t() | nil}
   def headsign_with_variation(headsign) do
     via_pattern = ~r/(.+) (via .+)/
     paren_pattern = ~r/(.+) (\(.+)/
 
-    [headsign, variation] =
+    [base_headsign, variation] =
       cond do
         String.match?(headsign, via_pattern) ->
           Regex.run(via_pattern, headsign, capture: :all_but_first)
@@ -587,17 +590,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           [headsign, nil]
       end
 
-    %{headsign: headsign, variation: variation, headsigns: [headsign]}
-  end
-
-  @spec headsign_with_abbreviations(serialized_headsign() | String.t()) :: serialized_headsign()
-  defp headsign_with_abbreviations(%{headsign: headsign} = headsign_map) do
-    Map.put(headsign_map, :headsigns, Headsign.abbreviations(headsign))
-  end
-
-  defp headsign_with_abbreviations(headsign) do
-    # DUPs don't break out variations
-    %{headsign: headsign, headsigns: Headsign.abbreviations(headsign), variation: nil}
+    {base_headsign, variation}
   end
 
   def serialize_times_with_crowding(departures, screen, now) do
