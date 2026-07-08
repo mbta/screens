@@ -45,8 +45,7 @@ export type SizingStateUpdate =
   | IndexUpdate
   | TwoLinesPhaseUpdate;
 
-// Returns the next state given current state and line-fit measurements,
-// or null if no update is needed (phase is already DONE or refs are absent).
+// Returns changes to make to the state given the current line-fit measurements
 export const nextSizingState = (
   state: SizingState,
 ): SizingStateUpdate | null => {
@@ -84,7 +83,7 @@ export const nextSizingState = (
         return { phase: PHASES.Done };
       } else {
         if (!firstLineFits && partsIndex1 > 1) {
-          // Try all possible positions for the line break
+          // Try all possible positions for the line break to fit on 2 pages
           return { partsIndex1: partsIndex1 - 1 };
         } else if (headsignIndex < headsigns.length - 1) {
           // Try to fit a full abbreviated headsign on 2 pages
@@ -103,6 +102,7 @@ export const nextSizingState = (
         }
       }
     default:
+      // Must return default fallback, but we'll never reach this case
       return null;
   }
 };
@@ -203,9 +203,6 @@ const Destination: ComponentType<DupDestination> = ({
     firstLine = headsigns[headsignIndex];
     secondLine = "";
   } else {
-    console.log(
-      `parts: ${parts}, partsIndex1: ${partsIndex1}, partsIndex2: ${partsIndex2}`,
-    );
     firstLine = parts.slice(0, partsIndex1).join(" ") + "…";
     secondLine = "…" + parts.slice(partsIndex1, partsIndex2).join(" ");
   }
