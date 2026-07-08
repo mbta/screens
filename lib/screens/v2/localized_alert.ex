@@ -355,7 +355,7 @@ defmodule Screens.V2.LocalizedAlert do
     |> Enum.to_list()
   end
 
-  @spec stop_in_alert_boundary?(Alert.t(), t()) :: boolean()
+  @spec stop_in_alert_boundary?(Alert.t(), LocationContext.t()) :: boolean()
   def stop_in_alert_boundary?(alert, location_context) do
     location(%{alert: alert, location_context: location_context}) in [
       :inside,
