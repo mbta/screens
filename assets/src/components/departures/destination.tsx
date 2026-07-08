@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 
-import useAutoSize from "Hooks/use_auto_size";
+import { useHorizontalAutoSize } from "Hooks/use_auto_size";
 
 type Destination = {
   headsigns: string[];
@@ -8,7 +8,7 @@ type Destination = {
 };
 
 const Destination: ComponentType<Destination> = ({ headsigns, variation }) => {
-  const { ref, step: headsign } = useAutoSize(headsigns);
+  const { ref, step: headsign } = useHorizontalAutoSize(headsigns);
 
   return (
     <div className="departure-destination">

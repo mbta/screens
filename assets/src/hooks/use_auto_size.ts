@@ -84,7 +84,7 @@ const useAutoSize = <T extends Value>(
     if (remainingSteps.length > 1 && element && overflowCheckFn(element)) {
       setRemainingSteps(remainingSteps.slice(1));
     }
-  }, [element, remainingSteps]);
+  }, [element, remainingSteps, overflowCheckFn]);
 
   return { ref: setElement, step: remainingSteps[0] };
 };
