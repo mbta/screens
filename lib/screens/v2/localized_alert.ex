@@ -354,4 +354,13 @@ defmodule Screens.V2.LocalizedAlert do
     |> MapSet.difference(uninformed_routes)
     |> Enum.to_list()
   end
+
+  @spec stop_in_alert_boundary?(Alert.t(), t()) :: boolean()
+  def stop_in_alert_boundary?(alert, location_context) do
+    location(%{alert: alert, location_context: location_context}) in [
+      :inside,
+      :boundary_upstream,
+      :boundary_downstream
+    ]
+  end
 end

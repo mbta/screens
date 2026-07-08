@@ -4,6 +4,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Alerts, MultiStopAlerts}
   alias ScreensConfig.Screen
@@ -31,7 +32,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
          {:ok, alerts} <- fetch_alerts_by_stop_and_route_fn.(reachable_stop_ids, route_ids) do
       alerts
       |> Alert.consolidate_whole_route_delays()
-      |> relevant_alerts(reachable_stop_ids, route_ids, now)
+      |> relevant_alerts(reachable_stop_ids, route_ids, location_context, now)
       |> Enum.map(
         &%AlertWidget{alert: &1, screen: config, location_context: location_context, now: now}
       )
@@ -51,7 +52,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
 
   (list describes the `relevant_ie?` function clauses in order)
   """
-  def relevant_alerts(alerts, stop_ids, route_ids, now) do
+  def relevant_alerts(alerts, stop_ids, route_ids, location_context, now) do
     stop_id_set = MapSet.new(stop_ids)
     route_id_set = MapSet.new(route_ids)
 
@@ -78,6 +79,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     |> Stream.filter(&Alert.active?(&1, now))
     |> Stream.filter(&(&1.effect in @relevant_effects))
     |> Stream.filter(&Enum.any?(&1.informed_entities, relevant_ie?))
+    |> Stream.reject(&suppressable_alert?(&1, location_context, now))
     |> Enum.to_list()
   end
 
@@ -86,4 +88,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
          home_stop_ids
        ),
        do: home_stop_ids |> MapSet.new() |> MapSet.union(downstream_stops) |> MapSet.to_list()
+
+  @spec suppressable_alert?(Alert.t(), LocationContext.t(), DateTime.t()) :: boolean()
+  defp suppressable_alert?(alert, location_context, now) do
+    Alert.stale?(alert, now) and
+      !LocalizedAlert.stop_in_alert_boundary?(alert, location_context)
+  end
 end
