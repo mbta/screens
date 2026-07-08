@@ -93,7 +93,7 @@ export const useHorizontalAutoSize = <T extends Value>(
   steps: readonly T[],
   key?: Value,
 ): { ref: RefCallback<Element>; step: T } => {
-  return useAutoSize(steps, key);
+  return useAutoSize(steps, key, hasOverflowX);
 };
 
 export default useAutoSize;
