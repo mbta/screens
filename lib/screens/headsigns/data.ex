@@ -12,13 +12,13 @@ defmodule Screens.Headsigns.Data do
   """
 
   @headsign_abbreviations %{
-    "Allston Street" => ["Allston St"],
-    "Babcock Street" => ["Babcock St"],
+    "Allston Street" => ["Allston Street", "Allston St"],
+    "Babcock Street" => ["Babcock Street", "Babcock St"],
     "Back of the Hill" => ["Back of the Hill", "Back of Hill", "Back o'Hill"],
-    "Ball Square" => ["Ball Sq"],
+    "Ball Square" => ["Ball Square", "Ball Sq"],
     "Beaconsfield" => ["Beaconsfield", "B'consfield"],
-    "Bellingham Square" => ["Bellingham Sq"],
-    "Blandford Street" => ["Blandford St", "Blandford"],
+    "Bellingham Square" => ["Bellingham Square", "Bellingham Sq"],
+    "Blandford Street" => ["Blandford Street", "Blandford St", "Blandford"],
     "Boston College" => ["Boston College", "Boston Coll"],
     "Boston University Central" => ["Boston University Central", "BU Central"],
     "Boston University East" => ["Boston University East", "BU East"],
