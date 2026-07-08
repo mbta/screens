@@ -18,7 +18,7 @@ defmodule Screens.Headsigns.Data do
     "Ball Square" => ["Ball Square", "Ball Sq"],
     "Beaconsfield" => ["Beaconsfield", "B'consfield"],
     "Bellingham Square" => ["Bellingham Square", "Bellingham Sq"],
-    "Blandford Street" => ["Blandford Street", "Blandford St"],
+    "Blandford Street" => ["Blandford Street", "Blandford St", "Blandford"],
     "Boston College" => ["Boston College", "Boston Coll"],
     "Boston University Central" => ["Boston University Central", "BU Central"],
     "Boston University East" => ["Boston University East", "BU East"],
