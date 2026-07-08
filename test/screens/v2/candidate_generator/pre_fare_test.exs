@@ -1,9 +1,12 @@
 defmodule Screens.V2.CandidateGenerator.PreFareTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
+  alias Screens.LocationContext
   alias Screens.V2.CandidateGenerator.PreFare
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias Screens.V2.WidgetInstance.MockWidget
+  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias ScreensConfig, as: Config
   alias ScreensConfig.Screen
 
@@ -28,7 +31,17 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
       app_id: :pre_fare_v2
     }
 
-    %{config: config}
+    location_context = %LocationContext{
+      home_stop: "place-gover",
+      tagged_stop_sequences: %{},
+      upstream_stops: MapSet.new(),
+      downstream_stops: MapSet.new(),
+      child_stops_at_station: MapSet.new(),
+      routes: [],
+      alert_route_types: [:light_rail, :subway]
+    }
+
+    %{config: config, location_context: location_context}
   end
 
   describe "screen_template/1" do
@@ -93,6 +106,59 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                 screen_normal: [:header, {:body, %{body_normal: [body_right: @body_right]}}],
                 screen_split_takeover: [:full_right_screen]
               }} == PreFare.screen_template(put_in(config.app_params.template, :solo))
+    end
+  end
+
+  describe "candidate_instances/3" do
+    test "drops all reconstructed alerts in the :large slot when there are more than one",
+         %{config: config, location_context: location_context} do
+      alert1 = %Alert{id: "1", effect: :delay, severity: 5, informed_entities: []}
+      alert2 = %Alert{id: "2", effect: :station_closure, severity: 5, informed_entities: []}
+
+      alert_widget_1 = %ReconstructedAlert{
+        screen: config,
+        alert: alert1,
+        location_context: location_context,
+        is_priority: false
+      }
+
+      alert_widget_2 = %ReconstructedAlert{
+        screen: config,
+        alert: alert2,
+        location_context: location_context,
+        is_priority: false
+      }
+
+      other_widget = %MockWidget{slot_names: [:large]}
+
+      instance_fns = [
+        fn _config, _now -> [alert_widget_1, alert_widget_2, other_widget] end
+      ]
+
+      candidates = PreFare.candidate_instances(config, DateTime.utc_now(), instance_fns)
+
+      assert candidates == [other_widget]
+    end
+
+    test "keeps a single reconstructed alert in the :large slot",
+         %{config: config, location_context: location_context} do
+      alert = %Alert{id: "1", effect: :delay, severity: 5, informed_entities: []}
+
+      alert_widget = %ReconstructedAlert{
+        screen: config,
+        alert: alert,
+        location_context: location_context,
+        is_priority: false
+      }
+
+      other_widget = %MockWidget{slot_names: [:large]}
+
+      instance_fns = [
+        fn _config, _now -> [alert_widget, other_widget] end
+      ]
+
+      assert [alert_widget, other_widget] ==
+               PreFare.candidate_instances(config, DateTime.utc_now(), instance_fns)
     end
   end
 

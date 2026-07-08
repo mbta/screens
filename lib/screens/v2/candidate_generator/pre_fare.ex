@@ -7,6 +7,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
+  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 
@@ -75,8 +76,34 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   @impl CandidateGenerator
   def candidate_instances(config, now \\ DateTime.utc_now(), instance_fns \\ @instance_fns) do
-    CandidateGenerator.async_stream(instance_fns, & &1.(config, now), timeout: 15_000)
+    instance_fns
+    |> CandidateGenerator.async_stream(& &1.(config, now), timeout: 15_000)
+    |> simplify_flex_zone()
   end
+
+  @spec simplify_flex_zone([WidgetInstance.t()]) :: [WidgetInstance.t()]
+  defp simplify_flex_zone(widgets) do
+    # When multiple reconstructed alerts would compete for the :large slot in the flex zone,
+    # drop them all so Subway Status (which gives a better multi-alert overview) is shown instead.
+    # Rider research shows that people won't stand around and wait through many alerts.
+    reconstructed_alert_count =
+      widgets
+      |> Enum.filter(&flex_zone_reconstructed_alert?/1)
+      |> length()
+
+    if reconstructed_alert_count > 1 and length(widgets) > reconstructed_alert_count do
+      Enum.reject(widgets, &flex_zone_reconstructed_alert?/1)
+    else
+      widgets
+    end
+  end
+
+  @spec flex_zone_reconstructed_alert?(WidgetInstance.t()) :: boolean()
+  defp flex_zone_reconstructed_alert?(%ReconstructedAlert{} = widget) do
+    :large in WidgetInstance.slot_names(widget)
+  end
+
+  defp flex_zone_reconstructed_alert?(_), do: false
 
   @impl CandidateGenerator
   def audio_only_instances(widgets, config, routes_fetch_fn \\ &Route.fetch/1) do
