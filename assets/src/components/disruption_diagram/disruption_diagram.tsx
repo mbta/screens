@@ -610,7 +610,7 @@ Client is responsible for:
 - sizing, spacing, positioning of edges/end arrows/shuttle dashes/the diagram as a whole within its container
 */
 
-/* eslint-disable react-hooks/exhaustive-deps,react-hooks/set-state-in-effect --
+/* eslint-disable react-hooks/exhaustive-deps --
  * TODO: There are many places where this component breaks the Rules of Hooks.
  * We know it (mostly) works in its current form and have no pressing need to
  * change it, so these warnings are disabled for now. Trying to change this
@@ -682,7 +682,7 @@ const DisruptionDiagram: ComponentType<DisruptionDiagramData> = (props) => {
   const middleSlots = middle.map((s, i) => {
     // Add 1 to the index to counteract the offset caused by removing `beginning` from the original `slots` array.
     const slotIndex = i + 1;
-    /* eslint-disable react-hooks/immutability */
+     
     x = (spaceBetween + SLOT_WIDTH) * slotIndex;
     const slot = s as MiddleSlot;
     const key = slot.label === "…" ? i : slot.label.full;
