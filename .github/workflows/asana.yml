@@ -3,11 +3,12 @@ on:
   pull_request:
     types: [edited, opened]
 
-permissions: {}
+permissions:
+  pull-requests: read # Needed to read Asana ticket info from PR description
 
 jobs:
   asana:
-    uses: mbta/workflows/.github/workflows/asana.yml@ead2d40fcc0c546bd6f099a6d8fcd9f9950eab03 # v5.0.0
+    uses: mbta/workflows/.github/workflows/asana.yml@c76e5ccd9556fbea52bc41548f7ceed5985ad775 # v5.1.0
     with:
       attach-pr: true
       trigger-phrase: "\\*\\*Asana task\\*\\*:"
