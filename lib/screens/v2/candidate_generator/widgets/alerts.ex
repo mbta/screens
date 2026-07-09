@@ -4,6 +4,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Routes.Route
+  alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.Alert, as: AlertWidget
   alias ScreensConfig.{Alerts, MultiStopAlerts}
@@ -52,6 +54,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
 
   (list describes the `relevant_ie?` function clauses in order)
   """
+  @spec relevant_alerts([Alert.t()], [Stop.id()], [Route.id()], LocationContext.t(), DateTime.t()) ::
+          [Alert.t()]
   def relevant_alerts(alerts, stop_ids, route_ids, location_context, now) do
     stop_id_set = MapSet.new(stop_ids)
     route_id_set = MapSet.new(route_ids)
