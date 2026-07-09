@@ -237,11 +237,39 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     end
   end
 
-  describe "relevant_alerts/4" do
+  describe "relevant_alerts/5" do
     setup do
+      stop_id = "1"
+      app = BusShelter
+
+      routes_at_stop = [
+        %{route_id: "11", active?: false},
+        %{route_id: "22", active?: true},
+        %{route_id: "33", active?: true}
+      ]
+
+      tagged_stop_sequences = %{
+        "A" => [~w[3 1 2]],
+        "B" => [~w[3 1 2 4]],
+        "C" => [~w[1 2 4]],
+        "D" => [~w[3 1]]
+      }
+
+      stop_sequences = LocationContext.untag_stop_sequences(tagged_stop_sequences)
+
+      location_context = %LocationContext{
+        home_stop: stop_id,
+        tagged_stop_sequences: tagged_stop_sequences,
+        upstream_stops: LocationContext.upstream_stop_id_set([stop_id], stop_sequences),
+        downstream_stops: LocationContext.downstream_stop_id_set([stop_id], stop_sequences),
+        routes: routes_at_stop,
+        alert_route_types: LocationContext.route_type_filter(app, [stop_id])
+      }
+
       %{
         stop_ids: ~w[1 2 3],
         route_ids: ~w[11 22 33],
+        location_context: location_context,
         now: DateTime.utc_now()
       }
     end
@@ -249,6 +277,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
     test "filters out alerts that inform routes that do not serve the home stop", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
+      location_context: location_context,
       now: now
     } do
       alerts = [
@@ -285,12 +314,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               relevant_alerts(alerts, stop_ids, route_ids, now)
+               relevant_alerts(alerts, stop_ids, route_ids, location_context, now)
     end
 
     test "filters out alerts that inform stops that are not downstream of the home stop", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
+      location_context: location_context,
       now: now
     } do
       alerts = [
@@ -327,12 +357,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
       ]
 
       assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
-               relevant_alerts(alerts, stop_ids, route_ids, now)
+               relevant_alerts(alerts, stop_ids, route_ids, location_context, now)
     end
 
     test "keeps alerts that inform an entire route type", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
+      location_context: location_context,
       now: now
     } do
       alerts = [
@@ -356,12 +387,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [%Alert{id: "1"}] = relevant_alerts(alerts, stop_ids, route_ids, now)
+      assert [%Alert{id: "1"}] =
+               relevant_alerts(alerts, stop_ids, route_ids, location_context, now)
     end
 
     test "filters out alerts with other informed entities", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
+      location_context: location_context,
       now: now
     } do
       alerts = [
@@ -373,12 +406,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, location_context, now)
     end
 
     test "filters out alerts that do not have a relevant effect", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
+      location_context: location_context,
       now: now
     } do
       alerts = [
@@ -390,12 +424,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, location_context, now)
     end
 
     test "filters out upcoming alerts", %{
       stop_ids: stop_ids,
       route_ids: route_ids,
+      location_context: location_context,
       now: now
     } do
       alerts = [
@@ -407,7 +442,54 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         }
       ]
 
-      assert [] = relevant_alerts(alerts, stop_ids, route_ids, now)
+      assert [] = relevant_alerts(alerts, stop_ids, route_ids, location_context, now)
+    end
+
+    test "filters out stale alerts that don't affect the stop", %{
+      stop_ids: stop_ids,
+      route_ids: route_ids,
+      location_context: location_context,
+      now: now
+    } do
+      one_week_in_seconds = 604_800
+      ten_weeks_ago = DateTime.add(now, -10 * one_week_in_seconds)
+
+      home_stop = ie(stop_id: "1")
+      downstream_stop = ie(stop_id: "2")
+      upstream_stop = ie(stop_id: "1")
+
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :suspension,
+          informed_entities: [home_stop],
+          active_period: [{ten_weeks_ago, nil}]
+        },
+        %Alert{
+          id: "2",
+          effect: :suspension,
+          informed_entities: [home_stop, downstream_stop],
+          active_period: [{ten_weeks_ago, nil}]
+        },
+        %Alert{
+          id: "3",
+          effect: :suspension,
+          informed_entities: [
+            home_stop,
+            upstream_stop
+          ],
+          active_period: [{ten_weeks_ago, nil}]
+        },
+        %Alert{
+          id: "4",
+          effect: :suspension,
+          informed_entities: [ie(route_type: 1)],
+          active_period: [{ten_weeks_ago, nil}]
+        }
+      ]
+
+      assert [%Alert{id: "1"}, %Alert{id: "2"}, %Alert{id: "3"}] =
+               relevant_alerts(alerts, stop_ids, route_ids, location_context, now)
     end
   end
 end
