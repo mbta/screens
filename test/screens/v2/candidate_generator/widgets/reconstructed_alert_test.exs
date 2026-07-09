@@ -38,7 +38,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         }
       ]
 
+      now = ~U[2021-01-01T00:00:00Z]
       happening_now_active_period = [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+      ten_weeks_ago = DateTime.add(now, -10 * 604_800)
 
       oak_grove_sb = %Stop{
         id: "70036",
@@ -175,7 +177,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         config: config,
         bad_config: bad_config,
         location_context: location_context,
-        now: ~U[2021-01-01T00:00:00Z],
+        now: now,
+        ten_weeks_ago: ten_weeks_ago,
         happening_now_active_period: happening_now_active_period,
         malden_center_nb: malden_center_nb,
         malden_center_sb: malden_center_sb,
@@ -856,12 +859,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         config: config,
         location_context: location_context,
         now: now,
+        ten_weeks_ago: ten_weeks_ago,
         fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fetch_location_context_fn
       } = context
-
-      one_week_in_seconds = 604_800
-      ten_weeks_ago = DateTime.add(now, -10 * one_week_in_seconds)
 
       alerts = [
         %Alert{
@@ -878,6 +879,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         screen: config,
         location_context: location_context,
         now: now,
+        ten_weeks_ago: ten_weeks_ago,
         is_terminal_station: true,
         is_priority: true,
         home_station_name: "Oak Grove"
@@ -914,12 +916,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         config: config,
         location_context: location_context,
         now: now,
+        ten_weeks_ago: ten_weeks_ago,
         fetch_stop_name_fn: fetch_stop_name_fn,
         fetch_location_context_fn: fetch_location_context_fn
       } = context
-
-      one_week_in_seconds = 604_800
-      ten_weeks_ago = DateTime.add(now, -10 * one_week_in_seconds)
 
       alerts = [
         %Alert{
