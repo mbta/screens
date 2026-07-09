@@ -156,6 +156,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
+  @spec takeover_alert?(t()) :: boolean()
   def takeover_alert?(%__MODULE__{
         screen: %Screen{app_id: :gl_eink_v2},
         alert: %Alert{effect: effect} = alert,
@@ -203,6 +204,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   # For all other bus alert effects, all stops in the `informed_entities` are directly affected by the alert and would be useful for riders to see.
+  @spec valid_candidate?(t()) :: boolean()
   def valid_candidate?(
         %__MODULE__{
           screen: %Screen{app_id: screen_type},

@@ -118,6 +118,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert do
   # eliminated, even though service is still running. We expect live predictions to not be fully
   # available within single-tracked segments, so it's okay for this message to take up more space
   # when the severity warrants it.
+  @spec eliminated_service_type(t()) :: :some | :none
   defp eliminated_service_type(%__MODULE__{
          alert: %Alert{cause: :single_tracking, effect: :delay, severity: severity} = alert,
          location_context: location_context
