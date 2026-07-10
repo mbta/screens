@@ -156,11 +156,14 @@ defmodule Screens.V2.WidgetInstance.Alert do
       LocalizedAlert.informs_all_active_routes_at_home_stop?(t)
   end
 
-  def takeover_alert?(
-        %__MODULE__{screen: %Screen{app_id: :gl_eink_v2}, alert: %Alert{effect: effect}} = t
-      ) do
+  @spec takeover_alert?(t()) :: boolean()
+  def takeover_alert?(%__MODULE__{
+        screen: %Screen{app_id: :gl_eink_v2},
+        alert: %Alert{effect: effect} = alert,
+        location_context: location_context
+      }) do
     effect in [:station_closure, :suspension, :shuttle] and
-      LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
+      LocalizedAlert.stop_in_alert_boundary?(alert, location_context)
   end
 
   defp takeover_slot_names(%__MODULE__{screen: %Screen{app_id: :bus_shelter_v2}}) do
@@ -201,10 +204,16 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   # For all other bus alert effects, all stops in the `informed_entities` are directly affected by the alert and would be useful for riders to see.
-  def valid_candidate?(%__MODULE__{screen: %Screen{app_id: screen_type}} = t)
+  @spec valid_candidate?(t()) :: boolean()
+  def valid_candidate?(
+        %__MODULE__{
+          screen: %Screen{app_id: screen_type},
+          alert: alert,
+          location_context: location_context
+        } = t
+      )
       when screen_type in [:bus_shelter_v2, :bus_eink_v2] do
-    priority(t) != :no_render and
-      LocalizedAlert.location(t) in [:inside, :boundary_upstream, :boundary_downstream]
+    priority(t) != :no_render and LocalizedAlert.stop_in_alert_boundary?(alert, location_context)
   end
 
   # Any subway alert that is not filtered out in the candidate_generator is valid and should appear on screens›.
