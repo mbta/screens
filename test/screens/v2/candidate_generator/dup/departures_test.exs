@@ -849,6 +849,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           rows: expected_departures
         },
         %Screens.V2.WidgetInstance.Departures.OvernightSection{
+          header: %ScreensConfig.Departures.Header{},
+          headsign: nil,
           routes: [
             %Screens.Routes.Route{id: "r3", type: :subway, line: %Screens.Lines.Line{id: "l3"}}
           ]

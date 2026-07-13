@@ -30,6 +30,7 @@ defmodule Screens.V2.RDS do
   alias Screens.Util
 
   alias Screens.V2.Departure
+  alias Screens.V2.RDS
 
   alias ScreensConfig.Departures
   alias ScreensConfig.Departures.{Query, Section}
@@ -100,10 +101,11 @@ defmodule Screens.V2.RDS do
     """
     @type t :: %__MODULE__{
             destinations: [Screens.V2.RDS.destination()],
+            displayed_headsign: String.t(),
             routes: [Route.t()],
             last_schedule: Schedule.t() | nil
           }
-    defstruct ~w[destinations routes last_schedule]a
+    defstruct ~w[destinations displayed_headsign routes last_schedule]a
   end
 
   defmodule Headways do
@@ -287,7 +289,7 @@ defmodule Screens.V2.RDS do
           DateTime.t()
         ) :: item() | nil
   defp destination_state(
-         {%Stop{id: stop_id}, _line, _headsign} = destination,
+         {%Stop{id: stop_id}, _line, headsign} = destination,
          departures,
          schedules,
          routes_for_section,
@@ -310,7 +312,10 @@ defmodule Screens.V2.RDS do
 
     cond do
       presented_departures != [] ->
-        %Countdowns{destinations: [destination], departures: presented_departures}
+        %Countdowns{
+          destinations: [destination],
+          departures: presented_departures
+        }
 
       impacted_by_alert? ->
         nil
@@ -328,7 +333,13 @@ defmodule Screens.V2.RDS do
 
       departures == [] and service_state == :after ->
         %Schedule{route: route} = last_schedule
-        %ServiceEnded{destinations: [destination], last_schedule: last_schedule, routes: [route]}
+
+        %ServiceEnded{
+          destinations: [destination],
+          displayed_headsign: headsign,
+          last_schedule: last_schedule,
+          routes: [route]
+        }
 
       service_state == :before ->
         %FirstTrip{destinations: [destination], first_schedule: first_schedule}
@@ -381,13 +392,7 @@ defmodule Screens.V2.RDS do
         ]
 
       service_ended?(states) ->
-        [
-          %ServiceEnded{
-            destinations: states |> Enum.flat_map(& &1.destinations) |> Enum.uniq(),
-            routes: states |> Enum.flat_map(& &1.routes) |> Enum.uniq(),
-            last_schedule: nil
-          }
-        ]
+        combine_service_ended_states_for_section(states)
 
       headways?(states) ->
         combine_headway_states_for_section(states)
@@ -417,57 +422,54 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  defp combine_headway_states_for_section(
-         [
-           %Headways{
-             destinations: [{_stop, %Line{id: line_id}, first_headsign}],
-             routes: [route],
-             range: range
-           }
-           | _
-         ] = states
-       ) do
-    destinations = Enum.flat_map(states, & &1.destinations)
+  defp combine_service_ended_states_for_section([%ServiceEnded{routes: [route]} | _] = states) do
+    {state_destinations, routes, direction_id} =
+      get_combined_destinations_routes_direction_ids(states)
 
+    [
+      %ServiceEnded{
+        destinations: state_destinations,
+        displayed_headsign: get_common_headsign(state_destinations, route, direction_id),
+        routes: routes,
+        last_schedule: nil
+      }
+    ]
+  end
+
+  defp combine_headway_states_for_section([%Headways{routes: [route], range: range} | _] = states) do
+    {state_destinations, routes, direction_id} =
+      get_combined_destinations_routes_direction_ids(states)
+
+    [
+      %Headways{
+        destinations: state_destinations,
+        routes: routes,
+        displayed_headsign: get_common_headsign(state_destinations, route, direction_id),
+        range: range
+      }
+    ]
+  end
+
+  @spec get_combined_destinations_routes_direction_ids([RDS.item()]) ::
+          {[RDS.destination()], [Route.t()], Trip.direction() | nil}
+  defp get_combined_destinations_routes_direction_ids(states) do
     direction_id =
       states
-      |> Enum.map(& &1.direction_id)
+      |> Enum.map(fn
+        %ServiceEnded{last_schedule: %Schedule{direction_id: direction_id}} -> direction_id
+        %Headways{direction_id: direction_id} -> direction_id
+      end)
       |> Enum.uniq()
       |> case do
         [one_direction] -> one_direction
         _ -> nil
       end
 
-    displayed_headsign =
-      cond do
-        # Use the headsign if all destinations have the same headsign,
-        Enum.all?(destinations, fn {_stop, _line, other_headsign} ->
-          first_headsign == other_headsign
-        end) ->
-          first_headsign
+    state_destinations = states |> Enum.flat_map(& &1.destinations) |> Enum.uniq()
 
-        # Use the direction name if destinations have the same direction name,
-        direction_id != nil and
-            Enum.all?(
-              destinations,
-              fn {_stop, %Line{id: other_line_id}, _other_headsign} ->
-                line_id == other_line_id
-              end
-            ) ->
-          route |> Route.normalized_direction_names() |> Enum.at(direction_id)
+    routes = states |> Enum.flat_map(& &1.routes) |> Enum.uniq()
 
-        true ->
-          nil
-      end
-
-    [
-      %Headways{
-        destinations: destinations,
-        routes: states |> Enum.flat_map(& &1.routes) |> Enum.uniq(),
-        displayed_headsign: displayed_headsign,
-        range: range
-      }
-    ]
+    {state_destinations, routes, direction_id}
   end
 
   defp maybe_combine_headway_states(headway_states, lines_in_other_states)
@@ -512,6 +514,33 @@ defmodule Screens.V2.RDS do
   end
 
   defp maybe_combine_headway_states(headways, _line_direction_pairs), do: headways
+
+  defp get_common_headsign(
+         [{_stop, %Line{id: line_id}, headsign} | _] = destinations,
+         route,
+         direction_id
+       ) do
+    cond do
+      # Use the headsign if all destinations have the same headsign,
+      Enum.all?(destinations, fn {_stop, _line, other_headsign} ->
+        headsign == other_headsign
+      end) ->
+        headsign
+
+      # Use the direction name if destinations have the same direction name,
+      direction_id != nil and
+          Enum.all?(
+            destinations,
+            fn {_stop, %Line{id: other_line_id}, _other_headsign} ->
+              line_id == other_line_id
+            end
+          ) ->
+        route |> Route.normalized_direction_names() |> Enum.at(direction_id)
+
+      true ->
+        nil
+    end
+  end
 
   @spec scheduled_service_state(
           Schedule.t() | nil,

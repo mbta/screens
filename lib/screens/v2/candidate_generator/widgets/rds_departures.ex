@@ -102,8 +102,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
       [%NoService{routes: routes}] ->
         %NoServiceSection{routes: routes}
 
-      [%ServiceEnded{routes: routes}] ->
-        %OvernightSection{routes: routes}
+      [
+        %ServiceEnded{displayed_headsign: displayed_headsign, routes: routes}
+      ] ->
+        %OvernightSection{headsign: displayed_headsign, header: header, routes: routes}
 
       [
         %Headways{

@@ -7,11 +7,25 @@ import type {
   BaseFoldedSection,
   FoldedSection,
 } from "./normal_section";
+import { OvernightSection } from "./overnight_section";
 
-export type Section = NormalSection & { type: "normal_section" };
+export type Section =
+  | (NormalSection & { type: "normal_section" })
+  | (OvernightSection & { type: "overnight_section" });
 
-export const toFoldedSection = (section: Section): FoldedSection => {
+type DepartureSection = FoldedSection | OvernightSection;
+
+export const toDepartureSection = (section: Section): DepartureSection => {
   switch (section.type) {
+    case "overnight_section": {
+      const overnightSection: OvernightSection = {
+        ...section,
+        type: "overnight_section",
+      };
+
+      return overnightSection;
+    }
+
     case "normal_section": {
       const baseSection: BaseFoldedSection = {
         ...section,
@@ -57,7 +71,9 @@ export const toFoldedSection = (section: Section): FoldedSection => {
  *
  * Operates immutably. If no sections could be trimmed, returns the same array.
  */
-export const trimSections = (sections: FoldedSection[]): FoldedSection[] => {
+export const trimSections = (
+  sections: DepartureSection[],
+): DepartureSection[] => {
   const trimmed = _.cloneDeep(sections);
 
   const sortedSizedSections = trimmed
@@ -73,7 +89,7 @@ export const trimSections = (sections: FoldedSection[]): FoldedSection[] => {
 
 // Determine how many above-the-fold departure "items" a section contains, for
 // the purposes of deciding which sections should be trimmed first.
-const sectionLength = (section: FoldedSection): number => {
+const sectionLength = (section: DepartureSection): number => {
   if (section.type === "folded_section") {
     return section.rows.aboveFold.reduce(
       (sum, row) =>
@@ -86,9 +102,9 @@ const sectionLength = (section: FoldedSection): number => {
   }
 };
 
-type SizedFoldedSection = {
+type SizedDepartureSection = {
   length: number;
-  section: FoldedSection;
+  section: DepartureSection;
 };
 
 // `trimOne` functions destructively trim departures from sections, returning
@@ -98,16 +114,16 @@ type SizedFoldedSection = {
 
 // Trim one departure from the section with the most, among those with more than
 // their `base`. If no `base` is defined, acts as `trimTowardsMin`.
-const trimOneTowardsBase = (sections: SizedFoldedSection[]): boolean =>
+const trimOneTowardsBase = (sections: SizedDepartureSection[]): boolean =>
   trimOneBy(sections, (length, { min, base }) => length > (base || min));
 
 // Trim one departure from the section with the most, among those with more than
 // their `min`.
-const trimOneTowardsMin = (sections: SizedFoldedSection[]): boolean =>
+const trimOneTowardsMin = (sections: SizedDepartureSection[]): boolean =>
   trimOneBy(sections, (length, { min }) => length > min);
 
 const trimOneBy = (
-  sections: SizedFoldedSection[],
+  sections: SizedDepartureSection[],
   condition: (length: number, layout: Layout) => boolean,
 ): boolean => {
   for (const { section, length } of sections) {
