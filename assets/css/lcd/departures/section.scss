@@ -37,3 +37,27 @@
     border: none;
   }
 }
+
+.overnight-section {
+  & > .departures__notice-row {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    margin-right: 24px;
+
+    .free-text {
+      font-size: 64px;
+      font-weight: 400;
+    }
+  }
+
+  & > .departures__notice-row--with-headsign {
+    .free-text {
+      font-weight: 600;
+    }
+  }
+}
+
+.departures__overnight-no-service {
+  font-size: 56px;
+}

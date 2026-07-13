@@ -102,7 +102,7 @@ defmodule Screens.V2.RDSTest do
     }
   end
 
-  defp service_ended(destination_keys, schedule, routes) do
+  defp service_ended(destination_keys, schedule, routes, displayed_headsign \\ nil) do
     destinations =
       Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
         {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
@@ -110,6 +110,7 @@ defmodule Screens.V2.RDSTest do
 
     %RDS.ServiceEnded{
       destinations: destinations,
+      displayed_headsign: displayed_headsign,
       last_schedule: schedule,
       routes: routes
     }
@@ -751,9 +752,14 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [
                {:ok,
                 [
-                  service_ended([{"70061", "l1", "Alewife"}], nil, [
-                    %Route{id: "r1", line: %Line{id: "l1"}, type: :bus}
-                  ])
+                  service_ended(
+                    [{"70061", "l1", "Alewife"}],
+                    nil,
+                    [
+                      %Route{id: "r1", line: %Line{id: "l1"}, type: :bus}
+                    ],
+                    "Alewife"
+                  )
                 ]}
              ]
     end
