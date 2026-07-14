@@ -67,7 +67,7 @@ defmodule Screens.Headsigns.Data do
     "Malden Center" => ["Malden Center", "Malden Ctr"],
     "Malden via Square One Mall & Kennedy Dr" => ["Malden via Square One Mall & Kndy Dr"],
     "Massachusetts Avenue" => ["Mass Ave"],
-    "Medford / Tufts" => ["Medford/Tufts", "Medfd/Tufts"],
+    "Medford/Tufts" => ["Medford/Tufts", "Medfd/Tufts"],
     "Mission Park" => ["Mission Park", "Mission Pk"],
     "Museum of Fine Arts" => ["Museum of Fine Arts", "MFA"],
     "Needham Heights" => ["Needham Heights", "Needham Hts"],
