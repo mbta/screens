@@ -38,7 +38,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         }
       ]
 
+      now = ~U[2021-01-01T00:00:00Z]
       happening_now_active_period = [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
+      ten_weeks_ago = DateTime.add(now, -10 * 604_800)
 
       oak_grove_sb = %Stop{
         id: "70036",
@@ -175,7 +177,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         config: config,
         bad_config: bad_config,
         location_context: location_context,
-        now: ~U[2021-01-01T00:00:00Z],
+        now: now,
+        ten_weeks_ago: ten_weeks_ago,
         happening_now_active_period: happening_now_active_period,
         malden_center_nb: malden_center_nb,
         malden_center_sb: malden_center_sb,
@@ -836,6 +839,125 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
             is_priority: false,
             informed_station_names: ["Malden Center"],
             partial_closure_platform_names: ["Southbound"]
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widgets ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn
+               )
+    end
+
+    test "doesn't filter stale alerts that affect the stop", context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        ten_weeks_ago: ten_weeks_ago,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :station_closure,
+          informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+          active_period: [{ten_weeks_ago, nil}]
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        ten_weeks_ago: ten_weeks_ago,
+        is_terminal_station: true,
+        is_priority: true,
+        home_station_name: "Oak Grove"
+      }
+
+      expected_widget = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "1",
+              effect: :station_closure,
+              informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+              active_period: [{ten_weeks_ago, nil}]
+            },
+            informed_station_names: ["Oak Grove"],
+            is_priority: false
+          },
+          expected_common_data
+        )
+      ]
+
+      assert expected_widget ==
+               reconstructed_alert_instances(
+                 config,
+                 now,
+                 fetch_alerts_fn,
+                 fetch_stop_name_fn,
+                 fetch_location_context_fn
+               )
+    end
+
+    test "filters stale alerts at an outside an alert's location", context do
+      %{
+        config: config,
+        location_context: location_context,
+        now: now,
+        ten_weeks_ago: ten_weeks_ago,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn
+      } = context
+
+      alerts = [
+        %Alert{
+          id: "1",
+          effect: :station_closure,
+          informed_entities: [ie(stop: %Stop{id: "place-astao", name: "Assembly"})],
+          active_period: [{ten_weeks_ago, nil}]
+        },
+        %Alert{
+          id: "2",
+          effect: :station_closure,
+          informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+          active_period: [{now, nil}]
+        }
+      ]
+
+      fetch_alerts_fn = fn _ -> {:ok, alerts} end
+
+      expected_common_data = %{
+        screen: config,
+        location_context: location_context,
+        now: now,
+        is_terminal_station: true,
+        is_priority: true,
+        home_station_name: "Oak Grove"
+      }
+
+      expected_widgets = [
+        struct(
+          %ReconstructedAlertWidget{
+            alert: %Alert{
+              id: "2",
+              effect: :station_closure,
+              informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
+              active_period: [{now, nil}]
+            },
+            informed_station_names: ["Oak Grove"],
+            is_priority: false
           },
           expected_common_data
         )

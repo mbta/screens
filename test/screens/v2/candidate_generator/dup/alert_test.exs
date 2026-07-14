@@ -95,7 +95,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
     expect(@location_context, :fetch, fn _, _, _ -> location_context end)
   end
 
-  describe "alert_instances/5" do
+  describe "alert_instances/2" do
     test "returns alert instances" do
       expect_alerts()
       expect_location_context()
@@ -177,6 +177,101 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                      }
                    ],
                    active_period: [{@now, nil}],
+                   lifecycle: "ONGOING",
+                   timeframe: nil,
+                   created_at: @now,
+                   updated_at: @now,
+                   url: nil,
+                   description: nil
+                 },
+                 rotation_index: :two,
+                 stop_name: "Back Bay"
+               }
+             ] = actual_widgets
+    end
+
+    test "does not filter stale alert instances that affect the stop" do
+      one_week_in_seconds = 604_800
+      ten_weeks_ago = DateTime.add(@now, -10 * one_week_in_seconds)
+
+      expect_alerts(%{active_period: [{ten_weeks_ago, nil}]})
+      expect_location_context()
+
+      actual_widgets = Alerts.alert_instances(@config, @now)
+
+      assert [
+               %{
+                 alert: %Alert{
+                   active_period: [{ten_weeks_ago, nil}],
+                   cause: :accident,
+                   created_at: ~U[2025-09-18 02:30:00Z],
+                   description: nil,
+                   effect: :delay,
+                   header: "Orange Line experiencing delays up to 20 minutes.",
+                   id: "999",
+                   informed_entities: [
+                     %InformedEntity{
+                       stop: %Stop{id: "place-bbsta"},
+                       route: "Orange",
+                       direction_id: nil,
+                       route_type: nil,
+                       activities: ~w[board exit ride]a,
+                       facility: nil
+                     }
+                   ],
+                   lifecycle: "ONGOING",
+                   severity: 5,
+                   timeframe: nil,
+                   updated_at: ~U[2025-09-18 02:30:00Z],
+                   url: nil
+                 }
+               },
+               %{
+                 alert: %{
+                   id: "999",
+                   cause: :accident,
+                   effect: :delay,
+                   severity: 5,
+                   header: "Orange Line experiencing delays up to 20 minutes.",
+                   informed_entities: [
+                     %InformedEntity{
+                       stop: %Stop{id: "place-bbsta"},
+                       route: "Orange",
+                       direction_id: nil,
+                       route_type: nil,
+                       activities: [:board, :exit, :ride],
+                       facility: nil
+                     }
+                   ],
+                   active_period: [{ten_weeks_ago, nil}],
+                   lifecycle: "ONGOING",
+                   timeframe: nil,
+                   created_at: @now,
+                   updated_at: @now,
+                   url: nil,
+                   description: nil
+                 },
+                 rotation_index: :one,
+                 stop_name: "Back Bay"
+               },
+               %{
+                 alert: %{
+                   id: "999",
+                   cause: :accident,
+                   effect: :delay,
+                   severity: 5,
+                   header: "Orange Line experiencing delays up to 20 minutes.",
+                   informed_entities: [
+                     %InformedEntity{
+                       stop: %Stop{id: "place-bbsta"},
+                       route: "Orange",
+                       direction_id: nil,
+                       route_type: nil,
+                       activities: [:board, :exit, :ride],
+                       facility: nil
+                     }
+                   ],
+                   active_period: [{ten_weeks_ago, nil}],
                    lifecycle: "ONGOING",
                    timeframe: nil,
                    created_at: @now,
