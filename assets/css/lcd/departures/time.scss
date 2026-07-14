@@ -1,18 +1,10 @@
 @use "CSS/colors";
 
-.departure-times-with-crowding {
-  width: 328px;
-}
-
 .departure-time-with-crowding {
   text-align: right;
 
   &:not(:first-child) {
     margin-top: 16px;
-  }
-
-  .departure-time:not(.departure-time--timestamp) {
-    width: 210px;
   }
 
   .departure-time.departure-time--text {

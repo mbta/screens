@@ -11,22 +11,26 @@
 
 .departure-row {
   display: grid;
-  grid-template-columns: 144px 520px 302px;
+  grid-template-columns: auto 1fr auto;
   column-gap: 24px;
   padding-right: 32px;
   padding-left: 32px;
-
-  &--wide-pill {
-    grid-template-columns: 198px 466px 302px;
-  }
 }
 
 .departure-row__route {
+  width: 144px;
   height: 74px;
   margin-top: 27px;
+
+  .departure-row--wide-pill & {
+    width: 198px;
+  }
 }
 
 .departure-row__destination {
+  min-width: 0;
+  max-width: 520px;
+  height: 74px;
   margin-top: 32px;
 }
 

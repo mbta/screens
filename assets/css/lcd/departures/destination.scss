@@ -1,6 +1,11 @@
 @use "CSS/colors";
 
+.departure-destination {
+  height: 100%;
+}
+
 .departure-destination__headsign {
+  height: 100%;
   padding-bottom: 6px;
   overflow: clip;
   text-overflow: ellipsis;
