@@ -117,10 +117,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
            optional(:time_in_epoch) => integer()
          }
 
-  @type serialized_headsign :: %{
+  @type serialized_headsign_lcd :: %{
           headsigns: [String.t()],
           variation: String.t() | nil
         }
+
+  @type serialized_headsign_mercury :: %{
+          headsign: String.t(),
+          variation: String.t() | nil
+        }
+
+  @type serialized_headsign :: serialized_headsign_lcd | serialized_headsign_mercury
 
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
@@ -515,6 +522,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
       |> simplify_shuttle_headsign(first_departure, screen)
 
     %{headsigns: Headsign.abbreviations(headsign), variation: nil}
+  end
+
+  def serialize_headsign([first_departure | _], %Screen{app_id: app_id})
+      when app_id in [:bus_eink_v2, :gl_eink_v2] do
+    {base_headsign, variation} =
+      first_departure
+      |> Departure.headsign()
+      |> headsign_with_variation()
+
+    %{headsign: base_headsign, variation: variation}
   end
 
   def serialize_headsign([first_departure | _], screen) do

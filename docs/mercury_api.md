@@ -61,6 +61,7 @@ For E-ink screens, each of `sections[].rows[].times_with_crowding[]` has a
 Unix timestamp. This allows the conversion to a number of minutes or "Now" to
 be done "just in time", independent of data fetching. [[#1911]]
 
+We only pass a single headsign for each departure, so we include a `headsign` field instead of the `headsigns` array.
 
 ## `LineMap` widget
 
