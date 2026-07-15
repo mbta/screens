@@ -114,13 +114,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
          stop_id,
          line_id,
          headsign,
-         route,
+         route_id,
          direction_name,
          direction_id
        ) do
     %RDS.Headways{
       destinations: [{%Stop{id: stop_id}, %Line{id: line_id}, headsign}],
-      routes: [route],
+      routes: [%Route{id: route_id}],
       displayed_headsign: direction_name,
       direction_id: direction_id,
       range: {5, 10}
@@ -403,6 +403,40 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       end)
 
       assert [%DeparturesWidget{sections: [%NormalSection{rows: [^included_departure]}]}] =
+               RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "post process filters departures with excludes route-directions" do
+      config =
+        build_config([
+          %Section{
+            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+            filters: %Filters{
+              route_directions: %RouteDirections{
+                action: :exclude,
+                targets: [
+                  %RouteDirection{route_id: "39", direction_id: 0},
+                  %RouteDirection{route_id: "41", direction_id: 0}
+                ]
+              }
+            }
+          }
+        ])
+
+      excluded_departures = [build_departure("41", 0), build_departure("39", 0)]
+      included_departures = [build_departure("41", 1), build_departure("1", 1)]
+      all_departures = excluded_departures ++ included_departures
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             countdowns("bus_route", "line_id_one", "headsign", all_departures)
+           ]}
+        ]
+      end)
+
+      assert [%DeparturesWidget{sections: [%NormalSection{rows: ^included_departures}]}] =
                RealtimeDepartures.departures_instances(config, @now)
     end
 

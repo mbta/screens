@@ -1,5 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
-  @moduledoc false
+  @moduledoc """
+  Candidate Generator for RDS Items. 
+  Takes in RDS items and generates Screens.V2.WidgetInstance.Departures sections
+  to eventually be serialized and used as a part of the Departures Widget.
+
+  Note: This candidate generator only creates sections, and does not do the roll-up
+  of full screen presentations
+
+  """
 
   alias Screens.Schedules.Schedule
   alias Screens.V2.Departure

@@ -1,5 +1,10 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
-  @moduledoc false
+  @moduledoc """
+  Candidate generator for LCD RDS Items
+  Takes in the generated sections from Screens.V2.CandidateGenerator.Widets.RdsDepartures and
+  handles the roll-up and creation fo the actual widget that will be serialized and used on
+  the screen itself. 
+  """
 
   alias Screens.Config.Cache
   alias Screens.Routes.Route
@@ -43,6 +48,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     end
   end
 
+  @spec generate_instances(Departures.t(), [atom()], non_neg_integer(), Screen.t(), DateTime.t()) ::
+          [widget()]
   defp generate_instances(departures, _slot_names, _order, _screen, _now)
        when is_nil(departures) or departures.sections == [],
        do: []
@@ -62,6 +69,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     [create_departures_instance(sections_data, sections, screen, slot_names, order, now)]
   end
 
+  @spec create_departures_instance(
+          DeparturesWidget.section(),
+          Section.t(),
+          Screen.t(),
+          [atom()],
+          non_neg_integer(),
+          DateTime.t()
+        ) :: widget()
   defp create_departures_instance(
          sections_data,
          sections,
@@ -72,6 +87,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
        ) do
     sections_data_with_sections_config = Enum.zip(sections_data, sections)
 
+    # As we begin to support other rows/sections/widgets, add them in here
     if has_valid_normal_section?(sections_data_with_sections_config) do
       %DeparturesWidget{
         screen: screen,
@@ -165,6 +181,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     }
   end
 
+  @spec no_data_text(Route.t() | nil, Trip.direction_id() | :both) :: FreeTextLine.t()
   defp no_data_text(nil, _direction_id) do
     %FreeTextLine{
       icon: nil,
@@ -213,40 +230,56 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     end)
   end
 
-  defp filter_by_time(departures, nil, _now), do: departures
+  @spec filter_by_time(NormalSection.row(), non_neg_integer(), DateTime.t()) :: [
+          NormalSection.row()
+        ]
+  defp filter_by_time(rows, nil, _now), do: rows
 
-  defp filter_by_time(departures, max_minutes, now) do
+  defp filter_by_time(rows, max_minutes, now) do
     latest_time = DateTime.add(now, max_minutes, :minute)
 
-    Enum.filter(departures, fn departure ->
-      DateTime.compare(Departure.time(departure), latest_time) != :gt
+    Enum.filter(rows, fn
+      %Departure{} = departure ->
+        DateTime.compare(Departure.time(departure), latest_time) != :gt
+
+      {%Schedule{} = schedule, :first_trip} ->
+        DateTime.compare(Schedule.time(schedule), latest_time) != :gt
     end)
   end
 
-  defp filter_by_route_direction(departures, %RouteDirections{
+  @spec filter_by_route_direction(NormalSection.row(), RouteDirections.t()) :: [
+          NormalSection.row()
+        ]
+  defp filter_by_route_direction(rows, %RouteDirections{
          action: :include,
          targets: targets
        }) do
-    Enum.filter(departures, &departure_in_route_directions?(&1, targets))
+    Enum.filter(rows, &row_in_route_directions?(&1, targets))
   end
 
-  defp filter_by_route_direction(departures, %RouteDirections{
+  defp filter_by_route_direction(rows, %RouteDirections{
          action: :exclude,
          targets: targets
        }) do
-    Enum.reject(departures, &departure_in_route_directions?(&1, targets))
+    Enum.reject(rows, &row_in_route_directions?(&1, targets))
   end
 
   defp filter_by_route_direction(departures, nil) do
     departures
   end
 
-  defp departure_in_route_directions?(d, route_directions) do
-    route_direction(d) in route_directions
+  defp row_in_route_directions?(row, route_directions) do
+    route_direction(row) in route_directions
   end
 
-  defp route_direction(d) do
+  defp route_direction(%Departure{} = d) do
     %RouteDirection{route_id: Departure.route(d).id, direction_id: Departure.direction_id(d)}
+  end
+
+  defp route_direction(
+         {%Schedule{route: %Route{id: id}, direction_id: direction_id}, :first_trip}
+       ) do
+    %RouteDirection{route_id: id, direction_id: direction_id}
   end
 
   defp maybe_sort_by_direction_id(departures, :destination),
