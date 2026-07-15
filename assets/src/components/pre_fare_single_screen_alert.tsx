@@ -15,6 +15,8 @@ import InfoIcon from "Images/info.svg";
 import ISAIcon from "Images/isa.svg";
 import ShuttleBusIcon from "Images/bus.svg";
 
+type Region = "here" | "boundary" | "outside";
+
 interface PreFareSingleScreenAlertProps {
   issue: string;
   location: string;
@@ -30,7 +32,7 @@ interface PreFareSingleScreenAlertProps {
     | "station_closure"
     | "delay"
     | "information";
-  region: "here" | "boundary" | "outside";
+  region: Region;
   updated_at: string;
   end_time?: string;
   disruption_diagram?: DisruptionDiagramData;
@@ -455,7 +457,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
 
   return (
     <div className="pre-fare-alert__page">
-      {showBanner && <PreFareAlertBanner routes={routes} />}
+      {showBanner && <PreFareAlertBanner region={region} routes={routes} />}
       <div
         className={classWithModifiers("alert-container", [
           "single-page",
@@ -516,9 +518,10 @@ const getAlertColor = (routes: EnrichedRoute[]) => {
   return uniqueColors === 1 ? colors[0] : "yellow";
 };
 
-const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
-  routes,
-}) => {
+const PreFareAlertBanner: ComponentType<{
+  region: Region;
+  routes: EnrichedRoute[];
+}> = ({ region, routes }) => {
   let banner;
 
   if (
@@ -563,6 +566,29 @@ const PreFareAlertBanner: ComponentType<{ routes: EnrichedRoute[] }> = ({
           className="alert-banner__route-pill--long"
           color={getHexColor(color)}
         />
+      </h5>
+    );
+  } else if (routes.length >= 2 && region === "here") {
+    // Two or more lines, and the banner is at an affected stop
+    banner = (
+      <h5
+        className={classWithModifiers("alert-banner", [
+          "small",
+          getAlertColor(routes),
+        ])}
+      >
+        <span className="alert-banner__attention-text">Attention</span>
+        {routes.map((route) => {
+          const LinePill = STRING_TO_SVG[route.svg_name];
+          return (
+            <LinePill
+              className="alert-banner__route-pill--short--multiple-routes"
+              key={route.svg_name}
+              color={getHexColor(getRouteColor(route.route_id))}
+            />
+          );
+        })}
+        <span>riders</span>
       </h5>
     );
   } else if (routes.length === 2) {
