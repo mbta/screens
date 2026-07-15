@@ -320,7 +320,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                  include_later: false
                },
                rows: [
-                 %{headsign: %{headsigns: ["Medford/Tufts"]}},
+                 %{headsign: %{headsigns: ["Medford/Tufts", "Medfd/Tufts"]}},
                  %{headsign: %{headsigns: ["Government Ctr", "Gov’t Center", "Gov't Ctr"]}},
                  %{headsign: %{headsigns: ["Cleveland Circle", "Cleveland Cir", "Clvlnd Cir"]}},
                  %{headsign: %{headsigns: ["Riverside"]}}
@@ -356,7 +356,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                type: :normal_section,
                rows: [
-                 %{headsign: %{headsigns: ["Medford/Tufts"]}},
+                 %{headsign: %{headsigns: ["Medford/Tufts", "Medfd/Tufts"]}},
                  %{
                    headsign: %{headsign: "Westbound"},
                    direction_id: 0,
@@ -389,7 +389,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                rows: [
                  %{
-                   headsign: %{headsigns: ["Medford/Tufts"]},
+                   headsign: %{headsigns: ["Medford/Tufts", "Medfd/Tufts"]},
                    is_first_trip: true,
                    route: %{type: :text, text: "GL·E", color: :green},
                    times_with_crowding: [
@@ -426,7 +426,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                rows: [
                  %{
-                   headsign: %{headsigns: ["Medford/Tufts"]},
+                   headsign: %{headsigns: ["Medford/Tufts", "Medfd/Tufts"]},
                    route: %{type: :text, text: "GL·E", color: :green},
                    times_with_crowding: [
                      %{
