@@ -9,6 +9,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   alias Screens.Config.Cache
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Trips.Trip
   alias Screens.V2.CandidateGenerator.Widgets.RdsDepartures
   alias Screens.V2.Departure
   alias Screens.V2.RDS
@@ -70,7 +71,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   end
 
   @spec create_departures_instance(
-          DeparturesWidget.section(),
+          [DeparturesWidget.section()],
           Section.t(),
           Screen.t(),
           [atom()],
@@ -181,7 +182,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     }
   end
 
-  @spec no_data_text(Route.t() | nil, Trip.direction_id() | :both) :: FreeTextLine.t()
+  @spec no_data_text(Route.t() | nil, Trip.direction() | :both) :: FreeTextLine.t()
   defp no_data_text(nil, _direction_id) do
     %FreeTextLine{
       icon: nil,
@@ -230,7 +231,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     end)
   end
 
-  @spec filter_by_time(NormalSection.row(), non_neg_integer(), DateTime.t()) :: [
+  @spec filter_by_time([NormalSection.row()], non_neg_integer() | nil, DateTime.t()) :: [
           NormalSection.row()
         ]
   defp filter_by_time(rows, nil, _now), do: rows
@@ -247,7 +248,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     end)
   end
 
-  @spec filter_by_route_direction(NormalSection.row(), RouteDirections.t()) :: [
+  @spec filter_by_route_direction([NormalSection.row()], RouteDirections.t() | nil) :: [
           NormalSection.row()
         ]
   defp filter_by_route_direction(rows, %RouteDirections{
