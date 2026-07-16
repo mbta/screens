@@ -441,11 +441,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp base_placement(
          %__MODULE__{
            alert: %Alert{id: alert_id, effect: effect} = alert,
-           screen: %Screen{
-             app_params: %_app{
-               evergreen_content: evergreen_content
-             }
-           },
+           screen: %Screen{app_params: %_app{evergreen_content: evergreen_content}},
            is_priority: true,
            is_terminal_station: is_terminal_station,
            partial_closure_platform_names: []
