@@ -56,8 +56,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defmodule OvernightSection do
     @moduledoc "Section consisting of a 'service ended' message."
-    @type t :: %__MODULE__{routes: [Route.t()]}
-    defstruct ~w[routes]a
+    @type t :: %__MODULE__{headsign: String.t() | nil, routes: [Route.t()], header: Header.t()}
+    defstruct ~w[headsign routes header]a
   end
 
   defmodule NoDataSection do
@@ -280,11 +280,35 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  def serialize_section(%OvernightSection{routes: routes}, _screen, _now, _is_only_section) do
+  def serialize_section(
+        %OvernightSection{
+          header: %Header{image_path: image_path} = header,
+          headsign: headsign,
+          routes: routes
+        },
+        _screen,
+        _now,
+        _is_only_section
+      ) do
     route_pill = routes |> Enum.map(&Route.icon/1) |> List.first()
-    text = %FreeTextLine{icon: route_pill, text: ["Service ended"]}
 
-    %{type: :overnight_section, text: FreeTextLine.to_json(text)}
+    text = %FreeTextLine{
+      icon: route_pill,
+      text: [
+        if headsign do
+          headsign
+        else
+          "Service ended"
+        end
+      ]
+    }
+
+    %{
+      type: :overnight_section,
+      header: Map.put(header, :image_path, Assets.s3_asset_url(image_path)) |> Header.to_json(),
+      text: FreeTextLine.to_json(text),
+      with_headsign: headsign != nil
+    }
   end
 
   def audio_serialize_section(%NormalSection{header: header} = section, screen, now) do
@@ -454,7 +478,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp serialize_departure_group(
          [{%Schedule{id: id} = schedule, special_trip_type}],
-         screen,
+         %Screen{app_id: app_id} = screen,
          now,
          route_pill_serializer
        ) do
@@ -467,8 +491,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
       headsign: serialize_headsign(departures, screen),
       times_with_crowding:
         case special_trip_type do
-          :first_trip -> serialize_times_with_crowding(departures, screen, now)
-          :service_ended -> [%{id: id, time: %{type: :overnight, is_live: false}}]
+          # First Trip Types are currently just departures, this will be modified later
+          :first_trip ->
+            serialize_times_with_crowding(departures, screen, now)
+
+          :service_ended ->
+            [%{id: id, time: %{type: :overnight, with_text: app_id != :dup_v2, is_live: false}}]
         end,
       direction_id: serialize_direction_id(departures),
       is_first_trip: special_trip_type == :first_trip

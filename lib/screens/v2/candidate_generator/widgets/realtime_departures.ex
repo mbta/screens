@@ -89,12 +89,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     sections_data_with_sections_config = Enum.zip(sections_data, sections)
 
     # As we begin to support other rows/sections/widgets, add them in here
-    if has_valid_normal_section?(sections_data_with_sections_config) do
+    if has_valid_section?(sections_data_with_sections_config) do
       %DeparturesWidget{
         screen: screen,
         sections:
           sections_data_with_sections_config
           |> Enum.map(fn
+            {%OvernightSection{} = overnight_section, _section} ->
+              overnight_section
+
             {%NormalSection{rows: rows} = normal_section, _section} ->
               %{
                 normal_section
@@ -103,6 +106,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
                       %Departure{} = departure -> departure
                       # Treat First Trips as Countdowns while we don't support them yet
                       {%Schedule{} = schedule, :first_trip} -> %Departure{schedule: schedule}
+                      {%Schedule{}, :service_ended} = service_ended -> service_ended
                     end)
               }
 
@@ -118,16 +122,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     end
   end
 
-  defp has_valid_normal_section?(sections_data) do
+  defp has_valid_section?(sections_data) do
     Enum.any?(sections_data, fn {section_data, %Section{header_only: header_only}} ->
       header_only ||
-        (is_struct(section_data, NormalSection) && has_valid_normal_section_row?(section_data))
+        (is_struct(section_data, NormalSection) && has_valid_normal_section_row?(section_data)) ||
+        is_struct(section_data, OvernightSection)
     end)
   end
 
   defp has_valid_normal_section_row?(%NormalSection{rows: rows}) do
     Enum.any?(rows, fn row ->
-      is_struct(row, Departure) || match?({%Schedule{}, :first_trip}, row)
+      is_struct(row, Departure) || match?({%Schedule{}, _special_trip_type}, row)
     end)
   end
 
@@ -226,7 +231,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   defp filter_unsupported_rows(rows) do
     Enum.filter(rows, fn
       %Departure{} -> true
-      {%Schedule{}, :first_trip} -> true
+      {%Schedule{}, _special_trip_type} -> true
       _ -> false
     end)
   end
@@ -243,7 +248,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
       %Departure{} = departure ->
         DateTime.compare(Departure.time(departure), latest_time) != :gt
 
-      {%Schedule{} = schedule, :first_trip} ->
+      {%Schedule{} = schedule, _special_trip_type} ->
         DateTime.compare(Schedule.time(schedule), latest_time) != :gt
     end)
   end
@@ -278,7 +283,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   end
 
   defp route_direction(
-         {%Schedule{route: %Route{id: id}, direction_id: direction_id}, :first_trip}
+         {%Schedule{route: %Route{id: id}, direction_id: direction_id}, _special_trip_type}
        ) do
     %RouteDirection{route_id: id, direction_id: direction_id}
   end

@@ -12,7 +12,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.Departures.NormalSection
+  alias Screens.V2.WidgetInstance.Departures.{NormalSection, OvernightSection}
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.Departures, as: DeparturesConfig
   alias ScreensConfig.Departures.{Filters, Header, Layout, Query, Section}
@@ -103,9 +103,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
     }
   end
 
-  defp service_ended(stop_id, line_id, headsign, schedule) do
+  defp service_ended(stop_id, line_id, headsign, schedule, routes \\ []) do
     %RDS.ServiceEnded{
       destinations: [{%Stop{id: stop_id}, %Line{id: line_id}, headsign}],
+      displayed_headsign: headsign,
+      routes: routes,
       last_schedule: schedule
     }
   end
@@ -183,12 +185,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
           {:ok,
            [
              no_service("stop_id_one", "line_id_one", "test_headsign_one"),
-             service_ended(
-               "stop_id_two",
-               "line_id_two",
-               "test_headsign_two",
-               build_schedule("route_two", "line_id_two")
-             ),
              headways(
                "stop_id_three",
                "line_id_three",
@@ -325,6 +321,71 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                          text: ["No departures currently available"]
                        }
                      ]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "returns NormalSection with departures and service ended" do
+      config = build_config(["route_A"])
+
+      schedule = build_schedule("route_two", "line_id_two")
+      departure = build_departure("r1", 0, :bus)
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             countdowns("stop_id_one", "line_id_one", "headsign", [departure]),
+             service_ended("stop_id_two", "line_id_two", "headsign_two", schedule)
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %NormalSection{
+                     header: %Header{},
+                     grouping_type: :time,
+                     layout: %Layout{},
+                     rows: [^departure, {^schedule, :service_ended}]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "returns OvernightSection when section only contains Service Ended" do
+      config = build_config(["route_A"])
+
+      schedule_one = build_schedule("route_one", "line_id_one")
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             service_ended("stop_id_one", "line_id_one", "headsign_one", schedule_one, [
+               %Route{id: "route_one"}
+             ])
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %OvernightSection{
+                     header: %Header{},
+                     headsign: "headsign_one",
+                     routes: [%Route{id: "route_one"}]
                    }
                  ]
                }
