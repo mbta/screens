@@ -1403,8 +1403,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         # Two situations in which we show an alert on the full_body right of a screen
         # When a section contains CR departures, we want this to be fully displayed
         # For single screens, we want it to be visible on the right as well
-        IO.inspect(template == :duo and !departures_contains_commuter_rail?(departures))
-
         if template == :duo and !departures_contains_commuter_rail?(departures),
           do: [:paged_main_content_left],
           else: [:full_body_right]
