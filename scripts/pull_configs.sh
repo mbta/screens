@@ -11,9 +11,9 @@ if [ $# -eq 0 ]; then
 fi
 
 case $1 in
-  prod | dev | dev-green) true;;
+  prod | dev | dev-green | dev-blue) true;;
   * )
-    echo "Environment should be: prod | dev | dev-green" >&2
+    echo "Environment should be: prod | dev | dev-green | dev-blue" >&2
     exit 2
     ;;
 esac

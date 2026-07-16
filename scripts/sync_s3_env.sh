@@ -1,7 +1,8 @@
 #!/bin/sh
 
 # Syncs two environments S3 buckets and their config files.
-# Can only go from prod -> dev <-> dev-green
+# Can sync from prod as a source, but to prod as a destination.
+# Any of dev, dev-green, or dev-blue can be the source or destination.
 
 set -eu
 
@@ -36,7 +37,7 @@ while getopts "Dhs:d:" opt; do
 done
 
 case $SOURCE_ENV in
-prod | dev | dev-green) true ;;
+prod | dev | dev-green | dev-blue) true ;;
 *)
   echo "Usage: $0 [-D] -s <screens-env-source-name> -d <screens-env-dest-name>" >&2
   echo "<screens-env-source-name> should be one of the following: prod | dev | dev-green" >&2
@@ -45,10 +46,10 @@ prod | dev | dev-green) true ;;
 esac
 
 case $DEST_ENV in
-dev | dev-green) true ;;
+dev | dev-green | dev-blue) true ;;
 *)
   echo "Usage: $0 [-D] -s <screens-env-source-name> -d <screens-env-dest-name>" >&2
-  echo "<screens-env-dest-name> should be one of the following: dev | dev-green" >&2
+  echo "<screens-env-dest-name> should be one of the following: dev | dev-green | dev-blue" >&2
   exit 1
   ;;
 esac
