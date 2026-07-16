@@ -62,7 +62,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defmodule NoDataSection do
     @moduledoc "Section consisting of a 'no departures' message."
-    @type t :: %__MODULE__{route: Route.t()}
+    @type t :: %__MODULE__{route: Route.t() | nil}
     defstruct ~w[route]a
   end
 
