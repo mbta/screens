@@ -567,6 +567,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert_values(widget, {3, @flex_zone})
     end
+
+    test "service eliminating alert with corresponding evergreen content", %{widget: widget} do
+      widget =
+        widget
+        |> put_is_priority(true)
+        |> put_in(
+          [Access.key(:screen), Access.key(:app_params), Access.key(:evergreen_content)],
+          [
+            struct(EvergreenContentItem,
+              schedule: %AlertSchedule{alert_ids: ["123"], suppress_alert_widgets: false}
+            )
+          ]
+        )
+
+      assert_values(widget, {1, @left_screen}, {1, @right_screen})
+    end
   end
 
   describe "priority: single-line station" do

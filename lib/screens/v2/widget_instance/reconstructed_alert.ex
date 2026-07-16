@@ -442,7 +442,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          %__MODULE__{
            alert: %Alert{id: alert_id, effect: effect} = alert,
            screen: %Screen{
-             app_params: %PreFare{
+             app_params: %_app{
                evergreen_content: evergreen_content
              }
            },
@@ -477,7 +477,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp adjust_placement(:single_screen, _location, :solo, _, _), do: :flex_zone
   defp adjust_placement(:flex_zone, _location, :solo, _, _), do: :flex_zone
 
+  @spec evergreen_content_for_alert?(integer(), [EvergreenContentItem.t()]) :: boolean()
   defp evergreen_content_for_alert?(alert_id, evergreen_content) do
+    # If a high priority alert is paired with evergreen content having suppress_alert_widgets=false,
+    # we want to show the the alert on a single instead of dual screen.
     Enum.any?(evergreen_content, fn
       %EvergreenContentItem{
         schedule: %AlertSchedule{alert_ids: alert_ids, suppress_alert_widgets: false}
