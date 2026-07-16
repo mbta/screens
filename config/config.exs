@@ -484,7 +484,7 @@ v3_api_cache_options = [
 
 config :screens,
        Screens.V3Api.Cache.Realtime,
-       Keyword.merge(v3_api_cache_options, allocated_memory: 100 * 1024 * 1024)
+       Keyword.merge(v3_api_cache_options, allocated_memory: 200 * 1024 * 1024)
 
 config :screens,
        Screens.V3Api.Cache.Static,
