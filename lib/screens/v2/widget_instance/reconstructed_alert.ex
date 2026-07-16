@@ -440,7 +440,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp base_placement(
          %__MODULE__{
-           alert: %Alert{effect: effect} = alert,
+           alert: %Alert{id: alert_id, effect: effect} = alert,
+           screen: %Screen{
+             app_params: %PreFare{
+               evergreen_content: evergreen_content
+             }
+           },
            is_priority: true,
            is_terminal_station: is_terminal_station,
            partial_closure_platform_names: []
@@ -450,9 +455,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        when effect in [:station_closure, :suspension, :shuttle] do
     if location == :inside and
          LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
-         (is_nil(Alert.direction_id(alert)) or is_terminal_station),
-       do: :dual_screen,
-       else: :single_screen
+         (is_nil(Alert.direction_id(alert)) or is_terminal_station) and
+         not evergreen_content_for_alert?(alert_id, evergreen_content) do
+      :dual_screen
+    else
+      :single_screen
+    end
   end
 
   defp base_placement(%__MODULE__{is_priority: true}, _location), do: :single_screen
@@ -468,6 +476,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp adjust_placement(:single_screen, :inside, :solo, _, _), do: :single_screen
   defp adjust_placement(:single_screen, _location, :solo, _, _), do: :flex_zone
   defp adjust_placement(:flex_zone, _location, :solo, _, _), do: :flex_zone
+
+  defp evergreen_content_for_alert?(alert_id, evergreen_content) do
+    Enum.any?(evergreen_content, fn
+      %EvergreenContentItem{
+        schedule: %AlertSchedule{alert_ids: alert_ids, suppress_alert_widgets: false}
+      } ->
+        alert_id in alert_ids
+
+      _ ->
+        false
+    end)
+  end
 
   # Two screen alert, suspension
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
@@ -1383,6 +1403,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         # Two situations in which we show an alert on the full_body right of a screen
         # When a section contains CR departures, we want this to be fully displayed
         # For single screens, we want it to be visible on the right as well
+        IO.inspect(template == :duo and !departures_contains_commuter_rail?(departures))
+
         if template == :duo and !departures_contains_commuter_rail?(departures),
           do: [:paged_main_content_left],
           else: [:full_body_right]
