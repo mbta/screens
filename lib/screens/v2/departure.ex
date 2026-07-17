@@ -48,7 +48,7 @@ defmodule Screens.V2.Departure do
     fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
     with {:ok, predictions} <- fetch_predictions_fn.(params),
-         {:ok, schedules} <- fetch_schedules(params, opts) do
+         {:ok, schedules} <- get_schedules(params, opts) do
       departures = Builder.build(predictions, schedules, now, opts)
       @last_trip.update_last_trip_cache(departures, now)
       {:ok, departures}
@@ -57,6 +57,7 @@ defmodule Screens.V2.Departure do
     end
   end
 
+  @callback fetch_schedules(params(), opts()) :: Schedule.result()
   def fetch_schedules(params, opts) do
     fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
 
@@ -80,6 +81,13 @@ defmodule Screens.V2.Departure do
       ^all_types -> params |> Map.delete(:route_type) |> fetch_fn.()
       # We have a final route type filter that is neither "everything" nor "nothing".
       route_types -> params |> Map.put(:route_type, route_types) |> fetch_fn.()
+    end
+  end
+
+  defp get_schedules(params, opts) do
+    case Keyword.fetch(opts, :schedules) do
+      {:ok, schedules} -> {:ok, schedules}
+      :error -> fetch_schedules(params, opts)
     end
   end
 

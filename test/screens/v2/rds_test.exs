@@ -26,7 +26,6 @@ defmodule Screens.V2.RDSTest do
   @departure injected(Departure)
   @headways injected(Headways)
   @route_pattern injected(RoutePattern)
-  @schedule injected(Schedule)
   @stop injected(Stop)
   @config_cache injected(Cache)
   @last_trip injected(LastTrip)
@@ -34,9 +33,9 @@ defmodule Screens.V2.RDSTest do
   setup do
     stub(@alert, :fetch, fn _ -> {:ok, []} end)
     stub(@departure, :fetch, fn _, _ -> {:ok, []} end)
+    stub(@departure, :fetch_schedules, fn _, _ -> {:ok, []} end)
     stub(@headways, :get, fn _, _ -> nil end)
     stub(@route_pattern, :fetch, fn _ -> {:ok, []} end)
-    stub(@schedule, :fetch, fn _, _ -> {:ok, []} end)
     stub(@stop, :fetch, fn %{ids: ids} -> {:ok, Enum.map(ids, &stop/1)} end)
     stub(@config_cache, :disabled_modes, fn -> [] end)
     stub(@last_trip, :last_trip_departure_times, fn _ -> [] end)
@@ -233,7 +232,7 @@ defmodule Screens.V2.RDSTest do
       ]
 
       expect(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :bus, stop_ids: ["s0"]}, [{:now, ^now} | _] ->
+        %{direction_id: 0, route_type: :bus, stop_ids: ["s0"]}, [schedules: []] ->
           {
             :ok,
             expected_departures_one ++
@@ -300,7 +299,7 @@ defmodule Screens.V2.RDSTest do
       ]
 
       expect(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
+        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [schedules: []] ->
           {
             :ok,
             expected_departures
@@ -380,7 +379,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       expect(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :subway, stop_ids: ["s0"]}, [{:now, ^now} | _] ->
+        %{direction_id: 0, route_type: :subway, stop_ids: ["s0"]}, [schedules: []] ->
           {:ok, [skipped_departure | expected_departures]}
       end)
 
@@ -422,7 +421,7 @@ defmodule Screens.V2.RDSTest do
       }
 
       expect(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :subway, stop_ids: ["s0"]}, [{:now, ^now} | _] ->
+        %{direction_id: 0, route_type: :subway, stop_ids: ["s0"]}, [schedules: []] ->
           {:ok, [skipped_departure]}
       end)
 
@@ -478,7 +477,10 @@ defmodule Screens.V2.RDSTest do
         ]
       }
 
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+      expect(@departure, :fetch_schedules, fn %{stop_ids: ^stop_ids}, _now ->
+        {:ok, all_schedules}
+      end)
+
       expect_standard_stations(stop_ids)
       expect_standard_route_patterns(stop_ids)
 
@@ -529,7 +531,10 @@ defmodule Screens.V2.RDSTest do
 
       stub(@headways, :get, fn _, _ -> {5, 10} end)
 
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+      expect(@departure, :fetch_schedules, fn %{stop_ids: ^stop_ids}, _now ->
+        {:ok, all_schedules}
+      end)
+
       expect_standard_stations(stop_ids)
       expect_standard_route_patterns(stop_ids)
 
@@ -587,7 +592,10 @@ defmodule Screens.V2.RDSTest do
 
       stub(@headways, :get, fn _, _ -> {5, 10} end)
 
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+      expect(@departure, :fetch_schedules, fn %{stop_ids: ^stop_ids}, _now ->
+        {:ok, all_schedules}
+      end)
+
       expect_standard_stations(stop_ids)
       expect_standard_route_patterns(stop_ids)
 
@@ -671,11 +679,15 @@ defmodule Screens.V2.RDSTest do
       stub(@headways, :get, fn _, _ -> {5, 10} end)
 
       expect(@departure, :fetch, fn
-        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
+        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids},
+        [schedules: ^all_schedules] ->
           {:ok, []}
       end)
 
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+      expect(@departure, :fetch_schedules, fn %{stop_ids: ^stop_ids}, _now ->
+        {:ok, all_schedules}
+      end)
+
       expect_standard_stations(stop_ids)
       expect_standard_route_patterns(stop_ids)
 
@@ -724,11 +736,14 @@ defmodule Screens.V2.RDSTest do
       }
 
       expect(@departure, :fetch, fn
-        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
+        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids},
+        [schedules: ^all_schedules] ->
           {:ok, []}
       end)
 
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+      expect(@departure, :fetch_schedules, fn %{stop_ids: ^stop_ids}, _now ->
+        {:ok, all_schedules}
+      end)
 
       expect(@stop, :fetch, fn %{ids: ^stop_ids} ->
         {:ok, [station("70061", ~w[70061])]}
@@ -887,7 +902,11 @@ defmodule Screens.V2.RDSTest do
       }
 
       stub(@headways, :get, fn _, _ -> {5, 10} end)
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
+      expect(@departure, :fetch_schedules, fn %{stop_ids: ^stop_ids}, _now ->
+        {:ok, all_schedules}
+      end)
+
       expect_standard_stations(stop_ids)
       expect_standard_route_patterns(stop_ids)
 
@@ -1046,10 +1065,14 @@ defmodule Screens.V2.RDSTest do
       }
 
       stub(@headways, :get, fn _, _ -> {5, 10} end)
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
+      expect(@departure, :fetch_schedules, fn %{stop_ids: ^stop_ids}, _now ->
+        {:ok, all_schedules}
+      end)
 
       expect(@departure, :fetch, fn
-        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
+        %{direction_id: :both, route_type: :bus, stop_ids: ^stop_ids},
+        [schedules: ^all_schedules] ->
           {:ok, [departure_overlapping_with_headway]}
       end)
 
@@ -1353,7 +1376,11 @@ defmodule Screens.V2.RDSTest do
       }
 
       stub(@headways, :get, fn _, _ -> nil end)
-      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
+
+      expect(@departure, :fetch_schedules, fn %{stop_ids: ^stop_ids}, _now ->
+        {:ok, all_schedules}
+      end)
+
       expect_standard_stations(stop_ids)
       expect_standard_route_patterns(stop_ids)
 
@@ -1396,7 +1423,7 @@ defmodule Screens.V2.RDSTest do
       now = ~U[2024-10-11 12:00:00Z]
       stop_ids = ~w[s0]
 
-      expect(@departure, :fetch, fn %{stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
+      expect(@departure, :fetch, fn %{stop_ids: ^stop_ids}, [schedules: []] ->
         :error
       end)
 
@@ -1427,7 +1454,7 @@ defmodule Screens.V2.RDSTest do
         }
       ]
 
-      stub(@departure, :fetch, fn %{stop_ids: stop_ids}, [{:now, ^now} | _] ->
+      stub(@departure, :fetch, fn %{stop_ids: stop_ids}, [schedules: []] ->
         case stop_ids do
           ^stop_ids_primary -> {:ok, expected_departures}
           ^stop_ids_secondary -> :error
@@ -1479,10 +1506,10 @@ defmodule Screens.V2.RDSTest do
       ]
 
       stub(@departure, :fetch, fn
-        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
+        %{direction_id: 0, route_type: :bus, stop_ids: ^stop_ids}, [schedules: []] ->
           {:ok, bus_departures}
 
-        %{direction_id: 0, route_type: :subway, stop_ids: ^stop_ids}, [{:now, ^now} | _] ->
+        %{direction_id: 0, route_type: :subway, stop_ids: ^stop_ids}, [schedules: []] ->
           {:ok, subway_departures}
       end)
 

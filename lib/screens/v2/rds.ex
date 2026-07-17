@@ -111,7 +111,7 @@ defmodule Screens.V2.RDS do
     State for if we're in an active period, but we have no predictions
     and there are no alerts associated with the destination.
 
-    Shows an every “X-Y” minutes message. 
+    Shows an every “X-Y” minutes message.
     """
     @type t :: %__MODULE__{
             destinations: [Screens.V2.RDS.destination()],
@@ -127,7 +127,6 @@ defmodule Screens.V2.RDS do
   @departure injected(Departure)
   @headways injected(Headway)
   @route_pattern injected(RoutePattern)
-  @schedule injected(Schedule)
   @stop injected(Stop)
   @config_cache injected(Cache)
   @last_trip injected(LastTrip)
@@ -167,10 +166,13 @@ defmodule Screens.V2.RDS do
          {:ok, typical_patterns} <-
            params_struct |> Map.put(:typicality, 1) |> @route_pattern.fetch(),
          {:ok, child_stops} <- fetch_child_stops(stop_ids),
-         {:ok, schedules} <- @schedule.fetch(params_struct, Util.service_date(now)),
          {:ok, alerts} <- fetch_relevant_alerts(stop_ids, now),
-         {:ok, departures} <-
-           params_struct |> @departure.fetch(now: now, include_scheduled_cancelled?: true) do
+         {:ok, schedules} <-
+           @departure.fetch_schedules(params_struct,
+             date: Util.service_date(now),
+             include_scheduled_cancelled?: true
+           ),
+         {:ok, departures} <- @departure.fetch(params_struct, schedules: schedules) do
       case create_routes_for_section(departures, schedules, typical_patterns, params) do
         {[_ | _] = enabled_routes_for_section, _} ->
           create_section_rds(
