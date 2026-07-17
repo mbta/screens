@@ -577,18 +577,7 @@ const PreFareAlertBanner: ComponentType<{
           getAlertColor(routes),
         ])}
       >
-        <span className="alert-banner__attention-text">Attention</span>
-        {routes.map((route) => {
-          const LinePill = STRING_TO_SVG[route.svg_name];
-          return (
-            <LinePill
-              className="alert-banner__route-pill--short--multiple-routes"
-              key={route.svg_name}
-              color={getHexColor(getRouteColor(route.route_id))}
-            />
-          );
-        })}
-        <span>riders</span>
+        <span className="alert-banner__attention-text">Attention riders</span>
       </h5>
     );
   } else if (routes.length === 2) {
