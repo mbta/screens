@@ -28,6 +28,8 @@ defmodule Screens.ScreensByAlert do
   end
 
   defdelegate start_link(opts), to: @cache_module
+  defdelegate get_in_progress(screen_ids), to: @cache_module
+  defdelegate put_in_progress(screen_ids), to: @cache_module
   defdelegate put_data(screen_id, alert_ids), to: @cache_module
   defdelegate get_screens_by_alert(alert_ids), to: @cache_module
   defdelegate get_screens_last_updated(screen_ids), to: @cache_module

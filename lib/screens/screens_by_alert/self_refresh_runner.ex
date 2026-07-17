@@ -32,7 +32,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   @outdated_threshold_secs Application.compile_env!(:screens, [
                              :screens_by_alert,
                              :screens_by_alert_ttl_seconds
-                           ]) - 5
+                           ]) - 10
 
   @empty_set MapSet.new()
 
@@ -53,8 +53,13 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
       |> Enum.filter(fn {_screen_id, timestamp} -> now - timestamp > @outdated_threshold_secs end)
       |> Enum.sort_by(fn {_screen_id, timestamp} -> timestamp end)
       |> Enum.map(fn {screen_id, _timestamp} -> screen_id end)
+      |> then(fn screen_ids ->
+        in_progress = screen_ids |> @screens_by_alert.get_in_progress() |> MapSet.new()
+        Enum.reject(screen_ids, &(&1 in in_progress))
+      end)
       |> Enum.split(@batch_size)
 
+    @screens_by_alert.put_in_progress(ids_to_refresh)
     _ = start_refresh(ids_to_refresh, rest_ids)
     schedule_check()
 

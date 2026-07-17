@@ -461,9 +461,10 @@ config :screens,
 
 config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,
-  screens_by_alert_ttl_seconds: 40,
+  screens_by_alert_ttl_seconds: 45,
   screens_last_updated_ttl_seconds: 3600,
-  screens_ttl_seconds: 40
+  screens_in_progress_ttl_seconds: 20,
+  screens_ttl_seconds: 45
 
 config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 1
 
