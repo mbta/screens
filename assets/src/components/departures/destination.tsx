@@ -8,12 +8,12 @@ type Destination = {
 };
 
 const Destination: ComponentType<Destination> = ({ headsigns, variation }) => {
-  const { ref, step: sizedHeadsign } = useHorizontalAutoSize(headsigns);
+  const { ref, step: headsign } = useHorizontalAutoSize(headsigns);
 
   return (
     <div className="departure-destination">
       <div className="departure-destination__headsign" ref={ref}>
-        {sizedHeadsign}
+        {headsign}
       </div>
       {variation && (
         <div className="departure-destination__variation">{variation}</div>
