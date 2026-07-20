@@ -124,6 +124,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type serialized_headsign_mercury :: %{
           headsign: String.t(),
+          headsigns: [String.t()],
           variation: String.t() | nil
         }
 
@@ -132,6 +133,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
   @sl_route_ids ~w[741 742 743 746 749 751]
+
+  @eink_app_ids [:bus_eink_v2, :gl_eink_v2]
 
   defimpl Screens.V2.WidgetInstance do
     def priority(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [1]
@@ -525,13 +528,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_headsign([first_departure | _], %Screen{app_id: app_id})
-      when app_id in [:bus_eink_v2, :gl_eink_v2] do
+      when app_id in @eink_app_ids do
     {base_headsign, variation} =
       first_departure
       |> Departure.headsign()
       |> headsign_with_variation()
 
-    %{headsign: base_headsign, variation: variation}
+    %{headsign: base_headsign, headsigns: [base_headsign], variation: variation}
   end
 
   def serialize_headsign([first_departure | _], screen) do
@@ -619,8 +622,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
             optional(:scheduled_time) => serialized_timestamp() | nil,
             :is_live => boolean()
           }
-  defp serialize_time(departure, %Screen{app_id: app_id}, now)
-       when app_id in [:bus_eink_v2, :gl_eink_v2] do
+  defp serialize_time(departure, %Screen{app_id: app_id}, now) when app_id in @eink_app_ids do
     departure_time = Departure.time(departure)
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)

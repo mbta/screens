@@ -61,7 +61,7 @@ For E-ink screens, each of `sections[].rows[].times_with_crowding[]` has a
 Unix timestamp. This allows the conversion to a number of minutes or "Now" to
 be done "just in time", independent of data fetching. [[#1911]]
 
-We only pass a single headsign for each departure, so we include a `headsign` field instead of the `headsigns` array.
+We only pass a single headsign for each departure, so we include a `headsign` field instead of the `headsigns` array. [[[#3180]]]
 
 ## `LineMap` widget
 
@@ -82,3 +82,4 @@ add its own clock independent of data fetching and widget rendering. [[#1943]]
 [#1943]: https://github.com/mbta/screens/pull/1943
 [#1970]: https://github.com/mbta/screens/pull/1970
 [#2317]: https://github.com/mbta/screens/pull/2317
+[#3180]: https://github.com/mbta/screens/pull/3180/
