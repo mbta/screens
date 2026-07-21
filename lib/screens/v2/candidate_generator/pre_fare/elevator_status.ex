@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
 
   alias Screens.Alerts.Alert
   alias Screens.Elevator.Closure
+  alias Screens.Facilities.Facility
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.V2.WidgetInstance.ElevatorStatus, as: ElevatorWidget
@@ -10,6 +11,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
 
   import Screens.Inject
   @alert injected(Alert)
+  @facility injected(Facility)
   @route_pattern injected(RoutePattern)
 
   @spec instances(Screen.t(), DateTime.t()) :: [ElevatorWidget.t()]
@@ -42,8 +44,11 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
           []
       end
 
+    {:ok, elevators} = @facility.fetch(stop_ids: [station_id], types: [:elevator])
+
     [
       %ElevatorWidget{
+        all_station_elevators: elevators,
         closures: active_closures,
         home_station_id: station_id,
         relevant_station_ids: MapSet.new(relevant_station_ids)

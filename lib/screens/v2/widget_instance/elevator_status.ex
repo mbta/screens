@@ -9,10 +9,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   alias Screens.V2.WebLink
   alias ScreensConfig.FreeTextLine
 
-  @enforce_keys ~w[closures home_station_id]a
+  @enforce_keys ~w[all_station_elevators closures home_station_id]a
   defstruct @enforce_keys ++ [relevant_station_ids: []]
 
   @type t :: %__MODULE__{
+          all_station_elevators: [Facility.t()],
           closures: [Closure.t()],
           home_station_id: Stop.id(),
           relevant_station_ids: MapSet.t(Stop.id())
@@ -24,7 +25,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     @derive Jason.Encoder
 
     @type t :: %__MODULE__{
-            status: :ok | :alert,
+            status: :ok | :alert | :inaccessible,
             header: String.t(),
             header_size: :large | :medium,
             callout_items: [String.t()],
@@ -101,6 +102,20 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   @app_cta_url "mbta.com/go-access"
   @elevators_url "mbta.com/elevators"
+  @trip_planner_url "mbta.com/trip-planner"
+
+  @utm_campaign_query_string "utm_source=screens&utm_medium=qr&utm_campaign=no_ele&utm_content=[SCREEN_ID]"
+  # Each of the following URLs contain a base64-encoded query string value that will populate a
+  # trip origin and preselect the "Prefer accessible routes" checkbox in Trip Planner
+  @inaccessible_station_urls %{
+    "place-bomnl" =>
+      "https://#{@trip_planner_url}?#{@utm_campaign_query_string}&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjEwOjE3LjM0OTI3OS0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLkE1VHWjxAlsb25naXR1ZGXLwFHD-GoJiRbEBG5hbWXEB0Jvd2RvaW7EB3N0b3BfaWTEC3BsYWNlLWJvbW5sxAVtb2Rlc4nEA0JVU8QEdHJ1ZcQFRkVSUlnEBHRydWXEBFJBSUzEBHRydWXEBlNVQldBWcQEdHJ1ZcQOX3BlcnNpc3RlbnRfaWTEATDEC191bnVzZWRfQlVTxADEDV91bnVzZWRfRkVSUlnEAMQMX3VudXNlZF9SQUlMxADEDl91bnVzZWRfU1VCV0FZxADEAnRvhMQIbGF0aXR1ZGXEAMQJbG9uZ2l0dWRlxADEBG5hbWXEAMQHc3RvcF9pZMQAxAp3aGVlbGNoYWlyxAR0cnVl",
+    "place-boyls" =>
+      "https://#{@trip_planner_url}?#{@utm_campaign_query_string}&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjA1OjAwLjA3MjAzNy0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLS_CZWq-xAlsb25naXR1ZGXLwFHEIj4YaYPEBG5hbWXECEJveWxzdG9uxAdzdG9wX2lkxAtwbGFjZS1ib3lsc8QFbW9kZXOJxANCVVPEBHRydWXEBUZFUlJZxAR0cnVlxARSQUlMxAR0cnVlxAZTVUJXQVnEBHRydWXEDl9wZXJzaXN0ZW50X2lkxAEwxAtfdW51c2VkX0JVU8QAxA1fdW51c2VkX0ZFUlJZxADEDF91bnVzZWRfUkFJTMQAxA5fdW51c2VkX1NVQldBWcQAxAJ0b4TECGxhdGl0dWRlxADECWxvbmdpdHVkZcQAxARuYW1lxADEB3N0b3BfaWTEAMQKd2hlZWxjaGFpcsQEdHJ1ZQ==",
+    "place-hymnl" =>
+      "https://#{@trip_planner_url}?#{@utm_campaign_query_string}&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjEwOjM3LjA4MTUyOS0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLIeYD1XexAlsb25naXR1ZGXLwFHFoDPnjhnEBG5hbWXEF0h5bmVzIENvbnZlbnRpb24gQ2VudGVyxAdzdG9wX2lkxAtwbGFjZS1oeW1ubMQFbW9kZXOJxANCVVPEBHRydWXEBUZFUlJZxAR0cnVlxARSQUlMxAR0cnVlxAZTVUJXQVnEBHRydWXEDl9wZXJzaXN0ZW50X2lkxAEwxAtfdW51c2VkX0JVU8QAxA1fdW51c2VkX0ZFUlJZxADEDF91bnVzZWRfUkFJTMQAxA5fdW51c2VkX1NVQldBWcQAxAJ0b4TECGxhdGl0dWRlxADECWxvbmdpdHVkZcQAxARuYW1lxADEB3N0b3BfaWTEAMQKd2hlZWxjaGFpcsQEdHJ1ZQ=="
+  }
+  @inaccessible_station_names Map.keys(@inaccessible_station_urls)
 
   @elevator_hotline "617-222-2828"
   @audio_cta_alternate_path "For an alternate path, call #{@elevator_hotline}."
@@ -110,6 +125,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   @spec serialize(t()) :: Serialized.t()
   def serialize(%__MODULE__{
+        all_station_elevators: all_station_elevators,
         closures: closures,
         home_station_id: home_station_id,
         relevant_station_ids: relevant_station_ids
@@ -120,6 +136,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     # returns a `Serialized` if it does apply or `nil` if it does not.
     Enum.find_value(
       [
+        fn -> station_has_no_elevators(home_station_id, all_station_elevators) end,
         fn ->
           closed_here_without_nearby_backups(closures, home_station_id, closed_elevator_ids)
         end,
@@ -139,6 +156,27 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   def serialize_to_map(%__MODULE__{} = widget),
     do: widget |> serialize() |> Map.from_struct() |> Map.delete(:alert_ids)
+
+  # if reached: station does not have any elevators
+  @spec station_has_no_elevators(Stop.id(), [Facility.t()]) :: Serialized.t()
+  defp station_has_no_elevators(station_id, all_elevators_at_station)
+       when all_elevators_at_station == [] and station_id in @inaccessible_station_names do
+    %Serialized{
+      status: :inaccessible,
+      header: "This station is not accessible.",
+      footer_lines:
+        footer_lines([
+          [
+            "To plan an accessible trip, go to",
+            %{format: :bold, text: "https://#{@elevators_url}"}
+          ]
+        ]),
+      footer_audio: [@audio_cta_alternate_path],
+      qr_code_url: Map.get(@inaccessible_station_urls, station_id)
+    }
+  end
+
+  defp station_has_no_elevators(_station_id, _all_elevators_at_station), do: nil
 
   defp closed_here_without_nearby_backups(closures, station_id, closed_ids) do
     closures_here =

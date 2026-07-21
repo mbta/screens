@@ -49,7 +49,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       # This way we know the AlertsWidget implementation is actually hooked up to the `alert_ids`
       # field of `Serialized`, and tests that assert on this field are meaningful
       closures = [build_closure([stop: %Stop{id: "place-here"}], [redundancy: :in_station], "a1")]
-      widget = %Widget{closures: closures, home_station_id: "place-here"}
+
+      widget = %Widget{
+        all_station_elevators: Enum.map(closures, & &1.elevator),
+        closures: closures,
+        home_station_id: "place-here"
+      }
 
       assert AlertsWidget.alert_ids(widget) == Widget.serialize(widget).alert_ids
     end
@@ -57,12 +62,15 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
   describe "elevators without nearby redundancy are closed at this station" do
     test "one closure" do
-      closures = [
+      relevant_closure =
         build_closure(
           [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
           [redundancy: :in_station],
           "alert-1"
-        ),
+        )
+
+      closures = [
+        relevant_closure,
         # not at this station; irrelevant
         build_closure(stop: %Stop{id: "place-other"})
       ]
@@ -80,7 +88,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-1"]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: [relevant_closure.elevator],
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -110,7 +122,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-1"]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -135,7 +151,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a1 a2]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -168,17 +188,24 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a1 a2]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
     test "always includes elevators whose alternates are also closed" do
-      closures = [
+      closure_for_elevator =
         build_closure(
           [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
           [alternate_ids: ["alt"], redundancy: :nearby],
           "alert-1"
-        ),
+        )
+
+      closures = [
+        closure_for_elevator,
         build_closure(id: "alt")
       ]
 
@@ -195,7 +222,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-1"]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: [closure_for_elevator],
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
   end
@@ -230,7 +261,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-a"]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -253,7 +288,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a1 a2]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -275,7 +314,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a1 a2 a3]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -309,7 +352,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a0 a1 a2 a3 a4 a5]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -340,7 +387,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-a"]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -359,7 +410,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["a1"]
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: [],
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -382,9 +437,66 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
+               all_station_elevators: [],
                closures: closures,
                home_station_id: "place-here",
                relevant_station_ids: ~w[place-rel]
+             }) == expected
+    end
+  end
+
+  describe "inaccessible stations" do
+    test "displays a station inaccessible message" do
+      expected = %Serialized{
+        status: :inaccessible,
+        header: "This station is not accessible.",
+        header_size: :medium,
+        footer_audio: [@call_for_alternate_path],
+        footer_lines:
+          free_text_lines([
+            [
+              "To plan an accessible trip, go to",
+              %{format: :bold, text: "https://mbta.com/elevators"}
+            ]
+          ]),
+        cta_type: :plain,
+        qr_code_url:
+          "https://mbta.com/trip-planner?utm_source=screens&utm_medium=qr&utm_campaign=no_ele&utm_content=[SCREEN_ID]&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjEwOjE3LjM0OTI3OS0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLkE1VHWjxAlsb25naXR1ZGXLwFHD-GoJiRbEBG5hbWXEB0Jvd2RvaW7EB3N0b3BfaWTEC3BsYWNlLWJvbW5sxAVtb2Rlc4nEA0JVU8QEdHJ1ZcQFRkVSUlnEBHRydWXEBFJBSUzEBHRydWXEBlNVQldBWcQEdHJ1ZcQOX3BlcnNpc3RlbnRfaWTEATDEC191bnVzZWRfQlVTxADEDV91bnVzZWRfRkVSUlnEAMQMX3VudXNlZF9SQUlMxADEDl91bnVzZWRfU1VCV0FZxADEAnRvhMQIbGF0aXR1ZGXEAMQJbG9uZ2l0dWRlxADEBG5hbWXEAMQHc3RvcF9pZMQAxAp3aGVlbGNoYWlyxAR0cnVl"
+      }
+
+      assert Widget.serialize(%Widget{
+               all_station_elevators: [],
+               closures: [],
+               home_station_id: "place-bomnl"
+             }) == expected
+    end
+
+    test "displays a station inaccessible message when there are closures elsewhere" do
+      closures = [
+        build_closure([stop: %Stop{id: "place-a"}], redundancy: :backtrack)
+      ]
+
+      expected = %Serialized{
+        status: :inaccessible,
+        header: "This station is not accessible.",
+        header_size: :medium,
+        footer_audio: [@call_for_alternate_path],
+        footer_lines:
+          free_text_lines([
+            [
+              "To plan an accessible trip, go to",
+              %{format: :bold, text: "https://mbta.com/elevators"}
+            ]
+          ]),
+        cta_type: :plain,
+        qr_code_url:
+          "https://mbta.com/trip-planner?utm_source=screens&utm_medium=qr&utm_campaign=no_ele&utm_content=[SCREEN_ID]&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjEwOjE3LjM0OTI3OS0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLkE1VHWjxAlsb25naXR1ZGXLwFHD-GoJiRbEBG5hbWXEB0Jvd2RvaW7EB3N0b3BfaWTEC3BsYWNlLWJvbW5sxAVtb2Rlc4nEA0JVU8QEdHJ1ZcQFRkVSUlnEBHRydWXEBFJBSUzEBHRydWXEBlNVQldBWcQEdHJ1ZcQOX3BlcnNpc3RlbnRfaWTEATDEC191bnVzZWRfQlVTxADEDV91bnVzZWRfRkVSUlnEAMQMX3VudXNlZF9SQUlMxADEDl91bnVzZWRfU1VCV0FZxADEAnRvhMQIbGF0aXR1ZGXEAMQJbG9uZ2l0dWRlxADEBG5hbWXEAMQHc3RvcF9pZMQAxAp3aGVlbGNoYWlyxAR0cnVl"
+      }
+
+      assert Widget.serialize(%Widget{
+               all_station_elevators: [],
+               closures: closures,
+               home_station_id: "place-bomnl"
              }) == expected
     end
   end
@@ -412,7 +524,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         qr_code_url: "https://mbta.com/elevators"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
   end
@@ -430,7 +546,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         qr_code_url: "https://mbta.com/go-access"
       }
 
-      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
+      assert Widget.serialize(%Widget{
+               all_station_elevators: Enum.map(closures, & &1.elevator),
+               closures: closures,
+               home_station_id: "place-here"
+             }) ==
                expected
     end
 
@@ -444,7 +564,11 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         qr_code_url: "https://mbta.com/go-access"
       }
 
-      assert Widget.serialize(%Widget{closures: [], home_station_id: "place-here"}) == expected
+      assert Widget.serialize(%Widget{
+               all_station_elevators: [],
+               closures: [],
+               home_station_id: "place-here"
+             }) == expected
     end
   end
 end

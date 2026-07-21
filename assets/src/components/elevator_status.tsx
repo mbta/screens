@@ -1,6 +1,6 @@
 import cx from "classnames";
 import { QRCodeSVG as QRCode } from "qrcode.react";
-import { type ComponentType } from "react";
+import { type ComponentType, type JSX } from "react";
 
 import FreeText, { type FreeTextType } from "./free_text";
 
@@ -9,19 +9,33 @@ import { classWithModifier } from "Util/utils";
 
 import AppInHandIcon from "Images/app-in-hand.svg";
 import ElevatorAlertIcon from "Images/isa-alert-badge.svg";
+import InaccessibleAlertIcon from "Images/isa-inaccessible-badge.svg";
 import NormalServiceIcon from "Images/normal-service.svg";
 
 const className = (elementName: string | null = null) =>
   `elevator-status${elementName ? `__${elementName}` : ""}`;
 
+type ElevatorStatus = "ok" | "alert" | "inaccessible";
+
 type Props = {
-  status: "ok" | "alert";
+  status: ElevatorStatus;
   header: string;
   header_size: "large" | "medium";
   callout_items: string[];
   footer_lines: FreeTextType[];
   cta_type: "app" | "plain";
   qr_code_url: string;
+};
+
+const getStatusIcon = (status: ElevatorStatus): JSX.Element => {
+  switch (status) {
+    case "alert":
+      return <ElevatorAlertIcon width={280} height={160} />;
+    case "inaccessible":
+      return <InaccessibleAlertIcon width={300} height={160} />;
+    case "ok":
+      return <NormalServiceIcon width={160} height={160} fill="#00803b" />;
+  }
 };
 
 const ElevatorStatus: ComponentType<Props> = ({
@@ -45,11 +59,7 @@ const ElevatorStatus: ComponentType<Props> = ({
       )}
 
       <div className={className("body")}>
-        {status === "ok" ? (
-          <NormalServiceIcon width={160} height={160} fill="#00803b" />
-        ) : (
-          <ElevatorAlertIcon width={280} height={160} />
-        )}
+        {getStatusIcon(status)}
 
         <div className={className("header")}>
           {header_size === "large" ? <h3>{header}</h3> : <h4>{header}</h4>}
