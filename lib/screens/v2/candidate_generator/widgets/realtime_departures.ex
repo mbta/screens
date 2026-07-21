@@ -1,8 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   @moduledoc """
   Candidate generator for LCD RDS Items
-  Takes in the generated sections from Screens.V2.CandidateGenerator.Widets.RdsDepartures and
-  handles the roll-up and creation fo the actual widget that will be serialized and used on
+  Takes in the generated sections from Screens.V2.CandidateGenerator.Widgets.RdsDepartures and
+  handles the roll-up and creation of the actual widget that will be serialized and used on
   the screen itself. 
   """
 
@@ -37,16 +37,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   @spec departures_instances(Screen.t(), DateTime.t()) :: [widget()]
   def departures_instances(%Screen{app_params: app_params} = screen, now) do
-    if screen_devops_mode(screen) in @cache.disabled_modes() do
-      [%DeparturesNoData{screen: screen, show_alternatives?: false}]
-    else
-      app_params
-      |> departures_slots()
-      |> Enum.with_index()
-      |> Enum.flat_map(fn {{departures, slots}, index} ->
-        generate_instances(departures, slots, index, screen, now)
-      end)
-    end
+    app_params
+    |> departures_slots()
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {{departures, slots}, index} ->
+      generate_instances(departures, slots, index, screen, now)
+    end)
   end
 
   @spec generate_instances(Departures.t(), [atom()], non_neg_integer(), Screen.t(), DateTime.t()) ::
@@ -294,10 +290,4 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   defp departures_slots(%PreFare{departures: d, template: :duo}), do: [{d, [:main_content_left]}]
   defp departures_slots(%PreFare{departures: d, template: :solo}), do: [{d, [:large]}]
   defp departures_slots(%_app{departures: d}), do: [{d, [:main_content]}]
-
-  # Some screen types are always configured to show departures for one specific transit mode. In
-  # that case, if the mode is devops-disabled, we immediately know the whole screen should display
-  # a "no data" message. Right now, we only handle Bus Shelters
-  defp screen_devops_mode(%Screen{app_id: :bus_shelter_v2}), do: :bus
-  defp screen_devops_mode(_), do: nil
 end
