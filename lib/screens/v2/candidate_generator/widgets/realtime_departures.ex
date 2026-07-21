@@ -6,7 +6,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   the screen itself. 
   """
 
-  alias Screens.Config.Cache
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.Trips.Trip
@@ -31,7 +30,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   import Screens.Inject
   @rds injected(RDS)
-  @cache injected(Cache)
 
   @type widget :: DeparturesNoData.t() | DeparturesWidget.t()
 

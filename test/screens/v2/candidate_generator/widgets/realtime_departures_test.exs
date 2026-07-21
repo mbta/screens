@@ -1,7 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Config.Cache
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -25,7 +24,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   import Mox
   setup :verify_on_exit!
   @rds injected(RDS)
-  @cache injected(Cache)
 
   @now ~U[2020-04-06T10:00:00Z]
 
@@ -129,7 +127,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
 
   setup do
     stub(@rds, :get, fn _departures, @now -> [] end)
-    stub(@cache, :disabled_modes, fn -> [] end)
     :ok
   end
 
@@ -329,15 +326,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                  ]
                }
              ] = RealtimeDepartures.departures_instances(config, @now)
-    end
-
-    test "returns DeparturesNoData if the mode for the screen type is devops-disabled" do
-      config = build_config(["route_A"])
-
-      expect(@cache, :disabled_modes, fn -> [:bus] end)
-
-      assert [%DeparturesNoData{screen: ^config, show_alternatives?: false}] =
-               RealtimeDepartures.departures_instances(config, @now)
     end
 
     test "post process filters departures by time when a section has a max_minutes" do
