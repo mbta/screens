@@ -18,7 +18,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.Departures
-  alias ScreensConfig.Departures.Section
+  alias ScreensConfig.Departures.{Query, Section}
 
   @type post_process_rows_fn_t ::
           ([NormalSection.row()], Section.t(), non_neg_integer() -> [NormalSection.row()])
@@ -50,9 +50,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
         ) ::
           DeparturesWidget.section()
 
-  defp map_to_departure_section(:error, _, _, _), do: %NoDataSection{}
-
-  defp map_to_departure_section({:ok, []}, _, _, _), do: %NoDataSection{}
+  defp map_to_departure_section(data, section, _, _)
+       when data == :error or data == {:ok, []},
+       do: %NoDataSection{route: maybe_route_from_section(section)}
 
   defp map_to_departure_section(
          {:ok, items},
@@ -83,6 +83,30 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           header: header,
           grouping_type: grouping_type
         }
+    end
+  end
+
+  @spec maybe_route_from_section(Section.t()) :: Route.t() | nil
+  defp maybe_route_from_section(%Section{
+         query: %Query{params: %Query.Params{route_ids: nil, route_type: nil}}
+       }),
+       do: nil
+
+  defp maybe_route_from_section(%Section{
+         query: %Query{params: %Query.Params{route_ids: route_ids, route_type: route_type}}
+       }) do
+    %Route{id: representative_route_id(route_ids), type: route_type}
+  end
+
+  @spec representative_route_id([String.t()] | nil) :: String.t() | nil
+  defp representative_route_id(nil), do: nil
+  defp representative_route_id([]), do: nil
+
+  defp representative_route_id(route_ids) do
+    if Enum.all?(route_ids, &String.starts_with?(&1, "Green-")) do
+      "Green"
+    else
+      List.first(route_ids)
     end
   end
 
