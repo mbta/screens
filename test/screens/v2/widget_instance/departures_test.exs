@@ -747,33 +747,33 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       departure = %Departure{
         prediction: %Prediction{
           trip: %Trip{
-            headsign: "Alewife (Shuttle)"
+            headsign: "Lowell (Shuttle)"
           },
-          route: route(id: "AlewifeShuttle", line_id: "line-Red")
+          route: route(id: "CR-Lowell Shuttle (shuttle)", line_id: "line-CR-Lowell")
         }
       }
 
-      assert %{headsign: "Alewife", variation: nil, headsigns: ["Alewife"]} ==
+      assert %{headsign: "Lowell", variation: nil, headsigns: ["Lowell"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
 
-      assert %{headsign: "Alewife", variation: nil, headsigns: ["Alewife"]} ==
+      assert %{headsign: "Lowell", variation: nil, headsigns: ["Lowell"]} ==
                Departures.serialize_headsign([departure], dup_screen)
 
       departure = %Departure{
         prediction: %Prediction{
           trip: %Trip{
-            headsign: "Alewife (Express Shuttle)"
+            headsign: "Lowell (Express Shuttle)"
           },
-          route: route(id: "AlewifeExpressShuttle", line_id: "line-Red")
+          route: route(id: "Lowell Express Shuttle (shuttle)", line_id: "line-CR-Lowell")
         }
       }
 
-      assert %{headsign: "Alewife", variation: "(Express)", headsigns: ["Alewife"]} ==
+      assert %{headsign: "Lowell", variation: "(Express)", headsigns: ["Lowell"]} ==
                Departures.serialize_headsign([departure], bus_shelter_screen)
 
       assert %{
-               headsign: "Alewife (Express)",
-               headsigns: ["Alewife (Express)"],
+               headsign: "Lowell (Express)",
+               headsigns: ["Lowell (Express)"],
                variation: nil
              } ==
                Departures.serialize_headsign([departure], dup_screen)

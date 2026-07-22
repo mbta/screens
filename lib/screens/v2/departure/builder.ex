@@ -2,7 +2,9 @@ defmodule Screens.V2.Departure.Builder do
   @moduledoc false
 
   alias Screens.Departures.Departure
+  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
+  alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
@@ -45,6 +47,7 @@ defmodule Screens.V2.Departure.Builder do
 
   defp relevant_departures(departures, now, opts) do
     departures
+    |> Stream.reject(&subway_shuttle?(&1))
     |> Stream.reject(&unscheduled_cancelled?(&1))
     |> maybe_reject_scheduled_cancelled(opts)
     |> Stream.reject(&in_past_or_nil_time?(&1, now))
@@ -61,6 +64,15 @@ defmodule Screens.V2.Departure.Builder do
       prediction: prediction,
       schedule: Map.get(schedules_by_trip_id, trip_id)
     }
+
+  defp subway_shuttle?(%Departure{
+         prediction: nil,
+         schedule: %Schedule{route: %Route{line: line} = route}
+       }) do
+    Route.shuttle_route?(route) and Line.subway_line?(line)
+  end
+
+  defp subway_shuttle?(_), do: false
 
   # There isn't much we can do with a cancelled departure with no schedule information other than
   # not present it at all, so always reject those (unclear whether we'd even produce them)

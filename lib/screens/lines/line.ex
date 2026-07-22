@@ -11,4 +11,14 @@ defmodule Screens.Lines.Line do
           short_name: String.t(),
           sort_order: integer()
         }
+
+  @spec cr_line?(t()) :: boolean()
+  def cr_line?(%__MODULE__{id: "line-CR-" <> _line}), do: true
+  def cr_line?(_), do: false
+
+  @spec subway_line?(t()) :: boolean()
+  def subway_line?(%__MODULE__{id: "line-Blue"}), do: true
+  def subway_line?(%__MODULE__{id: "line-Orange"}), do: true
+  def subway_line?(%__MODULE__{id: "line-Red"}), do: true
+  def subway_line?(_), do: false
 end

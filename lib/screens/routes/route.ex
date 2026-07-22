@@ -153,4 +153,11 @@ defmodule Screens.Routes.Route do
       other -> other
     end)
   end
+
+  @spec shuttle_route?(t() | nil) :: boolean()
+  def shuttle_route?(%__MODULE__{id: route_id}) do
+    route_id |> String.downcase() |> String.contains?("shuttle")
+  end
+
+  def shuttle_route?(_), do: false
 end
