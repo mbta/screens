@@ -79,7 +79,11 @@ const ElevatorStatus: ComponentType<Props> = ({
           )}
 
           {cta_type === "plain" && (
-            <QRCode marginSize={2} size={128} value={qr_code_url} />
+            <QRCode
+              marginSize={2}
+              size={status === "inaccessible" ? 200 : 128}
+              value={qr_code_url}
+            />
           )}
         </div>
       </div>
