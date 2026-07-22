@@ -16,7 +16,6 @@ defmodule Screens.V2.RDS do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
-  alias Screens.Config.Cache
   alias Screens.Headways, as: Headway
   alias Screens.LastTrip.LastTrip
   alias Screens.Lines.Line
@@ -129,7 +128,6 @@ defmodule Screens.V2.RDS do
   @route_pattern injected(RoutePattern)
   @schedule injected(Schedule)
   @stop injected(Stop)
-  @config_cache injected(Cache)
   @last_trip injected(LastTrip)
 
   @max_departure_minutes 120
@@ -172,23 +170,20 @@ defmodule Screens.V2.RDS do
          {:ok, departures} <-
            params_struct |> @departure.fetch(now: now, include_scheduled_cancelled?: true) do
       case create_routes_for_section(departures, schedules, typical_patterns, params) do
-        {[_ | _] = enabled_routes_for_section, _} ->
+        [_ | _] = routes_for_section ->
           create_section_rds(
             departures,
             schedules,
             typical_patterns,
             child_stops,
-            enabled_routes_for_section,
+            routes_for_section,
             alerts,
             now
           )
 
-        {[], [_ | _] = _routes_for_section} ->
-          {:ok, []}
-
-        _ ->
+        [] ->
           Report.warning("rds_no_section_routes", params: inspect(params))
-          :error
+          {:ok, []}
       end
     end
   end
@@ -596,10 +591,7 @@ defmodule Screens.V2.RDS do
       |> filter_for_route_id_params(route_id_params)
       |> filter_for_route_type_param(route_type)
 
-    enabled_routes_for_section =
-      reject_disabled_modes(routes_for_section, @config_cache.disabled_modes())
-
-    {enabled_routes_for_section, routes_for_section}
+    routes_for_section
   end
 
   @spec filter_for_route_id_params([Route.t()], [String.t()]) :: [Route.t()]
@@ -613,11 +605,6 @@ defmodule Screens.V2.RDS do
 
   defp filter_for_route_type_param(all_routes, route_type),
     do: Enum.filter(all_routes, fn route -> route.type == route_type end)
-
-  defp reject_disabled_modes(all_routes, []), do: all_routes
-
-  defp reject_disabled_modes(all_routes, disabled_modes),
-    do: Enum.reject(all_routes, fn route -> route.type in disabled_modes end)
 
   @spec fetch_relevant_alerts([Stop.id()], DateTime.t()) :: {:ok, [Alert.t()]} | :error
   defp fetch_relevant_alerts(stop_ids, now) do

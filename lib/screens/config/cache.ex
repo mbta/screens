@@ -3,7 +3,7 @@ defmodule Screens.Config.Cache do
   Functions to read data from a cached copy of the screens config.
   """
 
-  alias ScreensConfig.{Config, Devops, Screen}
+  alias ScreensConfig.{Config, Screen}
 
   use Screens.Cache.Client, table: :screens_config
 
@@ -12,7 +12,6 @@ defmodule Screens.Config.Cache do
   @type table_entry ::
           {{:screen, screen_id :: String.t()}, Screen.t()}
           | {:last_deploy_timestamp, DateTime.t()}
-          | {:devops, Devops.t()}
 
   def ok?, do: table_exists?()
 
@@ -34,15 +33,6 @@ defmodule Screens.Config.Cache do
     end
   end
 
-  def devops do
-    with_table default: nil do
-      case :ets.match(@table, {:devops, :"$1"}) do
-        [[devops]] -> devops
-        [] -> nil
-      end
-    end
-  end
-
   @doc """
   Returns a list of all screen IDs that satisfy the given filter.
   The filter function will be passed a tuple of {screen_id, screen_config} and should return true if that screen ID should be included in the results.
@@ -58,20 +48,6 @@ defmodule Screens.Config.Cache do
       end
 
       :ets.foldl(filter_reducer, [], @table)
-    end
-  end
-
-  def mode_disabled?(mode) do
-    mode in disabled_modes()
-  end
-
-  @callback disabled_modes() :: [atom()]
-  def disabled_modes do
-    with_table default: [] do
-      case :ets.match(@table, {:devops, %{disabled_modes: :"$1"}}) do
-        [[disabled_modes]] -> disabled_modes
-        [] -> []
-      end
     end
   end
 
@@ -108,11 +84,12 @@ defmodule Screens.Config.Cache do
   that relies more on :ets.match / :ets.select to limit the size of data returned.
   """
   def config do
-    with screens_map when is_map(screens_map) <- screens(),
-         %Devops{} = devops_struct <- devops() do
-      %Config{screens: screens_map, devops: devops_struct}
+    screens_map = screens()
+
+    if is_map(screens_map) do
+      %Config{screens: screens_map}
     else
-      _ -> :error
+      :error
     end
   end
 end

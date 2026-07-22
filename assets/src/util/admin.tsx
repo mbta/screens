@@ -7,7 +7,6 @@ export type JSON = null | string | number | boolean | JSONArray | JSONObject;
 
 export type Config = {
   screens: { [id: string]: Screen };
-  devops: { disabled_modes: string[] };
 };
 
 export type Screen = {

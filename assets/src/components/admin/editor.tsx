@@ -15,7 +15,7 @@ import EditDialog from "./editor/edit_dialog";
 import NewDialog from "./editor/new_dialog";
 import Table from "./editor/table";
 
-const EMPTY_CONFIG: Config = { screens: {}, devops: { disabled_modes: [] } };
+const EMPTY_CONFIG: Config = { screens: {} };
 
 const appIdFilters: { id: AppId | null; name: string }[] = [
   { id: null, name: "All" },

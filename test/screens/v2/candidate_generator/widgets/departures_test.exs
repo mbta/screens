@@ -235,39 +235,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                )
     end
 
-    test "with multiple sections, returns a notice row when a mode is devops-disabled" do
-      # use a screen type that does not get entirely disabled based on mode
-      config = %Screen{build_config(["A", "B"]) | app_id: :busway_v2}
-      departure_b = build_departure("B", 0, :subway)
-
-      departure_fetch_fn =
-        build_fetch_fn(%{"A" => {:ok, [build_departure("A", 0)]}, "B" => {:ok, [departure_b]}})
-
-      disabled_modes_fn = fn -> [:bus] end
-      route_fetch_fn = fn %{ids: ["A"]} -> {:ok, [%Route{id: "A", type: :bus}]} end
-
-      assert [
-               %DeparturesWidget{
-                 sections: [
-                   %NormalSection{
-                     rows: [
-                       %FreeTextLine{
-                         icon: :bus,
-                         text: ["No departures currently available"]
-                       }
-                     ]
-                   },
-                   %NormalSection{rows: [^departure_b]}
-                 ]
-               }
-             ] =
-               departures_instances(config,
-                 departure_fetch_fn: departure_fetch_fn,
-                 disabled_modes_fn: disabled_modes_fn,
-                 route_fetch_fn: route_fetch_fn
-               )
-    end
-
     test "returns DeparturesNoData if any section request fails" do
       config = build_config(["A", "B"])
       fetch_fn = build_fetch_fn(%{"A" => {:ok, []}, "B" => :error})
@@ -279,18 +246,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       actual_departures_instances = departures_instances(config, departure_fetch_fn: fetch_fn)
 
       assert expected_departures_instances == actual_departures_instances
-    end
-
-    test "returns DeparturesNoData if the mode for the screen type is devops-disabled" do
-      config = %Screen{build_config(["A"]) | app_id: :gl_eink_v2}
-      fetch_fn = build_fetch_fn(%{"A" => {:ok, []}})
-      disabled_modes_fn = fn -> [:light_rail] end
-
-      assert [%DeparturesNoData{screen: config, show_alternatives?: false}] ==
-               departures_instances(config,
-                 departure_fetch_fn: fetch_fn,
-                 disabled_modes_fn: disabled_modes_fn
-               )
     end
 
     test "returns DeparturesNoService for bus e-ink when there is a single empty section" do
