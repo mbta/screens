@@ -303,21 +303,14 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePill do
   end
 
   @spec shuttle_route?(Route.t() | nil, Screen.t()) :: boolean()
-  def shuttle_route?(%Route{id: route_id, line: %Line{id: line_id}}, %Screen{app_id: app_id}) do
+  def shuttle_route?(%Route{line: line} = route, %Screen{app_id: app_id}) do
     # Shuttle routes have special pills on specific screens
-    # We only show special pills for shuttles replacing subway or CR lines
-    route_id |> String.downcase() |> String.contains?("shuttle") and
-      rail_line?(line_id) and
+    # We only show special pills for shuttles replacing CR lines
+    Route.shuttle_route?(route) and Line.cr_line?(line) and
       app_id in @shuttle_pill_enabled_screens
   end
 
   def shuttle_route?(_, _), do: false
-
-  defp rail_line?("line-Blue"), do: true
-  defp rail_line?("line-Orange"), do: true
-  defp rail_line?("line-Red"), do: true
-  defp rail_line?("line-CR-" <> _line), do: true
-  defp rail_line?(_), do: false
 
   @spec do_serialize_shuttle_pill(Line.id()) :: dual_route_pill()
   defp do_serialize_shuttle_pill(line_id) do
