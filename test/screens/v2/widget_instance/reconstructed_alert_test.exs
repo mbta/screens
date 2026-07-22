@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
+  alias Screens.Stops.Stop
   alias Screens.Stops.Subway
   alias Screens.V2.AlertsWidget
   alias Screens.V2.CandidateGenerator
@@ -566,6 +567,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_is_terminal_station(true)
 
       assert_values(widget, {3, @flex_zone})
+    end
+
+    test "service eliminating alert with corresponding evergreen content", %{widget: widget} do
+      widget =
+        widget
+        |> put_is_priority(true)
+        |> put_in(
+          [Access.key(:screen), Access.key(:app_params), Access.key(:evergreen_content)],
+          [
+            struct(EvergreenContentItem,
+              schedule: %AlertSchedule{alert_ids: ["123"], suppress_alert_widgets: false}
+            )
+          ]
+        )
+
+      assert_values(widget, {1, @left_screen}, {1, @right_screen})
     end
   end
 
@@ -3266,6 +3283,392 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         urgent: true,
         region: :boundary,
         remedy: "Use shuttle bus"
+      }
+
+      assert expected == ReconstructedAlert.serialize(%{alert_widget | is_priority: false})
+    end
+  end
+
+  describe "Real-world GL alerts:" do
+    setup do
+      stop_id = "place-spmnl"
+
+      config =
+        struct(Screen, %{
+          app_id: :pre_fare_v2,
+          app_params:
+            struct(PreFare, %{
+              reconstructed_alert_widget: %ScreensConfig.Alerts{stop_id: stop_id},
+              template: :solo
+            })
+        })
+
+      routes_at_stop = [
+        %{
+          route_id: "Green-B",
+          active?: false,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-C",
+          active?: false,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-D",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        },
+        %{
+          route_id: "Green-E",
+          active?: true,
+          direction_destinations: nil,
+          long_name: nil,
+          short_name: nil,
+          type: :light_rail
+        }
+      ]
+
+      gl_ies = [
+        ie(stop_id: "70201", route: "Green-D", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70201", route: "Green-E", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70202", route: "Green-D", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70202", route: "Green-E", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70203", route: "Green-D", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70203", route: "Green-E", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70204", route: "Green-D", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70204", route: "Green-E", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70205", route: "Green-D", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70205", route: "Green-E", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70206", route: "Green-D", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70206", route: "Green-E", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70207", route: "Green-D", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70207", route: "Green-E", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70208", route: "Green-D", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70208", route: "Green-E", route_type: "0", direction_id: "0"),
+        ie(
+          stop: %Stop{id: "70501", name: "Lechmere"},
+          route: "Green-D",
+          route_type: "0",
+          direction_id: "1"
+        ),
+        ie(
+          stop: %Stop{id: "70501", name: "Lechmere"},
+          route: "Green-E",
+          route_type: "0",
+          direction_id: "1"
+        ),
+        ie(
+          stop: %Stop{id: "70502", name: "Lechmere"},
+          route: "Green-D",
+          route_type: "0",
+          direction_id: "0"
+        ),
+        ie(
+          stop: %Stop{id: "70502", name: "Lechmere"},
+          route: "Green-E",
+          route_type: "0",
+          direction_id: "0"
+        ),
+        ie(stop_id: "place-gover", route: "Green-D", route_type: "0"),
+        ie(stop_id: "place-gover", route: "Green-E", route_type: "0"),
+        ie(stop_id: "place-haecl", route: "Green-D", route_type: "0"),
+        ie(stop_id: "place-haecl", route: "Green-E", route_type: "0"),
+        ie(stop: %Stop{id: "place-lech", name: "Lechmere"}, route: "Green-D", route_type: "0"),
+        ie(stop: %Stop{id: "place-lech", name: "Lechmere"}, route: "Green-E", route_type: "0"),
+        ie(stop_id: "place-north", route: "Green-D", route_type: "0"),
+        ie(stop_id: "place-north", route: "Green-E", route_type: "0"),
+        ie(stop_id: "place-spmnl", route: "Green-D", route_type: "0"),
+        ie(stop_id: "place-spmnl", route: "Green-E", route_type: "0")
+      ]
+
+      base_alert =
+        %Screens.Alerts.Alert{
+          active_period: [{~U[2027-07-14 09:00:00Z], nil}],
+          cause: :unknown,
+          created_at: ~U[2027-07-14 09:00:00Z],
+          description:
+            "Affected stops:\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
+          effect: :suspension,
+          header: "Green Line: service is suspended between Lechmere and Government Center.",
+          id: "450522",
+          informed_entities: gl_ies,
+          lifecycle: "NEW",
+          severity: 7,
+          timeframe: nil,
+          updated_at: ~U[2027-07-13 09:00:00Z],
+          url: nil
+        }
+
+      now = ~U[2027-07-15 09:00:00Z]
+      tagged_station_sequences = %{"Green" => [Subway.route_stop_sequence("Green")]}
+      station_sequences = LocationContext.untag_stop_sequences(tagged_station_sequences)
+
+      fetch_stop_name_fn = fn _ -> "Science Park/West End" end
+
+      fetch_location_context_fn = fn _, _, _ ->
+        {:ok,
+         %LocationContext{
+           home_stop: stop_id,
+           tagged_stop_sequences: tagged_station_sequences,
+           upstream_stops: LocationContext.upstream_stop_id_set([stop_id], station_sequences),
+           downstream_stops: LocationContext.downstream_stop_id_set([stop_id], station_sequences),
+           routes: routes_at_stop,
+           alert_route_types: LocationContext.route_type_filter(PreFare, [stop_id])
+         }}
+      end
+
+      %{
+        base_alert: base_alert,
+        config: config,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn,
+        now: now
+      }
+    end
+
+    test "handles GL suspension with multiple routes at Science Park solo prefare", context do
+      %{
+        config: config,
+        base_alert: base_alert,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn,
+        now: now
+      } = context
+
+      alert = %{
+        base_alert
+        | description:
+            "Affected stops:\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
+          effect: :suspension,
+          header: "Green Line: service is suspended between Lechmere and Government Center."
+      }
+
+      fetch_alerts_fn = fn _ -> {:ok, [alert]} end
+
+      alert_widget =
+        config
+        |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+          now,
+          fetch_alerts_fn,
+          fetch_stop_name_fn,
+          fetch_location_context_fn
+        )
+        |> List.first()
+
+      # Fullscreen test
+      expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/450522/s/place-spmnl",
+        cause: nil,
+        effect: :suspension,
+        issue: "No Green Line trains",
+        location: "Green Line service is suspended between Government Center and Lechmere",
+        region: :here,
+        routes: [%{route_id: "Green", svg_name: "gl"}],
+        updated_at: "Jul 13",
+        end_time: nil,
+        remedy: nil,
+        disruption_diagram: %{
+          line: :green,
+          effect: :suspension,
+          current_station_slot_index: 4,
+          effect_region_slot_index_range: {1, 5},
+          slots: [
+            %{type: :arrow, label_id: "place-coecl+west"},
+            %{label: %{full: "Government Center", abbrev: "Gov't Ctr"}, show_symbol: true},
+            %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+            %{label: %{full: "North Station", abbrev: "North Sta"}, show_symbol: true},
+            %{label: %{full: "Science Park/West End", abbrev: "Science Pk"}, show_symbol: true},
+            %{label: %{full: "Lechmere", abbrev: "Lechmere"}, show_symbol: true},
+            %{type: :arrow, label_id: "place-mdftf+place-unsqu"}
+          ]
+        },
+        endpoints: {"Government Center", "Lechmere"},
+        is_transfer_station: true,
+        show_alternate_route_text: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(alert_widget)
+
+      # Flexzone test
+      expected = %{
+        issue: "Green Line: service is suspended between Lechmere and Government Center.",
+        location: "",
+        cause: "",
+        routes: [%{color: :green, text: "GL", type: :text, branches: ["D", "E"]}],
+        effect: :suspension,
+        urgent: true,
+        region: :here,
+        remedy: ""
+      }
+
+      assert expected == ReconstructedAlert.serialize(%{alert_widget | is_priority: false})
+    end
+
+    test "handles GL shuttle service with multiple routes at Science Park solo prefare",
+         context do
+      %{
+        config: config,
+        base_alert: base_alert,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn,
+        now: now
+      } = context
+
+      alert = %{
+        base_alert
+        | description:
+            "Affected stops:\r\nLechmere\r\nScience Park/West End\r\nNorth Station\r\nHaymarket\r\nGovernment Center",
+          effect: :shuttle,
+          header:
+            "Green Line: Shuttle buses replace service between Lechmere and Government Center."
+      }
+
+      fetch_alerts_fn = fn _ -> {:ok, [alert]} end
+
+      alert_widget =
+        config
+        |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+          now,
+          fetch_alerts_fn,
+          fetch_stop_name_fn,
+          fetch_location_context_fn
+        )
+        |> List.first()
+
+      # Fullscreen test
+      expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/450522/s/place-spmnl",
+        cause: nil,
+        effect: :shuttle,
+        issue: "No Green Line trains",
+        location: "Shuttle buses replace trains between Government Center and Lechmere",
+        region: :here,
+        routes: [%{route_id: "Green", svg_name: "gl"}],
+        updated_at: "Jul 13",
+        end_time: nil,
+        remedy: "Use shuttle bus",
+        disruption_diagram: %{
+          line: :green,
+          effect: :shuttle,
+          current_station_slot_index: 4,
+          effect_region_slot_index_range: {1, 5},
+          slots: [
+            %{type: :arrow, label_id: "place-coecl+west"},
+            %{label: %{full: "Government Center", abbrev: "Gov't Ctr"}, show_symbol: true},
+            %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+            %{label: %{full: "North Station", abbrev: "North Sta"}, show_symbol: true},
+            %{label: %{full: "Science Park/West End", abbrev: "Science Pk"}, show_symbol: true},
+            %{label: %{full: "Lechmere", abbrev: "Lechmere"}, show_symbol: true},
+            %{type: :arrow, label_id: "place-mdftf+place-unsqu"}
+          ]
+        },
+        endpoints: {"Government Center", "Lechmere"},
+        is_transfer_station: true
+      }
+
+      assert expected == ReconstructedAlert.serialize(alert_widget)
+
+      # Flexzone test
+      expected = %{
+        issue:
+          "Green Line: Shuttle buses replace service between Lechmere and Government Center.",
+        location: "",
+        cause: "",
+        routes: [%{color: :green, text: "GL", type: :text, branches: ["D", "E"]}],
+        effect: :shuttle,
+        urgent: true,
+        region: :here,
+        remedy: ""
+      }
+
+      assert expected == ReconstructedAlert.serialize(%{alert_widget | is_priority: false})
+    end
+
+    test "handles GL station closures with multiple routes at Science Park solo prefare",
+         context do
+      %{
+        config: config,
+        base_alert: base_alert,
+        fetch_stop_name_fn: fetch_stop_name_fn,
+        fetch_location_context_fn: fetch_location_context_fn,
+        now: now
+      } = context
+
+      alert = %{
+        base_alert
+        | description: "Affected lines:\r\nGreen Line D\r\nGreen Line E",
+          effect: :station_closure,
+          header: "Lechmere is closed."
+      }
+
+      fetch_alerts_fn = fn _ -> {:ok, [alert]} end
+
+      alert_widget =
+        config
+        |> CandidateGenerator.Widgets.ReconstructedAlert.reconstructed_alert_instances(
+          now,
+          fetch_alerts_fn,
+          fetch_stop_name_fn,
+          fetch_location_context_fn
+        )
+        |> List.first()
+
+      # Fullscreen test
+      expected = %{
+        alternate_route_url: "mbta.com/alerts",
+        qr_code_url: "go.mbta.com/a/450522/s/place-spmnl",
+        cause: nil,
+        effect: :station_closure,
+        issue: "Station closed",
+        region: :here,
+        routes: [%{route_id: "Green", svg_name: "gl"}],
+        updated_at: "Jul 13",
+        end_time: nil,
+        remedy: nil,
+        disruption_diagram: %{
+          line: :green,
+          effect: :station_closure,
+          current_station_slot_index: 5,
+          slots: [
+            %{type: :arrow, label_id: "place-coecl+west"},
+            %{label: %{full: "Park Street", abbrev: "Park St"}, show_symbol: true},
+            %{label: %{full: "Government Center", abbrev: "Gov't Ctr"}, show_symbol: true},
+            %{label: %{full: "Haymarket", abbrev: "Haymarket"}, show_symbol: true},
+            %{label: %{full: "North Station", abbrev: "North Sta"}, show_symbol: true},
+            %{label: %{full: "Science Park/West End", abbrev: "Science Pk"}, show_symbol: true},
+            %{label: %{full: "Lechmere", abbrev: "Lechmere"}, show_symbol: true},
+            %{type: :arrow, label_id: "place-mdftf+place-unsqu"}
+          ],
+          closed_station_slot_indices: [2, 3, 4, 5, 6]
+        },
+        show_alternate_route_text: true,
+        unaffected_routes: []
+      }
+
+      assert expected == ReconstructedAlert.serialize(alert_widget)
+
+      # Flexzone test
+      expected = %{
+        issue: "Trains will skip Lechmere",
+        location: "",
+        cause: "",
+        routes: [%{color: :green, text: "GL", type: :text, branches: ["D", "E"]}],
+        effect: :station_closure,
+        urgent: true,
+        region: :here,
+        remedy: "Seek alternate route"
       }
 
       assert expected == ReconstructedAlert.serialize(%{alert_widget | is_priority: false})

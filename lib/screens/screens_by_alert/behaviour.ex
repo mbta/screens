@@ -19,9 +19,22 @@ defmodule Screens.ScreensByAlert.Behaviour do
   @callback start_link(GenServer.options()) :: GenServer.on_start()
 
   @doc """
-  Takes a screen ID and a list of alert IDs as parameters. With these, it will get an existing object
-  or create a new object in the cache using each alert_id. The key of each object is the `alert_id`, the value
-  is the list of `screen_id`s.
+  Given a list of screen IDs, return the subset of IDs that some app instance is in the process
+  of updating the alerts for, to reduce duplicate work.
+  """
+  @callback get_in_progress(list(screen_id())) :: list(screen_id())
+
+  @doc """
+  Mark screen IDs as being in the process of having their alerts updated. Does not un-mark IDs
+  that were previously marked; this only happens either when alert IDs are put for a screen (see
+  `put_data/2`) or after a short expiration time.
+  """
+  @callback put_in_progress(list(screen_id())) :: :ok
+
+  @doc """
+  Takes a screen ID and a list of alert IDs as parameters. With these, it will get an existing
+  object or create a new object in the cache using each alert_id. The key of each object is the
+  `alert_id`, the value is the list of `screen_id`s.
   """
   @callback put_data(screen_id(), list(alert_id())) :: :ok
 

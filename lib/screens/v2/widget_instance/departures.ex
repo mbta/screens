@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Provides real-time departure information, consisting of an ordered list of "sections".
   """
 
+  alias Screens.Headsigns.Headsign
   alias Screens.Headways
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
@@ -20,27 +21,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias ScreensConfig.{FreeTextLine, Screen}
   alias ScreensConfig.Screen.PreFare
 
-  defmodule HeadwayRow do
-    @moduledoc "A row that shows headway values in a NormalSection, X every Y - Z minutes"
-    @type t :: %__MODULE__{
-            line: Line.t(),
-            direction_id: Trip.direction(),
-            range: Headways.range(),
-            headsign: String.t()
-          }
-
-    defstruct id: nil, line: nil, direction_id: nil, range: nil, headsign: nil
-  end
-
   defmodule NormalSection do
     @moduledoc "Section which includes a number of independent 'rows' or items."
 
     @type special_trip :: {Schedule.t(), :first_trip | :service_ended}
+    @type headway_row :: {Line.t(), Trip.direction(), Headways.range(), String.t()}
 
     @type row ::
             Departure.t()
             | special_trip()
-            | HeadwayRow.t()
+            | headway_row()
             | FreeTextLine.t()
 
     @type t :: %__MODULE__{
@@ -58,10 +48,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     @type t :: %__MODULE__{
             headsign: String.t() | nil,
-            route: Route.id(),
+            route_id: Route.id(),
             time_range: Headways.range()
           }
-    defstruct ~w[headsign route time_range]a
+    defstruct ~w[headsign route_id time_range]a
   end
 
   defmodule OvernightSection do
@@ -129,6 +119,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type serialized_headsign :: %{
           headsign: String.t(),
+          headsigns: [String.t()],
           variation: String.t() | nil
         }
 
@@ -208,12 +199,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %HeadwaySection{route: route, time_range: time_range, headsign: headsign},
+        %HeadwaySection{route_id: route_id, time_range: time_range, headsign: headsign},
         _screen,
         _now,
         is_only_section
       ) do
-    pill_color = Route.color(route)
+    pill_color = Route.color(route_id)
 
     layout =
       cond do
@@ -222,7 +213,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         true -> :row_with_headsign
       end
 
-    text = get_headway_text(headsign, time_range, pill_color, route, is_only_section)
+    text = get_headway_text(headsign, time_range, pill_color, route_id, is_only_section)
 
     %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
   end
@@ -481,15 +472,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_departure_group(
-         [
-           %HeadwayRow{
-             line: line,
-             direction_id: direction_id,
-             range: {lo, hi},
-             headsign: headsign
-           }
-           | _
-         ],
+         [{line, direction_id, {lo, hi}, headsign} | _],
          screen,
          _now,
          route_pill_serializer
@@ -527,14 +510,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @spec serialize_headsign([Departure.t()], Screen.t()) :: serialized_headsign()
   def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2} = screen) do
-    headsign =
-      first_departure
-      |> Departure.headsign()
-      |> simplify_shuttle_headsign(first_departure, screen)
-
-    headsign_replacements = Application.get_env(:screens, :dup_headsign_replacements)
-
-    %{headsign: Map.get(headsign_replacements, headsign, headsign)}
+    first_departure
+    |> Departure.headsign()
+    |> simplify_shuttle_headsign(first_departure, screen)
+    |> headsign_with_abbreviations()
   end
 
   def serialize_headsign([first_departure | _], screen) do
@@ -542,6 +521,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     |> Departure.headsign()
     |> simplify_shuttle_headsign(first_departure, screen)
     |> headsign_with_variation()
+    |> headsign_with_abbreviations()
   end
 
   @doc """
@@ -588,7 +568,17 @@ defmodule Screens.V2.WidgetInstance.Departures do
           [headsign, nil]
       end
 
-    %{headsign: headsign, variation: variation}
+    %{headsign: headsign, variation: variation, headsigns: [headsign]}
+  end
+
+  @spec headsign_with_abbreviations(serialized_headsign() | String.t()) :: serialized_headsign()
+  defp headsign_with_abbreviations(%{headsign: headsign} = headsign_map) do
+    Map.put(headsign_map, :headsigns, Headsign.abbreviations(headsign))
+  end
+
+  defp headsign_with_abbreviations(headsign) do
+    # DUPs don't break out variations
+    %{headsign: headsign, headsigns: Headsign.abbreviations(headsign), variation: nil}
   end
 
   def serialize_times_with_crowding(departures, screen, now) do

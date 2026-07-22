@@ -73,6 +73,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
         |> Enum.filter(
           &(Alert.active?(&1, now) and relevant_direction?(&1, stop_id, stop_sequences))
         )
+        |> Enum.reject(&LocalizedAlert.suppressable_alert?(&1, location_context, now))
         |> Alert.consolidate_whole_route_delays()
         |> Enum.group_by(fn alert ->
           relevance(

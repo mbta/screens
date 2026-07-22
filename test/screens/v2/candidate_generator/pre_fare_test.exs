@@ -1,9 +1,12 @@
 defmodule Screens.V2.CandidateGenerator.PreFareTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
+  alias Screens.LocationContext
   alias Screens.V2.CandidateGenerator.PreFare
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias Screens.V2.WidgetInstance.MockWidget
+  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias ScreensConfig, as: Config
   alias ScreensConfig.Screen
 
@@ -28,7 +31,48 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
       app_id: :pre_fare_v2
     }
 
-    %{config: config}
+    location_context = %LocationContext{
+      home_stop: "place-gover",
+      tagged_stop_sequences: %{},
+      upstream_stops: MapSet.new(["place-pktrm"]),
+      downstream_stops: MapSet.new(["place-dwnxg"]),
+      child_stops_at_station: MapSet.new(),
+      routes: [],
+      alert_route_types: [:light_rail, :subway]
+    }
+
+    # Informed entities to test different types of alerts
+    downstream_ie = [
+      %Screens.Alerts.InformedEntity{
+        stop: %Screens.Stops.Stop{id: "place-dwnxg"},
+        route: "Red",
+        direction_id: 0
+      }
+    ]
+
+    inside_ie = [
+      %Screens.Alerts.InformedEntity{
+        stop: %Screens.Stops.Stop{id: "place-gover"},
+        route: "Red",
+        direction_id: 0
+      }
+    ]
+
+    upstream_ie = [
+      %Screens.Alerts.InformedEntity{
+        stop: %Screens.Stops.Stop{id: "place-pktrm"},
+        route: "Red",
+        direction_id: 0
+      }
+    ]
+
+    %{
+      config: config,
+      location_context: location_context,
+      downstream_ie: downstream_ie,
+      inside_ie: inside_ie,
+      upstream_ie: upstream_ie
+    }
   end
 
   describe "screen_template/1" do
@@ -93,6 +137,108 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
                 screen_normal: [:header, {:body, %{body_normal: [body_right: @body_right]}}],
                 screen_split_takeover: [:full_right_screen]
               }} == PreFare.screen_template(put_in(config.app_params.template, :solo))
+    end
+  end
+
+  describe "candidate_instances/3" do
+    test "keeps a single reconstructed alert in the :large slot",
+         %{config: config, location_context: location_context} do
+      alert = %Alert{id: "1", effect: :delay, severity: 5, informed_entities: []}
+
+      alert_widget = %ReconstructedAlert{
+        screen: config,
+        alert: alert,
+        location_context: location_context,
+        is_priority: false
+      }
+
+      other_widget = %MockWidget{slot_names: [:large]}
+
+      instance_fns = [
+        fn _config, _now -> [alert_widget, other_widget] end
+      ]
+
+      assert [alert_widget, other_widget] ==
+               PreFare.candidate_instances(config, DateTime.utc_now(), instance_fns)
+    end
+
+    test "drops multiple downstream/upstream reconstructed alerts in the :large slot",
+         %{
+           config: config,
+           location_context: location_context,
+           downstream_ie: downstream_ie,
+           upstream_ie: upstream_ie
+         } do
+      alert_widget_1 = %ReconstructedAlert{
+        screen: config,
+        alert: %Alert{id: "1", effect: :delay, severity: 5, informed_entities: downstream_ie},
+        location_context: location_context,
+        is_priority: false
+      }
+
+      alert_widget_2 = %ReconstructedAlert{
+        screen: config,
+        alert: %Alert{id: "2", effect: :delay, severity: 4, informed_entities: upstream_ie},
+        location_context: location_context,
+        is_priority: false
+      }
+
+      other_widget = %MockWidget{slot_names: [:large]}
+
+      instance_fns = [
+        fn _config, _now -> [alert_widget_1, alert_widget_2, other_widget] end
+      ]
+
+      assert [other_widget] ==
+               PreFare.candidate_instances(config, DateTime.utc_now(), instance_fns)
+    end
+
+    test "keeps inside alerts even when multiple downstream alerts exist",
+         %{
+           config: config,
+           location_context: location_context,
+           downstream_ie: downstream_ie,
+           inside_ie: inside_ie,
+           upstream_ie: upstream_ie
+         } do
+      downstream_widget = %ReconstructedAlert{
+        screen: config,
+        alert: %Alert{id: "1", effect: :delay, severity: 5, informed_entities: downstream_ie},
+        location_context: location_context,
+        is_priority: false
+      }
+
+      upstream_widget = %ReconstructedAlert{
+        screen: config,
+        alert: %Alert{id: "2", effect: :delay, severity: 4, informed_entities: upstream_ie},
+        location_context: location_context,
+        is_priority: false
+      }
+
+      inside_widget1 = %ReconstructedAlert{
+        screen: config,
+        alert: %Alert{id: "3", effect: :delay, severity: 5, informed_entities: inside_ie},
+        location_context: location_context,
+        is_priority: false
+      }
+
+      inside_widget2 = %ReconstructedAlert{
+        screen: config,
+        alert: %Alert{id: "4", effect: :delay, severity: 5, informed_entities: inside_ie},
+        location_context: location_context,
+        is_priority: false
+      }
+
+      other_widget = %MockWidget{slot_names: [:large]}
+
+      instance_fns = [
+        fn _config, _now ->
+          [downstream_widget, upstream_widget, inside_widget1, inside_widget2, other_widget]
+        end
+      ]
+
+      assert [inside_widget1, inside_widget2, other_widget] ==
+               PreFare.candidate_instances(config, DateTime.utc_now(), instance_fns)
     end
   end
 

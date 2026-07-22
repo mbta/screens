@@ -40,6 +40,7 @@ defmodule Screens.V2.ScreenData do
   @spec select_variant(Screen.t(), options(), (Layout.t(), Screen.t() -> data)) :: data
         when data: t() | simulation_data()
   defp select_variant(screen, opts, then_fn) do
+    update_visible_alerts_in_progress(screen, opts)
     selected_variant = Keyword.get(opts, :generator_variant)
 
     if Keyword.get(opts, :run_all_variants?, false) do
@@ -164,6 +165,14 @@ defmodule Screens.V2.ScreenData do
       # some children are not "leaf nodes". go down a level.
       Enum.find_value(children, &get_containing_slot(&1, target_slot_ids))
     end
+  end
+
+  defp update_visible_alerts_in_progress(%Screen{hidden_from_screenplay: true}, _opts), do: :ok
+
+  defp update_visible_alerts_in_progress(_screen, opts) do
+    screen_id = Keyword.get(opts, :update_visible_alerts_for_screen_id, nil)
+    if not is_nil(screen_id), do: ScreensByAlert.put_in_progress([screen_id])
+    :ok
   end
 
   defp update_visible_alerts(_, %Screen{hidden_from_screenplay: true}, _opts), do: :ok

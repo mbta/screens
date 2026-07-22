@@ -23,6 +23,9 @@ defmodule Screens.ScreensByAlert.Memcache do
 
     # Metadata to make the "self-refresh" mechanism possible
     "screens_last_updated." <> screen_id => timestamp
+
+    # Keeps track of data updates in progress to reduce duplicate work
+    "screens_in_progress." <> screen_id => true
   }
   ```
   """
@@ -37,15 +40,39 @@ defmodule Screens.ScreensByAlert.Memcache do
 
   @screens_by_alert_key_prefix "screens_by_alert."
   @screens_last_updated_key_prefix "screens_last_updated."
+  @screens_in_progress_key_prefix "screens_in_progress."
 
   @config Application.compile_env!(:screens, :screens_by_alert)
   @screens_by_alert_ttl Keyword.fetch!(@config, :screens_by_alert_ttl_seconds)
   @screens_last_updated_ttl Keyword.fetch!(@config, :screens_last_updated_ttl_seconds)
+  @screens_in_progress_ttl Keyword.fetch!(@config, :screens_in_progress_ttl_seconds)
   @screens_ttl Keyword.fetch!(@config, :screens_ttl_seconds)
 
   @impl true
   def start_link(_opts \\ []) do
     Screens.Memcache.start_link(name: @server)
+  end
+
+  @impl true
+  def get_in_progress(screen_ids) do
+    case Memcache.multi_get(@server, Enum.map(screen_ids, &in_progress_key/1)) do
+      {:ok, result} ->
+        result |> Map.keys() |> Enum.map(&key_to_id/1)
+
+      {:error, message} ->
+        log_warning(message, :get_in_progress)
+        []
+    end
+  end
+
+  @impl true
+  def put_in_progress(screen_ids) do
+    key_values = screen_ids |> Enum.map(&in_progress_key/1) |> Map.new(fn key -> {key, true} end)
+
+    case Memcache.multi_set(@server, key_values, ttl: @screens_in_progress_ttl) do
+      {:ok, _result} -> :ok
+      {:error, message} -> log_warning(message, :put_in_progress)
+    end
   end
 
   @impl true
@@ -60,6 +87,7 @@ defmodule Screens.ScreensByAlert.Memcache do
           fn ->
             update_screens_last_updated_key(screen_id, now)
             Enum.each(alert_ids, &update_alert_key(&1, screen_id, now))
+            delete_screens_in_progress_key(screen_id)
           end,
           10_000
         )
@@ -107,6 +135,19 @@ defmodule Screens.ScreensByAlert.Memcache do
     case Memcache.set(@server, last_updated_key(screen_id), now, ttl: @screens_last_updated_ttl) do
       {:error, message} ->
         log_warning(message, :update_screens_last_updated_key, screen_id: screen_id)
+
+      _ ->
+        :ok
+    end
+  end
+
+  defp delete_screens_in_progress_key(screen_id) do
+    case Memcache.delete(@server, in_progress_key(screen_id)) do
+      {:error, "Key not found"} ->
+        :ok
+
+      {:error, message} ->
+        log_warning(message, :delete_screens_in_progress_key, screen_id: screen_id)
 
       _ ->
         :ok
@@ -171,9 +212,11 @@ defmodule Screens.ScreensByAlert.Memcache do
 
   defp alert_key(alert_id), do: @screens_by_alert_key_prefix <> alert_id
   defp last_updated_key(screen_id), do: @screens_last_updated_key_prefix <> screen_id
+  defp in_progress_key(screen_id), do: @screens_in_progress_key_prefix <> screen_id
 
   defp key_to_id(@screens_by_alert_key_prefix <> alert_id), do: alert_id
   defp key_to_id(@screens_last_updated_key_prefix <> screen_id), do: screen_id
+  defp key_to_id(@screens_in_progress_key_prefix <> screen_id), do: screen_id
 
   defp log_warning(message, source, extra \\ []) do
     Report.warning("memcache_error", [message: message, source: source] ++ extra)

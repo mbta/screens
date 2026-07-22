@@ -308,14 +308,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
     routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
 
+    collapse_all_green? = all_green_routes_at_stop_affected?(affected_routes, routes_at_stop)
+
     affected_routes
-    # Filter alert-affected routes by which routes are at the current stop
-    # If a green-branch is the affected route, we can generalize it to just "Green-"
-    # because our prefare screens will be on the trunk. Any GL disruption will be
-    # downstream of a GL trunk station.
     |> Enum.filter(fn
       "Green" <> _ -> Enum.find(routes_at_stop, &String.starts_with?(&1, "Green"))
       route -> route in routes_at_stop
+    end)
+    |> Enum.map(fn route ->
+      case route do
+        "Green" <> _ when collapse_all_green? -> "Green"
+        route -> route
+      end
     end)
     |> Enum.flat_map(fn
       route_id ->
@@ -328,6 +332,20 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
         build_pills_from_headsign(route_id, headsign)
     end)
     |> Enum.uniq()
+  end
+
+  @spec all_green_routes_at_stop_affected?([String.t()], MapSet.t(LocalizedAlert.route_id())) ::
+          boolean()
+  defp all_green_routes_at_stop_affected?(affected_routes, routes_at_stop) do
+    routes_at_stop
+    |> Enum.filter(&String.starts_with?(&1, "Green"))
+    |> MapSet.new()
+    |> then(fn green_routes_or_line_at_stop ->
+      case MapSet.size(green_routes_or_line_at_stop) do
+        0 -> false
+        _ -> MapSet.subset?(green_routes_or_line_at_stop, MapSet.new(affected_routes))
+      end
+    end)
   end
 
   defp build_pills_from_headsign(route_id, nil) do
@@ -440,7 +458,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp base_placement(
          %__MODULE__{
-           alert: %Alert{effect: effect} = alert,
+           alert: %Alert{id: alert_id, effect: effect} = alert,
+           screen: %Screen{app_params: %_app{evergreen_content: evergreen_content}},
            is_priority: true,
            is_terminal_station: is_terminal_station,
            partial_closure_platform_names: []
@@ -450,9 +469,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        when effect in [:station_closure, :suspension, :shuttle] do
     if location == :inside and
          LocalizedAlert.informs_all_active_routes_at_home_stop?(t) and
-         (is_nil(Alert.direction_id(alert)) or is_terminal_station),
-       do: :dual_screen,
-       else: :single_screen
+         (is_nil(Alert.direction_id(alert)) or is_terminal_station) and
+         not evergreen_content_for_alert?(alert_id, evergreen_content) do
+      :dual_screen
+    else
+      :single_screen
+    end
   end
 
   defp base_placement(%__MODULE__{is_priority: true}, _location), do: :single_screen
@@ -468,6 +490,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp adjust_placement(:single_screen, :inside, :solo, _, _), do: :single_screen
   defp adjust_placement(:single_screen, _location, :solo, _, _), do: :flex_zone
   defp adjust_placement(:flex_zone, _location, :solo, _, _), do: :flex_zone
+
+  @spec evergreen_content_for_alert?(integer(), [EvergreenContentItem.t()]) :: boolean()
+  defp evergreen_content_for_alert?(alert_id, evergreen_content) do
+    # If a high priority alert is paired with evergreen content having suppress_alert_widgets=false,
+    # we want to show the the alert on a single instead of dual screen.
+    Enum.any?(evergreen_content, fn
+      %EvergreenContentItem{
+        schedule: %AlertSchedule{alert_ids: alert_ids, suppress_alert_widgets: false}
+      } ->
+        alert_id in alert_ids
+
+      _ ->
+        false
+    end)
+  end
 
   # Two screen alert, suspension
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
@@ -637,10 +674,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       now: now
     } = t
 
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
+    routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
+
+    collapse_all_green? = all_green_routes_at_stop_affected?(affected_routes, routes_at_stop)
+
     route_id =
-      case LocalizedAlert.consolidated_informed_subway_routes(t) do
+      case affected_routes do
         ["Green" <> _] -> "Green"
         [route_id] -> route_id
+        _route_ids when collapse_all_green? -> "Green"
       end
 
     endpoints = get_endpoints(informed_entities, route_id, home_stop)
@@ -705,10 +748,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       now: now
     } = t
 
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
+    routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
+
+    collapse_all_green? = all_green_routes_at_stop_affected?(affected_routes, routes_at_stop)
+
     route_id =
-      case LocalizedAlert.consolidated_informed_subway_routes(t) do
+      case affected_routes do
         ["Green" <> _] -> "Green"
         [route_id] -> route_id
+        _route_ids when collapse_all_green? -> "Green"
       end
 
     endpoints = get_endpoints(informed_entities, route_id, home_stop)

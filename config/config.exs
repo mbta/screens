@@ -457,52 +457,43 @@ config :screens,
       %{informed: "70278", not_informed: "70034", alert_headsign: "Forest Hills"},
       %{informed: "70035", not_informed: "70279", alert_headsign: "Oak Grove"}
     ]
-  },
-  dup_headsign_replacements: %{
-    "Government Center" => "Government Ctr",
-    "Charlestown Navy Yard" => "Charlestown",
-    "Saugus Center via Kennedy Dr & Square One Mall" => "Saugus Center via Kndy Dr & Square One",
-    "Malden via Square One Mall & Kennedy Dr" => "Malden via Square One Mall & Kndy Dr",
-    "Washington St & Pleasant St Weymouth" => "Washington St & Plsnt St Weymouth",
-    "Woodland Rd via Gateway Center" => "Woodland Rd via Gatew'y Center",
-    "Sullivan (Limited Stops)" => "Sullivan",
-    "Ruggles (Limited Stops)" => "Ruggles",
-    "Wickford Junction" => "Wickford Jct",
-    "Needham Heights" => "Needham Hts",
-    "Houghs Neck via McGrath & Germantown" => "Houghs Neck via McGth & Gtwn",
-    "Houghs Neck via Germantown" => "Houghs Neck via Germntwn"
   }
 
 config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,
-  screens_by_alert_ttl_seconds: 40,
+  screens_by_alert_ttl_seconds: 45,
   screens_last_updated_ttl_seconds: 3600,
-  screens_ttl_seconds: 40
+  screens_in_progress_ttl_seconds: 20,
+  screens_ttl_seconds: 45
 
 config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 1
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
 
-v3_api_cache_options = [
-  # Set with reference to the "slowest" refresh rate among screen types. In general should be
-  # chosen to minimize the impact of pruning data that hasn't been accessed in (2 * interval);
-  # see documentation for `Nebulex.Adapters.Local`.
-  gc_interval: :timer.seconds(30),
-  stats: true,
-  telemetry_prefix: ~w[screens v3_api cache]a
-]
+v3_api_cache_options = [stats: true, telemetry_prefix: ~w[screens v3_api cache]a]
 
 # Memory limits for V3 API response caches are based on stats measured in a deployed environment.
 # To avoid thrashing and overloading the HTTP connection pool, these can and should be tweaked as
 # the V3 API usage patterns and requirements of the app change over time.
+#
+# GC intervals should be chosen to minimize the impact of pruning data that hasn't been accessed
+# in (2 * interval); see documentation for `Nebulex.Adapters.Local`. Note the interval between
+# two instances of the same V3 API request will typically be much longer than the longest screen
+# refresh rate, because requests from a given screen won't always go to the same app instance.
 
 config :screens,
        Screens.V3Api.Cache.Realtime,
-       Keyword.merge(v3_api_cache_options, allocated_memory: 100 * 1024 * 1024)
+       Keyword.merge(v3_api_cache_options,
+         allocated_memory: 200 * 1024 * 1024,
+         gc_interval: :timer.seconds(30)
+       )
 
 config :screens,
        Screens.V3Api.Cache.Static,
-       Keyword.merge(v3_api_cache_options, allocated_memory: 300 * 1024 * 1024)
+       Keyword.merge(v3_api_cache_options,
+         allocated_memory: 600 * 1024 * 1024,
+         gc_interval: :timer.minutes(5)
+       )
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
