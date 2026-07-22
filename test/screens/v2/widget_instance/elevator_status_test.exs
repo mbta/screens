@@ -456,7 +456,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           free_text_lines([
             [
               "To plan an accessible trip, go to",
-              %{format: :bold, text: "https://mbta.com/trip-planner"}
+              %{format: :bold, text: "mbta.com/trip-planner"}
             ]
           ]),
         cta_type: :plain,
@@ -485,7 +485,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           free_text_lines([
             [
               "To plan an accessible trip, go to",
-              %{format: :bold, text: "https://mbta.com/trip-planner"}
+              %{format: :bold, text: "mbta.com/trip-planner"}
             ]
           ]),
         cta_type: :plain,
