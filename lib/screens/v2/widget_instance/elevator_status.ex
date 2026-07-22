@@ -168,7 +168,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
         footer_lines([
           [
             "To plan an accessible trip, go to",
-            %{format: :bold, text: "https://#{@elevators_url}"}
+            %{format: :bold, text: "https://#{@trip_planner_url}"}
           ]
         ]),
       footer_audio: [@audio_cta_alternate_path],
