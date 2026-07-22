@@ -1,6 +1,7 @@
 defmodule Screens.V2.Departure.BuilderTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -190,6 +191,51 @@ defmodule Screens.V2.Departure.BuilderTest do
       expected = to_departures([p1, p4, p5, p6])
 
       assert Enum.sort(actual) == Enum.sort(expected)
+    end
+
+    test "filters out subway shuttle schedules" do
+      predictions = []
+
+      s1 = %Schedule{
+        id: "s1",
+        route: %Route{id: "Red Shuttle (shuttle)", line: %Line{id: "line-Red"}},
+        departure_time: ~U[2020-02-01T00:01:00Z],
+        trip: %Trip{route_id: "Red Shuttle (shuttle)", id: "t1"}
+      }
+
+      s2 = %Schedule{
+        id: "s2",
+        route: %Route{id: "Blue Shuttle (shuttle)", line: %Line{id: "line-Blue"}},
+        departure_time: ~U[2020-02-01T00:01:00Z],
+        trip: %Trip{route_id: "Blue Shuttle (shuttle)", id: "t2"}
+      }
+
+      s3 = %Schedule{
+        id: "s3",
+        route: %Route{id: "Green Shuttle (shuttle)", line: %Line{id: "line-Green"}},
+        departure_time: ~U[2020-02-01T00:01:00Z],
+        trip: %Trip{route_id: "Green Shuttle (shuttle)", id: "t3"}
+      }
+
+      s4 = %Schedule{
+        id: "s4",
+        route: %Route{id: "Orange Shuttle (shuttle)", line: %Line{id: "line-Orange"}},
+        departure_time: ~U[2020-02-01T00:01:00Z],
+        trip: %Trip{route_id: "Orange Shuttle (shuttle)", id: "t4"}
+      }
+
+      s5 = %Schedule{
+        id: "s5",
+        route: %Route{id: "CR Lowell Shuttle (shuttle)", line: %Line{id: "line-CR-Lowell"}},
+        departure_time: ~U[2020-02-01T00:01:00Z],
+        trip: %Trip{route_id: "CR Lowell Shuttle (shuttle)", id: "t5"}
+      }
+
+      schedules = [s1, s2, s3, s4, s5]
+
+      expected = [%Departure{prediction: nil, schedule: s5}]
+
+      assert expected == Builder.build(predictions, schedules, @now)
     end
 
     test "sorts departures by arrival time if present, departure time if not" do
