@@ -60,6 +60,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
       departures
       |> @rds.get(now)
       |> RdsDepartures.create_departure_sections(departures, &post_process_rows/4, now)
+      |> IO.inspect()
 
     [create_departures_instance(sections_data, sections, screen, slot_names, order, now)]
   end
@@ -185,6 +186,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   end
 
   defp no_data_text(route, direction_id) when direction_id == :both do
+    %FreeTextLine{
+      icon: Route.icon(route),
+      text: [no_departures_message()]
+    }
+  end
+
+  # In cases where we have NoDataSections, we might have a partial route just for the icon
+  # Omit the normalized direction name in this instance
+  defp no_data_text(%Route{direction_names: nil} = route, _direction_id) do
     %FreeTextLine{
       icon: Route.icon(route),
       text: [no_departures_message()]
