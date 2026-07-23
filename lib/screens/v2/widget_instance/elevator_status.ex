@@ -156,7 +156,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   def serialize_to_map(%__MODULE__{} = widget),
     do: widget |> serialize() |> Map.from_struct() |> Map.delete(:alert_ids)
 
-  # if reached: station does not have any elevators
   @spec station_has_no_elevators(Stop.id(), [Facility.t()]) :: Serialized.t()
   defp station_has_no_elevators(station_id, all_elevators_at_station)
        when all_elevators_at_station == [] and station_id in @inaccessible_station_names do
@@ -177,6 +176,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   defp station_has_no_elevators(_station_id, _all_elevators_at_station), do: nil
 
+  # if reached: station has elevators
   defp closed_here_without_nearby_backups(closures, station_id, closed_ids) do
     closures_here =
       Enum.filter(closures, fn %Closure{facility: %Facility{stop: %Stop{id: id}}} ->
