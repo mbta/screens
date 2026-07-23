@@ -11,6 +11,8 @@ unless config_env() == :test do
 end
 
 if config_env() == :prod do
+  config :screens, dns_cluster_query: System.fetch_env!("CLUSTER_HOSTNAME")
+
   eb_env_name = System.get_env("ENVIRONMENT_NAME")
 
   config :sentry,
