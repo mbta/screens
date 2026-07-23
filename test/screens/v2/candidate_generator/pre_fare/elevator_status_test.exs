@@ -19,6 +19,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatusTest do
   import Screens.Inject
   @alert injected(Alert)
   @elevator injected(Elevator)
+  @facility injected(Facility)
   @route_pattern injected(RoutePattern)
 
   @screen %Screen{
@@ -58,6 +59,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatusTest do
 
     expect(@elevator, :get, fn "111" -> elevator end)
 
+    expect(@facility, :fetch, fn _ -> {:ok, [facility]} end)
+
     expect(@route_pattern, :fetch, fn %{canonical?: true, stop_ids: ~w[place-here]} ->
       {:ok,
        [
@@ -80,6 +83,7 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatusTest do
              [
                %ElevatorWidget{
                  closures: [%Closure{alert: alert, elevator: elevator, facility: facility}],
+                 home_station_has_elevators?: true,
                  home_station_id: "place-here",
                  relevant_station_ids: MapSet.new(~w[place-1 place-2])
                }
