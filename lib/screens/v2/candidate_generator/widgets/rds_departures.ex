@@ -9,6 +9,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   """
 
+  alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.V2.Departure
   alias Screens.V2.RDS
@@ -87,7 +88,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
          grouping_type: grouping_type
        }
 
-  defp map_to_departure_section(data, section, _, _)
+  defp map_to_departure_section(data, section, _, _, _)
        when data == :error or data == {:ok, []},
        do: %NoDataSection{route: maybe_route_from_section(section)}
 
