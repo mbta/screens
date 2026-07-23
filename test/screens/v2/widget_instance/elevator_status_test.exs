@@ -52,7 +52,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       widget = %Widget{
         closures: closures,
-        home_station_has_elevators?: true,
         home_station_id: "place-here"
       }
 
@@ -87,7 +86,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -121,7 +119,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -150,7 +147,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -187,7 +183,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -218,7 +213,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -257,7 +251,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -284,7 +277,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -310,7 +302,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -348,7 +339,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -383,7 +373,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -520,7 +509,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -542,7 +530,6 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
       assert Widget.serialize(%Widget{
                closures: closures,
-               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected

@@ -9,8 +9,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   alias Screens.V2.WebLink
   alias ScreensConfig.FreeTextLine
 
-  @enforce_keys ~w[ closures home_station_has_elevators? home_station_id]a
-  defstruct @enforce_keys ++ [relevant_station_ids: []]
+  @enforce_keys ~w[ closures home_station_id]a
+  defstruct @enforce_keys ++ [home_station_has_elevators?: true, relevant_station_ids: []]
 
   @type t :: %__MODULE__{
           closures: [Closure.t()],
