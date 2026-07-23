@@ -455,7 +455,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           ]),
         cta_type: :plain,
         qr_code_url:
-          "https://mbta.com/trip-planner?utm_source=screens&utm_medium=qr&utm_campaign=no_ele&utm_content=PRE-175&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjEwOjE3LjM0OTI3OS0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLkE1VHWjxAlsb25naXR1ZGXLwFHD-GoJiRbEBG5hbWXEB0Jvd2RvaW7EB3N0b3BfaWTEC3BsYWNlLWJvbW5sxAVtb2Rlc4nEA0JVU8QEdHJ1ZcQFRkVSUlnEBHRydWXEBFJBSUzEBHRydWXEBlNVQldBWcQEdHJ1ZcQOX3BlcnNpc3RlbnRfaWTEATDEC191bnVzZWRfQlVTxADEDV91bnVzZWRfRkVSUlnEAMQMX3VudXNlZF9SQUlMxADEDl91bnVzZWRfU1VCV0FZxADEAnRvhMQIbGF0aXR1ZGXEAMQJbG9uZ2l0dWRlxADEBG5hbWXEAMQHc3RvcF9pZMQAxAp3aGVlbGNoYWlyxAR0cnVl"
+          "https://mbta.com/trip-planner?utm_source=screens&utm_medium=qr&utm_campaign=no_ele&utm_content=place-bomnl&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjEwOjE3LjM0OTI3OS0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLkE1VHWjxAlsb25naXR1ZGXLwFHD-GoJiRbEBG5hbWXEB0Jvd2RvaW7EB3N0b3BfaWTEC3BsYWNlLWJvbW5sxAVtb2Rlc4nEA0JVU8QEdHJ1ZcQFRkVSUlnEBHRydWXEBFJBSUzEBHRydWXEBlNVQldBWcQEdHJ1ZcQOX3BlcnNpc3RlbnRfaWTEATDEC191bnVzZWRfQlVTxADEDV91bnVzZWRfRkVSUlnEAMQMX3VudXNlZF9SQUlMxADEDl91bnVzZWRfU1VCV0FZxADEAnRvhMQIbGF0aXR1ZGXEAMQJbG9uZ2l0dWRlxADEBG5hbWXEAMQHc3RvcF9pZMQAxAp3aGVlbGNoYWlyxAR0cnVl"
       }
 
       assert Widget.serialize(%Widget{
@@ -484,7 +484,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
           ]),
         cta_type: :plain,
         qr_code_url:
-          "https://mbta.com/trip-planner?utm_source=screens&utm_medium=qr&utm_campaign=no_ele&utm_content=PRE-175&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjEwOjE3LjM0OTI3OS0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLkE1VHWjxAlsb25naXR1ZGXLwFHD-GoJiRbEBG5hbWXEB0Jvd2RvaW7EB3N0b3BfaWTEC3BsYWNlLWJvbW5sxAVtb2Rlc4nEA0JVU8QEdHJ1ZcQFRkVSUlnEBHRydWXEBFJBSUzEBHRydWXEBlNVQldBWcQEdHJ1ZcQOX3BlcnNpc3RlbnRfaWTEATDEC191bnVzZWRfQlVTxADEDV91bnVzZWRfRkVSUlnEAMQMX3VudXNlZF9SQUlMxADEDl91bnVzZWRfU1VCV0FZxADEAnRvhMQIbGF0aXR1ZGXEAMQJbG9uZ2l0dWRlxADEBG5hbWXEAMQHc3RvcF9pZMQAxAp3aGVlbGNoYWlyxAR0cnVl"
+          "https://mbta.com/trip-planner?utm_source=screens&utm_medium=qr&utm_campaign=no_ele&utm_content=place-bomnl&plan=hsQVX3VudXNlZF9kYXRldGltZV90eXBlxADECGRhdGV0aW1lxCAyMDI2LTA3LTE0VDE1OjEwOjE3LjM0OTI3OS0wNDowMMQEZnJvbYTECGxhdGl0dWRly0BFLkE1VHWjxAlsb25naXR1ZGXLwFHD-GoJiRbEBG5hbWXEB0Jvd2RvaW7EB3N0b3BfaWTEC3BsYWNlLWJvbW5sxAVtb2Rlc4nEA0JVU8QEdHJ1ZcQFRkVSUlnEBHRydWXEBFJBSUzEBHRydWXEBlNVQldBWcQEdHJ1ZcQOX3BlcnNpc3RlbnRfaWTEATDEC191bnVzZWRfQlVTxADEDV91bnVzZWRfRkVSUlnEAMQMX3VudXNlZF9SQUlMxADEDl91bnVzZWRfU1VCV0FZxADEAnRvhMQIbGF0aXR1ZGXEAMQJbG9uZ2l0dWRlxADEBG5hbWXEAMQHc3RvcF9pZMQAxAp3aGVlbGNoYWlyxAR0cnVl"
       }
 
       assert Widget.serialize(%Widget{
