@@ -44,7 +44,7 @@ defmodule Screens.Config.Cache.Engine do
         {{:screen, screen_id}, screen_config}
       end)
 
-    metadata_entries = [last_deploy_timestamp: last_deploy_timestamp, devops: config.devops]
+    metadata_entries = [last_deploy_timestamp: last_deploy_timestamp]
 
     metadata_entries ++ screen_entries
   end

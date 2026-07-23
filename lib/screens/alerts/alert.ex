@@ -277,6 +277,19 @@ defmodule Screens.Alerts.Alert do
     DateTime.compare(t, start_t) in [:gt, :eq] && DateTime.compare(t, end_t) in [:lt, :eq]
   end
 
+  @spec stale?(t(), DateTime.t()) :: boolean()
+  def stale?(alert, now \\ DateTime.utc_now())
+
+  def stale?(%__MODULE__{active_period: [{current_start, _current_end} | _]}, now) do
+    five_weeks_ago_in_seconds = -3_024_000
+
+    now
+    |> DateTime.add(five_weeks_ago_in_seconds)
+    |> DateTime.compare(current_start) == :gt
+  end
+
+  def stale?(_, _), do: false
+
   # Rules for grammatically describing alert causes.
   @cause_description_rules %{
     accident: :an,

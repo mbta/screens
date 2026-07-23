@@ -52,7 +52,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   def relevant_alerts(alerts, screen, location_context, now) do
     Enum.filter(alerts, fn alert ->
       relevant_effect?(alert, screen) and Alert.active?(alert, now) and
-        relevant_location?(alert, location_context) and
+        LocalizedAlert.stop_in_alert_boundary?(alert, location_context) and
         not directional_shuttle_or_suspension?(alert)
     end)
   end
@@ -126,15 +126,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   defp relevant_effect?(%Alert{effect: effect}, _screen) do
     effect in [:station_closure, :shuttle, :suspension, :delay]
-  end
-
-  @spec relevant_location?(Alert.t(), LocationContext.t()) :: boolean()
-  defp relevant_location?(alert, location_context) do
-    LocalizedAlert.location(%{alert: alert, location_context: location_context}) in [
-      :inside,
-      :boundary_upstream,
-      :boundary_downstream
-    ]
   end
 
   defp directional_shuttle_or_suspension?(alert) do

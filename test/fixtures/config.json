@@ -1,7 +1,4 @@
 {
-  "devops": {
-    "disabled_modes": ["ferry", "light_rail"]
-  },
   "screens": {
     "1001": {
       "app_id": "bus_eink_v2",

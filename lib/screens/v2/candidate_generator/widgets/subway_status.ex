@@ -2,16 +2,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
   @moduledoc false
 
   alias Screens.Alerts.Alert
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.SubwayStatus
 
-  def subway_status_instances(config, now \\ DateTime.utc_now()) do
+  def subway_status_instances(
+        config,
+        now \\ DateTime.utc_now(),
+        fetch_alerts_fn \\ &Alert.fetch/1
+      ) do
     route_ids = ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E", "Mattapan"]
 
-    {:ok, alerts} = Screens.Alerts.Alert.fetch(route_ids: route_ids)
+    {:ok, alerts} = fetch_alerts_fn.(route_ids: route_ids)
 
     relevant_alerts =
       alerts
       |> Enum.filter(&(relevant_alert?(&1) and Alert.active?(&1, now)))
+      |> Enum.reject(&LocalizedAlert.suppressable_alert?(&1, now))
       |> Alert.consolidate_whole_route_delays()
       |> Enum.map(&%SubwayStatus.SubwayStatusAlert{alert: &1})
 

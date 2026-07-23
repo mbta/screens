@@ -3,7 +3,7 @@ defmodule ScreensWeb.AdminApiController do
 
   alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.{Image, Util}
-  alias ScreensConfig.{Config, Devops, Screen}
+  alias ScreensConfig.{Config, Screen}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
@@ -33,11 +33,6 @@ defmodule ScreensWeb.AdminApiController do
 
   def confirm(conn, %{"config" => config}) do
     config |> Jason.decode!() |> Config.from_json() |> put_config() |> to_success_response(conn)
-  end
-
-  def devops(conn, %{"disabled_modes" => _disabled_modes} = json) do
-    new_devops = Devops.from_json(json)
-    fetch_config() |> struct!(devops: new_devops) |> put_config() |> to_success_response(conn)
   end
 
   def refresh(conn, %{"screen_ids" => screen_ids}) do

@@ -62,7 +62,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defmodule NoDataSection do
     @moduledoc "Section consisting of a 'no departures' message."
-    @type t :: %__MODULE__{route: Route.t()}
+    @type t :: %__MODULE__{route: Route.t() | nil}
     defstruct ~w[route]a
   end
 
@@ -117,15 +117,24 @@ defmodule Screens.V2.WidgetInstance.Departures do
            optional(:time_in_epoch) => integer()
          }
 
-  @type serialized_headsign :: %{
+  @type serialized_headsign_lcd :: %{
+          headsigns: [String.t()],
+          variation: String.t() | nil
+        }
+
+  @type serialized_headsign_mercury :: %{
           headsign: String.t(),
           headsigns: [String.t()],
           variation: String.t() | nil
         }
 
+  @type serialized_headsign :: serialized_headsign_lcd | serialized_headsign_mercury
+
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
   @sl_route_ids ~w[741 742 743 746 749 751]
+
+  @eink_app_ids [:bus_eink_v2, :gl_eink_v2]
 
   defimpl Screens.V2.WidgetInstance do
     def priority(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [1]
@@ -514,18 +523,32 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @spec serialize_headsign([Departure.t()], Screen.t()) :: serialized_headsign()
   def serialize_headsign([first_departure | _], %Screen{app_id: :dup_v2} = screen) do
-    first_departure
-    |> Departure.headsign()
-    |> simplify_shuttle_headsign(first_departure, screen)
-    |> headsign_with_abbreviations()
+    headsign =
+      first_departure
+      |> Departure.headsign()
+      |> simplify_shuttle_headsign(first_departure, screen)
+
+    %{headsigns: Headsign.abbreviations(headsign), variation: nil}
+  end
+
+  def serialize_headsign([first_departure | _], %Screen{app_id: app_id})
+      when app_id in @eink_app_ids do
+    {base_headsign, variation} =
+      first_departure
+      |> Departure.headsign()
+      |> headsign_with_variation()
+
+    %{headsign: base_headsign, headsigns: [base_headsign], variation: variation}
   end
 
   def serialize_headsign([first_departure | _], screen) do
-    first_departure
-    |> Departure.headsign()
-    |> simplify_shuttle_headsign(first_departure, screen)
-    |> headsign_with_variation()
-    |> headsign_with_abbreviations()
+    {base_headsign, variation} =
+      first_departure
+      |> Departure.headsign()
+      |> simplify_shuttle_headsign(first_departure, screen)
+      |> headsign_with_variation()
+
+    %{headsigns: Headsign.abbreviations(base_headsign), variation: variation}
   end
 
   @doc """
@@ -555,12 +578,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
     end
   end
 
-  @spec headsign_with_variation(String.t()) :: serialized_headsign()
+  @spec headsign_with_variation(String.t()) :: {String.t(), String.t() | nil}
   def headsign_with_variation(headsign) do
     via_pattern = ~r/(.+) (via .+)/
     paren_pattern = ~r/(.+) (\(.+)/
 
-    [headsign, variation] =
+    [base_headsign, variation] =
       cond do
         String.match?(headsign, via_pattern) ->
           Regex.run(via_pattern, headsign, capture: :all_but_first)
@@ -572,17 +595,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           [headsign, nil]
       end
 
-    %{headsign: headsign, variation: variation, headsigns: [headsign]}
-  end
-
-  @spec headsign_with_abbreviations(serialized_headsign() | String.t()) :: serialized_headsign()
-  defp headsign_with_abbreviations(%{headsign: headsign} = headsign_map) do
-    Map.put(headsign_map, :headsigns, Headsign.abbreviations(headsign))
-  end
-
-  defp headsign_with_abbreviations(headsign) do
-    # DUPs don't break out variations
-    %{headsign: headsign, headsigns: Headsign.abbreviations(headsign), variation: nil}
+    {base_headsign, variation}
   end
 
   def serialize_times_with_crowding(departures, screen, now) do
@@ -613,8 +626,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
             optional(:scheduled_time) => serialized_timestamp() | nil,
             :is_live => boolean()
           }
-  defp serialize_time(departure, %Screen{app_id: app_id}, now)
-       when app_id in [:bus_eink_v2, :gl_eink_v2] do
+  defp serialize_time(departure, %Screen{app_id: app_id}, now) when app_id in @eink_app_ids do
     departure_time = Departure.time(departure)
     second_diff = DateTime.diff(departure_time, now)
     minute_diff = round(second_diff / 60)

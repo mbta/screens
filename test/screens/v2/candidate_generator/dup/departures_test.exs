@@ -307,6 +307,83 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       assert actual_instances == expected_instances
     end
 
+    test "creates no data sections for empty departures states" do
+      primary_departures = [
+        %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},
+        %Section{
+          query: %Query{
+            params: %Query.Params{stop_ids: ["s2"], route_ids: ["Green-B", "Green-C"]}
+          }
+        }
+      ]
+
+      secondary_departures = []
+
+      expected_departures = [
+        %Departure{
+          prediction: %Prediction{
+            arrival_time: ~U[2024-10-11 12:27:00Z],
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            stop: %Stop{id: "s1"},
+            trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+          },
+          schedule: nil
+        }
+      ]
+
+      expected_primary_sections = [
+        %Screens.V2.WidgetInstance.Departures.NormalSection{
+          header: %ScreensConfig.Departures.Header{
+            arrow: nil,
+            read_as: nil,
+            subtitle: nil,
+            title: nil
+          },
+          layout: %ScreensConfig.Departures.Layout{
+            base: nil,
+            include_later: false,
+            max: nil,
+            min: 1
+          },
+          grouping_type: :time,
+          rows: expected_departures
+        },
+        %Screens.V2.WidgetInstance.Departures.NoDataSection{
+          route: %Screens.Routes.Route{
+            id: "Green",
+            short_name: nil,
+            long_name: nil,
+            direction_names: nil,
+            direction_destinations: nil,
+            type: nil,
+            line: nil
+          }
+        }
+      ]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections(secondary_departures)
+
+      expect(@rds, :get, fn _primary_departures, @now ->
+        [
+          {:ok, [rds_countdown("s1", "l1", "other1", expected_departures)]},
+          {:ok, []}
+        ]
+      end)
+
+      expect(@rds, :get, fn _secondary_departures, @now -> [{:ok, []}, {:ok, []}] end)
+
+      expected_instances =
+        expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
+
+      actual_instances = Dup.Departures.instances(config, @now)
+
+      assert actual_instances == expected_instances
+    end
+
     test "creates no service sections for no service states" do
       primary_departures = [
         %Section{query: %Query{params: %Query.Params{stop_ids: ["s1"]}}},

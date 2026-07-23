@@ -4,9 +4,11 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
   alias Screens.Routes.Route
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Widgets
+  alias Screens.V2.LocalizedAlert
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
+  alias Screens.V2.WidgetInstance.ReconstructedAlert
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.PreFare
 
@@ -75,7 +77,47 @@ defmodule Screens.V2.CandidateGenerator.PreFare do
 
   @impl CandidateGenerator
   def candidate_instances(config, now \\ DateTime.utc_now(), instance_fns \\ @instance_fns) do
-    CandidateGenerator.async_stream(instance_fns, & &1.(config, now), timeout: 15_000)
+    instance_fns
+    |> CandidateGenerator.async_stream(& &1.(config, now), timeout: 15_000)
+    |> simplify_flex_zone()
+  end
+
+  @spec simplify_flex_zone([WidgetInstance.t()]) :: [WidgetInstance.t()]
+  defp simplify_flex_zone(widgets) do
+    # If multiple reconstructed alerts would compete for the flex zone, drop (down/up)stream alerts
+    # to spend more time showing Subway Status (which gives a better line-wide overview).
+    # Alerts with other locations (inside, boundaries) should still be shown.
+    flex_zone_alert_count =
+      widgets
+      |> Enum.filter(&flex_zone_reconstructed_alert?/1)
+      |> length()
+
+    if flex_zone_alert_count > 1 do
+      Enum.reject(widgets, fn widget ->
+        flex_zone_reconstructed_alert?(widget) and downstream_or_upstream_alert?(widget)
+      end)
+    else
+      widgets
+    end
+  end
+
+  @spec flex_zone_reconstructed_alert?(WidgetInstance.t()) :: boolean()
+  defp flex_zone_reconstructed_alert?(%ReconstructedAlert{} = widget) do
+    :large in WidgetInstance.slot_names(widget)
+  end
+
+  defp flex_zone_reconstructed_alert?(_), do: false
+
+  @spec downstream_or_upstream_alert?(ReconstructedAlert.t()) :: boolean()
+  defp downstream_or_upstream_alert?(%ReconstructedAlert{
+         alert: alert,
+         location_context: location_context,
+         is_terminal_station: is_terminal_station
+       }) do
+    LocalizedAlert.location(
+      %{alert: alert, location_context: location_context},
+      is_terminal_station
+    ) in [:downstream, :upstream]
   end
 
   @impl CandidateGenerator

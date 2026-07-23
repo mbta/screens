@@ -2,7 +2,7 @@
 
 .departure-destination__headsign {
   padding-bottom: 6px;
-  overflow: hidden;
+  overflow: clip;
   text-overflow: ellipsis;
   font-size: 64px;
   font-weight: 600;

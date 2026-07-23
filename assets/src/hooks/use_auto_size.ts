@@ -1,6 +1,6 @@
 import { type RefCallback, useLayoutEffect, useState, useRef } from "react";
 
-import { hasOverflow } from "Util/utils";
+import { hasOverflow, hasOverflowX } from "Util/utils";
 
 // Types which use value equality
 type Value = undefined | null | boolean | number | string | bigint;
@@ -54,6 +54,7 @@ type Value = undefined | null | boolean | number | string | bigint;
 const useAutoSize = <T extends Value>(
   steps: readonly T[],
   key?: Value,
+  overflowCheckFn: (element: Element) => boolean = hasOverflow,
 ): { ref: RefCallback<Element>; step: T } => {
   const initialSteps = useRef(steps);
   const [element, setElement] = useState<Element | null>(null);
@@ -80,12 +81,19 @@ const useAutoSize = <T extends Value>(
   // step. This is a change to `remainingSteps` and so itself causes the effect
   // to run again, but on the next render, with the new step value.
   useLayoutEffect(() => {
-    if (remainingSteps.length > 1 && element && hasOverflow(element)) {
+    if (remainingSteps.length > 1 && element && overflowCheckFn(element)) {
       setRemainingSteps(remainingSteps.slice(1));
     }
-  }, [element, remainingSteps]);
+  }, [element, remainingSteps, overflowCheckFn]);
 
   return { ref: setElement, step: remainingSteps[0] };
+};
+
+export const useHorizontalAutoSize = <T extends Value>(
+  steps: readonly T[],
+  key?: Value,
+): { ref: RefCallback<Element>; step: T } => {
+  return useAutoSize(steps, key, hasOverflowX);
 };
 
 export default useAutoSize;
