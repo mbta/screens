@@ -51,8 +51,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       closures = [build_closure([stop: %Stop{id: "place-here"}], [redundancy: :in_station], "a1")]
 
       widget = %Widget{
-        all_station_elevators: Enum.map(closures, & &1.elevator),
         closures: closures,
+        home_station_has_elevators?: true,
         home_station_id: "place-here"
       }
 
@@ -62,15 +62,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
 
   describe "elevators without nearby redundancy are closed at this station" do
     test "one closure" do
-      relevant_closure =
+      closures = [
         build_closure(
           [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
           [redundancy: :in_station],
           "alert-1"
-        )
-
-      closures = [
-        relevant_closure,
+        ),
         # not at this station; irrelevant
         build_closure(stop: %Stop{id: "place-other"})
       ]
@@ -89,8 +86,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: [relevant_closure.elevator],
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -123,8 +120,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -152,8 +149,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -189,23 +186,20 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
     end
 
     test "always includes elevators whose alternates are also closed" do
-      closure_for_elevator =
+      closures = [
         build_closure(
           [long_name: "Test Elevator 100", stop: %Stop{id: "place-here"}],
           [alternate_ids: ["alt"], redundancy: :nearby],
           "alert-1"
-        )
-
-      closures = [
-        closure_for_elevator,
+        ),
         build_closure(id: "alt")
       ]
 
@@ -223,8 +217,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: [closure_for_elevator],
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -262,8 +256,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -289,8 +283,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -315,8 +309,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -353,8 +347,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -388,8 +382,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -411,8 +405,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: [],
                closures: closures,
+               home_station_has_elevators?: false,
                home_station_id: "place-here"
              }) ==
                expected
@@ -437,8 +431,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: [],
                closures: closures,
+               home_station_has_elevators?: false,
                home_station_id: "place-here",
                relevant_station_ids: ~w[place-rel]
              }) == expected
@@ -465,8 +459,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: [],
                closures: [],
+               home_station_has_elevators?: false,
                home_station_id: "place-bomnl"
              }) == expected
     end
@@ -494,8 +488,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: [],
                closures: closures,
+               home_station_has_elevators?: false,
                home_station_id: "place-bomnl"
              }) == expected
     end
@@ -525,8 +519,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -547,8 +541,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: Enum.map(closures, & &1.elevator),
                closures: closures,
+               home_station_has_elevators?: true,
                home_station_id: "place-here"
              }) ==
                expected
@@ -565,8 +559,8 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       }
 
       assert Widget.serialize(%Widget{
-               all_station_elevators: [],
                closures: [],
+               home_station_has_elevators?: false,
                home_station_id: "place-here"
              }) == expected
     end

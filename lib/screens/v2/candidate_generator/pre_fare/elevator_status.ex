@@ -48,8 +48,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatus do
 
     [
       %ElevatorWidget{
-        all_station_elevators: elevators,
         closures: active_closures,
+        home_station_has_elevators?: elevators != [],
         home_station_id: station_id,
         relevant_station_ids: MapSet.new(relevant_station_ids)
       }

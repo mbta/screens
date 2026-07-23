@@ -9,12 +9,12 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   alias Screens.V2.WebLink
   alias ScreensConfig.FreeTextLine
 
-  @enforce_keys ~w[all_station_elevators closures home_station_id]a
+  @enforce_keys ~w[ closures home_station_has_elevators? home_station_id]a
   defstruct @enforce_keys ++ [relevant_station_ids: []]
 
   @type t :: %__MODULE__{
-          all_station_elevators: [Facility.t()],
           closures: [Closure.t()],
+          home_station_has_elevators?: boolean(),
           home_station_id: Stop.id(),
           relevant_station_ids: MapSet.t(Stop.id())
         }
@@ -124,9 +124,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
 
   @spec serialize(t()) :: Serialized.t()
   def serialize(%__MODULE__{
-        all_station_elevators: all_station_elevators,
         closures: closures,
         home_station_id: home_station_id,
+        home_station_has_elevators?: home_station_has_elevators?,
         relevant_station_ids: relevant_station_ids
       }) do
     closed_elevator_ids = MapSet.new(closures, fn %Closure{facility: %Facility{id: id}} -> id end)
@@ -135,7 +135,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
     # returns a `Serialized` if it does apply or `nil` if it does not.
     Enum.find_value(
       [
-        fn -> station_has_no_elevators(home_station_id, all_station_elevators) end,
+        fn -> station_has_no_elevators(home_station_id, home_station_has_elevators?) end,
         fn ->
           closed_here_without_nearby_backups(closures, home_station_id, closed_elevator_ids)
         end,
@@ -156,9 +156,9 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatus do
   def serialize_to_map(%__MODULE__{} = widget),
     do: widget |> serialize() |> Map.from_struct() |> Map.delete(:alert_ids)
 
-  @spec station_has_no_elevators(Stop.id(), [Facility.t()]) :: Serialized.t()
-  defp station_has_no_elevators(station_id, all_elevators_at_station)
-       when all_elevators_at_station == [] and station_id in @inaccessible_station_names do
+  @spec station_has_no_elevators(Stop.id(), boolean()) :: Serialized.t()
+  defp station_has_no_elevators(station_id, _home_station_has_elevators? = false)
+       when station_id in @inaccessible_station_names do
     %Serialized{
       status: :inaccessible,
       header: "This station is not accessible.",

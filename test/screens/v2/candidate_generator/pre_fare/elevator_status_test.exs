@@ -82,8 +82,8 @@ defmodule Screens.V2.CandidateGenerator.PreFare.ElevatorStatusTest do
     assert ElevatorStatus.instances(@screen, DateTime.utc_now()) ==
              [
                %ElevatorWidget{
-                 all_station_elevators: [facility],
                  closures: [%Closure{alert: alert, elevator: elevator, facility: facility}],
+                 home_station_has_elevators?: true,
                  home_station_id: "place-here",
                  relevant_station_ids: MapSet.new(~w[place-1 place-2])
                }
