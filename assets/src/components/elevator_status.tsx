@@ -27,7 +27,9 @@ type Props = {
   qr_code_url: string;
 };
 
-const getStatusIcon = (status: ElevatorStatus): JSX.Element => {
+const StatusIcon: ComponentType<{ status: ElevatorStatus }> = ({
+  status,
+}): JSX.Element => {
   switch (status) {
     case "alert":
       return <ElevatorAlertIcon width={280} height={160} />;
@@ -59,7 +61,7 @@ const ElevatorStatus: ComponentType<Props> = ({
       )}
 
       <div className={className("body")}>
-        {getStatusIcon(status)}
+        <StatusIcon status={status} />
 
         <div className={className("header")}>
           {header_size === "large" ? <h3>{header}</h3> : <h4>{header}</h4>}
