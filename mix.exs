@@ -56,6 +56,7 @@ defmodule Screens.MixProject do
     [
       {:aja, "~> 0.7.0"},
       {:corsica, "~> 2.1"},
+      {:dns_cluster, "~> 0.2.0"},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_polly, "~> 0.5.0"},
       {:ex_aws_s3, "~> 2.1"},
