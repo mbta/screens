@@ -49,11 +49,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
       # This way we know the AlertsWidget implementation is actually hooked up to the `alert_ids`
       # field of `Serialized`, and tests that assert on this field are meaningful
       closures = [build_closure([stop: %Stop{id: "place-here"}], [redundancy: :in_station], "a1")]
-
-      widget = %Widget{
-        closures: closures,
-        home_station_id: "place-here"
-      }
+      widget = %Widget{closures: closures, home_station_id: "place-here"}
 
       assert AlertsWidget.alert_ids(widget) == Widget.serialize(widget).alert_ids
     end
@@ -84,10 +80,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-1"]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -117,10 +110,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-1"]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -145,10 +135,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a1 a2]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -181,10 +168,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a1 a2]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -211,10 +195,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-1"]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
   end
@@ -249,10 +230,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-a"]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -275,10 +253,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a1 a2]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -300,10 +275,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a1 a2 a3]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -337,10 +309,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ~w[a0 a1 a2 a3 a4 a5]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -371,10 +340,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         alert_ids: ["alert-a"]
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
@@ -507,10 +473,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         qr_code_url: "https://mbta.com/elevators"
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
   end
@@ -528,10 +491,7 @@ defmodule Screens.V2.WidgetInstance.ElevatorStatusTest do
         qr_code_url: "https://mbta.com/go-access"
       }
 
-      assert Widget.serialize(%Widget{
-               closures: closures,
-               home_station_id: "place-here"
-             }) ==
+      assert Widget.serialize(%Widget{closures: closures, home_station_id: "place-here"}) ==
                expected
     end
 
