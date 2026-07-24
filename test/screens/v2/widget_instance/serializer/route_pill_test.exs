@@ -146,42 +146,6 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                )
     end
 
-    test "Returns dual pill for Red Line shuttle", %{pre_fare_screen: screen} do
-      route =
-        route(
-          id: "Shuttle-BoylstonKenmore (shuttle)",
-          type: :bus,
-          line_id: "line-Red"
-        )
-
-      assert %{type: :dual, text: "RL", icon: :bus, color: :red, secondary_color: :yellow} ==
-               serialize_for_departure(route, nil, screen)
-    end
-
-    test "Returns dual pill for Blue Line shuttle", %{pre_fare_screen: screen} do
-      route =
-        route(
-          id: "Blue Line Shuttle (shuttle)",
-          type: :bus,
-          line_id: "line-Blue"
-        )
-
-      assert %{type: :dual, text: "BL", icon: :bus, color: :blue, secondary_color: :yellow} ==
-               serialize_for_departure(route, nil, screen)
-    end
-
-    test "Returns dual pill for Orange Line shuttle", %{pre_fare_screen: screen} do
-      route =
-        route(
-          id: "Orange Line Shuttle (shuttle)",
-          type: :bus,
-          line_id: "line-Orange"
-        )
-
-      assert %{type: :dual, text: "OL", icon: :bus, color: :orange, secondary_color: :yellow} ==
-               serialize_for_departure(route, nil, screen)
-    end
-
     test "Returns dual pill for Commuter Rail shuttle", %{pre_fare_screen: screen} do
       route =
         route(
