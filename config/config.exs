@@ -466,7 +466,7 @@ config :screens, :screens_by_alert,
   screens_in_progress_ttl_seconds: 20,
   screens_ttl_seconds: 45
 
-config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 1
+config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 2
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
 
@@ -491,7 +491,7 @@ config :screens,
 config :screens,
        Screens.V3Api.Cache.Static,
        Keyword.merge(v3_api_cache_options,
-         allocated_memory: 1000 * 1024 * 1024,
+         allocated_memory: 800 * 1024 * 1024,
          gc_interval: :timer.minutes(5)
        )
 
