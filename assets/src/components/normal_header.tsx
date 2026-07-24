@@ -71,9 +71,9 @@ const NormalHeaderTitle: ComponentType<NormalHeaderTitleProps> = ({
 
   return (
     <>
-      {["screens-dev", "screens-dev-blue", "screens-dev-green"].includes(environmentName) && (
-        <div className="normal-header__environment">{environmentName}</div>
-      )}
+      {["screens-dev", "screens-dev-blue", "screens-dev-green"].includes(
+        environmentName,
+      ) && <div className="normal-header__environment">{environmentName}</div>}
       <div
         className={classWithModifiers("normal-header-title", [
           ...classes,
