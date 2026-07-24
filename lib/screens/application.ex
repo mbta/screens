@@ -15,6 +15,7 @@ defmodule Screens.Application do
          name: Screens.V3Api.Finch, pools: %{default: [size: 100, start_pool_metrics?: true]}},
         Screens.V3Api.Cache.Realtime,
         Screens.V3Api.Cache.Static,
+        Screens.V3Api.Cache.Schedule,
         Screens.LastTrip.Cache,
         # Task supervisor for ScreensByAlert async updates
         {Task.Supervisor, name: Screens.ScreensByAlert.Memcache.TaskSupervisor},

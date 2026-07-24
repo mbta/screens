@@ -484,15 +484,22 @@ v3_api_cache_options = [stats: true, telemetry_prefix: ~w[screens v3_api cache]a
 config :screens,
        Screens.V3Api.Cache.Realtime,
        Keyword.merge(v3_api_cache_options,
-         allocated_memory: 200 * 1024 * 1024,
+         allocated_memory: 100 * 1024 * 1024,
          gc_interval: :timer.seconds(30)
        )
 
 config :screens,
        Screens.V3Api.Cache.Static,
        Keyword.merge(v3_api_cache_options,
-         allocated_memory: 600 * 1024 * 1024,
+         allocated_memory: 100 * 1024 * 1024,
          gc_interval: :timer.minutes(5)
+       )
+
+config :screens,
+       Screens.V3Api.Cache.Schedule,
+       Keyword.merge(v3_api_cache_options,
+         allocated_memory: 700 * 1024 * 1024,
+         gc_interval: :timer.minutes(30)
        )
 
 # Import environment specific config. This must remain at the bottom

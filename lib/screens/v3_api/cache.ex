@@ -21,7 +21,14 @@ defmodule Screens.V3Api.Cache do
     def unconditional_ttl, do: :timer.minutes(30)
   end
 
+  defmodule Schedule do
+    use Nebulex.Cache, otp_app: :screens, adapter: Nebulex.Adapters.Local
+
+    def unconditional_ttl, do: :timer.hours(1)
+  end
+
   @realtime_resources ~w[alert prediction vehicle]
+  @schedule_resources ~w[schedule]
 
   @type key :: {path :: String.t(), params :: map()}
   @type result :: {:fresh, term()} | {:stale, term()} | nil
@@ -49,6 +56,7 @@ defmodule Screens.V3Api.Cache do
   @spec put(key(), term(), now :: DateTime.t()) :: :ok
   def put(key, value, now \\ DateTime.utc_now()) do
     cache = cache_for(key)
+
     stale_at = DateTime.add(now, cache.unconditional_ttl(), :millisecond)
     _ = cache.put(key, {stale_at, value})
     :ok
@@ -66,9 +74,17 @@ defmodule Screens.V3Api.Cache do
   # it to the appropriate cache. Should err on the side of over-categorizing data as `Realtime`,
   # since we give static data a very long unconditional TTL.
   defp cache_for({path, params}) do
-    if String.contains?(path, @realtime_resources) or
-         params |> Map.get("include", "") |> String.contains?(@realtime_resources),
-       do: Realtime,
-       else: Static
+    cond do
+      String.contains?(path, @realtime_resources) or
+          params |> Map.get("include", "") |> String.contains?(@realtime_resources) ->
+        Realtime
+
+      String.contains?(path, @schedule_resources) or
+          params |> Map.get("include", "") |> String.contains?(@schedule_resources) ->
+        Schedule
+
+      true ->
+        Static
+    end
   end
 end

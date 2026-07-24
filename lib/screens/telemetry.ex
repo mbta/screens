@@ -47,7 +47,7 @@ defmodule Screens.Telemetry do
   end
 
   def cache_stats do
-    for cache <- [Cache.Realtime, Cache.Static] do
+    for cache <- [Cache.Realtime, Cache.Static, Cache.Schedule] do
       with {:ok, info} <- cache.info() do
         :telemetry.execute(
           ~w[screens v3_api cache stats]a,
