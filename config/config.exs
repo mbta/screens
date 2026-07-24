@@ -466,7 +466,7 @@ config :screens, :screens_by_alert,
   screens_in_progress_ttl_seconds: 20,
   screens_ttl_seconds: 45
 
-config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 20
+config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 40
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
 
