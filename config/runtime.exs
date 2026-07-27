@@ -32,6 +32,8 @@ if config_env() == :prod do
     namespace: System.fetch_env!("HOST"),
     hostname: System.fetch_env!("MEMCACHED_HOST")
 
+  config :screens, Screens.Repo, pool_size: 10
+
   config :ueberauth_oidcc,
     issuers: [
       %{

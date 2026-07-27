@@ -39,7 +39,8 @@
 
 1. `mix deps.get`
 1. `npm install --prefix assets`
-1. `mix phx.server`
+1. `mix ecto.create` to stand up the DB used for storing screen configs.
+1. `mix phx.server` 
 1. Visit <http://localhost:4000/v2/screen/PRE-101> (one of our screens, chosen
    arbitrarily) to check that everything is working!
 

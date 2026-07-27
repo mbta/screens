@@ -56,8 +56,10 @@ defmodule Screens.MixProject do
     [
       {:aja, "~> 0.7.0"},
       {:corsica, "~> 2.1"},
+      {:ecto_sql, "~> 3.12"},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_polly, "~> 0.5.0"},
+      {:ex_aws_rds, "~> 2.0.2"},
       {:ex_aws_s3, "~> 2.1"},
       {:ex_cldr_messages, "~> 2.0"},
       {:gettext, "~> 0.26.1"},
@@ -74,6 +76,7 @@ defmodule Screens.MixProject do
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_view, "~> 2.0"},
       {:plug_cowboy, "~> 2.6"},
+      {:postgrex, "~> 0.19"},
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
       {:req, "~> 0.6.0"},

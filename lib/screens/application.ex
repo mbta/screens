@@ -31,7 +31,9 @@ defmodule Screens.Application do
         Screens.Telemetry,
         {Phoenix.PubSub, name: ScreensWeb.PubSub},
         ScreensWeb.Endpoint,
-        Screens.Health
+        Screens.Health,
+        Screens.Repo,
+        Screens.Migrate
       ]
       |> Enum.reject(&is_nil/1)
 

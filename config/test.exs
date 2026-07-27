@@ -6,6 +6,11 @@ config :screens, ScreensWeb.Endpoint,
   http: [port: 4002],
   server: false
 
+config :screens, Screens.Repo,
+  adapter: Ecto.Adapters.Postgres,
+  database: "screens_test",
+  pool: Ecto.Adapters.SQL.Sandbox
+
 config :screens,
   config_fetcher: Screens.Config.Fetch.Local,
   pending_config_fetcher: Screens.PendingConfig.Fetch.Local,

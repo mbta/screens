@@ -15,6 +15,19 @@ config :screens, ScreensWeb.Endpoint,
   pubsub_server: ScreensWeb.PubSub,
   live_view: [signing_salt: "cK5v02Jnzmp4C8NjV0wwpD2IdTaZdMvi"]
 
+# Configure the Ecto repository
+config :screens, Screens.Repo,
+  database: "screens",
+  username: System.get_env("DATABASE_USER", ""),
+  password: System.get_env("DATABASE_PASSWORD", ""),
+  hostname: System.get_env("DATABASE_HOST", "localhost"),
+  port: System.get_env("DATABASE_PORT", "5432") |> String.to_integer(),
+  stacktrace: true,
+  show_sensitive_data_on_connection_error: true,
+  backoff_min: 5_000
+
+config :screens, ecto_repos: [Screens.Repo]
+
 # Include 2 logger backends
 config :logger,
   backends: [:console, Sentry.LoggerBackend]
