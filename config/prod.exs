@@ -16,6 +16,7 @@ config :screens, ScreensWeb.Endpoint,
   check_origin: [
     "https://screens.mbta.com",
     "https://screens-dev.mbtace.com",
+    "https://screens-dev-blue.mbtace.com",
     "https://screens-dev-green.mbtace.com"
   ]
 
