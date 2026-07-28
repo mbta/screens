@@ -1,5 +1,9 @@
 # Getting Started
 
+#### Postgres
+
+If you don't already have Postgres installed, and you're on a Mac, [Postgres.app](https://postgresapp.com/downloads.html) is an easy way to get started. However, any Postgres instance to which you can connect and in which you have sufficient privileges should work.
+
 #### Install tools
 
 1. Clone this repo
