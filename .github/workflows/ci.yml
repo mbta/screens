@@ -17,8 +17,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  ex-compile:
-    name: Elixir Warnings
+  build-elixir:
+    name: Build and Test Elixir
     runs-on: ubuntu-latest
     env:
       MIX_ENV: test
@@ -41,47 +41,16 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - run: mix compile --warnings-as-errors
-
-  ex-credo:
-    name: Elixir Credo
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup
-      - run: mix credo.ci
-
-  ex-dialyzer:
-    name: Elixir Dialyze
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup
-      - uses: mbta/actions/dialyzer@788f8e264e9ebb1b76b927c89e6466d5a162be80 # v2.24
-
-  ex-format:
-    name: Elixir Format
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup
-      - run: mix format --check-formatted
-
-  ex-tests:
-    name: Elixir Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup
-      - run: mix test
+      - name: Compile Elixir (Warnings as Errors)
+        run: mix compile --warnings-as-errors
+      - name: Elixir Credo
+        run:  mix credo.ci
+      - name: Elixir Dialyze
+        uses: mbta/actions/dialyzer@788f8e264e9ebb1b76b927c89e6466d5a162be80 # v2.24
+      - name: Elixir Format
+        run: mix format --check-formatted
+      - name: Elixir Tests
+        run: mix test
 
   js-build:
     name: Frontend Build
