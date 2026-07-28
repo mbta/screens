@@ -16,28 +16,26 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
-env:
-  MIX_ENV: test
-  DATABASE_PASSWORD: postgres
-  DATABASE_USER: postgres
-  DATABASE_NAME: screens_test
-  DATABASE_HOST: localhost
-
-services:
-  postgres:
-    image: postgres
-    ports:
-      - 5432:5432
-    env:
-      POSTGRES_PASSWORD: ${{env.DATABASE_PASSWORD}}
-      POSTGRES_USER: ${{env.DATABASE_USER}}
-      POSTGRES_DB: ${{env.DATABASE_NAME}}
-    options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-
 jobs:
   ex-compile:
     name: Elixir Warnings
     runs-on: ubuntu-latest
+    env:
+      MIX_ENV: test
+      DATABASE_PASSWORD: postgres
+      DATABASE_USER: postgres
+      DATABASE_NAME: screens_test
+      DATABASE_HOST: localhost
+    services:
+      postgres:
+        image: postgres@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: ${{env.DATABASE_PASSWORD}}
+          POSTGRES_USER: ${{env.DATABASE_USER}}
+          POSTGRES_DB: ${{env.DATABASE_NAME}}
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
