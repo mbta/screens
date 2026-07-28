@@ -39,8 +39,7 @@ config :screens, Screens.Repo,
   database: "screens",
   ssl: true,
   show_sensitive_data_on_connection_error: false,
-  configure: {Screens.Repo, :add_prod_credentials, []},
-  pool_size: 15
+  configure: {Screens.Repo, :add_prod_credentials, []}
 
 # ## SSL Support
 #
