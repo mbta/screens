@@ -4,7 +4,7 @@ defmodule Screens.Repo.Migrations.CreateScreenConfigs do
   def change do
     create table(:screen_configs, primary_key: false) do
       add :id, :string, primary_key: true
-      add :config, :jsonb
+      add :config, :jsonb, null: false
 
       timestamps(type: :utc_datetime)
     end
