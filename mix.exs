@@ -45,7 +45,8 @@ defmodule Screens.MixProject do
 
   defp aliases do
     [
-      "credo.ci": "credo --strict --checks-without-tag formatter"
+      "credo.ci": "credo --strict --checks-without-tag formatter",
+      test: ["ecto.create --quiet", "ecto.migrate --quiet", "test"]
     ]
   end
 
