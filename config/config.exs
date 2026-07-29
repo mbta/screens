@@ -18,10 +18,7 @@ config :screens, ScreensWeb.Endpoint,
 # Configure the Ecto repository
 config :screens, Screens.Repo,
   database: "screens",
-  username: System.get_env("DATABASE_USER", ""),
-  password: System.get_env("DATABASE_PASSWORD", ""),
-  hostname: System.get_env("DATABASE_HOST", "localhost"),
-  port: System.get_env("DATABASE_PORT", "5432") |> String.to_integer(),
+  configure: {Screens.Repo, :add_prod_credentials, []},
   stacktrace: true,
   show_sensitive_data_on_connection_error: true,
   backoff_min: 5_000
