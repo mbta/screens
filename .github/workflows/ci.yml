@@ -16,6 +16,9 @@ concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  MIX_ENV: test
+
 jobs:
   build-elixir:
     name: Build and Test Elixir
