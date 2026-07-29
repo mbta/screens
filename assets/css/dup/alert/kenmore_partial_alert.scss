@@ -1,0 +1,18 @@
+@use "CSS/colors";
+
+.kenmore-partial-alert__container {
+  background: colors.$warm-neutral-95;
+}
+
+.kenmore-partial-alert__body {
+  box-sizing: border-box;
+  width: 1920px;
+  height: 632px;
+  padding-top: 72px;
+  padding-right: 64px;
+  padding-left: 64px;
+}
+
+.kenmore-partial-alert__body-text .free-text {
+  color: colors.$cool-black-15;
+}

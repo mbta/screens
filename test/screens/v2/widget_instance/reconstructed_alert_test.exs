@@ -61,6 +61,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     }
   end
 
+  defp put_reconstructed_alert_widget_id(widget, stop_id),
+    do: put_in(widget.screen.app_params.reconstructed_alert_widget.stop_id, stop_id)
+
   defp put_solo_screen(widget), do: put_in(widget.screen.app_params.template, :solo)
 
   defp put_active_period(widget, ap) do
@@ -177,12 +180,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         sections: [%Section{query: %Query{params: %Params{route_type: :rail}}}]
       })
 
-    app_params = struct(PreFare, departures: departures)
-
-    %{
-      widget
-      | screen: %Screen{widget.screen | app_params: app_params}
-    }
+    update_in(widget.screen.app_params, fn
+      %PreFare{} = app_params ->
+        %{app_params | departures: departures}
+    end)
   end
 
   defp setup_transfer_station(%{widget: widget}) do
@@ -2622,6 +2623,75 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert %{issue: "Simulation of PIO text"} =
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+    end
+
+    test "handles GL alert at Kenmore suspending some branches", %{widget: widget} do
+      widget =
+        widget
+        |> put_reconstructed_alert_widget_id("place-kencl")
+        |> put_home_stop(PreFare, "place-kencl")
+        |> put_effect(:suspension)
+        |> put_informed_entities([
+          ie(stop_id: "place-hymnl", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-hymnl", route: "Green-C", route_type: 0),
+          ie(stop_id: "place-hymnl", route: "Green-D", route_type: 0),
+          ie(stop_id: "place-kencl", route: "Green-B", route_type: 0),
+          ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
+          ie(stop_id: "place-kencl", route: "Green-D", route_type: 0),
+          ie(stop_id: "70149", route: "Green-B", route_type: 0),
+          ie(stop_id: "70211", route: "Green-C", route_type: 0)
+        ])
+        |> put_cause(:unknown)
+        |> put_alert_header("Kenmore Partial Suspension")
+        |> put_tagged_stop_sequences(%{
+          "Green-D" => [
+            [
+              "place-hymnl",
+              "place-kencl",
+              "70187"
+            ]
+          ]
+        })
+        |> put_routes_at_stop([
+          %{
+            route_id: "Green-B",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          },
+          %{
+            route_id: "Green-C",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          },
+          %{
+            route_id: "Green-D",
+            active?: true,
+            direction_destinations: nil,
+            long_name: nil,
+            short_name: nil,
+            type: :subway
+          }
+        ])
+
+      expected = %{
+        issue: "Kenmore Partial Suspension",
+        location: "",
+        cause: "",
+        routes: [%{color: :green, text: "GL", type: :text, branches: ["B", "C", "D"]}],
+        effect: :suspension,
+        urgent: true,
+        region: :boundary,
+        remedy: ""
+      }
+
+      assert expected == ReconstructedAlert.serialize(widget)
+      assert expected == widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
   end
 
