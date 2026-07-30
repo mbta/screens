@@ -19,9 +19,8 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   setup do
     stub(@cache, :last_deploy_timestamp, fn -> ~U[2020-01-01 00:00:00Z] end)
     stub(@cache, :screen, fn _id -> struct(Screen) end)
-    stub(@parameters, :candidate_generator, fn _screen, _variant -> StubGenerator end)
+    stub(@parameters, :candidate_generator, fn _screen -> StubGenerator end)
     stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
-    stub(@parameters, :variants, fn _screen -> [nil] end)
     stub(ScreensByAlert.Mock, :put_data, fn _screen_id, _alert_ids -> :ok end)
     :ok
   end

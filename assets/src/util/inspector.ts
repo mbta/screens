@@ -15,7 +15,6 @@ export type Message =
   | { type: "audio_config"; config: AudioConfig | null }
   | { type: "data_refreshed"; timestamp: number }
   | { type: "refresh_data" }
-  | { type: "set_data_variant"; variant: string | null }
   | { type: "set_refresh_rate"; ms: number | null };
 
 export const INSPECTOR_FRAME_NAME = "screen-inspector-frame";

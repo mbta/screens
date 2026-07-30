@@ -25,8 +25,6 @@ defmodule Screens.Application do
         {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
         # ScreensByAlert self-refresh job runner
         self_refresh_runner_child(),
-        # Task supervisor for parallel running of candidate generator variants
-        {Task.Supervisor, name: Screens.V2.ScreenData.ParallelRunSupervisor},
         {Task.Supervisor, name: Screens.DeviceMonitor.Supervisor},
         Screens.DeviceMonitor,
         Screens.Telemetry,

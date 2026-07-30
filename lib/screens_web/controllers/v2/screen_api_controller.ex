@@ -20,10 +20,10 @@ defmodule ScreensWeb.V2.ScreenApiController do
   plug :disabled_response when action in @non_pending_show_actions
   plug :outdated_response when action in @non_pending_show_actions
 
-  def show(%{assigns: %{screen_id: screen_id, screen: screen, variant: variant}} = conn, _params) do
+  def show(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
     response =
       screen
-      |> screen_response(variant, update_visible_alerts_for_screen_id: screen_id)
+      |> screen_response(update_visible_alerts_for_screen_id: screen_id)
       |> put_extra_fields(screen)
 
     json(conn, response)
@@ -31,14 +31,9 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   def show_dup(conn, params), do: show(conn, params)
 
-  def simulation(
-        %{assigns: %{screen_id: screen_id, screen: screen, variant: variant}} = conn,
-        _params
-      ) do
-    json(
-      conn,
-      simulation_response(screen, variant, update_visible_alerts_for_screen_id: screen_id)
-    )
+  def simulation(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
+    data = ScreenData.simulation(screen, update_visible_alerts_for_screen_id: screen_id)
+    json(conn, %{@base_response | data: data})
   end
 
   def show_pending(%{assigns: %{screen: screen}} = conn, _params) do
@@ -85,22 +80,14 @@ defmodule ScreensWeb.V2.ScreenApiController do
     )
   end
 
-  defp screen_response(screen, "all", _opts) do
-    {default, variants} = ScreenData.variants(screen)
-    Map.put(%{@base_response | data: default}, :variants, variants)
-  end
-
   # See `docs/mercury_api.md`
-  defp screen_response(%Screen{vendor: :mercury} = screen, variant, opts) do
-    %{full_page: data, flex_zone: flex_zone} =
-      ScreenData.simulation(screen, merge_options(variant, opts))
-
+  defp screen_response(%Screen{vendor: :mercury} = screen, opts) do
+    %{full_page: data, flex_zone: flex_zone} = ScreenData.simulation(screen, opts)
     Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
   end
 
-  defp screen_response(screen, variant, opts) do
-    data = ScreenData.get(screen, merge_options(variant, opts))
-    %{@base_response | data: data}
+  defp screen_response(screen, opts) do
+    %{@base_response | data: ScreenData.get(screen, opts)}
   end
 
   # See `docs/mercury_api.md`
@@ -120,19 +107,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
       data ->
         View.render_to_string(ScreensWeb.V2.AudioView, "index.ssml", widget_audio_data: data)
     end
-  end
-
-  defp simulation_response(screen, "all", _opts) do
-    {default, variants} = ScreenData.simulation_variants(screen)
-    Map.put(%{@base_response | data: default}, :variants, variants)
-  end
-
-  defp simulation_response(screen, variant, opts) do
-    %{@base_response | data: ScreenData.simulation(screen, merge_options(variant, opts))}
-  end
-
-  defp merge_options(variant, opts) do
-    Keyword.put(opts, :generator_variant, variant)
   end
 
   defp disabled_response(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _) do

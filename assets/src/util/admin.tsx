@@ -31,15 +31,15 @@ export type AppId =
   | "gl_eink_v2"
   | "pre_fare_v2";
 
-type AppInfo = { name: string; hasAudio: boolean; variants: string[] };
+type AppInfo = { name: string; hasAudio: boolean };
 
 export const SCREEN_APPS: { [key in AppId]: AppInfo } = {
-  bus_eink_v2: { name: "Bus E-ink", hasAudio: true, variants: [] },
-  bus_shelter_v2: { name: "Bus Shelter", hasAudio: true, variants: [] },
-  busway_v2: { name: "Sectional", hasAudio: true, variants: [] },
-  dup_v2: { name: "DUP", hasAudio: false, variants: [] },
-  gl_eink_v2: { name: "GL E-ink", hasAudio: true, variants: [] },
-  pre_fare_v2: { name: "Pre-Fare", hasAudio: true, variants: [] },
+  bus_eink_v2: { name: "Bus E-ink", hasAudio: true },
+  bus_shelter_v2: { name: "Bus Shelter", hasAudio: true },
+  busway_v2: { name: "Sectional", hasAudio: true },
+  dup_v2: { name: "DUP", hasAudio: false },
+  gl_eink_v2: { name: "GL E-ink", hasAudio: true },
+  pre_fare_v2: { name: "Pre-Fare", hasAudio: true },
 };
 
 export const SCREEN_APP_ENTRIES = (

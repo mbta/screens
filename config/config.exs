@@ -35,7 +35,6 @@ config :logger, :console,
     rotation_index
     screen_id
     screen_side
-    variant
     vendor
   ]a
 

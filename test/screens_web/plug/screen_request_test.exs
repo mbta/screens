@@ -104,10 +104,10 @@ defmodule ScreensWeb.Plug.ScreenRequestTest do
       %Conn{assigns: assigns} =
         conn
         |> make_successful()
-        |> struct!(query_string: "requestor=test&rotation_index=2&variant=abc")
+        |> struct!(query_string: "requestor=test&rotation_index=2")
         |> ScreenRequest.call(%Options{})
 
-      assert %{requestor: "test", rotation_index: "2", variant: "abc"} = assigns
+      assert %{requestor: "test", rotation_index: "2"} = assigns
     end
 
     test "assigns is_real_screen from param", %{conn: conn} do

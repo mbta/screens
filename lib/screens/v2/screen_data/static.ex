@@ -28,10 +28,9 @@ defmodule Screens.V2.ScreenData.Static do
           audio_active_time: time_range() | nil,
           candidate_generator: module(),
           periodic_audio: PeriodicAudio.t() | nil,
-          refresh_rate: pos_integer(),
-          variants: %{String.t() => module()}
+          refresh_rate: pos_integer()
         }
 
   @enforce_keys ~w[candidate_generator refresh_rate]a
-  defstruct @enforce_keys ++ [audio_active_time: nil, periodic_audio: nil, variants: %{}]
+  defstruct @enforce_keys ++ [audio_active_time: nil, periodic_audio: nil]
 end
