@@ -19,4 +19,3 @@ export SECRET_KEY_BASE="local_secret_key_base_at_least_64_bytes_________________
 # export DATABASE_USER=
 # export DATABASE_PASSWORD=
 export DATABASE_HOST="localhost"
-export ENVIRONMENT_NAME="local"
