@@ -69,7 +69,7 @@ defmodule Screens.Headsigns.Data do
     "Museum of Fine Arts" => ["Museum of Fine Arts", "MFA"],
     "Needham Heights" => ["Needham Heights", "Needham Hts"],
     "Newton Centre" => ["Newton Centre", "Newton Ctr"],
-    "Newton Highlands" => ["Newton Highlands", "Newton Hlnd"],
+    "Newton Highlands" => ["Newton Highlands", "Nwtn Highlands", "Newton Hlnd"],
     "North Quincy" => ["North Quincy", "N Quincy"],
     "North Station" => ["North Station", "North Sta"],
     "Northeastern" => ["Northeastern University", "Northeastern", "Northeast'n"],
