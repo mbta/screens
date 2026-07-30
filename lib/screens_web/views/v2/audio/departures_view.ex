@@ -137,11 +137,11 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     end
   end
 
-  defp render_headsign(%{headsign: headsign, variation: nil}) do
+  defp render_headsign(%{headsigns: [headsign | _], variation: nil}) do
     ~E|<%= headsign %>|
   end
 
-  defp render_headsign(%{headsign: headsign, variation: variation}) do
+  defp render_headsign(%{headsigns: [headsign | _], variation: variation}) do
     ~E|<%= headsign %> <%= variation %>|
   end
 
