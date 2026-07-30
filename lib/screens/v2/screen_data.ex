@@ -6,7 +6,8 @@ defmodule Screens.V2.ScreenData do
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
-  alias __MODULE__.{ParallelRunSupervisor, Layout}
+
+  alias __MODULE__.Layout
 
   import Screens.Inject
   import Screens.V2.Template.Guards, only: [is_slot_id: 1, is_paged_slot_id: 1]
@@ -15,64 +16,27 @@ defmodule Screens.V2.ScreenData do
 
   @type t :: %{type: atom()}
   @type simulation_data :: %{full_page: t(), flex_zone: [t()]}
-  @type variants(data) :: {data, %{String.t() => data}}
   @type options :: [
-          generator_variant: String.t() | nil,
-          run_all_variants?: boolean(),
           update_visible_alerts_for_screen_id: String.t()
         ]
 
   @callback get(Screen.t()) :: t()
   @callback get(Screen.t(), options()) :: t()
-  def get(screen, opts \\ []), do: select_variant(screen, opts, &layout_to_data/2)
+  def get(screen, opts \\ []), do: generate(screen, opts, &layout_to_data/2)
 
   @spec simulation(Screen.t()) :: simulation_data()
   @spec simulation(Screen.t(), options()) :: simulation_data()
-  def simulation(screen, opts \\ []),
-    do: select_variant(screen, opts, &layout_to_simulation_data/2)
+  def simulation(screen, opts \\ []), do: generate(screen, opts, &layout_to_simulation_data/2)
 
-  @spec variants(Screen.t()) :: variants(t())
-  def variants(screen), do: all_variants(screen, &layout_to_data/2)
-
-  @spec simulation_variants(Screen.t()) :: variants(simulation_data())
-  def simulation_variants(screen), do: all_variants(screen, &layout_to_simulation_data/2)
-
-  @spec select_variant(Screen.t(), options(), (Layout.t(), Screen.t() -> data)) :: data
+  @spec generate(Screen.t(), options(), (Layout.t(), Screen.t() -> data)) :: data
         when data: t() | simulation_data()
-  defp select_variant(screen, opts, then_fn) do
+  defp generate(screen, opts, then_fn) do
     update_visible_alerts_in_progress(screen, opts)
-    selected_variant = Keyword.get(opts, :generator_variant)
-
-    if Keyword.get(opts, :run_all_variants?, false) do
-      other_variants = List.delete([nil | @parameters.variants(screen)], selected_variant)
-
-      Enum.each(other_variants, fn variant ->
-        {:ok, _pid} =
-          Task.Supervisor.start_child(ParallelRunSupervisor, fn ->
-            screen |> Layout.generate(variant) |> then_fn.(screen)
-          end)
-      end)
-    end
 
     screen
-    |> Layout.generate(selected_variant)
+    |> Layout.generate()
     |> tap(&update_visible_alerts(&1, screen, opts))
     |> then_fn.(screen)
-  end
-
-  @spec all_variants(Screen.t(), (Layout.t(), Screen.t() -> data)) :: {data, %{atom() => data}}
-        when data: t() | simulation_data()
-  defp all_variants(screen, then_fn) do
-    ParallelRunSupervisor
-    |> Task.Supervisor.async_stream(
-      [nil | @parameters.variants(screen)],
-      fn variant ->
-        {variant, screen |> Layout.generate(variant) |> then_fn.(screen)}
-      end
-    )
-    |> Enum.map(fn {:ok, result} -> result end)
-    |> Enum.split(1)
-    |> then(fn {[{nil, default}], variants} -> {default, Map.new(variants)} end)
   end
 
   @spec layout_to_data(Layout.t(), Screen.t()) :: t()

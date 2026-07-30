@@ -131,12 +131,7 @@ defmodule Screens.V2.ScreenData.ParametersTest do
   describe "candidate_generator/2" do
     test "returns the candidate generator for a screen type" do
       static_params = build_params(candidate_generator: :default)
-      assert Parameters.candidate_generator(build_screen(), nil, static_params) == :default
-    end
-
-    test "returns a variant candidate generator" do
-      static_params = build_params(candidate_generator: :default, variants: %{"test" => :variant})
-      assert Parameters.candidate_generator(build_screen(), "test", static_params) == :variant
+      assert Parameters.candidate_generator(build_screen(), static_params) == :default
     end
   end
 
@@ -144,13 +139,6 @@ defmodule Screens.V2.ScreenData.ParametersTest do
     test "returns the configured refresh rate for a screen type" do
       static_params = build_params(refresh_rate: 25)
       assert Parameters.refresh_rate(build_screen(), static_params) == 25
-    end
-  end
-
-  describe "variants/1" do
-    test "returns the list of variants for a screen type" do
-      static_params = build_params(variants: %{"one" => :test1, "two" => :test2})
-      assert Parameters.variants(build_screen(), static_params) == ["one", "two"]
     end
   end
 end

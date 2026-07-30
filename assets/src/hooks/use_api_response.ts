@@ -21,12 +21,7 @@ const BASE_PATH = "/v2/api/screen";
 const MINUTE_IN_MS = 60_000;
 
 type SimulationResponse = { full_page: WidgetData; flex_zone: WidgetData[] };
-
-type DataResponse<T extends SimulationResponse | WidgetData> = {
-  data: T;
-  variants?: Record<string, T>;
-};
-
+type DataResponse<T extends SimulationResponse | WidgetData> = { data: T };
 type SimulationData = { fullPage: WidgetData; flexZone: WidgetData[] };
 
 type Success = { state: "success"; data: WidgetData };
@@ -44,34 +39,23 @@ type NonSuccess =
 
 type ApiResponse = Success | SimulationSuccess | NonSuccess;
 
-type ApiResponseWithVariants =
-  | (Success & { variants?: Record<string, WidgetData> })
-  | (SimulationSuccess & { variants?: Record<string, SimulationData> })
-  | NonSuccess;
-
 const FAILURE_RESPONSE: ApiResponse = { state: "failure" };
 const LOADING_RESPONSE: ApiResponse = { state: "loading" };
 
-const parseRawResponse = (json): ApiResponseWithVariants => {
+const parseRawResponse = (json): ApiResponse => {
   if (json.disabled) {
     return { state: "disabled" };
   } else if (json.data) {
     if ("full_page" in json.data) {
-      const { data, variants } = json as DataResponse<SimulationResponse>;
+      const { data } = json as DataResponse<SimulationResponse>;
 
       return {
         state: "simulation_success",
         data: parseSimulationResponse(data),
-        variants: Object.fromEntries(
-          Object.entries(variants ?? {}).map(([variant, data]) => [
-            variant,
-            parseSimulationResponse(data),
-          ]),
-        ),
       };
     } else {
-      const { data, variants } = json as DataResponse<WidgetData>;
-      return { state: "success", data, variants };
+      const { data } = json as DataResponse<WidgetData>;
+      return { state: "success", data };
     }
   } else {
     return { state: "failure" };
@@ -138,7 +122,6 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
       requestor: getDatasetValue("requestor"),
       rotation_index: getRotationIndex(),
       screen_side: getScreenSide(),
-      variant: getDatasetValue("variant"),
       version: getVersion(),
     };
 
@@ -219,36 +202,9 @@ const useBaseApiResponse = ({
     refreshRateOffsetMs,
   );
 
-  const variant = useInspectorVariant();
   useInspectorControls(fetchData, lastSuccess);
 
-  return {
-    apiResponse: selectVariant(apiResponse, variant),
-    requestCount,
-    lastSuccess,
-  };
-};
-
-const selectVariant = (
-  response: ApiResponseWithVariants,
-  variant: string | null,
-): ApiResponse => {
-  if (variant && isSuccess(response) && response.variants) {
-    if (variant in response.variants) {
-      // This seems like it should be replacable with a less "mutable" approach
-      // such as `return { ...response, data: response.variants[variant] }`, but
-      // the compiler can't work out that the types are compatible. Maybe check
-      // this again once we upgrade to TypeScript 5.
-      const copy = { ...response };
-      copy.data = response.variants[variant];
-      delete copy.variants;
-      return copy;
-    } else {
-      return FAILURE_RESPONSE;
-    }
-  } else {
-    return response;
-  }
+  return { apiResponse, requestCount, lastSuccess };
 };
 
 const useInspectorRateOverride = (): number | null => {
@@ -259,16 +215,6 @@ const useInspectorRateOverride = (): number | null => {
   });
 
   return override;
-};
-
-const useInspectorVariant = (): string | null => {
-  const [variant, setVariant] = useState<string | null>(null);
-
-  useReceiveFromInspector((message) => {
-    if (message.type === "set_data_variant") setVariant(message.variant);
-  });
-
-  return variant;
 };
 
 const useInspectorControls = (

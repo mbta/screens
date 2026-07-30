@@ -6,7 +6,6 @@ defmodule Screens.V2.ScreenDataTest do
   alias Screens.V2.WidgetInstance.{MockWidget, Placeholder}
   alias ScreensConfig.Screen
 
-  import ExUnit.CaptureLog
   import Screens.Inject
   import Mox
   setup :verify_on_exit!
@@ -16,7 +15,6 @@ defmodule Screens.V2.ScreenDataTest do
   require Stub
 
   Stub.candidate_generator(GrayGenerator, fn _ -> [placeholder(:gray)] end)
-  Stub.candidate_generator(GreenGenerator, fn _ -> [placeholder(:green)] end)
 
   Stub.candidate_generator(CrashGenerator, fn %Screen{app_params: %{test_pid: pid}} ->
     send(pid, {:crash_running, self()})
@@ -39,76 +37,10 @@ defmodule Screens.V2.ScreenDataTest do
     test "gets widget data for a screen" do
       screen = build_screen(%{app_id: :test_app})
 
-      expect(
-        @parameters,
-        :candidate_generator,
-        fn %Screen{app_id: :test_app}, nil -> GrayGenerator end
-      )
+      expect(@parameters, :candidate_generator, fn %Screen{app_id: :test_app} -> GrayGenerator end)
 
       assert ScreenData.get(screen) ==
                %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
-    end
-
-    test "selects a variant candidate generator" do
-      screen = build_screen(%{app_id: :test_app})
-
-      expect(
-        @parameters,
-        :candidate_generator,
-        fn %Screen{app_id: :test_app}, "test_variant" -> GrayGenerator end
-      )
-
-      assert ScreenData.get(screen, generator_variant: "test_variant") ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
-    end
-
-    test "runs all variant generators in the background" do
-      screen = build_screen(%{app_id: :test_app, app_params: %{test_pid: self()}})
-      expect(@parameters, :variants, fn %Screen{app_id: :test_app} -> ["crash"] end)
-
-      stub(
-        @parameters,
-        :candidate_generator,
-        fn
-          %Screen{app_id: :test_app}, nil -> GrayGenerator
-          %Screen{app_id: :test_app}, "crash" -> CrashGenerator
-        end
-      )
-
-      capture_log(fn ->
-        assert %{type: :normal} = ScreenData.get(screen, run_all_variants?: true)
-
-        receive do
-          {:crash_running, pid} ->
-            ref = Process.monitor(pid)
-            # Wait a bit longer than the default 100ms to avoid occasional timeouts
-            assert_receive({:DOWN, ^ref, :process, _pid, _reason}, 200)
-        end
-      end)
-    end
-  end
-
-  describe "variants/2" do
-    setup do
-      stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
-      :ok
-    end
-
-    test "gets widget data for all variants" do
-      screen = build_screen(%{app_id: :test_app})
-      expect(@parameters, :variants, fn %Screen{app_id: :test_app} -> ["green"] end)
-
-      stub(
-        @parameters,
-        :candidate_generator,
-        fn
-          %Screen{app_id: :test_app}, nil -> GrayGenerator
-          %Screen{app_id: :test_app}, "green" -> GreenGenerator
-        end
-      )
-
-      assert {%{main: %{color: :gray}}, %{"green" => %{main: %{color: :green}}}} =
-               ScreenData.variants(screen)
     end
   end
 

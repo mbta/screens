@@ -21,7 +21,4 @@
     data-screenplay-fullstory-org-id="<%= assigns[:screenplay_fullstory_org_id] %>"
   <% end %>
   data-sentry="<%= @sentry_dsn %>"
-  <%= if assigns[:variant] do %>
-    data-variant="<%= @variant %>"
-  <% end %>
 ></div>

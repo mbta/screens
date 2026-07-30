@@ -32,23 +32,13 @@ const APP_IDS = new Set(Object.keys(SCREEN_APPS));
 const MAX_SSML_BILLED_CHARS = 3000;
 const MAX_SSML_TOTAL_CHARS = 6000;
 
-const anyVariantsExist = Object.values(SCREEN_APPS).some(
-  ({ variants }) => variants.length > 0,
-);
-
-const buildIframeUrl = (
-  screen: ScreenWithId | null,
-  isSimulation: boolean,
-  isVariantEnabled: boolean,
-) => {
+const buildIframeUrl = (screen: ScreenWithId | null, isSimulation: boolean) => {
   if (screen) {
     const pathSuffix = isSimulation ? "/simulation" : "";
     const url = new URL(
       `/v2/screen/${screen.id}${pathSuffix}`,
       location.origin.toString(),
     );
-
-    if (isVariantEnabled) url.searchParams.append("variant", "all");
 
     return url.toString();
   } else {
@@ -86,9 +76,8 @@ const Inspector: ComponentType = () => {
       : null;
 
   const [isSimulation, setIsSimulation] = useState(false);
-  const [isVariantEnabled, setIsVariantEnabled] = useState(false);
 
-  const iframeUrl = buildIframeUrl(screen, isSimulation, isVariantEnabled);
+  const iframeUrl = buildIframeUrl(screen, isSimulation);
 
   const frameRef = useRef<HTMLIFrameElement>(null);
 
@@ -116,8 +105,6 @@ const Inspector: ComponentType = () => {
               reloadFrame={reloadFrame}
               isSimulation={isSimulation}
               setIsSimulation={setIsSimulation}
-              isVariantEnabled={isVariantEnabled}
-              setIsVariantEnabled={setIsVariantEnabled}
             />
 
             {screen && (
@@ -135,8 +122,6 @@ const Inspector: ComponentType = () => {
                   // Reset when the iframe reloads, since the screen will no
                   // longer be aware of previously-sent inspector messages
                   key={"data-controls-" + frameLoadedAt}
-                  isVariantEnabled={isVariantEnabled}
-                  screen={screen}
                   sendToFrame={sendToFrame}
                 />
                 <AudioControls
@@ -174,17 +159,7 @@ const ScreenSelector: ComponentType<{
   reloadFrame: () => void;
   isSimulation: boolean;
   setIsSimulation: (value: boolean) => void;
-  isVariantEnabled: boolean;
-  setIsVariantEnabled: (value: boolean) => void;
-}> = ({
-  config,
-  screen,
-  reloadFrame,
-  isSimulation,
-  setIsSimulation,
-  isVariantEnabled,
-  setIsVariantEnabled,
-}) => {
+}> = ({ config, screen, reloadFrame, isSimulation, setIsSimulation }) => {
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
 
@@ -238,17 +213,6 @@ const ScreenSelector: ComponentType<{
         />
         Screenplay simulation
       </label>
-
-      {anyVariantsExist && (
-        <label>
-          <input
-            type="checkbox"
-            checked={isVariantEnabled}
-            onChange={() => setIsVariantEnabled(!isVariantEnabled)}
-          />
-          Enable variant switcher
-        </label>
-      )}
 
       <button onClick={reloadFrame}>🔄 Reload Screen</button>
     </fieldset>
@@ -350,14 +314,11 @@ const ViewControls: ComponentType<{
 };
 
 const DataControls: ComponentType<{
-  isVariantEnabled: boolean;
-  screen: ScreenWithId;
   sendToFrame: (message: Message) => void;
-}> = ({ isVariantEnabled, screen, sendToFrame }) => {
+}> = ({ sendToFrame }) => {
   const [dataTimestamp, setDataTimestamp] = useState<number | null>(null);
   const [dataSecondsOld, setDataSecondsOld] = useState<number | null>(null);
   const [isRefreshEnabled, setIsRefreshEnabled] = useState(true);
-  const [variant, setVariant] = useState<string | null>(null);
 
   useReceiveMessage((message) => {
     if (message.type === "data_refreshed") {
@@ -378,11 +339,6 @@ const DataControls: ComponentType<{
   const updateIsRefreshEnabled = (isEnabled) => {
     setIsRefreshEnabled(isEnabled);
     sendToFrame({ type: "set_refresh_rate", ms: isEnabled ? null : 0 });
-  };
-
-  const updateVariant = (newVariant) => {
-    setVariant(newVariant);
-    sendToFrame({ type: "set_data_variant", variant: newVariant });
   };
 
   return (
@@ -409,34 +365,6 @@ const DataControls: ComponentType<{
           Enable refresh interval
         </label>
       </fieldset>
-
-      {isVariantEnabled && (
-        <fieldset>
-          <legend>Variants</legend>
-
-          <label>
-            <input
-              type="radio"
-              name="variant"
-              checked={variant === null}
-              onChange={() => updateVariant(null)}
-            />
-            Default
-          </label>
-
-          {SCREEN_APPS[screen.config.app_id].variants.map((v) => (
-            <label key={v}>
-              <input
-                type="radio"
-                name="variant"
-                checked={variant === v}
-                onChange={() => updateVariant(v)}
-              />
-              <code>{v}</code>
-            </label>
-          ))}
-        </fieldset>
-      )}
     </>
   );
 };

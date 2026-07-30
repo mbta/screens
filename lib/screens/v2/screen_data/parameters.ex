@@ -117,17 +117,10 @@ defmodule Screens.V2.ScreenData.Parameters do
   end
 
   @callback candidate_generator(Screen.t()) :: module()
-  @callback candidate_generator(Screen.t(), String.t() | nil) :: module()
-  @callback candidate_generator(Screen.t(), String.t() | nil, static_params()) :: module()
-  def candidate_generator(
-        %Screen{app_id: app_id},
-        variant \\ nil,
-        static_params \\ @static_params
-      ) do
-    case Map.fetch!(static_params, app_id) do
-      %Static{candidate_generator: default} when is_nil(variant) -> default
-      %Static{variants: %{^variant => variant}} -> variant
-    end
+  @callback candidate_generator(Screen.t(), static_params()) :: module()
+  def candidate_generator(%Screen{app_id: app_id}, static_params \\ @static_params) do
+    %Static{candidate_generator: generator} = Map.fetch!(static_params, app_id)
+    generator
   end
 
   @callback refresh_rate(Screen.t() | Screen.app_id()) :: pos_integer() | nil
@@ -140,12 +133,5 @@ defmodule Screens.V2.ScreenData.Parameters do
   def refresh_rate(app_id, static_params) do
     %Static{refresh_rate: refresh_rate} = Map.fetch!(static_params, app_id)
     refresh_rate
-  end
-
-  @callback variants(Screen.t()) :: [String.t()]
-  @callback variants(Screen.t(), static_params()) :: [String.t()]
-  def variants(%Screen{app_id: app_id}, static_params \\ @static_params) do
-    %Static{variants: variants} = Map.fetch!(static_params, app_id)
-    Map.keys(variants)
   end
 end

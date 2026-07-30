@@ -75,8 +75,7 @@ defmodule ScreensWeb.Plug.ScreenRequest do
       requestor: params["requestor"],
       rotation_index: params["rotation_index"],
       screen_id: screen_id,
-      screen_side: screen_side(app_params, params),
-      variant: params["variant"]
+      screen_side: screen_side(app_params, params)
     ]
 
     Logger.metadata(meta_base ++ meta_assigns)
