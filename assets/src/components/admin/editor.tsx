@@ -9,6 +9,7 @@ import {
   fetch,
   useModalDialog,
   useResetKey,
+  withInFlight,
 } from "Util/admin";
 
 import EditDialog from "./editor/edit_dialog";
@@ -109,19 +110,8 @@ const Editor = () => {
     resetKeyFn();
   };
 
-  const withInFlight = async (func: () => Promise<void>) => {
-    setIsLoading(true);
-    try {
-      await func();
-    } catch {
-      window.alert("Error: Request failed.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
   const reloadConfig = () => {
-    withInFlight(async () => {
+    withInFlight(setIsLoading, async () => {
       const response = await fetch.get("/api/admin");
       const config: Config = JSON.parse(response.config);
       setLocalConfig(config);
@@ -133,7 +123,7 @@ const Editor = () => {
   };
 
   const validateConfig = () => {
-    withInFlight(async () => {
+    withInFlight(setIsLoading, async () => {
       const { config } = await fetch.post("/api/admin/screens/validate", {
         config: JSON.stringify(localConfig),
       });
@@ -144,7 +134,7 @@ const Editor = () => {
   };
 
   const commitConfig = () => {
-    withInFlight(async () => {
+    withInFlight(setIsLoading, async () => {
       const { success } = await fetch.post("/api/admin/screens/confirm", {
         config: JSON.stringify(localConfig),
       });

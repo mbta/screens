@@ -25,6 +25,12 @@
         margin-right: 0.5em;
       }
     }
+
+    tbody {
+      input[type="checkbox"] {
+        width: 100%;
+      }
+    }
   }
 
   &__footer {

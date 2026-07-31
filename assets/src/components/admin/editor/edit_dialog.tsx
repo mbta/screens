@@ -27,7 +27,8 @@ const EditDialog: ComponentType<{
   return (
     <dialog className="admin-editor__dialog" onClose={onClose} ref={ref}>
       <h2>
-        Editing {entries.length} screen{entries.length === 1 ? "" : "s"}
+        Editing{" "}
+        {entries.length === 1 ? entries[0][0] : `${entries.length} screens`}
       </h2>
 
       {entries.length > 0 && (

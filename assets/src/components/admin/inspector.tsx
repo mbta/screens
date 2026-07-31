@@ -14,6 +14,7 @@ import { type AudioConfig } from "Components/screen_container";
 
 import {
   fetch,
+  withInFlight,
   SCREEN_APPS,
   type Config,
   type Screen,
@@ -49,13 +50,17 @@ const buildIframeUrl = (screen: ScreenWithId | null, isSimulation: boolean) => {
 const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
   const [frameLoadedAt, setFrameLoadedAt] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
 
-  useEffect(() => {
-    fetch
-      .get("/api/admin")
-      .then((response) => JSON.parse(response.config))
-      .then((config) => setConfig(config));
-  }, []);
+  const reloadConfig = () => {
+    withInFlight(setIsLoading, async () => {
+      const response = await fetch.get("/api/admin");
+      const config: Config = JSON.parse(response.config);
+      setConfig(config);
+    });
+  };
+
+  useEffect(reloadConfig, []);
 
   const onScreenUpdated = (screenId, newConfig) => {
     if (config) {
@@ -97,12 +102,17 @@ const Inspector: ComponentType = () => {
       <div className="inspector__controls">
         <h1>Inspector</h1>
 
+        <div>
+          <button disabled={isLoading} onClick={reloadConfig}>
+            🔄 Reload Configuration
+          </button>
+        </div>
+
         {config && (
           <>
             <ScreenSelector
               config={config}
               screen={screen}
-              reloadFrame={reloadFrame}
               isSimulation={isSimulation}
               setIsSimulation={setIsSimulation}
             />
@@ -111,6 +121,7 @@ const Inspector: ComponentType = () => {
               <>
                 <ConfigControls
                   screen={screen}
+                  isLoading={isLoading}
                   onUpdated={(config) => onScreenUpdated(screen.id, config)}
                 />
                 <ViewControls
@@ -136,7 +147,10 @@ const Inspector: ComponentType = () => {
       </div>
 
       <div className="inspector__screen">
-        <input disabled value={iframeUrl} />
+        <div className="inspector__screen__toolbar">
+          <button onClick={reloadFrame}>🔄</button>
+          <input disabled value={iframeUrl} />
+        </div>
 
         <iframe
           className={isSimulation ? "simulation" : undefined}
@@ -156,10 +170,9 @@ const Inspector: ComponentType = () => {
 const ScreenSelector: ComponentType<{
   config: Config;
   screen: ScreenWithId | null;
-  reloadFrame: () => void;
   isSimulation: boolean;
   setIsSimulation: (value: boolean) => void;
-}> = ({ config, screen, reloadFrame, isSimulation, setIsSimulation }) => {
+}> = ({ config, screen, isSimulation, setIsSimulation }) => {
   const navigate = useNavigate();
   const { pathname, search } = useLocation();
 
@@ -213,16 +226,15 @@ const ScreenSelector: ComponentType<{
         />
         Screenplay simulation
       </label>
-
-      <button onClick={reloadFrame}>🔄 Reload Screen</button>
     </fieldset>
   );
 };
 
 const ConfigControls: ComponentType<{
   screen: ScreenWithId;
+  isLoading: boolean;
   onUpdated: (newConfig: Screen) => void;
-}> = ({ screen, onUpdated }) => {
+}> = ({ screen, isLoading, onUpdated }) => {
   const [editableConfig, setEditableConfig] = useState<Screen | null>(null);
   const [isRequestingReload, setIsRequestingReload] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -232,12 +244,15 @@ const ConfigControls: ComponentType<{
     setEditableConfig(null);
   };
 
+  const isDisabled = isLoading || isRequestingReload;
+
   return (
     <fieldset>
       <legend>Configuration</legend>
 
       <div>
         <button
+          disabled={isDisabled}
           onClick={() => {
             setEditableConfig(screen.config);
             dialogRef.current?.showModal();
@@ -247,7 +262,7 @@ const ConfigControls: ComponentType<{
         </button>
 
         <button
-          disabled={isRequestingReload}
+          disabled={isDisabled}
           onClick={() => {
             setIsRequestingReload(true);
             fetch
