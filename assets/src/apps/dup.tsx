@@ -29,6 +29,7 @@ import SplitBody from "Components/dup/split_body";
 import { splitRotationFromPropNames } from "Components/dup/dup_rotation_wrapper";
 import PartialAlert from "Components/dup/partial_alert";
 import TakeoverAlert from "Components/dup/takeover_alert";
+import KenmorePartialAlert from "Components/dup/kenmore_partial_alert";
 import SimulationScreenPage from "Components/simulation_screen_page";
 import {
   BlinkConfig,
@@ -66,6 +67,7 @@ const TYPE_TO_COMPONENT = {
   evergreen_content: EvergreenContent,
   partial_alert: PartialAlert,
   takeover_alert: TakeoverAlert,
+  kenmore_partial_alert: KenmorePartialAlert,
   page_load_no_data: PageLoadNoData,
   no_data: NoData,
   departures_no_data: DeparturesNoData,

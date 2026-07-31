@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
   Its serialized data must be valid for a DUP full-screen or partial alert on the client.
   """
 
+  alias Screens.Alerts.KenmoreAlertHelper
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.{FreeText, FreeTextLine}
 
@@ -19,15 +20,42 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
           slot_names: list(WidgetInstance.slot_id()),
           widget_type: WidgetInstance.widget_type(),
           branches: list(String.t()),
-          special_case: special_case
+          special_case: special_case()
         }
 
   @type alert_id :: String.t()
-  @type special_case :: :kenmore_westbound_shuttles | :wtc_detour
+  @type special_case ::
+          :kenmore_westbound_shuttles | :kenmore_partial_branches_closed | :wtc_detour
 
   @spec serialize(t()) :: map()
   def serialize(t) do
     case t do
+      %{widget_type: :kenmore_partial_alert} ->
+        %{
+          text: %FreeTextLine{
+            icon: :check_negative,
+            text: kenmore_partial_branches_partial_text(t.branches)
+          },
+          header: %{text: "Kenmore"},
+          banner: %{
+            text: %FreeTextLine{
+              icon: :warning,
+              text: kenmore_partial_branches_banner_text()
+            },
+            color: :green
+          }
+        }
+
+      %{special_case: :kenmore_partial_branches_closed, widget_type: :takeover_alert} ->
+        %{
+          text: %FreeTextLine{
+            icon: :warning,
+            text: kenmore_partial_branches_takeover_text()
+          },
+          header: %{color: :green, text: "Kenmore"},
+          link_text: "mbta.com/greenline"
+        }
+
       %{special_case: :kenmore_westbound_shuttles, widget_type: :partial_alert} ->
         %{
           text: %FreeTextLine{
@@ -64,6 +92,37 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
         %{}
     end
   end
+
+  @spec kenmore_partial_branches_takeover_text() :: [FreeText.t()]
+  defp kenmore_partial_branches_takeover_text do
+    [
+      %{format: :bold, text: "Limited"},
+      %{route: "green"},
+      %{format: :bold, text: "service"},
+      %{special: "break"},
+      "due to maintenance"
+    ]
+  end
+
+  @spec kenmore_partial_branches_partial_text(list(String.t())) :: [FreeText.t()]
+  defp kenmore_partial_branches_partial_text([single_branch]) do
+    [
+      "Trains to",
+      %{format: :bold, text: KenmoreAlertHelper.branch_headsign(single_branch, false)}
+    ]
+  end
+
+  defp kenmore_partial_branches_partial_text([first_branch | [second_branch]]) do
+    [
+      "Trains to",
+      %{format: :bold, text: KenmoreAlertHelper.branch_headsign(first_branch, false)},
+      "and",
+      %{format: :bold, text: KenmoreAlertHelper.branch_headsign(second_branch, false)}
+    ]
+  end
+
+  @spec kenmore_partial_branches_banner_text() :: [FreeText.t()]
+  defp kenmore_partial_branches_banner_text, do: [%{format: :bold, text: "Limited Green Line"}]
 
   @spec get_kenmore_special_text(list(String.t()), atom()) :: list(FreeText.t())
   def get_kenmore_special_text(["b", "c"], :partial_alert),

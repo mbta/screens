@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
+  alias Screens.Alerts.KenmoreAlertHelper
   alias Screens.LocationContext
   alias Screens.Report
   alias Screens.Stops.Stop
@@ -161,7 +162,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
        ) do
     case stop_id do
       "place-kencl" ->
-        inside_alert = Enum.any?(alerts, &inside_alert?(&1, location_context))
+        inside_alert =
+          Enum.any?(
+            alerts,
+            &inside_alert?(&1, location_context)
+          ) and not KenmoreAlertHelper.kenmore_only_some_branches_affected?(alerts, stop_id)
+
         kenmore_special_case(alerts, inside_alert)
 
       "place-wtcst" ->
@@ -189,48 +195,76 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   defp kenmore_special_case(alerts, true), do: {:normal, alerts}
 
   defp kenmore_special_case(alerts, _inside_location) do
-    branches =
+    shuttle_branches =
       alerts
       |> Enum.filter(fn a -> a.effect === :shuttle end)
-      |> Enum.flat_map(
-        &get_branches_if_entity_matches_stop(&1, [
-          %{branch: "b", stop: "70149"},
-          %{branch: "c", stop: "70211"},
-          %{branch: "d", stop: "70187"}
-        ])
-      )
-      |> Enum.sort()
-      |> Enum.uniq()
+      |> KenmoreAlertHelper.get_branches_if_entity_matches_stop()
 
-    if length(branches) > 1 do
-      alert_ids = Enum.map(alerts, fn a -> a.id end)
+    active_branches_during_suspension =
+      alerts
+      |> Enum.filter(fn a -> a.effect === :suspension end)
+      |> KenmoreAlertHelper.reject_branches_if_entity_matches_stop()
 
-      {:special,
-       [
-         %DupSpecialCaseAlert{
-           alert_ids: alert_ids,
-           widget_type: :partial_alert,
-           slot_names: [:bottom_pane_zero],
-           branches: branches,
-           special_case: :kenmore_westbound_shuttles
-         },
-         %DupSpecialCaseAlert{
-           alert_ids: alert_ids,
-           widget_type: :takeover_alert,
-           slot_names: [:full_rotation_one],
-           branches: branches,
-           special_case: :kenmore_westbound_shuttles
-         },
-         %DupSpecialCaseAlert{
-           alert_ids: alert_ids,
-           widget_type: :partial_alert,
-           slot_names: [:bottom_pane_two],
-           branches: branches,
-           special_case: :kenmore_westbound_shuttles
-         }
-       ]}
-    else
-      {:normal, alerts}
+    alert_ids = Enum.map(alerts, fn a -> a.id end)
+
+    cond do
+      length(shuttle_branches) > 1 ->
+        {:special,
+         [
+           %DupSpecialCaseAlert{
+             alert_ids: alert_ids,
+             widget_type: :partial_alert,
+             slot_names: [:bottom_pane_zero],
+             branches: shuttle_branches,
+             special_case: :kenmore_westbound_shuttles
+           },
+           %DupSpecialCaseAlert{
+             alert_ids: alert_ids,
+             widget_type: :takeover_alert,
+             slot_names: [:full_rotation_one],
+             branches: shuttle_branches,
+             special_case: :kenmore_westbound_shuttles
+           },
+           %DupSpecialCaseAlert{
+             alert_ids: alert_ids,
+             widget_type: :partial_alert,
+             slot_names: [:bottom_pane_two],
+             branches: shuttle_branches,
+             special_case: :kenmore_westbound_shuttles
+           }
+         ]}
+
+      # Specific edge case where Kenmore becomes a terminal eastbound station for
+      # Green Line branches. Show a specific Kenmore alert that mimics a partial alert
+      # banner with specific text and a full takeover alert with specific Kenmore text
+      active_branches_during_suspension != [] ->
+        {:special,
+         [
+           %DupSpecialCaseAlert{
+             alert_ids: alert_ids,
+             widget_type: :kenmore_partial_alert,
+             slot_names: [:full_rotation_zero],
+             branches: active_branches_during_suspension,
+             special_case: :kenmore_partial_branches_closed
+           },
+           %DupSpecialCaseAlert{
+             alert_ids: alert_ids,
+             widget_type: :takeover_alert,
+             slot_names: [:full_rotation_one],
+             branches: active_branches_during_suspension,
+             special_case: :kenmore_partial_branches_closed
+           },
+           %DupSpecialCaseAlert{
+             alert_ids: alert_ids,
+             widget_type: :kenmore_partial_alert,
+             slot_names: [:full_rotation_two],
+             branches: active_branches_during_suspension,
+             special_case: :kenmore_partial_branches_closed
+           }
+         ]}
+
+      true ->
+        {:normal, alerts}
     end
   end
 
@@ -263,24 +297,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
     else
       {:normal, []}
     end
-  end
-
-  # Given an alert, see if its informed entities match a list of stops-of-interest (called stop_matchers here).
-  # If a stop matcher is found, the branch is added the the returned list.
-  @spec get_branches_if_entity_matches_stop(
-          Alert.t(),
-          list(%{branch: String.t(), stop: String.t()})
-        ) ::
-          [String.t()]
-  defp get_branches_if_entity_matches_stop(%{informed_entities: informed_entities}, stop_matchers) do
-    stop_matchers
-    |> Enum.filter(fn stop_matcher ->
-      Enum.any?(informed_entities, fn
-        %{stop: %{id: stop_id}} -> stop_matcher.stop === stop_id
-        %{stop: nil} -> false
-      end)
-    end)
-    |> Enum.map(&Map.get(&1, :branch))
   end
 
   for {effect, key} <- Enum.with_index([:shuttle, :suspension, :station_closure, :detour, :delay]) do

@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
+  alias Screens.Alerts.KenmoreAlertHelper
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.{Stop, Subway}
@@ -443,17 +444,34 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp placement(
          %__MODULE__{
+           alert: alert,
            is_terminal_station: is_terminal_station,
-           screen: %Screen{app_params: %PreFare{departures: departures, template: template}}
+           screen: %Screen{
+             app_params: %PreFare{
+               departures: departures,
+               template: template,
+               reconstructed_alert_widget: %{stop_id: stop_id}
+             }
+           }
          } = t
        ) do
     has_departures = match?(%Departures{sections: [_ | _]}, departures)
     has_cr_departures = departures_contains_commuter_rail?(departures)
+
+    kenmore_only_some_branches_affected =
+      KenmoreAlertHelper.kenmore_only_some_branches_affected?([alert], stop_id)
+
     location = LocalizedAlert.location(t, is_terminal_station)
 
     t
     |> base_placement(location)
-    |> adjust_placement(location, template, has_departures, has_cr_departures)
+    |> adjust_placement(
+      location,
+      template,
+      has_departures,
+      has_cr_departures,
+      kenmore_only_some_branches_affected
+    )
   end
 
   defp base_placement(
@@ -481,15 +499,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp base_placement(%__MODULE__{}, _location), do: :flex_zone
 
   # When departures are enabled, downgrade single-screen takeovers to the flex zone
-  # But when CR departures are enabled, maintain level of single-screen takeovers
-  defp adjust_placement(:single_screen, _location, :duo, true, false), do: :flex_zone
-  defp adjust_placement(placement, _location, :duo, _has_departures, _has_cr), do: placement
+  # But when CR departures are enabled, maintain level of single-screen takeovers:takeovers#
+  # Kenmore special case also change a full "closure" just into a flex zone alert
+  defp adjust_placement(:dual_screen, _location, :duo, _, _, true), do: :flex_zone
+  defp adjust_placement(:single_screen, _location, :duo, true, false, _), do: :flex_zone
+  defp adjust_placement(placement, _location, :duo, _has_departures, _has_cr, _), do: placement
 
   # "Downgrade" placement by one level for solo screens, with some exceptions.
-  defp adjust_placement(:dual_screen, _location, :solo, _, _), do: :single_screen
-  defp adjust_placement(:single_screen, :inside, :solo, _, _), do: :single_screen
-  defp adjust_placement(:single_screen, _location, :solo, _, _), do: :flex_zone
-  defp adjust_placement(:flex_zone, _location, :solo, _, _), do: :flex_zone
+  defp adjust_placement(:dual_screen, _location, :solo, _, _, false), do: :single_screen
+  defp adjust_placement(:dual_screen, _location, :solo, _, _, true), do: :flex_zone
+  defp adjust_placement(:single_screen, :inside, :solo, _, _, _), do: :single_screen
+  defp adjust_placement(:single_screen, _location, :solo, _, _, _), do: :flex_zone
+  defp adjust_placement(:flex_zone, _location, :solo, _, _, _), do: :flex_zone
 
   @spec evergreen_content_for_alert?(integer(), [EvergreenContentItem.t()]) :: boolean()
   defp evergreen_content_for_alert?(alert_id, evergreen_content) do
@@ -1039,12 +1060,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   defp flex_zone_fields(%__MODULE__{alert: %Alert{effect: effect}} = t, location)
        when location in ~w[inside boundary_upstream boundary_downstream]a and
               effect in ~w[delay shuttle suspension]a do
-    %__MODULE__{alert: %Alert{} = alert} = t
+    %__MODULE__{
+      alert: %Alert{} = alert,
+      screen: %Screen{app_params: %PreFare{reconstructed_alert_widget: %{stop_id: stop_id}}}
+    } = t
 
     affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
     is_urgent = urgent?(t, location)
 
-    if length(affected_routes) > 1 do
+    kenmore_only_some_branches_affected =
+      KenmoreAlertHelper.kenmore_only_some_branches_affected?([alert], stop_id)
+
+    if length(affected_routes) > 1 or kenmore_only_some_branches_affected do
       flex_zone_fallback_fields(t, location, is_urgent)
     else
       destination = get_destination(t, location)

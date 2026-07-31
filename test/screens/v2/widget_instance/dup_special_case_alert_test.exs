@@ -391,6 +391,59 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           url: nil
         }
 
+      # WB B / C with Kenmore inside but D branch is still running
+      kenmore_suspension_alerts =
+        [
+          %Screens.Alerts.Alert{
+            active_period: [{~U[2023-04-14 10:53:53Z], ~U[2023-04-14 21:53:59Z]}],
+            cause: :unknown,
+            created_at: ~U[2023-04-14 10:53:54Z],
+            description:
+              "Affected stops:\r\nHynes\r\nKenmore\r\nBlandford Street\r\nSaint Mary's Street\r\nFenway",
+            effect: :suspension,
+            header: "Shuttle buses replacing Green Line service",
+            id: "137273",
+            informed_entities: [
+              ie(stop_id: "70211", route: "Green-C", route_type: 0),
+              ie(stop_id: "place-kencl", route: "Green-B", route_type: 0),
+              ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
+              ie(stop_id: "place-kencl", route: "Green-D", route_type: 0),
+              ie(stop_id: "place-hymnl", route: "Green-B", route_type: 0),
+              ie(stop_id: "place-hymnl", route: "Green-C", route_type: 0),
+              ie(stop_id: "place-hymnl", route: "Green-D", route_type: 0)
+            ],
+            lifecycle: "NEW",
+            severity: 7,
+            timeframe: nil,
+            updated_at: ~U[2023-04-14 19:53:54Z],
+            url: nil
+          },
+          %Screens.Alerts.Alert{
+            active_period: [{~U[2023-04-14 10:53:53Z], ~U[2023-04-14 21:53:59Z]}],
+            cause: :unknown,
+            created_at: ~U[2023-04-14 10:53:54Z],
+            description:
+              "Affected stops:\r\nHynes\r\nKenmore\r\nBlandford Street\r\nSaint Mary's Street\r\nFenway",
+            effect: :suspension,
+            header: "Shuttle buses replacing Green Line service",
+            id: "137274",
+            informed_entities: [
+              ie(stop_id: "70149", route: "Green-B", route_type: 0),
+              ie(stop_id: "place-kencl", route: "Green-B", route_type: 0),
+              ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
+              ie(stop_id: "place-kencl", route: "Green-D", route_type: 0),
+              ie(stop_id: "place-hymnl", route: "Green-B", route_type: 0),
+              ie(stop_id: "place-hymnl", route: "Green-C", route_type: 0),
+              ie(stop_id: "place-hymnl", route: "Green-D", route_type: 0)
+            ],
+            lifecycle: "NEW",
+            severity: 7,
+            timeframe: nil,
+            updated_at: ~U[2023-04-14 19:53:54Z],
+            url: nil
+          }
+        ]
+
       wtc_alerts = [
         %Screens.Alerts.Alert{
           active_period: [{~U[2023-04-14 10:48:05Z], ~U[2023-04-14 16:53:05Z]}],
@@ -442,6 +495,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
         fetch_stop_name_fn: fn _ -> "Test" end,
         kenmore_alerts: kenmore_alerts,
         kenmore_inside_alert: kenmore_inside_alert,
+        kenmore_suspension_alerts: kenmore_suspension_alerts,
         wtc_alerts: wtc_alerts
       }
     end
@@ -670,6 +724,40 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
       actual_widgets = DupAlerts.alert_instances(context.config_kenmore, context.now)
 
       assert Enum.all?(actual_widgets, &match?(%DupAlert{}, &1))
+    end
+
+    test "serialize DupAlert for alerts inside Kenmore but D line is still running", context do
+      alerts = context.kenmore_suspension_alerts
+
+      expect_alerts(["Green-B", "Green-C", "Green-D"], alerts)
+
+      expected_widgets = [
+        %Screens.V2.WidgetInstance.DupSpecialCaseAlert{
+          alert_ids: ["137273", "137274"],
+          slot_names: [:full_rotation_zero],
+          widget_type: :kenmore_partial_alert,
+          special_case: :kenmore_partial_branches_closed,
+          branches: ["d"]
+        },
+        %Screens.V2.WidgetInstance.DupSpecialCaseAlert{
+          alert_ids: ["137273", "137274"],
+          slot_names: [:full_rotation_one],
+          widget_type: :takeover_alert,
+          special_case: :kenmore_partial_branches_closed,
+          branches: ["d"]
+        },
+        %Screens.V2.WidgetInstance.DupSpecialCaseAlert{
+          alert_ids: ["137273", "137274"],
+          slot_names: [:full_rotation_two],
+          widget_type: :kenmore_partial_alert,
+          special_case: :kenmore_partial_branches_closed,
+          branches: ["d"]
+        }
+      ]
+
+      actual_widgets = DupAlerts.alert_instances(context.config_kenmore, context.now)
+
+      assert actual_widgets == expected_widgets
     end
 
     test "serializes WTC special case: WTC is detoured", context do

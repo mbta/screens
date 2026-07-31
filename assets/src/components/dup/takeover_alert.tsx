@@ -10,10 +10,11 @@ interface TakeoverAlertProps {
     text: string;
     color: string;
   };
+  link_text?: string;
 }
 
 const TakeoverAlert = (alert: TakeoverAlertProps) => {
-  const { text, remedy, header } = alert;
+  const { text, remedy, header, link_text: linkText } = alert;
 
   return (
     <>
@@ -24,13 +25,15 @@ const TakeoverAlert = (alert: TakeoverAlertProps) => {
       />
       <div className="full-screen-alert__body">
         <div className="full-screen-alert__body-text">
-          <FreeText lines={[text, remedy]} />
+          <FreeText lines={remedy ? [text, remedy] : [text]}></FreeText>
         </div>
         <div className="full-screen-alert__link">
           <div className="full-screen-alert__link-arrow">
             <LinkArrow width={628} colorHex="#64696e" />
           </div>
-          <div className="full-screen-alert__link-text">mbta.com/alerts</div>
+          <div className="full-screen-alert__link-text">
+            {linkText ? linkText : "mbta.com/alerts"}
+          </div>
         </div>
       </div>
     </>

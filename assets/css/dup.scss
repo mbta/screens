@@ -9,6 +9,7 @@
 
 @use "dup/alert/full_screen_alert";
 @use "dup/alert/partial_alert";
+@use "dup/alert/kenmore_partial_alert";
 @use "dup/body/normal" as *;
 @use "dup/body/split";
 @use "dup/debug";
