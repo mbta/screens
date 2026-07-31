@@ -9,7 +9,6 @@ import {
   Outlet,
 } from "react-router";
 
-import AdminScreenConfigForm from "Components/admin/admin_screen_config_form";
 import Editor from "Components/admin/editor";
 import ImageManager from "Components/admin/admin_image_manager";
 import Inspector from "Components/admin/inspector";
@@ -18,7 +17,6 @@ import Tools from "Components/admin/tools";
 const routes: [string | undefined, string, ComponentType][] = [
   ["inspector", "🔍 Inspector", Inspector],
   [undefined, "📋 Screens Table", Editor],
-  ["screens-json-editor", "📝 JSON Editor", AdminScreenConfigForm],
   ["image-manager", "🏞️ Image Manager", ImageManager],
   ["tools", "🛠️ Tools", Tools],
 ];
