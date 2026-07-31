@@ -37,7 +37,6 @@ config :screens, :screens_by_alert, cache_module: Screens.ScreensByAlert.Memcach
 config :screens, Screens.ScreensByAlert.SelfRefreshRunner, concurrency: 2
 
 config :screens, Screens.Repo,
-  database: "screens",
   ssl: true,
   show_sensitive_data_on_connection_error: false,
   configure: {Screens.Repo, :add_prod_credentials, []}

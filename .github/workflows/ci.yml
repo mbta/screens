@@ -24,7 +24,6 @@ jobs:
     name: Build and Test Elixir
     runs-on: ubuntu-latest
     env:
-      MIX_ENV: test
       DATABASE_PASSWORD: postgres
       DATABASE_USER: postgres
       DATABASE_NAME: screens_test

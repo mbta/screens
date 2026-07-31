@@ -14,8 +14,6 @@ export API_V3_URL="https://api-v3.mbta.com"
 
 export SECRET_KEY_BASE="local_secret_key_base_at_least_64_bytes_________________________________"
 
-## Postgres configuration: username, password, and hostname
-## * Your local Postgres server should go here
+## Postgres configuration: username and password for local server
 # export DATABASE_USER=
 # export DATABASE_PASSWORD=
-export DATABASE_HOST="localhost"

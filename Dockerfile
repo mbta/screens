@@ -13,7 +13,6 @@ WORKDIR /root
 ADD . .
 
 RUN apk add --update git make
-
 RUN mix do local.hex --force, local.rebar --force
 RUN mix do deps.get --only prod
 
@@ -36,7 +35,7 @@ RUN npm --prefix assets run deploy
 
 FROM elixir-builder AS app-builder
 
-RUN apk add --no-cache --update curl
+RUN apk add --update curl
 
 ENV MIX_ENV="prod"
 WORKDIR /root

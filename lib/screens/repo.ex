@@ -6,17 +6,11 @@ defmodule Screens.Repo do
     adapter: Ecto.Adapters.Postgres
 
   def add_prod_credentials(config, auth_token_fn \\ &ExAws.RDS.generate_db_auth_token/4) do
-    host = System.get_env("DATABASE_HOST")
+    host = System.fetch_env!("DATABASE_HOST")
+    user = System.fetch_env!("DATABASE_USER")
     port = String.to_integer(System.get_env("DATABASE_PORT", "5432"))
-    user = System.get_env("DATABASE_USER")
 
-    token =
-      auth_token_fn.(
-        host,
-        user,
-        port,
-        %{}
-      )
+    token = auth_token_fn.(host, user, port, %{})
 
     if is_nil(token) do
       Logger.info("#{__MODULE__} add_prod_credentials token_is_nil")
