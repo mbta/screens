@@ -27,6 +27,7 @@ const Table: ComponentType<{
   appIdFilter: AppId | null;
   changedIDs: Set<string>;
   dataKey: Key;
+  deletedIDs: Set<string>;
   isLoading: boolean;
   localConfig: Config;
   newIDs: Set<string>;
@@ -38,6 +39,7 @@ const Table: ComponentType<{
   appIdFilter,
   changedIDs,
   dataKey,
+  deletedIDs,
   isLoading,
   localConfig,
   newIDs,
@@ -96,12 +98,13 @@ const Table: ComponentType<{
       visible: visibleIDs.size,
       changed: changedIDs.size,
       new: newIDs.size,
+      deleted: deletedIDs.size,
       selected: selectedIDs.size,
       visibleChanged: visibleIDs.intersection(changedIDs).size,
       visibleNew: visibleIDs.intersection(newIDs).size,
       visibleSelected: visibleIDs.intersection(selectedIDs).size,
     };
-  }, [localConfig, changedIDs, newIDs, selectedIDs, visibleIDs]);
+  }, [localConfig, changedIDs, newIDs, deletedIDs, selectedIDs, visibleIDs]);
 
   return (
     <table>
@@ -160,10 +163,15 @@ const Table: ComponentType<{
 
                   {counts.new > 0 && (
                     <span>
+                      ✴️
                       {counts.new !== counts.visibleNew &&
                         `${counts.visibleNew} of`}{" "}
                       {counts.new} new
                     </span>
+                  )}
+
+                  {counts.deleted > 0 && (
+                    <span>❌ {counts.deleted} deleted</span>
                   )}
 
                   {isFiltered && (
