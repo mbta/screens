@@ -24,26 +24,33 @@ env:
   DATABASE_HOST: localhost
 
 jobs:
-  build-elixir:
+  ex-build-test:
     name: Build and Test Elixir
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:18-bookworm
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_PASSWORD: ${{env.DATABASE_PASSWORD}}
-          POSTGRES_USER: ${{env.DATABASE_USER}}
-          POSTGRES_DB: ${{env.DATABASE_NAME}}
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+      - name: Build Postgres image
+        run: docker build --file .github/deps/postgres.Dockerfile --tag screens-postgres:ci .
+      - name: Start Postgres container
+        run: |
+          docker run --name screens-postgres --detach \
+            --publish 5432:5432 \
+            --env POSTGRES_PASSWORD="${DATABASE_PASSWORD}" \
+            --env POSTGRES_USER="${DATABASE_USER}" \
+            --env POSTGRES_DB="${DATABASE_NAME}" \
+            --health-cmd pg_isready \
+            --health-interval 10s \
+            --health-timeout 5s \
+            --health-retries 5 \
+            screens-postgres:ci
       - uses: ./.github/actions/setup
-      - run: mix compile --warnings-as-errors
-    
+      - name: Elixir Compile (warnings as errors)
+        run: mix compile --warnings-as-errors
+      - name: Elixir Tests
+        run: mix test
+
   ex-credo:
     name: Elixir Credo
     runs-on: ubuntu-latest
@@ -73,26 +80,6 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
       - run: mix format --check-formatted
-
-  ex-tests:
-    name: Elixir Tests
-    runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:18-bookworm
-        ports:
-          - 5432:5432
-        env:
-          POSTGRES_PASSWORD: ${{env.DATABASE_PASSWORD}}
-          POSTGRES_USER: ${{env.DATABASE_USER}}
-          POSTGRES_DB: ${{env.DATABASE_NAME}}
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          persist-credentials: false
-      - uses: ./.github/actions/setup
-      - run: mix test
 
   js-build:
     name: Frontend Build

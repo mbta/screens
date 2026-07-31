@@ -1,0 +1,1 @@
+FROM postgres:18-bookworm@sha256:f4a8c7d23153f3593cb5159ec65a028e36f358ba980e05c741dc06fcd3e5acee
