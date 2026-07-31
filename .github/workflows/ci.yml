@@ -18,19 +18,18 @@ concurrency:
 
 env:
   MIX_ENV: test
+  DATABASE_PASSWORD: postgres
+  DATABASE_USER: postgres
+  DATABASE_NAME: screens_test
+  DATABASE_HOST: localhost
 
 jobs:
   build-elixir:
     name: Build and Test Elixir
     runs-on: ubuntu-latest
-    env:
-      DATABASE_PASSWORD: postgres
-      DATABASE_USER: postgres
-      DATABASE_NAME: screens_test
-      DATABASE_HOST: localhost
     services:
       postgres:
-        image: postgres@sha256:1961f96e6029a02c3812d7cb329a3b03a3ac2bb067058dec17b0f5596aca9296
+        image: postgres:18-bookworm
         ports:
           - 5432:5432
         env:
@@ -43,10 +42,21 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - name: Elixir Compile (warnings as errors)
-        run: mix compile --warnings-as-errors
-      - name: Elixir Tests
-        run: mix test
+      - parallel:
+          - name: Elixir Compile (warnings as errors)
+            env:
+              MIX_BUILD_PATH: _build/ci_compile
+              MIX_DEPS_PATH: deps/ci_compile
+            run: |
+              mix deps.get
+              mix compile --warnings-as-errors
+          - name: Elixir Tests
+            env:
+              MIX_BUILD_PATH: _build/ci_test
+              MIX_DEPS_PATH: deps/ci_test
+            run: |
+              mix deps.get
+              mix test
 
   ex-credo:
     name: Elixir Credo
