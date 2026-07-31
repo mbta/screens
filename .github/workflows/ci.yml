@@ -42,22 +42,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./.github/actions/setup
-      - parallel:
-          - name: Elixir Compile (warnings as errors)
-            env:
-              MIX_BUILD_PATH: _build/ci_compile
-              MIX_DEPS_PATH: deps/ci_compile
-            run: |
-              mix deps.get
-              mix compile --warnings-as-errors
-          - name: Elixir Tests
-            env:
-              MIX_BUILD_PATH: _build/ci_test
-              MIX_DEPS_PATH: deps/ci_test
-            run: |
-              mix deps.get
-              mix test
-
+      - run: mix compile --warnings-as-errors
+    
   ex-credo:
     name: Elixir Credo
     runs-on: ubuntu-latest
@@ -87,6 +73,26 @@ jobs:
           persist-credentials: false
       - uses: ./.github/actions/setup
       - run: mix format --check-formatted
+
+  ex-tests:
+    name: Elixir Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:18-bookworm
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_PASSWORD: ${{env.DATABASE_PASSWORD}}
+          POSTGRES_USER: ${{env.DATABASE_USER}}
+          POSTGRES_DB: ${{env.DATABASE_NAME}}
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: ./.github/actions/setup
+      - run: mix test
 
   js-build:
     name: Frontend Build
