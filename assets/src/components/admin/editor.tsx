@@ -22,6 +22,18 @@ const appIdFilters: { id: AppId | null; name: string }[] = [
   ...SCREEN_APP_ENTRIES.map(([id, { name }]) => ({ id, name })),
 ];
 
+const confirmScreenDeletion = (ids: Set<string>): boolean =>
+  window.confirm(
+    `This will permanently delete the following screens:
+
+${Array.from(ids)
+  .sort()
+  .map((id) => `❌ ${id}`)
+  .join("\n")}
+
+This is not easily undone and may break live screens if done in production. Really commit this change?`.trim(),
+  );
+
 const Editor = () => {
   const [didInitialize, setDidInitialize] = useState(false);
   const [isAddingScreen, setIsAddingScreen] = useState(false);
@@ -51,6 +63,14 @@ const Editor = () => {
     [remoteConfig, localConfig],
   );
 
+  const deletedIDs = useMemo(
+    () =>
+      new Set(Object.keys(remoteConfig.screens)).difference(
+        new Set(Object.keys(localConfig.screens)),
+      ),
+    [remoteConfig, localConfig],
+  );
+
   const changedIDs = useMemo(
     () =>
       new Set(
@@ -64,7 +84,7 @@ const Editor = () => {
     [localConfig, remoteConfig, newIDs],
   );
 
-  const isChanged = changedIDs.size > 0 || newIDs.size > 0;
+  const isChanged = changedIDs.size + newIDs.size + deletedIDs.size > 0;
 
   const navBlocker = useBlocker(isChanged);
 
@@ -75,6 +95,15 @@ const Editor = () => {
     setLocalConfig({
       ...localConfig,
       screens: { ...localConfig.screens, ...screens },
+    });
+    setIsCommitReady(false);
+    resetKeyFn();
+  };
+
+  const deleteScreens = (ids: string[], resetKeyFn: () => void = () => {}) => {
+    setLocalConfig({
+      ...localConfig,
+      screens: _.omit(ids, localConfig.screens),
     });
     setIsCommitReady(false);
     resetKeyFn();
@@ -191,6 +220,7 @@ const Editor = () => {
           appIdFilter={appIdFilter}
           changedIDs={changedIDs}
           dataKey={tableDataKey}
+          deletedIDs={deletedIDs}
           isLoading={isLoading}
           localConfig={localConfig}
           newIDs={newIDs}
@@ -211,8 +241,25 @@ const Editor = () => {
           🔹 Edit selected
         </button>
 
+        <button
+          disabled={selectedIDs.size === 0}
+          onClick={() => {
+            deleteScreens(Array.from(selectedIDs), resetTableDataKey);
+            setSelectedIDs(new Set());
+          }}
+        >
+          ❌ Delete selected
+        </button>
+
         {isCommitReady ? (
-          <button disabled={isLoading} onClick={commitConfig}>
+          <button
+            disabled={isLoading}
+            onClick={() => {
+              if (deletedIDs.size === 0 || confirmScreenDeletion(deletedIDs)) {
+                commitConfig();
+              }
+            }}
+          >
             ✅ Commit changes
           </button>
         ) : (
