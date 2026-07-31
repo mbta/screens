@@ -144,6 +144,22 @@ export const useResetKey = (): [Key, () => void] => {
 };
 
 /**
+ * Calls an async function and sets a state value according to whether the
+ * function is "in flight" (has not yet resolved).
+ */
+export const withInFlight = async (
+  setFn: (isInFlight: boolean) => void,
+  requestFn: () => Promise<void>,
+) => {
+  setFn(true);
+  try {
+    await requestFn();
+  } finally {
+    setFn(false);
+  }
+};
+
+/**
  * Set of attributes for forms and form elements which disable "auto" browser
  * behaviors like autocomplete and spell check.
  */

@@ -71,6 +71,15 @@
   gap: 0.5em;
   margin-top: 0.5em;
 
+  &__toolbar {
+    display: flex;
+    gap: 0.5em;
+
+    input {
+      flex-grow: 1;
+    }
+  }
+
   iframe {
     width: 100%;
     border: 0;
