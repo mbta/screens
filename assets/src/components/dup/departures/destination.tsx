@@ -107,24 +107,79 @@ export const nextSizingState = (
   }
 };
 
-const RenderedDestination = ({ parts, index1, index2, classModifier }) => {
+type PageContentAndSplitIndices = {
+  entireMessageByWord: string[];
+  firstLineEndIndex: number;
+  secondLineEndIndex: number;
+};
+
+/**
+ * For single headsign's content, chunk it into one or two pages.
+ *
+ * When two pages of content are returned, an ellipsis will be added to:
+ * 1. The end of the first page
+ * 2. The start of the second page
+ * 3. The end of the second page, if the message does not wholly fit on 2 pages
+ */
+export const buildPageContent = ({
+  entireMessageByWord,
+  firstLineEndIndex,
+  secondLineEndIndex,
+}: PageContentAndSplitIndices): ReadonlyArray<string> => {
+  if (firstLineEndIndex === entireMessageByWord.length) {
+    return [entireMessageByWord.join(" ")];
+  } else {
+    const firstPage = entireMessageByWord.slice(0, firstLineEndIndex).join(" ");
+
+    let secondPage = entireMessageByWord
+      .slice(firstLineEndIndex, secondLineEndIndex)
+      .join(" ")
+      .trimEnd();
+
+    let lastUsedSecondPageIndex = secondLineEndIndex;
+    if (
+      secondPage.trim() === "v/" &&
+      lastUsedSecondPageIndex <= entireMessageByWord.length - 1
+    ) {
+      // Pull the next word into the second page, allow CSS to handle overflow
+      secondPage += ` ${entireMessageByWord[lastUsedSecondPageIndex].trim()}`;
+      lastUsedSecondPageIndex += 1;
+    }
+
+    if (secondPage === "") {
+      return [firstPage];
+    } else {
+      secondPage =
+        lastUsedSecondPageIndex === entireMessageByWord.length
+          ? secondPage
+          : secondPage + "…";
+      return [firstPage + "…", "…" + secondPage];
+    }
+  }
+};
+
+type RenderedDestinationProps = {
+  pageContent: ReadonlyArray<string>;
+  classModifier: string;
+};
+
+const RenderedDestination: ComponentType<RenderedDestinationProps> = ({
+  pageContent,
+  classModifier,
+}) => {
   const currentPage = useCurrentPage();
 
-  let pageContent: string;
+  let currentContent: string;
 
-  if (index1 === parts.length) {
-    pageContent = parts.join(" ");
+  if (pageContent.length === 1) {
+    currentContent = pageContent[0];
   } else {
-    const pages = [
-      parts.slice(0, index1).join(" ") + "…",
-      "…" + parts.slice(index1, index2).join(" "),
-    ];
-    pageContent = pages[currentPage];
+    currentContent = pageContent[currentPage];
   }
 
   return (
     <div className={classWithModifier("departure-destination", classModifier)}>
-      <div className="departure-destination__headsign">{pageContent}</div>
+      <div className="departure-destination__headsign">{currentContent}</div>
     </div>
   );
 };
@@ -186,11 +241,14 @@ const Destination: ComponentType<DupDestination> = ({
 
   // Render paged version when done determining breaks
   if (phase === PHASES.Done) {
+    const pageContent = buildPageContent({
+      entireMessageByWord: parts,
+      firstLineEndIndex: partsIndex1,
+      secondLineEndIndex: partsIndex2,
+    });
     return (
       <RenderedDestination
-        index1={partsIndex1}
-        index2={partsIndex2}
-        parts={parts}
+        pageContent={pageContent}
         classModifier={classModifier}
       />
     );

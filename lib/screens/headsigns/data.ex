@@ -11,6 +11,7 @@ defmodule Screens.Headsigns.Data do
   See the generate_headsign_abbreviations.exs script to see how to generate this data in bulk.
   """
 
+  # TODO(NOW): Update the Notion document with the changes here
   @headsign_abbreviations %{
     "Allston Street" => ["Allston Street", "Allston St"],
     "Babcock Street" => ["Babcock Street", "Babcock St"],
@@ -54,15 +55,21 @@ defmodule Screens.Headsigns.Data do
     "Harvard Avenue" => ["Harvard Avenue", "Harvard Ave"],
     "Hawes Street" => ["Hawes Street", "Hawes St"],
     "Heath Street" => ["Heath Street", "Heath St"],
-    "Houghs Neck via Germantown" => ["Houghs Neck via Germntwn"],
-    "Houghs Neck via McGrath & Germantown" => ["Houghs Neck via McGth & Gtwn"],
+    "Houghs Neck via Germantown" => ["Houghs Neck via Germntwn", "Houghs Neck v/ Germntwn"],
+    "Houghs Neck via McGrath & Germantown" => [
+      "Houghs Neck via McGth & Gtwn",
+      "Houghs Neck v/ McGth & Gtwn"
+    ],
     "Hynes Convention Center" => ["Hynes Convention Center", "Hynes"],
     "Jackson Square" => ["Jackson Sq"],
     "Kent Street" => ["Kent Street", "Kent St"],
     "Longwood Medical Area" => ["Longwood Medical Area", "Longwood Med", "Lngwd Med"],
     "Magoun Square" => ["Magoun Square", "Magoun Sq"],
     "Malden Center" => ["Malden Center", "Malden Ctr"],
-    "Malden via Square One Mall & Kennedy Dr" => ["Malden via Square One Mall & Kndy Dr"],
+    "Malden via Square One Mall & Kennedy Dr" => [
+      "Malden via Square One Mall & Kndy Dr",
+      "Malden v/ Square One Mall & Kndy Dr"
+    ],
     "Massachusetts Avenue" => ["Mass Ave"],
     "Medford/Tufts" => ["Medford/Tufts", "Medfd/Tufts"],
     "Mission Park" => ["Mission Park", "Mission Pk"],
@@ -82,7 +89,10 @@ defmodule Screens.Headsigns.Data do
     "Roxbury Crossing" => ["Roxbury Crossing", "Roxbury Xng"],
     "Saint Mary's Street" => ["St. Mary's Street", "St. Mary's St", "St. Mary's"],
     "Saint Paul Street" => ["St. Paul Street", "St. Paul St"],
-    "Saugus Center via Kennedy Dr & Square One Mall" => ["Saugus Center via Kndy Dr & Square One"],
+    "Saugus Center via Kennedy Dr & Square One Mall" => [
+      "Saugus Center via Kndy Dr & Square One",
+      "Saugus Center v/ Kndy Dr & Square One"
+    ],
     "Science Park/West End" => ["Science Park/West End", "Science Park", "Science Pk"],
     "Silver Line Way" => ["Silver Line Way"],
     "South Station" => ["South Station", "South Sta"],
@@ -100,7 +110,10 @@ defmodule Screens.Headsigns.Data do
     "Washington Street" => ["Washington Street", "Washington St", "Wshngtn St"],
     "Washington St & Pleasant St Weymouth" => ["Washington St & Plsnt St Weymouth"],
     "Wickford Junction" => ["Wickford Junction", "Wickford Jct"],
-    "Woodland Rd via Gateway Center" => ["Woodland Rd via Gatew'y Center"],
+    "Woodland Rd via Gateway Center" => [
+      "Woodland Rd via Gatew'y Center",
+      "Woodland Rd v/ Gatew'y Center"
+    ],
     "Worcester Square" => ["Worcester Square", "Worcester Sq"],
     "World Trade Center" => ["World Trade Center", "World Trade Ctr"]
   }
@@ -114,6 +127,7 @@ defmodule Screens.Headsigns.Data do
     "College" => "Coll",
     "Corner" => "Cn",
     "Court" => "Ct",
+    "Depot" => "Dpt",
     "Drive" => "Dr",
     "East" => "E",
     "Express" => "Exp",
@@ -134,6 +148,7 @@ defmodule Screens.Headsigns.Data do
     "Station" => "Stn",
     "Street" => "St",
     "Terrace" => "Ter",
+    "via" => "v/",
     "Village" => "Vill",
     "Washington" => "Wash",
     "Way" => "Wy",
