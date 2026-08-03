@@ -4,6 +4,12 @@
 # remember to add this file to your .gitignore.
 import Config
 
+config :screens, Screens.Repo,
+  username: System.fetch_env!("DATABASE_USER"),
+  password: System.get_env("DATABASE_PASSWORD"),
+  hostname: System.get_env("DATABASE_HOST", "localhost"),
+  port: System.get_env("DATABASE_PORT", "5432") |> String.to_integer()
+
 unless config_env() == :test do
   config :screens,
     api_v3_url: System.get_env("API_V3_URL", "https://api-v3.mbta.com/"),
