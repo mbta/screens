@@ -9,8 +9,6 @@ ARG NODE_VERSION=22.18.0
 FROM hexpm/elixir:${ELIXIR_VERSION}-erlang-${ERLANG_VERSION}-alpine-${ALPINE_VERSION} AS elixir-builder
 
 ENV MIX_ENV="prod"
-ENV DATABASE_USER=""
-ENV DATABASE_PASSWORD=""
 WORKDIR /root
 ADD . .
 
