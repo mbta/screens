@@ -1,6 +1,11 @@
 name: Setup
 description: Installs tools and dependencies
 
+env:
+  # Placeholder values for database credentials
+  DATABASE_PASSWORD: postgres
+  DATABASE_USER: postgres
+
 runs:
   using: composite
   steps:
