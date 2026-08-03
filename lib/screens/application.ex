@@ -9,6 +9,8 @@ defmodule Screens.Application do
     # List all child processes to be supervised
     children =
       [
+        Screens.Repo,
+        Screens.Migrate,
         {DNSCluster, query: Application.get_env(:screens, :dns_cluster_query, :ignore)},
         {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
         {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},

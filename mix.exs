@@ -45,7 +45,10 @@ defmodule Screens.MixProject do
 
   defp aliases do
     [
-      "credo.ci": "credo --strict --checks-without-tag formatter"
+      "credo.ci": "credo --strict --checks-without-tag formatter",
+      test: ["ecto.setup --quiet", "test"],
+      "ecto.setup": ["ecto.create", "ecto.migrate"],
+      "ecto.reset": ["ecto.drop", "ecto.setup"]
     ]
   end
 
@@ -57,8 +60,10 @@ defmodule Screens.MixProject do
       {:aja, "~> 0.7.0"},
       {:corsica, "~> 2.1"},
       {:dns_cluster, "~> 0.2.0"},
+      {:ecto_sql, "~> 3.12"},
       {:ex_aws, "~> 2.1"},
       {:ex_aws_polly, "~> 0.5.0"},
+      {:ex_aws_rds, "~> 2.0.2"},
       {:ex_aws_s3, "~> 2.1"},
       {:ex_cldr_messages, "~> 2.0"},
       {:gettext, "~> 0.26.1"},
@@ -75,6 +80,7 @@ defmodule Screens.MixProject do
       {:phoenix_pubsub, "~> 2.0"},
       {:phoenix_view, "~> 2.0"},
       {:plug_cowboy, "~> 2.6"},
+      {:postgrex, "~> 0.19"},
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
       {:req, "~> 0.6.0"},
