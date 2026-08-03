@@ -321,7 +321,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                },
                rows: [
                  %{headsign: %{headsigns: ["Medford/Tufts", "Medfd/Tufts"]}},
-                 %{headsign: %{headsigns: ["Government Ctr", "Gov’t Center", "Gov't Ctr"]}},
+                 %{headsign: %{headsigns: ["Government Ctr", "Gov't Center", "Gov't Ctr"]}},
                  %{headsign: %{headsigns: ["Cleveland Circle", "Cleveland Cir", "Clvlnd Cir"]}},
                  %{headsign: %{headsigns: ["Riverside"]}}
                ]
