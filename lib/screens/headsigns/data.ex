@@ -48,7 +48,7 @@ defmodule Screens.Headsigns.Data do
     "Fields Corner" => ["Fields Corner", "Fields Cnr"],
     "Forest Hills" => ["Forest Hills", "Frst Hills"],
     "Gilman Square" => ["Gilman Square", "Gilman Sq"],
-    "Government Center" => ["Government Ctr", "Gov’t Center", "Gov't Ctr"],
+    "Government Center" => ["Government Ctr", "Gov't Center", "Gov't Ctr"],
     "Green Street" => ["Green Street", "Green St"],
     "Griggs Street" => ["Griggs Street", "Griggs St"],
     "Harvard Avenue" => ["Harvard Avenue", "Harvard Ave"],
