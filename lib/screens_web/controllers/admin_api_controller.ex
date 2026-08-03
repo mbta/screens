@@ -3,6 +3,7 @@ defmodule ScreensWeb.AdminApiController do
 
   alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.{Image, Util}
+  alias Screens.ScreenConfigs
   alias ScreensConfig.{Config, Screen}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
@@ -44,6 +45,20 @@ defmodule ScreensWeb.AdminApiController do
 
   def list_images(conn, _params) do
     json(conn, %{images: Image.list()})
+  end
+
+  @spec import_configs(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  # This should be a part of post_config_migration_cleanup
+  def import_configs(conn, _params) do
+    case ScreenConfigs.import_from_file() do
+      {:ok, %{upserted: upserted, deleted: deleted}} ->
+        json(conn, %{success: true, upserted: upserted, deleted: deleted})
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: inspect(reason)})
+    end
   end
 
   def upload_image(conn, %{"image" => %Plug.Upload{} = upload, "key" => key}) do

@@ -2,11 +2,13 @@ import { useMemo, useState } from "react";
 import { fetch } from "Util/admin";
 
 const API_PATH = "/api/admin/maintenance";
+const IMPORT_PATH = "/api/admin/import_configs";
 
 const Tools = () => {
   return (
     <main className="admin-page">
       <EvergreenContentCleanup />
+      <ImportConfigs />
     </main>
   );
 };
@@ -64,6 +66,37 @@ const EvergreenContentCleanup = () => {
         />
         <button type="submit">Cleanup</button>
       </form>
+    </section>
+  );
+};
+
+// This section should be a part of post_config_migration_cleanup
+const ImportConfigs = () => {
+  const importConfigs = async () => {
+    const { success, upserted, deleted, error } = await fetch.post(
+      IMPORT_PATH,
+      {},
+    );
+
+    if (success) {
+      window.alert(
+        `Imported ${upserted} screen configurations. Deleted ${deleted}.`,
+      );
+    } else {
+      window.alert(`Import failed: ${error || "Unknown error"}`);
+    }
+  };
+
+  return (
+    <section>
+      <h2>Import Screen Configurations</h2>
+      <p>
+        Load screen configurations from the JSON file into the DB. This will
+        overwrite any existing configurations in Postgres.
+      </p>
+      <button type="button" onClick={importConfigs}>
+        Import
+      </button>
     </section>
   );
 };
