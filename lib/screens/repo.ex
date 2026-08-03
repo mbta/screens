@@ -12,13 +12,8 @@ defmodule Screens.Repo do
 
     token = auth_token_fn.(host, user, port, %{})
 
-    if is_nil(token) do
-      Logger.info("#{__MODULE__} add_prod_credentials token_is_nil")
-    else
-      hash_string = Base.encode16(:crypto.hash(:sha3_256, token))
-
-      Logger.info("#{__MODULE__} add_prod_credentials token_hash=#{hash_string}")
-    end
+    hash_string = Base.encode16(:crypto.hash(:sha3_256, token))
+    Logger.info("#{__MODULE__} add_prod_credentials token_hash=#{hash_string}")
 
     Keyword.merge(config,
       hostname: host,
