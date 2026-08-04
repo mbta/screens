@@ -88,9 +88,12 @@ const ImportConfigs = () => {
 
     setIsImporting(true);
 
-    const { success, upserted, deleted, error } = await fetch.post(IMPORT_PATH, {});
+    const { status, upserted, deleted, error } = await fetch.post(
+      IMPORT_PATH,
+      {},
+    );
 
-    if (success) {
+    if (status === 200) {
       window.alert(`Imported ${upserted} configurations. Deleted ${deleted}.`);
     } else {
       window.alert(`Import failed: ${error || "Unknown error"}`);

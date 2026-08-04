@@ -52,7 +52,7 @@ defmodule ScreensWeb.AdminApiController do
   def import_configs(conn, _params) do
     case ScreenConfigs.import_from_file() do
       {:ok, %{upserted: upserted, deleted: deleted}} ->
-        json(conn, %{success: true, upserted: upserted, deleted: deleted})
+        json(conn, %{upserted: upserted, deleted: deleted})
 
       {:error, reason} ->
         conn
