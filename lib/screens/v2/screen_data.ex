@@ -7,7 +7,7 @@ defmodule Screens.V2.ScreenData do
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
 
-  alias __MODULE__.Layout
+  alias __MODULE__.{Cache, Layout}
 
   import Screens.Inject
   import Screens.V2.Template.Guards, only: [is_slot_id: 1, is_paged_slot_id: 1]
@@ -16,35 +16,63 @@ defmodule Screens.V2.ScreenData do
 
   @type t :: %{type: atom()}
   @type simulation_data :: %{full_page: t(), flex_zone: [t()]}
+  @type audio_data :: [{view :: module(), assigns :: %{optional(atom()) => any()}}]
 
   @callback get(String.t(), Screen.t()) :: t()
-  def get(id, screen), do: generate(id, screen, &layout_to_data/2)
+  def get(id, screen) do
+    generate(id, screen) |> resolve_paging(screen) |> serialize()
+  end
 
   @spec simulation(String.t(), Screen.t()) :: simulation_data()
-  def simulation(id, screen), do: generate(id, screen, &layout_to_simulation_data/2)
+  def simulation(id, %Screen{app_id: app_id} = screen) do
+    layout = generate(id, screen)
 
-  @spec generate(String.t(), Screen.t(), (Layout.t(), Screen.t() -> data)) :: data
-        when data: t() | simulation_data()
-  defp generate(id, screen, then_fn) do
-    screen
-    |> tap(&update_visible_alerts_in_progress(id, &1))
-    |> Layout.generate()
-    |> tap(&update_visible_alerts(&1, id, screen))
-    |> then_fn.(screen)
-  end
-
-  @spec layout_to_data(Layout.t(), Screen.t()) :: t()
-  defp layout_to_data(layout, config) do
-    layout |> resolve_paging(config) |> serialize()
-  end
-
-  @spec layout_to_simulation_data(Layout.t(), Screen.t()) :: simulation_data()
-  defp layout_to_simulation_data(layout, config) do
     %{
-      full_page: layout |> resolve_paging(config) |> serialize(),
-      flex_zone: layout |> serialize_paged_slots(config.app_id)
+      full_page: layout |> resolve_paging(screen) |> serialize(),
+      flex_zone: layout |> serialize_paged_slots(app_id)
     }
   end
+
+  @spec audio(String.t(), Screen.t()) :: audio_data()
+  def audio(id, screen, opts \\ []) do
+    generate_fn = Keyword.get(opts, :generate_fn, &generate/2)
+
+    audio_only_instances_fn =
+      Keyword.get_lazy(opts, :audio_only_instances_fn, fn ->
+        candidate_generator = @parameters.candidate_generator(screen)
+        &candidate_generator.audio_only_instances/2
+      end)
+
+    widgets = generate_fn.(id, screen) |> elem(1) |> Map.values()
+    audio_only_widgets = audio_only_instances_fn.(widgets, screen)
+
+    (widgets ++ audio_only_widgets)
+    |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
+    |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
+    |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
+  end
+
+  @spec generate(String.t(), Screen.t()) :: Layout.t()
+  defp generate(id, screen) do
+    generator = @parameters.candidate_generator(screen)
+    screen_template = generator.screen_template(screen)
+
+    {instances, meta} = Cache.instances(id, screen)
+    log_cache_meta(meta)
+
+    instances
+    |> Enum.filter(&WidgetInstance.valid_candidate?/1)
+    |> Layout.pick_instances(screen_template)
+    |> tap(&update_visible_alerts(&1, id, screen))
+  end
+
+  defp log_cache_meta(%Cache.Meta{what: {:error, operation, error}, where: where}) do
+    Logger.metadata(cache_result: :error, cache_location: where)
+    Logster.warning(["screen_data_cache_error", operation: operation, error: inspect(error)])
+  end
+
+  defp log_cache_meta(%Cache.Meta{what: what, where: where}),
+    do: Logger.metadata(cache_result: what, cache_location: where)
 
   defp resolve_paging(layout, config),
     do: Layout.resolve_paging(layout, @parameters.refresh_rate(config))
@@ -124,9 +152,6 @@ defmodule Screens.V2.ScreenData do
       Enum.find_value(children, &get_containing_slot(&1, target_slot_ids))
     end
   end
-
-  defp update_visible_alerts_in_progress(_id, %Screen{hidden_from_screenplay: true}), do: :ok
-  defp update_visible_alerts_in_progress(id, _screen), do: ScreensByAlert.put_in_progress([id])
 
   defp update_visible_alerts(_, _id, %Screen{hidden_from_screenplay: true}), do: :ok
 

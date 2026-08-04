@@ -3,7 +3,8 @@ defmodule Screens.Telemetry do
 
   use Supervisor
 
-  alias Screens.V3Api.Cache
+  alias Screens.V2.ScreenData
+  alias Screens.V3Api
 
   def start_link(opts) do
     Supervisor.start_link(__MODULE__, [], opts)
@@ -19,11 +20,11 @@ defmodule Screens.Telemetry do
       # log_span(~w[screens v3_api get_json]a, metadata: ~w[path query cache]a),
 
       # events
-      log_event(~w[screens v3_api cache stats]a,
+      log_event(~w[screens cache stats]a,
         metadata: ~w[cache]a,
         measurements: ~w[used total hits misses writes updates evictions expirations]a
       ),
-      log_event(~w[screens v3_api pool stats]a,
+      log_event(~w[screens pool stats]a,
         metadata: ~w[host]a,
         measurements: ~w[pool_size available_connections in_use_connections in_flight_requests]a
       )
@@ -46,21 +47,25 @@ defmodule Screens.Telemetry do
   end
 
   def cache_stats do
-    for cache <- [Cache.Realtime, Cache.Static] do
-      with {:ok, info} <- cache.info() do
-        :telemetry.execute(
-          ~w[screens v3_api cache stats]a,
-          Map.merge(info.memory, info.stats),
-          %{cache: info.server[:cache_name]}
-        )
-      end
+    for {name, mod} <- [api_realtime: V3Api.Cache.Realtime, api_static: V3Api.Cache.Static] do
+      with {:ok, info} <- mod.info(), do: do_cache_stats(name, info)
     end
+
+    # For the distributed cache, just log the stats for this node's local cache layer, not the
+    # cache as a whole
+    with {:ok, %{nodes_info: nodes_info}} <- ScreenData.Cache.Store.Adapter.info(),
+         {:ok, info} <- Map.fetch(nodes_info, node()),
+         do: do_cache_stats(:screen_data, info)
+  end
+
+  defp do_cache_stats(name, %{memory: memory, stats: stats}) do
+    :telemetry.execute(~w[screens cache stats]a, Map.merge(memory, stats), %{cache: name})
   end
 
   def pool_stats do
     with {:ok, status} <- Finch.get_pool_status(Screens.V3Api.Finch, :default) do
       for {%Finch.Pool{host: host}, pools} <- status, metrics <- pools do
-        :telemetry.execute(~w[screens v3_api pool stats]a, metrics, %{host: host})
+        :telemetry.execute(~w[screens pool stats]a, metrics, %{host: host})
       end
     end
   end
