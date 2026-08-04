@@ -72,29 +72,40 @@ const EvergreenContentCleanup = () => {
 
 // This section should be a part of post_config_migration_cleanup
 const ImportConfigs = () => {
+  const [isImporting, setIsImporting] = useState(false);
+
   const importConfigs = async () => {
-    const { success, upserted, deleted, error } = await fetch.post(
-      IMPORT_PATH,
-      {},
-    );
+    // Shouldn't happen, but just in case the button is clicked multiple times
+    if (isImporting) return;
+
+    if (
+      !window.confirm(
+        "Are you sure? This will overwrite existing configurations in Postgres with the JSON file in S3.",
+      )
+    ) {
+      return;
+    }
+
+    setIsImporting(true);
+
+    const { success, upserted, deleted, error } = await fetch.post(IMPORT_PATH, {});
 
     if (success) {
-      window.alert(
-        `Imported ${upserted} screen configurations. Deleted ${deleted}.`,
-      );
+      window.alert(`Imported ${upserted} configurations. Deleted ${deleted}.`);
     } else {
       window.alert(`Import failed: ${error || "Unknown error"}`);
     }
+    setIsImporting(false);
   };
 
   return (
     <section>
-      <h2>Import Screen Configurations</h2>
+      <h2>Import Screen Configurations to Postgres</h2>
       <p>
-        Load screen configurations from the JSON file into the DB. This will
+        Load screen configurations from the JSON file into our DB. This will
         overwrite any existing configurations in Postgres.
       </p>
-      <button type="button" onClick={importConfigs}>
+      <button type="button" onClick={importConfigs} disabled={isImporting}>
         Import
       </button>
     </section>
