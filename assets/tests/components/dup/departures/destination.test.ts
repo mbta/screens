@@ -158,6 +158,18 @@ describe("buildPageContent", () => {
       expect(actual).toEqual(["Wickford Junction (Express…", "…to Sharon…"]);
     });
 
+    test("paginates and truncates the content with 'via' shorthand", () => {
+      const messageContent = "Wickford Junction v/ Park Street".split(" ");
+
+      const actual = buildPageContent({
+        entireMessageByWord: messageContent,
+        firstLineEndIndex: 2, // "Wickford Junction"
+        secondLineEndIndex: 4, // "v/ Park"
+      });
+
+      expect(actual).toEqual(["Wickford Junction…", "…v/ Park…"]);
+    });
+
     test("does not remove trailing 'via' shorthand on the second page", () => {
       const messageContent = "Forge Park/495 v/ Back Bay".split(" ");
 
