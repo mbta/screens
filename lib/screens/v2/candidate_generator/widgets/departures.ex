@@ -65,7 +65,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
           section: &1,
           result:
             &1
-            |> fetch_section_departures(departure_fetch_fn, now)
+            |> fetch_section_departures(departure_fetch_fn)
             |> post_process_fn.(screen)
             |> post_process_no_data(&1, has_multiple_sections, route_fetch_fn)
         },
@@ -180,23 +180,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   defp no_departures_message, do: "No departures currently available"
   defp no_departures_message(direction_name), do: "No #{direction_name} departures available"
 
-  defp fetch_section_departures(%Section{header_only: true}, _, _), do: {:ok, []}
+  defp fetch_section_departures(%Section{header_only: true}, _), do: {:ok, []}
 
   defp fetch_section_departures(
          %Section{
            query: %Query{params: params},
-           filters: filters,
+           filters: %Filters{route_directions: route_directions},
            bidirectional: is_bidirectional,
            grouping_type: grouping_type
          },
-         departure_fetch_fn,
-         now
+         departure_fetch_fn
        ) do
     fetch_params = Map.from_struct(params)
     fetch_opts = [schedule_route_type_filter: [:ferry, :rail]]
 
     with {:ok, departures} <- departure_fetch_fn.(fetch_params, fetch_opts) do
-      filtered_departures = filter_departures(departures, filters, now)
+      filtered_departures = filter_by_route_direction(departures, route_directions)
 
       {:ok,
        cond do
@@ -205,23 +204,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
          true -> filtered_departures
        end}
     end
-  end
-
-  defp filter_departures(
-         departures,
-         %Filters{max_minutes: max_minutes, route_directions: route_directions},
-         now
-       ) do
-    departures
-    |> filter_by_time(max_minutes, now)
-    |> filter_by_route_direction(route_directions)
-  end
-
-  defp filter_by_time(departures, nil, _now), do: departures
-
-  defp filter_by_time(departures, max_minutes, now) do
-    latest_time = DateTime.add(now, max_minutes, :minute)
-    Enum.reject(departures, &(DateTime.compare(Departure.time(&1), latest_time) == :gt))
   end
 
   defp filter_by_route_direction(departures, %RouteDirections{

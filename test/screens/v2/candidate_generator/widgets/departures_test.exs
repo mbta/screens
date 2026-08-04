@@ -341,31 +341,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                )
     end
 
-    test "filters departures by time when a section has a max_minutes" do
-      now = ~U[2024-01-01 12:00:00Z]
-
-      config =
-        build_config([
-          %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
-            filters: %Filters{max_minutes: 60}
-          }
-        ])
-
-      included_departures = [
-        build_departure("1", 0, nil, DateTime.add(now, 59, :minute)),
-        build_departure("1", 0, nil, DateTime.add(now, 60, :minute))
-      ]
-
-      fetch_fn = fn %{stop_ids: ["S"]}, _ ->
-        {:ok,
-         [build_departure("1", 0, nil, DateTime.add(now, 61, :minute)) | included_departures]}
-      end
-
-      assert [%DeparturesWidget{sections: [%NormalSection{rows: ^included_departures}]}] =
-               departures_instances(config, departure_fetch_fn: fetch_fn, now: now)
-    end
-
     test "filters departures with included route-directions" do
       config =
         build_config([
