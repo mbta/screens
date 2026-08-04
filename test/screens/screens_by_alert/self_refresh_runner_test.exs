@@ -25,12 +25,12 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
     expect(ScreensByAlert.Mock, :put_in_progress, fn ~w[1401 1002] -> :ok end)
 
     expect(ScreenData.Mock, :get, fn %Screen{app_id: :bus_shelter_v2},
-                                     [update_visible_alerts_for_screen_id: "1401"] ->
+                                     [screen_id: "1401", update_visible_alerts?: true] ->
       %{type: :x}
     end)
 
     expect(ScreenData.Mock, :get, fn %Screen{app_id: :bus_eink_v2},
-                                     [update_visible_alerts_for_screen_id: "1002"] ->
+                                     [screen_id: "1002", update_visible_alerts?: true] ->
       raise "oops"
     end)
 

@@ -16,9 +16,7 @@ defmodule Screens.V2.ScreenData do
 
   @type t :: %{type: atom()}
   @type simulation_data :: %{full_page: t(), flex_zone: [t()]}
-  @type options :: [
-          update_visible_alerts_for_screen_id: String.t()
-        ]
+  @type options :: [screen_id: String.t(), update_visible_alerts?: boolean()]
 
   @callback get(Screen.t()) :: t()
   @callback get(Screen.t(), options()) :: t()
@@ -34,7 +32,7 @@ defmodule Screens.V2.ScreenData do
     update_visible_alerts_in_progress(screen, opts)
 
     screen
-    |> Layout.generate()
+    |> Layout.generate(opts[:screen_id])
     |> tap(&update_visible_alerts(&1, screen, opts))
     |> then_fn.(screen)
   end
@@ -131,18 +129,14 @@ defmodule Screens.V2.ScreenData do
     end
   end
 
-  defp update_visible_alerts_in_progress(%Screen{hidden_from_screenplay: true}, _opts), do: :ok
-
-  defp update_visible_alerts_in_progress(_screen, opts) do
-    screen_id = Keyword.get(opts, :update_visible_alerts_for_screen_id, nil)
+  defp update_visible_alerts_in_progress(screen, opts) do
+    screen_id = screen_id_for_updating_visible_alerts(screen, opts)
     if not is_nil(screen_id), do: ScreensByAlert.put_in_progress([screen_id])
     :ok
   end
 
-  defp update_visible_alerts(_, %Screen{hidden_from_screenplay: true}, _opts), do: :ok
-
-  defp update_visible_alerts({_layout, instance_map}, _screen, opts) do
-    screen_id = Keyword.get(opts, :update_visible_alerts_for_screen_id, nil)
+  defp update_visible_alerts({_layout, instance_map}, screen, opts) do
+    screen_id = screen_id_for_updating_visible_alerts(screen, opts)
 
     if not is_nil(screen_id) do
       alert_ids =
@@ -154,6 +148,16 @@ defmodule Screens.V2.ScreenData do
     end
 
     :ok
+  end
+
+  # Never update visible alerts for "hidden" screens since they are not visible in Screenplay.
+  defp screen_id_for_updating_visible_alerts(%Screen{hidden_from_screenplay: true}, _opts),
+    do: nil
+
+  # Only update visible alerts when the caller A) requested it, and B) provided a screen ID (not
+  # available for pending screens).
+  defp screen_id_for_updating_visible_alerts(_screen, opts) do
+    if Keyword.get(opts, :update_visible_alerts?, false), do: Keyword.get(opts, :screen_id, nil)
   end
 
   defp paged_slot_key({paged_slot_id, _}, :pre_fare_v2), do: Template.get_slot_id(paged_slot_id)

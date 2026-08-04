@@ -16,6 +16,7 @@ defmodule Screens.Application do
         {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
         {Finch,
          name: Screens.V3Api.Finch, pools: %{default: [size: 100, start_pool_metrics?: true]}},
+        Screens.V2.ScreenData.Cache,
         Screens.V3Api.Cache.Realtime,
         Screens.V3Api.Cache.Static,
         Screens.LastTrip.Cache,
@@ -26,7 +27,7 @@ defmodule Screens.Application do
         # Task supervisor for ScreensByAlert self-refresh jobs
         {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
         # ScreensByAlert self-refresh job runner
-        self_refresh_runner_child(),
+        # self_refresh_runner_child(),
         {Task.Supervisor, name: Screens.DeviceMonitor.Supervisor},
         Screens.DeviceMonitor,
         Screens.Telemetry,

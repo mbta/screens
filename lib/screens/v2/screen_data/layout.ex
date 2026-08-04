@@ -4,6 +4,7 @@ defmodule Screens.V2.ScreenData.Layout do
   """
 
   alias Screens.Util
+  alias Screens.V2.ScreenData.Cache
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
   alias ScreensConfig.Screen
@@ -26,12 +27,14 @@ defmodule Screens.V2.ScreenData.Layout do
         }
 
   @spec generate(Screen.t()) :: t()
-  def generate(config) do
-    candidate_generator = @parameters.candidate_generator(config)
-    screen_template = candidate_generator.screen_template(config)
+  @spec generate(Screen.t(), screen_id :: String.t() | nil) :: t()
+  def generate(screen, screen_id \\ nil) do
+    candidate_generator = @parameters.candidate_generator(screen)
+    screen_template = candidate_generator.screen_template(screen)
+    if screen_id == "BUS-101", do: Logster.info(["cache_debug", what: "layout", node: node()])
 
-    config
-    |> candidate_generator.candidate_instances()
+    screen_id
+    |> Cache.instances(candidate_generator, screen)
     |> Enum.filter(&WidgetInstance.valid_candidate?/1)
     |> pick_instances(screen_template)
   end

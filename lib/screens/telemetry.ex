@@ -4,7 +4,8 @@ defmodule Screens.Telemetry do
   use Supervisor
   require Logger
 
-  alias Screens.V3Api.Cache
+  alias Screens.V2.ScreenData
+  alias Screens.V3Api
 
   def start_link(opts) do
     Supervisor.start_link(__MODULE__, [], opts)
@@ -20,11 +21,11 @@ defmodule Screens.Telemetry do
       # log_span(~w[screens v3_api get_json]a, metadata: ~w[path query cache]a),
 
       # events
-      log_event(~w[screens v3_api cache stats]a,
+      log_event(~w[screens cache stats]a,
         metadata: ~w[cache]a,
         measurements: ~w[used total hits misses writes updates evictions expirations]a
       ),
-      log_event(~w[screens v3_api pool stats]a,
+      log_event(~w[screens pool stats]a,
         metadata: ~w[host]a,
         measurements: ~w[pool_size available_connections in_use_connections in_flight_requests]a
       )
@@ -47,10 +48,10 @@ defmodule Screens.Telemetry do
   end
 
   def cache_stats do
-    for cache <- [Cache.Realtime, Cache.Static] do
+    for cache <- [ScreenData.Cache, V3Api.Cache.Realtime, V3Api.Cache.Static] do
       with {:ok, info} <- cache.info() do
         :telemetry.execute(
-          ~w[screens v3_api cache stats]a,
+          ~w[screens cache stats]a,
           Map.merge(info.memory, info.stats),
           %{cache: info.server[:cache_name]}
         )
@@ -61,7 +62,7 @@ defmodule Screens.Telemetry do
   def pool_stats do
     with {:ok, status} <- Finch.get_pool_status(Screens.V3Api.Finch, :default) do
       for {%Finch.Pool{host: host}, pools} <- status, metrics <- pools do
-        :telemetry.execute(~w[screens v3_api pool stats]a, metrics, %{host: host})
+        :telemetry.execute(~w[screens pool stats]a, metrics, %{host: host})
       end
     end
   end

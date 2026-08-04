@@ -53,6 +53,7 @@ defmodule Screens.V2.CandidateGenerator.BusShelter do
         evergreen_content_instances_fn \\ &Widgets.Evergreen.evergreen_content_instances/2,
         subway_status_instances_fn \\ &Widgets.SubwayStatus.subway_status_instances/2
       ) do
+    Logster.info(["cache_debug", what: "candgen", node: node()])
     CandidateGenerator.async_stream(
       [
         fn -> header_instances_fn.(config, now) end,

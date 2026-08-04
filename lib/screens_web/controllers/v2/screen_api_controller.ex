@@ -23,7 +23,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   def show(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
     response =
       screen
-      |> screen_response(update_visible_alerts_for_screen_id: screen_id)
+      |> screen_response(screen_id: screen_id, update_visible_alerts?: true)
       |> put_extra_fields(screen)
 
     json(conn, response)
@@ -32,7 +32,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   def show_dup(conn, params), do: show(conn, params)
 
   def simulation(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
-    data = ScreenData.simulation(screen, update_visible_alerts_for_screen_id: screen_id)
+    data = ScreenData.simulation(screen, screen_id: screen_id, update_visible_alerts?: true)
     json(conn, %{@base_response | data: data})
   end
 

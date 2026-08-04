@@ -72,6 +72,7 @@ defmodule Screens.MixProject do
       {:logster, "~> 2.0.0-rc.5"},
       {:memcachex, "~> 0.5.5"},
       {:nebulex, "~> 3.0.2"},
+      {:nebulex_distributed, "~> 3.0"},
       {:nebulex_local, "~> 3.0.0"},
       {:phoenix, "~> 1.8.7"},
       {:phoenix_html, "~> 4.0"},

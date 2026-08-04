@@ -99,7 +99,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
         |> Task.Supervisor.async_stream_nolink(
           ids,
           fn id ->
-            id |> Cache.screen() |> @screen_data.get(update_visible_alerts_for_screen_id: id)
+            id |> Cache.screen() |> @screen_data.get(screen_id: id, update_visible_alerts?: true)
             id
           end,
           max_concurrency: @max_concurrency,
