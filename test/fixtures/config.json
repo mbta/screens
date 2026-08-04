@@ -181,10 +181,7 @@
                 "arrow": null,
                 "read_as": null
               },
-              "filters": {
-                "max_minutes": null,
-                "route_directions": null
-              },
+              "filters": { "route_directions": null },
               "grouping_type": "time",
               "query": {
                 "params": {
