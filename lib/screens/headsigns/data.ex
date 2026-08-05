@@ -11,7 +11,6 @@ defmodule Screens.Headsigns.Data do
   See the generate_headsign_abbreviations.exs script to see how to generate this data in bulk.
   """
 
-  # TODO(NOW): Update the Notion document with the changes here
   @headsign_abbreviations %{
     "Allston Street" => ["Allston Street", "Allston St"],
     "Babcock Street" => ["Babcock Street", "Babcock St"],
