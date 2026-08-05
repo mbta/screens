@@ -141,7 +141,7 @@ export const buildPageContent = ({
     if (secondPage === "") {
       return [firstPage];
     } else {
-      return [firstPage + "…", "…" + secondPage];
+      return [`${firstPage}…`, `…${secondPage}`];
     }
   }
 };
