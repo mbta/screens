@@ -93,12 +93,13 @@ const ImportConfigs = () => {
       {},
     );
 
+    setIsImporting(false);
+
     if (status === 200) {
       window.alert(`Imported ${upserted} configurations. Deleted ${deleted}.`);
     } else {
       window.alert(`Import failed: ${error || "Unknown error"}`);
     }
-    setIsImporting(false);
   };
 
   return (
