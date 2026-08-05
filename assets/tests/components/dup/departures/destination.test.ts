@@ -122,76 +122,56 @@ describe("buildPageContent", () => {
 
       const actual = buildPageContent({
         entireMessageByWord: messageContent,
-        firstLineEndIndex: messageContent.length,
-        secondLineEndIndex: messageContent.length, // fit the entire message
+        firstLineEndIndex: messageContent.length, // fit the entire message
       });
 
       expect(actual).toEqual(messageContent);
     });
   });
 
-  describe("message fits on both lines", () => {
+  describe("message extends to two lines", () => {
     test("paginates the content", () => {
       const messageContent = "Readville v/ Fairmount".split(" ");
 
       const actual = buildPageContent({
         entireMessageByWord: messageContent,
         firstLineEndIndex: messageContent.length - 1, // "Readville v/"
-        secondLineEndIndex: messageContent.length, // "Fairmount"
       });
 
       expect(actual).toEqual(["Readville v/…", "…Fairmount"]);
     });
-  });
 
-  describe("message doesn't fit on both lines", () => {
-    test("paginates and truncates the content", () => {
+    test("paginates particularly long content", () => {
       const messageContent =
         "Wickford Junction (Express to Sharon after Ruggles)".split(" ");
 
       const actual = buildPageContent({
         entireMessageByWord: messageContent,
         firstLineEndIndex: 3, // "Wickford Junction (Express"
-        secondLineEndIndex: 5, // "to Sharon"
       });
 
-      expect(actual).toEqual(["Wickford Junction (Express…", "…to Sharon…"]);
+      expect(actual).toEqual([
+        "Wickford Junction (Express…",
+        "…to Sharon after Ruggles)",
+      ]);
     });
 
-    test("paginates and truncates the content with 'via' shorthand", () => {
-      const messageContent = "Wickford Junction v/ Park Street".split(" ");
+    test.each([{ preposition: "v/" }, { preposition: "via" }])(
+      "paginates the content with the preposition '$preposition'",
+      ({ preposition }) => {
+        const messageContent =
+          `Wickford Junction ${preposition} Park Street`.split(" ");
 
-      const actual = buildPageContent({
-        entireMessageByWord: messageContent,
-        firstLineEndIndex: 2, // "Wickford Junction"
-        secondLineEndIndex: 4, // "v/ Park"
-      });
+        const actual = buildPageContent({
+          entireMessageByWord: messageContent,
+          firstLineEndIndex: 2, // "Wickford Junction"
+        });
 
-      expect(actual).toEqual(["Wickford Junction…", "…v/ Park…"]);
-    });
-
-    test("does not remove trailing 'via' shorthand on the second page", () => {
-      const messageContent = "Forge Park/495 v/ Back Bay".split(" ");
-
-      const actual = buildPageContent({
-        entireMessageByWord: messageContent,
-        firstLineEndIndex: 1, // "Forge"
-        secondLineEndIndex: 3, // "Park/495 v/"
-      });
-
-      expect(actual).toEqual(["Forge…", "…Park/495 v/…"]);
-    });
-
-    test("pulls in the next word when the second page is only 'via' shorthand", () => {
-      const messageContent = "Readville v/ Fairmount".split(" ");
-
-      const actual = buildPageContent({
-        entireMessageByWord: messageContent,
-        firstLineEndIndex: 1, // "Readville"
-        secondLineEndIndex: 2, // "v/"
-      });
-
-      expect(actual).toEqual(["Readville…", "…v/ Fairmount"]);
-    });
+        expect(actual).toEqual([
+          "Wickford Junction…",
+          `…${preposition} Park Street`,
+        ]);
+      },
+    );
   });
 });

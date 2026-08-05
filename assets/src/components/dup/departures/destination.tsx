@@ -110,7 +110,6 @@ export const nextSizingState = (
 type PageContentAndSplitIndices = {
   entireMessageByWord: string[];
   firstLineEndIndex: number;
-  secondLineEndIndex: number;
 };
 
 /**
@@ -119,40 +118,29 @@ type PageContentAndSplitIndices = {
  * When two pages of content are returned, an ellipsis will be added to:
  * 1. The end of the first page
  * 2. The start of the second page
- * 3. The end of the second page, if the message does not wholly fit on 2 pages
+ *
+ * For DUPs, the second page consists of "…" + the portion of the message that
+ * did not fit on the first page. It is not guaranteed that all text will fit
+ * when actually displayed. We rely on CSS rules on text-overflow to ellipsize
+ * the end of the second page for us.
  */
 export const buildPageContent = ({
   entireMessageByWord,
   firstLineEndIndex,
-  secondLineEndIndex,
 }: PageContentAndSplitIndices): ReadonlyArray<string> => {
   if (firstLineEndIndex === entireMessageByWord.length) {
     return [entireMessageByWord.join(" ")];
   } else {
     const firstPage = entireMessageByWord.slice(0, firstLineEndIndex).join(" ");
 
-    let secondPage = entireMessageByWord
-      .slice(firstLineEndIndex, secondLineEndIndex)
+    const secondPage = entireMessageByWord
+      .slice(firstLineEndIndex, entireMessageByWord.length)
       .join(" ")
       .trimEnd();
-
-    let lastUsedSecondPageIndex = secondLineEndIndex;
-    if (
-      secondPage.trim() === "v/" &&
-      lastUsedSecondPageIndex <= entireMessageByWord.length - 1
-    ) {
-      // Pull the next word into the second page, allow CSS to handle overflow
-      secondPage += ` ${entireMessageByWord[lastUsedSecondPageIndex].trim()}`;
-      lastUsedSecondPageIndex += 1;
-    }
 
     if (secondPage === "") {
       return [firstPage];
     } else {
-      secondPage =
-        lastUsedSecondPageIndex === entireMessageByWord.length
-          ? secondPage
-          : secondPage + "…";
       return [firstPage + "…", "…" + secondPage];
     }
   }
@@ -244,7 +232,6 @@ const Destination: ComponentType<DupDestination> = ({
     const pageContent = buildPageContent({
       entireMessageByWord: parts,
       firstLineEndIndex: partsIndex1,
-      secondLineEndIndex: partsIndex2,
     });
     return (
       <RenderedDestination
