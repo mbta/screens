@@ -2,11 +2,13 @@ import { useMemo, useState } from "react";
 import { fetch } from "Util/admin";
 
 const API_PATH = "/api/admin/maintenance";
+const IMPORT_PATH = "/api/admin/import_configs";
 
 const Tools = () => {
   return (
     <main className="admin-page">
       <EvergreenContentCleanup />
+      <ImportConfigs />
     </main>
   );
 };
@@ -64,6 +66,52 @@ const EvergreenContentCleanup = () => {
         />
         <button type="submit">Cleanup</button>
       </form>
+    </section>
+  );
+};
+
+// This section should be a part of post_config_migration_cleanup
+const ImportConfigs = () => {
+  const [isImporting, setIsImporting] = useState(false);
+
+  const importConfigs = async () => {
+    // Shouldn't happen, but just in case the button is clicked multiple times
+    if (isImporting) return;
+
+    if (
+      !window.confirm(
+        "Are you sure? This will overwrite existing configurations in Postgres with the JSON file in S3.",
+      )
+    ) {
+      return;
+    }
+
+    setIsImporting(true);
+
+    const { status, upserted, deleted, error } = await fetch.post(
+      IMPORT_PATH,
+      {},
+    );
+
+    setIsImporting(false);
+
+    if (status === 200) {
+      window.alert(`Imported ${upserted} configurations. Deleted ${deleted}.`);
+    } else {
+      window.alert(`Import failed: ${error || "Unknown error"}`);
+    }
+  };
+
+  return (
+    <section>
+      <h2>Import Screen Configurations to Postgres</h2>
+      <p>
+        Load screen configurations from the JSON file into our DB. This will
+        overwrite any existing configurations in Postgres.
+      </p>
+      <button type="button" onClick={importConfigs} disabled={isImporting}>
+        Import
+      </button>
     </section>
   );
 };

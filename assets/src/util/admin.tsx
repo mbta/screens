@@ -174,14 +174,21 @@ export const fetch = {
   get: (path) => doFetch(path, {}),
 
   post: (path, data) => {
-    return doFetch(path, {
-      body: JSON.stringify(data),
-      headers: {
-        "content-type": "application/json",
-        "x-csrf-token": getCsrfToken(),
+    return doFetch(
+      path,
+      {
+        body: JSON.stringify(data),
+        headers: {
+          "content-type": "application/json",
+          "x-csrf-token": getCsrfToken(),
+        },
+        method: "POST",
       },
-      method: "POST",
-    });
+      async (response) => {
+        const json = await response.json();
+        return { status: response.status, ...json };
+      },
+    );
   },
 
   delete: (path) =>
