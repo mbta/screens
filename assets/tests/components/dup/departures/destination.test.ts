@@ -1,31 +1,35 @@
 import { describe, expect, test } from "@jest/globals";
-import { nextSizingState, PHASES } from "Components/dup/departures/destination";
-
-// Helper constants for different line fit scenarios
-const fits = { firstLineFits: true, secondLineFits: true };
-const firstOverflows = { firstLineFits: false, secondLineFits: true };
-const secondOverflows = { firstLineFits: true, secondLineFits: false };
-const bothOverflow = { firstLineFits: false, secondLineFits: false };
-
-const oneLineBase = {
-  phase: PHASES.OneLine,
-  headsignIndex: 0,
-  partsIndex1: 3,
-  partsIndex2: 3,
-  partsLength: 3,
-  headsigns: ["Wonderland"],
-};
-
-const twoLinesBase = {
-  phase: PHASES.TwoLines,
-  headsignIndex: 0,
-  partsIndex1: 3,
-  partsIndex2: 3,
-  partsLength: 3,
-  headsigns: ["Wonderland"],
-};
+import {
+  buildPageContent,
+  nextSizingState,
+  PHASES,
+} from "Components/dup/departures/destination";
 
 describe("nextSizingState", () => {
+  // Helper constants for different line fit scenarios
+  const fits = { firstLineFits: true, secondLineFits: true };
+  const firstOverflows = { firstLineFits: false, secondLineFits: true };
+  const secondOverflows = { firstLineFits: true, secondLineFits: false };
+  const bothOverflow = { firstLineFits: false, secondLineFits: false };
+
+  const oneLineBase = {
+    phase: PHASES.OneLine,
+    headsignIndex: 0,
+    partsIndex1: 3,
+    partsIndex2: 3,
+    partsLength: 3,
+    headsigns: ["Wonderland"],
+  };
+
+  const twoLinesBase = {
+    phase: PHASES.TwoLines,
+    headsignIndex: 0,
+    partsIndex1: 3,
+    partsIndex2: 3,
+    partsLength: 3,
+    headsigns: ["Wonderland"],
+  };
+
   describe("PHASES.OneLine", () => {
     test("transitions to DONE and resets indices when first line fits", () => {
       expect(nextSizingState({ ...oneLineBase, ...fits })).toEqual({
@@ -108,5 +112,66 @@ describe("nextSizingState", () => {
       };
       expect(nextSizingState(state)).toEqual({ phase: PHASES.Done });
     });
+  });
+});
+
+describe("buildPageContent", () => {
+  describe("message fits on the first line", () => {
+    test("places all content in a single page", () => {
+      const messageContent = ["Framingham"];
+
+      const actual = buildPageContent({
+        entireMessageByWord: messageContent,
+        firstLineEndIndex: messageContent.length, // fit the entire message
+      });
+
+      expect(actual).toEqual(messageContent);
+    });
+  });
+
+  describe("message extends to two lines", () => {
+    test("paginates the content", () => {
+      const messageContent = "Readville v/ Fairmount".split(" ");
+
+      const actual = buildPageContent({
+        entireMessageByWord: messageContent,
+        firstLineEndIndex: messageContent.length - 1, // "Readville v/"
+      });
+
+      expect(actual).toEqual(["Readville v/…", "…Fairmount"]);
+    });
+
+    test("paginates particularly long content", () => {
+      const messageContent =
+        "Wickford Junction (Express to Sharon after Ruggles)".split(" ");
+
+      const actual = buildPageContent({
+        entireMessageByWord: messageContent,
+        firstLineEndIndex: 3, // "Wickford Junction (Express"
+      });
+
+      expect(actual).toEqual([
+        "Wickford Junction (Express…",
+        "…to Sharon after Ruggles)",
+      ]);
+    });
+
+    test.each([{ preposition: "v/" }, { preposition: "via" }])(
+      "paginates the content with the preposition '$preposition'",
+      ({ preposition }) => {
+        const messageContent =
+          `Wickford Junction ${preposition} Park Street`.split(" ");
+
+        const actual = buildPageContent({
+          entireMessageByWord: messageContent,
+          firstLineEndIndex: 2, // "Wickford Junction"
+        });
+
+        expect(actual).toEqual([
+          "Wickford Junction…",
+          `…${preposition} Park Street`,
+        ]);
+      },
+    );
   });
 });

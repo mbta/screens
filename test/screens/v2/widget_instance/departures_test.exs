@@ -740,7 +740,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     test "does not handle via on DUPs", %{dup_screen: dup_screen} do
       departure = %Departure{prediction: %Prediction{trip: %Trip{headsign: "Nubian via Allston"}}}
 
-      assert %{headsigns: ["Nubian via Allston"], variation: nil} ==
+      assert %{headsigns: ["Nubian via Allston", "Nubian v/ Allston"], variation: nil} ==
                Departures.serialize_headsign([departure], dup_screen)
     end
 
