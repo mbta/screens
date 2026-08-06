@@ -83,7 +83,7 @@ defmodule Screens.MixProject do
       {:postgrex, "~> 0.19"},
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
-      {:req, "~> 0.6.0"},
+      {:req, "~> 0.7.1"},
       {:screens_config, github: "mbta/screens-config-lib"},
       {:sentry, "~> 13.3.0"},
       {:sweet_xml, "~> 0.7.0"},
