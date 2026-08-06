@@ -190,41 +190,44 @@ const Destination: ComponentType<DupDestination> = ({
    * cause infinite update loops, so we don't need to be warned that it might.
    */
   useLayoutEffect(() => {
-    // First attempt to fit headsign on a single line. Prefer fitting an abbreviated
-    // headsign on a single line than the full headsign across 2 pages.
-    // If that doesn't work, try to fit it on two lines by adjusting
-    // between which words we paginate. Move through abbreviations until we find fit.
-    if (
-      firstLineRef.current &&
-      secondLineRef.current &&
-      phase !== PHASES.Done
-    ) {
-      const next = nextSizingState({
-        phase,
-        headsignIndex,
-        partsIndex1,
-        partsIndex2,
-        partsLength: parts.length,
-        headsigns: headsigns,
-        firstLineFits: !hasOverflowX(firstLineRef.current),
-        secondLineFits: !hasOverflowX(secondLineRef.current),
-      });
-      if (next) {
-        // Update the state so we can re-attempt sizing with updated values
-        if ("headsignIndex" in next && next.headsignIndex !== undefined) {
-          setHeadsignIndex(next.headsignIndex);
-        }
-        if ("phase" in next && next.phase !== undefined) {
-          setPhase(next.phase);
-        }
-        if ("partsIndex1" in next && next.partsIndex1 !== undefined) {
-          setPartsIndex1(next.partsIndex1);
-        }
-        if ("partsIndex2" in next && next.partsIndex2 !== undefined) {
-          setPartsIndex2(next.partsIndex2);
+    // Wait for fonts to load before measuring text width
+    document.fonts.ready.then(() => {
+      // First attempt to fit headsign on a single line. Prefer fitting an abbreviated
+      // headsign on a single line than the full headsign across 2 pages.
+      // If that doesn't work, try to fit it on two lines by adjusting
+      // between which words we paginate. Move through abbreviations until we find fit.
+      if (
+        firstLineRef.current &&
+        secondLineRef.current &&
+        phase !== PHASES.Done
+      ) {
+        const next = nextSizingState({
+          phase,
+          headsignIndex,
+          partsIndex1,
+          partsIndex2,
+          partsLength: parts.length,
+          headsigns: headsigns,
+          firstLineFits: !hasOverflowX(firstLineRef.current),
+          secondLineFits: !hasOverflowX(secondLineRef.current),
+        });
+        if (next) {
+          // Update the state so we can re-attempt sizing with updated values
+          if ("headsignIndex" in next && next.headsignIndex !== undefined) {
+            setHeadsignIndex(next.headsignIndex);
+          }
+          if ("phase" in next && next.phase !== undefined) {
+            setPhase(next.phase);
+          }
+          if ("partsIndex1" in next && next.partsIndex1 !== undefined) {
+            setPartsIndex1(next.partsIndex1);
+          }
+          if ("partsIndex2" in next && next.partsIndex2 !== undefined) {
+            setPartsIndex2(next.partsIndex2);
+          }
         }
       }
-    }
+    });
   });
 
   // Render paged version when done determining breaks
