@@ -14,19 +14,11 @@ defmodule Screens.V2.ScreenAudioData do
         now \\ DateTime.utc_now()
       ) do
     if Parameters.audio_enabled?(screen, now) do
-      visual_widgets_with_audio_equivalence =
-        screen
-        |> generate_layout_fn.()
-        |> elem(1)
-        |> Map.values()
-        |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
+      visual_widgets = screen |> generate_layout_fn.() |> elem(1) |> Map.values()
+      audio_only_widgets = get_audio_only_instances_fn.(visual_widgets, screen)
 
-      audio_only_widgets =
-        visual_widgets_with_audio_equivalence
-        |> get_audio_only_instances_fn.(screen)
-        |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
-
-      (visual_widgets_with_audio_equivalence ++ audio_only_widgets)
+      (visual_widgets ++ audio_only_widgets)
+      |> Enum.filter(&WidgetInstance.audio_valid_candidate?/1)
       |> Enum.sort_by(&WidgetInstance.audio_sort_key/1)
       |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
     else
