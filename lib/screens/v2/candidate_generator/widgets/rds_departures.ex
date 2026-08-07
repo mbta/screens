@@ -1,5 +1,13 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
-  @moduledoc false
+  @moduledoc """
+  Candidate Generator for RDS Items. 
+  Takes in RDS items and generates Screens.V2.WidgetInstance.Departures sections
+  to eventually be serialized and used as a part of the Departures Widget.
+
+  Note: This candidate generator only creates sections, and does not do the roll-up
+  of full screen presentations
+
+  """
 
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -21,13 +29,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   alias ScreensConfig.Departures.{Query, Section}
 
   @type post_process_rows_fn_t ::
-          ([NormalSection.row()], Section.t(), non_neg_integer() -> [NormalSection.row()])
+          ([NormalSection.row()], Section.t(), non_neg_integer(), DateTime.t() ->
+             [NormalSection.row()])
   @type widget :: DeparturesNoData.t() | DeparturesWidget.t()
 
+  @spec create_departure_sections(
+          [RDS.item()],
+          Departures.t(),
+          post_process_rows_fn_t(),
+          DateTime.t()
+        ) :: [DeparturesWidget.section()]
   def create_departure_sections(
         rds_sections,
         %Departures{sections: departure_sections},
-        post_process_rows_fn \\ fn rows, _section, _total_section_count -> rows end
+        post_process_rows_fn \\ fn rows, _section, _total_section_count, _now -> rows end,
+        now
       ) do
     total_section_count = length(rds_sections)
 
@@ -37,7 +53,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
         rds_section,
         section,
         total_section_count,
-        post_process_rows_fn
+        post_process_rows_fn,
+        now
       )
     end)
   end
@@ -46,11 +63,32 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           RDS.data(),
           Section.t(),
           non_neg_integer(),
-          post_process_rows_fn_t()
+          post_process_rows_fn_t(),
+          DateTime.t()
         ) ::
           DeparturesWidget.section()
 
-  defp map_to_departure_section(data, section, _, _)
+  # header_only sections are only supported on LCD screens
+  defp map_to_departure_section(
+         _,
+         %Section{
+           header_only: true,
+           header: header,
+           layout: layout,
+           grouping_type: grouping_type
+         },
+         _,
+         _,
+         _
+       ),
+       do: %NormalSection{
+         rows: [],
+         header: header,
+         layout: layout,
+         grouping_type: grouping_type
+       }
+
+  defp map_to_departure_section(data, section, _, _, _)
        when data == :error or data == {:ok, []},
        do: %NoDataSection{route: maybe_route_from_section(section)}
 
@@ -58,7 +96,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
          {:ok, items},
          %Section{header: header, layout: layout, grouping_type: grouping_type} = section,
          section_count,
-         post_process_rows_fn
+         post_process_rows_fn,
+         now
        ) do
     case items do
       [%NoService{routes: routes}] ->
@@ -69,16 +108,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
       [
         %Headways{
-          routes: [%Route{id: route_id} | _rest],
+          routes: [first_route | _rest],
           range: range,
           displayed_headsign: displayed_headsign
         }
       ] ->
-        %HeadwaySection{route_id: route_id, time_range: range, headsign: displayed_headsign}
+        %HeadwaySection{route: first_route, time_range: range, headsign: displayed_headsign}
 
       _ ->
         %NormalSection{
-          rows: items |> create_and_sort_rows() |> post_process_rows_fn.(section, section_count),
+          rows:
+            items |> create_and_sort_rows() |> post_process_rows_fn.(section, section_count, now),
           layout: layout,
           header: header,
           grouping_type: grouping_type
@@ -194,7 +234,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   defp departure_time(%Departure{} = departure), do: Departure.time(departure)
   defp departure_time({%Schedule{} = schedule, _type}), do: Schedule.time(schedule)
 
-  defp departure_direction_id(%Departure{} = departure), do: Departure.direction_id(departure)
-  defp departure_direction_id({%Schedule{direction_id: direction_id}, _type}), do: direction_id
-  defp departure_direction_id({_line, direction_id, _range, _headsign}), do: direction_id
+  def departure_direction_id(%Departure{} = departure), do: Departure.direction_id(departure)
+  def departure_direction_id({%Schedule{direction_id: direction_id}, _type}), do: direction_id
+  def departure_direction_id({_line, direction_id, _range, _headsign}), do: direction_id
 end

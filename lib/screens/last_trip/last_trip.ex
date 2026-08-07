@@ -10,7 +10,14 @@ defmodule Screens.LastTrip.LastTrip do
   @callback update_last_trip_cache([Departure.t()], DateTime.t()) :: :ok
   def update_last_trip_cache(departures, now) do
     departures
-    |> Enum.filter(&Departure.last_trip?(&1))
+    |> Enum.filter(fn
+      %Departure{prediction: %Prediction{departure_time: departure_time}} = departure
+      when not is_nil(departure_time) ->
+        Departure.last_trip?(departure)
+
+      _ ->
+        false
+    end)
     |> Enum.group_by(
       &{Departure.stop(&1).id, Departure.route(&1).line.id,
        Departure.representative_headsign(&1)},
