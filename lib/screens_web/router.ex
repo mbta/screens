@@ -37,6 +37,10 @@ defmodule ScreensWeb.Router do
     plug(ScreensWeb.Plug.EnsureScreensGroup)
   end
 
+  pipeline :screens_api_client_auth do
+    plug(ScreensWeb.Plug.EnsureBearerToken, env_var: "SCREENS_API_CLIENT_KEY")
+  end
+
   scope "/", ScreensWeb do
     get "/_health", HealthController, :index
   end
@@ -65,6 +69,7 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :api, :auth, :ensure_auth, :ensure_screens_group]
 
     get "/", AdminApiController, :index
+    post "/screen_configs", AdminApiController, :update_screen_configs
     post "/screens/validate", AdminApiController, :validate
     post "/screens/validate/:id", AdminApiController, :validate
     post "/screens/confirm", AdminApiController, :confirm
@@ -131,5 +136,12 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :api]
 
     get "/screens_by_alert", ScreensByAlertController, :index
+  end
+
+  scope "/api", ScreensWeb do
+    pipe_through [:redirect_prod_http, :api, :screens_api_client_auth]
+
+    get "/screen_configs", ScreenConfigsApiController, :index
+    post "/screen_configs", ScreenConfigsApiController, :update
   end
 end
