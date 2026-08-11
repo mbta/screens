@@ -32,7 +32,6 @@ config :logger, :console,
   format: "$time [$level] $message $metadata\n",
   metadata: ~w[
     app_id
-    is_pending
     is_real_screen
     ofm_app_package_version
     remote_ip
@@ -98,7 +97,6 @@ config :screens,
   config_fetcher: Screens.Config.Fetch.S3,
   config_s3_bucket: "mbta-ctd-config",
   last_deploy_fetcher: Screens.Util.LastDeploy.S3Fetch,
-  pending_config_fetcher: Screens.PendingConfig.Fetch.S3,
   signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.S3,
   signs_ui_s3_path: "config.json"
 

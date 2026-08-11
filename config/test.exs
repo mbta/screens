@@ -13,10 +13,8 @@ config :screens, Screens.Repo,
 
 config :screens,
   config_fetcher: Screens.Config.Fetch.Local,
-  pending_config_fetcher: Screens.PendingConfig.Fetch.Local,
   last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:test, "config.json"},
-  local_pending_config_file_spec: {:test, "pending_config.json"},
   local_signs_ui_config_file_spec: {:test, "signs_ui_config.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.Local,
   # This will help us write testable functions.

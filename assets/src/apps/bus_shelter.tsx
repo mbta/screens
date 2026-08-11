@@ -125,7 +125,7 @@ const App = (): JSX.Element => {
               <Route path="bus_shelter_v2" element={<MultiScreenPage />} />
 
               <Route
-                path="pending?/:id"
+                path=":id"
                 element={
                   <AudioConfigContext.Provider value={getAudioConfig()}>
                     <ScreenPage />
@@ -133,10 +133,7 @@ const App = (): JSX.Element => {
                 }
               />
 
-              <Route
-                path="pending?/:id/simulation"
-                element={<SimulationScreenPage />}
-              />
+              <Route path=":id/simulation" element={<SimulationScreenPage />} />
             </Routes>
           </Router>
         </BlinkConfigContext.Provider>

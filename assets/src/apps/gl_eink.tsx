@@ -99,10 +99,10 @@ const App = (): JSX.Element => {
         <Router basename="v2">
           <Routes>
             <Route path="screen/gl_eink_v2" element={<MultiScreenPage />} />
-            <Route path="screen/pending?/:id" element={<ScreenPage />} />
+            <Route path="screen/:id" element={<ScreenPage />} />
 
             <Route
-              path="screen/pending?/:id/simulation"
+              path="screen/:id/simulation"
               element={<SimulationScreenPage />}
             />
 

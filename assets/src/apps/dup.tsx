@@ -145,7 +145,7 @@ const App = (): JSX.Element => {
                   <Route path="dup_v2" element={<MultiScreenPage />} />
 
                   <Route
-                    path="pending?/:id"
+                    path=":id"
                     element={
                       <Viewport>
                         <ScreenPage />
@@ -154,7 +154,7 @@ const App = (): JSX.Element => {
                   />
 
                   <Route
-                    path="pending?/:id/simulation"
+                    path=":id/simulation"
                     element={
                       <SimulationScreenPage opts={{ alternateView: true }} />
                     }

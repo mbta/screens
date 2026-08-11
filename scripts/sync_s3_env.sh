@@ -8,7 +8,6 @@ set -eu
 
 SCREENS_BUCKET_PREFIX="s3://mbta-screens/screens"
 SCREENS_CONFIG_PREFIX="s3://mbta-ctd-config/screens/screens"
-PENDING_SCREENS_CONFIG_PREFIX="s3://mbta-ctd-config/screens/pending-screens"
 
 DELETE_FLAG=false
 SOURCE_ENV=""
@@ -60,9 +59,6 @@ DEST_BUCKET="$SCREENS_BUCKET_PREFIX-$DEST_ENV"
 SCREENS_SOURCE_JSON="$SCREENS_CONFIG_PREFIX-$SOURCE_ENV.json"
 SCREENS_DEST_JSON="$SCREENS_CONFIG_PREFIX-$DEST_ENV.json"
 
-PENDING_SCREENS_SOURCE_JSON="$PENDING_SCREENS_CONFIG_PREFIX-$SOURCE_ENV.json"
-PENDING_SCREENS_DEST_JSON="$PENDING_SCREENS_CONFIG_PREFIX-$DEST_ENV.json"
-
 printf '%s' "Copy *$SOURCE_ENV* screens assets and configs into *$DEST_ENV*? "
 read -r answer
 case $answer in
@@ -74,7 +70,6 @@ case $answer in
     aws s3 sync "$SOURCE_BUCKET" "$DEST_BUCKET" --exact-timestamps --acl public-read --exclude LAST_DEPLOY --copy-props metadata-directive
   fi
   aws s3 cp "$SCREENS_SOURCE_JSON" "$SCREENS_DEST_JSON"
-  aws s3 cp "$PENDING_SCREENS_SOURCE_JSON" "$PENDING_SCREENS_DEST_JSON"
   ;;
 *) echo "Did not copy from *$SOURCE_ENV* to *$DEST_ENV*" ;;
 esac
