@@ -15,6 +15,7 @@ import { type AudioConfig } from "Components/screen_container";
 import {
   fetch,
   withInFlight,
+  commitScreenConfigChanges,
   SCREEN_APPS,
   type Config,
   type Screen,
@@ -49,6 +50,7 @@ const buildIframeUrl = (screen: ScreenWithId | null, isSimulation: boolean) => {
 
 const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
+  const [configMigrationEnabled, setConfigMigrationEnabled] = useState(false);
   const [frameLoadedAt, setFrameLoadedAt] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -57,6 +59,7 @@ const Inspector: ComponentType = () => {
       const response = await fetch.get("/api/admin");
       const config: Config = JSON.parse(response.config);
       setConfig(config);
+      setConfigMigrationEnabled(response.config_migration || false);
     });
   };
 
@@ -120,6 +123,8 @@ const Inspector: ComponentType = () => {
             {screen && (
               <>
                 <ConfigControls
+                  config={config}
+                  configMigrationEnabled={configMigrationEnabled}
                   screen={screen}
                   isLoading={isLoading}
                   onUpdated={(config) => onScreenUpdated(screen.id, config)}
@@ -231,10 +236,12 @@ const ScreenSelector: ComponentType<{
 };
 
 const ConfigControls: ComponentType<{
+  config: Config | null;
+  configMigrationEnabled: boolean;
   screen: ScreenWithId;
   isLoading: boolean;
   onUpdated: (newConfig: Screen) => void;
-}> = ({ screen, isLoading, onUpdated }) => {
+}> = ({ config, configMigrationEnabled, screen, isLoading, onUpdated }) => {
   const [editableConfig, setEditableConfig] = useState<Screen | null>(null);
   const [isRequestingReload, setIsRequestingReload] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -245,6 +252,24 @@ const ConfigControls: ComponentType<{
   };
 
   const isDisabled = isLoading || isRequestingReload;
+
+  const handleConfirmEdit = async (editedConfig: Screen) => {
+    if (!config) return { success: false };
+
+    const updatedConfig: Config = {
+      ...config,
+      screens: { ...config.screens, [screen.id]: editedConfig },
+    };
+
+    const success = await commitScreenConfigChanges(
+      configMigrationEnabled,
+      [screen.id],
+      [],
+      updatedConfig,
+    );
+
+    return { success };
+  };
 
   return (
     <fieldset>
@@ -291,7 +316,7 @@ const ConfigControls: ComponentType<{
           <AdminForm
             fetchConfig={async () => editableConfig}
             validatePath={`/api/admin/screens/validate/${screen.id}`}
-            confirmPath={`/api/admin/screens/confirm/${screen.id}`}
+            onConfirm={handleConfirmEdit}
             onUpdated={(newConfig) => {
               alert("Success. Allow 5 seconds for changes to propagate.");
               closeDialog();

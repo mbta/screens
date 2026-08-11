@@ -73,7 +73,6 @@ defmodule ScreensWeb.Router do
     post "/screens/validate", AdminApiController, :validate
     post "/screens/validate/:id", AdminApiController, :validate
     post "/screens/confirm", AdminApiController, :confirm
-    post "/screens/confirm/:id", AdminApiController, :confirm
     post "/refresh", AdminApiController, :refresh
     post "/maintenance", AdminApiController, :maintenance
     post "/import_configs", AdminApiController, :import_configs

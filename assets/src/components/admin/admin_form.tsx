@@ -44,28 +44,41 @@ const AdminValidateControls = ({
 };
 
 const AdminConfirmControls = ({
-  confirmPath,
+  onConfirm,
   configRef,
   onCancel,
   onError,
   onSuccess,
 }): JSX.Element => {
-  const confirmFn = () => {
-    const config = configRef.current.value;
-    const dataToSubmit = { config };
-    fetch.post(confirmPath, dataToSubmit).then((resultJson) => {
-      if (resultJson.success === true) {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const confirmFn = async () => {
+    setIsLoading(true);
+    try {
+      const config = configRef.current.value;
+      const parsedConfig = JSON.parse(config);
+      const result = await onConfirm(parsedConfig);
+
+      if (result.success === true) {
         onSuccess();
       } else {
         onError();
       }
-    });
+    } catch (_error) {
+      onError();
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div>
-      <button onClick={onCancel}>Back</button>
-      <button onClick={confirmFn}>Confirm</button>
+      <button onClick={onCancel} disabled={isLoading}>
+        Back
+      </button>
+      <button onClick={confirmFn} disabled={isLoading}>
+        Confirm
+      </button>
     </div>
   );
 };
@@ -73,7 +86,7 @@ const AdminConfirmControls = ({
 const AdminForm = ({
   fetchConfig,
   validatePath,
-  confirmPath,
+  onConfirm,
   onUpdated,
 }): JSX.Element => {
   const [editable, setEditable] = useState(true);
@@ -111,7 +124,7 @@ const AdminForm = ({
         />
       ) : (
         <AdminConfirmControls
-          confirmPath={confirmPath}
+          onConfirm={onConfirm}
           configRef={configRef}
           onCancel={() => setEditable(true)}
           onError={() => {

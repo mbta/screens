@@ -231,3 +231,30 @@ const doFetch = async (
     throw error;
   }
 };
+
+export const commitScreenConfigChanges = async (
+  configMigrationEnabled: boolean,
+  changedScreenIds: string[],
+  deletedScreenIds: string[],
+  localConfig: Config,
+) => {
+  if (configMigrationEnabled) {
+    const changedConfigs = changedScreenIds.map((id) => ({
+      id,
+      config: localConfig.screens[id],
+    }));
+
+    const { success } = await fetch.post("/api/admin/screen_configs", {
+      screen_configs: changedConfigs,
+      deleted_screen_ids: deletedScreenIds,
+    });
+
+    return success;
+  } else {
+    const { success } = await fetch.post("/api/admin/screens/confirm", {
+      config: JSON.stringify(localConfig),
+    });
+
+    return success;
+  }
+};

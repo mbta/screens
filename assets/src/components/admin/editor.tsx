@@ -6,6 +6,7 @@ import {
   type AppId,
   type Config,
   SCREEN_APP_ENTRIES,
+  commitScreenConfigChanges,
   fetch,
   useModalDialog,
   useResetKey,
@@ -45,6 +46,7 @@ const Editor = () => {
   const [remoteConfig, setRemoteConfig] = useState<Config>(EMPTY_CONFIG);
   const [appIdFilter, setAppIdFilter] = useState<AppId | null>(null);
   const [selectedIDs, setSelectedIDs] = useState<Set<string>>(new Set());
+  const [configMigrationEnabled, setConfigMigrationEnabled] = useState(false);
 
   const { dialog: navBlockDialog, ref: navBlockDialogRef } = useModalDialog();
 
@@ -116,6 +118,7 @@ const Editor = () => {
       const config: Config = JSON.parse(response.config);
       setLocalConfig(config);
       setRemoteConfig(config);
+      setConfigMigrationEnabled(response.config_migration || false);
       setSelectedIDs(new Set());
       resetTableDataKey();
       setIsCommitReady(false);
@@ -135,9 +138,14 @@ const Editor = () => {
 
   const commitConfig = () => {
     withInFlight(setIsLoading, async () => {
-      const { success } = await fetch.post("/api/admin/screens/confirm", {
-        config: JSON.stringify(localConfig),
-      });
+      const changedIds = Array.from(changedIDs);
+      const deletedIds = Array.from(deletedIDs);
+      const success = await commitScreenConfigChanges(
+        configMigrationEnabled,
+        changedIds,
+        deletedIds,
+        localConfig,
+      );
 
       if (success) {
         setRemoteConfig(localConfig);
