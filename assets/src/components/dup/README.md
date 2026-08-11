@@ -5,7 +5,7 @@
 - **Only if you are packaging for local testing:** To test against your local screens backend instead of production, then replace the value of `data-api-origin` in [`priv/dup-app.html`][dup-app.html] with `http://localhost:4000`.
 - Run `scripts/build_dup_client_package.sh`. The packaged client apps will be output at `priv/packaged`.
   - Run with `-h` to see available options; in particular, it can automatically create a tag to record deploying the package with Outfront.
-- To test a created package locally or in Browserstack, you need to add any query param with key `test` to the `index.html`, such as `index.html?test=`.
+- To test a created package locally or in Browserstack, you need to add any query param with key `test` to the `dup-app.html` URL, such as `dup-app.html?test=`.
   - Setting this query param sets up a fake MRAID object that emulates the real one available to the client when running on Outfront screens.
   - You can also set `playerName` and `station` within the URL params to change which screen is emulated.
   - If you are testing multiple iterations locally and don't want to add the URL params with each rebuild of the package, temporarily modify the if statement and/or defaults within [`outfront.tsx`][outfront.tsx]'s `initFakeMRAID` function. Just make sure to remove before sending client packages to Outfront to test.
