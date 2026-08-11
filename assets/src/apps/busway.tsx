@@ -106,12 +106,9 @@ const App = (): JSX.Element => {
           <Router basename="v2/screen">
             <Routes>
               <Route path="bus_shelter_v2" element={<MultiScreenPage />} />
-              <Route path="pending?/:id" element={<ScreenPage />} />
+              <Route path=":id" element={<ScreenPage />} />
 
-              <Route
-                path="pending?/:id/simulation"
-                element={<SimulationScreenPage />}
-              />
+              <Route path=":id/simulation" element={<SimulationScreenPage />} />
             </Routes>
           </Router>
         </BlinkConfigContext.Provider>

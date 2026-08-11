@@ -9,9 +9,6 @@ defmodule ScreensWeb.V2.ScreenController do
 
   plug ScreenRequest, [type: :page] when action in [:index, :simulation]
 
-  plug ScreenRequest,
-       [type: :page, pending?: true] when action in [:index_pending, :simulation_pending]
-
   plug :environment_name
   plug :last_refresh
 
@@ -28,13 +25,6 @@ defmodule ScreensWeb.V2.ScreenController do
 
   def index(conn, params) do
     conn |> page_assigns(params) |> render("index.html")
-  end
-
-  def index_pending(conn, params) do
-    conn
-    |> page_assigns(params, _pending? = true)
-    |> put_view(ScreensWeb.V2.ScreenView)
-    |> render("index.html")
   end
 
   def index_multi(%{assigns: %{app_id: app_id}} = conn, _params) do
@@ -54,15 +44,6 @@ defmodule ScreensWeb.V2.ScreenController do
       Application.get_env(:screens, :screenplay_fullstory_org_id)
     )
     |> index(params)
-  end
-
-  def simulation_pending(conn, params) do
-    conn
-    |> assign(
-      :screenplay_fullstory_org_id,
-      Application.get_env(:screens, :screenplay_fullstory_org_id)
-    )
-    |> index_pending(params)
   end
 
   # Handles widget page GET requests with widget data as a query param.
@@ -104,19 +85,17 @@ defmodule ScreensWeb.V2.ScreenController do
 
   defp page_assigns(
          %{assigns: %{screen_id: screen_id, screen: %Screen{app_id: app_id} = screen}} = conn,
-         params,
-         pending? \\ false
+         params
        ) do
     refresh_rate = Parameters.refresh_rate(app_id)
 
     merge_assigns(conn,
       app_id: strip_v2(app_id),
-      refresh_rate: if(pending?, do: 0, else: refresh_rate),
+      refresh_rate: refresh_rate,
       audio_readout_interval: Parameters.audio_interval_minutes(screen),
       audio_interval_offset_seconds: Parameters.audio_interval_offset_seconds(screen),
       sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
-      refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate),
-      is_pending: pending?
+      refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate)
     )
   end
 

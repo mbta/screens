@@ -6,30 +6,27 @@ defmodule ScreensWeb.Plug.ScreenRequest do
   ## Options
 
   - `:type`: Sets the `:request_type` in logger metadata.
-  - `:pending?`: When true, the screen data is fetched from pending configuration. Otherwise
-    the "live" configuration is used.
   """
 
   alias Phoenix.Controller
   alias Plug.Conn
-  alias ScreensConfig.{PendingConfig, Screen}
+  alias ScreensConfig.Screen
 
   import Screens.Inject
   @cache injected(Screens.Config.Cache)
-  @pending injected(Screens.PendingConfig.Fetch)
 
   defmodule Options do
     @moduledoc false
-    defstruct pending?: false, type: nil
+    defstruct type: nil
   end
 
   def init(options), do: struct!(Options, options)
 
-  def call(conn, %Options{pending?: false} = options) do
+  def call(conn, options) do
     with {:params, %Conn{path_params: %{"id" => id}}} <- {:params, conn},
          {:cache, true} <- {:cache, Screens.Config.Cache.ok?()},
          {:screen, %Screen{} = screen} <- {:screen, @cache.screen(id)} do
-      handle_request(conn, options, id, screen)
+      conn |> Conn.fetch_query_params() |> assign(options, id, screen)
     else
       {:params, _conn} -> error(conn, 400)
       {:cache, false} -> error(conn, 503)
@@ -37,34 +34,11 @@ defmodule ScreensWeb.Plug.ScreenRequest do
     end
   end
 
-  def call(conn, %Options{pending?: true} = options) do
-    with {:params, %Conn{path_params: %{"id" => id}}} <- {:params, conn},
-         {:ok, fetched} = @pending.fetch_config(),
-         {:ok, decoded} = Jason.decode(fetched),
-         %PendingConfig{screens: screens} = PendingConfig.from_json(decoded),
-         {:screen, {:ok, screen}} <- {:screen, Map.fetch(screens, id)} do
-      handle_request(conn, options, id, screen)
-    else
-      {:params, _conn} -> error(conn, 400)
-      {:screen, :error} -> error(conn, 404)
-    end
-  end
-
-  defp handle_request(conn, options, screen_id, screen) do
-    conn |> Conn.fetch_query_params() |> assign(options, screen_id, screen)
-  end
-
-  defp assign(
-         %Conn{params: params} = conn,
-         %Options{pending?: pending?, type: request_type},
-         screen_id,
-         screen
-       ) do
+  defp assign(%Conn{params: params} = conn, %Options{type: request_type}, screen_id, screen) do
     %Screen{app_id: app_id, app_params: app_params, vendor: vendor} = screen
 
     meta_base = [
       app_id: app_id,
-      is_pending: pending?,
       ofm_app_package_version: params["version"],
       request_type: request_type,
       vendor: vendor

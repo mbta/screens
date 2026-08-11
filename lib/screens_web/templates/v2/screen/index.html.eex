@@ -3,7 +3,6 @@
   data-audio-interval-offset-seconds="<%= @audio_interval_offset_seconds %>"
   data-audio-readout-interval="<%= @audio_readout_interval %>"
   data-environment-name="<%= @environment_name %>"
-  data-is-pending="<%= @is_pending %>"
   data-is-real-screen="<%= @is_real_screen %>"
   data-last-refresh="<%= @last_refresh %>"
   data-refresh-rate-offset="<%= @refresh_rate_offset %>"

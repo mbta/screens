@@ -105,14 +105,7 @@ const isSuccess = (
 const useApiPath = (screenId: string, appendPath?: string): string => {
   return useMemo(() => {
     const base = getDatasetValue("apiOrigin") ?? document.baseURI;
-    const path = [
-      BASE_PATH,
-      getDatasetValue("isPending") === "true" ? "pending" : null,
-      screenId,
-      appendPath,
-    ]
-      .filter(Boolean)
-      .join("/");
+    const path = [BASE_PATH, screenId, appendPath].filter(Boolean).join("/");
 
     const url = new URL(path, base);
 

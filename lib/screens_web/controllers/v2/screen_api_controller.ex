@@ -11,14 +11,12 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   @base_response %{data: nil, disabled: false, force_reload: false}
 
-  @non_pending_show_actions [:show, :show_dup, :simulation]
-  @pending_show_actions [:show_pending, :simulation_pending]
+  @show_actions [:show, :show_dup, :simulation]
 
   plug Corsica, [origins: "*"] when action in [:show_dup, :log_frontend_error]
-  plug ScreenRequest, [type: :data] when action in @non_pending_show_actions
-  plug ScreenRequest, [type: :data, pending?: true] when action in @pending_show_actions
-  plug :disabled_response when action in @non_pending_show_actions
-  plug :outdated_response when action in @non_pending_show_actions
+  plug ScreenRequest, [type: :data] when action in @show_actions
+  plug :disabled_response when action in @show_actions
+  plug :outdated_response when action in @show_actions
 
   def show(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
     response =
@@ -34,14 +32,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
   def simulation(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
     data = ScreenData.simulation(screen, update_visible_alerts_for_screen_id: screen_id)
     json(conn, %{@base_response | data: data})
-  end
-
-  def show_pending(%{assigns: %{screen: screen}} = conn, _params) do
-    json(conn, %{@base_response | data: ScreenData.get(screen)})
-  end
-
-  def simulation_pending(%{assigns: %{screen: screen}} = conn, _params) do
-    json(conn, %{@base_response | data: ScreenData.simulation(screen)})
   end
 
   def log_frontend_error(conn, params) do
