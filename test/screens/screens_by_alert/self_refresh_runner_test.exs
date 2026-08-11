@@ -24,15 +24,8 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
     expect(ScreensByAlert.Mock, :get_in_progress, fn _screen_ids -> ["1301"] end)
     expect(ScreensByAlert.Mock, :put_in_progress, fn ~w[1401 1002] -> :ok end)
 
-    expect(ScreenData.Mock, :get, fn %Screen{app_id: :bus_shelter_v2},
-                                     [update_visible_alerts_for_screen_id: "1401"] ->
-      %{type: :x}
-    end)
-
-    expect(ScreenData.Mock, :get, fn %Screen{app_id: :bus_eink_v2},
-                                     [update_visible_alerts_for_screen_id: "1002"] ->
-      raise "oops"
-    end)
+    expect(ScreenData.Mock, :get, fn "1401", %Screen{app_id: :bus_shelter_v2} -> %{type: :x} end)
+    expect(ScreenData.Mock, :get, fn "1002", %Screen{app_id: :bus_eink_v2} -> raise "oops" end)
 
     screen_ids = MapSet.new(~w[1002 1401])
     assert {:noreply, ^screen_ids} = SelfRefreshRunner.handle_info(:check, MapSet.new())

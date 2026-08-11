@@ -39,7 +39,7 @@ defmodule Screens.V2.ScreenDataTest do
 
       expect(@parameters, :candidate_generator, fn %Screen{app_id: :test_app} -> GrayGenerator end)
 
-      assert ScreenData.get(screen) ==
+      assert ScreenData.get("test", screen) ==
                %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
     end
   end
