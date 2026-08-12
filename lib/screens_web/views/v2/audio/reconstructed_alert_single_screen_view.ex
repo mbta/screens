@@ -161,14 +161,6 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
     end
   end
 
-  # Fallback
-  def render_alert(%{
-        issue: issue,
-        remedy: remedy
-      }) do
-    ~E|<%= issue %>. <%= remedy %>|
-  end
-
   # Fallback for Dual Screen
   def render_alert(%{
         issue: issue,
@@ -180,6 +172,14 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
     else
       ~E|<%= location %>.|
     end
+  end
+
+  # Fallback
+  def render_alert(%{
+        issue: issue,
+        remedy: remedy
+      }) do
+    ~E|<%= issue %>. <%= remedy %>|
   end
 
   defp get_line_name([%{color: _color, text: _text, type: _type} | _tail] = routes) do

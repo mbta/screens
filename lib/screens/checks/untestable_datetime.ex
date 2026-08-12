@@ -88,7 +88,8 @@ if Code.ensure_loaded?(Credo) do
              issues,
              issue_meta
            ) do
-        mfa = Tuple.append(unquote(mf), length(args))
+        mf_list = unquote(mf)
+        mfa = Tuple.insert_at(mf_list, tuple_size(mf_list), length(args))
         {ast, issues ++ [issue_for(mfa, meta[:line], issue_meta)]}
       end
     end

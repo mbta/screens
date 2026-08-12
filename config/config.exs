@@ -23,12 +23,8 @@ config :screens, Screens.Repo,
 
 config :screens, ecto_repos: [Screens.Repo]
 
-# Include 2 logger backends
-config :logger,
-  backends: [:console, Sentry.LoggerBackend]
-
 # Configures Elixir's Logger
-config :logger, :console,
+config :logger, :default_formatter,
   format: "$time [$level] $message $metadata\n",
   metadata: ~w[
     app_id

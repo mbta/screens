@@ -39,7 +39,7 @@ defmodule ScreensWeb.Plug.ScreenRequestTest do
       vendor: nil
     }
 
-    defp make_successful(conn, screen \\ @screen) do
+    defp make_successful(%Conn{} = conn, screen \\ @screen) do
       id = System.unique_integer() |> to_string()
       expect(@cache, :screen, fn ^id -> screen end)
       %Conn{conn | path_params: %{"id" => id}}
@@ -50,12 +50,12 @@ defmodule ScreensWeb.Plug.ScreenRequestTest do
       assert response(conn, 400)
     end
 
-    test "errors when no screen exists for the given ID", %{conn: conn} do
+    test "errors when no screen exists for the given ID", %{conn: %Conn{} = conn} do
       conn = ScreenRequest.call(%Conn{conn | path_params: %{"id" => "1"}}, %Options{})
       assert response(conn, 404)
     end
 
-    test "assigns screen ID and configuration", %{conn: conn} do
+    test "assigns screen ID and configuration", %{conn: %Conn{} = conn} do
       expect(@cache, :screen, fn "1" -> @screen end)
 
       %Conn{assigns: assigns} =

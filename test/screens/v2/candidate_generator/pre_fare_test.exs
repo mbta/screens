@@ -37,7 +37,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
       upstream_stops: MapSet.new(["place-pktrm"]),
       downstream_stops: MapSet.new(["place-dwnxg"]),
       child_stops_at_station: MapSet.new(),
-      routes: [],
+      routes: [%{route_id: "Red", active?: true}],
       alert_route_types: [:light_rail, :subway]
     }
 

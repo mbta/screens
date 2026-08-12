@@ -304,8 +304,7 @@ defmodule Screens.V2.ScreenData.LayoutTest do
               %{
                 header: %MockWidget{widget_type: :header, content: "header"},
                 large: %MockWidget{widget_type: :psa, content: "5"}
-              },
-              ^expected_paging_metadata} =
+              }, ^expected_paging_metadata} =
                Layout.resolve_paging({layout, selected_widgets}, refresh_rate, now)
     end
 
@@ -372,8 +371,7 @@ defmodule Screens.V2.ScreenData.LayoutTest do
                 medium_left: %MockWidget{slot_names: [], content: "medium_left 1"},
                 medium_right: %MockWidget{slot_names: [], content: "medium_right"},
                 footer: %MockWidget{slot_names: [], content: "footer 0"}
-              },
-              ^expected_paging_metadata} =
+              }, ^expected_paging_metadata} =
                Layout.resolve_paging({layout, selected_widgets}, refresh_rate, now)
     end
   end
