@@ -120,8 +120,6 @@ const filenameForFullBodyTopScreenIcon = (icon: AlertIcon) => {
       return "alert-black.svg";
     case "snowflake":
       return "alert-widget-icon-snowflake--eink.svg";
-    default:
-      return "alert-black.svg";
   }
 };
 
