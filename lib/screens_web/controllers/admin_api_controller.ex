@@ -25,7 +25,7 @@ defmodule ScreensWeb.AdminApiController do
       {:error, reason} ->
         conn
         |> put_status(500)
-        |> json(%{success: false, error: "Failed to update screen configs: #{inspect(reason)}"})
+        |> json(%{success: false, error: inspect(reason)})
     end
   end
 

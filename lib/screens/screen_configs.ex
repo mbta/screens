@@ -11,7 +11,19 @@ defmodule Screens.ScreenConfigs do
 
   @config_fetcher injected(Screens.Config.Fetch)
 
-  @spec import_from_file() :: {:ok, %{upserted: integer(), deleted: integer()}} | {:error, any()}
+  @type screen_id :: String.t()
+  @type screen_update :: %{required(:id) => screen_id(), required(:config) => map()}
+  @type commit_error ::
+          {:upsert_failed, String.t()}
+          | {:delete_failed, String.t()}
+          | {:legacy_fetch_failed, term()}
+          | {:legacy_decode_failed, Jason.DecodeError.t()}
+          | {:legacy_encode_failed, Jason.EncodeError.t()}
+          | :legacy_write_failed
+          | :legacy_screens_invalid
+
+  @spec import_from_file() ::
+          {:ok, %{upserted: integer(), deleted: integer()}} | {:error, commit_error()}
   def import_from_file do
     # This should be a part of post_config_migration_cleanup
     with {:ok, config, _version} <- @config_fetcher.fetch_config(),
@@ -23,16 +35,24 @@ defmodule Screens.ScreenConfigs do
         upsert_screen_config(%{id: id, config: config})
       end)
 
-      {deleted, _} =
-        Repo.delete_all(from s in ScreenConfig, where: s.id not in ^screen_ids)
+      stale_ids =
+        Repo.all(from s in ScreenConfig, where: s.id not in ^screen_ids, select: s.id)
 
-      {:ok, %{upserted: Enum.count(screen_ids), deleted: deleted}}
+      case perform_deletes(stale_ids) do
+        :ok ->
+          {:ok, %{upserted: Enum.count(screen_ids), deleted: Enum.count(stale_ids)}}
+
+        {:error, reason} ->
+          {:error, reason}
+      end
     end
   end
 
+  @doc """
+  Returns all Configs as JSON to be used by Screens Admin
+  """
   @spec list_all() :: String.t() | :error
   def list_all do
-    # Returns all Configs as a JSON to be used by Screens Admin
     if config_migration_enabled?() do
       screens =
         ScreenConfig
@@ -47,11 +67,13 @@ defmodule Screens.ScreenConfigs do
     end
   end
 
+  @doc """
+  Returns all configs as a list of ScreenConfig structs to be used by Screens Admin
+  The API controller handles the JSON encoding and formatting for the response.
+  As part of post_config_migration_cleanup, this and list_all can be cleaned up and restructured
+  """
   @spec list_screen_configs() :: [ScreenConfig.t()]
   def list_screen_configs do
-    # Returns all configs as a list of ScreenConfig structs to be used by Screens Admin
-    # The API controller handles the JSON encoding and formatting for the response.
-    # As part of post_config_migration_cleanup, this and above function can be cleaned up
     if config_migration_enabled?() do
       Repo.all(ScreenConfig)
     else
@@ -82,12 +104,16 @@ defmodule Screens.ScreenConfigs do
     )
   end
 
-  @spec upsert_list([%{:id => String.t(), :config => map()}]) :: :ok | {:error, any()}
+  @spec upsert_list([screen_update()]) :: :ok | {:error, commit_error()}
   defp upsert_list(updates) do
     Enum.reduce_while(updates, :ok, fn update, _acc ->
       case upsert_screen_config(update) do
-        {:ok, _} -> {:cont, :ok}
-        {:error, reason} -> {:halt, {:error, reason}}
+        {:ok, _} ->
+          {:cont, :ok}
+
+        {:error, %Ecto.Changeset{} = changeset} ->
+          {:halt,
+           {:error, {:upsert_failed, "ID #{update[:id]} failed: #{inspect(changeset.errors)}"}}}
       end
     end)
   end
@@ -96,8 +122,8 @@ defmodule Screens.ScreenConfigs do
   Updates and deletes multiple screen configs.
   Accepts a list of maps with :id and :config keys for updates, and a list of screen IDs for deletions.
   """
-  @spec commit_updates([%{:id => String.t(), :config => map()}], [String.t()]) ::
-          :ok | {:error, any()}
+  @spec commit_updates([screen_update()], [screen_id()]) ::
+          :ok | {:error, commit_error()}
   def commit_updates(updates, deletes \\ []) do
     if config_migration_enabled?() do
       update_to_postgres(updates, deletes)
@@ -108,48 +134,81 @@ defmodule Screens.ScreenConfigs do
     end
   end
 
-  @spec update_to_postgres([%{:id => String.t(), :config => map()}], [String.t()]) ::
-          :ok | {:error, any()}
+  @spec update_to_postgres([screen_update()], [screen_id()]) ::
+          :ok | {:error, commit_error()}
   defp update_to_postgres(updates, deletes) do
-    with :ok <- upsert_list(updates) do
-      perform_deletes(deletes)
+    case upsert_list(updates) do
+      :ok -> perform_deletes(deletes)
+      {:error, _} = error -> error
     end
   end
 
-  @spec perform_deletes([String.t()]) :: :ok | {:error, any()}
+  @spec perform_deletes([screen_id()]) :: :ok | {:error, commit_error()}
   defp perform_deletes(deletes) do
     Enum.reduce_while(deletes, :ok, fn id, _acc ->
-      Repo.delete_all(from s in ScreenConfig, where: s.id == ^id)
-      {:cont, :ok}
+      case delete_screen_config(id) do
+        :ok -> {:cont, :ok}
+        {:error, _} = error -> {:halt, error}
+      end
     end)
   end
 
+  @spec delete_screen_config(screen_id()) :: :ok | {:error, commit_error()}
+  defp delete_screen_config(id) do
+    case Repo.delete_all(from s in ScreenConfig, where: s.id == ^id) do
+      {count, _} when count > 0 ->
+        :ok
+
+      {0, _} ->
+        {:error, {:delete_failed, "Config for screen ID #{id} not found"}}
+
+      response ->
+        {:error, {:delete_failed, "Unexpected delete operation response: #{inspect(response)}"}}
+    end
+  end
+
+  # This will be a part of post_config_migration_cleanup
+  # Merges updates into the existing config and removes deleted screens, then writes back to the legacy source.
+  # We need to fetch the existing config before writing updates to prevent overwriting any existing configs.
+  @spec update_to_legacy_json([screen_update()], [screen_id()]) ::
+          :ok | {:error, commit_error()}
   defp update_to_legacy_json(updates, deletes) do
-    # This will be a part of post_config_migration_cleanup
-    # Merges updates into the existing config and removes deleted screens, then writes back to the legacy source.
-    # We need to fetch the existing config before writing updates to prevent overwriting any existing configs.
     with {:ok, config_json, _version} <- @config_fetcher.fetch_config(),
-         {:ok, decoded_config} <- Jason.decode(config_json),
-         screens when is_map(screens) <- Map.get(decoded_config, "screens", %{}) do
-      updated_screens =
-        Enum.reduce(updates, screens, fn update, acc ->
-          id = extract_id(update)
-          config = extract_config(update)
+         {:ok, decoded_config} <- Jason.decode(config_json) do
+      screens = Map.get(decoded_config, "screens", %{})
 
-          existing_config = Map.get(acc, id, %{})
-          merged_config = Map.merge(existing_config, config)
-          Map.put(acc, id, merged_config)
-        end)
+      if is_map(screens) do
+        updated_screens =
+          Enum.reduce(updates, screens, fn update, acc ->
+            id = extract_id(update)
 
-      final_screens = Map.drop(updated_screens, deletes)
-      updated_config = Map.put(decoded_config, "screens", final_screens)
+            merged_config =
+              acc
+              |> Map.get(id, %{})
+              |> Map.merge(extract_config(update))
 
-      case Jason.encode(updated_config) do
-        {:ok, encoded_config} -> @config_fetcher.put_config(encoded_config)
-        {:error, reason} -> {:error, reason}
+            Map.put(acc, id, merged_config)
+          end)
+
+        final_screens = Map.drop(updated_screens, deletes)
+        updated_config = Map.put(decoded_config, "screens", final_screens)
+
+        case Jason.encode(updated_config) do
+          {:ok, encoded_config} ->
+            case @config_fetcher.put_config(encoded_config) do
+              :ok -> :ok
+              :error -> {:error, :legacy_write_failed}
+            end
+
+          {:error, %Jason.EncodeError{} = reason} ->
+            {:error, {:legacy_encode_failed, reason}}
+        end
+      else
+        {:error, :legacy_screens_invalid}
       end
     else
-      _ -> :error
+      {:error, %Jason.DecodeError{} = reason} -> {:error, {:legacy_decode_failed, reason}}
+      reason -> {:error, {:legacy_fetch_failed, reason}}
     end
   end
 

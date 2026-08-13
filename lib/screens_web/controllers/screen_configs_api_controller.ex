@@ -4,14 +4,7 @@ defmodule ScreensWeb.ScreenConfigsApiController do
   alias Screens.ScreenConfigs
 
   def index(conn, _params) do
-    screen_configs =
-      ScreenConfigs.list_screen_configs()
-      |> Enum.map(fn screen_config ->
-        %{
-          id: screen_config.id,
-          config: screen_config.config
-        }
-      end)
+    screen_configs = ScreenConfigs.list_screen_configs()
 
     json(conn, %{screen_configs: screen_configs})
   end
@@ -26,7 +19,7 @@ defmodule ScreensWeb.ScreenConfigsApiController do
       {:error, reason} ->
         conn
         |> put_status(500)
-        |> json(%{success: false, error: "Failed to update screen configs: #{inspect(reason)}"})
+        |> json(%{success: false, error: inspect(reason)})
     end
   end
 
