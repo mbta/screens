@@ -55,19 +55,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     secondary_rds_sections = @rds.get(secondary_departures, now)
 
-    post_process_rows_fn = fn rows, %Section{bidirectional: bidirectional}, total_section_count ->
-      num_departures_per_section = div(@max_departures_per_rotation, total_section_count)
-
-      rows
-      |> RdsDepartures.maybe_make_bidirectional(bidirectional)
-      |> Enum.take(num_departures_per_section)
-    end
-
     primary_departure_sections =
       RdsDepartures.create_departure_sections(
         primary_rds_sections,
         primary_departures,
-        post_process_rows_fn
+        &post_process_rows/4,
+        now
       )
 
     secondary_departure_sections =
@@ -77,7 +70,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         RdsDepartures.create_departure_sections(
           secondary_rds_sections,
           secondary_departures,
-          post_process_rows_fn
+          &post_process_rows/4,
+          now
         )
       end
 
@@ -199,5 +193,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           end
         )
     end
+  end
+
+  defp post_process_rows(rows, %Section{bidirectional: bidirectional}, total_section_count, _now) do
+    num_departures_per_section = div(@max_departures_per_rotation, total_section_count)
+
+    rows
+    |> RdsDepartures.maybe_make_bidirectional(bidirectional)
+    |> Enum.take(num_departures_per_section)
   end
 end
