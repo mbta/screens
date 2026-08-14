@@ -1,6 +1,6 @@
 import cx from "classnames";
 import { QRCodeSVG as QRCode } from "qrcode.react";
-import { type ComponentType, type JSX } from "react";
+import { type ComponentType } from "react";
 
 import FreeText, { type FreeTextType } from "./free_text";
 
@@ -27,9 +27,7 @@ type Props = {
   qr_code_url: string;
 };
 
-const StatusIcon: ComponentType<{ status: ElevatorStatus }> = ({
-  status,
-}): JSX.Element => {
+const StatusIcon: ComponentType<{ status: ElevatorStatus }> = ({ status }) => {
   switch (status) {
     case "alert":
       return <ElevatorAlertIcon width={280} height={160} />;
