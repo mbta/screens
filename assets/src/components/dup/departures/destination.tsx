@@ -46,9 +46,7 @@ export type SizingStateUpdate =
   | TwoLinesPhaseUpdate;
 
 // Returns changes to make to the state given the current line-fit measurements
-export const nextSizingState = (
-  state: SizingState,
-): SizingStateUpdate | null => {
+export const nextSizingState = (state: SizingState): SizingStateUpdate => {
   const {
     phase,
     headsignIndex,
@@ -101,9 +99,8 @@ export const nextSizingState = (
           return { phase: PHASES.Done };
         }
       }
-    default:
-      // Must return default fallback, but we'll never reach this case
-      return null;
+    case PHASES.Done:
+      return { phase: PHASES.Done };
   }
 };
 
@@ -211,20 +208,18 @@ const Destination: ComponentType<DupDestination> = ({
           firstLineFits: !hasOverflowX(firstLineRef.current),
           secondLineFits: !hasOverflowX(secondLineRef.current),
         });
-        if (next) {
-          // Update the state so we can re-attempt sizing with updated values
-          if ("headsignIndex" in next && next.headsignIndex !== undefined) {
-            setHeadsignIndex(next.headsignIndex);
-          }
-          if ("phase" in next && next.phase !== undefined) {
-            setPhase(next.phase);
-          }
-          if ("partsIndex1" in next && next.partsIndex1 !== undefined) {
-            setPartsIndex1(next.partsIndex1);
-          }
-          if ("partsIndex2" in next && next.partsIndex2 !== undefined) {
-            setPartsIndex2(next.partsIndex2);
-          }
+        // Update the state so we can re-attempt sizing with updated values
+        if ("headsignIndex" in next && next.headsignIndex !== undefined) {
+          setHeadsignIndex(next.headsignIndex);
+        }
+        if ("phase" in next && next.phase !== undefined) {
+          setPhase(next.phase);
+        }
+        if ("partsIndex1" in next && next.partsIndex1 !== undefined) {
+          setPartsIndex1(next.partsIndex1);
+        }
+        if ("partsIndex2" in next && next.partsIndex2 !== undefined) {
+          setPartsIndex2(next.partsIndex2);
         }
       }
     });

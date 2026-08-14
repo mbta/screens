@@ -20,8 +20,9 @@ const Viewport: ComponentType<PropsWithChildren> = ({ children }) => {
     case "2":
       shifterClassName += " dup-shifter--rotation-two";
       break;
-    default:
+    case null:
       viewportClassName += " dup-screen-viewport--all";
+      break;
   }
 
   return (
