@@ -9,7 +9,7 @@ defmodule ScreensWeb.ScreenConfigsApiController do
     json(conn, %{screen_configs: screen_configs})
   end
 
-  def update(conn, %{"screen_configs" => screen_configs} = params) when is_list(screen_configs) do
+  def update(conn, %{"screen_configs" => screen_configs}) when is_list(screen_configs) do
     case ScreenConfigs.commit_updates(screen_configs) do
       :ok ->
         json(conn, %{success: true})
