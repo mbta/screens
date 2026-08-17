@@ -21,6 +21,10 @@ and more to come!
 
 See [`docs/getting_started.md`](docs/getting_started.md).
 
+## Screen Config API Auth
+
+The `api/screen_configs` endpoints require a valid Bearer token included in an `Authorization` header. This can be obtained from a member of the screens team if there's a need to access these APIs.
+
 ## Architecture
 
 On <sup>almost</sup> all of our screen types, we use a common "framework" to fetch relevant real-time info for the screen's location, and then determine which pieces of info are most important to riders from moment to moment.
