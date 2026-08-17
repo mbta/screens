@@ -25,7 +25,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
   setup :verify_on_exit!
 
-  describe "update_screen_configs/2" do
+  describe "screen config admin endpoints" do
     @tag :authenticated
     test "updates screen configs in Postgres when migration flag is true", %{conn: conn} do
       Application.put_env(:screens, :config_migration, true)
@@ -33,7 +33,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
       Repo.insert!(%ScreenConfig{id: "screen-1", config: @screen_busway_config})
 
       conn =
-        post(conn, "/api/admin/screen_configs", %{
+        post(conn, "/api/admin/screen_configs/update", %{
           screen_configs: [
             %{id: "screen-1", config: @screen_dup_config}
           ]
@@ -57,7 +57,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
       expect(Screens.Config.Fetch.Mock, :put_config, fn _config -> :ok end)
 
       conn =
-        post(conn, "/api/admin/screen_configs", %{
+        post(conn, "/api/admin/screen_configs/update", %{
           screen_configs: [
             %{"id" => "screen-2", "config" => @screen_busway_config}
           ]
@@ -69,7 +69,32 @@ defmodule ScreensWeb.AdminApiControllerTest do
     @tag :authenticated
     test "returns 400 when screen_configs param is missing", %{conn: conn} do
       capture_log([level: :warning], fn ->
-        conn = post(conn, "/api/admin/screen_configs", %{})
+        conn = post(conn, "/api/admin/screen_configs/update", %{})
+        assert conn.status == 400
+      end)
+    end
+
+    @tag :authenticated
+    test "deletes screen configs in Postgres when migration flag is true", %{conn: conn} do
+      Application.put_env(:screens, :config_migration, true)
+
+      Repo.insert!(%ScreenConfig{id: "screen-1", config: @screen_dup_config})
+      Repo.insert!(%ScreenConfig{id: "screen-2", config: @screen_busway_config})
+
+      conn =
+        post(conn, "/api/admin/screen_configs/delete", %{
+          deleted_screen_ids: ["screen-2"]
+        })
+
+      assert json_response(conn, 200) == %{"success" => true}
+      assert Repo.get(ScreenConfig, "screen-1")
+      assert nil == Repo.get(ScreenConfig, "screen-2")
+    end
+
+    @tag :authenticated
+    test "returns 400 when deleted_screen_ids param is missing", %{conn: conn} do
+      capture_log([level: :warning], fn ->
+        conn = post(conn, "/api/admin/screen_configs/delete", %{})
         assert conn.status == 400
       end)
     end

@@ -2,10 +2,10 @@ import { useState, useEffect, useRef, type JSX, type RefObject } from "react";
 import { AUTOLESS_ATTRIBUTES, fetch } from "Util/admin";
 
 type AdminConfirmControlsProps = {
-  onConfirm: (config: any) => Promise<{ success: boolean }>;
+  onConfirm: (config: any) => Promise<{ success: boolean; error?: string }>;
   configRef: RefObject<HTMLTextAreaElement | null>;
   onCancel: () => void;
-  onError: () => void;
+  onError: (string) => void;
   onSuccess: () => void;
 };
 
@@ -64,8 +64,8 @@ const AdminConfirmControls = ({
     setIsLoading(true);
     try {
       const config = configRef.current?.value;
-      if (config == null) {
-        onError();
+      if (!config) {
+        onError("No current configuration found.");
         return;
       }
 
@@ -75,10 +75,10 @@ const AdminConfirmControls = ({
       if (result.success === true) {
         onSuccess();
       } else {
-        onError();
+        onError(result.error);
       }
-    } catch (_error) {
-      onError();
+    } catch (error) {
+      onError(error);
     } finally {
       setIsLoading(false);
     }
@@ -140,8 +140,8 @@ const AdminForm = ({
           onConfirm={onConfirm}
           configRef={configRef}
           onCancel={() => setEditable(true)}
-          onError={() => {
-            alert("Config update failed");
+          onError={(error) => {
+            alert(`Config update failed: ${error}`);
             setEditable(true);
           }}
           onSuccess={() => {

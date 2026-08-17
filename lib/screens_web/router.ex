@@ -69,7 +69,8 @@ defmodule ScreensWeb.Router do
     pipe_through [:redirect_prod_http, :api, :auth, :ensure_auth, :ensure_screens_group]
 
     get "/", AdminApiController, :index
-    post "/screen_configs", AdminApiController, :update_screen_configs
+    post "/screen_configs/update", AdminApiController, :update_screen_configs
+    post "/screen_configs/delete", AdminApiController, :delete_screen_configs
     post "/screens/validate", AdminApiController, :validate
     post "/screens/validate/:id", AdminApiController, :validate
     post "/screens/confirm", AdminApiController, :confirm

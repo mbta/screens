@@ -184,58 +184,6 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
         assert response["error"] == "screen_configs parameter is required"
       end)
     end
-
-    test "deletes screen configs in Postgres when migration flag is true", %{conn: conn} do
-      System.put_env(@env_var, "shared-secret")
-      Application.put_env(:screens, :config_migration, true)
-
-      Repo.insert!(%ScreenConfig{id: "screen-1", config: @screen_dup_config})
-      Repo.insert!(%ScreenConfig{id: "screen-2", config: @screen_busway_config})
-
-      conn =
-        conn
-        |> put_req_header("authorization", "Bearer shared-secret")
-        |> post("/api/screen_configs", %{
-          screen_configs: [],
-          deleted_screen_ids: ["screen-2"]
-        })
-
-      assert json_response(conn, 200) == %{"success" => true}
-
-      # Verify deletion
-      assert Repo.get(ScreenConfig, "screen-1")
-      assert nil == Repo.get(ScreenConfig, "screen-2")
-    end
-
-    test "deletes screens from legacy config when migration flag is false", %{conn: conn} do
-      System.put_env(@env_var, "shared-secret")
-      Application.put_env(:screens, :config_migration, false)
-
-      # Mock the fetch and put to verify deletion logic
-      expect(Screens.Config.Fetch.Mock, :fetch_config, fn ->
-        {:ok, Jason.encode!(@legacy_config), 1}
-      end)
-
-      expect(Screens.Config.Fetch.Mock, :put_config, fn config ->
-        {:ok, decoded} = Jason.decode(config)
-        screens = Map.get(decoded, "screens", %{})
-        assert not Map.has_key?(screens, "busway_1")
-        assert screens["dup_1"] == @screen_dup_config
-        :ok
-      end)
-
-      capture_log([level: :warning], fn ->
-        conn =
-          conn
-          |> put_req_header("authorization", "Bearer shared-secret")
-          |> post("/api/screen_configs", %{
-            screen_configs: [],
-            deleted_screen_ids: ["busway_1"]
-          })
-
-        assert json_response(conn, 200) == %{"success" => true}
-      end)
-    end
   end
 
   defp restore_env_var(env_var, nil), do: System.delete_env(env_var)

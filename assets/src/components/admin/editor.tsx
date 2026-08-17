@@ -140,19 +140,21 @@ const Editor = () => {
     withInFlight(setIsLoading, async () => {
       const changedIds = Array.from(changedIDs);
       const deletedIds = Array.from(deletedIDs);
-      const success = await commitScreenConfigChanges(
+      const commitResponse = await commitScreenConfigChanges(
         configMigrationEnabled,
         changedIds,
         deletedIds,
         localConfig,
       );
 
-      if (success) {
+      if (commitResponse.success) {
         setRemoteConfig(localConfig);
         setIsCommitReady(false);
         window.alert("Config updated successfully.");
       } else {
-        window.alert("Error: Config update failed.");
+        window.alert(
+          `Error: Config update failed with the following: ${commitResponse.error}`,
+        );
       }
     });
   };

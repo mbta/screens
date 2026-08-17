@@ -254,21 +254,22 @@ const ConfigControls: ComponentType<{
   const isDisabled = isLoading || isRequestingReload;
 
   const handleConfirmEdit = async (editedConfig: Screen) => {
-    if (!config) return { success: false };
+    if (!config)
+      return { success: false, error: "No current configuration found." };
 
     const updatedConfig: Config = {
       ...config,
       screens: { ...config.screens, [screen.id]: editedConfig },
     };
 
-    const success = await commitScreenConfigChanges(
+    const response = await commitScreenConfigChanges(
       configMigrationEnabled,
       [screen.id],
       [],
       updatedConfig,
     );
 
-    return { success };
+    return response;
   };
 
   return (

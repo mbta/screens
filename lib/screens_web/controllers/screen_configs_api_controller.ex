@@ -10,9 +10,7 @@ defmodule ScreensWeb.ScreenConfigsApiController do
   end
 
   def update(conn, %{"screen_configs" => screen_configs} = params) when is_list(screen_configs) do
-    deleted_screen_ids = Map.get(params, "deleted_screen_ids", [])
-
-    case ScreenConfigs.commit_updates(screen_configs, deleted_screen_ids) do
+    case ScreenConfigs.commit_updates(screen_configs) do
       :ok ->
         json(conn, %{success: true})
 

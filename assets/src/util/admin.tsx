@@ -244,17 +244,34 @@ export const commitScreenConfigChanges = async (
       config: localConfig.screens[id],
     }));
 
-    const { success } = await fetch.post("/api/admin/screen_configs", {
-      screen_configs: changedConfigs,
-      deleted_screen_ids: deletedScreenIds,
-    });
+    if (changedConfigs.length > 0) {
+      const updateResponse = await fetch.post(
+        "/api/admin/screen_configs/update",
+        {
+          screen_configs: changedConfigs,
+        },
+      );
 
-    return success;
+      if (!updateResponse.success) return updateResponse;
+    }
+
+    if (deletedScreenIds.length > 0) {
+      const deleteResponse = await fetch.post(
+        "/api/admin/screen_configs/delete",
+        {
+          deleted_screen_ids: deletedScreenIds,
+        },
+      );
+
+      if (!deleteResponse.success) return deleteResponse;
+    }
+
+    return { success: true };
   } else {
-    const { success } = await fetch.post("/api/admin/screens/confirm", {
+    const response = await fetch.post("/api/admin/screens/confirm", {
       config: JSON.stringify(localConfig),
     });
 
-    return success;
+    return response;
   }
 };

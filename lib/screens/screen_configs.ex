@@ -126,7 +126,7 @@ defmodule Screens.ScreenConfigs do
           :ok | {:error, commit_error()}
   def commit_updates(updates, deletes \\ []) do
     if config_migration_enabled?() do
-      update_to_postgres(updates, deletes)
+      upsert_list(updates)
     else
       # This branch will be removed as part of post_config_migration_cleanup.
       # When the feature flag is disabled, continue to update the JSON config.
@@ -134,12 +134,15 @@ defmodule Screens.ScreenConfigs do
     end
   end
 
-  @spec update_to_postgres([screen_update()], [screen_id()]) ::
-          :ok | {:error, commit_error()}
-  defp update_to_postgres(updates, deletes) do
-    case upsert_list(updates) do
-      :ok -> perform_deletes(deletes)
-      {:error, _} = error -> error
+  @doc "Deletes multiple screen configs based on a list of IDs."
+  @spec commit_deletes([screen_id()]) :: :ok | {:error, commit_error()}
+  def commit_deletes(deletes) do
+    if config_migration_enabled?() do
+      perform_deletes(deletes)
+    else
+      # This branch will be removed as part of post_config_migration_cleanup.
+      # When the feature flag is disabled, continue to update the JSON config.
+      update_to_legacy_json([], deletes)
     end
   end
 
