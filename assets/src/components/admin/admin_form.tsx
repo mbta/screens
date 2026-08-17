@@ -1,5 +1,13 @@
-import { useState, useEffect, useRef, type JSX } from "react";
+import { useState, useEffect, useRef, type JSX, type RefObject } from "react";
 import { AUTOLESS_ATTRIBUTES, fetch } from "Util/admin";
+
+type AdminConfirmControlsProps = {
+  onConfirm: (config: any) => Promise<{ success: boolean }>;
+  configRef: RefObject<HTMLTextAreaElement | null>;
+  onCancel: () => void;
+  onError: () => void;
+  onSuccess: () => void;
+};
 
 const validateJson = (json) => {
   try {
@@ -49,13 +57,18 @@ const AdminConfirmControls = ({
   onCancel,
   onError,
   onSuccess,
-}): JSX.Element => {
+}: AdminConfirmControlsProps): JSX.Element => {
   const [isLoading, setIsLoading] = useState(false);
 
   const confirmFn = async () => {
     setIsLoading(true);
     try {
-      const config = configRef.current.value;
+      const config = configRef.current?.value;
+      if (config == null) {
+        onError();
+        return;
+      }
+
       const parsedConfig = JSON.parse(config);
       const result = await onConfirm(parsedConfig);
 
