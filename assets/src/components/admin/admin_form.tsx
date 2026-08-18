@@ -74,11 +74,19 @@ const AdminConfirmControls = ({
 
       if (result.success === true) {
         onSuccess();
-      } else {
+      } else if (result.error) {
         onError(result.error);
+      } else {
+        onError("An unknown error was returned from the server.");
       }
-    } catch (error) {
-      onError(error);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        onError(error.message);
+      } else if (error && typeof error === "object" && "toString" in error) {
+        onError(error.toString());
+      } else {
+        onError("An unknown exception occurred.");
+      }
     } finally {
       setIsLoading(false);
     }

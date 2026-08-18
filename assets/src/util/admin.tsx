@@ -244,27 +244,22 @@ export const commitScreenConfigChanges = async (
       config: localConfig.screens[id],
     }));
 
-    if (changedConfigs.length > 0) {
-      const updateResponse = await fetch.post(
-        "/api/admin/screen_configs/update",
-        {
-          screen_configs: changedConfigs,
-        },
-      );
+    const [updateResponse, deleteResponse] = await Promise.all([
+      changedConfigs.length > 0
+        ? fetch.post("/api/admin/screen_configs/update", {
+            screen_configs: changedConfigs,
+          })
+        : Promise.resolve({ success: true }),
 
-      if (!updateResponse.success) return updateResponse;
-    }
+      deletedScreenIds.length > 0
+        ? fetch.post("/api/admin/screen_configs/delete", {
+            deleted_screen_ids: deletedScreenIds,
+          })
+        : Promise.resolve({ success: true }),
+    ]);
 
-    if (deletedScreenIds.length > 0) {
-      const deleteResponse = await fetch.post(
-        "/api/admin/screen_configs/delete",
-        {
-          deleted_screen_ids: deletedScreenIds,
-        },
-      );
-
-      if (!deleteResponse.success) return deleteResponse;
-    }
+    if (!updateResponse.success) return updateResponse;
+    if (!deleteResponse.success) return deleteResponse;
 
     return { success: true };
   } else {
