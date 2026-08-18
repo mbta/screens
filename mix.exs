@@ -16,7 +16,8 @@ defmodule Screens.MixProject do
           :unmatched_returns
         ]
       ],
-      test_coverage: [tool: LcovEx]
+      test_coverage: [tool: LcovEx],
+      listeners: [Phoenix.CodeReloader]
     ]
   end
 
@@ -59,12 +60,13 @@ defmodule Screens.MixProject do
     [
       {:aja, "~> 0.7.0"},
       {:corsica, "~> 2.1"},
+      {:datix, "~> 0.3"},
       {:dns_cluster, "~> 0.2.0"},
       {:ecto_sql, "~> 3.12"},
-      {:ex_aws, "~> 2.1"},
+      {:ex_aws, "~> 2.7"},
       {:ex_aws_polly, "~> 0.5.0"},
       {:ex_aws_rds, "~> 2.0.2"},
-      {:ex_aws_s3, "~> 2.1"},
+      {:ex_aws_s3, "~> 2.5"},
       {:ex_cldr_messages, "~> 2.0"},
       {:gettext, "~> 0.26.1"},
       {:guardian, "~> 2.4.0"},
@@ -84,15 +86,15 @@ defmodule Screens.MixProject do
       {:postgrex, "~> 0.19"},
       {:recon, "~> 2.5.6"},
       {:remote_ip, "~> 1.2"},
-      {:req, "~> 0.6.0"},
+      {:req, "~> 0.7.3"},
       {:screens_config, github: "mbta/screens-config-lib"},
       {:sentry, "~> 13.3.0"},
+      {:ssl_verify_fun, "~> 1.1"},
       {:sweet_xml, "~> 0.7.0"},
       {:telemetry, "~> 1.2"},
       {:telemetry_metrics, "~> 1.0"},
       {:telemetry_poller, "~> 1.0"},
-      {:timex, "~> 3.6"},
-      {:tzdata, "~> 1.1"},
+      {:tz, "~> 0.28"},
       {:ueberauth, "~> 0.10"},
       {:ueberauth_fake_oidcc,
        github: "skyqrose/ueberauth_fake_oidcc", tag: "v0.1.2", only: [:dev, :test]},

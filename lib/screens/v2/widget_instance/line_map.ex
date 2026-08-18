@@ -275,8 +275,11 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     if prediction_count < 2 and not is_nil(departure) do
       %{name: origin_stop_name} = Enum.at(stops, 0)
 
-      {:ok, timestamp} =
-        departure |> Departure.time() |> Util.to_eastern() |> Timex.format("{h12}:{m}")
+      timestamp =
+        departure
+        |> Departure.time()
+        |> Util.to_eastern()
+        |> Calendar.strftime("%-I:%M")
 
       %{timestamp: timestamp, station_name: origin_stop_name}
     end
