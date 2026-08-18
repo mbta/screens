@@ -46,9 +46,7 @@ export type SizingStateUpdate =
   | TwoLinesPhaseUpdate;
 
 // Returns changes to make to the state given the current line-fit measurements
-export const nextSizingState = (
-  state: SizingState,
-): SizingStateUpdate | null => {
+export const nextSizingState = (state: SizingState): SizingStateUpdate => {
   const {
     phase,
     headsignIndex,
@@ -101,30 +99,72 @@ export const nextSizingState = (
           return { phase: PHASES.Done };
         }
       }
-    default:
-      // Must return default fallback, but we'll never reach this case
-      return null;
+    case PHASES.Done:
+      return { phase: PHASES.Done };
   }
 };
 
-const RenderedDestination = ({ parts, index1, index2, classModifier }) => {
+type PageContentAndSplitIndices = {
+  entireMessageByWord: string[];
+  firstLineEndIndex: number;
+};
+
+/**
+ * For single headsign's content, chunk it into one or two pages.
+ *
+ * When two pages of content are returned, an ellipsis will be added to:
+ * 1. The end of the first page
+ * 2. The start of the second page
+ *
+ * For DUPs, the second page consists of "…" + the portion of the message that
+ * did not fit on the first page. It is not guaranteed that all text will fit
+ * when actually displayed. We rely on CSS rules on text-overflow to ellipsize
+ * the end of the second page for us.
+ */
+export const buildPageContent = ({
+  entireMessageByWord,
+  firstLineEndIndex,
+}: PageContentAndSplitIndices): ReadonlyArray<string> => {
+  if (firstLineEndIndex === entireMessageByWord.length) {
+    return [entireMessageByWord.join(" ")];
+  } else {
+    const firstPage = entireMessageByWord.slice(0, firstLineEndIndex).join(" ");
+
+    const secondPage = entireMessageByWord
+      .slice(firstLineEndIndex, entireMessageByWord.length)
+      .join(" ")
+      .trimEnd();
+
+    if (secondPage === "") {
+      return [firstPage];
+    } else {
+      return [`${firstPage}…`, `…${secondPage}`];
+    }
+  }
+};
+
+type RenderedDestinationProps = {
+  pageContent: ReadonlyArray<string>;
+  classModifier: string;
+};
+
+const RenderedDestination: ComponentType<RenderedDestinationProps> = ({
+  pageContent,
+  classModifier,
+}) => {
   const currentPage = useCurrentPage();
 
-  let pageContent: string;
+  let currentContent: string;
 
-  if (index1 === parts.length) {
-    pageContent = parts.join(" ");
+  if (pageContent.length === 1) {
+    currentContent = pageContent[0];
   } else {
-    const pages = [
-      parts.slice(0, index1).join(" ") + "…",
-      "…" + parts.slice(index1, index2).join(" "),
-    ];
-    pageContent = pages[currentPage];
+    currentContent = pageContent[currentPage];
   }
 
   return (
     <div className={classWithModifier("departure-destination", classModifier)}>
-      <div className="departure-destination__headsign">{pageContent}</div>
+      <div className="departure-destination__headsign">{currentContent}</div>
     </div>
   );
 };
@@ -147,26 +187,27 @@ const Destination: ComponentType<DupDestination> = ({
    * cause infinite update loops, so we don't need to be warned that it might.
    */
   useLayoutEffect(() => {
-    // First attempt to fit headsign on a single line. Prefer fitting an abbreviated
-    // headsign on a single line than the full headsign across 2 pages.
-    // If that doesn't work, try to fit it on two lines by adjusting
-    // between which words we paginate. Move through abbreviations until we find fit.
-    if (
-      firstLineRef.current &&
-      secondLineRef.current &&
-      phase !== PHASES.Done
-    ) {
-      const next = nextSizingState({
-        phase,
-        headsignIndex,
-        partsIndex1,
-        partsIndex2,
-        partsLength: parts.length,
-        headsigns: headsigns,
-        firstLineFits: !hasOverflowX(firstLineRef.current),
-        secondLineFits: !hasOverflowX(secondLineRef.current),
-      });
-      if (next) {
+    // Wait for fonts to load before measuring text width
+    document.fonts.ready.then(() => {
+      // First attempt to fit headsign on a single line. Prefer fitting an abbreviated
+      // headsign on a single line than the full headsign across 2 pages.
+      // If that doesn't work, try to fit it on two lines by adjusting
+      // between which words we paginate. Move through abbreviations until we find fit.
+      if (
+        firstLineRef.current &&
+        secondLineRef.current &&
+        phase !== PHASES.Done
+      ) {
+        const next = nextSizingState({
+          phase,
+          headsignIndex,
+          partsIndex1,
+          partsIndex2,
+          partsLength: parts.length,
+          headsigns: headsigns,
+          firstLineFits: !hasOverflowX(firstLineRef.current),
+          secondLineFits: !hasOverflowX(secondLineRef.current),
+        });
         // Update the state so we can re-attempt sizing with updated values
         if ("headsignIndex" in next && next.headsignIndex !== undefined) {
           setHeadsignIndex(next.headsignIndex);
@@ -181,16 +222,18 @@ const Destination: ComponentType<DupDestination> = ({
           setPartsIndex2(next.partsIndex2);
         }
       }
-    }
+    });
   });
 
   // Render paged version when done determining breaks
   if (phase === PHASES.Done) {
+    const pageContent = buildPageContent({
+      entireMessageByWord: parts,
+      firstLineEndIndex: partsIndex1,
+    });
     return (
       <RenderedDestination
-        index1={partsIndex1}
-        index2={partsIndex2}
-        parts={parts}
+        pageContent={pageContent}
         classModifier={classModifier}
       />
     );

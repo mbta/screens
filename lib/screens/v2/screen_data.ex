@@ -16,26 +16,20 @@ defmodule Screens.V2.ScreenData do
 
   @type t :: %{type: atom()}
   @type simulation_data :: %{full_page: t(), flex_zone: [t()]}
-  @type options :: [
-          update_visible_alerts_for_screen_id: String.t()
-        ]
 
-  @callback get(Screen.t()) :: t()
-  @callback get(Screen.t(), options()) :: t()
-  def get(screen, opts \\ []), do: generate(screen, opts, &layout_to_data/2)
+  @callback get(String.t(), Screen.t()) :: t()
+  def get(id, screen), do: generate(id, screen, &layout_to_data/2)
 
-  @spec simulation(Screen.t()) :: simulation_data()
-  @spec simulation(Screen.t(), options()) :: simulation_data()
-  def simulation(screen, opts \\ []), do: generate(screen, opts, &layout_to_simulation_data/2)
+  @spec simulation(String.t(), Screen.t()) :: simulation_data()
+  def simulation(id, screen), do: generate(id, screen, &layout_to_simulation_data/2)
 
-  @spec generate(Screen.t(), options(), (Layout.t(), Screen.t() -> data)) :: data
+  @spec generate(String.t(), Screen.t(), (Layout.t(), Screen.t() -> data)) :: data
         when data: t() | simulation_data()
-  defp generate(screen, opts, then_fn) do
-    update_visible_alerts_in_progress(screen, opts)
-
+  defp generate(id, screen, then_fn) do
     screen
+    |> tap(&update_visible_alerts_in_progress(id, &1))
     |> Layout.generate()
-    |> tap(&update_visible_alerts(&1, screen, opts))
+    |> tap(&update_visible_alerts(&1, id, screen))
     |> then_fn.(screen)
   end
 
@@ -131,29 +125,18 @@ defmodule Screens.V2.ScreenData do
     end
   end
 
-  defp update_visible_alerts_in_progress(%Screen{hidden_from_screenplay: true}, _opts), do: :ok
+  defp update_visible_alerts_in_progress(_id, %Screen{hidden_from_screenplay: true}), do: :ok
+  defp update_visible_alerts_in_progress(id, _screen), do: ScreensByAlert.put_in_progress([id])
 
-  defp update_visible_alerts_in_progress(_screen, opts) do
-    screen_id = Keyword.get(opts, :update_visible_alerts_for_screen_id, nil)
-    if not is_nil(screen_id), do: ScreensByAlert.put_in_progress([screen_id])
-    :ok
-  end
+  defp update_visible_alerts(_, _id, %Screen{hidden_from_screenplay: true}), do: :ok
 
-  defp update_visible_alerts(_, %Screen{hidden_from_screenplay: true}, _opts), do: :ok
+  defp update_visible_alerts({_layout, instance_map}, id, _screen) do
+    alert_ids =
+      instance_map
+      |> Map.values()
+      |> Enum.flat_map(&AlertsWidget.alert_ids/1)
 
-  defp update_visible_alerts({_layout, instance_map}, _screen, opts) do
-    screen_id = Keyword.get(opts, :update_visible_alerts_for_screen_id, nil)
-
-    if not is_nil(screen_id) do
-      alert_ids =
-        instance_map
-        |> Map.values()
-        |> Enum.flat_map(&AlertsWidget.alert_ids/1)
-
-      ScreensByAlert.put_data(screen_id, alert_ids)
-    end
-
-    :ok
+    ScreensByAlert.put_data(id, alert_ids)
   end
 
   defp paged_slot_key({paged_slot_id, _}, :pre_fare_v2), do: Template.get_slot_id(paged_slot_id)

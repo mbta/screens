@@ -11,37 +11,21 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   @base_response %{data: nil, disabled: false, force_reload: false}
 
-  @non_pending_show_actions [:show, :show_dup, :simulation]
-  @pending_show_actions [:show_pending, :simulation_pending]
+  @show_actions [:show, :show_dup, :simulation]
 
   plug Corsica, [origins: "*"] when action in [:show_dup, :log_frontend_error]
-  plug ScreenRequest, [type: :data] when action in @non_pending_show_actions
-  plug ScreenRequest, [type: :data, pending?: true] when action in @pending_show_actions
-  plug :disabled_response when action in @non_pending_show_actions
-  plug :outdated_response when action in @non_pending_show_actions
+  plug ScreenRequest, [type: :data] when action in @show_actions
+  plug :disabled_response when action in @show_actions
+  plug :outdated_response when action in @show_actions
 
-  def show(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
-    response =
-      screen
-      |> screen_response(update_visible_alerts_for_screen_id: screen_id)
-      |> put_extra_fields(screen)
-
-    json(conn, response)
+  def show(%{assigns: %{screen_id: id, screen: screen}} = conn, _params) do
+    json(conn, screen_response(id, screen) |> put_extra_fields(screen))
   end
 
   def show_dup(conn, params), do: show(conn, params)
 
-  def simulation(%{assigns: %{screen_id: screen_id, screen: screen}} = conn, _params) do
-    data = ScreenData.simulation(screen, update_visible_alerts_for_screen_id: screen_id)
-    json(conn, %{@base_response | data: data})
-  end
-
-  def show_pending(%{assigns: %{screen: screen}} = conn, _params) do
-    json(conn, %{@base_response | data: ScreenData.get(screen)})
-  end
-
-  def simulation_pending(%{assigns: %{screen: screen}} = conn, _params) do
-    json(conn, %{@base_response | data: ScreenData.simulation(screen)})
+  def simulation(%{assigns: %{screen_id: id, screen: screen}} = conn, _params) do
+    json(conn, %{@base_response | data: ScreenData.simulation(id, screen)})
   end
 
   def log_frontend_error(conn, params) do
@@ -81,13 +65,13 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   # See `docs/mercury_api.md`
-  defp screen_response(%Screen{vendor: :mercury} = screen, opts) do
-    %{full_page: data, flex_zone: flex_zone} = ScreenData.simulation(screen, opts)
+  defp screen_response(id, %Screen{vendor: :mercury} = screen) do
+    %{full_page: data, flex_zone: flex_zone} = ScreenData.simulation(id, screen)
     Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
   end
 
-  defp screen_response(screen, opts) do
-    %{@base_response | data: ScreenData.get(screen, opts)}
+  defp screen_response(id, screen) do
+    %{@base_response | data: ScreenData.get(id, screen)}
   end
 
   # See `docs/mercury_api.md`

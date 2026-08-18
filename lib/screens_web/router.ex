@@ -99,9 +99,6 @@ defmodule ScreensWeb.Router do
 
       get "/:id", ScreenController, :index
       get "/:id/simulation", ScreenController, :simulation
-
-      get "/pending/:id", ScreenController, :index_pending
-      get "/pending/:id/simulation", ScreenController, :simulation_pending
     end
 
     scope "/api/screen" do
@@ -111,9 +108,6 @@ defmodule ScreensWeb.Router do
       get "/:id/simulation", ScreenApiController, :simulation
 
       get "/:id/dup", ScreenApiController, :show_dup
-
-      get "/pending/:id", ScreenApiController, :show_pending
-      get "/pending/:id/simulation", ScreenApiController, :simulation_pending
     end
 
     scope "/api/logging" do

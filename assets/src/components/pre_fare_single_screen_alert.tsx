@@ -368,7 +368,7 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
   } = alert;
 
   /**
-   * This switch statement picks the alert layout
+   * This series of if/else statements picks the alert layout:
    * - fallback: icon, followed by a summary & pio text, or just the pio text
    * - partial closure: icon + route pill + text explaining the lines that are closed at the station
    *                    and then icon + route pill + text explaining normal service. Finally, the map section
@@ -376,81 +376,78 @@ const PreFareSingleScreenAlert: ComponentType<PreFareSingleScreenAlertProps> = (
    * - downstream: map, issue without icon, then icon + remedy
    **/
   let layout;
-  switch (true) {
-    case effect === "delay" || !disruption_diagram:
-      layout = <FallbackLayout issue={issue} remedy={remedy} effect={effect} />;
-      break;
-    case isPartialClosure(alert):
-      // By definition if `isPartialClosure` is true then `unaffected_routes` is
-      // present, so it's okay to use a non-null assertion here.
-      layout = (
-        <PartialClosureLayout
-          routes={routes}
-          unaffected_routes={unaffected_routes!}
-          disruptionDiagram={disruption_diagram}
-        />
-      );
-      break;
-    case effect === "station_closure" && region === "here":
-      layout = (
-        <StandardLayout
-          issue={issue}
-          remedy={remedy}
-          effect={effect}
-          location={location}
-          disruptionDiagram={disruption_diagram}
-          show_alternate_route_text={show_alternate_route_text}
-          alternateRouteURL={alternateRouteURL}
-          qrCodeURL={qrCodeURL}
-        />
-      );
-      break;
-    case effect === "station_closure":
-      layout = (
-        <StandardLayout
-          issue={issue}
-          remedy={remedy}
-          effect={effect}
-          location={location}
-          disruptionDiagram={disruption_diagram}
-          show_alternate_route_text={show_alternate_route_text}
-          alternateRouteURL={alternateRouteURL}
-          qrCodeURL={qrCodeURL}
-        />
-      );
-      break;
-    case (region === "boundary" || region === "here") &&
-      (effect === "shuttle" || effect === "suspension"):
-      layout = (
-        <StandardLayout
-          issue={issue}
-          remedy={remedy}
-          effect={effect}
-          location={location}
-          disruptionDiagram={disruption_diagram}
-          show_alternate_route_text={show_alternate_route_text}
-          alternateRouteURL={alternateRouteURL}
-          qrCodeURL={qrCodeURL}
-        />
-      );
-      break;
-    case region === "outside" &&
-      endpoints &&
-      (effect === "shuttle" || effect === "suspension"):
-      layout = (
-        <DownstreamLayout
-          endpoints={endpoints}
-          effect={effect}
-          remedy={remedy}
-          disruptionDiagram={disruption_diagram}
-          show_alternate_route_text={show_alternate_route_text}
-          alternateRouteURL={alternateRouteURL}
-          qrCodeURL={qrCodeURL}
-        />
-      );
-      break;
-    default:
-      layout = <FallbackLayout issue={issue} remedy={remedy} effect={effect} />;
+  if (effect === "delay" || !disruption_diagram) {
+    layout = <FallbackLayout issue={issue} remedy={remedy} effect={effect} />;
+  } else if (isPartialClosure(alert)) {
+    // By definition if `isPartialClosure` is true then `unaffected_routes` is
+    // present, so it's okay to use a non-null assertion here.
+    layout = (
+      <PartialClosureLayout
+        routes={routes}
+        unaffected_routes={unaffected_routes!}
+        disruptionDiagram={disruption_diagram}
+      />
+    );
+  } else if (effect === "station_closure" && region === "here") {
+    layout = (
+      <StandardLayout
+        issue={issue}
+        remedy={remedy}
+        effect={effect}
+        location={location}
+        disruptionDiagram={disruption_diagram}
+        show_alternate_route_text={show_alternate_route_text}
+        alternateRouteURL={alternateRouteURL}
+        qrCodeURL={qrCodeURL}
+      />
+    );
+  } else if (effect === "station_closure") {
+    layout = (
+      <StandardLayout
+        issue={issue}
+        remedy={remedy}
+        effect={effect}
+        location={location}
+        disruptionDiagram={disruption_diagram}
+        show_alternate_route_text={show_alternate_route_text}
+        alternateRouteURL={alternateRouteURL}
+        qrCodeURL={qrCodeURL}
+      />
+    );
+  } else if (
+    (region === "boundary" || region === "here") &&
+    (effect === "shuttle" || effect === "suspension")
+  ) {
+    layout = (
+      <StandardLayout
+        issue={issue}
+        remedy={remedy}
+        effect={effect}
+        location={location}
+        disruptionDiagram={disruption_diagram}
+        show_alternate_route_text={show_alternate_route_text}
+        alternateRouteURL={alternateRouteURL}
+        qrCodeURL={qrCodeURL}
+      />
+    );
+  } else if (
+    region === "outside" &&
+    endpoints &&
+    (effect === "shuttle" || effect === "suspension")
+  ) {
+    layout = (
+      <DownstreamLayout
+        endpoints={endpoints}
+        effect={effect}
+        remedy={remedy}
+        disruptionDiagram={disruption_diagram}
+        show_alternate_route_text={show_alternate_route_text}
+        alternateRouteURL={alternateRouteURL}
+        qrCodeURL={qrCodeURL}
+      />
+    );
+  } else {
+    layout = <FallbackLayout issue={issue} remedy={remedy} effect={effect} />;
   }
 
   const showBanner = !isPartialClosure(alert);

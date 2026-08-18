@@ -1,8 +1,6 @@
 defmodule Screens.Stops.Stop do
   @moduledoc false
 
-  require Logger
-
   alias Screens.RouteType
   alias Screens.V3Api
 

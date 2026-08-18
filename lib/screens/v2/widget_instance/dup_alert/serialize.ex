@@ -305,6 +305,7 @@ defmodule Screens.V2.WidgetInstance.DupAlert.Serialize do
       t.alert.informed_entities
       |> Enum.filter(&(&1.stop.id in child_stop_ids and &1.stop.platform_name))
       |> Enum.map(& &1.stop.platform_name)
+      |> Enum.uniq()
 
     case platform_names do
       [platform_name] ->

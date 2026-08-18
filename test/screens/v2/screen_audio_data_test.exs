@@ -62,7 +62,14 @@ defmodule Screens.V2.ScreenAudioDataTest do
       }
 
       generate_layout_fn = fn _config_valid_audio -> {:layout, selected_instances} end
-      get_audio_only_instances_fn = fn _widgets, _config -> [] end
+
+      get_audio_only_instances_fn = fn widgets, _config ->
+        # All selected instances should be passed to `audio_only_instances` in the snapshot, even
+        # those without audio equivalence
+        assert Enum.sort(widgets) == selected_instances |> Map.values() |> Enum.sort()
+        []
+      end
+
       audio_view = ScreensWeb.V2.Audio.MockWidgetView
       expected_data = [{audio_view, %{content: "Header"}}, {audio_view, %{content: "Departures"}}]
 

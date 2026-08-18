@@ -7,7 +7,21 @@ import eslintConfigPrettier from "eslint-config-prettier";
 import jestPlugin from "eslint-plugin-jest";
 
 export default [
-  { languageOptions: { globals: globals.browser } },
+  {
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: {
+        projectService: {
+          allowDefaultProject: [
+            "eslint.config.mjs",
+            "jest.config.js",
+            "stylelint.config.mjs",
+            "webpack.config.js",
+          ],
+        },
+      },
+    },
+  },
   pluginJs.configs.recommended,
   ...tseslint.configs.recommended,
   pluginReact.configs.flat.recommended,
@@ -50,6 +64,14 @@ export default [
           caughtErrorsIgnorePattern: "^_",
           destructuredArrayIgnorePattern: "^_",
           varsIgnorePattern: "^_",
+        },
+      ],
+      "@typescript-eslint/switch-exhaustiveness-check": [
+        "error",
+        {
+          allowDefaultCaseForExhaustiveSwitch: false,
+          requireDefaultForNonUnion: true,
+          considerDefaultExhaustiveForUnions: true,
         },
       ],
     },

@@ -128,7 +128,7 @@ defmodule Screens.V2.LocalizedAlert do
   end
 
   # Only stop is not nil (route type ignored)
-  defp informed_entity_to_zone(%InformedEntity{stop: %Stop{id: stop_id}}, context)
+  defp informed_entity_to_zone(%InformedEntity{stop: %Stop{id: stop_id}, route: nil}, context)
        when not is_nil(stop_id) do
     cond do
       stop_id == context.home_stop -> [:home_stop]
@@ -141,14 +141,10 @@ defmodule Screens.V2.LocalizedAlert do
   end
 
   # Only route is not nil (route type ignored)
-  defp informed_entity_to_zone(%InformedEntity{stop: nil, route: route}, context) do
+  defp informed_entity_to_zone(%InformedEntity{stop: nil, route: route}, context)
+       when not is_nil(route) do
     route_ids = LocationContext.route_ids(context)
     if route in route_ids, do: [:upstream, :home_stop, :downstream], else: []
-  end
-
-  defp informed_entity_to_zone(%InformedEntity{stop: stop} = entity, context)
-       when not is_nil(stop) do
-    informed_entity_to_zone(Map.put(entity, :route, nil), context)
   end
 
   # Both stop and route are not nil (route type ignored)
@@ -156,7 +152,7 @@ defmodule Screens.V2.LocalizedAlert do
          %InformedEntity{stop: stop, route: route} = informed_entity,
          context
        )
-       when not is_nil(stop) do
+       when not is_nil(stop) and not is_nil(route) do
     route_ids = LocationContext.route_ids(context)
 
     if route in route_ids do

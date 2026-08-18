@@ -41,7 +41,6 @@ npm-debug.log
 
 # Local config files
 /priv/local.json
-/priv/local_pending.json
 /priv/signs_ui_config.json
 
 # local environment variables
