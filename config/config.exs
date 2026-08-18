@@ -23,7 +23,10 @@ config :screens, Screens.Repo,
 
 config :screens, ecto_repos: [Screens.Repo]
 
-# Configures Elixir's Logger
+# Increase drop mode threshold from the default to accommodate periodic "bursts" of >200 log
+# messages at once from the Device Monitor.
+config :logger, :default_handler, config: [drop_mode_qlen: 500]
+
 config :logger, :default_formatter,
   format: "$time [$level] $message $metadata\n",
   metadata: ~w[
