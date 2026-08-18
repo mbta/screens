@@ -16,8 +16,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.Dup
 
-  require Logger
-
   import Screens.Inject
   @alert injected(Alert)
   @stop injected(Stop)

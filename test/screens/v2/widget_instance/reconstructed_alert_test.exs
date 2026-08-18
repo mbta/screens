@@ -53,7 +53,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           tagged_stop_sequences: nil,
           upstream_stops: nil,
           downstream_stops: nil,
-          routes: nil,
+          routes: [%{route_id: "Red", active?: true}],
           alert_route_types: nil
         },
         partial_closure_platform_names: []

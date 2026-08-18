@@ -1,6 +1,5 @@
 defmodule ScreensWeb.V2.AudioController do
   use ScreensWeb, :controller
-  require Logger
 
   alias Phoenix.View
   alias Screens.V2.ScreenAudioData

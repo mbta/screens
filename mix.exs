@@ -5,7 +5,7 @@ defmodule Screens.MixProject do
     [
       app: :screens,
       version: "0.1.0",
-      elixir: "~> 1.17",
+      elixir: "~> 1.20",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       aliases: aliases(),
@@ -70,6 +70,7 @@ defmodule Screens.MixProject do
       {:guardian, "~> 2.4.0"},
       {:jason, "~> 1.0"},
       {:logster, "~> 2.0.0-rc.5"},
+      {:logger_backends, "~> 1.0"},
       {:memcachex, "~> 0.5.5"},
       {:nebulex, "~> 3.0.2"},
       {:nebulex_local, "~> 3.0.0"},

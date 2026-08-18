@@ -35,6 +35,8 @@ defmodule Screens.Application do
       ]
       |> Enum.reject(&is_nil/1)
 
+    _ = LoggerBackends.add(Sentry.LoggerBackend)
+
     :ok = Logster.attach_phoenix_logger()
 
     # See https://hexdocs.pm/elixir/Supervisor.html

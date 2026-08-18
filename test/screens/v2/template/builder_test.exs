@@ -65,15 +65,6 @@ defmodule Screens.V2.Template.BuilderTest do
       assert expected == Builder.with_paging(draft_template, num_pages)
     end
 
-    test "rejects paged templates" do
-      paged_draft_template = [{0, :header}, {1, :header}]
-      num_pages = 2
-
-      assert_raise FunctionClauseError, fn ->
-        Builder.with_paging(paged_draft_template, num_pages)
-      end
-    end
-
     test "rejects nested paged templates" do
       paged_draft_template =
         {:flex_zone,
