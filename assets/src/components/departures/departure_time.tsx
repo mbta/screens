@@ -1,4 +1,4 @@
-import type { ComponentType } from "react";
+import { ComponentType, useEffect, useState } from "react";
 
 import { useCurrentPage } from "Context/dup_page";
 import MoonIcon from "Images/moon.svg";
@@ -14,13 +14,47 @@ type DepartureTime =
 
 interface DepartureTimePartProps {
   time: DepartureTime;
+  timeInEpochMinutes: number;
   currentPage: number;
 }
 
+/**
+ * Given two dates, compute the difference in seconds between `departureTimeSeconds`
+ * and `currentDateTime`.
+ *
+ * If the difference between the two values in minutes results in a float,
+ * round the result (rounding method is considered an implementation detail).
+ * This function will always return a value of 1 or greater - the system relies
+ * on the backend to provide the appropriate text ("ARR", "BRD", etc.) in lieu
+ * of showing '0 min'.
+ *
+ * @param departureTimeSeconds A datetime provided by the backend, representing
+ * the departure time of a route at a stop.
+ * @param currentDateTime The current datetime of the browser
+ */
+const adjustMinute = (
+  departureTimeSeconds: Date,
+  currentDateTime: Date,
+): number => {
+  const timeDifferenceMin =
+    departureTimeSeconds.getTime() - currentDateTime.getTime() / 1000;
+  const timeDifferenceSeconds = Math.floor(timeDifferenceMin / 60);
+  return Math.max(timeDifferenceSeconds, 1);
+};
+
 const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
   time,
+  timeInEpochMinutes,
   currentPage,
 }) => {
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+  useEffect(() => {
+    const intervalTimer = setInterval(() => {
+      setCurrentDateTime(new Date());
+    }, 1000);
+
+    return () => clearInterval(intervalTimer);
+  }, []);
   switch (time.type) {
     case "text":
       return <div className="departure-time__text">{time.text}</div>;
@@ -28,7 +62,9 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
     case "minutes":
       return (
         <>
-          <div className="departure-time__minutes">{time.minutes}</div>
+          <div className="departure-time__minutes">
+            {adjustMinute(new Date(timeInEpochMinutes), currentDateTime)}
+          </div>
           <div className="departure-time__minutes-label">m</div>
         </>
       );
@@ -58,12 +94,14 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
 
 interface Props {
   time?: DepartureTime;
+  time_in_epoch: number;
   scheduled_time?: DepartureTime;
   is_live: boolean;
 }
 
 const DepartureTime: ComponentType<Props> = ({
   time,
+  time_in_epoch: timeInEpoch,
   scheduled_time,
   is_live: isLive,
 }) => {
@@ -80,7 +118,11 @@ const DepartureTime: ComponentType<Props> = ({
             className="departure-time__live-icon"
           />
         )}
-        <DepartureTimePart currentPage={currentPage} time={time} />
+        <DepartureTimePart
+          currentPage={currentPage}
+          time={time}
+          timeInEpochMinutes={timeInEpoch}
+        />
       </div>
     );
   } else if (scheduled_time && (currentPage === 1 || !time)) {
@@ -91,7 +133,13 @@ const DepartureTime: ComponentType<Props> = ({
           time ? "delayed" : "cancelled",
         ])}
       >
-        <DepartureTimePart {...{ time: scheduled_time, currentPage }} />
+        <DepartureTimePart
+          {...{
+            time: scheduled_time,
+            timeInEpochMinutes: timeInEpoch,
+            currentPage,
+          }}
+        />
       </div>
     );
   } else {
