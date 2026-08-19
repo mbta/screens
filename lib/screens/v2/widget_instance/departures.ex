@@ -114,7 +114,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
            required(:scheduled_time) => serialized_timestamp() | nil,
            required(:crowding) => pos_integer() | nil,
            required(:is_live) => boolean(),
-           optional(:time_in_epoch) => integer()
+           required(:time_in_epoch) => integer()
          }
 
   @type serialized_headsign_lcd :: %{
@@ -618,7 +618,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @spec serialize_time(Departure.t(), Screen.t(), DateTime.t()) ::
           %{
             :time => serialized_time() | nil,
-            optional(:time_in_epoch) => integer(),
+            :time_in_epoch => integer(),
             optional(:scheduled_time) => serialized_timestamp() | nil,
             :is_live => boolean()
           }
@@ -669,6 +669,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       time: serialized_predicted_time,
+      time_in_epoch: departure |> Departure.time() |> DateTime.to_unix(),
       scheduled_time: serialized_scheduled_time,
       is_live: predicted?
     }
