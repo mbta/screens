@@ -3,13 +3,10 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
   import ExUnit.CaptureLog
   import Mox
+  import Screens.TestSupport.ScreenConfigBuilder
 
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
-
-  # Test config constants
-  @screen_dup_config %{"app_id" => "dup_v2"}
-  @screen_busway_config %{"app_id" => "busway_v2"}
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
@@ -30,24 +27,29 @@ defmodule ScreensWeb.AdminApiControllerTest do
     test "updates screen configs in Postgres when migration flag is true", %{conn: conn} do
       Application.put_env(:screens, :config_migration, true)
 
-      Repo.insert!(%ScreenConfig{id: "screen-1", config: @screen_busway_config})
+      screen_dup_config = screen_config(:dup_v2)
+      screen_busway_config = screen_config(:busway_v2)
+
+      Repo.insert!(%ScreenConfig{id: "screen-1", config: screen_busway_config})
 
       conn =
         post(conn, "/api/admin/screen_configs/update", %{
           screen_configs: [
-            %{id: "screen-1", config: @screen_dup_config}
+            %{id: "screen-1", config: screen_dup_config}
           ]
         })
 
       assert json_response(conn, 200) == %{"success" => true}
 
       updated = Repo.get!(ScreenConfig, "screen-1")
-      assert updated.config == @screen_dup_config
+      assert updated.config == screen_dup_config
     end
 
     @tag :authenticated
     test "updates full config when migration flag is false", %{conn: conn} do
       Application.put_env(:screens, :config_migration, false)
+
+      screen_busway_config = screen_config_json(:busway_v2)
 
       # Mock the fetch and put to prevent writing to the fixture file
       expect(Screens.Config.Fetch.Mock, :fetch_config, fn ->
@@ -59,7 +61,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
       conn =
         post(conn, "/api/admin/screen_configs/update", %{
           screen_configs: [
-            %{"id" => "screen-2", "config" => @screen_busway_config}
+            %{"id" => "screen-2", "config" => screen_busway_config}
           ]
         })
 
@@ -78,8 +80,11 @@ defmodule ScreensWeb.AdminApiControllerTest do
     test "deletes screen configs in Postgres when migration flag is true", %{conn: conn} do
       Application.put_env(:screens, :config_migration, true)
 
-      Repo.insert!(%ScreenConfig{id: "screen-1", config: @screen_dup_config})
-      Repo.insert!(%ScreenConfig{id: "screen-2", config: @screen_busway_config})
+      screen_dup_config = screen_config(:dup_v2)
+      screen_busway_config = screen_config(:busway_v2)
+
+      Repo.insert!(%ScreenConfig{id: "screen-1", config: screen_dup_config})
+      Repo.insert!(%ScreenConfig{id: "screen-2", config: screen_busway_config})
 
       conn =
         post(conn, "/api/admin/screen_configs/delete", %{
