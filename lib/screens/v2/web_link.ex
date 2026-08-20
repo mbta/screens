@@ -14,15 +14,20 @@ defmodule Screens.V2.WebLink do
   def stop_url_app(stop_id), do: "go.mbta.com/s/#{stop_id}"
   def stop_url_web(stop_id), do: "mbta.com/stops/#{stop_id}"
 
-  def alternate_route_url(vanity_url)
-      when is_nil(vanity_url) or vanity_url == "" or
-             (is_binary(vanity_url) and byte_size(vanity_url) > 20) do
+  def alternate_route_url(vanity_url) when is_nil(vanity_url) or vanity_url == "" do
     "mbta.com/alerts"
   end
 
   def alternate_route_url(vanity_url) do
-    vanity_url
-    |> String.replace(~r/^https?:\/\//i, "")
-    |> String.replace(~r/^www\./i, "")
+    cleaned_url =
+      vanity_url
+      |> String.replace(~r/^https?:\/\//i, "")
+      |> String.replace(~r/^www\./i, "")
+
+    if byte_size(cleaned_url) > 20 do
+      "mbta.com/alerts"
+    else
+      cleaned_url
+    end
   end
 end
