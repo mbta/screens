@@ -2,7 +2,12 @@ import type { ComponentType } from "react";
 
 import useAutoSize from "Hooks/use_auto_size";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
-import { classWithModifier, classWithModifiers, formatCause } from "Util/utils";
+import {
+  addUrlBreaksAfterSlashes,
+  classWithModifier,
+  classWithModifiers,
+  formatCause,
+} from "Util/utils";
 import { QRCodeSVG as QRCode } from "qrcode.react";
 
 import DisruptionDiagram, {
@@ -311,7 +316,9 @@ const RemedySection: ComponentType<RemedySectionProps> = ({
             <span className="alert-card__remedy__text--alternate-route">
               Find alternate route at{" "}
             </span>
-            {alternateRouteURL}
+            <span className="alert-card__remedy__text--alternate-route-url">
+              {addUrlBreaksAfterSlashes(alternateRouteURL)}
+            </span>
           </h5>
         ) : (
           <h5 className="alert-card__remedy__text">{remedy}</h5>
