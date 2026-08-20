@@ -8,6 +8,7 @@ defmodule Screens.ScreenConfigs do
 
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
+  alias ScreensConfig.Screen
 
   @config_fetcher injected(Screens.Config.Fetch)
 
@@ -49,7 +50,7 @@ defmodule Screens.ScreenConfigs do
   end
 
   @doc """
-  Returns all Configs as JSON to be used by Screens Admin
+  Returns all Configs as JSON with the ID as a key and the configuration as the value.
   """
   @spec list_all() :: String.t() | :error
   def list_all do
@@ -57,34 +58,14 @@ defmodule Screens.ScreenConfigs do
       screens =
         ScreenConfig
         |> Repo.all()
-        |> Map.new(fn %ScreenConfig{id: id, config: config} -> {id, config} end)
+        |> Map.new(fn %ScreenConfig{id: id, config: config} ->
+          {id, Screen.to_json(config)}
+        end)
 
       Jason.encode!(%{screens: screens})
     else
       with {:ok, config, _version} <- @config_fetcher.fetch_config() do
         config
-      end
-    end
-  end
-
-  @doc """
-  Returns all configs as a list of ScreenConfig structs to be used by Screens Admin
-  The API controller handles the JSON encoding and formatting for the response.
-  As part of post_config_migration_cleanup, this and list_all can be cleaned up and restructured
-  """
-  @spec list_screen_configs() :: [ScreenConfig.t()]
-  def list_screen_configs do
-    if config_migration_enabled?() do
-      Repo.all(ScreenConfig)
-    else
-      with {:ok, config_json, _version} <- @config_fetcher.fetch_config(),
-           {:ok, decoded_config} <- Jason.decode(config_json),
-           screens when is_map(screens) <- Map.get(decoded_config, "screens", %{}) do
-        Enum.map(screens, fn {id, config} ->
-          %ScreenConfig{id: id, config: config}
-        end)
-      else
-        _ -> []
       end
     end
   end
