@@ -1,9 +1,5 @@
 import type { ComponentType } from "react";
-import {
-  addUrlBreaksAfterSlashes,
-  classWithModifiers,
-  imagePath,
-} from "Util/utils";
+import { classWithModifiers, imagePath } from "Util/utils";
 import DisruptionDiagram, {
   DisruptionDiagramData,
 } from "./disruption_diagram/disruption_diagram";
@@ -122,7 +118,8 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
                     <span className="alert-card__body__remedy--alternate-route">
                       Find alternate route at{" "}
                     </span>
-                    {addUrlBreaksAfterSlashes(alternateRouteURL)}
+                    {alternateRouteURL}
+
                     <div className="alert-card__body__remedy--alternate-route-qrcode">
                       <QRCode marginSize={1} size={128} value={qrCodeURL} />
                     </div>

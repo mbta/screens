@@ -71,9 +71,6 @@ export const firstWord = (str: string): string => str.split(" ")[0];
 export const formatCause = (cause: string) =>
   (cause.charAt(0).toUpperCase() + cause.substring(1)).replace("_", " ");
 
-export const addUrlBreaksAfterSlashes = (url: string): string =>
-  url.replace(/\//g, "/\u200B");
-
 export const extensionForAsset = (assetPath: string) => {
   const parts = assetPath.split(".");
   return parts[parts.length - 1].toLowerCase();
