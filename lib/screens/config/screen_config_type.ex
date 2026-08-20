@@ -18,6 +18,8 @@ defmodule Screens.Config.ScreenConfigType do
   @impl true
   def cast(%Screen{} = screen), do: {:ok, screen}
 
+  def cast(%{} = map), do: {:ok, Screen.from_json(map)}
+
   def cast(_), do: :error
 
   @impl true
