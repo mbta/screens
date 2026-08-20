@@ -14,7 +14,9 @@ defmodule Screens.V2.WebLink do
   def stop_url_app(stop_id), do: "go.mbta.com/s/#{stop_id}"
   def stop_url_web(stop_id), do: "mbta.com/stops/#{stop_id}"
 
-  def alternate_route_url(vanity_url) when is_nil(vanity_url) or vanity_url == "" do
+  def alternate_route_url(vanity_url)
+      when is_nil(vanity_url) or vanity_url == "" or
+             (is_binary(vanity_url) and byte_size(vanity_url) > 20) do
     "mbta.com/alerts"
   end
 
