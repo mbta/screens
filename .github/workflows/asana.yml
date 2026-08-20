@@ -8,7 +8,7 @@ permissions:
 
 jobs:
   asana:
-    uses: mbta/workflows/.github/workflows/asana.yml@c76e5ccd9556fbea52bc41548f7ceed5985ad775 # v5.1.0
+    uses: mbta/workflows/.github/workflows/asana.yml@ba8d62bff3a4aa0df22eb2d6a1ce7ad4fb2eac1a # v5.1.1
     with:
       attach-pr: true
       trigger-phrase: "\\*\\*Asana task\\*\\*:"
