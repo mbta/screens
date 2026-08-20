@@ -19,8 +19,15 @@ defmodule Screens.V2.WebLink do
   end
 
   def alternate_route_url(vanity_url) do
-    vanity_url
-    |> String.replace(~r/^https?:\/\//i, "")
-    |> String.replace(~r/^www\./i, "")
+    cleaned_url =
+      vanity_url
+      |> String.replace(~r/^https?:\/\//i, "")
+      |> String.replace(~r/^www\./i, "")
+
+    if byte_size(cleaned_url) > 20 do
+      "mbta.com/alerts"
+    else
+      cleaned_url
+    end
   end
 end
