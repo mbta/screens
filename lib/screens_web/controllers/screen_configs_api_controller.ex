@@ -4,9 +4,7 @@ defmodule ScreensWeb.ScreenConfigsApiController do
   alias Screens.ScreenConfigs
 
   def index(conn, _params) do
-    screen_configs = ScreenConfigs.list_screen_configs()
-
-    json(conn, %{screen_configs: screen_configs})
+    json(conn, %{config: ScreenConfigs.list_all()})
   end
 
   def update(conn, %{"screen_configs" => screen_configs}) when is_list(screen_configs) do
