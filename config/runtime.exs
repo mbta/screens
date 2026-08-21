@@ -57,6 +57,8 @@ if config_env() == :prod do
     ]
 end
 
+config :screens, :build_identifier, DateTime.utc_now()
+
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

@@ -11,6 +11,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   setup {ScreenDataCache, :passthrough}
 
   import Screens.Inject
+  @build_info injected(Screens.Util.BuildInfo)
   @cache injected(Screens.Config.Cache)
   @parameters injected(Screens.V2.ScreenData.Parameters)
 
@@ -19,7 +20,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   Stub.candidate_generator(StubGenerator, fn _ -> [placeholder(:blue)] end)
 
   setup do
-    stub(@cache, :last_deploy_timestamp, fn -> ~U[2020-01-01 00:00:00Z] end)
+    stub(@build_info, :build_identifier, fn -> ~U[2020-01-01 00:00:00Z] end)
     stub(@cache, :screen, fn _id -> struct(Screen) end)
     stub(@parameters, :candidate_generator, fn _screen -> StubGenerator end)
     stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
@@ -29,7 +30,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
 
   describe "show/2" do
     test "tells client to reload when its code is outdated", %{conn: conn} do
-      expect(@cache, :last_deploy_timestamp, fn -> ~U[2026-01-01 12:00:00Z] end)
+      expect(@build_info, :build_identifier, fn -> ~U[2026-01-01 12:00:00Z] end)
 
       conn = get(conn, "/v2/api/screen/1?last_refresh=2026-01-01T11:00:00Z")
 
@@ -37,7 +38,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
     end
 
     test "tells client to reload based on refresh_if_loaded_before", %{conn: conn} do
-      expect(@cache, :last_deploy_timestamp, fn -> ~U[2026-01-01 12:00:00Z] end)
+      expect(@build_info, :build_identifier, fn -> ~U[2026-01-01 12:00:00Z] end)
 
       expect(@cache, :screen, fn "1" ->
         struct(Screen, refresh_if_loaded_before: ~U[2026-01-01 14:00:00Z])

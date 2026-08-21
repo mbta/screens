@@ -7,7 +7,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias ScreensWeb.Plug.ScreenRequest
 
   import Screens.Inject
-  @cache injected(Screens.Config.Cache)
+  @build_info injected(Screens.Util.BuildInfo)
 
   @base_response %{data: nil, disabled: false, force_reload: false}
 
@@ -78,7 +78,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   defp put_extra_fields(response, id, %Screen{vendor: :mercury} = screen) do
     response
     |> Map.put(:audio_data, fetch_ssml(id, screen))
-    |> Map.put(:last_deploy_timestamp, @cache.last_deploy_timestamp())
+    |> Map.put(:last_deploy_timestamp, @build_info.build_identifier())
   end
 
   defp put_extra_fields(response, _id, _screen), do: response
@@ -102,7 +102,6 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   # The packaged client can't reload the page to update itself; this would just reload the local
   # copy of the code, resulting in an infinite loop. Compatibility and versioning of the packaged
-  # client is handled manually.
   defp outdated_response(%{params: %{"last_refresh" => "packaged"}} = conn, _), do: conn
 
   defp outdated_response(
@@ -115,7 +114,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     with param when is_binary(param) <- params["last_refresh"],
          {:ok, last_refresh_at, _offset} <- DateTime.from_iso8601(param) do
       should_refresh_at =
-        [@cache.last_deploy_timestamp(), refresh_if_loaded_before]
+        [@build_info.build_identifier(), refresh_if_loaded_before]
         |> Enum.reject(&is_nil/1)
         |> Enum.max(DateTime, fn -> nil end)
 
