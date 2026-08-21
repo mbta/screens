@@ -49,9 +49,7 @@ defmodule Screens.ScreenConfigs do
     end
   end
 
-  @doc """
-  Returns all Configs as JSON with the ID as a key and the configuration as the value.
-  """
+  @doc "Returns all Configs as JSON with the ID as a key and the configuration as the value."
   @spec list_all() :: String.t() | :error
   def list_all do
     if config_migration_enabled?() do
@@ -68,6 +66,57 @@ defmodule Screens.ScreenConfigs do
         config
       end
     end
+  end
+
+  @doc """
+  Counts screen configs that contain expired evergreen content, i.e. those where
+  all non-empty schedule `end_dt` values are before `before_date`.
+  """
+  @spec count_with_evergreen_end_dt_before(Date.t()) :: non_neg_integer()
+  def count_with_evergreen_end_dt_before(before_date) do
+    evergreen_end_dt_before_query(before_date)
+    |> select([s], s.id)
+    |> Repo.all()
+    |> Enum.count()
+  end
+
+  @doc """
+  Returns all screen configs that contain expired evergreen content.
+  """
+  @spec fetch_all_with_evergreen_end_dt_before(Date.t()) :: [ScreenConfig.t()]
+  def fetch_all_with_evergreen_end_dt_before(before_date) do
+    Repo.all(evergreen_end_dt_before_query(before_date))
+  end
+
+  @spec evergreen_end_dt_before_query(Date.t()) :: Ecto.Query.t()
+  defp evergreen_end_dt_before_query(before_date) do
+    # SQL query to find configs with expired evergreen content.
+    # Rejects any items with a Schedule with at least one end date after the given date or null.
+    from s in ScreenConfig,
+      where:
+        fragment(
+          """
+          coalesce(
+            (
+              select bool_and(
+                coalesce(sched->>'end_dt', '') <> ''
+                and left(sched->>'end_dt', 10)::date < ?
+              )
+              from jsonb_array_elements(coalesce(?->'app_params'->'evergreen_content', '[]'::jsonb)) item
+              cross join lateral jsonb_array_elements(
+                case
+                  when jsonb_typeof(item->'schedule') = 'array' then item->'schedule'
+                  else '[]'::jsonb
+                end
+              ) sched
+              where jsonb_exists(sched, 'end_dt')
+            ),
+            false
+          )
+          """,
+          ^before_date,
+          s.config
+        )
   end
 
   @doc """

@@ -110,30 +110,60 @@ defmodule ScreensWeb.AdminApiController do
 
   def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date, "dry_run" => _}) do
     before_date = Date.from_iso8601!(iso_date)
-    %Config{screens: screens} = fetch_config()
 
     affected =
-      Enum.count(screens, fn {_id, screen} ->
-        screen != Util.Admin.cleanup_evergreen_content(screen, before_date)
-      end)
+      if ScreenConfigs.config_migration_enabled?() do
+        ScreenConfigs.count_with_evergreen_end_dt_before(before_date)
+      else
+        %Config{screens: screens} = fetch_config()
+
+        Enum.count(screens, fn {_id, screen} ->
+          screen != Util.Admin.cleanup_evergreen_content(screen, before_date)
+        end)
+      end
 
     json(conn, %{affected: affected})
   end
 
   def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date}) do
     before_date = Date.from_iso8601!(iso_date)
-    %Config{screens: screens} = config = fetch_config()
 
-    new_screens =
-      screens
-      |> Enum.map(fn {id, screen} ->
-        {id, Util.Admin.cleanup_evergreen_content(screen, before_date)}
-      end)
-      |> Map.new()
+    if ScreenConfigs.config_migration_enabled?() do
+      updates =
+        ScreenConfigs.fetch_all_with_evergreen_end_dt_before(before_date)
+        |> Enum.reduce([], fn %{id: id, config: screen}, acc ->
+          cleaned = Util.Admin.cleanup_evergreen_content(screen, before_date)
 
-    %Config{config | screens: new_screens}
-    |> put_config()
-    |> to_success_response(conn)
+          if cleaned == screen do
+            acc
+          else
+            [%{id: id, config: cleaned} | acc]
+          end
+        end)
+
+      case ScreenConfigs.commit_updates(updates) do
+        :ok ->
+          json(conn, %{success: true})
+
+        {:error, reason} ->
+          conn
+          |> put_status(500)
+          |> json(%{success: false, error: inspect(reason)})
+      end
+    else
+      %Config{screens: screens} = config = fetch_config()
+
+      new_screens =
+        screens
+        |> Enum.map(fn {id, screen} ->
+          {id, Util.Admin.cleanup_evergreen_content(screen, before_date)}
+        end)
+        |> Map.new()
+
+      %Config{config | screens: new_screens}
+      |> put_config()
+      |> to_success_response(conn)
+    end
   end
 
   @spec fetch_config() :: Config.t()
