@@ -32,4 +32,14 @@ defmodule Screens.Config.ScreenConfig do
     |> changeset(attrs)
     |> apply_action(:insert)
   end
+
+  @spec load_config(term()) :: Screen.t() | term()
+  def load_config(config) do
+    # Ensures that legacy configuration is loaded the same way as Postgres configs
+    # Can be removed as part of post_config_migration_cleanup
+    case ScreenConfigType.load(config) do
+      {:ok, loaded} -> loaded
+      :error -> config
+    end
+  end
 end

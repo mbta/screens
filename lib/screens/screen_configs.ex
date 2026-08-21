@@ -10,6 +10,7 @@ defmodule Screens.ScreenConfigs do
   alias Screens.Repo
   alias ScreensConfig.Screen
 
+  @cache injected(Screens.Config.Cache)
   @config_fetcher injected(Screens.Config.Fetch)
 
   @type screen_id :: String.t()
@@ -45,6 +46,22 @@ defmodule Screens.ScreenConfigs do
 
         {:error, reason} ->
           {:error, reason}
+      end
+    end
+  end
+
+  @spec fetch(screen_id()) :: {:ok, Screen.t() | nil} | {:error, :cache_unavailable}
+  def fetch(id) do
+    if config_migration_enabled?() do
+      case Repo.get(ScreenConfig, id) do
+        %ScreenConfig{config: %Screen{} = screen} -> {:ok, screen}
+        nil -> {:ok, nil}
+      end
+    else
+      if Screens.Config.Cache.ok?() do
+        {:ok, @cache.screen(id)}
+      else
+        {:error, :cache_unavailable}
       end
     end
   end
@@ -117,6 +134,48 @@ defmodule Screens.ScreenConfigs do
           ^before_date,
           s.config
         )
+  end
+
+  @doc "Returns screen IDs for screens matching the given app ID."
+  @spec screen_ids_for_app(atom()) :: [screen_id()]
+  def screen_ids_for_app(target_app_id) do
+    if config_migration_enabled?() do
+      target_app_id = Atom.to_string(target_app_id)
+
+      Repo.all(
+        from s in ScreenConfig,
+          where: fragment("?->>? = ?", s.config, "app_id", ^target_app_id),
+          select: s.id
+      )
+    else
+      Screens.Config.Cache.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
+    end
+  end
+
+  @doc "Returns screen IDs that are eligible for Screenplay self-refresh."
+  @spec self_refresh_screen_ids() :: [screen_id()]
+  def self_refresh_screen_ids do
+    if config_migration_enabled?() do
+      Repo.all(
+        from s in ScreenConfig,
+          where:
+            fragment("coalesce(?->>?, 'false') = 'false'", s.config, "disabled") and
+              fragment(
+                "coalesce(?->>?, 'false') = 'false'",
+                s.config,
+                "hidden_from_screenplay"
+              ),
+          select: s.id
+      )
+    else
+      Screens.Config.Cache.screen_ids(fn {_id,
+                                          %Screen{
+                                            disabled: disabled,
+                                            hidden_from_screenplay: hidden
+                                          }} ->
+        not disabled and not hidden
+      end)
+    end
   end
 
   @doc """
