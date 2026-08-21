@@ -36,6 +36,7 @@ export const timeWithCrowding = Factory.define<TimeWithCrowding>(
   ({ sequence }) => ({
     id: sequence.toString(),
     time: { type: "minutes", minutes: sequence },
+    time_in_epoch: new Date(2026, 7, 20, 16, sequence).getTime() / 60_000,
     crowding: null,
     is_live: true,
   }),
