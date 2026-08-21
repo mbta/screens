@@ -102,28 +102,26 @@ const isSuccess = (
 ): response is Success | SimulationSuccess =>
   ["success", "simulation_success"].includes(response.state);
 
-const useApiPath = (screenId: string, appendPath?: string): string => {
-  return useMemo(() => {
-    const base = getDatasetValue("apiOrigin") ?? document.baseURI;
-    const path = [BASE_PATH, screenId, appendPath].filter(Boolean).join("/");
+const buildApiUrl = (screenId: string, appendPath?: string): string => {
+  const base = getDatasetValue("apiOrigin") ?? document.baseURI;
+  const path = [BASE_PATH, screenId, appendPath].filter(Boolean).join("/");
 
-    const url = new URL(path, base);
+  const url = new URL(path, base);
 
-    const params: Record<string, string | null | undefined> = {
-      is_real_screen: isRealScreen() ? "true" : null,
-      last_refresh: getDatasetValue("lastRefresh"),
-      requestor: getDatasetValue("requestor"),
-      rotation_index: getRotationIndex(),
-      screen_side: getScreenSide(),
-      version: getVersion(),
-    };
+  const params: Record<string, string | null | undefined> = {
+    is_real_screen: isRealScreen() ? "true" : null,
+    last_refresh: getDatasetValue("lastRefresh"),
+    requestor: getDatasetValue("requestor"),
+    rotation_index: getRotationIndex(),
+    screen_side: getScreenSide(),
+    version: getVersion(),
+  };
 
-    for (const [key, value] of Object.entries(params)) {
-      if (value) url.searchParams.append(key, value);
-    }
+  for (const [key, value] of Object.entries(params)) {
+    if (value) url.searchParams.append(key, value);
+  }
 
-    return url.toString();
-  }, [screenId, appendPath]);
+  return url.toString();
 };
 
 interface UseBaseApiResponseOpts {
@@ -148,37 +146,47 @@ const useBaseApiResponse = ({
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const [initialFetchDone, setInitialFetchDone] = useState(false);
 
-  const apiPath = useApiPath(id, appendPath);
+  const apiUrl = useMemo(() => buildApiUrl(id, appendPath), [id, appendPath]);
 
-  const fetchData = useCallback(async () => {
-    try {
-      const now = Date.now();
-      const result = await fetch(apiPath);
-      const json = await result.json();
+  const fetchData = useCallback(
+    async (requestForceRefresh = false) => {
+      try {
+        let url = apiUrl;
+        if (requestForceRefresh) {
+          const newUrl = new URL(apiUrl);
+          newUrl.searchParams.append("force_refresh", "true");
+          url = newUrl.toString();
+        }
 
-      if (json.force_reload) window.location.reload();
+        const now = Date.now();
+        const result = await fetch(url);
+        const json = await result.json();
 
-      const response = parseRawResponse(json);
+        if (json.force_reload) window.location.reload();
 
-      if (response.state === "failure") {
-        report("info", "Request failed.", { json });
-        doFailureBuffer(lastSuccess, setApiResponse, response);
-      } else {
-        setApiResponse((prevApiResponse) => {
-          if (!isSuccess(prevApiResponse)) {
-            report("info", "Exiting no-data state.");
-          }
-          return response;
-        });
-        setLastSuccess(now);
+        const response = parseRawResponse(json);
+
+        if (response.state === "failure") {
+          report("info", "Request failed.", { json });
+          doFailureBuffer(lastSuccess, setApiResponse, response);
+        } else {
+          setApiResponse((prevApiResponse) => {
+            if (!isSuccess(prevApiResponse)) {
+              report("info", "Exiting no-data state.");
+            }
+            return response;
+          });
+          setLastSuccess(now);
+        }
+      } catch (err) {
+        captureException(err);
+        doFailureBuffer(lastSuccess, setApiResponse);
       }
-    } catch (err) {
-      captureException(err);
-      doFailureBuffer(lastSuccess, setApiResponse);
-    }
 
-    setRequestCount((count) => count + 1);
-  }, [apiPath, lastSuccess]);
+      setRequestCount((count) => count + 1);
+    },
+    [apiUrl, lastSuccess],
+  );
 
   // Fetch data once, immediately, on first render
   if (!initialFetchDone) {
@@ -211,11 +219,11 @@ const useInspectorRateOverride = (): number | null => {
 };
 
 const useInspectorControls = (
-  fetchData: () => void,
+  fetchData: (requestForceRefresh: boolean) => void,
   lastSuccess: number | null,
 ): void => {
   useReceiveFromInspector((message) => {
-    if (message.type === "refresh_data") fetchData();
+    if (message.type === "refresh_data") fetchData(true);
   });
 
   useEffect(() => {

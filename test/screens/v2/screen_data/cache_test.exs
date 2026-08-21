@@ -22,7 +22,6 @@ defmodule Screens.V2.ScreenData.CacheTest do
 
   setup do
     stub(@parameters, :candidate_generator, fn %Screen{app_id: :test_app} -> TestGenerator end)
-    stub(@store, :fetch, fn _key -> {:error, %Nebulex.KeyError{reason: :not_found}} end)
     stub(@store, :find_node, fn _key -> {:ok, node()} end)
     stub(@store, :transaction, fn fun, _opts -> {:ok, fun.()} end)
     :ok
@@ -36,6 +35,7 @@ defmodule Screens.V2.ScreenData.CacheTest do
     end
 
     test "generates and caches instances for a screen owned by this node" do
+      expect(@store, :fetch, fn _key -> {:error, %Nebulex.KeyError{reason: :not_found}} end)
       expect(@store, :transaction, fn fun, [keys: ["1"]] -> {:ok, fun.()} end)
       expect(@store, :put, fn "1", [@widget], _opts -> :ok end)
 
@@ -49,7 +49,7 @@ defmodule Screens.V2.ScreenData.CacheTest do
       deny(@store, :transaction, 2)
       expect(@store, :find_node, fn "1" -> {:ok, :other_node} end)
 
-      expect(@store, :call, fn :other_node, Cache, :instances, ["1", @screen], _ ->
+      expect(@store, :call, fn :other_node, Cache, :instances, ["1", @screen, []], _ ->
         # From the remote node's perspective this is a "local" key; the local node should
         # correctly tell the caller this was a remote key, leaving the "what" alone
         {[@widget], %Cache.Meta{what: {:error, :foo, @error}, where: :local}}
@@ -57,6 +57,14 @@ defmodule Screens.V2.ScreenData.CacheTest do
 
       assert Cache.instances("1", @screen) ==
                {[@widget], %Cache.Meta{what: {:error, :foo, @error}, where: :remote}}
+    end
+
+    test "skips fetching and generates instances fresh when requested" do
+      expect(@store, :transaction, fn fun, [keys: ["1"]] -> {:ok, fun.()} end)
+      expect(@store, :put, fn "1", [@widget], _opts -> :ok end)
+
+      assert Cache.instances("1", @screen, refresh?: true) ==
+               {[@widget], %Cache.Meta{what: :refresh, where: :local}}
     end
 
     test "falls back to local generation when unable to find the owner node" do
@@ -81,6 +89,7 @@ defmodule Screens.V2.ScreenData.CacheTest do
     end
 
     test "tolerates an error storing the generated instances" do
+      expect(@store, :fetch, fn _key -> {:error, %Nebulex.KeyError{reason: :not_found}} end)
       expect(@store, :put, fn "1", [@widget], _opts -> {:error, @error} end)
 
       assert Cache.instances("1", @screen) ==
