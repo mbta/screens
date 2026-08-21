@@ -5,6 +5,8 @@ defmodule Screens.Config.ScreenConfig do
 
   import Ecto.Changeset
 
+  @derive {Jason.Encoder, except: [:__meta__]}
+
   @type t() :: %__MODULE__{
           id: String.t(),
           config: Config.t()

@@ -14,6 +14,11 @@ export API_V3_URL="https://api-v3.mbta.com"
 
 export SECRET_KEY_BASE="local_secret_key_base_at_least_64_bytes_________________________________"
 
+export SCREENS_API_CLIENT_KEY="local_screens_api_client_key"
+
 ## Postgres configuration: username and password for local server
 # export DATABASE_USER=
 # export DATABASE_PASSWORD=
+
+## Feature flag. Setting to true uses the Postgres DB for screen configurations
+export CONFIG_MIGRATION="false"

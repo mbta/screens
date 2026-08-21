@@ -1,5 +1,13 @@
-import { useState, useEffect, useRef, type JSX } from "react";
+import { useState, useEffect, useRef, type JSX, type RefObject } from "react";
 import { AUTOLESS_ATTRIBUTES, fetch } from "Util/admin";
+
+type AdminConfirmControlsProps = {
+  onConfirm: (config: any) => Promise<{ success: boolean; error?: string }>;
+  configRef: RefObject<HTMLTextAreaElement | null>;
+  onCancel: () => void;
+  onError: (string) => void;
+  onSuccess: () => void;
+};
 
 const validateJson = (json) => {
   try {
@@ -44,28 +52,54 @@ const AdminValidateControls = ({
 };
 
 const AdminConfirmControls = ({
-  confirmPath,
+  onConfirm,
   configRef,
   onCancel,
   onError,
   onSuccess,
-}): JSX.Element => {
-  const confirmFn = () => {
-    const config = configRef.current.value;
-    const dataToSubmit = { config };
-    fetch.post(confirmPath, dataToSubmit).then((resultJson) => {
-      if (resultJson.success === true) {
-        onSuccess();
-      } else {
-        onError();
+}: AdminConfirmControlsProps): JSX.Element => {
+  const [isLoading, setIsLoading] = useState(false);
+
+  const confirmFn = async () => {
+    setIsLoading(true);
+    try {
+      const config = configRef.current?.value;
+      if (!config) {
+        onError("No current configuration found.");
+        return;
       }
-    });
+
+      const parsedConfig = JSON.parse(config);
+      const result = await onConfirm(parsedConfig);
+
+      if (result.success === true) {
+        onSuccess();
+      } else if (result.error) {
+        onError(result.error);
+      } else {
+        onError("An unknown error was returned from the server.");
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        onError(error.message);
+      } else if (error && typeof error === "object" && "toString" in error) {
+        onError(error.toString());
+      } else {
+        onError("An unknown exception occurred.");
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div>
-      <button onClick={onCancel}>Back</button>
-      <button onClick={confirmFn}>Confirm</button>
+      <button onClick={onCancel} disabled={isLoading}>
+        Back
+      </button>
+      <button onClick={confirmFn} disabled={isLoading}>
+        Confirm
+      </button>
     </div>
   );
 };
@@ -73,7 +107,7 @@ const AdminConfirmControls = ({
 const AdminForm = ({
   fetchConfig,
   validatePath,
-  confirmPath,
+  onConfirm,
   onUpdated,
 }): JSX.Element => {
   const [editable, setEditable] = useState(true);
@@ -111,11 +145,11 @@ const AdminForm = ({
         />
       ) : (
         <AdminConfirmControls
-          confirmPath={confirmPath}
+          onConfirm={onConfirm}
           configRef={configRef}
           onCancel={() => setEditable(true)}
-          onError={() => {
-            alert("Config update failed");
+          onError={(error) => {
+            alert(`Config update failed: ${error}`);
             setEditable(true);
           }}
           onSuccess={() => {

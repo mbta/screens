@@ -9,8 +9,47 @@ defmodule ScreensWeb.AdminApiController do
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
   def index(conn, _params) do
-    {:ok, config, _version} = ConfigFetch.fetch_config()
-    json(conn, %{config: config})
+    config = ScreenConfigs.list_all()
+    config_migration = ScreenConfigs.config_migration_enabled?()
+    json(conn, %{config: config, config_migration: config_migration})
+  end
+
+  def update_screen_configs(conn, %{"screen_configs" => screen_configs})
+      when is_list(screen_configs) do
+    case ScreenConfigs.commit_updates(screen_configs) do
+      :ok ->
+        json(conn, %{success: true})
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: inspect(reason)})
+    end
+  end
+
+  def update_screen_configs(conn, _params) do
+    conn
+    |> put_status(400)
+    |> json(%{success: false, error: "Invalid request parameters"})
+  end
+
+  def delete_screen_configs(conn, %{"deleted_screen_ids" => deleted_screen_ids})
+      when is_list(deleted_screen_ids) do
+    case ScreenConfigs.commit_deletes(deleted_screen_ids) do
+      :ok ->
+        json(conn, %{success: true})
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: inspect(reason)})
+    end
+  end
+
+  def delete_screen_configs(conn, _params) do
+    conn
+    |> put_status(400)
+    |> json(%{success: false, error: "Invalid request parameters"})
   end
 
   def validate(conn, %{"id" => _id, "config" => screen_json}) do

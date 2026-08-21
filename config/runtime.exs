@@ -4,6 +4,8 @@
 # remember to add this file to your .gitignore.
 import Config
 
+config :screens, :config_migration, System.get_env("CONFIG_MIGRATION", "false") == "true"
+
 config :screens, Screens.Repo,
   username: System.fetch_env!("DATABASE_USER"),
   password: System.get_env("DATABASE_PASSWORD"),
