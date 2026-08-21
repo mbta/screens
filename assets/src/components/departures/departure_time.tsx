@@ -14,7 +14,7 @@ type DepartureTime =
 
 interface DepartureTimePartProps {
   time: DepartureTime;
-  timeInEpochMinutes: number;
+  timeInEpochSeconds: number;
   currentPage: number;
 }
 
@@ -44,7 +44,7 @@ const adjustMinute = (
 
 const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
   time,
-  timeInEpochMinutes,
+  timeInEpochSeconds,
   currentPage,
 }) => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
@@ -63,7 +63,7 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
       return (
         <>
           <div className="departure-time__minutes">
-            {adjustMinute(new Date(timeInEpochMinutes), currentDateTime)}
+            {adjustMinute(new Date(timeInEpochSeconds), currentDateTime)}
           </div>
           <div className="departure-time__minutes-label">m</div>
         </>
@@ -121,7 +121,7 @@ const DepartureTime: ComponentType<Props> = ({
         <DepartureTimePart
           currentPage={currentPage}
           time={time}
-          timeInEpochMinutes={timeInEpoch}
+          timeInEpochSeconds={timeInEpoch}
         />
       </div>
     );
@@ -136,7 +136,7 @@ const DepartureTime: ComponentType<Props> = ({
         <DepartureTimePart
           {...{
             time: scheduled_time,
-            timeInEpochMinutes: timeInEpoch,
+            timeInEpochSeconds: timeInEpoch,
             currentPage,
           }}
         />
