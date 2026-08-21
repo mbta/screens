@@ -8,8 +8,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   """
 
   alias __MODULE__.TaskSupervisor
-  alias Screens.Config.Cache
-  alias ScreensConfig.Screen
+  alias Screens.ScreenConfigs
 
   use GenServer
 
@@ -99,7 +98,14 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
         |> Task.Supervisor.async_stream_nolink(
           ids,
           fn id ->
-            @screen_data.get(id, Cache.screen(id))
+            case ScreenConfigs.fetch(id) do
+              {:ok, %ScreensConfig.Screen{} = screen} ->
+                @screen_data.get(id, screen)
+
+              _ ->
+                :noop
+            end
+
             id
           end,
           max_concurrency: @max_concurrency,
@@ -118,9 +124,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   end
 
   defp relevant_screen_ids do
-    Cache.screen_ids(fn {_id, %Screen{disabled: disabled, hidden_from_screenplay: hidden}} ->
-      not disabled and not hidden
-    end)
+    ScreenConfigs.self_refresh_screen_ids()
   end
 
   defp schedule_check, do: Process.send_after(self(), :check, 1_000)

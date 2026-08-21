@@ -1,8 +1,8 @@
 defmodule ScreensWeb.V2.ScreenController do
   use ScreensWeb, :controller
 
-  alias Screens.Config.Cache
   alias Screens.Report
+  alias Screens.ScreenConfigs
   alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.Screen
   alias ScreensWeb.Plug.ScreenRequest
@@ -107,7 +107,7 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   defp screen_ids(target_app_id, refresh_rate) do
-    Cache.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
+    ScreenConfigs.screen_ids_for_app(target_app_id)
     |> Enum.map(&%{id: &1, refresh_rate_offset: calculate_refresh_rate_offset(&1, refresh_rate)})
   end
 
