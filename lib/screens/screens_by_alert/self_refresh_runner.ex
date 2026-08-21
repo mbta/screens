@@ -8,7 +8,8 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   """
 
   alias __MODULE__.TaskSupervisor
-  alias Screens.Config.Cache
+  alias Screens.Config
+  alias Screens.V2.ScreenData
   alias ScreensConfig.Screen
 
   use GenServer
@@ -46,20 +47,18 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
   def handle_info(:check, refreshing_ids) when refreshing_ids == @empty_set do
     now = System.system_time(:second)
 
-    # Select the N "most outdated" screen IDs, sorted by how outdated they are, for refreshing
+    # Select the N "most outdated" screen IDs, sorted by how outdated they are, for refreshing.
+    # As an optimization, if the partitioned screen data cache is available, only consider screen
+    # IDs owned by this node.
     {ids_to_refresh, rest_ids} =
       relevant_screen_ids()
       |> @screens_by_alert.get_screens_last_updated()
       |> Enum.filter(fn {_screen_id, timestamp} -> now - timestamp > @outdated_threshold_secs end)
       |> Enum.sort_by(fn {_screen_id, timestamp} -> timestamp end)
       |> Enum.map(fn {screen_id, _timestamp} -> screen_id end)
-      |> then(fn screen_ids ->
-        in_progress = screen_ids |> @screens_by_alert.get_in_progress() |> MapSet.new()
-        Enum.reject(screen_ids, &(&1 in in_progress))
-      end)
+      |> Enum.filter(&should_refresh_on_this_node?/1)
       |> Enum.split(@batch_size)
 
-    @screens_by_alert.put_in_progress(ids_to_refresh)
     _ = start_refresh(ids_to_refresh, rest_ids)
     schedule_check()
 
@@ -99,7 +98,7 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
         |> Task.Supervisor.async_stream_nolink(
           ids,
           fn id ->
-            @screen_data.get(id, Cache.screen(id))
+            @screen_data.get(id, Config.Cache.screen(id))
             id
           end,
           max_concurrency: @max_concurrency,
@@ -117,8 +116,16 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunner do
       end)
   end
 
+  defp should_refresh_on_this_node?(id) do
+    case ScreenData.Cache.Store.find_node(id) do
+      {:ok, n} when n == node() -> true
+      {:ok, _other} -> false
+      {:error, _error} -> true
+    end
+  end
+
   defp relevant_screen_ids do
-    Cache.screen_ids(fn {_id, %Screen{disabled: disabled, hidden_from_screenplay: hidden}} ->
+    Config.Cache.screen_ids(fn {_id, %Screen{disabled: disabled, hidden_from_screenplay: hidden}} ->
       not disabled and not hidden
     end)
   end
