@@ -10,10 +10,8 @@ defmodule ScreensWeb.Plug.ScreenRequest do
 
   alias Phoenix.Controller
   alias Plug.Conn
+  alias Screens.ScreenConfigs
   alias ScreensConfig.Screen
-
-  import Screens.Inject
-  @cache injected(Screens.Config.Cache)
 
   defmodule Options do
     @moduledoc false
@@ -24,13 +22,12 @@ defmodule ScreensWeb.Plug.ScreenRequest do
 
   def call(conn, options) do
     with {:params, %Conn{path_params: %{"id" => id}}} <- {:params, conn},
-         {:cache, true} <- {:cache, Screens.Config.Cache.ok?()},
-         {:screen, %Screen{} = screen} <- {:screen, @cache.screen(id)} do
+         {:screen, {:ok, %Screen{} = screen}} <- {:screen, ScreenConfigs.fetch(id)} do
       conn |> Conn.fetch_query_params() |> assign(options, id, screen)
     else
       {:params, _conn} -> error(conn, 400)
-      {:cache, false} -> error(conn, 503)
-      {:screen, nil} -> error(conn, 404)
+      {:screen, {:error, :cache_unavailable}} -> error(conn, 503)
+      {:screen, {:ok, nil}} -> error(conn, 404)
     end
   end
 
