@@ -18,14 +18,16 @@ defmodule ScreensWeb.V2.ScreenApiController do
   plug :disabled_response when action in @show_actions
   plug :outdated_response when action in @show_actions
 
-  def show(%{assigns: %{screen_id: id, screen: screen}} = conn, _params) do
-    json(conn, screen_response(id, screen) |> put_extra_fields(id, screen))
+  def show(%{assigns: %{screen_id: id, screen: screen}} = conn, params) do
+    opts = screen_data_options(params)
+    json(conn, screen_response(id, screen, opts) |> put_extra_fields(id, screen))
   end
 
   def show_dup(conn, params), do: show(conn, params)
 
-  def simulation(%{assigns: %{screen_id: id, screen: screen}} = conn, _params) do
-    json(conn, %{@base_response | data: ScreenData.simulation(id, screen)})
+  def simulation(%{assigns: %{screen_id: id, screen: screen}} = conn, params) do
+    opts = screen_data_options(params)
+    json(conn, %{@base_response | data: ScreenData.simulation(id, screen, opts)})
   end
 
   def log_frontend_error(conn, params) do
@@ -65,14 +67,17 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   # See `docs/mercury_api.md`
-  defp screen_response(id, %Screen{vendor: :mercury} = screen) do
-    %{full_page: data, flex_zone: flex_zone} = ScreenData.simulation(id, screen)
+  defp screen_response(id, %Screen{vendor: :mercury} = screen, opts) do
+    %{full_page: data, flex_zone: flex_zone} = ScreenData.simulation(id, screen, opts)
     Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
   end
 
-  defp screen_response(id, screen) do
-    %{@base_response | data: ScreenData.get(id, screen)}
+  defp screen_response(id, screen, opts) do
+    %{@base_response | data: ScreenData.get(id, screen, opts)}
   end
+
+  defp screen_data_options(%{"force_refresh" => "true"}), do: [refresh?: true]
+  defp screen_data_options(_params), do: []
 
   # See `docs/mercury_api.md`
   defp put_extra_fields(response, id, %Screen{vendor: :mercury} = screen) do

@@ -19,13 +19,15 @@ defmodule Screens.V2.ScreenData do
   @type audio_data :: [{view :: module(), assigns :: %{optional(atom()) => any()}}]
 
   @callback get(String.t(), Screen.t()) :: t()
-  def get(id, screen) do
-    generate(id, screen) |> resolve_paging(screen) |> serialize()
+  @callback get(String.t(), Screen.t(), Cache.options()) :: t()
+  def get(id, screen, opts \\ []) do
+    generate(id, screen, opts) |> resolve_paging(screen) |> serialize()
   end
 
   @spec simulation(String.t(), Screen.t()) :: simulation_data()
-  def simulation(id, %Screen{app_id: app_id} = screen) do
-    layout = generate(id, screen)
+  @spec simulation(String.t(), Screen.t(), Cache.options()) :: simulation_data()
+  def simulation(id, %Screen{app_id: app_id} = screen, opts \\ []) do
+    layout = generate(id, screen, opts)
 
     %{
       full_page: layout |> resolve_paging(screen) |> serialize(),
@@ -53,11 +55,12 @@ defmodule Screens.V2.ScreenData do
   end
 
   @spec generate(String.t(), Screen.t()) :: Layout.t()
-  defp generate(id, screen) do
+  @spec generate(String.t(), Screen.t(), Cache.options()) :: Layout.t()
+  defp generate(id, screen, opts \\ []) do
     generator = @parameters.candidate_generator(screen)
     screen_template = generator.screen_template(screen)
 
-    {instances, meta} = Cache.instances(id, screen)
+    {instances, meta} = Cache.instances(id, screen, opts)
     log_cache_meta(meta)
 
     instances
