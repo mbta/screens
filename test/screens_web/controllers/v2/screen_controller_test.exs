@@ -5,7 +5,13 @@ defmodule ScreensWeb.V2.ScreenControllerTest do
   setup :verify_on_exit!
 
   import Screens.Inject
+  @build_info injected(Screens.Util.BuildInfo)
   @cache injected(Screens.Config.Cache)
+
+  setup do
+    stub(@build_info, :build_identifier, fn -> "eae8fa35" end)
+    :ok
+  end
 
   describe "index/2" do
     test "returns 200", %{conn: conn} do

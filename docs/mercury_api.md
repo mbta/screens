@@ -53,6 +53,9 @@ we include the following additional fields:
 * `last_deploy_timestamp` *(string)* — The datetime the app was last deployed,
   in ISO8601 format. [[#1909]]
 
+* `build_identifier` *(string)* — A string identifying when the app was last 
+  deployed, expressed as a short git SHA. [[#3258]]
+
 
 ## `Departures` widget
 
@@ -83,3 +86,4 @@ add its own clock independent of data fetching and widget rendering. [[#1943]]
 [#1970]: https://github.com/mbta/screens/pull/1970
 [#2317]: https://github.com/mbta/screens/pull/2317
 [#3180]: https://github.com/mbta/screens/pull/3180/
+[#3258]: https://github.com/mbta/screens/pull/3258/

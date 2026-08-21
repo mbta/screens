@@ -57,6 +57,14 @@ if config_env() == :prod do
     ]
 end
 
+build_identifier =
+  case System.cmd("git", ["rev-parse", "--short", "HEAD"]) do
+    {build_id, 0} -> String.trim(build_id)
+    {_, exit_code} -> raise "Failed with exit code: " <> Integer.to_string(exit_code)
+  end
+
+config :screens, :build_identifier, build_identifier
+
 # ## Using releases (Elixir v1.9+)
 #
 # If you are doing OTP releases, you need to instruct Phoenix

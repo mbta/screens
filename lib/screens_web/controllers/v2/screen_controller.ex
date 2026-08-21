@@ -7,20 +7,30 @@ defmodule ScreensWeb.V2.ScreenController do
   alias ScreensConfig.Screen
   alias ScreensWeb.Plug.ScreenRequest
 
+  import Screens.Inject
+  @build_info injected(Screens.Util.BuildInfo)
+
   plug ScreenRequest, [type: :page] when action in [:index, :simulation]
 
   plug :environment_name
   plug :last_refresh
+  plug :build_identifier
 
   defp environment_name(conn, _) do
     environment_name = Application.get_env(:screens, :environment_name)
     assign(conn, :environment_name, environment_name)
   end
 
+  # credo:disable-for-next-line
+  # TODO: Remove this following a complete rollout of build_identifier code
   defp last_refresh(conn, _) do
     # credo:disable-for-next-line Screens.Checks.UntestableDateTime
     now = DateTime.utc_now() |> DateTime.to_iso8601()
     assign(conn, :last_refresh, now)
+  end
+
+  defp build_identifier(conn, _) do
+    assign(conn, :build_identifier, @build_info.build_identifier())
   end
 
   def index(conn, params) do

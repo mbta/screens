@@ -9,6 +9,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   setup :verify_on_exit!
 
   import Screens.Inject
+  @build_info injected(Screens.Util.BuildInfo)
   @cache injected(Screens.Config.Cache)
   @parameters injected(Screens.V2.ScreenData.Parameters)
 
@@ -17,6 +18,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   Stub.candidate_generator(StubGenerator, fn _ -> [placeholder(:blue)] end)
 
   setup do
+    stub(@build_info, :build_identifier, fn -> "eae8fa35" end)
     stub(@cache, :last_deploy_timestamp, fn -> ~U[2020-01-01 00:00:00Z] end)
     stub(@cache, :screen, fn _id -> struct(Screen) end)
     stub(@parameters, :candidate_generator, fn _screen -> StubGenerator end)
@@ -26,6 +28,29 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   end
 
   describe "show/2" do
+    test "does not tell the client to reload when its code is up to date by the build identifier",
+         %{conn: conn} do
+      conn = get(conn, "/v2/api/screen/1?build_identifier=eae8fa35")
+
+      assert %{"force_reload" => false} = json_response(conn, 200)
+    end
+
+    test "tells client to reload when its code is outdated by the build identifier", %{conn: conn} do
+      conn = get(conn, "/v2/api/screen/1?build_identifier=123456a")
+
+      assert %{"force_reload" => true} = json_response(conn, 200)
+    end
+
+    test "tells client to reload when its code is outdated by the build identifier over last_refresh",
+         %{conn: conn} do
+      expect(@cache, :last_deploy_timestamp, 0, fn -> ~U[2026-01-01 12:00:00Z] end)
+
+      conn =
+        get(conn, "/v2/api/screen/1?build_identifier=123456a&last_refresh=2026-01-01T11:00:00Z")
+
+      assert %{"force_reload" => true} = json_response(conn, 200)
+    end
+
     test "tells client to reload when its code is outdated", %{conn: conn} do
       expect(@cache, :last_deploy_timestamp, fn -> ~U[2026-01-01 12:00:00Z] end)
 
@@ -74,7 +99,8 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
                "disabled" => false,
                "flex_zone" => [],
                "force_reload" => false,
-               "last_deploy_timestamp" => "2020-01-01T00:00:00Z"
+               "last_deploy_timestamp" => "2020-01-01T00:00:00Z",
+               "build_identifier" => "eae8fa35"
              } == json_response(conn, 200)
     end
 

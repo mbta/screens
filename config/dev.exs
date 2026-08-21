@@ -15,6 +15,7 @@ config :screens, ScreensWeb.Endpoint,
 
 config :screens,
   config_fetcher: Screens.Config.Fetch.Local,
+  # TODO: Remove this following a complete rollout of build_identifier code
   last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:priv, "local.json"},
   local_signs_ui_config_file_spec: {:priv, "signs_ui_config.json"},

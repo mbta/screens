@@ -7,6 +7,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   alias ScreensWeb.Plug.ScreenRequest
 
   import Screens.Inject
+  @build_info injected(Screens.Util.BuildInfo)
   @cache injected(Screens.Config.Cache)
 
   @base_response %{data: nil, disabled: false, force_reload: false}
@@ -79,6 +80,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     response
     |> Map.put(:audio_data, fetch_ssml(screen))
     |> Map.put(:last_deploy_timestamp, @cache.last_deploy_timestamp())
+    |> Map.put(:build_identifier, @build_info.build_identifier())
   end
 
   defp put_extra_fields(response, _screen), do: response
@@ -103,8 +105,28 @@ defmodule ScreensWeb.V2.ScreenApiController do
   # The packaged client can't reload the page to update itself; this would just reload the local
   # copy of the code, resulting in an infinite loop. Compatibility and versioning of the packaged
   # client is handled manually.
+  # credo:disable-for-next-line
+  # TODO: Remove this following a complete rollout of build_identifier code
   defp outdated_response(%{params: %{"last_refresh" => "packaged"}} = conn, _), do: conn
+  defp outdated_response(%{params: %{"build_identifier" => "packaged"}} = conn, _), do: conn
 
+  defp outdated_response(%{params: %{"build_identifier" => build_identifier}} = conn, _) do
+    latest_build_identifier = @build_info.build_identifier()
+    # TODO(NOW): RM
+    IO.inspect(latest_build_identifier, label: "LATEST")
+    IO.inspect(build_identifier, label: "REC")
+
+    if is_binary(build_identifier) &&
+         String.trim(build_identifier) != String.trim(latest_build_identifier) do
+      Logger.metadata(response_type: :outdated)
+      conn |> json(%{@base_response | force_reload: true}) |> halt()
+    else
+      conn
+    end
+  end
+
+  # credo:disable-for-next-line
+  # TODO: Remove this following a complete rollout of build_identifier code
   defp outdated_response(
          %{
            assigns: %{screen: %Screen{refresh_if_loaded_before: refresh_if_loaded_before}},

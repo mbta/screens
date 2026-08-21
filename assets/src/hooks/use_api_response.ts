@@ -111,7 +111,9 @@ const useApiPath = (screenId: string, appendPath?: string): string => {
 
     const params: Record<string, string | null | undefined> = {
       is_real_screen: isRealScreen() ? "true" : null,
+      // TODO: Remove this following a complete rollout of build_identifier code
       last_refresh: getDatasetValue("lastRefresh"),
+      build_identifier: getDatasetValue("buildIdentifier"),
       requestor: getDatasetValue("requestor"),
       rotation_index: getRotationIndex(),
       screen_side: getScreenSide(),

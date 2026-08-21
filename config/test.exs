@@ -13,6 +13,7 @@ config :screens, Screens.Repo,
 
 config :screens,
   config_fetcher: Screens.Config.Fetch.Local,
+  # TODO: Remove this following a complete rollout of build_identifier code
   last_deploy_fetcher: Screens.Util.LastDeploy.LocalFetch,
   local_config_file_spec: {:test, "config.json"},
   local_signs_ui_config_file_spec: {:test, "signs_ui_config.json"},

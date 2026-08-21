@@ -11,6 +11,7 @@ injected_modules = [
   Screens.Routes.Route,
   Screens.Schedules.Schedule,
   Screens.Stops.Stop,
+  Screens.Util.BuildInfo,
   Screens.V2.Departure,
   Screens.V2.RDS,
   Screens.V2.ScreenData,
