@@ -49,21 +49,11 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
 }) => {
   const [currentDateTime, setCurrentDateTime] = useState(new Date());
   useEffect(() => {
-    const timeDifferenceSeconds =
-      new Date(timeInEpoch).getTime() - currentDateTime.getTime() / 1000;
-    const timeUntilDeptWithoutMin = Math.floor(timeDifferenceSeconds % 60);
-    // Ensure that if the number of seconds is greater than or equal to 30, we
-    // refresh when there are 29 seconds left in the minute. Otherwise, refresh
-    // when the minute changes (and there are 59 seconds left)
-    const timerDelaySeconds =
-      timeUntilDeptWithoutMin >= 30
-        ? timeUntilDeptWithoutMin - 29
-        : timeUntilDeptWithoutMin + 1;
-    const minuteAdjustTimer = setTimeout(() => {
+    const intervalTimer = setInterval(() => {
       setCurrentDateTime(new Date());
-    }, timerDelaySeconds * 1000);
+    }, 1000);
 
-    return () => clearTimeout(minuteAdjustTimer);
+    return () => clearInterval(intervalTimer);
   }, []);
   switch (time.type) {
     case "text":
