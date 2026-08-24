@@ -134,7 +134,7 @@ defmodule Screens.DeviceMonitor.Gds do
   end
 
   defp parse_datetime(s) do
-    with {:ok, naive_datetime} <- Timex.parse(s, "%-m/%-d/%Y %-I:%M:%S %p", :strftime),
+    with {:ok, naive_datetime} <- Datix.NaiveDateTime.parse(s, "%-m/%-d/%Y %-I:%M:%S %p"),
          {:ok, dt} <- DateTime.from_naive(naive_datetime, "Europe/Rome"),
          {:ok, utc_dt} <- DateTime.shift_zone(dt, "Etc/UTC") do
       utc_dt
