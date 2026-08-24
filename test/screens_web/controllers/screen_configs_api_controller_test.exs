@@ -3,29 +3,13 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
 
   import ExUnit.CaptureLog
   import Mox
+  import Screens.TestSupport.ScreenConfigBuilder
 
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
+  alias ScreensConfig.Screen
 
   @env_var "SCREENS_API_CLIENT_KEY"
-
-  # Test config constants
-  @screen_dup_config %{"app_id" => "dup_v2"}
-  @screen_busway_config %{"app_id" => "busway_v2"}
-  @screen_dup_old_config %{"app_id" => "dup_old"}
-
-  @legacy_config %{
-    "screens" => %{
-      "dup_1" => @screen_dup_config,
-      "busway_1" => @screen_busway_config
-    }
-  }
-
-  @legacy_config_dup_only %{
-    "screens" => %{
-      "dup_1" => @screen_dup_old_config
-    }
-  }
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
@@ -59,8 +43,11 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
       System.put_env(@env_var, "shared-secret")
       Application.put_env(:screens, :config_migration, true)
 
-      Repo.insert!(%ScreenConfig{id: "screen-1", config: @screen_dup_config})
-      Repo.insert!(%ScreenConfig{id: "screen-2", config: @screen_busway_config})
+      screen_dup_config = screen_config(:dup_v2)
+      screen_busway_config = screen_config(:busway_v2)
+
+      Repo.insert!(%ScreenConfig{id: "screen-1", config: screen_dup_config})
+      Repo.insert!(%ScreenConfig{id: "screen-2", config: screen_busway_config})
 
       conn =
         conn
@@ -69,12 +56,11 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
 
       assert conn.status == 200
 
-      %{"screen_configs" => screen_configs} = json_response(conn, 200)
+      %{"config" => config_json} = json_response(conn, 200)
+      config = Jason.decode!(config_json)
 
-      assert length(screen_configs) == 2
-      configs_by_id = Map.new(screen_configs, &{&1["id"], &1["config"]})
-      assert configs_by_id["screen-1"] == @screen_dup_config
-      assert configs_by_id["screen-2"] == @screen_busway_config
+      assert config["screens"]["screen-1"] == normalize_json(Screen.to_json(screen_dup_config))
+      assert config["screens"]["screen-2"] == normalize_json(Screen.to_json(screen_busway_config))
     end
 
     test "returns screen configs from legacy config source when migration flag is false", %{
@@ -83,9 +69,12 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
       System.put_env(@env_var, "shared-secret")
       Application.put_env(:screens, :config_migration, false)
 
+      screen_dup_config = screen_config_json(:dup_v2)
+      screen_busway_config = screen_config_json(:busway_v2)
+
       # Mock fetch_config to return our test config
       expect(Screens.Config.Fetch.Mock, :fetch_config, fn ->
-        {:ok, Jason.encode!(@legacy_config), 1}
+        {:ok, Jason.encode!(legacy_config(screen_dup_config, screen_busway_config)), 1}
       end)
 
       conn =
@@ -95,12 +84,11 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
 
       assert conn.status == 200
 
-      %{"screen_configs" => screen_configs} = json_response(conn, 200)
+      %{"config" => config_json} = json_response(conn, 200)
+      config = Jason.decode!(config_json)
 
-      # Verify configs match our constants
-      configs_by_id = Map.new(screen_configs, &{&1["id"], &1["config"]})
-      assert configs_by_id["dup_1"] == @screen_dup_config
-      assert configs_by_id["busway_1"] == @screen_busway_config
+      assert config["screens"]["dup_1"] == normalize_json(screen_dup_config)
+      assert config["screens"]["busway_1"] == normalize_json(screen_busway_config)
     end
   end
 
@@ -123,37 +111,45 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
       System.put_env(@env_var, "shared-secret")
       Application.put_env(:screens, :config_migration, true)
 
-      Repo.insert!(%ScreenConfig{id: "screen-1", config: @screen_dup_config})
+      screen_dup_config = screen_config(:dup_v2)
+      screen_busway_config = screen_config(:busway_v2)
+
+      Repo.insert!(%ScreenConfig{id: "screen-1", config: screen_dup_config})
 
       conn =
         conn
         |> put_req_header("authorization", "Bearer shared-secret")
         |> post("/api/screen_configs", %{
           screen_configs: [
-            %{id: "screen-1", config: @screen_busway_config}
+            %{id: "screen-1", config: screen_busway_config}
           ]
         })
 
       assert json_response(conn, 200) == %{"success" => true}
 
       updated = Repo.get!(ScreenConfig, "screen-1")
-      assert updated.config == @screen_busway_config
+      assert updated.config == screen_busway_config
     end
 
     test "updates full config when migration flag is false", %{conn: conn} do
       System.put_env(@env_var, "shared-secret")
       Application.put_env(:screens, :config_migration, false)
 
+      screen_dup_config = screen_config_json(:dup_v2)
+
       # Mock the fetch and put to prevent writing to the fixture file
       expect(Screens.Config.Fetch.Mock, :fetch_config, fn ->
-        {:ok, Jason.encode!(@legacy_config_dup_only), 1}
+        {:ok, Jason.encode!(legacy_config_dup_only()), 1}
       end)
 
       expect(Screens.Config.Fetch.Mock, :put_config, fn config ->
         # Verify the updated config has the new screen 1001 config
         {:ok, decoded} = Jason.decode(config)
         screens = Map.get(decoded, "screens", %{})
-        assert screens["dup_1"] == @screen_dup_config
+
+        assert Screen.to_json(Screen.from_json(screens["dup_1"])) ==
+                 Screen.to_json(screen_config(:dup_v2))
+
         :ok
       end)
 
@@ -162,7 +158,7 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
         |> put_req_header("authorization", "Bearer shared-secret")
         |> post("/api/screen_configs", %{
           screen_configs: [
-            %{"id" => "dup_1", "config" => @screen_dup_config}
+            %{"id" => "dup_1", "config" => screen_dup_config}
           ]
         })
 

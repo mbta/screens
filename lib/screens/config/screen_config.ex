@@ -1,7 +1,8 @@
 defmodule Screens.Config.ScreenConfig do
   use Ecto.Schema
 
-  alias ScreensConfig.Config
+  alias Screens.Config.ScreenConfigType
+  alias ScreensConfig.Screen
 
   import Ecto.Changeset
 
@@ -9,12 +10,12 @@ defmodule Screens.Config.ScreenConfig do
 
   @type t() :: %__MODULE__{
           id: String.t(),
-          config: Config.t()
+          config: Screen.t()
         }
 
   @primary_key {:id, :string, autogenerate: false}
   schema "screen_configs" do
-    field :config, :map
+    field :config, ScreenConfigType
 
     timestamps(type: :utc_datetime)
   end
@@ -23,5 +24,12 @@ defmodule Screens.Config.ScreenConfig do
     screen_config
     |> cast(attrs, [:id, :config])
     |> validate_required([:id, :config])
+  end
+
+  @spec from_attrs(map()) :: {:ok, t()} | {:error, Ecto.Changeset.t()}
+  def from_attrs(attrs) do
+    %__MODULE__{}
+    |> changeset(attrs)
+    |> apply_action(:insert)
   end
 end
