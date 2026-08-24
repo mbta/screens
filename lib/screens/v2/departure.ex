@@ -2,6 +2,7 @@ defmodule Screens.V2.Departure do
   @moduledoc false
 
   alias Screens.Predictions.Prediction
+  alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Schedules.Schedule
@@ -27,7 +28,6 @@ defmodule Screens.V2.Departure do
           optional(:direction_id) => Trip.direction() | :both,
           optional(:mode) => Mode.t(),
           optional(:route_ids) => [Route.id()],
-          optional(:route_type) => nil | RouteType.t() | [RouteType.t()],
           optional(:sort) => String.t(),
           optional(:stop_ids) => [Stop.id()]
         }
@@ -66,22 +66,16 @@ defmodule Screens.V2.Departure do
     # route_types to filter on are configured in params AND options, we only include route_types
     # that are set in both.
     all_types = RouteType.all() |> Enum.sort()
-    param_types = (params[:route_type] || all_types) |> List.wrap() |> MapSet.new()
+
+    route_type = Mode.to_route_type(params[:mode])
+
     option_types = Keyword.get(opts, :schedule_route_type_filter, all_types) |> MapSet.new()
 
-    final_types =
-      param_types |> MapSet.intersection(option_types) |> MapSet.to_list() |> Enum.sort()
-
-    case final_types do
-      # An empty list here, which we'd intend as "no route types", would encode as an empty string
-      # in the fetch params, which means "no route type *filter*" a.k.a. all route types. Fetching
-      # schedules for "no route types" is just not fetching any schedules, so we can skip it.
-      [] -> {:ok, []}
-      # By similar logic, filtering on every route type is the same as not filtering at all, so
-      # normalize this to not include the filter.
-      ^all_types -> params |> Map.delete(:route_type) |> fetch_fn.()
-      # We have a final route type filter that is neither "everything" nor "nothing".
-      route_types -> params |> Map.put(:route_type, route_types) |> fetch_fn.()
+    if route_type in option_types do
+      fetch_fn.(params)
+    else
+      Report.warning("departure_mode_unknown", Map.to_list(params))
+      {:ok, []}
     end
   end
 
@@ -105,17 +99,18 @@ defmodule Screens.V2.Departure do
   defp encode_param({:mode, nil}), do: nil
 
   defp encode_param({:mode, mode}),
-    do: {"filter[route_type]", Mode.to_route_type(mode)}
+    do:
+      {"filter[route_type]",
+       mode
+       |> Mode.to_route_type()
+       |> Screens.RouteType.to_id()}
 
   defp encode_param({:route_ids, []}), do: nil
   defp encode_param({:route_ids, route_ids}), do: {"filter[route]", Enum.join(route_ids, ",")}
-  defp encode_param({:route_type, nil}), do: nil
 
+  # Handling the `schedule_route_type_filter` for ferries/commuter rail
   defp encode_param({:route_type, route_types}) when is_list(route_types),
     do: {"filter[route_type]", Enum.map_join(route_types, ",", &Screens.RouteType.to_id(&1))}
-
-  defp encode_param({:route_type, route_type}),
-    do: {"filter[route_type]", Screens.RouteType.to_id(route_type)}
 
   defp encode_param({:sort, sort}), do: {"sort", sort}
   defp encode_param({:stop_ids, []}), do: nil

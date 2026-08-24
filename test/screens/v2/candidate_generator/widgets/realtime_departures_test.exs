@@ -156,7 +156,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
             route_ids ->
               Enum.map(
                 route_ids,
-                &%Section{query: %Query{params: %Query.Params{route_ids: [&1]}}}
+                &%Section{query: %Query{params: %Query.Params{mode: :rl, route_ids: [&1]}}}
               )
           end
       }
@@ -290,9 +290,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
           %Section{
             header: %Header{title: "Test Header"},
             header_only: true,
-            query: %Query{params: %Query.Params{route_ids: []}}
+            query: %Query{params: %Query.Params{mode: :rl, route_ids: []}}
           },
-          %Section{query: %Query{params: %Query.Params{route_ids: ["route_one"]}}}
+          %Section{query: %Query{params: %Query.Params{mode: :rl, route_ids: ["route_one"]}}}
         ])
 
       expect(@rds, :get, fn _departures, @now ->
@@ -332,7 +332,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       config =
         build_config([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+            query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["S"]}},
             filters: %Filters{
               route_directions: %RouteDirections{
                 action: :include,
@@ -365,7 +365,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       config =
         build_config([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+            query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["S"]}},
             filters: %Filters{
               route_directions: %RouteDirections{
                 action: :exclude,
@@ -398,8 +398,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
     test "post process filters departures for sections configured as bidirectional" do
       config =
         build_config([
-          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, bidirectional: true},
-          %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
+          %Section{
+            query: %Query{params: %Query.Params{mode: :rl, route_ids: ["A"]}},
+            bidirectional: true
+          },
+          %Section{query: %Query{params: %Query.Params{mode: :rl, route_ids: ["B"]}}}
         ])
 
       departure_a_0 = build_departure("A", 0)

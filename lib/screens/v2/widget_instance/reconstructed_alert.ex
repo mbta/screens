@@ -1511,12 +1511,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     Enum.any?(sections, &section_contains_commuter_rail?(&1))
   end
 
-  @spec section_contains_commuter_rail?(Section.t() | nil) :: boolean()
+  @spec section_contains_commuter_rail?(Section.t()) :: boolean()
+
+  defp section_contains_commuter_rail?(%Section{query: nil}), do: false
+
   defp section_contains_commuter_rail?(%Section{
-         query: %Query{params: %Params{route_type: route_type}}
+         query: %Query{params: %Params{mode: mode}}
        }) do
-    case route_type do
-      :rail -> true
+    case mode do
+      :cr -> true
       _ -> false
     end
   end

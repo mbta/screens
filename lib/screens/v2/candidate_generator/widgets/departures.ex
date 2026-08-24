@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
-  alias ScreensConfig.Departures.{Filters, Query, Section}
+  alias ScreensConfig.Departures.{Filters, Mode, Query, Section}
   alias ScreensConfig.Departures.Filters.{RouteDirections, RouteDirections.RouteDirection}
   alias ScreensConfig.Screen.{Busway, PreFare}
 
@@ -123,9 +123,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
          %Section{
            query: %Query{
              params: %Query.Params{
+               mode: mode,
                direction_id: direction_id,
                route_ids: route_ids,
-               route_type: route_type,
                stop_ids: stop_ids
              }
            },
@@ -139,7 +139,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
         %{
           limit: 1,
           ids: route_ids,
-          route_types: if(route_type, do: [route_type], else: []),
+          route_types: [Mode.to_route_type(mode)],
           stop_ids: stop_ids
         },
         fn {_key, value} -> value == [] end

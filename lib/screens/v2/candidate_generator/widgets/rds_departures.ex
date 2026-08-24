@@ -26,7 +26,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.Departures
-  alias ScreensConfig.Departures.{Query, Section}
+  alias ScreensConfig.Departures.{Mode, Query, Section}
 
   @type post_process_rows_fn_t :: ([NormalSection.row()], Section.t(), non_neg_integer() ->
                                      [NormalSection.row()])
@@ -119,15 +119,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   end
 
   @spec maybe_route_from_section(Section.t()) :: Route.t() | nil
-  defp maybe_route_from_section(%Section{
-         query: %Query{params: %Query.Params{route_ids: nil, route_type: nil}}
-       }),
-       do: nil
+  defp maybe_route_from_section(%Section{query: nil}), do: nil
 
   defp maybe_route_from_section(%Section{
-         query: %Query{params: %Query.Params{route_ids: route_ids, route_type: route_type}}
+         query: %Query{params: %Query.Params{mode: mode, route_ids: route_ids}}
        }) do
-    %Route{id: representative_route_id(route_ids), type: route_type}
+    %Route{id: representative_route_id(route_ids), type: Mode.to_route_type(mode)}
   end
 
   @spec representative_route_id([String.t()] | nil) :: String.t() | nil

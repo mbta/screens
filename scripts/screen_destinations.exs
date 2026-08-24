@@ -31,6 +31,16 @@ defmodule ScreenDestinations do
   @typicality_threshold 1
   @route_type_mapping %{0 => "light_rail", 1 => "subway", 2 => "rail", 3 => "bus", 4 => "ferry"}
 
+  def mode_to_route_type(mode) do
+    cond do
+      mode == "ferry" -> "ferry"
+      mode == "cr" -> "rail"
+      mode in ["bl", "ol", "rl"] -> "subway"
+      mode in ["m", "gl"] -> "light_rail"
+      mode in ["sl", "bus"] -> "bus"
+    end
+  end
+
   def fetch_local_json(output_file, filtered_screens) do
     case File.read("../priv/local.json") do
       {:ok, configs} ->
@@ -112,8 +122,9 @@ defmodule ScreenDestinations do
     |> Enum.map(fn section -> section["query"]["params"] end)
     |> Enum.flat_map(fn params ->
       # For each section of a screen, get the possible destinations from the V3 API
-      {route_type_param, fetch_params} = Map.split(params, ["route_type"])
-      route_filter = Map.get(route_type_param, "route_type") || "all"
+      {mode_param, fetch_params} = Map.split(params, ["mode"])
+
+      route_filter = mode_param |> Map.get("mode") |> mode_to_route_type()
 
       encoded_params =
         fetch_params
@@ -149,7 +160,7 @@ defmodule ScreenDestinations do
           end)
           |> Enum.reject(
             &(String.contains?(&1.headsign, "Shuttle") or
-                (route_filter != "all" and &1.route_type != route_filter))
+                &1.route_type != route_filter)
           )
           |> Enum.uniq()
 
