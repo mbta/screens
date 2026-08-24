@@ -113,7 +113,8 @@ defmodule ScreensWeb.AdminApiController do
 
     affected =
       if ScreenConfigs.config_migration_enabled?() do
-        ScreenConfigs.count_with_evergreen_end_dt_before(before_date)
+        ScreenConfigs.all()
+        |> Util.Admin.expired_evergreen_content_count(before_date)
       else
         %Config{screens: screens} = fetch_config()
 
@@ -129,19 +130,12 @@ defmodule ScreensWeb.AdminApiController do
     before_date = Date.from_iso8601!(iso_date)
 
     if ScreenConfigs.config_migration_enabled?() do
-      updates =
-        ScreenConfigs.fetch_all_with_evergreen_end_dt_before(before_date)
-        |> Enum.reduce([], fn %{id: id, config: screen}, acc ->
-          cleaned = Util.Admin.cleanup_evergreen_content(screen, before_date)
+      response =
+        ScreenConfigs.all()
+        |> Util.Admin.evergreen_content_cleanup_updates(before_date)
+        |> ScreenConfigs.commit_updates()
 
-          if cleaned == screen do
-            acc
-          else
-            [%{id: id, config: cleaned} | acc]
-          end
-        end)
-
-      case ScreenConfigs.commit_updates(updates) do
+      case response do
         :ok ->
           json(conn, %{success: true})
 
