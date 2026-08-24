@@ -19,7 +19,7 @@ interface DepartureTimePartProps {
 }
 
 /**
- * Given two dates, compute the difference in seconds between `departureTimeSeconds`
+ * Given two dates, compute the difference in minutes between `departureTimeSeconds`
  * and `currentDateTime`.
  *
  * If the difference between the two values in minutes results in a float,
@@ -36,10 +36,10 @@ const adjustMinute = (
   departureTimeSeconds: Date,
   currentDateTime: Date,
 ): number => {
-  const timeDifferenceMin =
+  const timeDifferenceSeconds =
     departureTimeSeconds.getTime() - currentDateTime.getTime() / 1000;
-  const timeDifferenceSeconds = Math.floor(timeDifferenceMin / 60);
-  return Math.max(timeDifferenceSeconds, 1);
+  const timeDifferenceMin = Math.floor(timeDifferenceSeconds / 60);
+  return Math.max(timeDifferenceMin, 1);
 };
 
 const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
