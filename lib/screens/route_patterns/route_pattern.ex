@@ -6,6 +6,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.V3Api
+  alias ScreensConfig.Departures.Mode
 
   defstruct ~w[id canonical? direction_id typicality route headsign stops]a
 
@@ -28,6 +29,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
           optional(:date) => Date.t(),
           optional(:direction_id) => Trip.direction() | :both,
           optional(:ids) => [id()],
+          optional(:mode) => Mode.t(),
           optional(:route_ids) => [Route.id()],
           optional(:route_type) => RouteType.t(),
           optional(:stop_ids) => [Stop.id()],
@@ -37,7 +39,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
   @callback fetch(params()) :: result()
   def fetch(params, get_json_fn \\ &V3Api.get_json/2) do
     # The API doesn't currently have some of these filters built-in
-    {filter_params, fetch_params} = Map.split(params, ~w[route_type typicality]a)
+    {filter_params, fetch_params} = Map.split(params, ~w[mode route_type typicality]a)
 
     encoded_params =
       fetch_params
@@ -61,6 +63,11 @@ defmodule Screens.RoutePatterns.RoutePattern do
 
   defp apply_filter({:route_type, type}, patterns),
     do: Enum.filter(patterns, &(&1.route.type == type))
+
+  defp apply_filter({:mode, nil}, patterns), do: patterns
+
+  defp apply_filter({:mode, mode}, patterns),
+    do: Enum.filter(patterns, &(&1.route.type == Mode.to_route_type(mode)))
 
   defp apply_filter({:typicality, typicality}, patterns),
     do: Enum.filter(patterns, &(&1.typicality == typicality))

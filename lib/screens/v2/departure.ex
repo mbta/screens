@@ -11,6 +11,7 @@ defmodule Screens.V2.Departure do
   alias Screens.V2.Departure.Builder
   alias Screens.V3Api
   alias Screens.Vehicles.Vehicle
+  alias ScreensConfig.Departures.Mode
 
   import Screens.Inject
   @last_trip injected(Screens.LastTrip.LastTrip)
@@ -24,6 +25,7 @@ defmodule Screens.V2.Departure do
 
   @type params :: %{
           optional(:direction_id) => Trip.direction() | :both,
+          optional(:mode) => Mode.t(),
           optional(:route_ids) => [Route.id()],
           optional(:route_type) => nil | RouteType.t() | [RouteType.t()],
           optional(:sort) => String.t(),
@@ -100,6 +102,11 @@ defmodule Screens.V2.Departure do
   defp encode_param({:direction_id, :both}), do: nil
   defp encode_param({:direction_id, direction_id}), do: {"filter[direction_id]", direction_id}
   defp encode_param({:include, relationships}), do: {"include", Enum.join(relationships, ",")}
+  defp encode_param({:mode, nil}), do: nil
+
+  defp encode_param({:mode, mode}),
+    do: {"filter[route_type]", Mode.to_route_type(mode)}
+
   defp encode_param({:route_ids, []}), do: nil
   defp encode_param({:route_ids, route_ids}), do: {"filter[route]", Enum.join(route_ids, ",")}
   defp encode_param({:route_type, nil}), do: nil
