@@ -7,8 +7,8 @@ defmodule Screens.Util.BuildInfo do
   @doc """
   Return an identifier that uniquely identifies a build of the project.
   """
-  @callback build_identifier :: String.t()
-  def build_identifier() do
+  @callback build_identifier() :: String.t()
+  def build_identifier do
     Application.fetch_env!(:screens, :build_identifier)
   end
 end
