@@ -33,7 +33,7 @@ defmodule Screens.ScreenConfigs do
       screen_ids = Map.keys(screens)
 
       Enum.each(screens, fn {id, config} ->
-        upsert_screen_config(%{id: id, config: config})
+        upsert(%{id: id, config: config})
       end)
 
       stale_ids =
@@ -47,6 +47,12 @@ defmodule Screens.ScreenConfigs do
           {:error, reason}
       end
     end
+  end
+
+  @doc "Returns all configs as a list of ScreenConfig structs."
+  @spec all() :: [ScreenConfig.t()]
+  def all do
+    Repo.all(ScreenConfig)
   end
 
   @doc """
@@ -74,9 +80,8 @@ defmodule Screens.ScreenConfigs do
   Creates a screen configuration.
   Upserts so an existing config with the same ID will be overwritten.
   """
-  @spec upsert_screen_config(params :: map()) ::
-          {:ok, ScreenConfig.t()} | {:error, Ecto.Changeset.t()}
-  def upsert_screen_config(params) do
+  @spec upsert(params :: map()) :: {:ok, ScreenConfig.t()} | {:error, Ecto.Changeset.t()}
+  def upsert(params) do
     %ScreenConfig{}
     |> ScreenConfig.changeset(params)
     |> Repo.insert(
@@ -88,7 +93,7 @@ defmodule Screens.ScreenConfigs do
   @spec upsert_list([screen_update()]) :: :ok | {:error, commit_error()}
   defp upsert_list(updates) do
     Enum.reduce_while(updates, :ok, fn update, _acc ->
-      case upsert_screen_config(update) do
+      case upsert(update) do
         {:ok, _} ->
           {:cont, :ok}
 
@@ -130,15 +135,15 @@ defmodule Screens.ScreenConfigs do
   @spec perform_deletes([screen_id()]) :: :ok | {:error, commit_error()}
   defp perform_deletes(deletes) do
     Enum.reduce_while(deletes, :ok, fn id, _acc ->
-      case delete_screen_config(id) do
+      case delete(id) do
         :ok -> {:cont, :ok}
         {:error, _} = error -> {:halt, error}
       end
     end)
   end
 
-  @spec delete_screen_config(screen_id()) :: :ok | {:error, commit_error()}
-  defp delete_screen_config(id) do
+  @spec delete(screen_id()) :: :ok | {:error, commit_error()}
+  defp delete(id) do
     case Repo.delete_all(from s in ScreenConfig, where: s.id == ^id) do
       {count, _} when count > 0 ->
         :ok

@@ -110,30 +110,54 @@ defmodule ScreensWeb.AdminApiController do
 
   def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date, "dry_run" => _}) do
     before_date = Date.from_iso8601!(iso_date)
-    %Config{screens: screens} = fetch_config()
 
     affected =
-      Enum.count(screens, fn {_id, screen} ->
-        screen != Util.Admin.cleanup_evergreen_content(screen, before_date)
-      end)
+      if ScreenConfigs.config_migration_enabled?() do
+        ScreenConfigs.all()
+        |> Util.Admin.expired_evergreen_content_count(before_date)
+      else
+        %Config{screens: screens} = fetch_config()
+
+        Enum.count(screens, fn {_id, screen} ->
+          screen != Util.Admin.cleanup_evergreen_content(screen, before_date)
+        end)
+      end
 
     json(conn, %{affected: affected})
   end
 
   def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date}) do
     before_date = Date.from_iso8601!(iso_date)
-    %Config{screens: screens} = config = fetch_config()
 
-    new_screens =
-      screens
-      |> Enum.map(fn {id, screen} ->
-        {id, Util.Admin.cleanup_evergreen_content(screen, before_date)}
-      end)
-      |> Map.new()
+    if ScreenConfigs.config_migration_enabled?() do
+      response =
+        ScreenConfigs.all()
+        |> Util.Admin.evergreen_content_cleanup_updates(before_date)
+        |> ScreenConfigs.commit_updates()
 
-    %Config{config | screens: new_screens}
-    |> put_config()
-    |> to_success_response(conn)
+      case response do
+        :ok ->
+          json(conn, %{success: true})
+
+        {:error, reason} ->
+          conn
+          |> put_status(500)
+          |> json(%{success: false, error: inspect(reason)})
+      end
+    else
+      %Config{screens: screens} = config = fetch_config()
+
+      new_screens =
+        screens
+        |> Enum.map(fn {id, screen} ->
+          {id, Util.Admin.cleanup_evergreen_content(screen, before_date)}
+        end)
+        |> Map.new()
+
+      %Config{config | screens: new_screens}
+      |> put_config()
+      |> to_success_response(conn)
+    end
   end
 
   @spec fetch_config() :: Config.t()

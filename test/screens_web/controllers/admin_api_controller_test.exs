@@ -7,6 +7,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
+  alias ScreensConfig.{EvergreenContentItem, Schedule}
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
@@ -18,6 +19,22 @@ defmodule ScreensWeb.AdminApiControllerTest do
     end)
 
     :ok
+  end
+
+  defp screen_with_evergreen_end_dts(end_dts) do
+    screen = screen_config(:busway_v2)
+
+    item = %EvergreenContentItem{
+      slot_names: [],
+      asset_path: "test-asset.png",
+      priority: 1,
+      schedule:
+        Enum.map(end_dts, fn end_dt ->
+          %Schedule{start_dt: ~U[2024-01-01 00:00:00Z], end_dt: end_dt}
+        end)
+    }
+
+    %{screen | app_params: %{screen.app_params | evergreen_content: [item]}}
   end
 
   setup :verify_on_exit!
@@ -113,6 +130,98 @@ defmodule ScreensWeb.AdminApiControllerTest do
       assert conn.status == 200
       %{"config_migration" => config_migration} = json_response(conn, 200)
       assert config_migration == true
+    end
+  end
+
+  describe "/maintenance" do
+    setup do
+      before_date = ~D[2025-01-01]
+
+      all_ended_screen_config =
+        screen_with_evergreen_end_dts([
+          ~U[2024-10-03 00:00:00Z],
+          ~U[2024-11-03 00:00:00Z]
+        ])
+
+      mixed_ended_screen_config =
+        screen_with_evergreen_end_dts([
+          ~U[2024-10-03 00:00:00Z],
+          ~U[2025-02-03 00:00:00Z]
+        ])
+
+      null_ended_screen_config =
+        screen_with_evergreen_end_dts([
+          ~U[2024-10-03 00:00:00Z],
+          nil
+        ])
+
+      {:ok,
+       before_date: before_date,
+       all_ended_screen_config: all_ended_screen_config,
+       mixed_ended_screen_config: mixed_ended_screen_config,
+       null_ended_screen_config: null_ended_screen_config}
+    end
+
+    @tag :authenticated
+    test "dry_run only counts configs with evergreen schedule end_dt before cutoff", %{
+      conn: conn,
+      before_date: before_date,
+      all_ended_screen_config: all_ended_screen_config,
+      mixed_ended_screen_config: mixed_ended_screen_config,
+      null_ended_screen_config: null_ended_screen_config
+    } do
+      Application.put_env(:screens, :config_migration, true)
+
+      Repo.insert!(%ScreenConfig{
+        id: "all-ended",
+        config: all_ended_screen_config
+      })
+
+      Repo.insert!(%ScreenConfig{
+        id: "mixed-ended",
+        config: mixed_ended_screen_config
+      })
+
+      Repo.insert!(%ScreenConfig{
+        id: "null-ended",
+        config: null_ended_screen_config
+      })
+
+      conn =
+        post(conn, "/api/admin/maintenance", %{
+          "action" => "content_cleanup",
+          "before" => Date.to_iso8601(before_date),
+          "dry_run" => "true"
+        })
+
+      assert json_response(conn, 200) == %{"affected" => 1}
+    end
+
+    @tag :authenticated
+    test "only updates configs with all evergreen schedule end_dt before cutoff", %{
+      conn: conn,
+      before_date: before_date,
+      all_ended_screen_config: all_ended_screen_config,
+      mixed_ended_screen_config: mixed_ended_screen_config,
+      null_ended_screen_config: null_ended_screen_config
+    } do
+      Application.put_env(:screens, :config_migration, true)
+
+      Repo.insert!(%ScreenConfig{id: "all-ended", config: all_ended_screen_config})
+      Repo.insert!(%ScreenConfig{id: "mixed-ended", config: mixed_ended_screen_config})
+      Repo.insert!(%ScreenConfig{id: "null-ended", config: null_ended_screen_config})
+
+      conn =
+        post(conn, "/api/admin/maintenance", %{
+          "action" => "content_cleanup",
+          "before" => Date.to_iso8601(before_date)
+        })
+
+      assert json_response(conn, 200) == %{"success" => true}
+
+      assert Repo.get!(ScreenConfig, "all-ended").config.app_params.evergreen_content == []
+      assert Repo.get!(ScreenConfig, "mixed-ended").config == mixed_ended_screen_config
+      assert Repo.get!(ScreenConfig, "null-ended").config == null_ended_screen_config
     end
   end
 
