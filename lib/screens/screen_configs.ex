@@ -55,7 +55,9 @@ defmodule Screens.ScreenConfigs do
     Repo.all(ScreenConfig)
   end
 
-  @doc "Returns all Configs as JSON with the ID as a key and the configuration as the value."
+  @doc """
+  Returns all Configs as JSON with the ID as a key and the configuration as the value.
+  """
   @spec list_all() :: String.t() | :error
   def list_all do
     if config_migration_enabled?() do

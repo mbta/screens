@@ -2,7 +2,8 @@ defmodule ScreensWeb.V2.AudioController do
   use ScreensWeb, :controller
 
   alias Phoenix.View
-  alias Screens.V2.ScreenAudioData
+  alias Screens.V2.ScreenData
+  alias Screens.V2.ScreenData.Parameters
   alias ScreensConfig.EmergencyTakeover
   alias ScreensConfig.Screen
   alias ScreensWeb.Plug.ScreenRequest
@@ -29,20 +30,13 @@ defmodule ScreensWeb.V2.AudioController do
     redirect(conn, external: audio_asset_path)
   end
 
-  def show(%{assigns: %{screen: screen}} = conn, params) do
-    disposition = if Map.has_key?(params, "inline"), do: :inline, else: :attachment
-
-    screen
-    |> fetch_ssml()
-    |> Screens.Audio.synthesize()
-    |> case do
-      {:ok, audio_data} ->
-        send_download(conn, {:binary, audio_data},
-          filename: "readout.mp3",
-          disposition: disposition
-        )
-
-      :error ->
+  def show(%{assigns: %{screen_id: id, screen: screen}} = conn, params) do
+    with true <- Parameters.audio_enabled?(screen, now(conn)),
+         {:ok, audio} <- fetch_ssml(id, screen) |> Screens.Audio.synthesize() do
+      disposition = if Map.has_key?(params, "inline"), do: :inline, else: :attachment
+      send_download(conn, {:binary, audio}, filename: "readout.mp3", disposition: disposition)
+    else
+      _ ->
         not_found(conn)
     end
   end
@@ -50,24 +44,27 @@ defmodule ScreensWeb.V2.AudioController do
   def show_volume(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _params),
     do: json(conn, %{volume: 0.0})
 
-  def show_volume(%{assigns: %{screen: screen}} = conn, _params) do
-    {:ok, volume} = ScreenAudioData.get_volume(screen)
-    json(conn, %{volume: volume})
+  def show_volume(%{assigns: %{screen: screen}} = conn, _params),
+    do: json(conn, %{volume: Parameters.audio_volume(screen, now(conn))})
+
+  def debug(%{assigns: %{screen_id: id, screen: screen}} = conn, _params) do
+    text(conn, fetch_ssml(id, screen))
   end
 
-  def debug(%{assigns: %{screen: screen}} = conn, _params) do
-    text(conn, fetch_ssml(screen))
-  end
-
-  defp fetch_ssml(screen) do
+  defp fetch_ssml(id, screen) do
     View.render_to_string(
       ScreensWeb.V2.AudioView,
       "index.ssml",
-      widget_audio_data: ScreenAudioData.get(screen)
+      widget_audio_data: ScreenData.audio(id, screen)
     )
   end
 
   defp not_found(conn) do
     send_resp(conn, 404, "Not found")
   end
+
+  defp now(%{assigns: %{now: now}}), do: now
+  # This is equivalent to an argument with a default value
+  # credo:disable-for-next-line Screens.Checks.UntestableDateTime
+  defp now(_conn), do: DateTime.utc_now()
 end

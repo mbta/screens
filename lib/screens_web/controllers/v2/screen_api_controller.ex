@@ -2,7 +2,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   use ScreensWeb, :controller
 
   alias Phoenix.View
-  alias Screens.V2.{ScreenAudioData, ScreenData}
+  alias Screens.V2.ScreenData
   alias ScreensConfig.Screen
   alias ScreensWeb.Plug.ScreenRequest
 
@@ -19,7 +19,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   plug :outdated_response when action in @show_actions
 
   def show(%{assigns: %{screen_id: id, screen: screen}} = conn, _params) do
-    json(conn, screen_response(id, screen) |> put_extra_fields(screen))
+    json(conn, screen_response(id, screen) |> put_extra_fields(id, screen))
   end
 
   def show_dup(conn, params), do: show(conn, params)
@@ -75,16 +75,16 @@ defmodule ScreensWeb.V2.ScreenApiController do
   end
 
   # See `docs/mercury_api.md`
-  defp put_extra_fields(response, %Screen{vendor: :mercury} = screen) do
+  defp put_extra_fields(response, id, %Screen{vendor: :mercury} = screen) do
     response
-    |> Map.put(:audio_data, fetch_ssml(screen))
+    |> Map.put(:audio_data, fetch_ssml(id, screen))
     |> Map.put(:last_deploy_timestamp, @cache.last_deploy_timestamp())
   end
 
-  defp put_extra_fields(response, _screen), do: response
+  defp put_extra_fields(response, _id, _screen), do: response
 
-  defp fetch_ssml(screen) do
-    case ScreenAudioData.get(screen) do
+  defp fetch_ssml(id, screen) do
+    case ScreenData.audio(id, screen) do
       [] ->
         ""
 

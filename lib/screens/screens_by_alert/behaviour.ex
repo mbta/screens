@@ -1,13 +1,6 @@
 defmodule Screens.ScreensByAlert.Behaviour do
   @moduledoc """
   Behavior for accessing the cache that holds screens by alert.
-
-  - `start_link(opts)` is called to start the backend by the supervisor.
-  - `put_data(screen_id, list(alert_id))` inserts the list of alert_ids visible on a given screen_id
-    to the cache.
-  - `get_screens_by_alert(alert_ids)` returns a map associating each requested alert_id with the screen IDs that are currently displaying it.
-  - `get_screens_last_updated(screen_ids)` returns a map associating each requested screen_id with its last-updated Unix timestamp.
-
   """
   @type screen_id :: String.t()
   @type alert_id :: String.t()
@@ -17,19 +10,6 @@ defmodule Screens.ScreensByAlert.Behaviour do
   Starts the process that interfaces with the screens-by-alert cache.
   """
   @callback start_link(GenServer.options()) :: GenServer.on_start()
-
-  @doc """
-  Given a list of screen IDs, return the subset of IDs that some app instance is in the process
-  of updating the alerts for, to reduce duplicate work.
-  """
-  @callback get_in_progress(list(screen_id())) :: list(screen_id())
-
-  @doc """
-  Mark screen IDs as being in the process of having their alerts updated. Does not un-mark IDs
-  that were previously marked; this only happens either when alert IDs are put for a screen (see
-  `put_data/2`) or after a short expiration time.
-  """
-  @callback put_in_progress(list(screen_id())) :: :ok
 
   @doc """
   Takes a screen ID and a list of alert IDs as parameters. With these, it will get an existing

@@ -31,6 +31,8 @@ config :logger, :default_formatter,
   format: "$time [$level] $message $metadata\n",
   metadata: ~w[
     app_id
+    cache_location
+    cache_result
     is_real_screen
     ofm_app_package_version
     remote_ip
@@ -60,7 +62,7 @@ config :phoenix, :format_encoders,
 
 config :ex_aws, http_client: ExAws.Request.Req, json_codec: Jason
 
-config :elixir, :time_zone_database, Tzdata.TimeZoneDatabase
+config :elixir, :time_zone_database, Tz.TimeZoneDatabase
 
 config :screens,
   redirect_http?: true,
@@ -467,37 +469,44 @@ config :screens, :screens_by_alert,
   cache_module: Screens.ScreensByAlert.GenServer,
   screens_by_alert_ttl_seconds: 45,
   screens_last_updated_ttl_seconds: 3600,
-  screens_in_progress_ttl_seconds: 20,
   screens_ttl_seconds: 45
 
 config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 1
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
 
-v3_api_cache_options = [stats: true, telemetry_prefix: ~w[screens v3_api cache]a]
-
 # Memory limits for V3 API response caches are based on stats measured in a deployed environment.
 # To avoid thrashing and overloading the HTTP connection pool, these can and should be tweaked as
 # the V3 API usage patterns and requirements of the app change over time.
 #
 # GC intervals should be chosen to minimize the impact of pruning data that hasn't been accessed
-# in (2 * interval); see documentation for `Nebulex.Adapters.Local`. Note the interval between
-# two instances of the same V3 API request will typically be much longer than the longest screen
-# refresh rate, because requests from a given screen won't always go to the same app instance.
+# in (2 * interval); see documentation for `Nebulex.Adapters.Local`. We expect any still-relevant
+# data to be accessed regularly every N seconds, where N is the highest refresh interval among
+# screen types. (Due to the distributed partitioned cache, this is true per instance rather than
+# across all instances, since a given instance always fulfills requests for a given screen ID.)
+
+shared_cache_options = [
+  gc_interval: :timer.seconds(30),
+  stats: true,
+  telemetry_prefix: ~w[screens cache]a
+]
 
 config :screens,
        Screens.V3Api.Cache.Realtime,
-       Keyword.merge(v3_api_cache_options,
-         allocated_memory: 200 * 1024 * 1024,
-         gc_interval: :timer.seconds(30)
-       )
+       Keyword.merge(shared_cache_options, allocated_memory: 200 * 1024 * 1024)
 
 config :screens,
        Screens.V3Api.Cache.Static,
-       Keyword.merge(v3_api_cache_options,
-         allocated_memory: 600 * 1024 * 1024,
-         gc_interval: :timer.minutes(5)
-       )
+       Keyword.merge(shared_cache_options, allocated_memory: 600 * 1024 * 1024)
+
+config :screens,
+       Screens.V2.ScreenData.Cache.Store.Adapter,
+       primary:
+         Keyword.merge(shared_cache_options,
+           allocated_memory: 200 * 1024 * 1024,
+           # Match the (temporarily) small TTL on the cache entries; see comment in `Cache`.
+           gc_interval: :timer.seconds(5)
+         )
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

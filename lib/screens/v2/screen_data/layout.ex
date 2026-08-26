@@ -6,12 +6,8 @@ defmodule Screens.V2.ScreenData.Layout do
   alias Screens.Util
   alias Screens.V2.Template
   alias Screens.V2.WidgetInstance
-  alias ScreensConfig.Screen
 
-  import Screens.Inject
   import Template.Guards, only: [is_paged: 1, is_paged_slot_id: 1, is_non_paged_slot_id: 1]
-
-  @parameters injected(Screens.V2.ScreenData.Parameters)
 
   @type t :: {Template.layout(), %{Template.slot_id() => WidgetInstance.t()}}
   @type non_paged ::
@@ -24,17 +20,6 @@ defmodule Screens.V2.ScreenData.Layout do
           Template.non_paged_slot_id() =>
             {page_index :: non_neg_integer(), num_pages :: pos_integer()}
         }
-
-  @spec generate(Screen.t()) :: t()
-  def generate(config) do
-    candidate_generator = @parameters.candidate_generator(config)
-    screen_template = candidate_generator.screen_template(config)
-
-    config
-    |> candidate_generator.candidate_instances()
-    |> Enum.filter(&WidgetInstance.valid_candidate?/1)
-    |> pick_instances(screen_template)
-  end
 
   @spec pick_instances([WidgetInstance.t()], Template.template()) :: t()
   def pick_instances(candidate_instances, screen_template) do

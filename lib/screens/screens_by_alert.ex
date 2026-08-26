@@ -1,17 +1,6 @@
 defmodule Screens.ScreensByAlert do
   @moduledoc """
-    Tracks visible alerts by screen.
-
-    The ScreensByAlert server will keep track of all alerts that are currently visible on a screen.
-
-    ### Cache data structure shape:
-    ```
-      %{
-        "screens_by_alert." <> alert_id => list(timestamped_screen_id),
-        # metadata to make the "self-refresh" mechanism possible
-        "screens_last_updated." <> screen_id => timestamp
-      }
-    ```
+  Tracks visible alerts by screen.
   """
 
   @behaviour Screens.ScreensByAlert.Behaviour
@@ -28,8 +17,6 @@ defmodule Screens.ScreensByAlert do
   end
 
   defdelegate start_link(opts), to: @cache_module
-  defdelegate get_in_progress(screen_ids), to: @cache_module
-  defdelegate put_in_progress(screen_ids), to: @cache_module
   defdelegate put_data(screen_id, alert_ids), to: @cache_module
   defdelegate get_screens_by_alert(alert_ids), to: @cache_module
   defdelegate get_screens_last_updated(screen_ids), to: @cache_module

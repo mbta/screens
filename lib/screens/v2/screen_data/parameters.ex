@@ -49,8 +49,8 @@ defmodule Screens.V2.ScreenData.Parameters do
 
   @typep static_params :: %{Screen.app_id() => Static.t()}
 
-  @spec audio_enabled?(Screen.t(), DateTime.t()) :: boolean()
-  @spec audio_enabled?(Screen.t(), DateTime.t(), static_params()) :: boolean()
+  @callback audio_enabled?(Screen.t(), DateTime.t()) :: boolean()
+  @callback audio_enabled?(Screen.t(), DateTime.t(), static_params()) :: boolean()
   def audio_enabled?(%Screen{app_id: app_id}, now, static_params \\ @static_params) do
     case Map.fetch!(static_params, app_id) do
       %Static{audio_active_time: nil} ->
@@ -96,8 +96,8 @@ defmodule Screens.V2.ScreenData.Parameters do
 
   def audio_interval_offset_seconds(_screen), do: nil
 
-  @spec audio_volume(Screen.t(), DateTime.t()) :: float() | nil
-  @spec audio_volume(Screen.t(), DateTime.t(), static_params()) :: float() | nil
+  @callback audio_volume(Screen.t(), DateTime.t()) :: float() | nil
+  @callback audio_volume(Screen.t(), DateTime.t(), static_params()) :: float() | nil
   def audio_volume(%Screen{app_id: app_id}, now, static_params \\ @static_params) do
     case Map.fetch!(static_params, app_id) do
       %Static{periodic_audio: nil} ->

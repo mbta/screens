@@ -3,10 +3,12 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
 
   alias Screens.ScreensByAlert
   alias Screens.TestSupport.CandidateGeneratorStub, as: Stub
+  alias Screens.TestSupport.ScreenDataCache
   alias ScreensConfig.Screen
 
   import Mox
   setup :verify_on_exit!
+  setup {ScreenDataCache, :passthrough}
 
   import Screens.Inject
   @cache injected(Screens.Config.Cache)
