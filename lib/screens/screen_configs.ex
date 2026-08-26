@@ -135,15 +135,15 @@ defmodule Screens.ScreenConfigs do
   @spec perform_deletes([screen_id()]) :: :ok | {:error, commit_error()}
   defp perform_deletes(deletes) do
     Enum.reduce_while(deletes, :ok, fn id, _acc ->
-      case delete_screen_config(id) do
+      case delete(id) do
         :ok -> {:cont, :ok}
         {:error, _} = error -> {:halt, error}
       end
     end)
   end
 
-  @spec delete_screen_config(screen_id()) :: :ok | {:error, commit_error()}
-  defp delete_screen_config(id) do
+  @spec delete(screen_id()) :: :ok | {:error, commit_error()}
+  defp delete(id) do
     case Repo.delete_all(from s in ScreenConfig, where: s.id == ^id) do
       {count, _} when count > 0 ->
         :ok
