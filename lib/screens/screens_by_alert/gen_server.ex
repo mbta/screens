@@ -19,16 +19,14 @@ defmodule Screens.ScreensByAlert.GenServer do
           },
           screens_last_updated: %{
             screen_id() => %{last_updated: timestamp(), timer_reference: reference()}
-          },
-          screens_in_progress: %{screen_id() => reference()}
+          }
         }
 
-  defstruct screens_by_alert: %{}, screens_last_updated: %{}, screens_in_progress: %{}
+  defstruct screens_by_alert: %{}, screens_last_updated: %{}
 
   @config Application.compile_env!(:screens, :screens_by_alert)
   @screens_by_alert_ttl_ms Keyword.fetch!(@config, :screens_by_alert_ttl_seconds) * 1_000
   @screens_last_updated_ttl_ms Keyword.fetch!(@config, :screens_last_updated_ttl_seconds) * 1_000
-  @screens_in_progress_ttl_ms Keyword.fetch!(@config, :screens_in_progress_ttl_seconds) * 1_000
   @screens_ttl_seconds Keyword.fetch!(@config, :screens_ttl_seconds)
 
   ### Client
@@ -36,16 +34,6 @@ defmodule Screens.ScreensByAlert.GenServer do
   @impl Screens.ScreensByAlert.Behaviour
   def start_link(opts \\ []) do
     GenServer.start_link(__MODULE__, opts, name: __MODULE__)
-  end
-
-  @impl Screens.ScreensByAlert.Behaviour
-  def get_in_progress(pid \\ __MODULE__, screen_ids) do
-    GenServer.call(pid, {:get_in_progress, screen_ids})
-  end
-
-  @impl Screens.ScreensByAlert.Behaviour
-  def put_in_progress(pid \\ __MODULE__, screen_ids) do
-    GenServer.cast(pid, {:put_in_progress, screen_ids})
   end
 
   @impl Screens.ScreensByAlert.Behaviour
@@ -102,30 +90,8 @@ defmodule Screens.ScreensByAlert.GenServer do
      %__MODULE__{
        state
        | screens_by_alert: updated_screens_by_alert,
-         screens_last_updated: updated_screens_last_updated,
-         screens_in_progress: Map.delete(state.screens_in_progress, screen_id)
+         screens_last_updated: updated_screens_last_updated
      }}
-  end
-
-  @impl GenServer
-  def handle_cast({:put_in_progress, screen_ids}, %__MODULE__{} = state) do
-    new_in_progress =
-      Enum.reduce(screen_ids, state.screens_in_progress, fn screen_id, in_progress ->
-        old_ref = Map.get(in_progress, screen_id)
-        _ = if not is_nil(old_ref), do: Process.cancel_timer(old_ref, async: true, info: false)
-
-        Map.put(
-          in_progress,
-          screen_id,
-          Process.send_after(
-            self(),
-            {:expire_in_progress, screen_id},
-            @screens_in_progress_ttl_ms
-          )
-        )
-      end)
-
-    {:noreply, %__MODULE__{state | screens_in_progress: new_in_progress}}
   end
 
   @impl GenServer
@@ -176,27 +142,11 @@ defmodule Screens.ScreensByAlert.GenServer do
   end
 
   @impl GenServer
-  def handle_call({:get_in_progress, screen_ids}, _from, %__MODULE__{} = state) do
-    subset =
-      state.screens_in_progress
-      |> Map.keys()
-      |> MapSet.new()
-      |> MapSet.intersection(MapSet.new(screen_ids))
-
-    {:reply, subset, state}
-  end
-
-  @impl GenServer
   def handle_info(
         {:expire_alert, alert_id},
         %__MODULE__{} = state
       ) do
     {:noreply, %{state | screens_by_alert: Map.delete(state.screens_by_alert, alert_id)}}
-  end
-
-  @impl GenServer
-  def handle_info({:expire_in_progress, screen_id}, %__MODULE__{} = state) do
-    {:noreply, %{state | screens_in_progress: Map.delete(state.screens_in_progress, screen_id)}}
   end
 
   @impl GenServer

@@ -43,20 +43,15 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
       %{"1001" => now - 61, "1002" => now - 62, "1301" => now - 63, "1401" => now - 64}
     end)
 
-    # Pretend another instance is refreshing 1301. Per the batch size in test, the 2 most outdated
-    # screens should be refreshed (that are not already being refreshed), which are 1401 and 1002.
-    expect(ScreensByAlert.Mock, :get_in_progress, fn _screen_ids -> ["1301"] end)
-    expect(ScreensByAlert.Mock, :put_in_progress, fn ~w[1401 1002] -> :ok end)
-
     expect(ScreenData.Mock, :get, fn "1401", %Screen{app_id: :bus_shelter_v2} -> %{type: :x} end)
-    expect(ScreenData.Mock, :get, fn "1002", %Screen{app_id: :bus_eink_v2} -> raise "oops" end)
+    expect(ScreenData.Mock, :get, fn "1301", %Screen{app_id: :bus_eink_v2} -> raise "oops" end)
 
-    screen_ids = MapSet.new(~w[1002 1401])
+    screen_ids = MapSet.new(~w[1301 1401])
     assert {:noreply, ^screen_ids} = SelfRefreshRunner.handle_info(:check, MapSet.new())
 
     # Wait longer than the default 100ms to avoid occasional timeouts
     assert_receive({:done, :ok, "1401"}, 200)
-    assert_receive({:done, :exit, "1002"}, 200)
+    assert_receive({:done, :exit, "1301"}, 200)
   end
 
   test "skips refreshing if any refreshes are in progress" do
@@ -90,9 +85,6 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
     expect(ScreensByAlert.Mock, :get_screens_last_updated, fn ["eligible"] ->
       %{"eligible" => now}
     end)
-
-    expect(ScreensByAlert.Mock, :get_in_progress, fn _screen_ids -> [] end)
-    expect(ScreensByAlert.Mock, :put_in_progress, fn [] -> :ok end)
 
     assert {:noreply, refreshing_ids} = SelfRefreshRunner.handle_info(:check, MapSet.new())
     assert MapSet.equal?(refreshing_ids, MapSet.new())

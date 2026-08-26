@@ -1272,7 +1272,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       Date.diff(end_date, now_date) == 1 ->
         "tomorrow"
 
-      Timex.iso_week(end_date) == Timex.iso_week(now_date) ->
+      Date.beginning_of_week(end_date) == Date.beginning_of_week(now_date) ->
         "this #{Calendar.strftime(end_date, "%A")}"
 
       true ->
