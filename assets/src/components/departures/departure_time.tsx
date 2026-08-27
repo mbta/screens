@@ -1,6 +1,7 @@
-import { ComponentType, useEffect, useState } from "react";
+import { ComponentType } from "react";
 
 import { useCurrentPage } from "Context/dup_page";
+import { useCurrentTime } from "Hooks/use_current_time";
 import MoonIcon from "Images/moon.svg";
 import LiveDataSvg from "Images/live-data-small.svg";
 import { classWithModifier, classWithModifiers } from "Util/utils";
@@ -24,14 +25,8 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
   timeInEpoch,
   currentPage,
 }) => {
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  useEffect(() => {
-    const intervalTimer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
+  const { currentDateTime } = useCurrentTime();
 
-    return () => clearInterval(intervalTimer);
-  }, []);
   switch (time.type) {
     case "text":
       return <div className="departure-time__text">{time.text}</div>;
