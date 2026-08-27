@@ -483,7 +483,7 @@ type Stop = {
 type Vehicle = {
   id: string;
   index: number;
-  label: { type: string; minutes: number } | { type: string, text: string}
+  label: { type: string; minutes: number } | { type: string; text: string };
   time_in_epoch: number;
 };
 
