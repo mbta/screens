@@ -1,9 +1,11 @@
-import { ComponentType, useEffect, useState } from "react";
+import { ComponentType } from "react";
 
 import { useCurrentPage } from "Context/dup_page";
+import { useCurrentTime } from "Hooks/use_current_time";
 import MoonIcon from "Images/moon.svg";
 import LiveDataSvg from "Images/live-data-small.svg";
 import { classWithModifier, classWithModifiers } from "Util/utils";
+import { adjustMinute } from "Util/timing";
 
 type DepartureTime =
   | { type: "text"; text: string }
@@ -18,43 +20,13 @@ interface DepartureTimePartProps {
   currentPage: number;
 }
 
-/**
- * Given two dates, compute the difference in minutes between `departureTimeSeconds`
- * and `currentDateTime`.
- *
- * If the difference between the two values in minutes results in a float,
- * round the result (rounding method is considered an implementation detail).
- * This function will always return a value of 1 or greater - the system relies
- * on the backend to provide the appropriate text ("ARR", "BRD", etc.) in lieu
- * of showing '0 min'.
- *
- * @param departureTimeSeconds A datetime provided by the backend, representing
- * the departure time of a route at a stop.
- * @param currentDateTime The current datetime of the browser
- */
-const adjustMinute = (
-  departureTimeSeconds: Date,
-  currentDateTime: Date,
-): number => {
-  const timeDifferenceSeconds =
-    departureTimeSeconds.getTime() - currentDateTime.getTime() / 1000;
-  const timeDifferenceMin = Math.floor(timeDifferenceSeconds / 60);
-  return Math.max(timeDifferenceMin, 1);
-};
-
 const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
   time,
   timeInEpoch,
   currentPage,
 }) => {
-  const [currentDateTime, setCurrentDateTime] = useState(new Date());
-  useEffect(() => {
-    const intervalTimer = setInterval(() => {
-      setCurrentDateTime(new Date());
-    }, 1000);
+  const { currentDateTime } = useCurrentTime();
 
-    return () => clearInterval(intervalTimer);
-  }, []);
   switch (time.type) {
     case "text":
       return <div className="departure-time__text">{time.text}</div>;
