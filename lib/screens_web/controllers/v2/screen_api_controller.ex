@@ -102,6 +102,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   # The packaged client can't reload the page to update itself; this would just reload the local
   # copy of the code, resulting in an infinite loop. Compatibility and versioning of the packaged
+  # client is handled manually.
   defp outdated_response(%{params: %{"last_refresh" => "packaged"}} = conn, _), do: conn
 
   defp outdated_response(
