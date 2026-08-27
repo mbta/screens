@@ -19,6 +19,12 @@ defmodule ScreensWeb.Router do
     plug :protect_from_forgery
   end
 
+  pipeline :api_client_auth do
+    plug :accepts, ["json"]
+    plug :fetch_session
+    plug(ScreensWeb.Plug.EnsureBearerToken, env_var: "SCREENS_API_CLIENT_KEY")
+  end
+
   pipeline :redirect_prod_http do
     if Application.compile_env(:screens, :redirect_http?) do
       plug(Plug.SSL, rewrite_on: [:x_forwarded_proto])
@@ -35,10 +41,6 @@ defmodule ScreensWeb.Router do
 
   pipeline :ensure_screens_group do
     plug(ScreensWeb.Plug.EnsureScreensGroup)
-  end
-
-  pipeline :screens_api_client_auth do
-    plug(ScreensWeb.Plug.EnsureBearerToken, env_var: "SCREENS_API_CLIENT_KEY")
   end
 
   scope "/", ScreensWeb do
@@ -133,7 +135,7 @@ defmodule ScreensWeb.Router do
   end
 
   scope "/api", ScreensWeb do
-    pipe_through [:redirect_prod_http, :api, :screens_api_client_auth]
+    pipe_through [:redirect_prod_http, :api_client_auth]
 
     get "/screen_configs", ScreenConfigsApiController, :index
     post "/screen_configs", ScreenConfigsApiController, :update
