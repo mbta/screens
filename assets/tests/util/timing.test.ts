@@ -24,7 +24,7 @@ describe("adjustMinute", () => {
     expect(actual).toBe(1);
   });
 
-  test("returns 1 when the the current datetime is after the departure time are the same", () => {
+  test("returns 1 when the the current datetime is after the departure time", () => {
     const departureTimeSeconds = new Date(
       new Date(2026, 7, 27, 13, 30, 45, 0).getTime() / 1000,
     );
