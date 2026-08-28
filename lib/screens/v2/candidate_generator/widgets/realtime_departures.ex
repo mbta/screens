@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   Candidate generator for LCD RDS Items
   Takes in the generated sections from Screens.V2.CandidateGenerator.Widgets.RdsDepartures and
   handles the roll-up and creation of the actual widget that will be serialized and used on
-  the screen itself. 
+  the screen itself.
   """
 
   alias Screens.Routes.Route
@@ -191,6 +191,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   end
 
   defp no_data_text(%Route{direction_names: direction_names} = route, direction_id) do
+    direction_index =
+      if is_binary(direction_id), do: String.to_integer(direction_id), else: direction_id
+
     %FreeTextLine{
       icon: Route.icon(route),
       text: [
@@ -201,7 +204,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
         else
           route
           |> Route.normalized_direction_names()
-          |> Enum.at(direction_id, "")
+          |> Enum.at(direction_index, "")
           |> no_departures_message()
         end
       ]
