@@ -77,6 +77,35 @@ defmodule Screens.ScreenConfigs do
   end
 
   @doc """
+  Returns Configs filtered by a list of screen IDs as JSON with the ID as a key and the configuration as the value.
+  When config_migration_enabled? is true, filters in the Postgres query.
+  When false, filters after fetching the config.
+  """
+  @spec list_by_ids(ids :: [screen_id()]) :: String.t() | :error
+  def list_by_ids(ids) when is_list(ids) do
+    if config_migration_enabled?() do
+      screens =
+        ScreenConfig
+        |> where([screen_config], screen_config.id in ^ids)
+        |> Repo.all()
+        |> Map.new(fn %ScreenConfig{id: id, config: config} ->
+          {id, Screen.to_json(config)}
+        end)
+
+      Jason.encode!(%{screens: screens})
+    else
+      with {:ok, config, _version} <- @config_fetcher.fetch_config() do
+        config_map = Jason.decode!(config)
+        screens = Map.get(config_map, "screens", %{})
+
+        filtered_screens = Map.take(screens, ids)
+
+        Jason.encode!(%{screens: filtered_screens})
+      end
+    end
+  end
+
+  @doc """
   Creates a screen configuration.
   Upserts so an existing config with the same ID will be overwritten.
   """
