@@ -1,6 +1,8 @@
-import { Fragment, type JSX } from "react";
+import { ComponentType, Fragment, type JSX } from "react";
 
+import { adjustMinute } from "Util/timing";
 import { classWithModifier } from "Util/utils";
+import { useCurrentTime } from "Hooks/use_current_time";
 
 const WIDTH = 374;
 const HEIGHT = 1312;
@@ -394,17 +396,25 @@ const VehicleMinutesLabel = ({ cx, cy, minutes }) => {
   );
 };
 
-const VehicleLabel = ({ cx, cy, label }) => {
+const VehicleLabel = ({ cx, cy, label, timeInEpoch }) => {
+  const { currentDateTime } = useCurrentTime();
+
   if (label.type === "text") {
     return <VehicleTextLabel cx={cx} cy={cy} text={label.text} />;
   } else if (label.type === "minutes") {
-    return <VehicleMinutesLabel cx={cx} cy={cy} minutes={label.minutes} />;
+    return (
+      <VehicleMinutesLabel
+        cx={cx}
+        cy={cy}
+        minutes={adjustMinute(new Date(timeInEpoch), currentDateTime)}
+      />
+    );
   }
 
   return null;
 };
 
-const Vehicle = ({ index, label }) => {
+const Vehicle: ComponentType<Vehicle> = ({ index, label, time_in_epoch }) => {
   const cx = LEFT_MARGIN + LINE_WIDTH / 2;
   const cy = TOP_MARGIN + index * STOP_SPACING;
 
@@ -412,7 +422,14 @@ const Vehicle = ({ index, label }) => {
     <>
       <VehicleDroplet cx={cx} cy={cy} />
       <VehicleIcon cx={cx} cy={cy} iconSize={VEHICLE_ICON_SIZE} />
-      {label && <VehicleLabel cx={cx} cy={cy} label={label} />}
+      {label && (
+        <VehicleLabel
+          cx={cx}
+          cy={cy}
+          label={label}
+          timeInEpoch={time_in_epoch}
+        />
+      )}
     </>
   );
 };
@@ -429,8 +446,8 @@ const Vehicles = ({
 
   return (
     <>
-      {vehicles.map(({ id, ...data }) => (
-        <Vehicle {...data} key={id} />
+      {vehicles.map((vehicle) => (
+        <Vehicle {...vehicle} key={vehicle.id} />
       ))}
     </>
   );
@@ -466,7 +483,8 @@ type Stop = {
 type Vehicle = {
   id: string;
   index: number;
-  label: string;
+  label: { type: string; minutes: number } | { type: string; text: string };
+  time_in_epoch: number;
 };
 
 type ScheduledDeparture = {

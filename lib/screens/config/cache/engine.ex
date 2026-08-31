@@ -5,18 +5,17 @@ defmodule Screens.Config.Cache.Engine do
 
   alias Screens.Config.Cache
   alias Screens.Config.Fetch
+  alias Screens.Util.BuildInfo
   alias ScreensConfig.Config
 
   @behaviour Screens.Cache.Engine
-
-  @last_deploy_fetcher Application.compile_env(:screens, :last_deploy_fetcher)
 
   @impl true
   def name, do: Screens.Config.Cache.table()
 
   @impl true
   def update_table(current_version) do
-    last_deploy_timestamp = @last_deploy_fetcher.get_last_deploy_time()
+    last_deploy_timestamp = BuildInfo.build_identifier()
 
     with {:ok, body, new_version} <- Fetch.fetch_config(current_version),
          {:ok, deserialized} <- Jason.decode(body) do

@@ -48,10 +48,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     @type t :: %__MODULE__{
             headsign: String.t() | nil,
-            route_id: Route.id(),
+            route: Route.t(),
             time_range: Headways.range()
           }
-    defstruct ~w[headsign route_id time_range]a
+    defstruct ~w[headsign route time_range]a
   end
 
   defmodule OvernightSection do
@@ -208,7 +208,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %HeadwaySection{route_id: route_id, time_range: time_range, headsign: headsign},
+        %HeadwaySection{
+          route: %Route{id: route_id},
+          time_range: time_range,
+          headsign: headsign
+        },
         _screen,
         _now,
         is_only_section
@@ -595,7 +599,18 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_times_with_crowding(departures, screen, now) do
-    Enum.map(departures, &serialize_time_with_crowding(&1, screen, now))
+    departures
+    # Quick fix for cancelled scheduled departures, remove once we
+    # have a presentation for this
+    |> Enum.reject(&cancelled_prediction_on_lcd?(&1, screen))
+    |> Enum.map(&serialize_time_with_crowding(&1, screen, now))
+  end
+
+  @spec cancelled_prediction_on_lcd?(Departure.t(), Screen.t()) :: boolean()
+  defp cancelled_prediction_on_lcd?(_departure, %Screen{app_id: :dup_v2}), do: false
+
+  defp cancelled_prediction_on_lcd?(departure, _screen) do
+    Departure.cancelled?(departure) and departure.schedule != nil
   end
 
   @spec serialize_time_with_crowding(Departure.t(), Screen.t(), DateTime.t()) ::
