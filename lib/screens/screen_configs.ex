@@ -91,68 +91,14 @@ defmodule Screens.ScreenConfigs do
     end
   end
 
-  @doc """
-  Counts screen configs that contain expired evergreen content, i.e. those where
-  all non-empty schedule `end_dt` values are before `before_date`.
-  """
-  @spec count_with_evergreen_end_dt_before(Date.t()) :: non_neg_integer()
-  def count_with_evergreen_end_dt_before(before_date) do
-    evergreen_end_dt_before_query(before_date)
-    |> select([s], s.id)
-    |> Repo.all()
-    |> Enum.count()
-  end
-
-  @doc """
-  Returns all screen configs that contain expired evergreen content.
-  """
-  @spec fetch_all_with_evergreen_end_dt_before(Date.t()) :: [ScreenConfig.t()]
-  def fetch_all_with_evergreen_end_dt_before(before_date) do
-    Repo.all(evergreen_end_dt_before_query(before_date))
-  end
-
-  @spec evergreen_end_dt_before_query(Date.t()) :: Ecto.Query.t()
-  defp evergreen_end_dt_before_query(before_date) do
-    # SQL query to find configs with expired evergreen content.
-    # Rejects any items with a Schedule with at least one end date after the given date or null.
-    from s in ScreenConfig,
-      where:
-        fragment(
-          """
-          coalesce(
-            (
-              select bool_and(
-                coalesce(sched->>'end_dt', '') <> ''
-                and left(sched->>'end_dt', 10)::date < ?
-              )
-              from jsonb_array_elements(coalesce(?->'app_params'->'evergreen_content', '[]'::jsonb)) item
-              cross join lateral jsonb_array_elements(
-                case
-                  when jsonb_typeof(item->'schedule') = 'array' then item->'schedule'
-                  else '[]'::jsonb
-                end
-              ) sched
-              where jsonb_exists(sched, 'end_dt')
-            ),
-            false
-          )
-          """,
-          ^before_date,
-          s.config
-        )
-  end
-
   @doc "Returns screen IDs for screens matching the given app ID."
   @spec screen_ids_for_app(atom()) :: [screen_id()]
   def screen_ids_for_app(target_app_id) do
     if config_migration_enabled?() do
-      target_app_id = Atom.to_string(target_app_id)
-
-      Repo.all(
-        from s in ScreenConfig,
-          where: fragment("?->>? = ?", s.config, "app_id", ^target_app_id),
-          select: s.id
-      )
+      ScreenConfig
+      |> Repo.all()
+      |> Enum.filter(&match?(%ScreenConfig{config: %Screen{app_id: ^target_app_id}}, &1))
+      |> Enum.map(& &1.id)
     else
       Screens.Config.Cache.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
     end
@@ -162,17 +108,15 @@ defmodule Screens.ScreenConfigs do
   @spec self_refresh_screen_ids() :: [screen_id()]
   def self_refresh_screen_ids do
     if config_migration_enabled?() do
-      Repo.all(
-        from s in ScreenConfig,
-          where:
-            fragment("coalesce(?->>?, 'false') = 'false'", s.config, "disabled") and
-              fragment(
-                "coalesce(?->>?, 'false') = 'false'",
-                s.config,
-                "hidden_from_screenplay"
-              ),
-          select: s.id
+      ScreenConfig
+      |> Repo.all()
+      |> Enum.filter(
+        &match?(
+          %ScreenConfig{config: %Screen{disabled: false, hidden_from_screenplay: false}},
+          &1
+        )
       )
+      |> Enum.map(& &1.id)
     else
       Screens.Config.Cache.screen_ids(fn {_id,
                                           %Screen{
