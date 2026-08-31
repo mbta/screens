@@ -32,6 +32,6 @@ defmodule ScreensWeb.ScreenConfigsApiController do
   end
 
   defp parse_query_param_list(param) do
-    param |> String.split(",") |> Enum.map(&String.trim/1)
+    param |> String.split(",") |> Enum.map(&String.trim/1) |> Enum.reject(&(&1 == ""))
   end
 end
