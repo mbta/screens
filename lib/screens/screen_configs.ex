@@ -92,7 +92,7 @@ defmodule Screens.ScreenConfigs do
   end
 
   @doc "Returns screen IDs for screens matching the given app ID."
-  @spec screen_ids_for_app(atom()) :: [screen_id()]
+  @spec screen_ids_for_app(Screen.app_id()) :: [screen_id()]
   def screen_ids_for_app(target_app_id) do
     if config_migration_enabled?() do
       ScreenConfig
