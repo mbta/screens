@@ -39,6 +39,15 @@ defmodule Screens.TestSupport.ScreenConfigBuilder do
     }
   end
 
+  defp minimal_app_params(:bus_eink_v2) do
+    %{
+      "alerts" => %{"stop_ids" => ["place-test"]},
+      "departures" => %{"sections" => []},
+      "footer" => %{"stop_id" => "place-test"},
+      "header" => %{"stop_name" => "Test Stop"}
+    }
+  end
+
   def legacy_config(screen_dup_config, screen_busway_config) do
     %{
       "screens" => %{
