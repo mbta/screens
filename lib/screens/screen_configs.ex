@@ -10,6 +10,7 @@ defmodule Screens.ScreenConfigs do
   alias Screens.Repo
   alias ScreensConfig.Screen
 
+  @cache injected(Screens.Config.Cache)
   @config_fetcher injected(Screens.Config.Fetch)
 
   @type screen_id :: String.t()
@@ -49,15 +50,29 @@ defmodule Screens.ScreenConfigs do
     end
   end
 
+  @spec fetch(screen_id()) :: {:ok, Screen.t() | nil} | {:error, :cache_unavailable}
+  def fetch(id) do
+    if config_migration_enabled?() do
+      case Repo.get(ScreenConfig, id) do
+        %ScreenConfig{config: %Screen{} = screen} -> {:ok, screen}
+        nil -> {:ok, nil}
+      end
+    else
+      if Screens.Config.Cache.ok?() do
+        {:ok, @cache.screen(id)}
+      else
+        {:error, :cache_unavailable}
+      end
+    end
+  end
+
   @doc "Returns all configs as a list of ScreenConfig structs."
   @spec all() :: [ScreenConfig.t()]
   def all do
     Repo.all(ScreenConfig)
   end
 
-  @doc """
-  Returns all Configs as JSON with the ID as a key and the configuration as the value.
-  """
+  @doc "Returns all Configs as JSON with the ID as a key and the configuration as the value."
   @spec list_all() :: String.t() | :error
   def list_all do
     if config_migration_enabled?() do
@@ -73,6 +88,43 @@ defmodule Screens.ScreenConfigs do
       with {:ok, config, _version} <- @config_fetcher.fetch_config() do
         config
       end
+    end
+  end
+
+  @doc "Returns screen IDs for screens matching the given app ID."
+  @spec screen_ids_for_app(Screen.app_id()) :: [screen_id()]
+  def screen_ids_for_app(target_app_id) do
+    if config_migration_enabled?() do
+      ScreenConfig
+      |> Repo.all()
+      |> Enum.filter(&match?(%ScreenConfig{config: %Screen{app_id: ^target_app_id}}, &1))
+      |> Enum.map(& &1.id)
+    else
+      Screens.Config.Cache.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
+    end
+  end
+
+  @doc "Returns screen IDs that are eligible for Screenplay self-refresh."
+  @spec self_refresh_screen_ids() :: [screen_id()]
+  def self_refresh_screen_ids do
+    if config_migration_enabled?() do
+      ScreenConfig
+      |> Repo.all()
+      |> Enum.filter(
+        &match?(
+          %ScreenConfig{config: %Screen{disabled: false, hidden_from_screenplay: false}},
+          &1
+        )
+      )
+      |> Enum.map(& &1.id)
+    else
+      Screens.Config.Cache.screen_ids(fn {_id,
+                                          %Screen{
+                                            disabled: disabled,
+                                            hidden_from_screenplay: hidden
+                                          }} ->
+        not disabled and not hidden
+      end)
     end
   end
 

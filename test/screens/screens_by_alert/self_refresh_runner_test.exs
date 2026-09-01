@@ -1,13 +1,37 @@
 defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Config.ScreenConfig
+  alias Screens.Repo
   alias Screens.ScreensByAlert
   alias Screens.ScreensByAlert.SelfRefreshRunner
   alias Screens.V2.ScreenData
   alias ScreensConfig.Screen
 
   import Mox
+  import Screens.TestSupport.ScreenConfigBuilder
+  import Screens.Inject
+
+  @cache injected(Screens.Config.Cache)
+
   setup :verify_on_exit!
+
+  setup do
+    previous_config_migration = Application.get_env(:screens, :config_migration)
+    Application.put_env(:screens, :config_migration, false)
+
+    stub(@cache, :screen, fn
+      "1401" -> struct(Screen, app_id: :bus_shelter_v2)
+      "1002" -> struct(Screen, app_id: :bus_eink_v2)
+      _id -> struct(Screen)
+    end)
+
+    on_exit(fn ->
+      restore_app_env(:screens, :config_migration, previous_config_migration)
+    end)
+
+    :ok
+  end
 
   # NOTE: Screen IDs used in these tests come from `test/fixtures/config.json`
 
@@ -42,4 +66,30 @@ defmodule Screens.ScreensByAlert.SelfRefreshRunnerTest do
     assert {:noreply, ^new_screen_ids} =
              SelfRefreshRunner.handle_info({:done, :ok, "1001"}, screen_ids)
   end
+
+  @tag :capture_log
+  test "uses Postgres-backed eligible screen IDs when config migration is true" do
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
+    Application.put_env(:screens, :config_migration, true)
+
+    base_screen = screen_config(:dup_v2)
+    disabled_screen = %{base_screen | disabled: true}
+    hidden_screen = %{base_screen | hidden_from_screenplay: true}
+
+    Repo.insert!(%ScreenConfig{id: "eligible", config: base_screen})
+    Repo.insert!(%ScreenConfig{id: "disabled", config: disabled_screen})
+    Repo.insert!(%ScreenConfig{id: "hidden", config: hidden_screen})
+
+    now = System.system_time(:second)
+
+    expect(ScreensByAlert.Mock, :get_screens_last_updated, fn ["eligible"] ->
+      %{"eligible" => now}
+    end)
+
+    assert {:noreply, refreshing_ids} = SelfRefreshRunner.handle_info(:check, MapSet.new())
+    assert MapSet.equal?(refreshing_ids, MapSet.new())
+  end
+
+  defp restore_app_env(app, key, nil), do: Application.delete_env(app, key)
+  defp restore_app_env(app, key, value), do: Application.put_env(app, key, value)
 end
