@@ -35,8 +35,7 @@ defmodule Screens.Stops.Stop do
 
   @type params :: %{
           optional(:ids) => [id()],
-          optional(:location_types) => [location_type()],
-          optional(:route_types) => [RouteType.t()]
+          optional(:location_types) => [location_type()]
         }
 
   @includes ~w[
@@ -60,7 +59,6 @@ defmodule Screens.Stops.Stop do
 
   defp encode_param({:ids, ids}), do: [{"filter[id]", Enum.join(ids, ",")}]
   defp encode_param({:location_types, lts}), do: [{"filter[location_type]", Enum.join(lts, ",")}]
-  defp encode_param({:route_types, rts}), do: [{"filter[route_type]", Enum.join(rts, ",")}]
 
   @callback fetch_stop_name(id()) :: String.t() | nil
   def fetch_stop_name(stop_id) do

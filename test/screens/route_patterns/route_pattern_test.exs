@@ -211,7 +211,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
       assert {:ok, expected} == RoutePattern.fetch(%{}, get_json_fn)
     end
 
-    test "filters by route type or typicality" do
+    test "filters by mode or typicality" do
       get_json_fn =
         fn "route_patterns",
            %{"include" => "route.line,representative_trip.stops.parent_station"} ->
@@ -315,7 +315,7 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
         end
 
       assert {:ok, [%RoutePattern{id: "rp-bus-1"}]} =
-               RoutePattern.fetch(%{route_type: :bus}, get_json_fn)
+               RoutePattern.fetch(%{mode: :bus}, get_json_fn)
 
       assert {:ok, [%RoutePattern{id: "rp-blue"}]} =
                RoutePattern.fetch(%{typicality: 1}, get_json_fn)

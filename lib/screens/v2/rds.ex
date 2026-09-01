@@ -31,7 +31,7 @@ defmodule Screens.V2.RDS do
   alias Screens.V2.Departure
 
   alias ScreensConfig.Departures
-  alias ScreensConfig.Departures.{Query, Section}
+  alias ScreensConfig.Departures.{Mode, Query, Section}
 
   alias __MODULE__.{Countdowns, FirstTrip, Headways, NoService, ServiceEnded}
 
@@ -580,7 +580,7 @@ defmodule Screens.V2.RDS do
          departures,
          schedules,
          typical_patterns,
-         %Query.Params{route_ids: route_id_params, route_type: route_type} = _params
+         %Query.Params{mode: mode, route_ids: route_id_params} = _params
        ) do
     routes_for_section =
       (departures ++ schedules ++ typical_patterns)
@@ -591,7 +591,7 @@ defmodule Screens.V2.RDS do
       end)
       |> Enum.uniq()
       |> filter_for_route_id_params(route_id_params)
-      |> filter_for_route_type_param(route_type)
+      |> filter_for_mode_param(mode)
 
     routes_for_section
   end
@@ -602,11 +602,9 @@ defmodule Screens.V2.RDS do
   defp filter_for_route_id_params(all_routes, route_id_params),
     do: Enum.filter(all_routes, fn route -> route.id in route_id_params end)
 
-  @spec filter_for_route_type_param([Route.t()], RouteType.t()) :: [Route.t()]
-  defp filter_for_route_type_param(all_routes, nil), do: all_routes
-
-  defp filter_for_route_type_param(all_routes, route_type),
-    do: Enum.filter(all_routes, fn route -> route.type == route_type end)
+  @spec filter_for_mode_param([Route.t()], Mode.t()) :: [Route.t()]
+  defp filter_for_mode_param(all_routes, mode),
+    do: Enum.filter(all_routes, fn route -> route.type == Mode.to_route_type(mode) end)
 
   @spec fetch_relevant_alerts([Stop.id()], DateTime.t()) :: {:ok, [Alert.t()]} | :error
   defp fetch_relevant_alerts(stop_ids, now) do

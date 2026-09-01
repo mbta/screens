@@ -58,7 +58,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
             route_ids ->
               Enum.map(
                 route_ids,
-                &%Section{query: %Query{params: %Query.Params{route_ids: [&1]}}}
+                &%Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: [&1]}}}
               )
           end
       }
@@ -136,7 +136,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       config =
         put_in(config.app_params.departures.sections, [
-          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, layout: layout}
+          %Section{
+            query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}},
+            layout: layout
+          }
         ])
 
       assert [
@@ -151,7 +154,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       config =
         put_in(config.app_params.departures.sections, [
-          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, header: header}
+          %Section{
+            query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}},
+            header: header
+          }
         ])
 
       assert [%DeparturesWidget{sections: [%{header: ^header}]}] =
@@ -161,9 +167,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     test "with multiple sections, returns DeparturesWidget with notice rows in empty sections" do
       config =
         build_config([
-          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}},
-          %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}},
-          %Section{query: %Query{params: %Query.Params{route_ids: ["C"], direction_id: 1}}}
+          %Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}}},
+          %Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: ["B"]}}},
+          %Section{
+            query: %Query{params: %Query.Params{mode: :bus, route_ids: ["C"], direction_id: 1}}
+          }
         ])
 
       departure_b = build_departure("B", 0)
@@ -305,10 +313,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
           departures: %DeparturesConfig{
             sections: [
               %Section{
-                query: %Query{params: %Query.Params{route_ids: ["A"]}},
+                query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}},
                 header_only: true
               },
-              %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
+              %Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: ["B"]}}}
             ]
           },
           header: nil,
@@ -345,7 +353,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       config =
         build_config([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+            query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["S"]}},
             filters: %Filters{
               route_directions: %RouteDirections{
                 action: :include,
@@ -372,7 +380,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       config =
         build_config([
           %Section{
-            query: %Query{params: %Query.Params{stop_ids: ["S"]}},
+            query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["S"]}},
             filters: %Filters{
               route_directions: %RouteDirections{
                 action: :exclude,
@@ -400,8 +408,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       config =
         put_in(config.app_params.departures.sections, [
-          %Section{query: %Query{params: %Query.Params{route_ids: ["A"]}}, bidirectional: true},
-          %Section{query: %Query{params: %Query.Params{route_ids: ["B"]}}}
+          %Section{
+            query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}},
+            bidirectional: true
+          },
+          %Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: ["B"]}}}
         ])
 
       departure_a_0 = build_departure("A", 0)

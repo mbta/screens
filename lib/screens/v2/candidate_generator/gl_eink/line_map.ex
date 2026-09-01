@@ -40,7 +40,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMap do
 
   defp fetch_departures(station_id, now) do
     @departure.fetch(
-      %{stop_ids: [station_id]},
+      %{stop_ids: [station_id], mode: "gl"},
       now: DateTime.add(now, -@scheduled_terminal_departure_lookback_seconds)
     )
   end

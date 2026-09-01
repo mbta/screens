@@ -448,7 +448,7 @@ defmodule Screens.V2.DepartureTest do
 
       assert {:ok, [%Departure{schedule: schedule, prediction: prediction}]} ==
                Departure.fetch(
-                 %{},
+                 %{mode: :rl},
                  now: now,
                  fetch_predictions_fn: fetch_predictions_fn,
                  fetch_schedules_fn: fetch_schedules_fn
@@ -457,34 +457,18 @@ defmodule Screens.V2.DepartureTest do
   end
 
   describe "encode_params/1" do
-    test "encodes params correctly, including route_type list" do
+    test "encodes params correctly, including mode" do
       params = %{
         direction_id: 1,
         route_ids: ["CR-Fairmount"],
-        route_type: [:ferry, :rail],
+        mode: :cr,
         stop_ids: ["place-sstat"]
       }
 
       assert %{
                "filter[direction_id]" => 1,
                "filter[route]" => "CR-Fairmount",
-               "filter[route_type]" => "4,2",
-               "filter[stop]" => "place-sstat"
-             } == Departure.encode_params(params)
-    end
-
-    test "encodes params correctly, including single route_type" do
-      params = %{
-        direction_id: 1,
-        route_ids: ["Red"],
-        route_type: [:subway],
-        stop_ids: ["place-sstat"]
-      }
-
-      assert %{
-               "filter[direction_id]" => 1,
-               "filter[route]" => "Red",
-               "filter[route_type]" => "1",
+               "filter[route_type]" => 2,
                "filter[stop]" => "place-sstat"
              } == Departure.encode_params(params)
     end
@@ -495,42 +479,31 @@ defmodule Screens.V2.DepartureTest do
       do: Keyword.put(opts, :fetch_schedules_fn, fn params -> {:test, params} end)
 
     test "fetches with params route_type when no opts route_type is provided" do
-      params = %{route_type: :subway}
+      params = %{mode: :rl}
 
-      assert Departure.fetch_schedules(params, build_opts()) == {:test, %{route_type: [:subway]}}
+      assert Departure.fetch_schedules(params, build_opts()) == {:test, %{mode: :rl}}
     end
 
     test "fetches with schedule_route_type_filter option when provided" do
-      params = %{stop_ids: ["place-sstat"]}
+      params = %{stop_ids: ["place-sstat"], mode: :cr}
       opts = build_opts(schedule_route_type_filter: [:rail, :ferry])
 
       assert Departure.fetch_schedules(params, opts) ==
-               {:test, %{route_type: [:ferry, :rail], stop_ids: ["place-sstat"]}}
+               {:test, %{mode: :cr, stop_ids: ["place-sstat"]}}
     end
 
     test "fetches with the intersection of params route_type and opts route_type" do
-      params = %{route_type: :rail}
+      params = %{mode: :cr}
       opts = build_opts(schedule_route_type_filter: [:rail, :ferry])
 
-      assert Departure.fetch_schedules(params, opts) == {:test, %{route_type: [:rail]}}
-    end
-
-    test "treats params route_type of `nil` as specifying all route types" do
-      params = %{route_type: nil}
-      opts = build_opts(schedule_route_type_filter: [:ferry])
-
-      assert Departure.fetch_schedules(params, opts) == {:test, %{route_type: [:ferry]}}
+      assert Departure.fetch_schedules(params, opts) == {:test, %{mode: :cr}}
     end
 
     test "skips fetching when the intersection of params and opts is empty" do
-      params = %{route_type: :light_rail}
+      params = %{mode: :gl}
       opts = build_opts(schedule_route_type_filter: [:ferry, :rail, :subway])
 
       assert Departure.fetch_schedules(params, opts) == {:ok, []}
-    end
-
-    test "defaults to no route type filter when route_type is not in params or opts" do
-      assert Departure.fetch_schedules(%{}, build_opts()) == {:test, %{}}
     end
   end
 end

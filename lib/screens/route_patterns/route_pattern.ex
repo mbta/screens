@@ -2,7 +2,6 @@ defmodule Screens.RoutePatterns.RoutePattern do
   @moduledoc false
 
   alias Screens.Routes.Route
-  alias Screens.RouteType
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.V3Api
@@ -31,7 +30,6 @@ defmodule Screens.RoutePatterns.RoutePattern do
           optional(:ids) => [id()],
           optional(:mode) => Mode.t(),
           optional(:route_ids) => [Route.id()],
-          optional(:route_type) => RouteType.t(),
           optional(:stop_ids) => [Stop.id()],
           optional(:typicality) => typicality()
         }
@@ -39,7 +37,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
   @callback fetch(params()) :: result()
   def fetch(params, get_json_fn \\ &V3Api.get_json/2) do
     # The API doesn't currently have some of these filters built-in
-    {filter_params, fetch_params} = Map.split(params, ~w[mode route_type typicality]a)
+    {filter_params, fetch_params} = Map.split(params, ~w[mode typicality]a)
 
     encoded_params =
       fetch_params
@@ -58,11 +56,6 @@ defmodule Screens.RoutePatterns.RoutePattern do
         :error
     end
   end
-
-  defp apply_filter({:route_type, nil}, patterns), do: patterns
-
-  defp apply_filter({:route_type, type}, patterns),
-    do: Enum.filter(patterns, &(&1.route.type == type))
 
   defp apply_filter({:mode, nil}, patterns), do: patterns
 
