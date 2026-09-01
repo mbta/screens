@@ -261,14 +261,37 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      layout: %Layout{},
                      rows: [^departure, %Departure{schedule: ^schedule, prediction: nil}]
                    },
-                   %NormalSection{
-                     header: %Header{},
-                     grouping_type: :time,
-                     layout: %Layout{},
-                     rows: [
-                       %ScreensConfig.FreeTextLine{
-                         icon: :bus,
-                         text: ["No departures currently available"]
+                   %Screens.V2.WidgetInstance.Departures.NoServiceSection{
+                     header: %ScreensConfig.Departures.Header{},
+                     headsign: nil,
+                     routes: [
+                       %Screens.Routes.Route{
+                         id: "r1",
+                         short_name: nil,
+                         long_name: nil,
+                         direction_names: nil,
+                         direction_destinations: nil,
+                         type: :bus,
+                         line: %Screens.Lines.Line{
+                           id: "l1",
+                           long_name: nil,
+                           short_name: nil,
+                           sort_order: nil
+                         }
+                       },
+                       %Screens.Routes.Route{
+                         id: "r2",
+                         short_name: nil,
+                         long_name: nil,
+                         direction_names: nil,
+                         direction_destinations: nil,
+                         type: :bus,
+                         line: %Screens.Lines.Line{
+                           id: "l2",
+                           long_name: nil,
+                           short_name: nil,
+                           sort_order: nil
+                         }
                        }
                      ]
                    }
@@ -301,14 +324,37 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                  screen: ^config,
                  sections: [
                    %NormalSection{header: %Header{title: "Test Header"}, rows: []},
-                   %NormalSection{
-                     header: %Header{},
-                     grouping_type: :time,
-                     layout: %Layout{},
-                     rows: [
-                       %ScreensConfig.FreeTextLine{
-                         icon: :bus,
-                         text: ["No departures currently available"]
+                   %Screens.V2.WidgetInstance.Departures.NoServiceSection{
+                     header: %ScreensConfig.Departures.Header{},
+                     headsign: nil,
+                     routes: [
+                       %Screens.Routes.Route{
+                         id: "r1",
+                         short_name: nil,
+                         long_name: nil,
+                         direction_names: nil,
+                         direction_destinations: nil,
+                         type: :bus,
+                         line: %Screens.Lines.Line{
+                           id: "l1",
+                           long_name: nil,
+                           short_name: nil,
+                           sort_order: nil
+                         }
+                       },
+                       %Screens.Routes.Route{
+                         id: "r2",
+                         short_name: nil,
+                         long_name: nil,
+                         direction_names: nil,
+                         direction_destinations: nil,
+                         type: :bus,
+                         line: %Screens.Lines.Line{
+                           id: "l2",
+                           long_name: nil,
+                           short_name: nil,
+                           sort_order: nil
+                         }
                        }
                      ]
                    }

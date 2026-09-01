@@ -92,6 +92,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
             {%OvernightSection{} = overnight_section, _section} ->
               overnight_section
 
+            {%NoServiceSection{} = no_service_section, _section} ->
+              no_service_section
+
             {%NormalSection{rows: rows} = normal_section, _section} ->
               %{
                 normal_section
@@ -120,7 +123,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     Enum.any?(sections_data, fn {section_data, %Section{params: params}} ->
       is_nil(params) or
         (is_struct(section_data, NormalSection) and has_valid_normal_section_row?(section_data)) or
-        is_struct(section_data, OvernightSection)
+        is_struct(section_data, OvernightSection) or
+        is_struct(section_data, NoServiceSection)
     end)
   end
 
@@ -146,12 +150,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
         %NoDataSection{route: route} ->
           no_data_text(route, direction_id)
-
-        %OvernightSection{routes: routes} ->
-          no_data_text(List.first(routes), direction_id)
-
-        %NoServiceSection{routes: routes} ->
-          no_data_text(List.first(routes), direction_id)
       end
 
     %NormalSection{

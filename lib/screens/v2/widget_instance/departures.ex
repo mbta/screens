@@ -68,8 +68,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defmodule NoServiceSection do
     @moduledoc "Section consisting of a 'no service' message."
-    @type t :: %__MODULE__{routes: [Route.t()]}
-    defstruct ~w[routes]a
+    @type t :: %__MODULE__{
+            headsign: String.t() | nil,
+            routes: [Route.t()],
+            header: Header.t()
+          }
+    defstruct ~w[headsign routes header]a
   end
 
   @type section ::
@@ -186,25 +190,33 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{type: :no_data_section, text: FreeTextLine.to_json(text)}
   end
 
-  def serialize_section(%NoServiceSection{routes: routes}, _screen, _now, _is_only_section) do
-    route_pills =
+  def serialize_section(
+        %NoServiceSection{
+          header: %Header{image_path: image_path} = header,
+          headsign: headsign,
+          routes: routes
+        },
+        _screen,
+        _now,
+        _is_only_section
+      ) do
+    route_pill =
       routes
       |> Enum.map(&Route.icon(&1))
       |> Enum.uniq()
-
-    route_icon =
-      if length(route_pills) == 1 do
-        Enum.at(route_pills, 0)
-      else
-        nil
-      end
+      |> Enum.at(0)
 
     text = %FreeTextLine{
-      icon: route_icon,
-      text: ["No service today"]
+      icon: route_pill,
+      text: [headsign || "No service today"]
     }
 
-    %{type: :no_service_section, text: FreeTextLine.to_json(text)}
+    %{
+      type: :no_service_section,
+      header: Map.put(header, :image_path, Assets.s3_asset_url(image_path)) |> Header.to_json(),
+      text: FreeTextLine.to_json(text),
+      with_headsign: headsign != nil
+    }
   end
 
   def serialize_section(

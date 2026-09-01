@@ -418,7 +418,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           grouping_type: :time,
           rows: expected_departures
         },
-        %Screens.V2.WidgetInstance.Departures.NoServiceSection{routes: []}
+        %Screens.V2.WidgetInstance.Departures.NoServiceSection{
+          header: %ScreensConfig.Departures.Header{},
+          routes: []
+        }
       ]
 
       config =
@@ -483,7 +486,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           grouping_type: :time,
           rows: expected_departures
         },
-        %Screens.V2.WidgetInstance.Departures.NoServiceSection{routes: [expected_route]}
+        %Screens.V2.WidgetInstance.Departures.NoServiceSection{
+          header: %ScreensConfig.Departures.Header{},
+          routes: [expected_route]
+        }
       ]
 
       config =
