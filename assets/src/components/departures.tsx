@@ -17,6 +17,7 @@ import {
 import { report } from "Util/sentry";
 import { hasOverflowY } from "Util/utils";
 import { OvernightSection } from "./departures/overnight_section";
+import { NoServiceSection } from "./departures/no_service_section";
 
 type Departures = {
   sections: Section[];
@@ -57,6 +58,10 @@ const Departures: ComponentType<Departures> = ({ sections }) => {
         switch (section.type) {
           case "overnight_section": {
             return <OvernightSection {...section} key={weakKey(section)} />;
+          }
+
+          case "no_service_section": {
+            return <NoServiceSection {...section} key={weakKey(section)} />;
           }
 
           case "folded_section": {
