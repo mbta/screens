@@ -21,7 +21,7 @@ defmodule Screens.V2.ScreenData do
   @callback get(String.t(), Screen.t()) :: t()
   def get(id, screen) do
     response = generate(id, screen) |> resolve_paging(screen) |> serialize()
-    Logster.info("payload_size=" <> Integer.to_string(byte_size(Jason.encode!(response))))
+    Logster.info("screen_id=" <> id <> " get_payload_size=" <> Jason.encode!(response))
     response
   end
 
@@ -29,10 +29,13 @@ defmodule Screens.V2.ScreenData do
   def simulation(id, %Screen{app_id: app_id} = screen) do
     layout = generate(id, screen)
 
-    %{
+    response = %{
       full_page: layout |> resolve_paging(screen) |> serialize(),
       flex_zone: layout |> serialize_paged_slots(app_id)
     }
+    Logster.info("screen_id=" <> id <> " sim_payload_size=" <> Jason.encode!(response))
+
+    response
   end
 
   @spec audio(String.t(), Screen.t()) :: audio_data()
