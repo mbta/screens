@@ -41,6 +41,8 @@ config :screens, Screens.Repo,
   show_sensitive_data_on_connection_error: false,
   configure: {Screens.Repo, :add_prod_credentials, []}
 
+config :screens, Screens.Config.Backup, store: Screens.Config.Backup.Store.S3
+
 # ## SSL Support
 #
 # To get SSL working, you will need to add the `https` key

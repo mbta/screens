@@ -40,6 +40,10 @@ config :ueberauth_oidcc,
     ]
   ]
 
+config :screens, Screens.Config.Backup,
+  local_backup_path: "local/config_backups/screens_local.json",
+  store: Screens.Config.Backup.Store.Mixed
+
 # ## SSL Support
 #
 # In order to use HTTPS in development, a self-signed
