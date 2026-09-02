@@ -20,7 +20,9 @@ defmodule Screens.V2.ScreenData do
 
   @callback get(String.t(), Screen.t()) :: t()
   def get(id, screen) do
-    generate(id, screen) |> resolve_paging(screen) |> serialize()
+    response = generate(id, screen) |> resolve_paging(screen) |> serialize()
+    Logster.info("payload_size=" <> Integer.to_string(byte_size(Jason.encode!(response))))
+    response
   end
 
   @spec simulation(String.t(), Screen.t()) :: simulation_data()
