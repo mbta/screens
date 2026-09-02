@@ -1,6 +1,7 @@
 defmodule ScreensWeb.AdminApiController do
   use ScreensWeb, :controller
 
+  alias Screens.Config.Backup
   alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.{Image, Util}
   alias Screens.ScreenConfigs
@@ -93,6 +94,42 @@ defmodule ScreensWeb.AdminApiController do
         |> put_status(500)
         |> json(%{success: false, error: inspect(reason)})
     end
+  end
+
+  @doc "Environments whose config backups can be restored into this environment."
+  @spec sync_environments(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def sync_environments(conn, _params) do
+    json(conn, %{environments: Backup.environments()})
+  end
+
+  @doc "Replaces all screen configs with the contents of the given environment's snapshot."
+  @spec sync_from_snapshot(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def sync_from_snapshot(conn, %{"environment" => environment}) do
+    case Backup.restore(environment) do
+      {:ok, %{upserted: upserted, deleted: deleted, assets_copied: assets_copied}} ->
+        json(conn, %{
+          success: true,
+          upserted: upserted,
+          deleted: deleted,
+          assets_copied: assets_copied
+        })
+
+      {:error, :environment_not_allowed} ->
+        conn
+        |> put_status(400)
+        |> json(%{success: false, error: "Cannot restore from #{inspect(environment)}"})
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: inspect(reason)})
+    end
+  end
+
+  def sync_from_snapshot(conn, _params) do
+    conn
+    |> put_status(400)
+    |> json(%{success: false, error: "Invalid request parameters"})
   end
 
   def upload_image(conn, %{"image" => %Plug.Upload{} = upload, "key" => key}) do

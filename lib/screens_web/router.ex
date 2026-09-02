@@ -79,6 +79,8 @@ defmodule ScreensWeb.Router do
     post "/refresh", AdminApiController, :refresh
     post "/maintenance", AdminApiController, :maintenance
     post "/import_configs", AdminApiController, :import_configs
+    post "/sync_from_snapshot", AdminApiController, :sync_from_snapshot
+    get "/sync_environments", AdminApiController, :sync_environments
     get "/images", AdminApiController, :list_images
     post "/images", AdminApiController, :upload_image
     delete "/images/:key", AdminApiController, :delete_image

@@ -1,14 +1,17 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { fetch } from "Util/admin";
 
 const API_PATH = "/api/admin/maintenance";
 const IMPORT_PATH = "/api/admin/import_configs";
+const SYNC_ENVIRONMENTS_PATH = "/api/admin/sync_environments";
+const SYNC_FROM_SNAPSHOT_PATH = "/api/admin/sync_from_snapshot";
 
 const Tools = () => {
   return (
     <main className="admin-page">
       <EvergreenContentCleanup />
       <ImportConfigs />
+      <SyncFromSnapshot />
     </main>
   );
 };
@@ -112,6 +115,82 @@ const ImportConfigs = () => {
       <button type="button" onClick={importConfigs} disabled={isImporting}>
         Import
       </button>
+    </section>
+  );
+};
+
+const SyncFromSnapshot = () => {
+  const [environments, setEnvironments] = useState<string[]>([]);
+  const [environment, setEnvironment] = useState("");
+  const [isRestoring, setIsRestoring] = useState(false);
+
+  useEffect(() => {
+    fetch.get(SYNC_ENVIRONMENTS_PATH).then(({ environments }) => {
+      setEnvironments(environments);
+      setEnvironment(environments[0] ?? "");
+    });
+  }, []);
+
+  const restore = async () => {
+    if (isRestoring || environment === "") return;
+
+    if (
+      !window.confirm(
+        `Overwrite all screen configurations and assets with the latest backup from "${environment}"? ` +
+          "Configurations that don't exist in the backup will be deleted.",
+      )
+    ) {
+      return;
+    }
+
+    setIsRestoring(true);
+    const { status, upserted, deleted, assets_copied, error } =
+      await fetch.post(SYNC_FROM_SNAPSHOT_PATH, { environment });
+    setIsRestoring(false);
+
+    if (status === 200) {
+      window.alert(
+        `Restored ${upserted} configurations. Deleted ${deleted}. Copied ${assets_copied} assets.`,
+      );
+    } else {
+      window.alert(`Restore failed: ${error || "Unknown error"}`);
+    }
+  };
+
+  // There will be no environments to restore from in production, so don't show this section.
+  if (environments.length === 0) return null;
+
+  // Display different prompt locally where we don't have assets in S3 to copy over
+  const configSyncPrompt =
+    "Replace all screen configurations in Postgres with the latest snapshot of the selected environment. ";
+  const assetSyncPrompt = ` Assets from the source environment will also be copied over in S3.`;
+  const fullBackupPrompt =
+    configSyncPrompt + (environments[0] === "local" ? "" : assetSyncPrompt);
+
+  return (
+    <section>
+      <h2>Sync Configurations from Source Environment</h2>
+      <p> {fullBackupPrompt} </p>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          restore();
+        }}
+      >
+        <select
+          value={environment}
+          onChange={(event) => setEnvironment(event.target.value)}
+        >
+          {environments.map((name) => (
+            <option key={name} value={name}>
+              {name}
+            </option>
+          ))}
+        </select>
+        <button type="submit" disabled={isRestoring}>
+          Sync
+        </button>
+      </form>
     </section>
   );
 };
