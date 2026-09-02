@@ -2,7 +2,6 @@ defmodule Screens.V2.Departure do
   @moduledoc false
 
   alias Screens.Predictions.Prediction
-  alias Screens.Report
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Schedules.Schedule
@@ -74,7 +73,7 @@ defmodule Screens.V2.Departure do
     if route_type in option_types do
       fetch_fn.(params)
     else
-      Report.warning("departure_mode_unknown_for_schedule", Map.to_list(params))
+      Logster.info(["departure_mode_unknown_for_schedule" | Map.to_list(params)])
       {:ok, []}
     end
   end
