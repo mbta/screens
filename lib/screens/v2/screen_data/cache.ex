@@ -44,10 +44,11 @@ defmodule Screens.V2.ScreenData.Cache do
   defmodule Meta do
     @moduledoc "Metadata returned about the internal cache operations."
     @type t :: %__MODULE__{
-            what: :hit | :miss | {:error, operation :: atom(), Nebulex.Error.t()},
+            what: :hit | :miss | :refresh | {:error, operation :: atom(), Nebulex.Error.t()},
             where: :local | :remote
           }
-    defstruct what: :miss, where: :local
+    @enforce_keys [:what]
+    defstruct what: nil, where: :local
   end
 
   alias Screens.V2.CandidateGenerator.Timeout
@@ -57,14 +58,22 @@ defmodule Screens.V2.ScreenData.Cache do
   @parameters injected(Screens.V2.ScreenData.Parameters)
   @store injected(Store)
 
+  @type options :: [refresh?: boolean()]
+
   @doc """
   Fetch or generate the widgets for a given screen.
 
   This function is "fail-safe" and simply generates widgets on the local node in the event of any
   error interacting with the cache; the returned `Meta` indicates whether this happened.
+
+  ### Options
+
+  - `refresh?`: If true, ignores any cached data and always generates widgets fresh. The result
+    may still be stored in the cache.
   """
   @spec instances(Store.key(), Screen.t()) :: {Store.value(), Meta.t()}
-  def instances(id, screen) do
+  @spec instances(Store.key(), Screen.t(), options()) :: {Store.value(), Meta.t()}
+  def instances(id, screen, opts \\ []) do
     case @store.find_node(id) do
       {:ok, n} when n == node() ->
         # This node probably* owns the key. Fetch it or generate and populate it, locking the key
@@ -73,7 +82,7 @@ defmodule Screens.V2.ScreenData.Cache do
         # (* There's no guarantee this hasn't changed since we called `find_node`. This still
         # works if it has, since the lock is cluster-wide and the actual cache operations will
         # always use the current owner.)
-        case @store.transaction(fn -> fetch_or_generate(id, screen) end, keys: [id]) do
+        case @store.transaction(fn -> fetch_or_generate(id, screen, opts) end, keys: [id]) do
           {:ok, result} -> result
           {:error, error} -> {generate(screen), %Meta{what: {:error, :transaction, error}}}
         end
@@ -83,7 +92,7 @@ defmodule Screens.V2.ScreenData.Cache do
         # wait for the longest possible candidate generation timeout; if we do exceed this, crash
         # instead of retrying the generation ourself, since the app may be overloaded and at that
         # point the client has been waiting on us for a long time.
-        case @store.call(node, __MODULE__, :instances, [id, screen], 20_000) do
+        case @store.call(node, __MODULE__, :instances, [id, screen, opts], 20_000) do
           {:error, %Nebulex.Error{reason: {:rpc, {:error, :timeout}}}} -> raise Timeout
           {:error, e} -> {generate(screen), %Meta{what: {:error, :rpc, e}, where: :remote}}
           {instances, %Meta{} = meta} -> {instances, %Meta{meta | where: :remote}}
@@ -94,12 +103,12 @@ defmodule Screens.V2.ScreenData.Cache do
     end
   end
 
-  defp fetch_or_generate(id, screen) do
-    case @store.fetch(id) do
+  defp fetch_or_generate(id, screen, opts) do
+    case maybe_fetch(id, opts) do
       {:ok, instances} ->
         {instances, %Meta{what: :hit}}
 
-      {:error, %Nebulex.KeyError{}} ->
+      result when result in [:miss, :refresh] ->
         instances = generate(screen)
 
         # For now we cache instances just long enough to avoid duplicating work for other
@@ -109,7 +118,7 @@ defmodule Screens.V2.ScreenData.Cache do
         # work will address this and enable instances to be cached for longer, up to the full
         # length of a refresh cycle.
         case @store.put(id, instances, ttl: :timer.seconds(5)) do
-          :ok -> {instances, %Meta{what: :miss}}
+          :ok -> {instances, %Meta{what: result}}
           {:error, error} -> {instances, %Meta{what: {:error, :put, error}}}
         end
 
@@ -119,4 +128,10 @@ defmodule Screens.V2.ScreenData.Cache do
   end
 
   defp generate(screen), do: @parameters.candidate_generator(screen).candidate_instances(screen)
+
+  defp maybe_fetch(id, opts) do
+    if Keyword.get(opts, :refresh?, false),
+      do: :refresh,
+      else: with({:error, %Nebulex.KeyError{}} <- @store.fetch(id), do: :miss)
+  end
 end
