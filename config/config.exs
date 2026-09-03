@@ -472,6 +472,11 @@ config :screens, :screens_by_alert,
 
 config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concurrency: 1
 
+config :screens, Screens.Config.Backup,
+  enabled: true,
+  interval_ms: :timer.seconds(10),
+  store: Screens.Config.Backup.Store.S3
+
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local
 
 # Memory limits for V3 API response caches are based on stats measured in a deployed environment.

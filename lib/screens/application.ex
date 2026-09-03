@@ -28,6 +28,7 @@ defmodule Screens.Application do
         {Task.Supervisor, name: Screens.ScreensByAlert.SelfRefreshRunner.TaskSupervisor},
         # ScreensByAlert self-refresh job runner
         self_refresh_runner_child(),
+        backup_runner_task_supervisor_child(),
         {Task.Supervisor, name: Screens.DeviceMonitor.Supervisor},
         Screens.DeviceMonitor,
         Screens.Telemetry,
@@ -59,5 +60,10 @@ defmodule Screens.Application do
     defp self_refresh_runner_child do
       {Screens.ScreensByAlert.SelfRefreshRunner, name: Screens.ScreensByAlert.SelfRefreshRunner}
     end
+  end
+
+  defp backup_runner_task_supervisor_child do
+    if Application.get_env(:screens, Screens.Config.Backup)[:enabled],
+      do: Screens.Config.Backup.Runner
   end
 end
