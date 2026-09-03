@@ -13,9 +13,10 @@ config :screens, Screens.Repo,
 
 config :screens, Screens.Config.Backup,
   enabled: false,
-  interval_ms: 10,
-  local_backup_path: "local/config_backups/screens_test.json",
   store: Screens.Config.Backup.Store.Local
+
+config :screens, Screens.Config.Backup.Store.Local,
+  local_backup_path: "local/config_backups/screens_test.json"
 
 config :screens,
   config_fetcher: Screens.Config.Fetch.Local,

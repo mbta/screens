@@ -3,11 +3,7 @@ defmodule Screens.Config.Backup.Store.Local do
   Functions to work with a local copy of the screen configs backup.
   """
 
-  alias Screens.Config.Backup
-
   @behaviour Screens.Config.Backup.Store
-
-  @backup_path Application.compile_env!(:screens, [Backup, :local_backup_path])
 
   @impl true
   def fetch_backup(_environment_name) do
@@ -30,6 +26,9 @@ defmodule Screens.Config.Backup.Store.Local do
   end
 
   defp backup_path do
-    Path.join([:code.priv_dir(:screens), @backup_path])
+    Path.join([
+      :code.priv_dir(:screens),
+      Application.get_env(:screens, __MODULE__)[:local_backup_path]
+    ])
   end
 end

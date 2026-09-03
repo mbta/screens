@@ -26,3 +26,11 @@ end
 
 Mox.defmock(Screens.DeviceMonitor.MockVendor, for: Screens.DeviceMonitor.Vendor)
 Mox.defmock(Screens.ScreensByAlert.Mock, for: Screens.ScreensByAlert.Behaviour)
+
+defmodule Screens.Repo.AdvisoryLock.Sleeper.Mock do
+  @moduledoc "No-op sleeper so tests don't have to wait out `AdvisoryLock`'s hold interval."
+  @behaviour Screens.Repo.AdvisoryLock.Sleeper
+
+  @impl true
+  def sleep(_ms), do: :ok
+end

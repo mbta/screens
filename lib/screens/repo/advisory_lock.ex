@@ -4,11 +4,15 @@ defmodule Screens.Repo.AdvisoryLock do
   every app instance only runs on one of them at a time.
 
   Can be reused for any recurring cron job type functions that only needs to run once across all tasks.
-  New uses of this locking mechanism just need to pass an  application-wide unique cron_lock_key
+  New uses of this locking mechanism just need to pass an application-wide unique cron_lock_key
   and an interval for how frequently the job should run.
   """
 
+  import Screens.Inject
+
   alias Screens.Repo
+
+  @sleeper injected(Screens.Repo.AdvisoryLock.Sleeper)
 
   @doc """
   Runs `func` if the lock identified by `cron_lock_key` can be acquired immediately, returning `:locked` otherwise.
@@ -37,9 +41,8 @@ defmodule Screens.Repo.AdvisoryLock do
   end
 
   defp hold_lock_until(started_at, interval) do
-    # Sleep for 15 seconds less than the interval for running the locking function
-    # This makes sure that the lock is held for slightly less than the full interval
-    remaining = interval - (System.monotonic_time(:millisecond) - started_at) - :timer.seconds(15)
-    if remaining > 0, do: Process.sleep(remaining)
+    # Ensure the lock is held for the full interval. It's released when the transaction ends.
+    remaining = interval - (System.monotonic_time(:millisecond) - started_at)
+    if remaining > 0, do: @sleeper.sleep(remaining)
   end
 end
