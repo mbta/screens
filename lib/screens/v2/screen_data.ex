@@ -21,8 +21,16 @@ defmodule Screens.V2.ScreenData do
   @callback get(String.t(), Screen.t()) :: t()
   def get(id, screen) do
     response = generate(id, screen) |> resolve_paging(screen) |> serialize()
-    Logster.info("screen_id=" <> id <> " get_payload_size=" <> Integer.to_string(byte_size(Jason.encode!(response))))
+    Logster.info("screen_id=" <> id <> " get_payload_size=" <> compressed_byte_sz(response))
     response
+  end
+
+  defp compressed_byte_sz(response) do
+    response
+    |> Jason.encode!()
+    |> :zlib.gzip()
+    |> byte_size
+    |> Integer.to_string()
   end
 
   @spec simulation(String.t(), Screen.t()) :: simulation_data()
@@ -33,7 +41,8 @@ defmodule Screens.V2.ScreenData do
       full_page: layout |> resolve_paging(screen) |> serialize(),
       flex_zone: layout |> serialize_paged_slots(app_id)
     }
-    Logster.info("screen_id=" <> id <> " sim_payload_size=" <> Integer.to_string(byte_size(Jason.encode!(response))))
+
+    Logster.info("screen_id=" <> id <> " sim_payload_size=" <> compressed_byte_sz(response))
 
     response
   end
