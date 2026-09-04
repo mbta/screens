@@ -1,7 +1,7 @@
 # Quick one off script to populate modes within a current local config.
 # The new config will be written to "priv/local.updated.json".
 #
-# We first use the current Query.Params values to try and
+# We first use the current Params values to try and
 # get the mode. If there isn't enough information, we go ahead
 # and get the departures for that particular section. If there
 # aren't any departures, we put a null mode for that section
@@ -77,30 +77,9 @@ defmodule AddModeToDeparturesConfig do
   end
 
   defp update_section(section) do
-    if get_in(section, ["header_only"]) == true do
-      case get_in(section, ["query", "params"]) do
-        nil ->
-          section
-
-        params ->
-          put_in(
-            section,
-            ["query", "params"],
-            Map.put(params, "mode", nil)
-          )
-      end
-    else
-      case get_in(section, ["query", "params"]) do
-        nil ->
-          section
-
-        params ->
-          put_in(
-            section,
-            ["query", "params"],
-            update_params(params, section)
-          )
-      end
+    case get_in(section, ["params"]) do
+      nil -> section
+      params -> put_in(section, ["params"], update_params(params, section))
     end
   end
 

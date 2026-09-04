@@ -13,13 +13,11 @@
                 "sign_ids": []
               },
               "grouping_type": "time",
-              "query": {
-                "params": {
-                  "mode": "bus",
-                  "direction_id": "both",
-                  "route_ids": ["1722"],
-                  "stop_ids": []
-                }
+              "params": {
+                "mode": "bus",
+                "direction_id": "both",
+                "route_ids": ["1722"],
+                "stop_ids": []
               }
             }
           ]
@@ -54,13 +52,11 @@
                 "sign_ids": []
               },
               "grouping_type": "time",
-              "query": {
-                "params": {
-                  "mode": "bus",
-                  "direction_id": "both",
-                  "route_ids": ["383"],
-                  "stop_ids": []
-                }
+              "params": {
+                "mode": "bus",
+                "direction_id": "both",
+                "route_ids": ["383"],
+                "stop_ids": []
               }
             }
           ]
@@ -95,13 +91,11 @@
                 "sign_ids": []
               },
               "grouping_type": "time",
-              "query": {
-                "params": {
-                  "mode": "bus",
-                  "direction_id": "both",
-                  "route_ids": ["1722"],
-                  "stop_ids": []
-                }
+              "params": {
+                "mode": "bus",
+                "direction_id": "both",
+                "route_ids": ["1722"],
+                "stop_ids": []
               }
             }
           ]
@@ -136,13 +130,11 @@
                 "sign_ids": []
               },
               "grouping_type": "time",
-              "query": {
-                "params": {
-                  "mode": "bus",
-                  "direction_id": "both",
-                  "route_ids": ["1722"],
-                  "stop_ids": []
-                }
+              "params": {
+                "mode": "bus",
+                "direction_id": "both",
+                "route_ids": ["1722"],
+                "stop_ids": []
               }
             }
           ]
@@ -183,13 +175,11 @@
               },
               "filters": { "route_directions": null },
               "grouping_type": "time",
-              "query": {
-                "params": {
-                  "mode": "gl",
-                  "direction_id": 0,
-                  "stop_ids": ["place-nuniv"],
-                  "route_ids": ["Green-E"]
-                }
+              "params": {
+                "mode": "gl",
+                "direction_id": 0,
+                "stop_ids": ["place-nuniv"],
+                "route_ids": ["Green-E"]
               },
               "layout": {
                 "max": null,

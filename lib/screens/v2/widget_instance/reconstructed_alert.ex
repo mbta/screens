@@ -25,8 +25,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     Screen
   }
 
-  alias ScreensConfig.Departures.{Query, Section}
-  alias ScreensConfig.Departures.Query.Params
+  alias ScreensConfig.Departures.{Params, Section}
   alias ScreensConfig.Screen.PreFare
 
   @inside_locations ~w[inside boundary_upstream boundary_downstream]a
@@ -1512,17 +1511,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   @spec section_contains_commuter_rail?(Section.t()) :: boolean()
-
-  defp section_contains_commuter_rail?(%Section{query: nil}), do: false
-
-  defp section_contains_commuter_rail?(%Section{
-         query: %Query{params: %Params{mode: mode}}
-       }) do
-    case mode do
-      :cr -> true
-      _ -> false
-    end
-  end
+  defp section_contains_commuter_rail?(%Section{params: %Params{mode: :cr}}), do: true
+  defp section_contains_commuter_rail?(_section), do: false
 
   def valid_candidate?(%__MODULE__{
         alert: %Alert{id: alert_id},

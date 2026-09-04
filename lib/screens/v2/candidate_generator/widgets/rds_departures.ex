@@ -26,7 +26,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.Departures
-  alias ScreensConfig.Departures.{Mode, Query, Section}
+  alias ScreensConfig.Departures.{Mode, Params, Section}
 
   @type post_process_rows_fn_t :: ([NormalSection.row()], Section.t(), non_neg_integer() ->
                                      [NormalSection.row()])
@@ -62,25 +62,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           post_process_rows_fn_t()
         ) ::
           DeparturesWidget.section()
-
-  # header_only sections are only supported on LCD screens
-  defp map_to_departure_section(
-         _,
-         %Section{
-           header_only: true,
-           header: header,
-           layout: layout,
-           grouping_type: grouping_type
-         },
-         _,
-         _
-       ),
-       do: %NormalSection{
-         rows: [],
-         header: header,
-         layout: layout,
-         grouping_type: grouping_type
-       }
 
   defp map_to_departure_section(data, section, _, _)
        when data == :error or data == {:ok, []},
@@ -119,11 +100,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   end
 
   @spec maybe_route_from_section(Section.t()) :: Route.t() | nil
-  defp maybe_route_from_section(%Section{query: nil}), do: nil
+  defp maybe_route_from_section(%Section{params: nil}), do: nil
 
-  defp maybe_route_from_section(%Section{
-         query: %Query{params: %Query.Params{mode: mode, route_ids: route_ids}}
-       }) do
+  defp maybe_route_from_section(%Section{params: %Params{mode: mode, route_ids: route_ids}}) do
     %Route{id: representative_route_id(route_ids), type: Mode.to_route_type(mode)}
   end
 

@@ -14,7 +14,7 @@ defmodule Screens.V2.RDSTest do
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias ScreensConfig.Departures
-  alias ScreensConfig.Departures.{Query, Section}
+  alias ScreensConfig.Departures.{Params, Section}
 
   import Screens.Inject
   import Screens.TestSupport.InformedEntityBuilder
@@ -187,9 +187,7 @@ defmodule Screens.V2.RDSTest do
       expect_standard_route_patterns(stop_ids)
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [
@@ -251,17 +249,7 @@ defmodule Screens.V2.RDSTest do
       end)
 
       departures = %Departures{
-        sections: [
-          %Section{
-            query: %Query{
-              params: %Query.Params{
-                direction_id: 0,
-                mode: :bus,
-                stop_ids: ["s0"]
-              }
-            }
-          }
-        ]
+        sections: [%Section{params: %Params{direction_id: 0, mode: :bus, stop_ids: ["s0"]}}]
       }
 
       assert RDS.get(departures, now) == [
@@ -319,15 +307,7 @@ defmodule Screens.V2.RDSTest do
 
       departures = %Departures{
         sections: [
-          %Section{
-            query: %Query{
-              params: %Query.Params{
-                direction_id: 0,
-                mode: :bus,
-                stop_ids: ["s0", "s1", "s2"]
-              }
-            }
-          }
+          %Section{params: %Params{direction_id: 0, mode: :bus, stop_ids: ["s0", "s1", "s2"]}}
         ]
       }
 
@@ -382,13 +362,7 @@ defmodule Screens.V2.RDSTest do
       end)
 
       departures = %Departures{
-        sections: [
-          %Section{
-            query: %Query{
-              params: %Query.Params{direction_id: 0, mode: :rl, stop_ids: ["s0"]}
-            }
-          }
-        ]
+        sections: [%Section{params: %Params{direction_id: 0, mode: :rl, stop_ids: ["s0"]}}]
       }
 
       assert RDS.get(departures, now) ==
@@ -424,13 +398,7 @@ defmodule Screens.V2.RDSTest do
       end)
 
       departures = %Departures{
-        sections: [
-          %Section{
-            query: %Query{
-              params: %Query.Params{direction_id: 0, mode: :rl, stop_ids: ["s0"]}
-            }
-          }
-        ]
+        sections: [%Section{params: %Params{direction_id: 0, mode: :rl, stop_ids: ["s0"]}}]
       }
 
       # The destination has a cancelled departure which is not presented (due to the stop having
@@ -470,9 +438,7 @@ defmodule Screens.V2.RDSTest do
       all_schedules = [first_schedule, second_schedule, third_schedule]
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _now -> {:ok, all_schedules} end)
@@ -519,9 +485,7 @@ defmodule Screens.V2.RDSTest do
       all_schedules = [first_schedule, second_schedule, third_schedule]
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       stub(@headways, :get, fn _, _ -> {5, 10} end)
@@ -577,9 +541,7 @@ defmodule Screens.V2.RDSTest do
       ]
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       stub(@headways, :get, fn _, _ -> {5, 10} end)
@@ -660,9 +622,7 @@ defmodule Screens.V2.RDSTest do
       all_schedules = [first_schedule, second_schedule, third_schedule]
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       stub(@headways, :get, fn _, _ -> {5, 10} end)
@@ -715,9 +675,7 @@ defmodule Screens.V2.RDSTest do
       all_schedules = [first_schedule]
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       expect(@departure, :fetch, fn
@@ -878,9 +836,7 @@ defmodule Screens.V2.RDSTest do
       ]
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       stub(@headways, :get, fn _, _ -> {5, 10} end)
@@ -1022,9 +978,7 @@ defmodule Screens.V2.RDSTest do
       ]
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       departure_overlapping_with_headway = %Departure{
@@ -1085,9 +1039,7 @@ defmodule Screens.V2.RDSTest do
       expect_standard_route_patterns(stop_ids)
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [
@@ -1116,9 +1068,7 @@ defmodule Screens.V2.RDSTest do
       expect_standard_route_patterns(stop_ids)
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [
@@ -1173,9 +1123,7 @@ defmodule Screens.V2.RDSTest do
       end)
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [
@@ -1204,9 +1152,7 @@ defmodule Screens.V2.RDSTest do
       expect_standard_route_patterns(stop_ids)
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       # All destinations are affected since the alert targets the entire bus route type
@@ -1236,7 +1182,7 @@ defmodule Screens.V2.RDSTest do
 
       departures = %Departures{
         sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
+          %Section{params: %Params{mode: :bus, stop_ids: stop_ids}}
         ]
       }
 
@@ -1344,9 +1290,7 @@ defmodule Screens.V2.RDSTest do
       ]
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       stub(@headways, :get, fn _, _ -> nil end)
@@ -1365,9 +1309,7 @@ defmodule Screens.V2.RDSTest do
       expect(@stop, :fetch, fn %{ids: ^stop_ids} -> :error end)
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [:error]
@@ -1381,9 +1323,7 @@ defmodule Screens.V2.RDSTest do
       end)
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [:error]
@@ -1398,9 +1338,7 @@ defmodule Screens.V2.RDSTest do
       end)
 
       departures = %Departures{
-        sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: stop_ids}}}
-        ]
+        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures, now) == [:error]
@@ -1433,8 +1371,8 @@ defmodule Screens.V2.RDSTest do
 
       departures = %Departures{
         sections: [
-          %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: stop_ids_primary}}},
-          %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: stop_ids_secondary}}}
+          %Section{params: %Params{mode: :rl, stop_ids: stop_ids_primary}},
+          %Section{params: %Params{mode: :rl, stop_ids: stop_ids_secondary}}
         ]
       }
 
