@@ -118,8 +118,8 @@ defmodule ScreenDestinations do
   # For each section of a screen, get the possible destinations from the V3 API, then combine and deduplicate them
   defp all_sections_destinations(screen_id, sections) do
     sections
-    |> Enum.filter(&(&1["header_only"] != true))
-    |> Enum.map(fn section -> section["query"]["params"] end)
+    |> Enum.filter(& &1["params"])
+    |> Enum.map(fn section -> section["params"] end)
     |> Enum.flat_map(fn params ->
       # For each section of a screen, get the possible destinations from the V3 API
       {mode_param, fetch_params} = Map.split(params, ["mode"])

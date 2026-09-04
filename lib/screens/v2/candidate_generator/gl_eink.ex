@@ -6,8 +6,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
   alias Screens.V2.Template.Builder
   alias Screens.V2.WidgetInstance.{BottomScreenFiller, FareInfoFooter, NormalHeader}
   alias ScreensConfig.{Departures, Footer, Header}
-  alias ScreensConfig.Departures.{Query, Section}
-  alias ScreensConfig.Departures.Query.Params
+  alias ScreensConfig.Departures.{Params, Section}
   alias ScreensConfig.{FreeTextLine, Screen}
   alias ScreensConfig.Screen.GlEink
 
@@ -143,12 +142,10 @@ defmodule Screens.V2.CandidateGenerator.GlEink do
         departures: %Departures{
           sections: [
             %Section{
-              query: %Query{
-                params: %Params{
-                  stop_ids: [stop_id],
-                  route_ids: [route_id],
-                  direction_id: direction_id
-                }
+              params: %Params{
+                stop_ids: [stop_id],
+                route_ids: [route_id],
+                direction_id: direction_id
               }
             }
           ]

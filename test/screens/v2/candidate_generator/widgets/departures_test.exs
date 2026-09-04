@@ -10,7 +10,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias ScreensConfig.Departures, as: DeparturesConfig
-  alias ScreensConfig.Departures.{Filters, Header, Layout, Query, Section}
+  alias ScreensConfig.Departures.{Filters, Header, Layout, Params, Section}
   alias ScreensConfig.Departures.Filters.RouteDirections
   alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
   alias ScreensConfig.FreeTextLine
@@ -56,10 +56,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
               sections
 
             route_ids ->
-              Enum.map(
-                route_ids,
-                &%Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: [&1]}}}
-              )
+              Enum.map(route_ids, &%Section{params: %Params{mode: :bus, route_ids: [&1]}})
           end
       }
     end
@@ -136,10 +133,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       config =
         put_in(config.app_params.departures.sections, [
-          %Section{
-            query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}},
-            layout: layout
-          }
+          %Section{params: %Params{mode: :bus, route_ids: ["A"]}, layout: layout}
         ])
 
       assert [
@@ -154,10 +148,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       config =
         put_in(config.app_params.departures.sections, [
-          %Section{
-            query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}},
-            header: header
-          }
+          %Section{params: %Params{mode: :bus, route_ids: ["A"]}, header: header}
         ])
 
       assert [%DeparturesWidget{sections: [%{header: ^header}]}] =
@@ -167,11 +158,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
     test "with multiple sections, returns DeparturesWidget with notice rows in empty sections" do
       config =
         build_config([
-          %Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}}},
-          %Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: ["B"]}}},
-          %Section{
-            query: %Query{params: %Query.Params{mode: :bus, route_ids: ["C"], direction_id: 1}}
-          }
+          %Section{params: %Params{mode: :bus, route_ids: ["A"]}},
+          %Section{params: %Params{mode: :bus, route_ids: ["B"]}},
+          %Section{params: %Params{mode: :bus, route_ids: ["C"], direction_id: 1}}
         ])
 
       departure_b = build_departure("B", 0)
@@ -307,16 +296,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
                )
     end
 
-    test "returns no departures when header_only is true in a given section, returns departures when header_only is unset" do
+    test "returns no departures when params are nil" do
       config = %Screen{
         app_params: %BusShelter{
           departures: %DeparturesConfig{
             sections: [
-              %Section{
-                query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}},
-                header_only: true
-              },
-              %Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: ["B"]}}}
+              %Section{params: nil},
+              %Section{params: %Params{mode: :bus, route_ids: ["B"]}}
             ]
           },
           header: nil,
@@ -335,12 +321,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       assert [
                %DeparturesWidget{
-                 sections: [
-                   %NormalSection{
-                     rows: []
-                   },
-                   %NormalSection{rows: [^departure_b]}
-                 ]
+                 sections: [%NormalSection{rows: []}, %NormalSection{rows: [^departure_b]}]
                }
              ] =
                departures_instances(config,
@@ -353,7 +334,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       config =
         build_config([
           %Section{
-            query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["S"]}},
+            params: %Params{mode: :bus, stop_ids: ["S"]},
             filters: %Filters{
               route_directions: %RouteDirections{
                 action: :include,
@@ -380,7 +361,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
       config =
         build_config([
           %Section{
-            query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["S"]}},
+            params: %Params{mode: :bus, stop_ids: ["S"]},
             filters: %Filters{
               route_directions: %RouteDirections{
                 action: :exclude,
@@ -408,11 +389,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.DeparturesTest do
 
       config =
         put_in(config.app_params.departures.sections, [
-          %Section{
-            query: %Query{params: %Query.Params{mode: :bus, route_ids: ["A"]}},
-            bidirectional: true
-          },
-          %Section{query: %Query{params: %Query.Params{mode: :bus, route_ids: ["B"]}}}
+          %Section{params: %Params{mode: :bus, route_ids: ["A"]}, bidirectional: true},
+          %Section{params: %Params{mode: :bus, route_ids: ["B"]}}
         ])
 
       departure_a_0 = build_departure("A", 0)

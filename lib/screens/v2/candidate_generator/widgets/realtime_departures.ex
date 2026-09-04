@@ -24,7 +24,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
-  alias ScreensConfig.Departures.{Filters, Query, Section}
+  alias ScreensConfig.Departures.{Filters, Params, Section}
   alias ScreensConfig.Departures.Filters.{RouteDirections, RouteDirections.RouteDirection}
   alias ScreensConfig.Screen.{Busway, PreFare}
 
@@ -113,9 +113,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   end
 
   defp has_valid_normal_section?(sections_data) do
-    Enum.any?(sections_data, fn {section_data, %Section{header_only: header_only}} ->
-      header_only ||
-        (is_struct(section_data, NormalSection) && has_valid_normal_section_row?(section_data))
+    Enum.any?(sections_data, fn {section_data, %Section{params: params}} ->
+      is_nil(params) or
+        (is_struct(section_data, NormalSection) and has_valid_normal_section_row?(section_data))
     end)
   end
 
@@ -131,7 +131,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
            header: header,
            layout: layout,
            grouping_type: grouping_type,
-           query: %Query{params: %Query.Params{direction_id: direction_id}}
+           params: %Params{direction_id: direction_id}
          }
        ) do
     text =
@@ -156,6 +156,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
       grouping_type: grouping_type
     }
   end
+
+  defp handle_unsupported_sections(_section, %Section{
+         params: nil,
+         header: header,
+         layout: layout,
+         grouping_type: grouping_type
+       }),
+       do: %NormalSection{rows: [], header: header, layout: layout, grouping_type: grouping_type}
 
   defp post_process_rows(
          rows,

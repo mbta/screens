@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   alias Screens.V2.WidgetInstance.Departures.NormalSection
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService, OvernightDepartures}
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
-  alias ScreensConfig.Departures.{Filters, Mode, Query, Section}
+  alias ScreensConfig.Departures.{Filters, Mode, Params, Section}
   alias ScreensConfig.Departures.Filters.{RouteDirections, RouteDirections.RouteDirection}
   alias ScreensConfig.Screen.{Busway, PreFare}
 
@@ -111,9 +111,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
     [departures_instance]
   end
 
-  # When a section has no departures on a screen with multiple sections and is not designated as
-  # `header_only`, populate it with a "no data" entry. This may include a "representative" route
-  # for the section, used to determine an icon to display alongside the message.
+  # When a section has no departures on a screen with multiple sections and has departure params,
+  # populate it with a "no data" entry. This may include a "representative" route for the section,
+  # used to determine an icon to display alongside the message.
   #
   # NOTE: Assumes any given section is configured such that it only displays departures from a
   # single route-type-or-subway-line. If there would be more than one route-type-or-subway-line,
@@ -121,15 +121,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   defp post_process_no_data(
          {:ok, []},
          %Section{
-           query: %Query{
-             params: %Query.Params{
-               mode: mode,
-               direction_id: direction_id,
-               route_ids: route_ids,
-               stop_ids: stop_ids
-             }
-           },
-           header_only: false
+           params: %Params{
+             mode: mode,
+             direction_id: direction_id,
+             route_ids: route_ids,
+             stop_ids: stop_ids
+           }
          },
          true = _has_multiple_sections,
          route_fetch_fn
@@ -180,11 +177,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Departures do
   defp no_departures_message, do: "No departures currently available"
   defp no_departures_message(direction_name), do: "No #{direction_name} departures available"
 
-  defp fetch_section_departures(%Section{header_only: true}, _), do: {:ok, []}
+  defp fetch_section_departures(%Section{params: nil}, _), do: {:ok, []}
 
   defp fetch_section_departures(
          %Section{
-           query: %Query{params: params},
+           params: params,
            filters: %Filters{route_directions: route_directions},
            bidirectional: is_bidirectional,
            grouping_type: grouping_type

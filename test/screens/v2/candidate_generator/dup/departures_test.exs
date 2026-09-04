@@ -14,7 +14,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService}
   alias Screens.V2.WidgetInstance.OvernightDepartures
   alias ScreensConfig.{Alerts, Departures, Header}
-  alias ScreensConfig.Departures.{Query, Section}
+  alias ScreensConfig.Departures.{Params, Section}
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.Dup, as: DupConfig
 
@@ -178,13 +178,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   describe "instances/3" do
     test "returns DeparturesNoData on RDS returning errors" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["place-A"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["place-B"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["place-A"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["place-B"]}}
       ]
 
       secondary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["place-C"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["place-D"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["place-C"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["place-D"]}}
       ]
 
       config =
@@ -211,13 +211,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "returns DeparturesNoService on RDS returning NoService states" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["place-A"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["place-B"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["place-A"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["place-B"]}}
       ]
 
       secondary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["place-C"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["place-D"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["place-C"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["place-D"]}}
       ]
 
       config =
@@ -250,8 +250,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "secondary departures fallback to primary departures when empty" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s2"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["s2"]}}
       ]
 
       secondary_departures = []
@@ -309,12 +309,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "creates no data sections for empty departures states" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :gl, stop_ids: ["s1"]}}},
-        %Section{
-          query: %Query{
-            params: %Query.Params{mode: :gl, stop_ids: ["s2"], route_ids: ["Green-B", "Green-C"]}
-          }
-        }
+        %Section{params: %Params{mode: :gl, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :gl, stop_ids: ["s2"], route_ids: ["Green-B", "Green-C"]}}
       ]
 
       secondary_departures = []
@@ -386,8 +382,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "creates no service sections for no service states" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s2"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["s2"]}}
       ]
 
       secondary_departures = []
@@ -449,8 +445,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "creates no service section with routes for no service states that have routes" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s2"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["s2"]}}
       ]
 
       expected_route = %Route{id: "r1", line: %Line{id: "l1"}, type: :bus}
@@ -514,13 +510,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "creates NormalSections for upcoming predictions and schedules" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s2"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["s2"]}}
       ]
 
       secondary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :ferry, stop_ids: ["s3"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :ferry, stop_ids: ["s4"]}}}
+        %Section{params: %Params{mode: :ferry, stop_ids: ["s3"]}},
+        %Section{params: %Params{mode: :ferry, stop_ids: ["s4"]}}
       ]
 
       expected_primary_departures = [
@@ -611,7 +607,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       primary_departures = [
         %Section{
           bidirectional: true,
-          query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s1"]}}
+          params: %Params{mode: :bus, stop_ids: ["s1"]}
         }
       ]
 
@@ -720,13 +716,13 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "creates NormalSections with First Departure rows for early morning scheduled departures" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s2"]}}}
+        %Section{params: %Params{mode: :rl, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :rl, stop_ids: ["s2"]}}
       ]
 
       secondary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s3"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s4"]}}}
+        %Section{params: %Params{mode: :rl, stop_ids: ["s3"]}},
+        %Section{params: %Params{mode: :rl, stop_ids: ["s4"]}}
       ]
 
       expected_primary_schedule =
@@ -812,8 +808,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       now = ~U[2024-10-11 10:40:00Z]
 
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s3"]}}}
+        %Section{params: %Params{mode: :rl, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :rl, stop_ids: ["s3"]}}
       ]
 
       expected_first_schedule =
@@ -888,8 +884,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       now = ~U[2024-10-11 10:40:00Z]
 
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s3"]}}}
+        %Section{params: %Params{mode: :rl, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :rl, stop_ids: ["s3"]}}
       ]
 
       expected_first_schedule =
@@ -963,8 +959,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       now = ~U[2024-10-11 10:40:00Z]
 
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s3"]}}}
+        %Section{params: %Params{mode: :rl, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :rl, stop_ids: ["s3"]}}
       ]
 
       expected_last_schedule_one =
@@ -1006,8 +1002,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "creates HeadwaySections for destinations with headways" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s2"]}}}
+        %Section{params: %Params{mode: :rl, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :rl, stop_ids: ["s2"]}}
       ]
 
       expected_route_id = "r1"
@@ -1052,8 +1048,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
     test "creates HeadwaySections for only headway sections" do
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :rl, stop_ids: ["s2"]}}}
+        %Section{params: %Params{mode: :rl, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :rl, stop_ids: ["s2"]}}
       ]
 
       expected_route_id = "r1"
@@ -1101,8 +1097,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_time_range = {6, 10}
 
       primary_departures = [
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s1"]}}},
-        %Section{query: %Query{params: %Query.Params{mode: :bus, stop_ids: ["s2"]}}}
+        %Section{params: %Params{mode: :bus, stop_ids: ["s1"]}},
+        %Section{params: %Params{mode: :bus, stop_ids: ["s2"]}}
       ]
 
       expected_primary_departure =
