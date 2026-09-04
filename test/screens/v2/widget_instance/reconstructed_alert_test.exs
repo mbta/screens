@@ -20,8 +20,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     Screen
   }
 
-  alias ScreensConfig.Departures.{Query, Section}
-  alias ScreensConfig.Departures.Query.Params
+  alias ScreensConfig.Departures.{Params, Section}
   alias ScreensConfig.Screen.PreFare
 
   import Screens.TestSupport.InformedEntityBuilder
@@ -163,10 +162,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp put_departures(widget) do
-    departures =
-      struct(%Departures{
-        sections: [%Section{query: %Query{params: %Params{mode: :rl}}}]
-      })
+    departures = struct(%Departures{sections: [%Section{params: %Params{mode: :rl}}]})
 
     update_in(widget.screen.app_params, fn
       %PreFare{} = app_params ->
@@ -175,10 +171,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
   end
 
   defp put_cr_departures(widget) do
-    departures =
-      struct(%Departures{
-        sections: [%Section{query: %Query{params: %Params{mode: :cr}}}]
-      })
+    departures = struct(%Departures{sections: [%Section{params: %Params{mode: :cr}}]})
 
     update_in(widget.screen.app_params, fn
       %PreFare{} = app_params ->

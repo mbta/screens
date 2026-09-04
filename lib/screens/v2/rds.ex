@@ -31,7 +31,7 @@ defmodule Screens.V2.RDS do
   alias Screens.V2.Departure
 
   alias ScreensConfig.Departures
-  alias ScreensConfig.Departures.{Mode, Query, Section}
+  alias ScreensConfig.Departures.{Mode, Params, Section}
 
   alias __MODULE__.{Countdowns, FirstTrip, Headways, NoService, ServiceEnded}
 
@@ -138,7 +138,7 @@ defmodule Screens.V2.RDS do
   Produces a list of destinations for each configured `Section`, in the same order the sections
   occur in the config.
 
-  ⚠️ Enforces that every section's query contains at least one ID in `stop_ids`.
+  ⚠️ Enforces that every section's params contains at least one ID in `stop_ids`.
   """
   @callback get(Departures.t()) :: [data()]
   @callback get(Departures.t(), DateTime.t()) :: [data()]
@@ -156,12 +156,9 @@ defmodule Screens.V2.RDS do
       end)
 
   @spec from_section(Section.t(), DateTime.t()) :: data()
-  defp from_section(%Section{header_only: true}, _now), do: {:ok, []}
+  defp from_section(%Section{params: nil}, _now), do: {:ok, []}
 
-  defp from_section(
-         %Section{query: %Query{params: %Query.Params{stop_ids: stop_ids} = params}},
-         now
-       )
+  defp from_section(%Section{params: %Params{stop_ids: stop_ids} = params}, now)
        when stop_ids != [] do
     with params_struct <- Map.from_struct(params),
          {:ok, typical_patterns} <-
@@ -580,7 +577,7 @@ defmodule Screens.V2.RDS do
          departures,
          schedules,
          typical_patterns,
-         %Query.Params{mode: mode, route_ids: route_id_params} = _params
+         %Params{mode: mode, route_ids: route_id_params} = _params
        ) do
     routes_for_section =
       (departures ++ schedules ++ typical_patterns)
