@@ -28,6 +28,9 @@ defmodule Screens.Repo.AdvisoryLock do
 
         case Repo.query!("SELECT pg_try_advisory_xact_lock($1)", [cron_lock_key]) do
           %{rows: [[true]]} ->
+            # Lock successfully acquired; run the function and hold lock for the full interval.
+            Logster.info(["advisory_lock_acquired", "lock_key=#{cron_lock_key}"])
+
             result = func.()
             hold_lock_until(started_at, interval)
             result
