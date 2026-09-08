@@ -14,7 +14,7 @@ defmodule Screens.Config.Backup do
 
   @store injected(Screens.Config.Backup.Store)
 
-  @type result :: %{count: non_neg_integer()}
+  @type result :: %{count: non_neg_integer()} | :skipped
 
   @cron_lock_key 1
   @interval Application.compile_env!(:screens, [Backup, :interval_ms])
@@ -36,6 +36,32 @@ defmodule Screens.Config.Backup do
   defp export(now) do
     configs = ScreenConfigs.all()
 
+    if any_updated_since_last_backup?(configs) do
+      write_backup(now, configs)
+    else
+      {:ok, :skipped}
+    end
+  end
+
+  # Skips writing a new backup if nothing has changed since the last one was exported, to avoid
+  # needless S3 writes. Any error reading the existing backup is treated as if it's out of date.
+  @spec any_updated_since_last_backup?([ScreenConfig.t()]) :: boolean()
+  defp any_updated_since_last_backup?(configs) do
+    environment = Application.get_env(:screens, :environment_name)
+
+    with {:ok, backup_json} <- @store.fetch_backup(environment),
+         {:ok, %{"meta" => %{"exported_at" => exported_at}}} <- Jason.decode(backup_json),
+         {:ok, exported_at, _offset} <- DateTime.from_iso8601(exported_at) do
+      Enum.any?(configs, fn %ScreenConfig{updated_at: updated_at} ->
+        DateTime.compare(updated_at, exported_at) == :gt
+      end)
+    else
+      _ -> true
+    end
+  end
+
+  @spec write_backup(DateTime.t(), [ScreenConfig.t()]) :: {:ok, result()} | {:error, term()}
+  defp write_backup(now, configs) do
     payload = %{
       meta: %{
         environment: Application.get_env(:screens, :environment_name),

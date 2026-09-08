@@ -22,21 +22,37 @@ defmodule Screens.ScreenConfigs.BackupTest do
       config_json = :dup_v2 |> screen_config_json() |> normalize_json()
       config = Screen.from_json(config_json)
 
-      {:ok, _} = Repo.insert(%ScreenConfig{id: "dup_1", config: config})
+      {:ok, %ScreenConfig{updated_at: updated_at}} =
+        Repo.insert(%ScreenConfig{id: "dup_1", config: config})
 
-      now = ~U[2026-09-02 15:30:45Z]
+      # Set export time to just before the last update time, so that the backup is considered out of date.
+      last_export_iso =
+        updated_at
+        |> DateTime.from_naive!("Etc/UTC")
+        |> DateTime.add(-1, :second)
+        |> DateTime.to_iso8601()
+
+      updated_at_iso = DateTime.to_iso8601(updated_at)
+
+      backup_json =
+        Jason.encode!(%{
+          meta: %{environment: "test", exported_at: last_export_iso},
+          screens: config_json
+        })
+
+      expect(Store.Mock, :fetch_backup, fn _environment -> {:ok, backup_json} end)
 
       expect(Store.Mock, :put_backup, fn contents ->
         send(self(), {:put_backup, contents})
         :ok
       end)
 
-      assert {:ok, %{count: 1}} = Backup.run(now)
+      assert {:ok, %{count: 1}} = Backup.run(updated_at)
 
       assert_received {:put_backup, contents}
 
       assert %{
-               "meta" => %{"exported_at" => "2026-09-02T15:30:45Z"},
+               "meta" => %{"exported_at" => ^updated_at_iso},
                "screens" => %{"dup_1" => ^config_json}
              } = Jason.decode!(contents)
     end
@@ -71,9 +87,30 @@ defmodule Screens.ScreenConfigs.BackupTest do
     end
 
     test "returns an error when the write fails" do
+      expect(Store.Mock, :fetch_backup, fn _environment -> :error end)
       expect(Store.Mock, :put_backup, fn _contents -> :error end)
 
       assert {:error, :backup_write_failed} = Backup.run(~U[2026-09-02 15:30:45Z])
+    end
+
+    test "skips writing a backup when no config has changed since the last export" do
+      config_json = :dup_v2 |> screen_config_json() |> normalize_json()
+      config = Screen.from_json(config_json)
+
+      {:ok, %ScreenConfig{updated_at: updated_at}} =
+        Repo.insert(%ScreenConfig{id: "dup_1", config: config})
+
+      exported_at = DateTime.add(DateTime.from_naive!(updated_at, "Etc/UTC"), 1, :second)
+
+      backup_json =
+        Jason.encode!(%{
+          meta: %{environment: "test", exported_at: DateTime.to_iso8601(exported_at)},
+          screens: %{"dup_1" => config_json}
+        })
+
+      expect(Store.Mock, :fetch_backup, fn _environment -> {:ok, backup_json} end)
+
+      assert {:ok, :skipped} = Backup.run(~U[2026-09-02 15:30:45Z])
     end
   end
 end
