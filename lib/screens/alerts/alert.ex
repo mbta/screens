@@ -19,7 +19,6 @@ defmodule Screens.Alerts.Alert do
             timeframe: nil,
             created_at: nil,
             updated_at: nil,
-            url: nil,
             description: nil
 
   @type activity ::

@@ -224,8 +224,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2023-04-14 19:29:52Z],
-          url: nil
+          updated_at: ~U[2023-04-14 19:29:52Z]
         },
         # WB C shuttle alert at Kenmore
         %Screens.Alerts.Alert{
@@ -250,8 +249,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2023-04-14 19:32:17Z],
-          url: nil
+          updated_at: ~U[2023-04-14 19:32:17Z]
         },
         # WB D shuttle alert at Kenmore
         %Screens.Alerts.Alert{
@@ -273,8 +271,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2023-04-14 19:52:45Z],
-          url: nil
+          updated_at: ~U[2023-04-14 19:52:45Z]
         },
         # WB B / C / D shuttle alert at Kenmore
         %Screens.Alerts.Alert{
@@ -327,8 +324,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2023-04-14 19:53:54Z],
-          url: nil
+          updated_at: ~U[2023-04-14 19:53:54Z]
         }
       ]
 
@@ -387,8 +383,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2023-04-14 19:53:54Z],
-          url: nil
+          updated_at: ~U[2023-04-14 19:53:54Z]
         }
 
       # WB B / C with Kenmore inside but D branch is still running
@@ -415,8 +410,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
             lifecycle: "NEW",
             severity: 7,
             timeframe: nil,
-            updated_at: ~U[2023-04-14 19:53:54Z],
-            url: nil
+            updated_at: ~U[2023-04-14 19:53:54Z]
           },
           %Screens.Alerts.Alert{
             active_period: [{~U[2023-04-14 10:53:53Z], ~U[2023-04-14 21:53:59Z]}],
@@ -439,8 +433,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
             lifecycle: "NEW",
             severity: 7,
             timeframe: nil,
-            updated_at: ~U[2023-04-14 19:53:54Z],
-            url: nil
+            updated_at: ~U[2023-04-14 19:53:54Z]
           }
         ]
 
@@ -483,8 +476,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2023-04-18 14:48:06Z],
-          url: nil
+          updated_at: ~U[2023-04-18 14:48:06Z]
         }
       ]
 
