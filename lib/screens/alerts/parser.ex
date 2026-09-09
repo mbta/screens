@@ -19,8 +19,7 @@ defmodule Screens.Alerts.Parser do
             "lifecycle" => lifecycle,
             "severity" => severity,
             "timeframe" => timeframe,
-            "updated_at" => updated_at,
-            "url" => url
+            "updated_at" => updated_at
           }
         },
         included
@@ -37,8 +36,7 @@ defmodule Screens.Alerts.Parser do
       lifecycle: lifecycle,
       severity: severity,
       timeframe: timeframe,
-      updated_at: parse_datetime(updated_at),
-      url: url
+      updated_at: parse_datetime(updated_at)
     }
   end
 

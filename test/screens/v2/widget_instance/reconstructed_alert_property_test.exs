@@ -58,8 +58,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         lifecycle: "NEW",
         severity: 7,
         timeframe: nil,
-        updated_at: ~U[2022-09-07 13:16:14Z],
-        url: nil
+        updated_at: ~U[2022-09-07 13:16:14Z]
       },
       %Alert{
         active_period: [{~U[2022-06-24 09:13:15Z], nil}],
@@ -97,8 +96,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         lifecycle: "NEW",
         severity: 7,
         timeframe: nil,
-        updated_at: ~U[2022-06-24 09:14:52Z],
-        url: nil
+        updated_at: ~U[2022-06-24 09:14:52Z]
       },
       %Alert{
         active_period: [{~U[2022-06-24 09:12:00Z], nil}],
@@ -151,8 +149,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         lifecycle: "NEW",
         severity: 7,
         timeframe: nil,
-        updated_at: ~U[2022-06-24 18:24:03Z],
-        url: nil
+        updated_at: ~U[2022-06-24 18:24:03Z]
       },
       %Screens.Alerts.Alert{
         active_period: [{~U[2022-08-20 01:00:00Z], ~U[2022-09-19 06:30:00Z]}],
@@ -170,8 +167,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         lifecycle: "ONGOING",
         severity: 1,
         timeframe: "through September 18",
-        updated_at: ~U[2022-08-22 16:38:57Z],
-        url: "https://mbta.com/BBT2022"
+        updated_at: ~U[2022-08-22 16:38:57Z]
       },
       %Screens.Alerts.Alert{
         active_period: [{~U[2022-08-22 08:30:00Z], ~U[2022-09-19 06:30:00Z]}],
@@ -260,8 +256,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertPropertyTest do
         lifecycle: "ONGOING",
         severity: 7,
         timeframe: "through September 18",
-        updated_at: ~U[2022-08-23 11:28:40Z],
-        url: nil
+        updated_at: ~U[2022-08-23 11:28:40Z]
       }
     ]
 

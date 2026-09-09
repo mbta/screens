@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.Alert do
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
   alias Screens.V2.LocalizedAlert
+  alias Screens.V2.WebLink
   alias Screens.V2.WidgetInstance
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias ScreensConfig.{Audio, Screen}
@@ -88,13 +89,13 @@ defmodule Screens.V2.WidgetInstance.Alert do
   end
 
   @spec serialize(t()) :: map()
-  def serialize(%__MODULE__{alert: %Alert{effect: effect, header: header, url: url}} = t) do
+  def serialize(%__MODULE__{alert: %Alert{effect: effect, header: header}} = t) do
     %{
       route_pills: serialize_route_pills(t),
       icon: serialize_icon(effect),
       header: serialize_header(effect),
       body: header,
-      url: clean_up_url(url || "mbta.com/alerts")
+      url: WebLink.alternate_route_url()
     }
   end
 
@@ -134,14 +135,6 @@ defmodule Screens.V2.WidgetInstance.Alert do
 
   for {e, icon} <- @effect_icons do
     defp serialize_icon(unquote(e)), do: unquote(icon)
-  end
-
-  # Removes leading scheme specifier ("http[s]"), www. prefix, and trailing "/" from url.
-  defp clean_up_url(url) do
-    url
-    |> String.replace(~r|^https?://|i, "")
-    |> String.replace(~r|^www\.|i, "")
-    |> String.replace(~r|/$|, "")
   end
 
   def slot_names(t) do
