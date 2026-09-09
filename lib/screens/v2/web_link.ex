@@ -14,6 +14,5 @@ defmodule Screens.V2.WebLink do
   def stop_url_app(stop_id), do: "go.mbta.com/s/#{stop_id}"
   def stop_url_web(stop_id), do: "mbta.com/stops/#{stop_id}"
 
-  # Default to alerts page instead of using the URL from Alert metadata
   def alternate_route_url, do: "mbta.com/alerts"
 end

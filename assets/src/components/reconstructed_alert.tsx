@@ -4,29 +4,58 @@ import RoutePill, { routePillKey } from "Components/departures/route_pill";
 import useAutoSize from "Hooks/use_auto_size";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 
-import { ReconAlertProps } from "./reconstructed_takeover";
+interface Props {
+  issue: string | string[];
+  location: string;
+  cause: string;
+  remedy: string;
+  show_alternate_route_text: boolean;
+  routes: any[]; // shouldn't be "any"
+  effect: string;
+  updated_at: string;
+  urgent: boolean;
+}
 
 interface AlertCardProps {
   urgent: boolean;
   children: ReactNode;
 }
 
+const ABBREV_SUFFIX = "-abbrev";
+
 // Corresponds to cases where on the server this widget is generated with an
 // `issue` consisting of the raw alert text (and empty cause/location/remedy),
 // which should be displayed as-is.
-const isTextFallback = ({ cause, location, remedy }: ReconAlertProps) => {
+const isTextFallback = ({ cause, location, remedy }: Props) => {
   return [cause, location, remedy].every((value) => value === "");
 };
 
-const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
+const ReconstructedAlert: ComponentType<Props> = (alert) => {
   const { cause, effect, issue, location, remedy, routes, urgent } = alert;
 
+  const sizeSteps = isTextFallback(alert)
+    ? ["large", "small", "extra-small"]
+    : ["extra-large", "large", "small"];
+
+  // If the backend sent abbreviated values, try them once the smallest full-text size still overflows.
+  const issues = Array.isArray(issue) ? issue : [issue];
+  const canAbbreviate = Array.isArray(issue) && issue.length > 1;
+
+  const steps = canAbbreviate
+    ? [...sizeSteps, `${sizeSteps[sizeSteps.length - 1]}${ABBREV_SUFFIX}`]
+    : sizeSteps;
+
   const { ref: contentRef, step: contentSize } = useAutoSize(
-    isTextFallback(alert)
-      ? ["large", "small", "extra-small"]
-      : ["extra-large", "large", "small"],
-    issue + cause,
+    steps,
+    issues.join("|") + cause,
   );
+
+  const abbreviated = contentSize.endsWith("-abbrev");
+  const sizeClass = abbreviated
+    ? contentSize.slice(0, -ABBREV_SUFFIX.length)
+    : contentSize;
+
+  const displayIssue = abbreviated && issues.length > 1 ? issues[1] : issues[0];
 
   const modifiers = [
     "large-flex",
@@ -57,17 +86,17 @@ const ReconstructedAlert: ComponentType<ReconAlertProps> = (alert) => {
             <div
               className={classWithModifier(
                 "alert-card__body__content",
-                contentSize,
+                sizeClass,
               )}
               ref={contentRef}
             >
               <div className="alert-card__body__issue">
                 {isTextFallback(alert) ? (
-                  <span className="medium-bold">{issue}</span>
+                  <span className="medium-bold">{displayIssue}</span>
                 ) : (
                   <>
                     <span className="bold">
-                      {issue} {location}
+                      {displayIssue} {location}
                     </span>{" "}
                     {cause}
                   </>

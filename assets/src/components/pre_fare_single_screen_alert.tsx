@@ -21,7 +21,7 @@ interface PreFareSingleScreenAlertProps {
   issue: string;
   location: string;
   cause: string;
-  remedy: string;
+  remedy: string | string[];
   show_alternate_route_text: boolean;
   routes: EnrichedRoute[];
   unaffected_routes?: EnrichedRoute[];
@@ -47,7 +47,7 @@ interface EnrichedRoute {
 
 interface StandardLayoutProps {
   issue: string;
-  remedy: string;
+  remedy: string | string[];
   show_alternate_route_text: boolean;
   effect: string;
   location: string | null;
@@ -55,6 +55,8 @@ interface StandardLayoutProps {
   alternateRouteURL: string;
   qrCodeURL: string;
 }
+
+const ABBREV_SUFFIX = "-abbrev";
 
 const StandardLayout: ComponentType<StandardLayoutProps> = ({
   issue,
@@ -68,10 +70,28 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
 }) => {
   // For station closure alerts, content may need to be sized down depending on
   // how many stations are affected
-  const { ref: textRef, step: issueTextSize } = useAutoSize(
-    effect === "station_closure" ? ["large", "medium"] : ["large"],
-    issue + remedy,
+  const sizeSteps =
+    effect === "station_closure" ? ["large", "medium"] : ["large"];
+
+  // If the backend sent abbreviated values, try them once the smallest full-text size still overflows.
+  const remedies = Array.isArray(remedy) ? remedy : [remedy];
+  const canAbbreviate = remedies.length > 1;
+  const steps = canAbbreviate
+    ? [...sizeSteps, `${sizeSteps[sizeSteps.length - 1]}${ABBREV_SUFFIX}`]
+    : sizeSteps;
+
+  const { ref: textRef, step: contentSize } = useAutoSize(
+    steps,
+    issue + remedies.join("|"),
   );
+
+  const abbreviated = contentSize.endsWith(ABBREV_SUFFIX);
+  const issueTextSize = abbreviated
+    ? contentSize.slice(0, -ABBREV_SUFFIX.length)
+    : contentSize;
+
+  const displayRemedy =
+    abbreviated && remedies.length > 1 ? remedies[1] : remedies[0];
 
   return (
     <div className="alert-card__content-block">
@@ -83,7 +103,7 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
         />
         <RemedySection
           effect={effect}
-          remedy={remedy}
+          remedy={displayRemedy}
           contentTextSize="large"
           show_alternate_route_text={show_alternate_route_text}
           alternateRouteURL={alternateRouteURL}
@@ -100,7 +120,7 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
 interface DownstreamLayoutProps {
   endpoints: [string, string];
   effect: string;
-  remedy: string;
+  remedy: string | string[];
   show_alternate_route_text: boolean;
   disruptionDiagram?: DisruptionDiagramData;
   alternateRouteURL: string;
@@ -122,7 +142,7 @@ const DownstreamLayout: ComponentType<DownstreamLayoutProps> = ({
     <DownstreamIssueSection endpoints={endpoints} />
     <RemedySection
       effect={effect}
-      remedy={remedy}
+      remedy={remedy[0]}
       contentTextSize="medium"
       show_alternate_route_text={show_alternate_route_text}
       alternateRouteURL={alternateRouteURL}
@@ -188,7 +208,7 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
 
 interface FallbackLayoutProps {
   issue: string;
-  remedy: string;
+  remedy: string | string[];
   effect: string;
 }
 
@@ -203,10 +223,26 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   remedy,
   effect,
 }) => {
+  const sizeSteps = ["body-1", "body-2", "body-3", "body-4"];
+
+  // Only remedy is measured for overflow here, so only it needs an abbreviated fallback step.
+  const remedies = Array.isArray(remedy) ? remedy : [remedy];
+  const steps =
+    remedies.length > 1
+      ? [...sizeSteps, `${sizeSteps[sizeSteps.length - 1]}${ABBREV_SUFFIX}`]
+      : sizeSteps;
+
   const { ref: alertTextRef, step: alertTextSize } = useAutoSize(
-    ["body-1", "body-2", "body-3", "body-4"],
-    remedy,
+    steps,
+    remedies.join("|"),
   );
+
+  const abbreviated = alertTextSize.endsWith(ABBREV_SUFFIX);
+  const textSizeClass = abbreviated
+    ? alertTextSize.slice(0, -ABBREV_SUFFIX.length)
+    : alertTextSize;
+  const displayRemedy =
+    abbreviated && remedies.length > 1 ? remedies[1] : remedies[0];
 
   const Icon = fallbackLayoutIcons[effect] ?? NoServiceIcon;
 
@@ -214,12 +250,12 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
     <div className="alert-card__fallback">
       <Icon className="alert-card__fallback__icon" />
       {issue && <h4 className="alert-card__fallback__issue-text">{issue}</h4>}
-      {remedy && (
+      {displayRemedy && (
         <div
-          className={`alert-card__fallback__alert-text ${alertTextSize}`}
+          className={`alert-card__fallback__alert-text ${textSizeClass}`}
           ref={alertTextRef}
         >
-          {remedy}
+          {displayRemedy}
         </div>
       )}
     </div>

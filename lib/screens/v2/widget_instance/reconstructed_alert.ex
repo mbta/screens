@@ -6,6 +6,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.KenmoreAlertHelper
+  alias Screens.Headsigns.Headsign
   alias Screens.LocationContext
   alias Screens.Routes.Route
   alias Screens.Stops.{Stop, Subway}
@@ -90,14 +91,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           # Unique to station closures
           optional(:unaffected_routes) => list(enriched_route()),
           optional(:location) => String.t() | nil,
-          optional(:remedy) => String.t() | nil,
+          optional(:remedy) => String.t() | list(String.t()) | nil,
           optional(:stations) => list(String.t()),
           # Unique to single screen alerts
           optional(:endpoints) => list(String.t()),
           # Unique to transfer station case
           optional(:is_transfer_station) => boolean(),
           end_time: String.t() | nil,
-          issue: String.t() | list(String.t()) | nil,
+          issue: String.t() | nil,
           cause: Alert.cause() | nil,
           # List of SVG filenames
           routes: list(enriched_route()),
@@ -110,7 +111,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @type flex_serialized_response :: %{
           region: region(),
-          issue: String.t(),
+          issue: String.t() | list(String.t()),
           remedy: String.t(),
           location: String.t(),
           cause: String.t(),
@@ -527,6 +528,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Two screen alert, suspension
+  @spec dual_screen_fields(t()) :: dual_screen_serialized_response()
   defp dual_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t) do
     %__MODULE__{
       alert: %Alert{
@@ -678,6 +680,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  @spec single_screen_fields(t(), LocalizedAlert.location()) ::
+          single_screen_serialized_response()
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t, location) do
     %__MODULE__{
       alert: %Alert{
@@ -851,7 +855,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: issue,
-      remedy: header,
+      remedy: Headsign.abbreviate_headsigns_in_text(header),
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :station_closure,
@@ -972,7 +976,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     %{
       issue: issue,
-      remedy: header,
+      remedy: Headsign.abbreviate_headsigns_in_text(header),
       cause: if(severity <= 1, do: nil, else: get_cause(cause)),
       routes: routes,
       effect: if(severity <= 1, do: :information, else: :delay),
@@ -985,6 +989,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Fallback for when we're unable to build a disruption diagram
+  @spec single_screen_fallback_fields(t(), LocalizedAlert.location()) ::
+          single_screen_serialized_response()
   defp single_screen_fallback_fields(%__MODULE__{alert: alert, now: now} = t, location) do
     %{
       active_period: active_period,
@@ -1002,7 +1008,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
           :station_closure -> "Stop Skipped"
           :delay -> "Delay"
         end,
-      remedy: header,
+      remedy: Headsign.abbreviate_headsigns_in_text(header),
       location: nil,
       cause: format_cause(cause),
       routes: get_route_pills(t, location),
@@ -1017,6 +1023,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Special case for informational alerts; currently intended only for single-tracking but may
   # work acceptably with other "causes"
+  @spec flex_zone_fields(t(), LocalizedAlert.location()) :: flex_serialized_response()
   defp flex_zone_fields(%__MODULE__{alert: %Alert{severity: sev}} = t, location) when sev <= 1 do
     %__MODULE__{
       alert: %Alert{cause: cause, informed_entities: informed_entities},
@@ -1179,7 +1186,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       end
 
     %{
-      issue: issue,
+      issue: Headsign.abbreviate_headsigns_in_text(issue),
       remedy: nil,
       location: "",
       cause: nil,
@@ -1209,13 +1216,15 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
+  @spec flex_zone_fallback_fields(t(), LocalizedAlert.location(), boolean()) ::
+          flex_serialized_response()
   defp flex_zone_fallback_fields(
          %__MODULE__{alert: %Alert{effect: effect, header: header}} = t,
          location,
          is_urgent
        ) do
     %{
-      issue: header,
+      issue: Headsign.abbreviate_headsigns_in_text(header),
       remedy: "",
       location: "",
       cause: "",
