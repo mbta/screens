@@ -2,6 +2,7 @@ defmodule Screens.Config.Backup.Store.S3 do
   @moduledoc """
   Functions to work with S3-hosted backups of the screen configs.
   """
+  alias Screens.Report
 
   @behaviour Screens.Config.Backup.Store
 
@@ -29,7 +30,7 @@ defmodule Screens.Config.Backup.Store.S3 do
         :ok
 
       err ->
-        Logster.warning(["s3_screen_configs_backup_put_error", inspect(err)])
+        Report.error("s3_screen_configs_backup_put_error", error: inspect(err))
         :error
     end
   end
