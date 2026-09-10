@@ -42,7 +42,8 @@
 .overnight-section {
   & > .departures__notice-row {
     display: flex;
-    align-items: flex-end;
+    gap: 18px;
+    align-items: center;
     justify-content: space-between;
     margin-right: 24px;
 
@@ -56,7 +57,6 @@
 
     .free-text__line-container {
       display: flex;
-      width: 100%;
       min-width: 0;
     }
 

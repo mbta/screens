@@ -20,6 +20,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.BusShelter
 
+  import Screens.TestSupport.RouteBuilder
   import Screens.Inject
   import Mox
   setup :verify_on_exit!
@@ -57,7 +58,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       routes: [
         %Screens.Routes.Route{
           id: "r1",
-          short_name: nil,
+          short_name: "",
           long_name: nil,
           direction_names: nil,
           direction_destinations: nil,
@@ -71,7 +72,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
         },
         %Screens.Routes.Route{
           id: "r2",
-          short_name: nil,
+          short_name: "",
           long_name: nil,
           direction_names: nil,
           direction_destinations: nil,
@@ -234,6 +235,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       schedule = build_schedule("route_two", "line_id_two")
       departure = build_departure("r1", 0, :bus)
 
+      expected_routes = [
+        route(id: "r1", line_id: "l1", type: :bus),
+        route(id: "r2", line_id: "l2", type: :bus)
+      ]
+
       expect(@rds, :get, fn _departures, @now ->
         [
           {:ok,
@@ -264,36 +270,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                    %Screens.V2.WidgetInstance.Departures.NoServiceSection{
                      header: %ScreensConfig.Departures.Header{},
                      headsign: nil,
-                     routes: [
-                       %Screens.Routes.Route{
-                         id: "r1",
-                         short_name: nil,
-                         long_name: nil,
-                         direction_names: nil,
-                         direction_destinations: nil,
-                         type: :bus,
-                         line: %Screens.Lines.Line{
-                           id: "l1",
-                           long_name: nil,
-                           short_name: nil,
-                           sort_order: nil
-                         }
-                       },
-                       %Screens.Routes.Route{
-                         id: "r2",
-                         short_name: nil,
-                         long_name: nil,
-                         direction_names: nil,
-                         direction_destinations: nil,
-                         type: :bus,
-                         line: %Screens.Lines.Line{
-                           id: "l2",
-                           long_name: nil,
-                           short_name: nil,
-                           sort_order: nil
-                         }
-                       }
-                     ]
+                     routes: ^expected_routes
                    }
                  ]
                }
@@ -317,6 +294,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
         ]
       end)
 
+      expected_routes = [
+        route(id: "r1", line_id: "l1", type: :bus),
+        route(id: "r2", line_id: "l2", type: :bus)
+      ]
+
       assert [
                %DeparturesWidget{
                  now: @now,
@@ -327,36 +309,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                    %Screens.V2.WidgetInstance.Departures.NoServiceSection{
                      header: %ScreensConfig.Departures.Header{},
                      headsign: nil,
-                     routes: [
-                       %Screens.Routes.Route{
-                         id: "r1",
-                         short_name: nil,
-                         long_name: nil,
-                         direction_names: nil,
-                         direction_destinations: nil,
-                         type: :bus,
-                         line: %Screens.Lines.Line{
-                           id: "l1",
-                           long_name: nil,
-                           short_name: nil,
-                           sort_order: nil
-                         }
-                       },
-                       %Screens.Routes.Route{
-                         id: "r2",
-                         short_name: nil,
-                         long_name: nil,
-                         direction_names: nil,
-                         direction_destinations: nil,
-                         type: :bus,
-                         line: %Screens.Lines.Line{
-                           id: "l2",
-                           long_name: nil,
-                           short_name: nil,
-                           sort_order: nil
-                         }
-                       }
-                     ]
+                     routes: ^expected_routes
                    }
                  ]
                }
