@@ -6,8 +6,8 @@ import DisruptionDiagram, {
 import FreeText, { FreeTextType } from "./free_text";
 import { QRCodeSVG as QRCode } from "qrcode.react";
 
-interface ReconAlertProps {
-  issue: string | any; // shouldn't be "any"
+interface Props {
+  issue: string;
   location: string | FreeTextType;
   cause: string;
   remedy: string;
@@ -22,7 +22,7 @@ interface ReconAlertProps {
   qr_code_url: string;
 }
 
-const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
+const ReconstructedTakeover: ComponentType<Props> = (alert) => {
   const {
     cause,
     effect,
@@ -142,4 +142,3 @@ const ReconstructedTakeover: ComponentType<ReconAlertProps> = (alert) => {
 };
 
 export default ReconstructedTakeover;
-export type { ReconAlertProps };
