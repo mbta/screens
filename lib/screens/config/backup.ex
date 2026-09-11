@@ -47,9 +47,8 @@ defmodule Screens.Config.Backup do
   # needless S3 writes. Any error reading the existing backup is treated as if it's out of date.
   @spec any_updated_since_last_backup?([ScreenConfig.t()]) :: boolean()
   defp any_updated_since_last_backup?(configs) do
-    environment = Application.get_env(:screens, :environment_name)
-
-    with {:ok, backup_json} <- @store.fetch_backup(environment),
+    with {:ok, backup_json} <-
+           @store.fetch_backup(Application.get_env(:screens, :environment_name)),
          {:ok, %{"meta" => %{"exported_at" => exported_at}}} <- Jason.decode(backup_json),
          {:ok, exported_at, _offset} <- DateTime.from_iso8601(exported_at) do
       Enum.any?(configs, fn %ScreenConfig{updated_at: updated_at} ->
