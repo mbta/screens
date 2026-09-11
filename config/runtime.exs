@@ -18,16 +18,16 @@ unless config_env() == :test do
     api_v3_key: System.get_env("API_V3_KEY")
 end
 
-eb_env_name = System.get_env("ENVIRONMENT_NAME", "screens-local")
+env_name = System.get_env("ENVIRONMENT_NAME", "screens-local")
 
-config :screens, environment_name: eb_env_name
+config :screens, environment_name: env_name
 
 if config_env() == :prod do
   config :screens, dns_cluster_query: System.fetch_env!("CLUSTER_HOSTNAME")
 
   config :sentry,
     dsn: System.get_env("SENTRY_DSN"),
-    environment_name: eb_env_name
+    environment_name: env_name
 
   config :screens, ScreensWeb.Endpoint,
     http: [:inet6, port: String.to_integer(System.get_env("PORT") || "4000")],
