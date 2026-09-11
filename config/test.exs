@@ -11,6 +11,13 @@ config :screens, Screens.Repo,
   database: "screens_test",
   pool: Ecto.Adapters.SQL.Sandbox
 
+config :screens, Screens.Config.Backup,
+  enabled: false,
+  store: Screens.Config.Backup.Store.Local
+
+config :screens, Screens.Config.Backup.Store.Local,
+  local_backup_path: "local/config_backups/screens_test.json"
+
 config :screens,
   config_fetcher: Screens.Config.Fetch.Local,
   local_config_file_spec: {:test, "config.json"},

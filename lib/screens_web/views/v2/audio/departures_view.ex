@@ -31,6 +31,20 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<%= Enum.map(departure_groups, &render_departure_group/1) %>|
   end
 
+  defp render_section(%{
+         type: :overnight_section,
+         header: header,
+         headsign: headsign,
+         routes: routes
+       })
+       when is_binary(header) do
+    ~E|<p><%= header %></p><%= service_ended_text(headsign, routes) %>|
+  end
+
+  defp render_section(%{type: :overnight_section, headsign: headsign, routes: routes}) do
+    ~E|<%= service_ended_text(headsign, routes) %>|
+  end
+
   defp render_departure_group({:notice, text}) do
     ~E|<p><s><%= text %></s></p>|
   end
@@ -97,6 +111,12 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
       ])
 
     ~E|<s><%= content %></s>|
+  end
+
+  defp render_time_with_crowding({%{time: %{type: :overnight}}, _}, _route, %{
+         headsigns: [full_name, _abbr]
+       }) do
+    build_text([full_name, "service has ended."])
   end
 
   defp render_route_headsign(
@@ -191,5 +211,31 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
       value -> identity_render(value)
     end)
     |> Enum.intersperse(~E| |)
+  end
+
+  # `service_ended_text/2` will eventually be changd to use modes in Params
+  # but will require a slight overhaul in our Departures Sections
+  defp service_ended_text(nil, []) do
+    build_text("Service has ended")
+  end
+
+  defp service_ended_text(nil, [%{long_name: long_name}]) do
+    build_text([long_name, "service has ended."])
+  end
+
+  defp service_ended_text(nil, [%{type: type, long_name: long_name} | _]) do
+    route_name =
+      cond do
+        type == :bus -> "Bus"
+        type == :cr -> "Commuter Rail"
+        type == :ferry -> "Ferry"
+        true -> long_name
+      end
+
+    build_text([route_name, "service has ended."])
+  end
+
+  defp service_ended_text(headsign, _routes) do
+    build_text([headsign, "service has ended."])
   end
 end

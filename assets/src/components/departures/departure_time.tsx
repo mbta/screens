@@ -12,7 +12,7 @@ type DepartureTime =
   | { type: "minutes"; minutes: number }
   | { type: "timestamp"; hour: number; minute: number }
   | { type: "status"; pages: string[] }
-  | { type: "overnight" };
+  | { type: "overnight"; with_text: boolean };
 
 interface DepartureTimePartProps {
   time: DepartureTime;
@@ -60,7 +60,11 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
     }
 
     case "overnight":
-      return <MoonIcon width={128} height={128} color="black" />;
+      if (time.with_text) {
+        return <>Svc Ended</>;
+      } else {
+        return <MoonIcon className="departure-time__moon-icon" color="black" />;
+      }
   }
 };
 
