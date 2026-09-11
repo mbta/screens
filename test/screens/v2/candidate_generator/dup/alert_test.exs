@@ -40,8 +40,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
     lifecycle: "ONGOING",
     severity: 5,
     timeframe: nil,
-    updated_at: ~U[2025-09-18 02:30:00Z],
-    url: nil
+    updated_at: ~U[2025-09-18 02:30:00Z]
   }
 
   @config %Screen{
@@ -125,7 +124,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    timeframe: nil,
                    created_at: @now,
                    updated_at: @now,
-                   url: nil,
                    description: nil
                  },
                  rotation_index: :zero,
@@ -153,7 +151,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    timeframe: nil,
                    created_at: @now,
                    updated_at: @now,
-                   url: nil,
                    description: nil
                  },
                  rotation_index: :one,
@@ -181,7 +178,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    timeframe: nil,
                    created_at: @now,
                    updated_at: @now,
-                   url: nil,
                    description: nil
                  },
                  rotation_index: :two,
@@ -222,8 +218,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    lifecycle: "ONGOING",
                    severity: 5,
                    timeframe: nil,
-                   updated_at: ~U[2025-09-18 02:30:00Z],
-                   url: nil
+                   updated_at: ~U[2025-09-18 02:30:00Z]
                  }
                },
                %{
@@ -248,7 +243,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    timeframe: nil,
                    created_at: @now,
                    updated_at: @now,
-                   url: nil,
                    description: nil
                  },
                  rotation_index: :one,
@@ -276,7 +270,6 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    timeframe: nil,
                    created_at: @now,
                    updated_at: @now,
-                   url: nil,
                    description: nil
                  },
                  rotation_index: :two,

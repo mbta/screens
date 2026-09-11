@@ -60,8 +60,7 @@ defmodule Screens.Alerts.AlertTest do
         lifecycle: "ONGOING",
         severity: 5,
         timeframe: nil,
-        updated_at: ~U[2017-08-14 18:54:01Z],
-        url: nil
+        updated_at: ~U[2017-08-14 18:54:01Z]
       }
 
       assert Alert.fetch([route_ids: ["1"]], get_json_fn) == {:ok, [expected]}

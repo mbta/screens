@@ -3087,8 +3087,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2022-06-24 09:14:52Z],
-          url: nil
+          updated_at: ~U[2022-06-24 09:14:52Z]
         }
       ]
 
@@ -3284,8 +3283,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2022-06-24 18:24:03Z],
-          url: nil
+          updated_at: ~U[2022-06-24 18:24:03Z]
         }
       ]
 
@@ -3468,8 +3466,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
           lifecycle: "NEW",
           severity: 7,
           timeframe: nil,
-          updated_at: ~U[2027-07-13 09:00:00Z],
-          url: nil
+          updated_at: ~U[2027-07-13 09:00:00Z]
         }
 
       now = ~U[2027-07-15 09:00:00Z]
