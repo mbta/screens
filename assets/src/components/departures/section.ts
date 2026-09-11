@@ -8,12 +8,14 @@ import type {
   FoldedSection,
 } from "./normal_section";
 import { OvernightSection } from "./overnight_section";
+import { NoServiceSection } from "./no_service_section";
 
 export type Section =
   | (NormalSection & { type: "normal_section" })
+  | (NoServiceSection & { type: "no_service_section" })
   | (OvernightSection & { type: "overnight_section" });
 
-type DepartureSection = FoldedSection | OvernightSection;
+type DepartureSection = FoldedSection | OvernightSection | NoServiceSection;
 
 export const toDepartureSection = (section: Section): DepartureSection => {
   switch (section.type) {
@@ -24,6 +26,15 @@ export const toDepartureSection = (section: Section): DepartureSection => {
       };
 
       return overnightSection;
+    }
+
+    case "no_service_section": {
+      const noServiceSection: NoServiceSection = {
+        ...section,
+        type: "no_service_section",
+      };
+
+      return noServiceSection;
     }
 
     case "normal_section": {

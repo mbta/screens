@@ -38,26 +38,37 @@
   }
 }
 
+.no-service-section,
 .overnight-section {
   & > .departures__notice-row {
     display: flex;
-    align-items: end;
+    gap: 18px;
+    align-items: center;
     justify-content: space-between;
     margin-right: 24px;
 
     .free-text {
+      display: flex;
+      flex: 1;
+      min-width: 0;
       font-size: 64px;
-      font-weight: 400;
-    }
-  }
-
-  & > .departures__notice-row--with-headsign {
-    .free-text {
       font-weight: 600;
     }
-  }
-}
 
-.departures__overnight-no-service {
-  font-size: 56px;
+    .free-text__line-container {
+      display: flex;
+      min-width: 0;
+    }
+
+    .free-text__string {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .departures__overnight-no-service,
+    .departures__no-service {
+      font-size: 56px;
+    }
+  }
 }
