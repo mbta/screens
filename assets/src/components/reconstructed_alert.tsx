@@ -1,7 +1,7 @@
 import type { ComponentType, ReactNode } from "react";
 
 import RoutePill, { routePillKey } from "Components/departures/route_pill";
-import useAutoSize from "Hooks/use_auto_size";
+import { useAutoSizeWithAbbreviation } from "Hooks/use_auto_size";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 
 interface Props {
@@ -21,8 +21,6 @@ interface AlertCardProps {
   children: ReactNode;
 }
 
-const ABBREV_SUFFIX = "-abbrev";
-
 // Corresponds to cases where on the server this widget is generated with an
 // `issue` consisting of the raw alert text (and empty cause/location/remedy),
 // which should be displayed as-is.
@@ -37,25 +35,11 @@ const ReconstructedAlert: ComponentType<Props> = (alert) => {
     ? ["large", "small", "extra-small"]
     : ["extra-large", "large", "small"];
 
-  // If the backend sent abbreviated values, try them once the smallest full-text size still overflows.
-  const issues = Array.isArray(issue) ? issue : [issue];
-  const canAbbreviate = Array.isArray(issue) && issue.length > 1;
-
-  const steps = canAbbreviate
-    ? [...sizeSteps, `${sizeSteps[sizeSteps.length - 1]}${ABBREV_SUFFIX}`]
-    : sizeSteps;
-
-  const { ref: contentRef, step: contentSize } = useAutoSize(
-    steps,
-    issues.join("|") + cause,
-  );
-
-  const abbreviated = contentSize.endsWith("-abbrev");
-  const sizeClass = abbreviated
-    ? contentSize.slice(0, -ABBREV_SUFFIX.length)
-    : contentSize;
-
-  const displayIssue = abbreviated && issues.length > 1 ? issues[1] : issues[0];
+  const {
+    ref: contentRef,
+    sizeClass,
+    displayValue: displayIssue,
+  } = useAutoSizeWithAbbreviation(sizeSteps, issue, cause);
 
   const modifiers = [
     "large-flex",

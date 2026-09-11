@@ -96,4 +96,38 @@ export const useHorizontalAutoSize = <T extends Value>(
   return useAutoSize(steps, key, hasOverflowX);
 };
 
+/**
+ * Like `useAutoSize`, but for content that may have an abbreviated fallback
+ * value. `values` is either a single (non-abbreviated) value, or a
+ * `[fullText, abbreviatedText]` pair sent by the backend. If a pair is given,
+ * an extra step trying the abbreviated text is appended after `sizeSteps` is
+ * otherwise exhausted.
+ *
+ * `key` behaves as in `useAutoSize`: any value not already covered by
+ * `values` that could affect overflow should be included here.
+ */
+export const useAutoSizeWithAbbreviation = (
+  sizeSteps: string[],
+  values: string | string[],
+  key: string | number | boolean | null | undefined = "",
+): { ref: RefCallback<Element>; sizeClass: string; displayValue: string } => {
+  const abbrevSuffix = "-abbrev";
+
+  const items = Array.isArray(values) ? values : [values];
+  const canAbbreviate = items.length > 1;
+  const steps = canAbbreviate
+    ? [...sizeSteps, `${sizeSteps[sizeSteps.length - 1]}${abbrevSuffix}`]
+    : sizeSteps;
+
+  const { ref, step: contentSize } = useAutoSize(steps, items.join("|") + key);
+
+  const abbreviated = contentSize.endsWith(abbrevSuffix);
+  const sizeClass = abbreviated
+    ? contentSize.slice(0, -abbrevSuffix.length)
+    : contentSize;
+  const displayValue = abbreviated && canAbbreviate ? items[1] : items[0];
+
+  return { ref, sizeClass, displayValue };
+};
+
 export default useAutoSize;

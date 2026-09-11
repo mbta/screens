@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 
-import useAutoSize from "Hooks/use_auto_size";
+import { useAutoSizeWithAbbreviation } from "Hooks/use_auto_size";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import { classWithModifier, classWithModifiers, formatCause } from "Util/utils";
 import { QRCodeSVG as QRCode } from "qrcode.react";
@@ -56,8 +56,6 @@ interface StandardLayoutProps {
   qrCodeURL: string;
 }
 
-const ABBREV_SUFFIX = "-abbrev";
-
 const StandardLayout: ComponentType<StandardLayoutProps> = ({
   issue,
   remedy,
@@ -73,25 +71,11 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
   const sizeSteps =
     effect === "station_closure" ? ["large", "medium"] : ["large"];
 
-  // If the backend sent abbreviated values, try them once the smallest full-text size still overflows.
-  const remedies = Array.isArray(remedy) ? remedy : [remedy];
-  const canAbbreviate = remedies.length > 1;
-  const steps = canAbbreviate
-    ? [...sizeSteps, `${sizeSteps[sizeSteps.length - 1]}${ABBREV_SUFFIX}`]
-    : sizeSteps;
-
-  const { ref: textRef, step: contentSize } = useAutoSize(
-    steps,
-    issue + remedies.join("|"),
-  );
-
-  const abbreviated = contentSize.endsWith(ABBREV_SUFFIX);
-  const issueTextSize = abbreviated
-    ? contentSize.slice(0, -ABBREV_SUFFIX.length)
-    : contentSize;
-
-  const displayRemedy =
-    abbreviated && remedies.length > 1 ? remedies[1] : remedies[0];
+  const {
+    ref: textRef,
+    sizeClass: issueTextSize,
+    displayValue: displayRemedy,
+  } = useAutoSizeWithAbbreviation(sizeSteps, remedy, issue);
 
   return (
     <div className="alert-card__content-block">
@@ -225,24 +209,11 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
 }) => {
   const sizeSteps = ["body-1", "body-2", "body-3", "body-4"];
 
-  // Only remedy is measured for overflow here, so only it needs an abbreviated fallback step.
-  const remedies = Array.isArray(remedy) ? remedy : [remedy];
-  const steps =
-    remedies.length > 1
-      ? [...sizeSteps, `${sizeSteps[sizeSteps.length - 1]}${ABBREV_SUFFIX}`]
-      : sizeSteps;
-
-  const { ref: alertTextRef, step: alertTextSize } = useAutoSize(
-    steps,
-    remedies.join("|"),
-  );
-
-  const abbreviated = alertTextSize.endsWith(ABBREV_SUFFIX);
-  const textSizeClass = abbreviated
-    ? alertTextSize.slice(0, -ABBREV_SUFFIX.length)
-    : alertTextSize;
-  const displayRemedy =
-    abbreviated && remedies.length > 1 ? remedies[1] : remedies[0];
+  const {
+    ref: alertTextRef,
+    sizeClass: textSizeClass,
+    displayValue: displayRemedy,
+  } = useAutoSizeWithAbbreviation(sizeSteps, remedy);
 
   const Icon = fallbackLayoutIcons[effect] ?? NoServiceIcon;
 
