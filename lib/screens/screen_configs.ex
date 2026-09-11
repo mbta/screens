@@ -10,14 +10,16 @@ defmodule Screens.ScreenConfigs do
   alias Screens.Repo
   alias ScreensConfig.Screen
 
-  @cache injected(Screens.Config.Cache)
+  @config_cache injected(Screens.Config.Cache)
   @config_fetcher injected(Screens.Config.Fetch)
+  @data_cache injected(Screens.V2.ScreenData.Cache)
 
   @type screen_id :: String.t()
-  @type screen_update :: %{required(:id) => screen_id(), required(:config) => map()}
+  @type screen_update :: %{(atom() | String.t()) => term()}
   @type commit_error ::
           {:upsert_failed, String.t()}
           | {:delete_failed, String.t()}
+          | {:transaction_failed, Nebulex.Error.t()}
           | {:legacy_fetch_failed, term()}
           | {:legacy_decode_failed, Jason.DecodeError.t()}
           | {:legacy_encode_failed, Jason.EncodeError.t()}
@@ -52,7 +54,7 @@ defmodule Screens.ScreenConfigs do
       end
     else
       if Screens.Config.Cache.ok?() do
-        {:ok, @cache.screen(id)}
+        {:ok, @config_cache.screen(id)}
       else
         {:error, :cache_unavailable}
       end
@@ -156,12 +158,23 @@ defmodule Screens.ScreenConfigs do
   """
   @spec commit_updates([screen_update()], [screen_id()]) :: :ok | {:error, commit_error()}
   def commit_updates(updates, deletes \\ []) do
-    if config_migration_enabled?() do
-      upsert_all(updates)
-    else
-      # This branch will be removed as part of post_config_migration_cleanup.
-      # When the feature flag is disabled, continue to update the JSON config.
-      update_to_legacy_json(updates, deletes)
+    updates
+    |> Enum.map(fn
+      %{id: id} -> id
+      %{"id" => id} -> id
+    end)
+    |> @data_cache.invalidate(fn ->
+      if config_migration_enabled?() do
+        upsert_all(updates)
+      else
+        # This branch will be removed as part of post_config_migration_cleanup.
+        # When the feature flag is disabled, continue to update the JSON config.
+        update_to_legacy_json(updates, deletes)
+      end
+    end)
+    |> case do
+      {:ok, result} -> result
+      {:error, error} -> {:error, {:transaction_failed, error}}
     end
   end
 
