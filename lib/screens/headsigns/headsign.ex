@@ -46,9 +46,10 @@ defmodule Screens.Headsigns.Headsign do
         end
       end)
 
-    cond do
-      abbreviated_text != text -> [text, abbreviated_text]
-      true -> text
+    if abbreviated_text != text do
+      [text, abbreviated_text]
+    else
+      text
     end
   end
 end
