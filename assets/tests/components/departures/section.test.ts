@@ -1,28 +1,59 @@
 import { describe, expect, test } from "@jest/globals";
 import _ from "lodash/fp";
-import { toFoldedSection, trimSections } from "Components/departures/section";
+import {
+  toDepartureSection,
+  trimSections,
+} from "Components/departures/section";
 import { departureRow, normalSection, timeWithCrowding } from "./factories";
+import { OvernightSection } from "Components/departures/overnight_section";
 
 const dropId = (rows) => rows.map((row) => _.omit(["id"], row));
+const overnightSection: OvernightSection = {
+  type: "overnight_section",
+  header: {
+    title: null,
+    arrow: null,
+    subtitle: null,
+    image_path: null,
+    wayfinding_point: null,
+  },
+  text: {
+    icon: undefined,
+    text: [
+      {
+        text: "Svc Ended",
+      },
+    ],
+  },
+  with_headsign: false,
+};
 
-describe("toFoldedSection", () => {
+describe("toDepartureSection", () => {
   test("trims departures above the section's `max`", () => {
     const rows = departureRow.buildList(5);
     const [row1, row2, row3, ...trimmed] = rows;
 
     const section = normalSection.build({ layout: { max: 3 }, rows: rows });
 
-    expect(toFoldedSection(section)).toMatchObject({
+    expect(toDepartureSection(section)).toMatchObject({
       ...section,
       type: "folded_section",
       rows: { aboveFold: [row1, row2, row3], belowFold: dropId(trimmed) },
+    });
+  });
+
+  test("creates overnight section", () => {
+    expect(toDepartureSection(overnightSection)).toMatchObject({
+      ...overnightSection,
+      type: "overnight_section",
     });
   });
 });
 
 describe("trimSections", () => {
   const buildFoldedSection = (attrs) =>
-    toFoldedSection(normalSection.build(attrs));
+    toDepartureSection(normalSection.build(attrs));
+  const buildOvernightSection = () => toDepartureSection(overnightSection);
 
   test("trims one departure from the largest section above its `base`", () => {
     const rowsB = departureRow.buildList(5);
@@ -38,6 +69,7 @@ describe("trimSections", () => {
         layout: { base: 2 },
         rows: departureRow.buildList(2),
       }),
+      buildOvernightSection(),
     ];
 
     expect(trimSections(sections)).toMatchObject([
@@ -50,6 +82,7 @@ describe("trimSections", () => {
         },
       },
       { ...sections[2] },
+      { ...sections[3] },
     ]);
   });
 
