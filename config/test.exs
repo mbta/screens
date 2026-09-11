@@ -16,7 +16,7 @@ config :screens, Screens.Config.Backup,
   store: Screens.Config.Backup.Store.Local
 
 config :screens, Screens.Config.Backup.Store.Local,
-  local_backup_path: "local/config_backups/screens_test.json"
+  local_backup_path: "local/config_backups/screens-test.json"
 
 config :screens,
   config_fetcher: Screens.Config.Fetch.Local,

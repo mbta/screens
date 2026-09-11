@@ -39,7 +39,8 @@ defmodule Screens.Repo.AdvisoryLock do
             {:ok, :locked}
         end
       end,
-      timeout: interval
+      # Add  additional 5 secs to timeout to prevent a race condition between sleep and timeout
+      timeout: interval + 5000
     )
   end
 

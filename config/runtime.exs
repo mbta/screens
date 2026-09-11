@@ -18,10 +18,12 @@ unless config_env() == :test do
     api_v3_key: System.get_env("API_V3_KEY")
 end
 
+eb_env_name = System.get_env("ENVIRONMENT_NAME", "screens-local")
+
+config :screens, environment_name: eb_env_name
+
 if config_env() == :prod do
   config :screens, dns_cluster_query: System.fetch_env!("CLUSTER_HOSTNAME")
-
-  eb_env_name = System.get_env("ENVIRONMENT_NAME")
 
   config :sentry,
     dsn: System.get_env("SENTRY_DSN"),
@@ -32,7 +34,6 @@ if config_env() == :prod do
     secret_key_base: System.get_env("SECRET_KEY_BASE")
 
   config :screens,
-    environment_name: eb_env_name,
     signs_ui_s3_bucket: System.fetch_env!("SIGNS_UI_S3_BUCKET"),
     screenplay_fullstory_org_id: System.get_env("SCREENPLAY_FULLSTORY_ORG_ID")
 
