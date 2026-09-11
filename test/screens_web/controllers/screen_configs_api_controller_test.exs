@@ -3,12 +3,14 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
 
   import ExUnit.CaptureLog
   import Mox
+  import Screens.Inject
   import Screens.TestSupport.ScreenConfigBuilder
 
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
   alias ScreensConfig.Screen
 
+  @data_cache injected(Screens.V2.ScreenData.Cache)
   @env_var "SCREENS_API_CLIENT_KEY"
 
   setup do
@@ -209,6 +211,7 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
     } do
       System.put_env(@env_var, "shared-secret")
       Application.put_env(:screens, :config_migration, true)
+      expect(@data_cache, :invalidate, fn ["screen-1"], fun -> {:ok, fun.()} end)
 
       Repo.insert!(%ScreenConfig{id: "screen-1", config: screen_dup_config})
 
@@ -233,6 +236,7 @@ defmodule ScreensWeb.ScreenConfigsApiControllerTest do
     } do
       System.put_env(@env_var, "shared-secret")
       Application.put_env(:screens, :config_migration, false)
+      expect(@data_cache, :invalidate, fn ["dup_1"], fun -> {:ok, fun.()} end)
 
       # Mock the fetch and put to prevent writing to the fixture file
       expect(Screens.Config.Fetch.Mock, :fetch_config, fn ->
