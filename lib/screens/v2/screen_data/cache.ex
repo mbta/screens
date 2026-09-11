@@ -21,9 +21,10 @@ defmodule Screens.V2.ScreenData.Cache do
     @type key :: String.t()
     @type value :: [Screens.V2.WidgetInstance.t()]
 
-    @typep error :: {:error, Nebulex.Error.t()}
+    @type error :: {:error, Nebulex.Error.t()}
 
     @callback call(node(), module(), atom(), [any()], timeout()) :: any()
+    @callback delete_all(Nebulex.Cache.query_spec()) :: {:ok, non_neg_integer()} | error()
     @callback fetch(key()) :: {:ok, value()} | error()
     @callback find_node(key()) :: {:ok, node()} | error()
     @callback put(key(), value(), keyword()) :: :ok | error()
@@ -35,6 +36,7 @@ defmodule Screens.V2.ScreenData.Cache do
     end
 
     defdelegate call(node, mod, fun, args, timeout), to: Nebulex.Distributed.RPC
+    defdelegate delete_all(query), to: Adapter
     defdelegate fetch(key), to: Adapter
     defdelegate find_node(key), to: Adapter
     defdelegate put(key, value, opts \\ []), to: Adapter
@@ -56,6 +58,16 @@ defmodule Screens.V2.ScreenData.Cache do
   import Screens.Inject
   @parameters injected(Screens.V2.ScreenData.Parameters)
   @store injected(Store)
+
+  @doc """
+  Clear the cache for the given screens, running a supplied function in a transaction that locks
+  the given screen IDs, enabling consistency for operations that change screen configs. The cache
+  delete is also part of this transaction, and if it fails, the function is not called.
+  """
+  @callback invalidate([Store.key()], (-> res)) :: {:ok, res} | Store.error() when res: any()
+  def invalidate(keys, func) do
+    @store.transaction(fn -> with :ok <- @store.delete_all(in: keys), do: func.() end, keys: keys)
+  end
 
   @doc """
   Fetch or generate the widgets for a given screen.

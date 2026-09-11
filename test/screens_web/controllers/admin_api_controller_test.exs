@@ -3,11 +3,14 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
   import ExUnit.CaptureLog
   import Mox
+  import Screens.Inject
   import Screens.TestSupport.ScreenConfigBuilder
 
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
   alias ScreensConfig.{EvergreenContentItem, Schedule}
+
+  @data_cache injected(Screens.V2.ScreenData.Cache)
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
@@ -48,6 +51,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
       screen_busway_config = screen_config(:busway_v2)
 
       Repo.insert!(%ScreenConfig{id: "screen-1", config: screen_busway_config})
+      expect(@data_cache, :invalidate, fn ["screen-1"], fun -> {:ok, fun.()} end)
 
       conn =
         post(conn, "/api/admin/screen_configs/update", %{
@@ -74,6 +78,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
       end)
 
       expect(Screens.Config.Fetch.Mock, :put_config, fn _config -> :ok end)
+      expect(@data_cache, :invalidate, fn ["screen-2"], fun -> {:ok, fun.()} end)
 
       conn =
         post(conn, "/api/admin/screen_configs/update", %{
@@ -210,6 +215,8 @@ defmodule ScreensWeb.AdminApiControllerTest do
       Repo.insert!(%ScreenConfig{id: "all-ended", config: all_ended_screen_config})
       Repo.insert!(%ScreenConfig{id: "mixed-ended", config: mixed_ended_screen_config})
       Repo.insert!(%ScreenConfig{id: "null-ended", config: null_ended_screen_config})
+
+      expect(@data_cache, :invalidate, fn ["all-ended"], fun -> {:ok, fun.()} end)
 
       conn =
         post(conn, "/api/admin/maintenance", %{
