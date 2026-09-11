@@ -388,6 +388,34 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
+  def audio_serialize_section(
+        %NoServiceSection{header: header, headsign: headsign, routes: routes},
+        _screen,
+        _now
+      ) do
+    header =
+      case header do
+        %{read_as: header} when is_binary(header) ->
+          header
+
+        %{title: title, subtitle: subtitle} when is_binary(title) and is_binary(subtitle) ->
+          "#{title}. #{String.replace(subtitle, "*", "")}"
+
+        %{title: header} when is_binary(header) ->
+          header
+
+        _ ->
+          nil
+      end
+
+    %{
+      type: :no_service_section,
+      headsign: headsign,
+      header: header,
+      routes: routes
+    }
+  end
+
   defp audio_serialize_row_group({:notice, free_text}, _, _now) do
     {:notice, FreeTextLine.to_plaintext(free_text)}
   end

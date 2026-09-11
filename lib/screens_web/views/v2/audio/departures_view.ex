@@ -32,17 +32,18 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   end
 
   defp render_section(%{
-         type: :overnight_section,
+         type: type,
          header: header,
          headsign: headsign,
          routes: routes
        })
-       when is_binary(header) do
-    ~E|<p><%= header %></p><%= service_ended_text(headsign, routes) %>|
+       when is_binary(header) and type in [:overnight_section, :no_service_section] do
+    ~E|<p><%= header %></p><%= section_text(type, headsign, routes) %>|
   end
 
-  defp render_section(%{type: :overnight_section, headsign: headsign, routes: routes}) do
-    ~E|<%= service_ended_text(headsign, routes) %>|
+  defp render_section(%{type: type, headsign: headsign, routes: routes})
+       when type in [:overnight_section, :no_service_section] do
+    ~E|<%= section_text(type, headsign, routes) %>|
   end
 
   defp render_departure_group({:notice, text}) do
@@ -213,17 +214,27 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     |> Enum.intersperse(~E| |)
   end
 
-  # `service_ended_text/2` will eventually be changd to use modes in Params
+  # `section_text/2` will eventually be changd to use modes in Params
   # but will require a slight overhaul in our Departures Sections
-  defp service_ended_text(nil, []) do
-    build_text("Service has ended")
+  defp section_text(section_type, nil, []) do
+    case section_type do
+      :overnight_section -> "Service has ended"
+      :no_service_section -> "No service today"
+    end
+    |> build_text()
   end
 
-  defp service_ended_text(nil, [%{long_name: long_name}]) do
-    build_text([long_name, "service has ended."])
+  defp section_text(section_type, nil, [%{long_name: long_name}]) do
+    section_text =
+      case section_type do
+        :overnight_section -> "service has ended."
+        :no_service_section -> "has no service today."
+      end
+
+    build_text([long_name, section_text])
   end
 
-  defp service_ended_text(nil, [%{type: type, long_name: long_name} | _]) do
+  defp section_text(section_type, nil, [%{type: type, long_name: long_name} | _]) do
     route_name =
       cond do
         type == :bus -> "Bus"
@@ -232,10 +243,22 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
         true -> long_name
       end
 
-    build_text([route_name, "service has ended."])
+    section_text =
+      case section_type do
+        :overnight_section -> "service has ended."
+        :no_service_section -> "has no service today."
+      end
+
+    build_text([route_name, section_text])
   end
 
-  defp service_ended_text(headsign, _routes) do
-    build_text([headsign, "service has ended."])
+  defp section_text(section_type, headsign, _routes) do
+    section_text =
+      case section_type do
+        :overnight_section -> "service has ended."
+        :no_service_section -> "has no service today."
+      end
+
+    build_text([headsign, section_text])
   end
 end
