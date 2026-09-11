@@ -31,21 +31,14 @@ defmodule Screens.ScreenConfigs do
     with {:ok, config, _version} <- @config_fetcher.fetch_config(),
          config = Jason.decode!(config),
          screens when is_map(screens) <- Map.get(config, "screens", %{}) do
+      screen_params = Enum.map(screens, fn {id, config} -> %{id: id, config: config} end)
       screen_ids = Map.keys(screens)
-
-      Enum.each(screens, fn {id, config} ->
-        upsert(%{id: id, config: config})
-      end)
 
       stale_ids =
         Repo.all(from s in ScreenConfig, where: s.id not in ^screen_ids, select: s.id)
 
-      case perform_deletes(stale_ids) do
-        :ok ->
-          {:ok, %{upserted: Enum.count(screen_ids), deleted: Enum.count(stale_ids)}}
-
-        {:error, reason} ->
-          {:error, reason}
+      with :ok <- upsert_all(screen_params), :ok <- delete_all(stale_ids) do
+        {:ok, %{upserted: Enum.count(screen_ids), deleted: Enum.count(stale_ids)}}
       end
     end
   end
@@ -158,21 +151,34 @@ defmodule Screens.ScreenConfigs do
   end
 
   @doc """
-  Creates a screen configuration.
-  Upserts so an existing config with the same ID will be overwritten.
+  Updates and deletes multiple screen configs.
+  Accepts a list of maps with :id and :config keys for updates, and a list of screen IDs for deletions.
   """
-  @spec upsert(params :: map()) :: {:ok, ScreenConfig.t()} | {:error, Ecto.Changeset.t()}
-  def upsert(params) do
-    %ScreenConfig{}
-    |> ScreenConfig.changeset(params)
-    |> Repo.insert(
-      on_conflict: {:replace, [:config, :updated_at]},
-      conflict_target: :id
-    )
+  @spec commit_updates([screen_update()], [screen_id()]) :: :ok | {:error, commit_error()}
+  def commit_updates(updates, deletes \\ []) do
+    if config_migration_enabled?() do
+      upsert_all(updates)
+    else
+      # This branch will be removed as part of post_config_migration_cleanup.
+      # When the feature flag is disabled, continue to update the JSON config.
+      update_to_legacy_json(updates, deletes)
+    end
   end
 
-  @spec upsert_list([screen_update()]) :: :ok | {:error, commit_error()}
-  defp upsert_list(updates) do
+  @doc "Deletes multiple screen configs based on a list of IDs."
+  @spec commit_deletes([screen_id()]) :: :ok | {:error, commit_error()}
+  def commit_deletes(deletes) do
+    if config_migration_enabled?() do
+      delete_all(deletes)
+    else
+      # This branch will be removed as part of post_config_migration_cleanup.
+      # When the feature flag is disabled, continue to update the JSON config.
+      update_to_legacy_json([], deletes)
+    end
+  end
+
+  @spec upsert_all([screen_update()]) :: :ok | {:error, commit_error()}
+  defp upsert_all(updates) do
     Enum.reduce_while(updates, :ok, fn update, _acc ->
       case upsert(update) do
         {:ok, _} ->
@@ -185,42 +191,26 @@ defmodule Screens.ScreenConfigs do
     end)
   end
 
-  @doc """
-  Updates and deletes multiple screen configs.
-  Accepts a list of maps with :id and :config keys for updates, and a list of screen IDs for deletions.
-  """
-  @spec commit_updates([screen_update()], [screen_id()]) ::
-          :ok | {:error, commit_error()}
-  def commit_updates(updates, deletes \\ []) do
-    if config_migration_enabled?() do
-      upsert_list(updates)
-    else
-      # This branch will be removed as part of post_config_migration_cleanup.
-      # When the feature flag is disabled, continue to update the JSON config.
-      update_to_legacy_json(updates, deletes)
-    end
-  end
-
-  @doc "Deletes multiple screen configs based on a list of IDs."
-  @spec commit_deletes([screen_id()]) :: :ok | {:error, commit_error()}
-  def commit_deletes(deletes) do
-    if config_migration_enabled?() do
-      perform_deletes(deletes)
-    else
-      # This branch will be removed as part of post_config_migration_cleanup.
-      # When the feature flag is disabled, continue to update the JSON config.
-      update_to_legacy_json([], deletes)
-    end
-  end
-
-  @spec perform_deletes([screen_id()]) :: :ok | {:error, commit_error()}
-  defp perform_deletes(deletes) do
-    Enum.reduce_while(deletes, :ok, fn id, _acc ->
+  @spec delete_all([screen_id()]) :: :ok | {:error, commit_error()}
+  defp delete_all(ids) do
+    Enum.reduce_while(ids, :ok, fn id, _acc ->
       case delete(id) do
         :ok -> {:cont, :ok}
         {:error, _} = error -> {:halt, error}
       end
     end)
+  end
+
+  # Creates a screen configuration.
+  # Upserts so an existing config with the same ID will be overwritten.
+  @spec upsert(params :: map()) :: {:ok, ScreenConfig.t()} | {:error, Ecto.Changeset.t()}
+  defp upsert(params) do
+    %ScreenConfig{}
+    |> ScreenConfig.changeset(params)
+    |> Repo.insert(
+      on_conflict: {:replace, [:config, :updated_at]},
+      conflict_target: :id
+    )
   end
 
   @spec delete(screen_id()) :: :ok | {:error, commit_error()}
