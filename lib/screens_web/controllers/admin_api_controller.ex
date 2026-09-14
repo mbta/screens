@@ -62,15 +62,6 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{success: true, config: validated_json})
   end
 
-  def confirm(conn, %{"id" => id, "config" => screen_json}) do
-    screen = screen_json |> Jason.decode!() |> Screen.from_json()
-    %Config{screens: screens} = config = fetch_config()
-
-    %Config{config | screens: Map.put(screens, id, screen)}
-    |> put_config()
-    |> to_success_response(conn)
-  end
-
   def confirm(conn, %{"config" => config}) do
     config |> Jason.decode!() |> Config.from_json() |> put_config() |> to_success_response(conn)
   end
