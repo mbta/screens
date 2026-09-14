@@ -61,9 +61,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
       Enum.filter(informed_entities, &InformedEntity.whole_direction?/1)
 
     direction =
-      @route_directions
-      |> Map.get(route_id)
-      |> Enum.at(direction_id)
+      Route.direction_name(route_id, direction_id)
 
     %{full: direction, abbrev: direction}
   end
