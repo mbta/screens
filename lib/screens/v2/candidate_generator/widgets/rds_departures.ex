@@ -74,8 +74,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
          post_process_rows_fn
        ) do
     case items do
-      [%NoService{routes: routes}] ->
-        %NoServiceSection{routes: routes}
+      [
+        %NoService{
+          displayed_headsign: displayed_headsign,
+          routes: routes
+        }
+      ] ->
+        %NoServiceSection{
+          headsign: displayed_headsign,
+          header: header,
+          routes: routes
+        }
 
       [%ServiceEnded{displayed_headsign: displayed_headsign, routes: routes}] ->
         %OvernightSection{headsign: displayed_headsign, header: header, routes: routes}

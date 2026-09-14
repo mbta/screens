@@ -73,7 +73,6 @@ defmodule Screens.V2.Departure do
     if route_type in option_types do
       fetch_fn.(params)
     else
-      Logster.info(["departure_mode_unknown_for_schedule" | Map.to_list(params)])
       {:ok, []}
     end
   end
