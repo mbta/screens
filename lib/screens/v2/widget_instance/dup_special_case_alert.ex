@@ -52,8 +52,7 @@ defmodule Screens.V2.WidgetInstance.DupSpecialCaseAlert do
             icon: :warning,
             text: kenmore_partial_branches_takeover_text()
           },
-          header: %{color: :green, text: "Kenmore"},
-          link_text: "mbta.com/greenline"
+          header: %{color: :green, text: "Kenmore"}
         }
 
       %{special_case: :kenmore_westbound_shuttles, widget_type: :partial_alert} ->
