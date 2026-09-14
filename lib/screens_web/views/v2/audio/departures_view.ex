@@ -115,7 +115,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   end
 
   defp render_time_with_crowding({%{time: %{type: :overnight}}, _}, _route, %{
-         headsigns: [full_name, _abbr]
+         headsigns: [full_name | _]
        }) do
     build_text([full_name, "service has ended."])
   end
