@@ -841,12 +841,17 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     } = t
 
     region = get_region_from_location(location)
+    direction_name = route_direction_name(t)
 
     issue =
       if region == :here do
         "#{informed_platform_name} platform closed"
       else
-        "#{Util.format_name_list_to_string(informed_station_names)}: Trains skip #{informed_platform_name} platform"
+        if is_nil(direction_name) do
+          "Stop Skipped: #{Util.format_name_list_to_string(informed_station_names)}"
+        else
+          "Stop Skipped: #{Util.format_name_list_to_string(informed_station_names)} (#{direction_name})"
+        end
       end
 
     %{
@@ -1164,10 +1169,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
          location
        )
        when partial_closure_platform_names != [] do
+    direction_name = route_direction_name(t)
+
     issue =
       case partial_closure_platform_names do
-        [informed_platform_name] ->
-          "#{informed_station}: Trains skip #{informed_platform_name} platform"
+        [_informed_platform_name] ->
+          if is_nil(direction_name) do
+            "Stop Skipped: #{informed_station}"
+          else
+            "Stop Skipped: #{informed_station} (#{direction_name})"
+          end
 
         informed_subway_platforms ->
           Cldr.Message.format!("Skipping {num_platforms, plural,
@@ -1364,6 +1375,23 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   defp format_endpoint_string({min_station, max_station}) do
     "between #{min_station} and #{max_station}"
+  end
+
+  @spec route_direction_name(ReconstructedAlert.t()) :: String.t() | nil
+  defp route_direction_name(%ReconstructedAlert{alert: alert} = t) do
+    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
+    routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
+
+    collapse_all_green? = all_green_routes_at_stop_affected?(affected_routes, routes_at_stop)
+
+    Route.direction_name(
+      case affected_routes do
+        ["Green" <> _] -> "Green"
+        [route_id] -> route_id
+        _route_ids when collapse_all_green? -> "Green"
+      end,
+      Alert.direction_id(alert)
+    )
   end
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
