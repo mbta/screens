@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 
-import useAutoSize from "Hooks/use_auto_size";
+import { useAutoSizeWithAbbreviation } from "Hooks/use_auto_size";
 import { getHexColor, STRING_TO_SVG } from "Util/svg_utils";
 import { classWithModifier, classWithModifiers, formatCause } from "Util/utils";
 import { QRCodeSVG as QRCode } from "qrcode.react";
@@ -21,7 +21,7 @@ interface PreFareSingleScreenAlertProps {
   issue: string;
   location: string;
   cause: string;
-  remedy: string;
+  remedy: string | string[];
   show_alternate_route_text: boolean;
   routes: EnrichedRoute[];
   unaffected_routes?: EnrichedRoute[];
@@ -47,7 +47,7 @@ interface EnrichedRoute {
 
 interface StandardLayoutProps {
   issue: string;
-  remedy: string;
+  remedy: string | string[];
   show_alternate_route_text: boolean;
   effect: string;
   location: string | null;
@@ -68,10 +68,14 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
 }) => {
   // For station closure alerts, content may need to be sized down depending on
   // how many stations are affected
-  const { ref: textRef, step: issueTextSize } = useAutoSize(
-    effect === "station_closure" ? ["large", "medium"] : ["large"],
-    issue + remedy,
-  );
+  const sizeSteps =
+    effect === "station_closure" ? ["large", "medium"] : ["large"];
+
+  const {
+    ref: textRef,
+    sizeClass: issueTextSize,
+    displayValue: displayRemedy,
+  } = useAutoSizeWithAbbreviation(sizeSteps, remedy, issue);
 
   return (
     <div className="alert-card__content-block">
@@ -83,7 +87,7 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
         />
         <RemedySection
           effect={effect}
-          remedy={remedy}
+          remedy={displayRemedy}
           contentTextSize="large"
           show_alternate_route_text={show_alternate_route_text}
           alternateRouteURL={alternateRouteURL}
@@ -100,7 +104,7 @@ const StandardLayout: ComponentType<StandardLayoutProps> = ({
 interface DownstreamLayoutProps {
   endpoints: [string, string];
   effect: string;
-  remedy: string;
+  remedy: string | string[];
   show_alternate_route_text: boolean;
   disruptionDiagram?: DisruptionDiagramData;
   alternateRouteURL: string;
@@ -122,7 +126,7 @@ const DownstreamLayout: ComponentType<DownstreamLayoutProps> = ({
     <DownstreamIssueSection endpoints={endpoints} />
     <RemedySection
       effect={effect}
-      remedy={remedy}
+      remedy={remedy[0]}
       contentTextSize="medium"
       show_alternate_route_text={show_alternate_route_text}
       alternateRouteURL={alternateRouteURL}
@@ -188,7 +192,7 @@ const PartialClosureLayout: ComponentType<PartialClosureLayoutProps> = ({
 
 interface FallbackLayoutProps {
   issue: string;
-  remedy: string;
+  remedy: string | string[];
   effect: string;
 }
 
@@ -203,10 +207,13 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
   remedy,
   effect,
 }) => {
-  const { ref: alertTextRef, step: alertTextSize } = useAutoSize(
-    ["body-1", "body-2", "body-3", "body-4"],
-    remedy,
-  );
+  const sizeSteps = ["body-1", "body-2", "body-3", "body-4"];
+
+  const {
+    ref: alertTextRef,
+    sizeClass: textSizeClass,
+    displayValue: displayRemedy,
+  } = useAutoSizeWithAbbreviation(sizeSteps, remedy);
 
   const Icon = fallbackLayoutIcons[effect] ?? NoServiceIcon;
 
@@ -214,12 +221,12 @@ const FallbackLayout: ComponentType<FallbackLayoutProps> = ({
     <div className="alert-card__fallback">
       <Icon className="alert-card__fallback__icon" />
       {issue && <h4 className="alert-card__fallback__issue-text">{issue}</h4>}
-      {remedy && (
+      {displayRemedy && (
         <div
-          className={`alert-card__fallback__alert-text ${alertTextSize}`}
+          className={`alert-card__fallback__alert-text ${textSizeClass}`}
           ref={alertTextRef}
         >
-          {remedy}
+          {displayRemedy}
         </div>
       )}
     </div>
