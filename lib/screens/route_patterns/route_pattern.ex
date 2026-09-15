@@ -50,7 +50,10 @@ defmodule Screens.RoutePatterns.RoutePattern do
 
     case get_json_fn.("route_patterns", encoded_params) do
       {:ok, response} ->
-        {:ok, Enum.reduce(filter_params, V3Api.Parser.parse(response), &apply_filter/2)}
+        {:ok,
+         filter_params
+         |> Enum.reduce(V3Api.Parser.parse(response), &apply_filter/2)
+         |> refilter_by_route_ids(params[:route_ids])}
 
       _ ->
         :error
@@ -74,4 +77,14 @@ defmodule Screens.RoutePatterns.RoutePattern do
   defp encode_param({:stop_ids, ids}), do: [{"filter[stop]", Enum.join(ids, ",")}]
   defp encode_param({:canonical?, canonical?}), do: [{"filter[canonical]", to_string(canonical?)}]
   defp encode_param({:date, date}), do: [{"filter[date]", Date.to_iso8601(date)}]
+
+  # This endpoint sometimes returns patterns that don't match the specified route IDs due to a
+  # legacy behavior involving multi-route trips, so if we want to "really" filter by route ID we
+  # have to do it ourselves.
+  defp refilter_by_route_ids(patterns, nil), do: patterns
+
+  defp refilter_by_route_ids(patterns, route_ids) do
+    route_ids = MapSet.new(route_ids)
+    Enum.filter(patterns, &(&1.route.id in route_ids))
+  end
 end
