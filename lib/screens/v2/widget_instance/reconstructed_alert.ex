@@ -133,18 +133,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     "Green-trunk" => ["Copley & West", "North Station & North"]
   }
 
-  @route_direction_names %{
-    "Blue" => ["Westbound", "Eastbound"],
-    "Orange" => ["Southbound", "Northbound"],
-    "Red" => ["Southbound", "Northbound"],
-    "Green-B" => ["Westbound", "Eastbound"],
-    "Green-C" => ["Westbound", "Eastbound"],
-    "Green-D" => ["Westbound", "Eastbound"],
-    "Green-E" => ["Westbound", "Eastbound"],
-    "Green" => ["Westbound", "Eastbound"],
-    "Mattapan" => ["Outbound", "Inbound"]
-  }
-
   @headsign_svg_map %{
     "Bowdoin" => "bl-bowdoin",
     "Wonderland" => "bl-wonderland",
@@ -1396,20 +1384,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
     collapse_all_green? = all_green_routes_at_stop_affected?(affected_routes, routes_at_stop)
 
-    route_id =
+    Route.direction_name(
       case affected_routes do
         ["Green" <> _] -> "Green"
         [route_id] -> route_id
         _route_ids when collapse_all_green? -> "Green"
-      end
-
-    direction_id = Alert.direction_id(alert)
-
-    if direction_id != nil do
-      @route_direction_names
-      |> Map.get(route_id)
-      |> Enum.at(direction_id)
-    end
+      end,
+      Alert.direction_id(alert)
+    )
   end
 
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
