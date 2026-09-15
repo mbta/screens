@@ -190,6 +190,30 @@ defmodule Screens.ScreenConfigs do
     end
   end
 
+  @doc "Schedules the requested screens to refresh by setting `refresh_if_loaded_before`."
+  @spec schedule_refresh_for_screen_ids([screen_id()], DateTime.t()) ::
+          :ok | {:error, commit_error()}
+  def schedule_refresh_for_screen_ids(screen_ids, now \\ DateTime.utc_now()) do
+    if config_migration_enabled?() do
+      updates =
+        ScreenConfig
+        |> where([screen_config], screen_config.id in ^screen_ids)
+        |> Repo.all()
+        |> Enum.map(fn %ScreenConfig{id: id, config: config} ->
+          %{id: id, config: Screen.schedule_refresh_at_time(config, now)}
+        end)
+
+      commit_updates(updates)
+    else
+      # This branch will be removed as part of post_config_migration_cleanup.
+      screen_ids
+      |> Enum.map(fn id ->
+        %{"id" => id, "config" => %{"refresh_if_loaded_before" => now}}
+      end)
+      |> commit_updates()
+    end
+  end
+
   @spec upsert_all([screen_update()]) :: :ok | {:error, commit_error()}
   defp upsert_all(updates) do
     Enum.reduce_while(updates, :ok, fn update, _acc ->
