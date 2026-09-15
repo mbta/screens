@@ -138,6 +138,44 @@ defmodule ScreensWeb.AdminApiControllerTest do
     end
   end
 
+  describe "/refresh" do
+    @tag :authenticated
+    test "schedules a Postgres screen refresh at the specified time", %{conn: conn} do
+      Application.put_env(:screens, :config_migration, true)
+
+      Repo.insert!(%ScreenConfig{id: "screen-1", config: screen_config(:dup_v2)})
+      Repo.insert!(%ScreenConfig{id: "screen-2", config: screen_config(:busway_v2)})
+      expect(@data_cache, :invalidate, fn ["screen-1"], fun -> {:ok, fun.()} end)
+
+      conn = post(conn, "/api/admin/refresh", %{screen_ids: ["screen-1"]})
+
+      assert json_response(conn, 200) == %{"success" => true}
+      assert Repo.get!(ScreenConfig, "screen-1").config.refresh_if_loaded_before
+      refute Repo.get!(ScreenConfig, "screen-2").config.refresh_if_loaded_before
+    end
+
+    @tag :authenticated
+    test "schedules a legacy screen refresh at the specified time", %{conn: conn} do
+      Application.put_env(:screens, :config_migration, false)
+      config = legacy_config(screen_config_json(:dup_v2), screen_config_json(:busway_v2))
+
+      expect(Screens.Config.Fetch.Mock, :fetch_config, fn -> {:ok, Jason.encode!(config), 1} end)
+
+      expect(Screens.Config.Fetch.Mock, :put_config, fn updated_config ->
+        screens = updated_config |> Jason.decode!() |> Map.fetch!("screens")
+        assert screens["dup_1"]["refresh_if_loaded_before"] != nil
+        assert is_nil(screens["busway_1"]["refresh_if_loaded_before"])
+        :ok
+      end)
+
+      expect(@data_cache, :invalidate, fn ["dup_1"], fun -> {:ok, fun.()} end)
+
+      conn = post(conn, "/api/admin/refresh", %{screen_ids: ["dup_1"]})
+
+      assert json_response(conn, 200) == %{"success" => true}
+    end
+  end
+
   describe "/maintenance" do
     setup do
       before_date = ~D[2025-01-01]

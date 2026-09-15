@@ -72,9 +72,8 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def refresh(conn, %{"screen_ids" => screen_ids}) do
-    fetch_config()
-    |> Config.schedule_refresh_for_screen_ids(screen_ids)
-    |> put_config()
+    screen_ids
+    |> ScreenConfigs.schedule_refresh_for_screen_ids()
     |> to_success_response(conn)
   end
 
@@ -178,12 +177,13 @@ defmodule ScreensWeb.AdminApiController do
 
   @spec to_success_response(:ok | :error, Plug.Conn.t()) :: Plug.Conn.t()
   defp to_success_response(result, conn) do
-    success =
+    response =
       case result do
-        :ok -> true
-        :error -> false
+        :ok -> %{success: true}
+        :error -> %{success: false}
+        {:error, reason} -> %{success: false, error: inspect(reason)}
       end
 
-    json(conn, %{success: success})
+    json(conn, response)
   end
 end
