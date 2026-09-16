@@ -64,6 +64,6 @@ defmodule Screens.Application do
 
   defp backup_runner_task_supervisor_child do
     if Application.get_env(:screens, Screens.Config.Backup)[:enabled],
-      do: Screens.Config.Backup.Runner
+      do: {Highlander, Screens.Config.Backup.Runner}
   end
 end
