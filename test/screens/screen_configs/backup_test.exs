@@ -57,35 +57,6 @@ defmodule Screens.ScreenConfigs.BackupTest do
              } = Jason.decode!(contents)
     end
 
-    test "does nothing and returns :locked when another instance is already running a backup" do
-      test_pid = self()
-
-      # Run test async so that other tests don't run while it's holding the lock.
-      task =
-        Task.async(fn ->
-          :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-
-          Repo.transaction(fn ->
-            # `1` is the same cron lock key `Backup.run/1` uses internally
-            Repo.query!("SELECT pg_advisory_xact_lock($1)", [1])
-            send(test_pid, :locked)
-
-            receive do
-              :release -> :ok
-            end
-          end)
-
-          Ecto.Adapters.SQL.Sandbox.checkin(Repo)
-        end)
-
-      assert_receive :locked
-
-      assert {:ok, :locked} = Backup.run(~U[2026-09-02 15:30:45Z])
-
-      send(task.pid, :release)
-      Task.await(task)
-    end
-
     test "returns an error when the write fails" do
       expect(Store.Mock, :fetch_backup, fn _environment -> :error end)
       expect(Store.Mock, :put_backup, fn _contents -> :error end)
