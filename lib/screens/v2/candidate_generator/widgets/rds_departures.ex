@@ -169,12 +169,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   defp headways_from_rds(headway_states) do
     Enum.flat_map(headway_states, fn
       %Headways{
-        destinations: [{_stop, line, _headsign} | _],
+        routes: [route],
         direction_id: direction_id,
         range: range,
         displayed_headsign: displayed_headsign
       } ->
-        [{line, direction_id, range, displayed_headsign}]
+        [{route, direction_id, range, displayed_headsign}]
     end)
   end
 
@@ -198,5 +198,5 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   def departure_direction_id(%Departure{} = departure), do: Departure.direction_id(departure)
   def departure_direction_id({%Schedule{direction_id: direction_id}, _type}), do: direction_id
-  def departure_direction_id({_line, direction_id, _range, _headsign}), do: direction_id
+  def departure_direction_id({_route, direction_id, _range, _headsign}), do: direction_id
 end
