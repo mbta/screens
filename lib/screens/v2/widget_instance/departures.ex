@@ -25,7 +25,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     @moduledoc "Section which includes a number of independent 'rows' or items."
 
     @type special_trip :: {Schedule.t(), :first_trip | :service_ended}
-    @type headway_row :: {Line.t(), Trip.direction(), Headways.range(), String.t()}
+    @type headway_row :: {Route.t(), Trip.direction(), Headways.range(), String.t()}
 
     @type row ::
             Departure.t()
@@ -225,7 +225,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           time_range: time_range,
           headsign: headsign
         },
-        _screen,
+        %Screen{app_id: :dup_v2},
         _now,
         is_only_section
       ) do
@@ -427,7 +427,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         departures,
         screen,
         now,
-        &RoutePill.serialize_for_audio_departure/3
+        &RoutePill.serialize_for_audio_departure/4
       )
     }
   end
@@ -463,7 +463,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   # departures can "leapfrog" ahead of other ones of a different route/headsign if there's an
   # earlier departure of the same route/headsign.
   @spec group_section_rows_for_audio(NormalSection.t(), Screen.app_id(), now :: DateTime.t()) ::
-          list({:normal, [Departure.t()]} | {:notice, FreeTextLine.t()})
+          list(
+            {:normal, [Departure.t()]}
+            | {:notice, FreeTextLine.t()}
+            | {:normal, [{Schedule.t(), :service_ended}]}
+            | {:normal, [NormalSection.headway_row()]}
+          )
   defp group_section_rows_for_audio(
          %NormalSection{rows: rows, grouping_type: grouping_type} = section,
          app_id,
@@ -481,6 +486,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
       {_key, [{_schedule, :service_ended}] = service_ended} ->
         {:normal, service_ended}
+
+      {_key, [{_route, _direction_id, _time_range, _headsign}] = headway} ->
+        {:normal, headway}
     end)
   end
 
@@ -501,6 +509,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp row_departure_grouping({%Schedule{route: route} = schedule, _special_trip_type}),
     do: {route, Schedule.headsign(schedule)}
+
+  defp row_departure_grouping({route, _direction_id, _time_range, headsign}),
+    do: {route, headsign}
 
   defp row_departure_grouping(%FreeTextLine{}), do: make_ref()
 
@@ -530,7 +541,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
          rows,
          screen,
          now,
-         route_pill_serializer \\ &RoutePill.serialize_for_departure/3
+         route_pill_serializer \\ &RoutePill.serialize_for_departure/4
        )
 
   defp serialize_departure_group(
@@ -561,19 +572,39 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_departure_group(
-         [{line, direction_id, {lo, hi}, headsign} | _],
-         screen,
+         [{route, direction_id, {lo, hi}, headsign} | _],
+         %Screen{app_id: :dup_v2} = screen,
          _now,
          route_pill_serializer
        ) do
-    id = hash_and_encode(line.id <> headsign)
+    id = hash_and_encode(route.id <> headsign)
 
     %{
       id: id,
       type: :departure_row,
-      route: route_pill_serializer.(line, nil, screen),
-      headsign: %{headsign: headsign},
+      route: route_pill_serializer.(route, nil, screen, true),
+      headsign: %{headsigns: [headsign]},
       times_with_crowding: [%{id: id, time: %{type: :status, pages: ["every #{lo}-#{hi}m"]}}],
+      direction_id: direction_id
+    }
+  end
+
+  defp serialize_departure_group(
+         [{route, direction_id, {lo, hi}, headsign} | _],
+         screen,
+         _now,
+         route_pill_serializer
+       ) do
+    id = hash_and_encode(route.id <> (headsign || ""))
+
+    {base_headsign, variation} = headsign |> headsign_with_variation()
+
+    %{
+      id: id,
+      type: :departure_row,
+      route: route_pill_serializer.(route, nil, screen, true),
+      headsign: %{headsigns: Headsign.abbreviations(base_headsign), variation: variation},
+      times_with_crowding: [%{id: id, time: %{type: :headway, range: %{lo: lo, hi: hi}}}],
       direction_id: direction_id
     }
   end
@@ -591,16 +622,18 @@ defmodule Screens.V2.WidgetInstance.Departures do
          now,
          route_pill_serializer
        ) do
-    departures =
-      rows
-      |> Enum.filter(fn
-        %Departure{} -> true
-        _ -> false
-      end)
-
     row_id =
-      departures
-      |> Enum.map(&Departure.id/1)
+      rows
+      |> Enum.map(fn
+        %Departure{} = departure ->
+          Departure.id(departure)
+
+        {%Route{line: %Line{id: line_id}}, _direction_id, _range, headsign} ->
+          hash_and_encode(line_id <> (headsign || ""))
+
+        {%Schedule{id: id}, _special_trip_type} ->
+          id
+      end)
       |> Enum.sort()
       |> Enum.join("")
       |> hash_and_encode()
@@ -608,23 +641,23 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       id: row_id,
       type: :departure_row,
-      route: serialize_route(departures, route_pill_serializer, screen),
-      headsign: serialize_headsign(departures, screen),
-      times_with_crowding: serialize_times_with_crowding(departures, screen, now),
-      direction_id: serialize_direction_id(departures)
+      route: serialize_route(rows, route_pill_serializer, screen),
+      headsign: serialize_headsign(rows, screen),
+      times_with_crowding: serialize_times_with_crowding(rows, screen, now),
+      direction_id: serialize_direction_id(rows)
     }
   end
 
   @spec serialize_route(
           [Departure.t()],
-          (Departure.t(), pos_integer() | nil, Screen.t() -> RoutePill.t()),
+          (Departure.t(), pos_integer() | nil, Screen.t(), boolean() -> RoutePill.t()),
           Screen.t()
         ) :: RoutePill.t()
   def serialize_route([first_departure | _], route_pill_serializer, screen) do
     route = Departure.route(first_departure)
     track_number = Departure.track_number(first_departure)
 
-    route_pill_serializer.(route, track_number, screen)
+    route_pill_serializer.(route, track_number, screen, false)
   end
 
   @spec serialize_headsign([Departure.t()], Screen.t()) :: serialized_headsign()

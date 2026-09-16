@@ -12,7 +12,8 @@ type DepartureTime =
   | { type: "minutes"; minutes: number }
   | { type: "timestamp"; hour: number; minute: number }
   | { type: "status"; pages: string[] }
-  | { type: "overnight"; with_text: boolean };
+  | { type: "overnight"; with_text: boolean }
+  | { type: "headway"; range: { lo: number; hi: number } };
 
 interface DepartureTimePartProps {
   time: DepartureTime;
@@ -65,6 +66,20 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
       } else {
         return <MoonIcon className="departure-time__moon-icon" color="black" />;
       }
+
+    case "headway": {
+      const { lo, hi } = time.range;
+
+      return (
+        <div className="departure-time__headway">
+          Every{" "}
+          <strong>
+            {lo}-{hi}
+          </strong>
+          m
+        </div>
+      );
+    }
   }
 };
 

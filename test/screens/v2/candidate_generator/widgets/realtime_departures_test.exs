@@ -381,6 +381,37 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
              ] = RealtimeDepartures.departures_instances(config, @now)
     end
 
+    test "returns NormalSection with a headway row for a HeadwaySection" do
+      config = build_config(["route_A"])
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             headways("stop_id_one", "line_id_one", "headsign", "route_one", "Westbound", 0)
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %NormalSection{
+                     header: %Header{},
+                     grouping_type: :time,
+                     layout: %Layout{},
+                     rows: [
+                       {%Screens.Routes.Route{id: "route_one"}, nil, {5, 10}, "Westbound"}
+                     ]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
     test "post process filters departures with included route-directions" do
       config =
         build_config([

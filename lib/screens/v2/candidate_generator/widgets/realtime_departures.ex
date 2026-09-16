@@ -95,6 +95,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
             {%NoServiceSection{} = no_service_section, _section} ->
               no_service_section
 
+            # The current headway section presentation is just a row with headways,
+            # we can reuse the NormalSection with the Headway row
+            {%HeadwaySection{
+               headsign: headsign,
+               route: route,
+               time_range: time_range
+             }, %Section{header: header, layout: layout, grouping_type: grouping_type}} ->
+              %NormalSection{
+                header: header,
+                layout: layout,
+                grouping_type: grouping_type,
+                rows: [{route, nil, time_range, headsign}]
+              }
+
             {%NormalSection{rows: rows} = normal_section, _section} ->
               %{
                 normal_section
@@ -124,7 +138,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
       is_nil(params) or
         (is_struct(section_data, NormalSection) and has_valid_normal_section_row?(section_data)) or
         is_struct(section_data, OvernightSection) or
-        is_struct(section_data, NoServiceSection)
+        is_struct(section_data, NoServiceSection) or
+        is_struct(section_data, HeadwaySection)
     end)
   end
 
@@ -135,7 +150,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   end
 
   defp handle_unsupported_sections(
-         section_to_change,
+         %NoDataSection{route: route},
          %Section{
            header: header,
            layout: layout,
@@ -143,14 +158,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
            params: %Params{direction_id: direction_id}
          }
        ) do
-    text =
-      case section_to_change do
-        %HeadwaySection{route: route, headsign: headsign} ->
-          headway_text(route, headsign)
-
-        %NoDataSection{route: route} ->
-          no_data_text(route, direction_id)
-      end
+    text = no_data_text(route, direction_id)
 
     %NormalSection{
       rows: [text],
@@ -177,13 +185,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     |> filter_rows(filters)
     |> maybe_sort_by_direction_id(grouping_type)
     |> RdsDepartures.maybe_make_bidirectional(bidirectional)
-  end
-
-  defp headway_text(route, headsign) do
-    %FreeTextLine{
-      icon: if(route, do: Route.icon(route), else: nil),
-      text: [no_departures_message(headsign)]
-    }
   end
 
   @spec no_data_text(Route.t() | nil, Trip.direction() | :both) :: FreeTextLine.t()

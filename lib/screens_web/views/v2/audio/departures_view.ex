@@ -66,6 +66,27 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     |> Enum.map(&render_time_with_crowding(&1, route, headsign))
   end
 
+  defp render_time_with_crowding(
+         {%{time: %{range: %{lo: lo, hi: hi}}}, 0},
+         %{vehicle_type: vehicle_type},
+         %{headsigns: [full_name | _]}
+       ) do
+    plural_vehicle_type = to_string(vehicle_type || :trip) <> "s"
+
+    content =
+      build_text([
+        full_name,
+        {plural_vehicle_type, fn v -> ~E|<%= v %>| end},
+        "every",
+        lo,
+        "to",
+        hi,
+        "minutes"
+      ])
+
+    ~E|<s><%= content %></s>|
+  end
+
   defp render_time_with_crowding({%{crowding: crowding, time: time}, 0}, route, headsign) do
     route_headsign_rendered = render_route_headsign(route, headsign)
     crowding_rendered = render_crowding_level(crowding)

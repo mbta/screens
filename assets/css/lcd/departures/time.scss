@@ -2,6 +2,10 @@
 
 .departure-times-with-crowding {
   width: 328px;
+
+  &:has(.departure-time--headway) {
+    width: 400px;
+  }
 }
 
 .departure-time-with-crowding {
@@ -21,6 +25,11 @@
 
   .departure-time.departure-time--overnight {
     width: 300px;
+    font-size: 56px;
+  }
+
+  .departure-time.departure-time--headway {
+    width: 400px;
     font-size: 56px;
   }
 

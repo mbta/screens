@@ -1,7 +1,6 @@
 defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Lines.Line
   alias ScreensConfig.Screen
 
   import ExUnit.CaptureLog
@@ -23,14 +22,14 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
       pre_fare_screen: screen
     } do
       assert %{type: :icon, icon: :rail, color: :purple, route_abbrev: "FMT"} ==
-               serialize_for_departure(route(id: "CR-Fairmount", type: :rail), nil, screen)
+               serialize_for_departure(route(id: "CR-Fairmount", type: :rail), nil, screen, false)
     end
 
     test "Returns track number with route abbreviation for CR when not nil", %{
       pre_fare_screen: screen
     } do
       assert %{type: :text, text: "TR3", color: :purple, route_abbrev: "FMT"} ==
-               serialize_for_departure(route(id: "CR-Fairmount", type: :rail), 3, screen)
+               serialize_for_departure(route(id: "CR-Fairmount", type: :rail), 3, screen, false)
     end
 
     test "Returns no abbreviation and logs a warning for an unknown CR route", %{
@@ -39,7 +38,12 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
       logs =
         capture_log([level: :warning], fn ->
           assert %{type: :icon, icon: :rail, color: :purple, route_abbrev: nil} ==
-                   serialize_for_departure(route(id: "CR-Foobar", type: :rail), nil, screen)
+                   serialize_for_departure(
+                     route(id: "CR-Foobar", type: :rail),
+                     nil,
+                     screen,
+                     false
+                   )
         end)
 
       assert logs =~ ~s(missing_route_pill_abbreviation line=Foobar)
@@ -47,39 +51,49 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
 
     test "Returns boat icon if route type is :ferry", %{pre_fare_screen: screen} do
       assert %{type: :icon, icon: :boat, color: :teal} ==
-               serialize_for_departure(route(id: "Boat-F1", type: :ferry), nil, screen)
+               serialize_for_departure(route(id: "Boat-F1", type: :ferry), nil, screen, false)
     end
 
     test "Returns ocean blue rail icon for CapeFlyer", %{pre_fare_screen: screen} do
       assert %{type: :icon, icon: :rail, color: :ocean_blue} ==
-               serialize_for_departure(route(id: "CapeFlyer", type: :rail), nil, screen)
+               serialize_for_departure(route(id: "CapeFlyer", type: :rail), nil, screen, false)
     end
 
     test "Returns slashed route pill if route name contains `/`", %{pre_fare_screen: screen} do
       assert %{type: :slashed, part1: "34", part2: "35", color: :yellow} ==
-               serialize_for_departure(route(id: "3435", type: :bus, name: "34/35"), nil, screen)
+               serialize_for_departure(
+                 route(id: "3435", type: :bus, name: "34/35"),
+                 nil,
+                 screen,
+                 false
+               )
     end
 
     test "Returns RL for Red Line", %{pre_fare_screen: screen} do
       assert %{type: :text, text: "RL", color: :red} ==
-               serialize_for_departure(route(id: "Red", type: :subway), nil, screen)
+               serialize_for_departure(route(id: "Red", type: :subway), nil, screen, false)
     end
 
     test "Does not include branch name for Green Line", %{pre_fare_screen: screen} do
       assert %{type: :text, text: "GL", color: :green} ==
-               serialize_for_departure(route(id: "Green", type: :light_rail), nil, screen)
+               serialize_for_departure(route(id: "Green", type: :light_rail), nil, screen, false)
     end
 
     test "Includes branch name for Green Line", %{
       pre_fare_screen: screen
     } do
       assert %{type: :text, text: "GL·B", color: :green} ==
-               serialize_for_departure(route(id: "Green-B", type: :light_rail), nil, screen)
+               serialize_for_departure(
+                 route(id: "Green-B", type: :light_rail),
+                 nil,
+                 screen,
+                 false
+               )
     end
 
     test "Handles Silver Line routes", %{pre_fare_screen: screen} do
       assert %{type: :text, text: "SL1", color: :silver} ==
-               serialize_for_departure(route(id: "741", type: :bus), nil, screen)
+               serialize_for_departure(route(id: "741", type: :bus), nil, screen, false)
     end
 
     test "Handles cross-town routes", %{pre_fare_screen: screen} do
@@ -92,7 +106,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                    line_id: "line-747"
                  ),
                  nil,
-                 screen
+                 screen,
+                 false
                )
     end
 
@@ -106,7 +121,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                    line_id: "line-44"
                  ),
                  nil,
-                 screen
+                 screen,
+                 false
                )
     end
 
@@ -122,7 +138,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                    line_id: "line-999"
                  ),
                  nil,
-                 screen
+                 screen,
+                 false
                )
     end
 
@@ -133,7 +150,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                serialize_for_departure(
                  route(id: "Example Long ID", type: :bus, name: "SHU"),
                  nil,
-                 screen
+                 screen,
+                 false
                )
     end
 
@@ -142,7 +160,8 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
                serialize_for_departure(
                  route(id: "Example Long ID", type: :bus, name: "Example Long Name"),
                  nil,
-                 screen
+                 screen,
+                 false
                )
     end
 
@@ -155,7 +174,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
         )
 
       assert %{type: :dual, text: "CR", icon: :bus, color: :purple, secondary_color: :yellow} ==
-               serialize_for_departure(route, nil, screen)
+               serialize_for_departure(route, nil, screen, false)
     end
 
     test "Does not return dual pill for Green Line shuttle", %{pre_fare_screen: screen} do
@@ -167,7 +186,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
         )
 
       assert %{type: :icon, icon: :bus, color: :yellow} ==
-               serialize_for_departure(route, nil, screen)
+               serialize_for_departure(route, nil, screen, false)
     end
 
     test "Does not return dual pill for Mattapan Line shuttle", %{pre_fare_screen: screen} do
@@ -179,7 +198,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
         )
 
       assert %{type: :icon, icon: :bus, color: :yellow} ==
-               serialize_for_departure(route, nil, screen)
+               serialize_for_departure(route, nil, screen, false)
     end
 
     test "Does not return dual pill on eink screen", %{gl_eink_screen: screen} do
@@ -191,7 +210,7 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
         )
 
       assert %{type: :icon, icon: :bus, color: :yellow} ==
-               serialize_for_departure(route, nil, screen)
+               serialize_for_departure(route, nil, screen, false)
     end
   end
 
@@ -255,29 +274,35 @@ defmodule Screens.V2.WidgetInstance.Serializer.RoutePillTest do
     setup do
       dup_screen = struct(Screen, %{app_id: :dup_v2})
 
-      %{
-        dup_screen: dup_screen
-      }
+      %{dup_screen: dup_screen}
     end
 
     test "returns GL for line-Green", %{dup_screen: dup_screen} do
+      route = route(id: "Green-B")
+
       assert %{type: :text, text: "GL", color: :green} ==
-               serialize_for_departure(%Line{id: "line-Green"}, nil, dup_screen)
+               serialize_for_departure(route, nil, dup_screen, true)
     end
 
     test "returns RL for line-Red", %{dup_screen: dup_screen} do
+      route = route(id: "Red")
+
       assert %{type: :text, text: "RL", color: :red} ==
-               serialize_for_departure(%Line{id: "line-Red"}, nil, dup_screen)
+               serialize_for_departure(route, nil, dup_screen, true)
     end
 
     test "returns CR pill for commuter rail lines", %{dup_screen: dup_screen} do
+      route = route(id: "CR-Foxboro")
+
       assert %{type: :icon, icon: :rail, route_abbrev: "FOX", color: :purple} ==
-               serialize_for_departure(%Line{id: "line-Foxboro"}, nil, dup_screen)
+               serialize_for_departure(route, nil, dup_screen, true)
     end
 
     test "returns Bus pill for numbered lines", %{dup_screen: dup_screen} do
+      route = route(id: "90")
+
       assert %{type: :text, text: "90", color: :yellow} ==
-               serialize_for_departure(%Line{id: "line-90"}, nil, dup_screen)
+               serialize_for_departure(route, nil, dup_screen, true)
     end
   end
 end
