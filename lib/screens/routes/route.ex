@@ -8,6 +8,18 @@ defmodule Screens.Routes.Route do
 
   @sl_route_ids ~w[741 742 743 746 749 751]
 
+  @route_direction_names %{
+    "Blue" => ["Westbound", "Eastbound"],
+    "Orange" => ["Southbound", "Northbound"],
+    "Red" => ["Southbound", "Northbound"],
+    "Green-B" => ["Westbound", "Eastbound"],
+    "Green-C" => ["Westbound", "Eastbound"],
+    "Green-D" => ["Westbound", "Eastbound"],
+    "Green-E" => ["Westbound", "Eastbound"],
+    "Green" => ["Westbound", "Eastbound"],
+    "Mattapan" => ["Outbound", "Inbound"]
+  }
+
   defstruct id: nil,
             short_name: nil,
             long_name: nil,
@@ -142,6 +154,17 @@ defmodule Screens.Routes.Route do
   @spec name(t()) :: String.t()
   def name(%__MODULE__{type: :bus, short_name: short_name}), do: short_name
   def name(%__MODULE__{long_name: long_name}), do: long_name
+
+  @spec direction_name(id(), 0 | 1 | nil) :: String.t() | nil
+
+  def direction_name(nil, _direction_id), do: nil
+  def direction_name(_route_id, nil), do: nil
+
+  def direction_name(route_id, direction_id) do
+    @route_direction_names
+    |> Map.get(route_id)
+    |> Enum.at(direction_id)
+  end
 
   @doc """
   Normalizes direction names to include the "bound" suffix (e.g. "Northbound" instead of "North").
