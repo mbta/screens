@@ -88,6 +88,7 @@ interface Props {
   time_in_epoch: number;
   scheduled_time?: DepartureTime;
   is_live: boolean;
+  isFirstTrip: boolean;
 }
 
 const DepartureTime: ComponentType<Props> = ({
@@ -95,6 +96,7 @@ const DepartureTime: ComponentType<Props> = ({
   time_in_epoch: timeInEpoch,
   scheduled_time,
   is_live: isLive,
+  isFirstTrip,
 }) => {
   const currentPage = useCurrentPage();
   if (time && (currentPage === 0 || !scheduled_time)) {
@@ -109,6 +111,7 @@ const DepartureTime: ComponentType<Props> = ({
             className="departure-time__live-icon"
           />
         )}
+        {isFirstTrip && <div className="departure-time__first">First</div>}
         <DepartureTimePart
           currentPage={currentPage}
           time={time}

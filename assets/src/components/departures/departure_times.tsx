@@ -14,9 +14,13 @@ export type TimeWithCrowding = {
 
 type Props = {
   timesWithCrowding: TimeWithCrowding[];
+  isFirstTrip: boolean;
 };
 
-const DepartureTimes: ComponentType<Props> = ({ timesWithCrowding }) => {
+const DepartureTimes: ComponentType<Props> = ({
+  timesWithCrowding,
+  isFirstTrip,
+}) => {
   return (
     <div className="departure-times-with-crowding">
       {timesWithCrowding.map(
@@ -28,6 +32,7 @@ const DepartureTimes: ComponentType<Props> = ({ timesWithCrowding }) => {
               time_in_epoch={time_in_epoch}
               scheduled_time={scheduled_time}
               is_live={is_live}
+              isFirstTrip={isFirstTrip}
             />
           </div>
         ),

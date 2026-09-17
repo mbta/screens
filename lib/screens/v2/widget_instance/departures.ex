@@ -484,11 +484,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
       {_key, [%Departure{} | _] = departures} ->
         {:normal, filter_audio_departure_group(departures, grouping_type, app_id, now)}
 
-      {_key, [{_schedule, :service_ended}] = service_ended} ->
-        {:normal, service_ended}
-
       {_key, [{_route, _direction_id, _time_range, _headsign}] = headway} ->
         {:normal, headway}
+
+      {_key, [{_schedule, _special_trip_type}] = special_trip} ->
+        {:normal, special_trip}
     end)
   end
 

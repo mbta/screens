@@ -30,8 +30,10 @@ const DepartureRow: ComponentType<DepartureRowBase> = ({
         <Destination {...headsign} classModifier={classModifier} />
       </div>
       <div className={classWithModifier("departure-row__time", classModifier)}>
-        {isFirstTrip && <div className="departure-row__first">First</div>}
-        <DepartureTimes timesWithCrowding={timesWithCrowding} />
+        <DepartureTimes
+          timesWithCrowding={timesWithCrowding}
+          isFirstTrip={isFirstTrip}
+        />
       </div>
     </div>
   );

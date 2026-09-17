@@ -109,17 +109,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
                 rows: [{route, nil, time_range, headsign}]
               }
 
-            {%NormalSection{rows: rows} = normal_section, _section} ->
-              %{
-                normal_section
-                | rows:
-                    Enum.map(rows, fn
-                      %Departure{} = departure -> departure
-                      # Treat First Trips as Countdowns while we don't support them yet
-                      {%Schedule{} = schedule, :first_trip} -> %Departure{schedule: schedule}
-                      {%Schedule{}, :service_ended} = service_ended -> service_ended
-                    end)
-              }
+            {%NormalSection{} = normal_section, _section} ->
+              normal_section
 
             {unsupported_section, section} ->
               handle_unsupported_sections(unsupported_section, section)
