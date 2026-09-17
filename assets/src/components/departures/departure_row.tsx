@@ -19,6 +19,7 @@ const DepartureRow: ComponentType<DepartureRow> = ({
   headsign,
   route,
   isBeforeDirectionSplit,
+  is_first_trip: isFirstTrip,
   times_with_crowding: timesWithCrowding,
 }) => {
   return (
@@ -30,7 +31,10 @@ const DepartureRow: ComponentType<DepartureRow> = ({
         <Destination {...headsign} />
       </div>
       <div className="departure-row__time">
-        <DepartureTimes timesWithCrowding={timesWithCrowding} />
+        <DepartureTimes
+          timesWithCrowding={timesWithCrowding}
+          isFirstTrip={isFirstTrip}
+        />
       </div>
     </div>
   );
