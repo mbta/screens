@@ -16,8 +16,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
-  alias ScreensConfig.Departures.Header
-  alias ScreensConfig.Departures.Layout
+  alias ScreensConfig.Departures.{Header, Layout, Mode}
   alias ScreensConfig.{FreeTextLine, Screen}
   alias ScreensConfig.Screen.PreFare
 
@@ -67,8 +66,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defmodule NoDataSection do
     @moduledoc "Section consisting of a 'no departures' message."
-    @type t :: %__MODULE__{route: Route.t() | nil}
-    defstruct ~w[route]a
+    @type t :: %__MODULE__{mode: Mode.t(), route: Route.t()}
+    defstruct ~w[mode route]a
   end
 
   defmodule NoServiceSection do
@@ -186,9 +185,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   def serialize_section(section, screen, now, is_only_section \\ false)
 
-  def serialize_section(%NoDataSection{route: route}, _screen, _now, _is_only_section) do
+  def serialize_section(%NoDataSection{mode: mode}, _screen, _now, _is_only_section) do
     text = %FreeTextLine{
-      icon: if(route == nil, do: nil, else: Route.icon(route)),
+      icon: Route.icon_from_mode(mode),
       text: ["Updates unavailable"]
     }
 

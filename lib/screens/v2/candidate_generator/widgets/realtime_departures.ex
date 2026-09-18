@@ -8,7 +8,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
-  alias Screens.Trips.Trip
   alias Screens.V2.CandidateGenerator.Widgets.RdsDepartures
   alias Screens.V2.Departure
   alias Screens.V2.RDS
@@ -24,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
-  alias ScreensConfig.Departures.{Filters, Params, Section}
+  alias ScreensConfig.Departures.{Filters, Mode, Section}
   alias ScreensConfig.Departures.Filters.{RouteDirections, RouteDirections.RouteDirection}
   alias ScreensConfig.Screen.{Busway, PreFare}
 
@@ -145,20 +144,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   defp handle_unsupported_sections(
          section_to_change,
-         %Section{
-           header: header,
-           layout: layout,
-           grouping_type: grouping_type,
-           params: %Params{direction_id: direction_id}
-         }
+         %Section{header: header, layout: layout, grouping_type: grouping_type}
        ) do
     text =
       case section_to_change do
-        %HeadwaySection{route: route, headsign: headsign} ->
-          headway_text(route, headsign)
-
-        %NoDataSection{route: route} ->
-          no_data_text(route, direction_id)
+        %HeadwaySection{route: route, headsign: headsign} -> headway_text(route, headsign)
+        %NoDataSection{mode: mode} -> no_data_text(mode)
       end
 
     %NormalSection{
@@ -168,14 +159,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
       grouping_type: grouping_type
     }
   end
-
-  defp handle_unsupported_sections(_section, %Section{
-         params: nil,
-         header: header,
-         layout: layout,
-         grouping_type: grouping_type
-       }),
-       do: %NormalSection{rows: [], header: header, layout: layout, grouping_type: grouping_type}
 
   defp post_process_rows(
          rows,
@@ -195,39 +178,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     }
   end
 
-  @spec no_data_text(Route.t() | nil, Trip.direction() | :both) :: FreeTextLine.t()
-  defp no_data_text(nil, _direction_id) do
+  @spec no_data_text(Mode.t()) :: FreeTextLine.t()
+  defp no_data_text(mode) do
     %FreeTextLine{
-      icon: nil,
+      icon: Route.icon_from_mode(mode),
       text: [no_departures_message()]
-    }
-  end
-
-  defp no_data_text(route, direction_id) when direction_id == :both do
-    %FreeTextLine{
-      icon: Route.icon(route),
-      text: [no_departures_message()]
-    }
-  end
-
-  defp no_data_text(%Route{direction_names: direction_names} = route, direction_id) do
-    direction_index =
-      if is_binary(direction_id), do: String.to_integer(direction_id), else: direction_id
-
-    %FreeTextLine{
-      icon: Route.icon(route),
-      text: [
-        # In cases where we have NoDataSections, we might have only a route_id for the icon
-        # Omit the normalized direction name in this instance
-        if direction_names == nil do
-          no_departures_message()
-        else
-          route
-          |> Route.normalized_direction_names()
-          |> Enum.at(direction_index, "")
-          |> no_departures_message()
-        end
-      ]
     }
   end
 

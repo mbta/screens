@@ -357,17 +357,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           grouping_type: :time,
           rows: expected_departures
         },
-        %Screens.V2.WidgetInstance.Departures.NoDataSection{
-          route: %Screens.Routes.Route{
-            id: "Green",
-            short_name: nil,
-            long_name: nil,
-            direction_names: nil,
-            direction_destinations: nil,
-            type: :light_rail,
-            line: nil
-          }
-        }
+        %Screens.V2.WidgetInstance.Departures.NoDataSection{mode: :gl}
       ]
 
       config =

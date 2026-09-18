@@ -5,6 +5,7 @@ defmodule Screens.Routes.Route do
   alias Screens.RouteType
   alias Screens.Stops.Stop
   alias Screens.V3Api
+  alias ScreensConfig.Departures.Mode
 
   @sl_route_ids ~w[741 742 743 746 749 751]
 
@@ -150,6 +151,17 @@ defmodule Screens.Routes.Route do
   def icon(%{type: :ferry}), do: :ferry
   def icon(%{type: :rail}), do: :cr
   def icon(_), do: :bus
+
+  @spec icon_from_mode(Mode.t()) :: icon()
+  def icon_from_mode(:bl), do: :blue
+  def icon_from_mode(:ol), do: :orange
+  def icon_from_mode(:rl), do: :red
+  def icon_from_mode(:m), do: :mattapan
+  def icon_from_mode(:gl), do: :green
+  def icon_from_mode(:sl), do: :silver
+  def icon_from_mode(:bus), do: :bus
+  def icon_from_mode(:cr), do: :cr
+  def icon_from_mode(:ferry), do: :ferry
 
   @spec name(t()) :: String.t()
   def name(%__MODULE__{type: :bus, short_name: short_name}), do: short_name

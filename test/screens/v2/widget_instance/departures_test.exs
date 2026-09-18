@@ -194,7 +194,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %NoDataSection{route: %{id: "Orange", type: :subway}}
+      section = %NoDataSection{mode: :ol}
 
       expected_text = %{
         icon: :orange,
@@ -204,7 +204,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{type: :no_data_section, text: expected_text} ==
                Departures.serialize_section(section, dup_screen, now, true)
 
-      section = %NoDataSection{route: %{id: "Green", type: :light_rail}}
+      section = %NoDataSection{mode: :gl}
 
       expected_text = %{
         icon: :green,
@@ -219,7 +219,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %NoDataSection{route: %{id: "555", type: :bus}}
+      section = %NoDataSection{mode: :bus}
 
       expected_text = %{
         icon: :bus,
@@ -234,7 +234,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %NoDataSection{route: %{short_name: "SL1", type: :bus}}
+      section = %NoDataSection{mode: :sl}
 
       expected_text = %{
         icon: :silver,
@@ -249,7 +249,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
-      section = %NoDataSection{route: %{id: "CR-Test", type: :rail}}
+      section = %NoDataSection{mode: :cr}
 
       expected_text = %{
         icon: :cr,
