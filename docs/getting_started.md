@@ -63,7 +63,7 @@ the app using the 1Password CLI, but one way is using an export command like
 this (which works in `.envrc`):
 
 ```sh
-export AWS_SECRET_ACCESS_KEY=$(op item get --vault VAULT_NAME ITEM_NAME --field FIELD_NAME)
+export AWS_SECRET_ACCESS_KEY=$(op item get --vault VAULT_NAME ITEM_NAME --field FIELD_NAME --reveal)
 ```
 
 [1]: https://www.notion.so/mbta-downtown-crossing/Storing-Access-Keys-Securely-in-1Password-b89310bc67784722a5a218500f34443d?pm=c

@@ -26,22 +26,33 @@ defmodule Screens.ScreenConfigs do
           | :legacy_write_failed
           | :legacy_screens_invalid
 
-  @spec import_from_file() ::
-          {:ok, %{upserted: integer(), deleted: integer()}} | {:error, commit_error()}
+  @type replace_result :: %{upserted: non_neg_integer(), deleted: non_neg_integer()}
+
+  @spec import_from_file() :: {:ok, replace_result()} | {:error, commit_error()}
   def import_from_file do
     # This should be a part of post_config_migration_cleanup
     with {:ok, config, _version} <- @config_fetcher.fetch_config(),
          config = Jason.decode!(config),
          screens when is_map(screens) <- Map.get(config, "screens", %{}) do
-      screen_params = Enum.map(screens, fn {id, config} -> %{id: id, config: config} end)
-      screen_ids = Map.keys(screens)
+      replace_all(screens)
+    end
+  end
 
-      stale_ids =
-        Repo.all(from s in ScreenConfig, where: s.id not in ^screen_ids, select: s.id)
+  @doc """
+  Replaces all persisted screen configs with the given map of screen ID to JSON config,
+  deleting any configs whose IDs are not present in the map.
+  """
+  @spec replace_all(%{optional(screen_id()) => map()}) ::
+          {:ok, replace_result()} | {:error, commit_error()}
+  def replace_all(screens) when is_map(screens) do
+    screen_ids = Map.keys(screens)
+    updates = Enum.map(screens, fn {id, config} -> %{id: id, config: config} end)
 
-      with :ok <- upsert_all(screen_params), :ok <- delete_all(stale_ids) do
-        {:ok, %{upserted: Enum.count(screen_ids), deleted: Enum.count(stale_ids)}}
-      end
+    stale_ids =
+      Repo.all(from s in ScreenConfig, where: s.id not in ^screen_ids, select: s.id)
+
+    with :ok <- upsert_all(updates), :ok <- delete_all(stale_ids) do
+      {:ok, %{upserted: Enum.count(screen_ids), deleted: Enum.count(stale_ids)}}
     end
   end
 
