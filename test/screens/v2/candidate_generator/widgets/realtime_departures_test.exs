@@ -222,14 +222,31 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      header: %Header{},
                      grouping_type: :time,
                      layout: %Layout{},
-                     rows: [^departure, %Departure{schedule: ^schedule, prediction: nil}]
+                     rows: [
+                       ^departure,
+                       {%Screens.Schedules.Schedule{
+                          trip: %Screens.Trips.Trip{
+                            direction_id: 0
+                          },
+                          stop: nil,
+                          route: %Screens.Routes.Route{
+                            id: "route_two",
+                            type: :bus,
+                            line: %Screens.Lines.Line{
+                              id: "line_id_two"
+                            }
+                          },
+                          arrival_time: ~U[2026-01-01 12:37:00Z],
+                          departure_time: ~U[2026-01-01 12:38:00Z]
+                        }, :first_trip}
+                     ]
                    }
                  ]
                }
              ] = RealtimeDepartures.departures_instances(config, @now)
     end
 
-    test "returns NormalSection with departures and no data sections when we have one section with supported rows and one without" do
+    test "returns NormalSection with departures and no data sections when we have one section with supported rows" do
       config = build_config(["route_A", "route_B"])
 
       schedule = build_schedule("route_two", "line_id_two")
@@ -265,7 +282,24 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      header: %Header{},
                      grouping_type: :time,
                      layout: %Layout{},
-                     rows: [^departure, %Departure{schedule: ^schedule, prediction: nil}]
+                     rows: [
+                       ^departure,
+                       {%Screens.Schedules.Schedule{
+                          id: nil,
+                          trip: %Screens.Trips.Trip{
+                            direction_id: 0
+                          },
+                          route: %Screens.Routes.Route{
+                            id: "route_two",
+                            type: :bus,
+                            line: %Screens.Lines.Line{
+                              id: "line_id_two"
+                            }
+                          },
+                          arrival_time: ~U[2026-01-01 12:37:00Z],
+                          departure_time: ~U[2026-01-01 12:38:00Z]
+                        }, :first_trip}
+                     ]
                    },
                    %Screens.V2.WidgetInstance.Departures.NoServiceSection{
                      header: %ScreensConfig.Departures.Header{},
