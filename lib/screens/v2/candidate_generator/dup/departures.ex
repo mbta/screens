@@ -83,6 +83,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
         Enum.all?(
           primary_departure_sections ++ secondary_departure_sections,
+          &is_struct(&1, NoServiceSection)
+        ) ->
+          :all_no_service
+
+        Enum.all?(
+          primary_departure_sections ++ secondary_departure_sections,
           &is_struct(&1, OvernightSection)
         ) ->
           :all_service_ended
@@ -120,26 +126,53 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
           DateTime.t()
         ) ::
           [widget()]
-  def(
-    build_instances(
-      slot_names,
-      _departure_sections,
-      :all_no_data,
-      config,
-      _now
-    )
-  ) do
+  def build_instances(
+        slot_names,
+        _departure_sections,
+        :all_no_data,
+        config,
+        _now
+      ) do
     Enum.map(slot_names, &%DeparturesNoData{screen: config, slot_name: &1})
   end
 
   def build_instances(
         slot_names,
-        _departure_sections,
+        departure_sections,
+        :all_no_service,
+        config,
+        _now
+      ) do
+    routes =
+      departure_sections
+      |> Enum.flat_map(fn %NoServiceSection{routes: routes} -> routes end)
+      |> Enum.map(fn route -> Route.icon(route) end)
+      |> Enum.uniq()
+
+    Enum.map(
+      slot_names,
+      &%DeparturesNoService{
+        screen: config,
+        slot_name: &1,
+        routes: routes
+      }
+    )
+  end
+
+  def build_instances(
+        slot_names,
+        departure_sections,
         :all_service_ended,
         config,
         _now
       ) do
-    Enum.map(slot_names, &%OvernightDepartures{screen: config, slot_names: [&1]})
+    routes =
+      departure_sections
+      |> Enum.flat_map(fn %OvernightSection{routes: routes} -> routes end)
+      |> Enum.map(fn route -> Route.icon(route) end)
+      |> Enum.uniq()
+
+    Enum.map(slot_names, &%OvernightDepartures{screen: config, slot_names: [&1], routes: routes})
   end
 
   def build_instances(
@@ -149,48 +182,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         config,
         now
       ) do
-    cond do
-      Enum.all?(departure_sections, &is_struct(&1, NoServiceSection)) ->
-        Enum.map(
-          slot_names,
-          &%DeparturesNoService{
-            screen: config,
-            slot_name: &1,
-            routes:
-              departure_sections
-              |> Enum.flat_map(fn %NoServiceSection{routes: routes} -> routes end)
-              |> Enum.map(fn route -> Route.icon(route) end)
-              |> Enum.uniq()
-          }
-        )
-
-      Enum.all?(departure_sections, &is_struct(&1, OvernightSection)) ->
-        Enum.map(
-          slot_names,
-          &%OvernightDepartures{
-            screen: config,
-            slot_names: [&1],
-            routes:
-              departure_sections
-              |> Enum.flat_map(fn %OvernightSection{routes: routes} -> routes end)
-              |> Enum.map(fn route -> Route.icon(route) end)
-              |> Enum.uniq()
-          }
-        )
-
-      true ->
-        Enum.map(
-          slot_names,
-          fn slot_name ->
-            %DeparturesWidget{
-              screen: config,
-              sections: departure_sections,
-              slot_names: [slot_name],
-              now: now
-            }
-          end
-        )
-    end
+    Enum.map(slot_names, fn slot_name ->
+      %DeparturesWidget{
+        screen: config,
+        sections: departure_sections,
+        slot_names: [slot_name],
+        now: now
+      }
+    end)
   end
 
   defp post_process_rows(rows, %Section{bidirectional: bidirectional}, total_section_count) do

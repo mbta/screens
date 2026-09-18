@@ -349,7 +349,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
              ] = RealtimeDepartures.departures_instances(config, @now)
     end
 
-    test "returns OvernightSection when section only contains Service Ended" do
+    test "returns a NormalSection with an Overnight Row when section only contains Service Ended" do
       config = build_config(["route_A"])
 
       schedule_one = build_schedule("route_one", "line_id_one")
@@ -371,10 +371,51 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                  order: 0,
                  screen: ^config,
                  sections: [
-                   %OvernightSection{
+                   %NormalSection{
                      header: %Header{},
+                     rows: [
+                       {%Screens.Schedules.Schedule{
+                          route: %Screens.Routes.Route{
+                            id: "route_one",
+                            type: :bus,
+                            line: %Screens.Lines.Line{
+                              id: "line_id_one"
+                            }
+                          },
+                          arrival_time: ~U[2026-01-01 12:37:00Z],
+                          departure_time: ~U[2026-01-01 12:38:00Z]
+                        }, :service_ended}
+                     ]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "returns an OvernightSection when section only contains a combined Service Ended state" do
+      config = build_config(["route_A"])
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             service_ended("stop_id_one", "line_id_one", "headsign_one", nil, [
+               %Route{id: "route_one"}
+             ])
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %OvernightSection{
+                     header: %ScreensConfig.Departures.Header{},
                      headsign: "headsign_one",
-                     routes: [%Route{id: "route_one"}]
+                     routes: [%Screens.Routes.Route{id: "route_one"}]
                    }
                  ]
                }

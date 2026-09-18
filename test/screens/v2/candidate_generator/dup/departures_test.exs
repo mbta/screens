@@ -141,12 +141,24 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
   defp expected_overnight_departures_widget(config) do
     [
-      %OvernightDepartures{screen: config, slot_names: [:main_content_zero]},
-      %OvernightDepartures{screen: config, slot_names: [:main_content_one]},
-      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_zero]},
-      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_one]},
-      %OvernightDepartures{screen: config, slot_names: [:main_content_two]},
-      %OvernightDepartures{screen: config, slot_names: [:main_content_reduced_two]}
+      %OvernightDepartures{routes: [:red], screen: config, slot_names: [:main_content_zero]},
+      %OvernightDepartures{routes: [:red], screen: config, slot_names: [:main_content_one]},
+      %OvernightDepartures{
+        routes: [:red],
+        screen: config,
+        slot_names: [:main_content_reduced_zero]
+      },
+      %OvernightDepartures{
+        routes: [:red],
+        screen: config,
+        slot_names: [:main_content_reduced_one]
+      },
+      %OvernightDepartures{routes: [:red], screen: config, slot_names: [:main_content_two]},
+      %OvernightDepartures{
+        routes: [:red],
+        screen: config,
+        slot_names: [:main_content_reduced_two]
+      }
     ]
   end
 
@@ -345,17 +357,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           grouping_type: :time,
           rows: expected_departures
         },
-        %Screens.V2.WidgetInstance.Departures.NoDataSection{
-          route: %Screens.Routes.Route{
-            id: "Green",
-            short_name: nil,
-            long_name: nil,
-            direction_names: nil,
-            direction_destinations: nil,
-            type: :light_rail,
-            line: nil
-          }
-        }
+        %Screens.V2.WidgetInstance.Departures.NoDataSection{mode: :gl}
       ]
 
       config =
@@ -933,6 +935,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         %Screens.V2.WidgetInstance.Departures.OvernightSection{
           header: %ScreensConfig.Departures.Header{},
           headsign: nil,
+          last_schedule: expected_last_schedule,
           routes: [
             %Screens.Routes.Route{id: "r3", type: :subway, line: %Screens.Lines.Line{id: "l3"}}
           ]
@@ -975,7 +978,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         %Schedule{
           arrival_time: ~U[2024-10-11 10:38:00Z],
           departure_time: ~U[2024-10-11 10:39:00Z],
-          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :subway},
+          route: %Route{id: "Red", line: %Line{id: "l1"}, type: :subway},
           stop: %Stop{id: "s1"},
           trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
         }
@@ -983,7 +986,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_last_schedule_two =
         %Schedule{
           departure_time: ~U[2024-10-11 10:38:00Z],
-          route: %Route{id: "r3", line: %Line{id: "l3"}, type: :subway},
+          route: %Route{id: "Red", line: %Line{id: "l3"}, type: :subway},
           stop: %Stop{id: "s3"},
           trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
         }
