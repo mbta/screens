@@ -89,8 +89,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
         sections:
           sections_data_with_sections_config
           |> Enum.map(fn
-            {%OvernightSection{} = overnight_section, _section} ->
+            {%OvernightSection{last_schedule: nil} = overnight_section, _section} ->
               overnight_section
+
+            {%OvernightSection{last_schedule: last_schedule},
+             %Section{header: header, layout: layout, grouping_type: grouping_type}} ->
+              %NormalSection{
+                header: header,
+                layout: layout,
+                grouping_type: grouping_type,
+                rows: [{last_schedule, :service_ended}]
+              }
 
             {%NoServiceSection{} = no_service_section, _section} ->
               no_service_section

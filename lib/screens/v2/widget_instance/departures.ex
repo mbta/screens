@@ -56,8 +56,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defmodule OvernightSection do
     @moduledoc "Section consisting of a 'service ended' message."
-    @type t :: %__MODULE__{header: Header.t(), headsign: String.t() | nil, routes: [Route.t()]}
-    defstruct ~w[header headsign routes]a
+    @type t :: %__MODULE__{
+            header: Header.t(),
+            headsign: String.t() | nil,
+            routes: [Route.t()],
+            last_schedule: Schedule.t()
+          }
+    defstruct ~w[header headsign routes last_schedule]a
   end
 
   defmodule NoDataSection do

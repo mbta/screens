@@ -372,6 +372,7 @@ defmodule Screens.V2.RDS do
 
   @spec maybe_combine_states([item()]) :: [item()]
   defp maybe_combine_states([]), do: []
+  defp maybe_combine_states([_single_state] = state), do: state
 
   defp maybe_combine_states(states) do
     cond do

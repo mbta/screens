@@ -86,8 +86,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           routes: routes
         }
 
-      [%ServiceEnded{displayed_headsign: displayed_headsign, routes: routes}] ->
-        %OvernightSection{headsign: displayed_headsign, header: header, routes: routes}
+      [
+        %ServiceEnded{
+          displayed_headsign: displayed_headsign,
+          routes: routes,
+          last_schedule: last_schedule
+        }
+      ] ->
+        %OvernightSection{
+          headsign: displayed_headsign,
+          header: header,
+          last_schedule: last_schedule,
+          routes: routes
+        }
 
       [
         %Headways{

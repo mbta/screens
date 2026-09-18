@@ -821,7 +821,7 @@ defmodule Screens.V2.RDSTest do
                 [
                   service_ended(
                     [{"70061", "l1", "Alewife"}],
-                    nil,
+                    first_schedule,
                     [
                       %Route{id: "r1", line: %Line{id: "l1"}, type: :bus}
                     ],
