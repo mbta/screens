@@ -1138,7 +1138,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           grouping_type: :time,
           rows: [
             expected_primary_departure,
-            {%Line{id: "l1"}, 0, {6, 10}, "other_headsign"}
+            {%Route{id: "r1"}, 0, {6, 10}, "other_headsign"}
           ]
         }
       ]
