@@ -97,13 +97,13 @@ export const useHorizontalAutoSize = <T extends Value>(
 };
 
 /**
- * Like `useAutoSize`, but for content that may have an abbreviated fallback
- * value. `values` is either a single (non-abbreviated) value, or a
+ * Like {@link useAutoSize}, but for content that may have an abbreviated fallback value.
+ * @param `sizeSteps` the array of size steps to try before falling back to the abbreviated value.
+ * @param `values` is either a single (non-abbreviated) value, or a
  * `[fullText, abbreviatedText]` pair sent by the backend. If a pair is given,
  * an extra step trying the abbreviated text is appended after `sizeSteps` is
  * otherwise exhausted.
- *
- * `key` behaves as in `useAutoSize`: any value not already covered by
+ * @param `key` behaves as in `useAutoSize`: any value not already covered by
  * `values` that could affect overflow should be included here.
  */
 export const useAutoSizeWithAbbreviation = (

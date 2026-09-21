@@ -1,6 +1,9 @@
 import type { ComponentType, ReactNode } from "react";
 
-import RoutePill, { routePillKey } from "Components/departures/route_pill";
+import RoutePill, {
+  Pill,
+  routePillKey,
+} from "Components/departures/route_pill";
 import { useAutoSizeWithAbbreviation } from "Hooks/use_auto_size";
 import { classWithModifier, classWithModifiers, imagePath } from "Util/utils";
 
@@ -10,7 +13,7 @@ interface Props {
   cause: string;
   remedy: string;
   show_alternate_route_text: boolean;
-  routes: any[]; // shouldn't be "any"
+  routes: Pill[];
   effect: string;
   updated_at: string;
   urgent: boolean;

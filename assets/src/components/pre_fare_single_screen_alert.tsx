@@ -120,20 +120,28 @@ const DownstreamLayout: ComponentType<DownstreamLayoutProps> = ({
   disruptionDiagram,
   alternateRouteURL,
   qrCodeURL,
-}) => (
-  <div className={classWithModifier("alert-card__content-block", "downstream")}>
-    {disruptionDiagram && <MapSection disruptionDiagram={disruptionDiagram} />}
-    <DownstreamIssueSection endpoints={endpoints} />
-    <RemedySection
-      effect={effect}
-      remedy={remedy[0]}
-      contentTextSize="medium"
-      show_alternate_route_text={show_alternate_route_text}
-      alternateRouteURL={alternateRouteURL}
-      qrCodeURL={qrCodeURL}
-    />
-  </div>
-);
+}) => {
+  const displayRemedy = Array.isArray(remedy) ? remedy[0] : remedy;
+
+  return (
+    <div
+      className={classWithModifier("alert-card__content-block", "downstream")}
+    >
+      {disruptionDiagram && (
+        <MapSection disruptionDiagram={disruptionDiagram} />
+      )}
+      <DownstreamIssueSection endpoints={endpoints} />
+      <RemedySection
+        effect={effect}
+        remedy={displayRemedy}
+        contentTextSize="medium"
+        show_alternate_route_text={show_alternate_route_text}
+        alternateRouteURL={alternateRouteURL}
+        qrCodeURL={qrCodeURL}
+      />
+    </div>
+  );
+};
 
 interface PartialClosureLayoutProps {
   routes: EnrichedRoute[];
