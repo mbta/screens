@@ -29,8 +29,8 @@ defmodule Screens.Config.Backup do
   @deployed_environments ~w[dev dev-green dev-blue prod]
 
   @doc "Writes a backup of the current screen configs."
-  @spec run(DateTime.t()) :: {:ok, backup_result()} | {:error, term()}
-  def run(now \\ DateTime.utc_now()) do
+  @spec capture_latest(DateTime.t()) :: {:ok, backup_result()} | {:error, term()}
+  def capture_latest(now \\ DateTime.utc_now()) do
     configs = ScreenConfigs.all()
 
     if any_updated_since_last_backup?(configs) do
@@ -38,11 +38,21 @@ defmodule Screens.Config.Backup do
 
       now
       |> DateTime.truncate(:second)
-      |> write_backup(configs)
+      |> write_backup(configs, &@store.put_latest/1)
     else
       Logster.info(["screen_configs_backup_latest", status: "skipped"])
       {:ok, :skipped}
     end
+  end
+
+  @doc "Writes a dated snapshot of the current screen configs."
+  @spec capture_daily(DateTime.t()) :: {:ok, backup_result()} | {:error, term()}
+  def capture_daily(now \\ DateTime.utc_now()) do
+    configs = ScreenConfigs.all()
+    now = DateTime.truncate(now, :second)
+
+    Logster.info(["screen_configs_backup_snapshot", status: "started"])
+    write_backup(now, configs, &@store.put_daily(&1, DateTime.to_date(now)))
   end
 
   # Skips writing a new backup if nothing has changed since the last one was exported, to avoid
@@ -50,7 +60,7 @@ defmodule Screens.Config.Backup do
   @spec any_updated_since_last_backup?([ScreenConfig.t()]) :: boolean()
   defp any_updated_since_last_backup?(configs) do
     with {:ok, backup_json} <-
-           @store.fetch_backup(Application.get_env(:screens, :environment_name)),
+           @store.fetch_latest(Application.get_env(:screens, :environment_name)),
          {:ok, %{"meta" => %{"exported_at" => exported_at}}} <- Jason.decode(backup_json),
          {:ok, exported_at, _offset} <- DateTime.from_iso8601(exported_at) do
       Enum.any?(configs, fn %ScreenConfig{updated_at: updated_at} ->
@@ -61,9 +71,9 @@ defmodule Screens.Config.Backup do
     end
   end
 
-  @spec write_backup(DateTime.t(), [ScreenConfig.t()]) ::
+  @spec write_backup(DateTime.t(), [ScreenConfig.t()], (String.t() -> :ok | :error)) ::
           {:ok, backup_result()} | {:error, term()}
-  defp write_backup(now, configs) do
+  defp write_backup(now, configs, put_backup_fn) do
     payload = %{
       meta: %{
         environment: Application.get_env(:screens, :environment_name),
@@ -76,7 +86,7 @@ defmodule Screens.Config.Backup do
     }
 
     with {:ok, json} <- Jason.encode(payload, pretty: true),
-         :ok <- @store.put_backup(json) do
+         :ok <- put_backup_fn.(json) do
       {:ok, %{count: length(configs)}}
     else
       :error -> {:error, :backup_write_failed}
@@ -112,7 +122,7 @@ defmodule Screens.Config.Backup do
   end
 
   defp do_restore(environment) do
-    with {:ok, json} <- @store.fetch_backup(environment),
+    with {:ok, json} <- @store.fetch_latest(environment),
          {:ok, %{"screens" => screens}} when is_map(screens) <- Jason.decode(json),
          {:ok, %{upserted: upserted, deleted: deleted}} <- ScreenConfigs.replace_all(screens),
          {:ok, %{copied: copied}} <- sync_assets(environment) do
