@@ -6,7 +6,7 @@ defmodule Screens.Config.Backup.Store.Local do
   @behaviour Screens.Config.Backup.Store
 
   @impl true
-  def fetch_backup(_environment_name) do
+  def fetch_latest(_environment_name) do
     case File.read(backup_path()) do
       {:ok, contents} -> {:ok, contents}
       {:error, _} -> :error
@@ -14,9 +14,21 @@ defmodule Screens.Config.Backup.Store.Local do
   end
 
   @impl true
-  def put_backup(file_contents) do
+  def put_latest(file_contents) do
     path = backup_path()
 
+    write(path, file_contents)
+  end
+
+  @impl true
+  def put_daily(file_contents, date) do
+    environment = Application.get_env(:screens, :environment_name)
+    path = Path.join([Path.dirname(backup_path()), "backups", environment, "#{date}.json"])
+
+    write(path, file_contents)
+  end
+
+  defp write(path, file_contents) do
     with :ok <- File.mkdir_p(Path.dirname(path)),
          :ok <- File.write(path, file_contents) do
       :ok
