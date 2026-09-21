@@ -49,10 +49,10 @@ defmodule Screens.V2.ScreenData.CacheTest do
       deny(@store, :transaction, 2)
       expect(@store, :find_node, fn "1" -> {:ok, :other_node} end)
 
-      expect(@store, :call, fn :other_node, Cache, :instances, ["1", @screen], _ ->
+      expect(@store, :call, fn :other_node, Cache, :instances, ["1", @screen], _timeout ->
         # From the remote node's perspective this is a "local" key; the local node should
         # correctly tell the caller this was a remote key, leaving the "what" alone
-        {[@widget], %Cache.Meta{what: {:error, :foo, @error}, where: :local}}
+        {:ok, {[@widget], %Cache.Meta{what: {:error, :foo, @error}, where: :local}}}
       end)
 
       assert Cache.instances("1", @screen) ==
@@ -87,20 +87,17 @@ defmodule Screens.V2.ScreenData.CacheTest do
                {[@widget], %Cache.Meta{what: {:error, :put, @error}, where: :local}}
     end
 
-    test "falls back to local generation when unable to call a remote owner node" do
+    test "falls back to local generation when unable to connect to a remote owner node" do
       expect(@store, :find_node, fn "1" -> {:ok, :other_node} end)
-      expect(@store, :call, fn :other_node, _mod, _fun, _args, _timeout -> {:error, @error} end)
+      expect(@store, :call, fn :other_node, _, _, _, _ -> {:error, {:erpc, :noconnection}} end)
 
       assert Cache.instances("1", @screen) ==
-               {[@widget], %Cache.Meta{what: {:error, :rpc, @error}, where: :remote}}
+               {[@widget], %Cache.Meta{what: {:error, :no_connection, nil}, where: :remote}}
     end
 
     test "raises when calling a remote owner node times out" do
       expect(@store, :find_node, fn "1" -> {:ok, :other_node} end)
-
-      expect(@store, :call, fn :other_node, _mod, _fun, _args, _timeout ->
-        {:error, %Nebulex.Error{reason: {:rpc, {:error, :timeout}}}}
-      end)
+      expect(@store, :call, fn :other_node, _, _, _, _ -> {:error, {:erpc, :timeout}} end)
 
       assert_raise Screens.V2.CandidateGenerator.Timeout, fn -> Cache.instances("1", @screen) end
     end

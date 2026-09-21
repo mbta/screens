@@ -21,9 +21,10 @@ defmodule Screens.V2.ScreenData.Cache do
     @type key :: String.t()
     @type value :: [Screens.V2.WidgetInstance.t()]
 
-    @typep error :: {:error, Nebulex.Error.t()}
+    @type error :: {:error, Nebulex.Error.t()}
 
-    @callback call(node(), module(), atom(), [any()], timeout()) :: any()
+    @callback call(node(), module(), atom(), [any()], timeout()) :: {:ok, any()} | {:error, any()}
+    @callback delete_all(Nebulex.Cache.query_spec()) :: {:ok, non_neg_integer()} | error()
     @callback fetch(key()) :: {:ok, value()} | error()
     @callback find_node(key()) :: {:ok, node()} | error()
     @callback put(key(), value(), keyword()) :: :ok | error()
@@ -34,17 +35,24 @@ defmodule Screens.V2.ScreenData.Cache do
       use Nebulex.Cache, otp_app: :screens, adapter: Nebulex.Adapters.Partitioned
     end
 
-    defdelegate call(node, mod, fun, args, timeout), to: Nebulex.Distributed.RPC
+    defdelegate delete_all(query), to: Adapter
     defdelegate fetch(key), to: Adapter
     defdelegate find_node(key), to: Adapter
     defdelegate put(key, value, opts \\ []), to: Adapter
     defdelegate transaction(fun, opts \\ []), to: Adapter
+
+    @doc "Wrapper for `:erpc.call/5` that returns an `:ok`/`:error` tuple instead of raising."
+    def call(node, mod, fun, args, timeout) do
+      {:ok, :erpc.call(node, mod, fun, args, timeout)}
+    rescue
+      e in ErlangError -> {:error, e.original}
+    end
   end
 
   defmodule Meta do
     @moduledoc "Metadata returned about the internal cache operations."
     @type t :: %__MODULE__{
-            what: :hit | :miss | {:error, operation :: atom(), Nebulex.Error.t()},
+            what: :hit | :miss | {:error, operation :: atom(), Nebulex.Error.t() | nil},
             where: :local | :remote
           }
     defstruct what: :miss, where: :local
@@ -56,6 +64,19 @@ defmodule Screens.V2.ScreenData.Cache do
   import Screens.Inject
   @parameters injected(Screens.V2.ScreenData.Parameters)
   @store injected(Store)
+
+  @doc """
+  Clear the cache for the given screens, running a supplied function in a transaction that locks
+  the given screen IDs, enabling consistency for operations that change screen configs. The cache
+  delete is also part of this transaction, and if it fails, the function is not called.
+  """
+  @callback invalidate([Store.key()], (-> res)) :: {:ok, res} | Store.error() when res: any()
+  def invalidate(keys, func) do
+    @store.transaction(
+      fn -> with {:ok, _count} <- @store.delete_all(in: keys), do: func.() end,
+      keys: keys
+    )
+  end
 
   @doc """
   Fetch or generate the widgets for a given screen.
@@ -84,9 +105,18 @@ defmodule Screens.V2.ScreenData.Cache do
         # instead of retrying the generation ourself, since the app may be overloaded and at that
         # point the client has been waiting on us for a long time.
         case @store.call(node, __MODULE__, :instances, [id, screen], 20_000) do
-          {:error, %Nebulex.Error{reason: {:rpc, {:error, :timeout}}}} -> raise Timeout
-          {:error, e} -> {generate(screen), %Meta{what: {:error, :rpc, e}, where: :remote}}
-          {instances, %Meta{} = meta} -> {instances, %Meta{meta | where: :remote}}
+          {:ok, {instances, %Meta{} = meta}} ->
+            {instances, %Meta{meta | where: :remote}}
+
+          # If unable to reach the remote node, generating instances locally might still work.
+          {:error, {:erpc, :noconnection}} ->
+            {generate(screen), %Meta{what: {:error, :no_connection, nil}, where: :remote}}
+
+          {:error, {:erpc, :timeout}} ->
+            raise Timeout
+
+          {:error, {:exception, Timeout, stacktrace}} ->
+            reraise Timeout, stacktrace
         end
 
       {:error, error} ->

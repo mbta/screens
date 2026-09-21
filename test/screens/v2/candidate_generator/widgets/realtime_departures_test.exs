@@ -20,6 +20,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   alias ScreensConfig.Screen
   alias ScreensConfig.Screen.BusShelter
 
+  import Screens.TestSupport.RouteBuilder
   import Screens.Inject
   import Mox
   setup :verify_on_exit!
@@ -57,7 +58,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       routes: [
         %Screens.Routes.Route{
           id: "r1",
-          short_name: nil,
+          short_name: "",
           long_name: nil,
           direction_names: nil,
           direction_destinations: nil,
@@ -71,7 +72,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
         },
         %Screens.Routes.Route{
           id: "r2",
-          short_name: nil,
+          short_name: "",
           long_name: nil,
           direction_names: nil,
           direction_destinations: nil,
@@ -234,6 +235,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       schedule = build_schedule("route_two", "line_id_two")
       departure = build_departure("r1", 0, :bus)
 
+      expected_routes = [
+        route(id: "r1", line_id: "l1", type: :bus),
+        route(id: "r2", line_id: "l2", type: :bus)
+      ]
+
       expect(@rds, :get, fn _departures, @now ->
         [
           {:ok,
@@ -261,16 +267,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      layout: %Layout{},
                      rows: [^departure, %Departure{schedule: ^schedule, prediction: nil}]
                    },
-                   %NormalSection{
-                     header: %Header{},
-                     grouping_type: :time,
-                     layout: %Layout{},
-                     rows: [
-                       %ScreensConfig.FreeTextLine{
-                         icon: :bus,
-                         text: ["No departures currently available"]
-                       }
-                     ]
+                   %Screens.V2.WidgetInstance.Departures.NoServiceSection{
+                     header: %ScreensConfig.Departures.Header{},
+                     headsign: nil,
+                     routes: ^expected_routes
                    }
                  ]
                }
@@ -294,6 +294,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
         ]
       end)
 
+      expected_routes = [
+        route(id: "r1", line_id: "l1", type: :bus),
+        route(id: "r2", line_id: "l2", type: :bus)
+      ]
+
       assert [
                %DeparturesWidget{
                  now: @now,
@@ -301,16 +306,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                  screen: ^config,
                  sections: [
                    %NormalSection{header: %Header{title: "Test Header"}, rows: []},
-                   %NormalSection{
-                     header: %Header{},
-                     grouping_type: :time,
-                     layout: %Layout{},
-                     rows: [
-                       %ScreensConfig.FreeTextLine{
-                         icon: :bus,
-                         text: ["No departures currently available"]
-                       }
-                     ]
+                   %Screens.V2.WidgetInstance.Departures.NoServiceSection{
+                     header: %ScreensConfig.Departures.Header{},
+                     headsign: nil,
+                     routes: ^expected_routes
                    }
                  ]
                }

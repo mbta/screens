@@ -1,7 +1,7 @@
 defmodule Screens.Config.Backup.Runner do
   @moduledoc """
-  Periodically runs a screen config backup. This runs on every instance, but the backup itself is
-  guarded by an advisory lock so only one instance does the work for a given interval.
+  Periodically runs a screen config backup. This is wrapped in `Highlander` (see
+  `Screens.Application`) so that it only ever runs on one node in the cluster at a time.
 
   Since we never need to maintain any state between runs, this is a task supervised by a
   `Task.Supervisor` rather than a `GenServer`.

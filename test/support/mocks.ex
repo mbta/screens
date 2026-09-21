@@ -16,6 +16,7 @@ injected_modules = [
   Screens.V2.Departure,
   Screens.V2.RDS,
   Screens.V2.ScreenData,
+  Screens.V2.ScreenData.Cache,
   Screens.V2.ScreenData.Cache.Store,
   Screens.V2.ScreenData.Parameters
 ]
@@ -26,11 +27,3 @@ end
 
 Mox.defmock(Screens.DeviceMonitor.MockVendor, for: Screens.DeviceMonitor.Vendor)
 Mox.defmock(Screens.ScreensByAlert.Mock, for: Screens.ScreensByAlert.Behaviour)
-
-defmodule Screens.Repo.AdvisoryLock.Sleeper.Mock do
-  @moduledoc "No-op sleeper so tests don't have to wait out `AdvisoryLock`'s hold interval."
-  @behaviour Screens.Repo.AdvisoryLock.Sleeper
-
-  @impl true
-  def sleep(_ms), do: :ok
-end

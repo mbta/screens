@@ -4,6 +4,7 @@ defmodule ScreensWeb.AdminApiController do
   alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.{Image, Util}
   alias Screens.ScreenConfigs
+  alias Screens.V2.ScreenData
   alias ScreensConfig.{Config, Screen}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
@@ -62,23 +63,17 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{success: true, config: validated_json})
   end
 
-  def confirm(conn, %{"id" => id, "config" => screen_json}) do
-    screen = screen_json |> Jason.decode!() |> Screen.from_json()
-    %Config{screens: screens} = config = fetch_config()
-
-    %Config{config | screens: Map.put(screens, id, screen)}
-    |> put_config()
+  def confirm(conn, %{"config" => config, "changed_ids" => changed_ids}) do
+    config
+    |> Jason.decode!()
+    |> Config.from_json()
+    |> put_config(changed_ids)
     |> to_success_response(conn)
   end
 
-  def confirm(conn, %{"config" => config}) do
-    config |> Jason.decode!() |> Config.from_json() |> put_config() |> to_success_response(conn)
-  end
-
   def refresh(conn, %{"screen_ids" => screen_ids}) do
-    fetch_config()
-    |> Config.schedule_refresh_for_screen_ids(screen_ids)
-    |> put_config()
+    screen_ids
+    |> ScreenConfigs.schedule_refresh_for_screen_ids()
     |> to_success_response(conn)
   end
 
@@ -167,21 +162,28 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   @spec put_config(Config.t()) :: :ok | :error
-  defp put_config(%Config{} = config) do
-    config
-    |> Config.to_json()
-    |> Jason.encode!(pretty: true)
-    |> ConfigFetch.put_config()
+  defp put_config(%Config{} = config, ids_changed \\ []) do
+    ScreenData.Cache.invalidate(ids_changed, fn ->
+      config
+      |> Config.to_json()
+      |> Jason.encode!(pretty: true)
+      |> ConfigFetch.put_config()
+    end)
+    |> case do
+      {:ok, result} -> result
+      {:error, _} -> :error
+    end
   end
 
   @spec to_success_response(:ok | :error, Plug.Conn.t()) :: Plug.Conn.t()
   defp to_success_response(result, conn) do
-    success =
+    response =
       case result do
-        :ok -> true
-        :error -> false
+        :ok -> %{success: true}
+        :error -> %{success: false}
+        {:error, reason} -> %{success: false, error: inspect(reason)}
       end
 
-    json(conn, %{success: success})
+    json(conn, response)
   end
 end

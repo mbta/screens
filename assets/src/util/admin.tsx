@@ -265,6 +265,7 @@ export const commitScreenConfigChanges = async (
   } else {
     const response = await fetch.post("/api/admin/screens/confirm", {
       config: JSON.stringify(localConfig),
+      changed_ids: changedScreenIds,
     });
 
     return response;

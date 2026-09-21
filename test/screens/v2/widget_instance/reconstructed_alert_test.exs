@@ -1422,7 +1422,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:station_closure)
         |> put_informed_station_names(["Jackson Square"])
         |> put_informed_entities([
-          ie(stop_id: "place-jaksn", route: "Orange", route_type: 1)
+          ie(stop_id: "place-jaksn", route: "Orange", route_type: 1, direction_id: 0)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1442,10 +1442,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       expected = %{
         alternate_route_url: "mbta.com/alerts",
         qr_code_url: "go.mbta.com/a/123/r/Orange",
-        issue: "Jackson Square: Trains skip Forest Hills platform",
+        issue: "Stop Skipped: Jackson Square (Southbound)",
         remedy: "Some information typed into the alert",
         cause: nil,
-        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        routes: [%{route_id: "Orange", svg_name: "ol-forest-hills", headsign: "Forest Hills"}],
         effect: :station_closure,
         updated_at: "Jun 9",
         end_time: "tomorrow",
@@ -1457,11 +1457,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert %{
                issue: [
-                 "Jackson Square: Trains skip Forest Hills platform",
-                 "Jackson Sq: Trains skip Frst Hills platform"
+                 "Stop Skipped: Jackson Square (Southbound)",
+                 "Stop Skipped: Jackson Sq (Southbound)"
                ]
-             } =
-               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+             } = widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
     @tag :capture_log
@@ -2102,8 +2101,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-asmnl")
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-portr", route: "Red", route_type: 1),
-          ie(stop_id: "70065", route: "Red", route_type: 1)
+          ie(stop_id: "place-portr", route: "Red", route_type: 1, direction_id: 0),
+          ie(stop_id: "70065", route: "Red", route_type: 1, direction_id: 0)
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [["place-portr", "place-asmnl"]]
@@ -2113,7 +2112,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_partial_closure_platform_names(["Ashmont/Braintree"])
 
       expected = %{
-        issue: "Porter: Trains skip Ashmont/Braintree platform",
+        issue: "Stop Skipped: Porter (Southbound)",
         location: "",
         cause: nil,
         routes: [

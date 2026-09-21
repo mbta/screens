@@ -474,7 +474,7 @@ config :screens, Screens.ScreensByAlert.SelfRefreshRunner, batch_size: 20, concu
 
 config :screens, Screens.Config.Backup,
   enabled: true,
-  interval_ms: :timer.seconds(10),
+  interval_ms: :timer.minutes(5),
   store: Screens.Config.Backup.Store.S3
 
 config :screens, Screens.DeviceMonitor.Store, backend: Screens.DeviceMonitor.Store.Local

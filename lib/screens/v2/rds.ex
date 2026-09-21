@@ -59,11 +59,12 @@ defmodule Screens.V2.RDS do
     and no scheduled departures for the day.
     """
     @type t :: %__MODULE__{
+            direction_id: Trip.direction() | nil,
+            displayed_headsign: String.t() | nil,
             destinations: [Screens.V2.RDS.destination()],
-            routes: [Route.t()],
-            direction_id: Trip.direction() | nil
+            routes: [Route.t()]
           }
-    defstruct ~w[destinations routes direction_id]a
+    defstruct ~w[direction_id displayed_headsign destinations routes]a
   end
 
   defmodule Countdowns do
@@ -99,12 +100,12 @@ defmodule Screens.V2.RDS do
     all of the `ServiceEnded` states into one item.
     """
     @type t :: %__MODULE__{
-            destinations: [Screens.V2.RDS.destination()],
             displayed_headsign: String.t(),
-            routes: [Route.t()],
-            last_schedule: Schedule.t() | nil
+            destinations: [Screens.V2.RDS.destination()],
+            last_schedule: Schedule.t() | nil,
+            routes: [Route.t()]
           }
-    defstruct ~w[destinations displayed_headsign routes last_schedule]a
+    defstruct ~w[displayed_headsign destinations last_schedule routes]a
   end
 
   defmodule Headways do
@@ -115,13 +116,13 @@ defmodule Screens.V2.RDS do
     Shows an every “X-Y” minutes message. 
     """
     @type t :: %__MODULE__{
-            destinations: [Screens.V2.RDS.destination()],
-            routes: [Route.t()],
+            direction_id: Trip.direction() | nil,
             displayed_headsign: String.t(),
+            destinations: [Screens.V2.RDS.destination()],
             range: Headway.range(),
-            direction_id: Trip.direction() | nil
+            routes: [Route.t()]
           }
-    defstruct ~w[destinations routes displayed_headsign range direction_id]a
+    defstruct ~w[direction_id displayed_headsign destinations range routes]a
   end
 
   @alert injected(Alert)
@@ -375,13 +376,7 @@ defmodule Screens.V2.RDS do
   defp maybe_combine_states(states) do
     cond do
       no_service?(states) ->
-        [
-          %NoService{
-            destinations: states |> Enum.flat_map(& &1.destinations) |> Enum.uniq(),
-            routes: states |> Enum.flat_map(& &1.routes) |> Enum.uniq(),
-            direction_id: nil
-          }
-        ]
+        combine_no_service_states_for_section(states)
 
       service_ended?(states) ->
         combine_service_ended_states_for_section(states)
@@ -412,6 +407,28 @@ defmodule Screens.V2.RDS do
 
         countdowns_states ++ headway_states ++ other_states
     end
+  end
+
+  @spec combine_no_service_states_for_section([RDS.NoService.t()]) :: [RDS.NoService.t()]
+  defp combine_no_service_states_for_section([%NoService{} | _] = states) do
+    {state_destinations, routes, direction_id} =
+      get_combined_destinations_routes_direction_ids(states)
+
+    representative_route = List.first(routes)
+
+    [
+      %NoService{
+        destinations: state_destinations,
+        displayed_headsign:
+          if is_nil(representative_route) do
+            nil
+          else
+            get_common_headsign(state_destinations, representative_route, direction_id)
+          end,
+        routes: routes,
+        direction_id: direction_id
+      }
+    ]
   end
 
   @spec combine_service_ended_states_for_section([RDS.ServiceEnded.t()]) :: [RDS.ServiceEnded.t()]
@@ -450,11 +467,13 @@ defmodule Screens.V2.RDS do
     direction_id =
       states
       |> Enum.map(fn
+        %NoService{direction_id: direction_id} -> direction_id
         %ServiceEnded{last_schedule: %Schedule{direction_id: direction_id}} -> direction_id
         %Headways{direction_id: direction_id} -> direction_id
       end)
       |> Enum.uniq()
       |> case do
+        [nil] -> nil
         [one_direction] -> one_direction
         _ -> nil
       end

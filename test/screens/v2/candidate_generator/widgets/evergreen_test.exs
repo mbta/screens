@@ -38,7 +38,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.EvergreenTest do
                    screen: screen,
                    slot_names: ~w[screen]a,
                    alerts: ["fake alert 1", "fake alert 2"],
-                   asset_url: "https://mbta-screens.s3.amazonaws.com/screens-dev/asset.png",
+                   asset_url: "https://mbta-screens.s3.amazonaws.com/screens-local/asset.png",
                    priority: [0],
                    schedule: %AlertSchedule{alert_ids: ~w[1 2]},
                    now: @now,

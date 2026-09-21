@@ -11,7 +11,7 @@ defmodule Screens.Config.Backup.Store.Mixed do
   alias Screens.Config.Backup.Store.S3
 
   @impl true
-  def fetch_backup("local"), do: Local.fetch_backup("local")
+  def fetch_backup("screens-local"), do: Local.fetch_backup("local")
   def fetch_backup(environment), do: S3.fetch_backup(environment)
 
   @impl true

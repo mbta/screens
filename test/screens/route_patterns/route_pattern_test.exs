@@ -320,5 +320,104 @@ defmodule Screens.RoutePatterns.RoutePatternTest do
       assert {:ok, [%RoutePattern{id: "rp-blue"}]} =
                RoutePattern.fetch(%{typicality: 1}, get_json_fn)
     end
+
+    test "doesn't trust the API's route filter" do
+      get_json_fn =
+        fn "route_patterns",
+           %{
+             "filter[route]" => "Blue",
+             "include" => "route.line,representative_trip.stops.parent_station"
+           } ->
+          {
+            :ok,
+            %{
+              "data" => [
+                %{
+                  "id" => "rp-blue",
+                  "type" => "route_pattern",
+                  "attributes" => %{
+                    "canonical" => true,
+                    "direction_id" => 0,
+                    "typicality" => 1
+                  },
+                  "relationships" => %{
+                    "representative_trip" => %{"data" => %{"id" => "trip-blue", "type" => "trip"}},
+                    "route" => %{"data" => %{"id" => "Blue", "type" => "route"}}
+                  }
+                },
+                %{
+                  "id" => "rp-shuttle",
+                  "type" => "route_pattern",
+                  "attributes" => %{
+                    "canonical" => true,
+                    "direction_id" => 0,
+                    "typicality" => 1
+                  },
+                  "relationships" => %{
+                    "representative_trip" => %{
+                      "data" => %{"id" => "trip-shuttle", "type" => "trip"}
+                    },
+                    "route" => %{"data" => %{"id" => "Blue-Shuttle", "type" => "route"}}
+                  }
+                }
+              ],
+              "included" => [
+                %{
+                  "id" => "Blue",
+                  "type" => "route",
+                  "attributes" => %{
+                    "direction_destinations" => ["Bowdoin", "Wonderland"],
+                    "direction_names" => ["South", "North"],
+                    "long_name" => "Blue Line",
+                    "short_name" => "",
+                    "type" => 1
+                  },
+                  "relationships" => %{
+                    "line" => %{"data" => %{"id" => "line-Blue", "type" => "line"}}
+                  }
+                },
+                %{
+                  "id" => "line-Blue",
+                  "type" => "line",
+                  "attributes" => %{
+                    "long_name" => "Blue Line",
+                    "short_name" => "",
+                    "sort_order" => 0
+                  }
+                },
+                %{
+                  "id" => "Blue-Shuttle",
+                  "type" => "route",
+                  "attributes" => %{
+                    "direction_destinations" => ["Bowdoin", "Wonderland"],
+                    "direction_names" => ["South", "North"],
+                    "long_name" => "Blue Line Shuttle",
+                    "short_name" => "",
+                    "type" => 3
+                  },
+                  "relationships" => %{
+                    "line" => %{"data" => %{"id" => "line-Blue", "type" => "line"}}
+                  }
+                },
+                %{
+                  "id" => "trip-blue",
+                  "type" => "trip",
+                  "attributes" => %{"headsign" => "Bowdoin"},
+                  "relationships" => %{"stops" => %{"data" => []}}
+                },
+                %{
+                  "id" => "trip-shuttle",
+                  "type" => "trip",
+                  "attributes" => %{"headsign" => "Bowdoin"},
+                  "relationships" => %{"stops" => %{"data" => []}}
+                }
+              ]
+            }
+          }
+        end
+
+      assert {:ok, [%RoutePattern{id: "rp-blue"}]} =
+               RoutePattern.fetch(%{route_ids: ["Blue"]}, get_json_fn)
+    end
   end
 end

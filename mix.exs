@@ -70,6 +70,7 @@ defmodule Screens.MixProject do
       {:ex_cldr_messages, "~> 2.0"},
       {:gettext, "~> 0.26.1"},
       {:guardian, "~> 2.5.0"},
+      {:highlander, "~> 0.2.1"},
       {:jason, "~> 1.0"},
       {:logster, "~> 2.0.0-rc.5"},
       {:logger_backends, "~> 1.0"},
