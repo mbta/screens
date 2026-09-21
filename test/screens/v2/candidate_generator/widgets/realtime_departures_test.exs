@@ -29,10 +29,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   @now ~U[2020-04-06T10:00:00Z]
 
   defp build_schedule(route_id, line_id, type \\ :bus, direction_id \\ 0) do
+    route = route(id: route_id, name: "short_name", line_id: line_id, type: type)
+
     %Schedule{
       arrival_time: ~U[2026-01-01 12:37:00Z],
       departure_time: ~U[2026-01-01 12:38:00Z],
-      route: %Route{id: route_id, line: %Line{id: line_id}, type: type},
+      route: route,
       trip: %Trip{direction_id: direction_id}
     }
   end
@@ -212,6 +214,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
         ]
       end)
 
+      expected_route =
+        route(id: "route_two", line_id: "line_id_two", type: :bus, name: "short_name")
+
       assert [
                %DeparturesWidget{
                  now: @now,
@@ -222,14 +227,25 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      header: %Header{},
                      grouping_type: :time,
                      layout: %Layout{},
-                     rows: [^departure, %Departure{schedule: ^schedule, prediction: nil}]
+                     rows: [
+                       ^departure,
+                       {%Screens.Schedules.Schedule{
+                          trip: %Screens.Trips.Trip{
+                            direction_id: 0
+                          },
+                          stop: nil,
+                          route: ^expected_route,
+                          arrival_time: ~U[2026-01-01 12:37:00Z],
+                          departure_time: ~U[2026-01-01 12:38:00Z]
+                        }, :first_trip}
+                     ]
                    }
                  ]
                }
              ] = RealtimeDepartures.departures_instances(config, @now)
     end
 
-    test "returns NormalSection with departures and no data sections when we have one section with supported rows and one without" do
+    test "returns NormalSection with departures and no data sections when we have one section with supported rows" do
       config = build_config(["route_A", "route_B"])
 
       schedule = build_schedule("route_two", "line_id_two")
@@ -255,6 +271,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
         ]
       end)
 
+      expected_route =
+        route(id: "route_two", line_id: "line_id_two", type: :bus, name: "short_name")
+
       assert [
                %DeparturesWidget{
                  now: @now,
@@ -265,7 +284,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      header: %Header{},
                      grouping_type: :time,
                      layout: %Layout{},
-                     rows: [^departure, %Departure{schedule: ^schedule, prediction: nil}]
+                     rows: [
+                       ^departure,
+                       {%Screens.Schedules.Schedule{
+                          id: nil,
+                          trip: %Screens.Trips.Trip{
+                            direction_id: 0
+                          },
+                          route: ^expected_route,
+                          arrival_time: ~U[2026-01-01 12:37:00Z],
+                          departure_time: ~U[2026-01-01 12:38:00Z]
+                        }, :first_trip}
+                     ]
                    },
                    %Screens.V2.WidgetInstance.Departures.NoServiceSection{
                      header: %ScreensConfig.Departures.Header{},

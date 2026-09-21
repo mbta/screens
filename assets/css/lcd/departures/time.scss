@@ -72,6 +72,7 @@
   font-size: 72px;
   font-weight: 800;
   line-height: 64px;
+  vertical-align: center;
 }
 
 .departure-time__live-icon {
@@ -79,6 +80,12 @@
   width: 40px;
   height: 40px;
   margin-right: 8px;
+}
+
+.departure-time__first {
+  display: inline-block;
+  margin-right: 24px;
+  font-size: 64px;
 }
 
 .departure-time__moon-icon {
