@@ -168,7 +168,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         location: location
       }) do
     if is_nil(location) do
-      ~E|<%= issue %>. <%= remedy %>|
+      ~E|<%= issue %>. <%= render_remedy(remedy) %>|
     else
       ~E|<%= location %>.|
     end
@@ -179,8 +179,11 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenView do
         issue: issue,
         remedy: remedy
       }) do
-    ~E|<%= issue %>. <%= remedy %>|
+    ~E|<%= issue %>. <%= render_remedy(remedy) %>|
   end
+
+  defp render_remedy([full_remedy | _]), do: full_remedy
+  defp render_remedy(remedy), do: remedy
 
   defp get_line_name([%{color: _color, text: _text, type: _type} | _tail] = routes) do
     routes
