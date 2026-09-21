@@ -9,7 +9,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   """
 
-  alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.V2.Departure
   alias Screens.V2.RDS
@@ -26,7 +25,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.Departures
-  alias ScreensConfig.Departures.{Mode, Params, Section}
+  alias ScreensConfig.Departures.{Params, Section}
 
   @type post_process_rows_fn_t :: ([NormalSection.row()], Section.t(), non_neg_integer() ->
                                      [NormalSection.row()])
@@ -63,9 +62,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
         ) ::
           DeparturesWidget.section()
 
-  defp map_to_departure_section(data, section, _, _)
+  defp map_to_departure_section(
+         data,
+         %Section{params: %Params{mode: mode}},
+         _,
+         _
+       )
        when data == :error or data == {:ok, []},
-       do: %NoDataSection{route: maybe_route_from_section(section)}
+       do: %NoDataSection{mode: mode}
 
   defp map_to_departure_section(
          {:ok, items},
@@ -105,25 +109,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           header: header,
           grouping_type: grouping_type
         }
-    end
-  end
-
-  @spec maybe_route_from_section(Section.t()) :: Route.t() | nil
-  defp maybe_route_from_section(%Section{params: nil}), do: nil
-
-  defp maybe_route_from_section(%Section{params: %Params{mode: mode, route_ids: route_ids}}) do
-    %Route{id: representative_route_id(route_ids), type: Mode.to_route_type(mode)}
-  end
-
-  @spec representative_route_id([String.t()] | nil) :: String.t() | nil
-  defp representative_route_id(nil), do: nil
-  defp representative_route_id([]), do: nil
-
-  defp representative_route_id(route_ids) do
-    if Enum.all?(route_ids, &String.starts_with?(&1, "Green-")) do
-      "Green"
-    else
-      List.first(route_ids)
     end
   end
 
