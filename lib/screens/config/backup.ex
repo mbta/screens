@@ -93,7 +93,7 @@ defmodule Screens.Config.Backup do
   def environments do
     case readable_current_environment() do
       "prod" -> []
-      "local" -> ["local" | @deployed_environments]
+      "local" -> @deployed_environments
       current_env -> List.delete(@deployed_environments, current_env)
     end
   end

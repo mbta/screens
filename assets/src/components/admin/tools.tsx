@@ -136,8 +136,8 @@ const SyncFromSnapshot = () => {
 
     if (
       !window.confirm(
-        `Overwrite all screen configurations and assets with the latest backup from "${environment}"? ` +
-          "Configurations that don't exist in the backup will be deleted.",
+        `Overwrite all screen configurations and assets with the latest backup from ${environment}? ` +
+          `\nConfigurations that don't exist in the backup will be deleted.`,
       )
     ) {
       return;
@@ -160,17 +160,18 @@ const SyncFromSnapshot = () => {
   // There will be no environments to restore from in production, so don't show this section.
   if (environments.length === 0) return null;
 
-  // Display different prompt locally where we don't have assets in S3 to copy over
-  const configSyncPrompt =
-    "Replace all screen configurations in Postgres with the latest snapshot of the selected environment. ";
-  const assetSyncPrompt = ` Assets from the source environment will also be copied over in S3.`;
-  const fullBackupPrompt =
-    configSyncPrompt + (environments[0] === "local" ? "" : assetSyncPrompt);
-
   return (
     <section>
       <h2>Sync Configurations from Source Environment</h2>
-      <p> {fullBackupPrompt} </p>
+      <p>
+        Replace all screen configurations in Postgres with the latest snapshot
+        of the selected environment.
+      </p>
+      <p>
+        Image and audio assets from the source environment will also be copied
+        over within S3, unless running in a local environment.
+      </p>
+
       <form
         onSubmit={(event) => {
           event.preventDefault();
