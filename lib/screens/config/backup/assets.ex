@@ -1,7 +1,7 @@
 defmodule Screens.Config.Backup.Assets do
   @moduledoc """
   Copies screen assets (images, videos, etc.) from a source environment into the environment the
-  app is running in. When running locally, assets are written to a local directory instead of S3.
+  app is running in. When running locally, assets are will not be copied at all.
   """
 
   alias ExAws.S3
