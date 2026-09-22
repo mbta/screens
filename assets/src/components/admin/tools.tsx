@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { fetch } from "Util/admin";
+import { adminEnvironment, fetch } from "Util/admin";
 
 const API_PATH = "/api/admin/maintenance";
 const IMPORT_PATH = "/api/admin/import_configs";
@@ -157,8 +157,10 @@ const SyncFromSnapshot = () => {
     }
   };
 
-  // There will be no environments to restore from in production, so don't show this section.
-  if (environments.length === 0) return null;
+  const currentEnvironment = adminEnvironment();
+
+  // Don't show the sync section in prod, since we never want to overwrite those configs.
+  if (currentEnvironment === "prod") return null;
 
   return (
     <section>
@@ -167,11 +169,12 @@ const SyncFromSnapshot = () => {
         Replace all screen configurations in Postgres with the latest snapshot
         of the selected environment.
       </p>
-      <p>
-        Image and audio assets from the source environment will also be copied
-        over within S3, unless running in a local environment.
-      </p>
-
+      {currentEnvironment !== "local" && (
+        <p>
+          Image and audio assets from the source environment will also be copied
+          over within S3.
+        </p>
+      )}
       <form
         onSubmit={(event) => {
           event.preventDefault();

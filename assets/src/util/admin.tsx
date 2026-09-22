@@ -1,5 +1,6 @@
 import { type Key, type RefCallback, useState } from "react";
 import getCsrfToken from "Util/csrf";
+import { getDatasetValue } from "Util/dataset";
 
 type JSONArray = Array<JSON>;
 type JSONObject = { [key: string]: JSON };
@@ -271,3 +272,7 @@ export const commitScreenConfigChanges = async (
     return response;
   }
 };
+
+// Returns the current admin environment, stripping the "screens-" prefix if present.
+export const adminEnvironment = () =>
+  (getDatasetValue("environmentName") ?? "no bueno").replace(/^screens-/, "");
