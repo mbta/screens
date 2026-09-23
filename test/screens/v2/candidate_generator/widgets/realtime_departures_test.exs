@@ -123,7 +123,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
        ) do
     %RDS.Headways{
       destinations: [{%Stop{id: stop_id}, %Line{id: line_id}, headsign}],
-      routes: [%Route{id: route_id}],
+      routes: [%Route{id: route_id, short_name: "", line: %Line{id: line_id}}],
       displayed_headsign: direction_name,
       direction_id: direction_id,
       range: {5, 10}
@@ -379,6 +379,41 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
              ] = RealtimeDepartures.departures_instances(config, @now)
     end
 
+    test "returns NormalSection with departures and headways" do
+      config = build_config(["route_A"])
+
+      departure = build_departure("r1", 0, :bus)
+
+      route = route(id: "route_id_one", line_id: "line_id_two")
+      headway = {route, 0, {5, 10}, "Westbound"}
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             countdowns("stop_id_one", "line_id_one", "headsign", [departure]),
+             headways("stop_id_two", "line_id_two", "headsign", "route_id_one", "Westbound", 0)
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %NormalSection{
+                     header: %Header{},
+                     grouping_type: :time,
+                     layout: %Layout{},
+                     rows: [^departure, ^headway]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
     test "returns OvernightSection when section only contains Service Ended" do
       config = build_config(["route_A"])
 
@@ -405,6 +440,37 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      header: %Header{},
                      headsign: "headsign_one",
                      routes: [%Route{id: "route_one"}]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "returns NormalSection with a headway row for a HeadwaySection" do
+      config = build_config(["route_A"])
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             headways("stop_id_one", "line_id_one", "headsign", "route_one", "Westbound", 0)
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %NormalSection{
+                     header: %Header{},
+                     grouping_type: :time,
+                     layout: %Layout{},
+                     rows: [
+                       {%Screens.Routes.Route{id: "route_one"}, nil, {5, 10}, "Westbound"}
+                     ]
                    }
                  ]
                }

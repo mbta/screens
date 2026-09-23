@@ -23,7 +23,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
-  alias ScreensConfig.Departures.{Filters, Mode, Section}
+  alias ScreensConfig.Departures.{Filters, Section}
   alias ScreensConfig.Departures.Filters.{RouteDirections, RouteDirections.RouteDirection}
   alias ScreensConfig.Screen.{Busway, PreFare}
 
@@ -94,6 +94,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
             {%NoServiceSection{} = no_service_section, _section} ->
               no_service_section
 
+            # The current headway section presentation is just one row with a headway value, 
+            # so we can reuse a NormalSection with a single Headway row
+            {%HeadwaySection{
+               headsign: headsign,
+               route: route,
+               time_range: time_range
+             }, %Section{header: header, layout: layout, grouping_type: grouping_type}} ->
+              %NormalSection{
+                header: header,
+                layout: layout,
+                grouping_type: grouping_type,
+                rows: [{route, nil, time_range, headsign}]
+              }
+
             {%NormalSection{} = normal_section, _section} ->
               normal_section
 
@@ -114,7 +128,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
       is_nil(params) or
         (is_struct(section_data, NormalSection) and has_valid_normal_section_row?(section_data)) or
         is_struct(section_data, OvernightSection) or
-        is_struct(section_data, NoServiceSection)
+        is_struct(section_data, NoServiceSection) or
+        is_struct(section_data, HeadwaySection)
     end)
   end
 
@@ -124,18 +139,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     end)
   end
 
-  defp handle_unsupported_sections(
-         section_to_change,
-         %Section{header: header, layout: layout, grouping_type: grouping_type}
-       ) do
-    text =
-      case section_to_change do
-        %HeadwaySection{route: route, headsign: headsign} -> headway_text(route, headsign)
-        %NoDataSection{mode: mode} -> no_data_text(mode)
-      end
-
+  defp handle_unsupported_sections(%NoDataSection{mode: mode}, %Section{
+         header: header,
+         layout: layout,
+         grouping_type: grouping_type
+       }) do
     %NormalSection{
-      rows: [text],
+      rows: [
+        %FreeTextLine{
+          icon: Route.icon_from_mode(mode),
+          text: ["No departures currently available"]
+        }
+      ],
       header: header,
       layout: layout,
       grouping_type: grouping_type
@@ -153,36 +168,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     |> RdsDepartures.maybe_make_bidirectional(bidirectional)
   end
 
-  defp headway_text(route, headsign) do
-    %FreeTextLine{
-      icon: if(route, do: Route.icon(route), else: nil),
-      text: [no_departures_message(headsign)]
-    }
-  end
-
-  @spec no_data_text(Mode.t()) :: FreeTextLine.t()
-  defp no_data_text(mode) do
-    %FreeTextLine{
-      icon: Route.icon_from_mode(mode),
-      text: [no_departures_message()]
-    }
-  end
-
-  defp no_departures_message, do: "No departures currently available"
-  defp no_departures_message(name), do: "No #{name} departures available"
-
   defp filter_rows(rows, %Filters{route_directions: route_directions}) do
-    rows
-    |> filter_unsupported_rows()
-    |> filter_by_route_direction(route_directions)
-  end
-
-  defp filter_unsupported_rows(rows) do
-    Enum.filter(rows, fn
-      %Departure{} -> true
-      {%Schedule{}, _special_trip_type} -> true
-      _ -> false
-    end)
+    rows |> filter_by_route_direction(route_directions)
   end
 
   @spec filter_by_route_direction([NormalSection.row()], RouteDirections.t() | nil) :: [
@@ -217,6 +204,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   defp route_direction(
          {%Schedule{route: %Route{id: id}, direction_id: direction_id}, _special_trip_type}
        ) do
+    %RouteDirection{route_id: id, direction_id: direction_id}
+  end
+
+  defp route_direction({%Route{id: id}, direction_id, _range, _headsign}) do
     %RouteDirection{route_id: id, direction_id: direction_id}
   end
 

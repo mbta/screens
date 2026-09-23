@@ -347,7 +347,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
             stop: %Stop{}
           }
         },
-        {%Line{id: "line-Green"}, 0, {20, 30}, "Westbound"}
+        {%Route{id: "Green-E", line: %Line{id: "line-Green"}}, 0, {20, 30}, "Westbound"}
       ]
 
       section = %NormalSection{
@@ -362,7 +362,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                rows: [
                  %{headsign: %{headsigns: ["Medford/Tufts", "Medfd/Tufts"]}},
                  %{
-                   headsign: %{headsign: "Westbound"},
+                   headsign: %{headsigns: ["Westbound"]},
                    direction_id: 0,
                    route: %{type: :text, text: "GL", color: :green},
                    times_with_crowding: [%{time: %{type: :status, pages: ["every 20-30m"]}}]
@@ -554,7 +554,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   describe "serialize_route/3" do
     setup do
       %{
-        serializer: &RoutePill.serialize_for_departure/3,
+        serializer: &RoutePill.serialize_for_departure/4,
         pre_fare_screen: struct(Screen, %{app_id: :pre_fare_v2})
       }
     end
