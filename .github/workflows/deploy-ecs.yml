@@ -32,10 +32,11 @@ jobs:
       - working-directory: ./assets
         run: npm run deploy
   call-workflow:
-    uses: mbta/workflows/.github/workflows/deploy-ecs.yml@ba8d62bff3a4aa0df22eb2d6a1ce7ad4fb2eac1a # v5.1.1
+    uses: mbta/workflows/.github/workflows/deploy-ecs.yml@2506d6911c5759f7e55690c92e81fa8566e12b4f # v5.1.1
     with:
       app-name: screens
       environment: ${{ github.event.inputs.environment || 'dev' }}
+      expose-image-tag-as: IMAGE_TAG
     permissions: {
       contents: read, # Needed to check out the repository
       id-token: write # Needed to authenticate against AWS
