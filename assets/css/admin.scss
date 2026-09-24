@@ -61,9 +61,9 @@ body {
   display: flex;
   gap: 0.75em;
   align-items: center;
-  padding: 0.75em 1em;
+  padding: 0 1em;
   color: white;
-  border-top: 6px solid;
+  border-top: 8px solid;
 
   @include admin-env-modifiers("border-top-color", 100%);
   @include admin-env-modifiers("background-color", 80%);
@@ -90,7 +90,6 @@ body {
   row-gap: 0.5em;
   align-items: center;
   padding: 1em;
-  background-color: #eee;
 }
 
 .admin-navbar a,

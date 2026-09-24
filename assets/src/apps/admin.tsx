@@ -26,25 +26,21 @@ const routes: [string | undefined, string, ComponentType][] = [
 const environment = adminEnvironment();
 const isProd = environment === "prod";
 
-const AdminHeader: ComponentType = () => (
-  <header className={classWithModifier("admin-header", environment)}>
-    <h1 className="admin-header__title">Screens Admin{!isProd && " Test"}</h1>
-    <span className={classWithModifier("admin-header__badge", environment)}>
-      {environment}
-    </span>
-  </header>
-);
-
-const NavLayout: ComponentType = () => (
+const HeaderAndNav: ComponentType = () => (
   <>
-    <AdminHeader />
-    <nav className="admin-navbar">
-      {routes.map(([path, label]) => (
-        <NavLink key={path ?? ""} to={path ?? "/admin"} end={!path}>
-          {label}
-        </NavLink>
-      ))}
-    </nav>
+    <header className={classWithModifier("admin-header", environment)}>
+      <h1 className="admin-header__title">Screens Admin{!isProd && " Test"}</h1>
+      <span className={classWithModifier("admin-header__badge", environment)}>
+        {environment}
+      </span>
+      <nav className="admin-navbar">
+        {routes.map(([path, label]) => (
+          <NavLink key={path ?? ""} to={path ?? "/admin"} end={!path}>
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+    </header>
     <Outlet />
   </>
 );
@@ -52,7 +48,7 @@ const NavLayout: ComponentType = () => (
 const router = createBrowserRouter([
   {
     path: "/admin",
-    Component: NavLayout,
+    Component: HeaderAndNav,
     children: routes.map(([path, , Component]) => ({
       path,
       Component,
