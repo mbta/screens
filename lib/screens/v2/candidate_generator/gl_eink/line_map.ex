@@ -24,7 +24,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMap do
         now
       ) do
     with {:ok, stops, reverse_stops} <- fetch_stops(route_id, direction_id),
-         {:ok, departures} <- fetch_departures(station_id, now) do
+         {:ok, departures} <- fetch_departures(route_id, direction_id, station_id, now) do
       [
         %LineMap{
           screen: screen,
@@ -38,9 +38,9 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMap do
     end
   end
 
-  defp fetch_departures(station_id, now) do
+  defp fetch_departures(route_id, direction_id, station_id, now) do
     @departure.fetch(
-      %{stop_ids: [station_id], mode: :gl},
+      %{direction_id: direction_id, mode: :gl, route_ids: [route_id], stop_ids: [station_id]},
       now: DateTime.add(now, -@scheduled_terminal_departure_lookback_seconds)
     )
   end
