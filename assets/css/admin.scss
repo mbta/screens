@@ -3,6 +3,8 @@
 @use "colors" as *;
 
 @mixin admin-env-modifiers($property, $opacity: 100%) {
+  #{$property}: rgba($admin-env-local-color, $opacity);
+
   &--prod {
     #{$property}: rgba($admin-env-prod-color, $opacity);
   }
