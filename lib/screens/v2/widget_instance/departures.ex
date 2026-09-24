@@ -199,14 +199,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _now,
         _is_only_section
       ) do
-    route_pill =
-      routes
-      |> Enum.map(&Route.icon(&1))
-      |> Enum.uniq()
-      |> Enum.at(0)
-
     text = %FreeTextLine{
-      icon: route_pill,
+      icon: route_pill(routes),
       text: [headsign || "No service today"]
     }
 
@@ -310,10 +304,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _now,
         _is_only_section
       ) do
-    route_pill = routes |> Enum.map(&Route.icon/1) |> List.first()
-
     text = %FreeTextLine{
-      icon: route_pill,
+      icon: route_pill(routes),
       text: [
         if headsign do
           headsign
@@ -933,6 +925,29 @@ defmodule Screens.V2.WidgetInstance.Departures do
       icon: pill_color,
       text: [%{format: :bold, text: headsign}, %{format: :small, text: "every #{lo}-#{hi}m"}]
     }
+  end
+
+  @spec route_pill([Route.t()]) :: Route.icon()
+  defp route_pill([%Route{id: id} = single_route]) do
+    icons_by_route_id = %{
+      "Green-B" => :green_b,
+      "Green-C" => :green_c,
+      "Green-D" => :green_d,
+      "Green-E" => :green_e
+    }
+
+    cond do
+      String.starts_with?(id, "Green-") -> Map.get(icons_by_route_id, id)
+      Integer.parse(id) != :error -> id
+      true -> Route.icon(single_route)
+    end
+  end
+
+  defp route_pill(routes) do
+    routes
+    |> Enum.map(&Route.icon(&1))
+    |> Enum.uniq()
+    |> Enum.at(0)
   end
 
   @spec parse_status_pages(Departure.t(), Screen.t()) :: [String.t()] | nil

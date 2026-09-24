@@ -30,6 +30,7 @@ defmodule Screens.Routes.Route do
             line: nil
 
   @type id :: String.t()
+  @type bus_route_id :: String.t()
 
   @type t :: %__MODULE__{
           id: id,
@@ -52,7 +53,14 @@ defmodule Screens.Routes.Route do
 
   @typep name_colors :: :blue | :green | :orange | :red | :silver
   @type color :: name_colors() | :purple | :teal | :yellow | :ocean_blue
-  @type icon :: name_colors() | :bus | :cr | :ferry | :mattapan | :capeflyer
+  @type icon ::
+          name_colors()
+          | :bus
+          | :cr
+          | :ferry
+          | :mattapan
+          | :capeflyer
+          | bus_route_id()
 
   @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(id) do

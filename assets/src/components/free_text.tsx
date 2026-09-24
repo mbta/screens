@@ -67,10 +67,11 @@ const getKey = (elt: string | FreeTextElementType) => {
 
 const Icon = ({ icon }: { icon?: string }) => {
   let iconElt;
+  const routeIsNumber = !isNaN(Number(icon));
 
   if (!icon) {
     iconElt = null;
-  } else if (textPills.includes(icon)) {
+  } else if (routeIsNumber || textPills.includes(icon)) {
     iconElt = <TextRoutePill route={icon} />;
   } else if (iconPills.includes(icon)) {
     iconElt = <IconRoutePill route={icon} />;
@@ -106,7 +107,8 @@ const FormatString = ({
 };
 
 const TextRoutePill = ({ route }: { route: string }) => {
-  const routeName = {
+  let routeColor: string;
+  let routeName = {
     red: "RL",
     blue: "BL",
     orange: "OL",
@@ -121,9 +123,18 @@ const TextRoutePill = ({ route }: { route: string }) => {
 
   const branch = route.startsWith("green_") ? "branch" : "trunk";
 
+  if (!routeName) {
+    routeName = route;
+    routeColor = "yellow";
+  } else if (branch === "branch") {
+    routeColor = "green";
+  } else {
+    routeColor = route;
+  }
+
   return (
     <span className="free-text__element">
-      <div className={classWithModifier("free-text__route-pill", route)}>
+      <div className={classWithModifier("free-text__route-pill", routeColor)}>
         <div
           className={classWithModifier("free-text__route-pill__text", branch)}
         >
