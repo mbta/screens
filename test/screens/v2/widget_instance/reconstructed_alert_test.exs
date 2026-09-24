@@ -1328,7 +1328,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected == ReconstructedAlert.serialize(widget)
 
-      assert %{issue: "Skipping 2 platforms at Malden Center"} =
+      assert %{
+               issue: [
+                 "Skipping 2 platforms at Malden Center",
+                 "Skipping 2 platforms at Malden Ctr"
+               ]
+             } =
                widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
@@ -1450,8 +1455,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       assert expected == ReconstructedAlert.serialize(widget)
 
-      assert %{issue: "Stop Skipped: Jackson Square (Southbound)"} =
-               widget |> put_solo_screen() |> ReconstructedAlert.serialize()
+      assert %{
+               issue: [
+                 "Stop Skipped: Jackson Square (Southbound)",
+                 "Stop Skipped: Jackson Sq (Southbound)"
+               ]
+             } = widget |> put_solo_screen() |> ReconstructedAlert.serialize()
     end
 
     @tag :capture_log
@@ -3328,8 +3337,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         routes: [%{route_id: "Green", svg_name: "gl"}],
         updated_at: "2:24 PM",
         end_time: nil,
-        remedy:
-          "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station."
+        remedy: [
+          "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station.",
+          "Green Line is replaced by shuttle buses between Gov't Ctr and Union Sq due to a structural issue with the Gov't Ctr Garage. Shuttle buses are not servicing Haymarket Station."
+        ]
       }
 
       assert expected == ReconstructedAlert.serialize(alert_widget)
@@ -3562,7 +3573,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Flexzone test
       expected = %{
-        issue: "Green Line: service is suspended between Lechmere and Government Center.",
+        issue: [
+          "Green Line: service is suspended between Lechmere and Government Center.",
+          "Green Line: service is suspended between Lechmere and Gov't Ctr."
+        ],
         location: "",
         cause: "",
         routes: [%{color: :green, text: "GL", type: :text, branches: ["D", "E"]}],
@@ -3642,8 +3656,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
       # Flexzone test
       expected = %{
-        issue:
+        issue: [
           "Green Line: Shuttle buses replace service between Lechmere and Government Center.",
+          "Green Line: Shuttle buses replace service between Lechmere and Gov't Ctr."
+        ],
         location: "",
         cause: "",
         routes: [%{color: :green, text: "GL", type: :text, branches: ["D", "E"]}],

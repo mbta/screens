@@ -8,7 +8,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
         region: :outside,
         effect: :station_closure
       }) do
-    ~E|<p><%= issue %> <%= cause %>. <%= adjust_remedy(remedy) %>.</p>|
+    ~E|<p><%= render_issue(issue) %> <%= cause %>.<%= render_remedy(remedy) %></p>|
   end
 
   def render("_widget.ssml", %{
@@ -18,7 +18,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
         effect: effect
       })
       when effect === :delay do
-    ~E|<p><%= render_affected_routes(routes) %> delay. <%= issue %>.</p>|
+    ~E|<p><%= render_affected_routes(routes) %> delay. <%= render_issue(issue) %>.</p>|
   end
 
   # Fix "alternate" pronunciation
@@ -30,21 +30,24 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
         routes: routes,
         effect: effect
       }) do
-    ~E|<p><%= render_affected_routes(routes) %> alert. <%= render_issue(issue) %> <%= location %> <%= cause %>. <%= adjust_remedy(remedy) %>. <%= render_additional_info_for_effect(effect) %>.</p>|
+    ~E|<p><%= render_affected_routes(routes) %> alert. <%= render_issue_details(issue, location, cause) %>.<%= render_remedy(remedy) %><%= render_additional_info_for_effect(effect) %></p>|
   end
 
-  defp render_issue(issue) do
-    case issue do
-      %{text: text} ->
-        text
-        |> Enum.map_join(" ", fn
-          %{route: route} -> "#{route} line"
-          text -> text
-        end)
+  defp render_issue([full_issue | _]), do: render_issue(full_issue)
 
-      text ->
-        text
-    end
+  defp render_issue(%{text: text}) do
+    Enum.map_join(text, " ", fn
+      %{route: route} -> "#{route} line"
+      text -> text
+    end)
+  end
+
+  defp render_issue(text), do: text
+
+  defp render_issue_details(issue, location, cause) do
+    [render_issue(issue), location, cause]
+    |> Enum.reject(&(&1 in [nil, ""]))
+    |> Enum.join(" ")
   end
 
   defp render_affected_routes(routes) do
@@ -105,10 +108,13 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
 
   defp render_additional_info_for_effect(effect) do
     case effect do
-      :shuttle -> "All shuttle buses are accessible"
+      :shuttle -> " All shuttle buses are accessible."
       _ -> ""
     end
   end
+
+  defp render_remedy(remedy) when remedy in [nil, ""], do: ""
+  defp render_remedy(remedy), do: " #{adjust_remedy(remedy)}."
 
   defp adjust_remedy("Seek alternate route"), do: "Please seek an alternate route"
 
