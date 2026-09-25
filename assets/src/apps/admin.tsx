@@ -13,6 +13,8 @@ import Editor from "Components/admin/editor";
 import ImageManager from "Components/admin/admin_image_manager";
 import Inspector from "Components/admin/inspector";
 import Tools from "Components/admin/tools";
+import { adminEnvironment } from "Util/admin";
+import { classWithModifier } from "Util/utils";
 
 const routes: [string | undefined, string, ComponentType][] = [
   ["inspector", "🔍 Inspector", Inspector],
@@ -21,15 +23,23 @@ const routes: [string | undefined, string, ComponentType][] = [
   ["tools", "🛠️ Tools", Tools],
 ];
 
-const NavLayout: ComponentType = () => (
+const environment = adminEnvironment();
+
+const HeaderAndNav: ComponentType = () => (
   <>
-    <nav className="admin-navbar">
-      {routes.map(([path, label]) => (
-        <NavLink key={path ?? ""} to={path ?? "/admin"} end={!path}>
-          {label}
-        </NavLink>
-      ))}
-    </nav>
+    <header className={classWithModifier("admin-header", environment)}>
+      <h1 className="admin-header__title">Screens Admin</h1>
+      <span className={classWithModifier("admin-header__badge", environment)}>
+        {environment}
+      </span>
+      <nav className="admin-navbar">
+        {routes.map(([path, label]) => (
+          <NavLink key={path ?? ""} to={path ?? "/admin"} end={!path}>
+            {label}
+          </NavLink>
+        ))}
+      </nav>
+    </header>
     <Outlet />
   </>
 );
@@ -37,7 +47,7 @@ const NavLayout: ComponentType = () => (
 const router = createBrowserRouter([
   {
     path: "/admin",
-    Component: NavLayout,
+    Component: HeaderAndNav,
     children: routes.map(([path, , Component]) => ({
       path,
       Component,
