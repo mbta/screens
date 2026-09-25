@@ -32,7 +32,10 @@ export const OvernightSection: ComponentType<OvernightSection> = ({
           withHeadsign ? "with-headsign" : "",
         )}
       >
-        <FreeText lines={text} />
+        <FreeText
+          className={withHeadsign ? "" : "service-ended-text"}
+          lines={text}
+        />
         {withHeadsign ? (
           <div className="departures__overnight-no-service">Svc Ended</div>
         ) : (

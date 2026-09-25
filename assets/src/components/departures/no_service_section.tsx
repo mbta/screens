@@ -31,7 +31,10 @@ export const NoServiceSection: ComponentType<NoServiceSection> = ({
           withHeadsign ? "with-headsign" : "",
         )}
       >
-        <FreeText lines={text} />
+        <FreeText
+          className={withHeadsign ? "" : "no-service-text"}
+          lines={text}
+        />
         {withHeadsign && (
           <div className="departures__no-service">No svc today</div>
         )}
