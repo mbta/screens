@@ -5,11 +5,13 @@ defmodule Screens.Config.Backup.Store do
   environment the app is running in.
   """
 
-  @callback fetch_backup(environment :: String.t()) :: {:ok, String.t()} | :error
-  @callback put_backup(file_contents :: String.t()) :: :ok | :error
+  @callback fetch_latest(environment :: String.t()) :: {:ok, String.t()} | :error
+  @callback put_latest(file_contents :: String.t()) :: :ok | :error
+  @callback put_daily(file_contents :: String.t(), date :: Date.t()) :: :ok | :error
 
   @store Application.compile_env!(:screens, [Screens.Config.Backup, :store])
 
-  defdelegate fetch_backup(environment), to: @store
-  defdelegate put_backup(file_contents), to: @store
+  defdelegate fetch_latest(environment), to: @store
+  defdelegate put_latest(file_contents), to: @store
+  defdelegate put_daily(file_contents, date), to: @store
 end
