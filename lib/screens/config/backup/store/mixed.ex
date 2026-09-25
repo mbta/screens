@@ -15,6 +15,14 @@ defmodule Screens.Config.Backup.Store.Mixed do
   def fetch_latest(environment), do: S3.fetch_latest(environment)
 
   @impl true
+  def fetch_daily("screens-local", date), do: Local.fetch_daily("screens-local", date)
+  def fetch_daily(environment, date), do: S3.fetch_daily(environment, date)
+
+  @impl true
+  def list_daily("screens-local"), do: Local.list_daily("screens-local")
+  def list_daily(environment), do: S3.list_daily(environment)
+
+  @impl true
   def put_latest(file_contents), do: Local.put_latest(file_contents)
 
   @impl true

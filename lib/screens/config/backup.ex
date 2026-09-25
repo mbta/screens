@@ -1,7 +1,7 @@
 defmodule Screens.Config.Backup do
   @moduledoc """
-  Exports all screen configs to JSON, so that any environment's configs can be used as a source
-  when syncing another environment.
+  Captures screen configurations as JSON backups and restores a complete snapshot from another
+  environment, including its assets.
   """
 
   import Screens.Inject
@@ -60,7 +60,7 @@ defmodule Screens.Config.Backup do
   @spec any_updated_since_last_backup?([ScreenConfig.t()]) :: boolean()
   defp any_updated_since_last_backup?(configs) do
     with {:ok, backup_json} <-
-           @store.fetch_latest(Application.get_env(:screens, :environment_name)),
+           @store.fetch_latest(environment_name()),
          {:ok, %{"meta" => %{"exported_at" => exported_at}}} <- Jason.decode(backup_json),
          {:ok, exported_at, _offset} <- DateTime.from_iso8601(exported_at) do
       Enum.any?(configs, fn %ScreenConfig{updated_at: updated_at} ->
@@ -76,7 +76,7 @@ defmodule Screens.Config.Backup do
   defp write_backup(now, configs, put_backup_fn) do
     payload = %{
       meta: %{
-        environment: Application.get_env(:screens, :environment_name),
+        environment: environment_name(),
         exported_at: DateTime.to_iso8601(now)
       },
       screens:
@@ -121,21 +121,37 @@ defmodule Screens.Config.Backup do
     end
   end
 
+  @spec do_restore(String.t()) :: {:ok, restore_result()} | {:error, restore_error()}
   defp do_restore(environment) do
     with {:ok, json} <- @store.fetch_latest(environment),
-         {:ok, %{"screens" => screens}} when is_map(screens) <- Jason.decode(json),
-         {:ok, %{upserted: upserted, deleted: deleted}} <- ScreenConfigs.replace_all(screens),
+         {:ok, %{upserted: upserted, deleted: deleted}} <- replace_configs(json),
          {:ok, %{copied: copied}} <- sync_assets(environment) do
       {:ok, %{upserted: upserted, deleted: deleted, assets_copied: copied}}
     else
       :error -> {:error, :backup_fetch_failed}
-      {:ok, _decoded} -> {:error, :backup_invalid}
-      {:error, %Jason.DecodeError{} = error} -> {:error, {:backup_decode_failed, error}}
       {:error, error} -> {:error, error}
     end
   end
 
+  @spec replace_configs(String.t()) ::
+          {:ok, %{upserted: non_neg_integer(), deleted: non_neg_integer()}}
+          | {:error, restore_error()}
+  defp replace_configs(json) do
+    case Jason.decode(json) do
+      {:ok, %{"screens" => screens}} when is_map(screens) ->
+        ScreenConfigs.replace_all(screens)
+
+      {:ok, _decoded} ->
+        {:error, :backup_invalid}
+
+      {:error, %Jason.DecodeError{} = error} ->
+        {:error, {:backup_decode_failed, error}}
+    end
+  end
+
   defp sync_assets(environment), do: Assets.sync(environment)
+
+  def environment_name, do: Application.get_env(:screens, :environment_name, "screens-local")
 
   # Deployed environments are named `screens-<environment>`.
   defp readable_current_environment do
