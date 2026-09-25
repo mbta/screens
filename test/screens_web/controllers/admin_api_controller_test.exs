@@ -7,6 +7,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
   import Screens.TestSupport.ScreenConfigBuilder
 
   alias Screens.Config.ScreenConfig
+  alias Screens.Config.Backup.Store
   alias Screens.Repo
   alias ScreensConfig.{EvergreenContentItem, Schedule}
 
@@ -41,6 +42,64 @@ defmodule ScreensWeb.AdminApiControllerTest do
   end
 
   setup :verify_on_exit!
+
+  describe "/backup_dates" do
+    @tag :authenticated
+    test "returns the current environment's daily backup dates", %{conn: conn} do
+      expect(Store.Mock, :list_daily, fn "screens-local" ->
+        {:ok, ["2026-09-24", "2026-09-23"]}
+      end)
+
+      conn = get(conn, "/api/admin/backup_dates")
+
+      assert json_response(conn, 200) == %{
+               "dates" => ["2026-09-24", "2026-09-23"]
+             }
+    end
+
+    @tag :authenticated
+    test "compares current configs with the selected daily backup", %{conn: conn} do
+      current_config = screen_config(:busway_v2)
+      backup_config = screen_config_json(:dup_v2)
+      Repo.insert!(%ScreenConfig{id: "current-screen", config: current_config})
+
+      expect(Store.Mock, :fetch_daily, fn "screens-local", ~D[2026-09-23] ->
+        {:ok, Jason.encode!(%{screens: %{"backup-screen" => backup_config}})}
+      end)
+
+      conn = post(conn, "/api/admin/daily_backup_comparison", %{date: "2026-09-23"})
+
+      assert %{
+               "current" => %{"current-screen" => _current},
+               "backup" => %{"backup-screen" => _backup},
+               "differing_ids" => ["backup-screen", "current-screen"]
+             } = json_response(conn, 200)
+
+      assert Repo.get(ScreenConfig, "current-screen")
+      refute Repo.get(ScreenConfig, "backup-screen")
+    end
+
+    @tag :authenticated
+    test "restores screen configs from the selected daily backup", %{conn: conn} do
+      restored_config = screen_config_json(:dup_v2)
+
+      expect(Store.Mock, :fetch_daily, fn "screens-local", ~D[2026-09-23] ->
+        {:ok, Jason.encode!(%{screens: %{"restored-screen" => restored_config}})}
+      end)
+
+      expect(@data_cache, :invalidate, fn ["restored-screen"], fun -> {:ok, fun.()} end)
+
+      conn = post(conn, "/api/admin/restore_daily_backup", %{date: "2026-09-23"})
+
+      assert json_response(conn, 200) == %{
+               "success" => true,
+               "upserted" => 1,
+               "deleted" => 0
+             }
+
+      assert Repo.get(ScreenConfig, "restored-screen")
+    end
+  end
 
   describe "screen config admin endpoints" do
     @tag :authenticated

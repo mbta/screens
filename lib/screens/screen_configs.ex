@@ -169,14 +169,17 @@ defmodule Screens.ScreenConfigs do
   """
   @spec commit_updates([screen_update()], [screen_id()]) :: :ok | {:error, commit_error()}
   def commit_updates(updates, deletes \\ []) do
-    updates
-    |> Enum.map(fn
-      %{id: id} -> id
-      %{"id" => id} -> id
-    end)
+    update_ids =
+      Enum.map(updates, fn
+        %{id: id} -> id
+        %{"id" => id} -> id
+      end)
+
+    (update_ids ++ deletes)
+    |> Enum.uniq()
     |> @data_cache.invalidate(fn ->
       if config_migration_enabled?() do
-        upsert_all(updates)
+        with :ok <- upsert_all(updates), do: delete_all(deletes)
       else
         # This branch will be removed as part of post_config_migration_cleanup.
         # When the feature flag is disabled, continue to update the JSON config.

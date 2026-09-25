@@ -28,6 +28,7 @@
     "moment-timezone": "^0.6.2",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.7",
+    "react-diff-viewer-continued": "^4.4.0",
     "react-dom": "^19.2.7",
     "react-dropzone": "^15.0.0",
     "react-router": "^8.3.0",

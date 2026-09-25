@@ -9,7 +9,16 @@ defmodule Screens.Config.Backup.Store.S3 do
 
   @impl true
   def fetch_latest(environment) do
-    get_operation = ExAws.S3.get_object(bucket(), latest_path(environment))
+    fetch(latest_path(environment))
+  end
+
+  @impl true
+  def fetch_daily(environment, date) do
+    fetch(daily_path(environment, date))
+  end
+
+  defp fetch(path) do
+    get_operation = ExAws.S3.get_object(bucket(), path)
 
     case ExAws.request(get_operation) do
       {:ok, %{body: body, status_code: 200}} ->
@@ -19,6 +28,27 @@ defmodule Screens.Config.Backup.Store.S3 do
         Logster.warning(["s3_screen_configs_backup_fetch_error", inspect(err)])
         :error
     end
+  end
+
+  @impl true
+  def list_daily(environment) do
+    prefix = daily_prefix(environment)
+
+    dates =
+      bucket()
+      |> ExAws.S3.list_objects_v2(prefix: prefix)
+      |> ExAws.stream!()
+      |> Enum.map(fn %{key: key} ->
+        key
+        |> String.replace_prefix(prefix, "")
+        |> Path.rootname()
+      end)
+
+    {:ok, dates}
+  rescue
+    error in ExAws.Error ->
+      Logster.warning(["s3_screen_configs_backup_list_error", inspect(error)])
+      :error
   end
 
   @impl true
@@ -49,5 +79,6 @@ defmodule Screens.Config.Backup.Store.S3 do
   defp bucket, do: Application.get_env(:screens, :config_s3_bucket)
 
   defp latest_path(environment), do: "screens/latest/#{environment}.json"
-  defp daily_path(environment, date), do: "screens/backups/#{environment}/#{date}.json"
+  defp daily_path(environment, date), do: daily_prefix(environment) <> "#{date}.json"
+  defp daily_prefix(environment), do: "screens/backups/#{environment}/"
 end

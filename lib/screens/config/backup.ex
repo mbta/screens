@@ -60,7 +60,7 @@ defmodule Screens.Config.Backup do
   @spec any_updated_since_last_backup?([ScreenConfig.t()]) :: boolean()
   defp any_updated_since_last_backup?(configs) do
     with {:ok, backup_json} <-
-           @store.fetch_latest(Application.get_env(:screens, :environment_name)),
+           @store.fetch_latest(environment_name()),
          {:ok, %{"meta" => %{"exported_at" => exported_at}}} <- Jason.decode(backup_json),
          {:ok, exported_at, _offset} <- DateTime.from_iso8601(exported_at) do
       Enum.any?(configs, fn %ScreenConfig{updated_at: updated_at} ->
@@ -76,7 +76,7 @@ defmodule Screens.Config.Backup do
   defp write_backup(now, configs, put_backup_fn) do
     payload = %{
       meta: %{
-        environment: Application.get_env(:screens, :environment_name),
+        environment: environment_name(),
         exported_at: DateTime.to_iso8601(now)
       },
       screens:
@@ -108,6 +108,67 @@ defmodule Screens.Config.Backup do
     end
   end
 
+  @doc "Dates for which the current environment has a backup."
+  @spec dates() :: {:ok, [String.t()]} | :error
+  def dates do
+    case @store.list_daily(environment_name()) do
+      {:ok, dates} -> {:ok, Enum.sort(dates, :desc)}
+      :error -> :error
+    end
+  end
+
+  @doc "Replaces persisted screen configs with the current environment's backup from a date."
+  @spec restore_daily(String.t()) :: {:ok, map()} | {:error, restore_error() | :invalid_date}
+  def restore_daily(date) do
+    with {:ok, backup_screens} <- configs_from_date(date),
+         comparison = compare_screens(backup_screens),
+         updates =
+           Enum.map(comparison.backup, fn {id, config} -> %{id: id, config: config} end),
+         deletes = Map.keys(comparison.current) -- Map.keys(comparison.backup),
+         :ok <- commit_daily_changes(updates, deletes) do
+      {:ok, %{upserted: length(updates), deleted: length(deletes)}}
+    end
+  end
+
+  @doc "Returns current and dated backup screen configs for comparison."
+  @spec compare_daily(String.t()) ::
+          {:ok, %{current: map(), backup: map(), differing_ids: [String.t()]}}
+          | {:error, restore_error() | :invalid_date}
+  def compare_daily(date) do
+    with {:ok, backup_configs} <- configs_from_date(date) do
+      {:ok, compare_screens(backup_configs)}
+    end
+  end
+
+  @spec compare_screens(map()) :: %{current: map(), backup: map(), differing_ids: [String.t()]}
+  defp compare_screens(backup_configs) do
+    current_configs =
+      ScreenConfigs.all()
+      |> Map.new(fn %ScreenConfig{id: id, config: config} ->
+        {id, Screen.to_json(config)}
+      end)
+      |> normalize_json()
+
+    differing_ids =
+      current_configs
+      |> Map.keys()
+      |> Kernel.++(Map.keys(backup_configs))
+      |> Enum.uniq()
+      |> Enum.reject(&(Map.get(current_configs, &1) == Map.get(backup_configs, &1)))
+      |> Enum.sort()
+
+    %{
+      current: Map.take(current_configs, differing_ids),
+      backup: Map.take(backup_configs, differing_ids),
+      differing_ids: differing_ids
+    }
+  end
+
+  defp normalize_json(map), do: map |> Jason.encode!() |> Jason.decode!()
+
+  defp commit_daily_changes([], []), do: :ok
+  defp commit_daily_changes(updates, deletes), do: ScreenConfigs.commit_updates(updates, deletes)
+
   @doc """
   Replaces the persisted screen configs and the environment's assets with the contents of the
   given environment's backup.
@@ -123,19 +184,47 @@ defmodule Screens.Config.Backup do
 
   defp do_restore(environment) do
     with {:ok, json} <- @store.fetch_latest(environment),
-         {:ok, %{"screens" => screens}} when is_map(screens) <- Jason.decode(json),
-         {:ok, %{upserted: upserted, deleted: deleted}} <- ScreenConfigs.replace_all(screens),
+         {:ok, %{upserted: upserted, deleted: deleted}} <- replace_configs(json),
          {:ok, %{copied: copied}} <- sync_assets(environment) do
       {:ok, %{upserted: upserted, deleted: deleted, assets_copied: copied}}
     else
       :error -> {:error, :backup_fetch_failed}
-      {:ok, _decoded} -> {:error, :backup_invalid}
-      {:error, %Jason.DecodeError{} = error} -> {:error, {:backup_decode_failed, error}}
       {:error, error} -> {:error, error}
     end
   end
 
+  defp replace_configs(json) do
+    with {:ok, %{"screens" => screens}} when is_map(screens) <- Jason.decode(json) do
+      ScreenConfigs.replace_all(screens)
+    else
+      {:ok, _decoded} -> {:error, :backup_invalid}
+      {:error, %Jason.DecodeError{} = error} -> {:error, {:backup_decode_failed, error}}
+    end
+  end
+
+  @spec configs_from_date(String.t()) ::
+          {:ok, map()}
+          | {:error,
+             :invalid_date
+             | :backup_fetch_failed
+             | :backup_invalid
+             | {:backup_decode_failed, Jason.DecodeError.t()}}
+  defp configs_from_date(date) do
+    with {:ok, parsed_date} <- Date.from_iso8601(date),
+         {:ok, json} <- @store.fetch_daily(environment_name(), parsed_date),
+         {:ok, %{"screens" => screens}} when is_map(screens) <- Jason.decode(json) do
+      {:ok, screens}
+    else
+      {:error, :invalid_format} -> {:error, :invalid_date}
+      :error -> {:error, :backup_fetch_failed}
+      {:ok, _decoded} -> {:error, :backup_invalid}
+      {:error, %Jason.DecodeError{} = error} -> {:error, {:backup_decode_failed, error}}
+    end
+  end
+
   defp sync_assets(environment), do: Assets.sync(environment)
+
+  defp environment_name, do: Application.get_env(:screens, :environment_name, "screens-local")
 
   # Deployed environments are named `screens-<environment>`.
   defp readable_current_environment do

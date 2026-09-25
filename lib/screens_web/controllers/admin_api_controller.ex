@@ -102,6 +102,70 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{environments: Backup.environments()})
   end
 
+  @doc "Dates for which the current environment has a daily config backup."
+  @spec backup_dates(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def backup_dates(conn, _params) do
+    case Backup.dates() do
+      {:ok, dates} ->
+        json(conn, %{dates: dates})
+
+      :error ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: "Could not list daily backups"})
+    end
+  end
+
+  @doc "Returns current and backed up screen configs for a side-by-side comparison."
+  @spec daily_backup_comparison(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def daily_backup_comparison(conn, %{"date" => date}) do
+    case Backup.compare_daily(date) do
+      {:ok, comparison} ->
+        json(conn, comparison)
+
+      {:error, :invalid_date} ->
+        conn
+        |> put_status(400)
+        |> json(%{success: false, error: "Invalid backup date"})
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: inspect(reason)})
+    end
+  end
+
+  def daily_backup_comparison(conn, _params) do
+    conn
+    |> put_status(400)
+    |> json(%{success: false, error: "Invalid request parameters"})
+  end
+
+  @doc "Replaces all screen configs with the current environment's daily backup from a date."
+  @spec restore_daily_backup(Plug.Conn.t(), map()) :: Plug.Conn.t()
+  def restore_daily_backup(conn, %{"date" => date}) do
+    case Backup.restore_daily(date) do
+      {:ok, %{upserted: upserted, deleted: deleted}} ->
+        json(conn, %{success: true, upserted: upserted, deleted: deleted})
+
+      {:error, :invalid_date} ->
+        conn
+        |> put_status(400)
+        |> json(%{success: false, error: "Invalid backup date"})
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: inspect(reason)})
+    end
+  end
+
+  def restore_daily_backup(conn, _params) do
+    conn
+    |> put_status(400)
+    |> json(%{success: false, error: "Invalid request parameters"})
+  end
+
   @doc "Replaces all screen configs with the contents of the given environment's snapshot."
   @spec sync_from_snapshot(Plug.Conn.t(), map()) :: Plug.Conn.t()
   def sync_from_snapshot(conn, %{"environment" => environment}) do
