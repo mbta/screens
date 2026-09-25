@@ -68,7 +68,7 @@ defmodule Screens.MixProject do
       {:ex_aws_rds, "~> 2.0.2"},
       {:ex_aws_s3, "~> 2.5"},
       {:ex_cldr_messages, "~> 2.0"},
-      {:gettext, "~> 0.26.1"},
+      {:gettext, "~> 1.0.2"},
       {:guardian, "~> 2.5.0"},
       {:highlander, "~> 0.2.1"},
       {:jason, "~> 1.0"},
