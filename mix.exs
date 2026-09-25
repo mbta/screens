@@ -90,7 +90,7 @@ defmodule Screens.MixProject do
       {:remote_ip, "~> 1.2"},
       {:req, "~> 0.7.3"},
       {:screens_config,
-       github: "mbta/screens-config-lib", commit: "d8b93854e71c61da208cdf6ba5c02b33f9d8b52c"},
+       github: "mbta/screens-config-lib", commit: "137c604dd48eda6f9c01f56019327ea41083fc7c"},
       {:sentry, "~> 13.4.2"},
       {:ssl_verify_fun, "~> 1.1"},
       {:sweet_xml, "~> 0.7.0"},

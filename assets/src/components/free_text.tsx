@@ -65,13 +65,14 @@ const getKey = (elt: string | FreeTextElementType) => {
   }
 };
 
-const Icon = ({ icon }: { icon?: string }) => {
+const Icon = ({ icon }: { icon?: string | number }) => {
   let iconElt;
-  const routeIsNumber = !isNaN(Number(icon));
 
   if (!icon) {
     iconElt = null;
-  } else if (routeIsNumber || textPills.includes(icon)) {
+  } else if (typeof icon === "number") {
+    iconElt = <TextRoutePill route={icon} />;
+  } else if (textPills.includes(icon)) {
     iconElt = <TextRoutePill route={icon} />;
   } else if (iconPills.includes(icon)) {
     iconElt = <IconRoutePill route={icon} />;
@@ -106,30 +107,31 @@ const FormatString = ({
   return <span className={className}>{text}</span>;
 };
 
-const TextRoutePill = ({ route }: { route: string }) => {
+const TextRoutePill = ({ route }: { route: string | number }) => {
+  let routeName: string | number;
   let routeColor: string;
-  let routeName = {
-    red: "RL",
-    blue: "BL",
-    orange: "OL",
-    green: "GL",
-    silver: "SL",
-    green_b: "GL·B",
-    green_c: "GL·C",
-    green_d: "GL·D",
-    green_e: "GL·E",
-    mattapan: "M",
-  }[route];
+  let branch: string;
 
-  const branch = route.startsWith("green_") ? "branch" : "trunk";
-
-  if (!routeName) {
+  if (typeof route === "number") {
+    branch = "";
     routeName = route;
     routeColor = "yellow";
-  } else if (branch === "branch") {
-    routeColor = "green";
   } else {
-    routeColor = route;
+    branch = route.startsWith("green_") ? "branch" : "trunk";
+    routeName =
+      {
+        red: "RL",
+        blue: "BL",
+        orange: "OL",
+        green: "GL",
+        silver: "SL",
+        green_b: "GL·B",
+        green_c: "GL·C",
+        green_d: "GL·D",
+        green_e: "GL·E",
+        mattapan: "M",
+      }[route] ?? route;
+    routeColor = branch === "branch" ? "green" : route;
   }
 
   return (

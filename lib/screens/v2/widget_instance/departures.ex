@@ -936,10 +936,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
       "Green-E" => :green_e
     }
 
-    cond do
-      String.starts_with?(id, "Green-") -> Map.get(icons_by_route_id, id)
-      Integer.parse(id) != :error -> id
-      true -> Route.icon(single_route)
+    case id do
+      "Green-" <> _ ->
+        Map.get(icons_by_route_id, id)
+
+      id ->
+        case Integer.parse(id) do
+          {number, ""} -> number
+          :error -> Route.icon(single_route)
+        end
     end
   end
 
