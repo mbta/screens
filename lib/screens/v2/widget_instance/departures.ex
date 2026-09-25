@@ -207,7 +207,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     text = %FreeTextLine{
       icon: route_pill,
-      text: [headsign || "No service today"]
+      text: [
+        if headsign != nil do
+          %{format: :bold, text: headsign}
+        else
+          "No service today"
+        end
+      ]
     }
 
     %{
@@ -316,7 +322,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       icon: route_pill,
       text: [
         if headsign do
-          headsign
+          %{format: :bold, text: headsign}
         else
           "Service ended"
         end
