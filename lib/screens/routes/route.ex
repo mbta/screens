@@ -52,7 +52,14 @@ defmodule Screens.Routes.Route do
 
   @typep name_colors :: :blue | :green | :orange | :red | :silver
   @type color :: name_colors() | :purple | :teal | :yellow | :ocean_blue
-  @type icon :: name_colors() | :bus | :cr | :ferry | :mattapan | :capeflyer
+  @type icon ::
+          name_colors()
+          | :bus
+          | :cr
+          | :ferry
+          | :mattapan
+          | :capeflyer
+          | pos_integer()
 
   @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(id) do
