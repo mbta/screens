@@ -30,7 +30,6 @@ defmodule Screens.Routes.Route do
             line: nil
 
   @type id :: String.t()
-  @type bus_route_id :: String.t()
 
   @type t :: %__MODULE__{
           id: id,
@@ -60,7 +59,7 @@ defmodule Screens.Routes.Route do
           | :ferry
           | :mattapan
           | :capeflyer
-          | bus_route_id()
+          | pos_integer()
 
   @spec by_id(id()) :: {:ok, t()} | :error
   def by_id(id) do
