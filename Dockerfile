@@ -52,6 +52,8 @@ RUN mix do compile --force, phx.digest, sentry.package_source_code, release
 
 FROM hexpm/erlang:${ERLANG_VERSION}-alpine-${ALPINE_VERSION}
 
+RUN apk add --update jq
+
 ENV MIX_ENV="prod" PORT="4000"
 WORKDIR /root
 ADD . .
