@@ -24,12 +24,11 @@ const routes: [string | undefined, string, ComponentType][] = [
 ];
 
 const environment = adminEnvironment();
-const isProd = environment === "prod";
 
 const HeaderAndNav: ComponentType = () => (
   <>
     <header className={classWithModifier("admin-header", environment)}>
-      <h1 className="admin-header__title">Screens Admin{!isProd && " Test"}</h1>
+      <h1 className="admin-header__title">Screens Admin</h1>
       <span className={classWithModifier("admin-header__badge", environment)}>
         {environment}
       </span>
