@@ -1,0 +1,26 @@
+# To prevent our multiple pre-production testing environments from becoming stale,
+# deploy main on a weekly cadence outside of working hours.
+
+name: Scheduled dev-green & dev-blue Deploys
+
+on:
+  schedule:
+    # Tuesday at 5:00 AM EST/ 6:00 AM EDT.
+    - cron: '0 10 * * 2'
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  deploy:
+    name: Deploy to ${{ matrix.environment }}
+    strategy:
+      # Do not cancel in-progress jobs if one fails.
+      fail-fast: false
+      matrix:
+        environment: [dev-blue, dev-green]
+    uses: $/.github/workflows/deploy-ecs.yml
+    with:
+      environment: ${{ matrix.environment }}
+    secrets: inherit

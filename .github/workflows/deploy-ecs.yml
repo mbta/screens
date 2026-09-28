@@ -1,6 +1,11 @@
 name: Deploy to ECS
 
 on:
+  workflow_call:
+    inputs:
+      environment:
+        type: string
+        required: true
   workflow_dispatch:
     inputs:
       environment:
@@ -13,7 +18,7 @@ on:
 permissions: {}
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.inputs.environment }}
+  group: ${{ github.workflow }}-${{ inputs.environment || 'dev' }}
   cancel-in-progress: true
 
 jobs:
@@ -35,7 +40,7 @@ jobs:
     uses: mbta/workflows/.github/workflows/deploy-ecs.yml@ba8d62bff3a4aa0df22eb2d6a1ce7ad4fb2eac1a # v5.1.1
     with:
       app-name: screens
-      environment: ${{ github.event.inputs.environment || 'dev' }}
+      environment: ${{ inputs.environment || 'dev' }}
     permissions: {
       contents: read, # Needed to check out the repository
       id-token: write # Needed to authenticate against AWS
