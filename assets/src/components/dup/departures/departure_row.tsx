@@ -33,6 +33,7 @@ const DepartureRow: ComponentType<DepartureRowBase> = ({
         <DepartureTimes
           timesWithCrowding={timesWithCrowding}
           isFirstTrip={isFirstTrip}
+          enableTimePaging={true}
         />
       </div>
     </div>

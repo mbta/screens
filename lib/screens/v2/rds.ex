@@ -517,7 +517,7 @@ defmodule Screens.V2.RDS do
       [
         %Headways{
           destinations: states |> Enum.flat_map(& &1.destinations),
-          routes: states |> Enum.flat_map(& &1.routes),
+          routes: states |> Enum.flat_map(& &1.routes) |> Enum.uniq(),
           direction_id: direction_id,
           range: range,
           displayed_headsign: displayed_headsign

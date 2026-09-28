@@ -13,12 +13,14 @@ type DepartureRow = {
   direction_id: 0 | 1;
   is_first_trip: boolean;
   isBeforeDirectionSplit: boolean;
+  enableTimePaging: boolean;
 };
 
 const DepartureRow: ComponentType<DepartureRow> = ({
   headsign,
   route,
   isBeforeDirectionSplit,
+  enableTimePaging,
   is_first_trip: isFirstTrip,
   times_with_crowding: timesWithCrowding,
 }) => {
@@ -34,6 +36,7 @@ const DepartureRow: ComponentType<DepartureRow> = ({
         <DepartureTimes
           timesWithCrowding={timesWithCrowding}
           isFirstTrip={isFirstTrip}
+          enableTimePaging={enableTimePaging}
         />
       </div>
     </div>

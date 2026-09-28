@@ -750,24 +750,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_times_with_crowding(departures, screen, now) do
-    departures
-    # Quick fix for cancelled scheduled departures, remove once we
-    # have a presentation for this
-    |> Enum.reject(&cancelled_prediction_on_lcd?(&1, screen))
-    |> Enum.map(&serialize_time_with_crowding(&1, screen, now))
-  end
-
-  @spec cancelled_prediction_on_lcd?(Departure.t(), Screen.t()) :: boolean()
-  defp cancelled_prediction_on_lcd?(_departure, %Screen{app_id: :dup_v2}), do: false
-
-  defp cancelled_prediction_on_lcd?(departure, _screen) do
-    Departure.cancelled?(departure) and departure.schedule != nil
+    Enum.map(departures, &serialize_time_with_crowding(&1, screen, now))
   end
 
   @spec serialize_time_with_crowding(Departure.t(), Screen.t(), DateTime.t()) ::
           serialized_time_with_crowding()
   defp serialize_time_with_crowding(departure, screen, now) do
-    serialize_time(departure, screen, now)
+    departure
+    |> serialize_time(screen, now)
     |> Map.merge(%{id: Departure.id(departure), crowding: serialize_crowding(departure, screen)})
   end
 
@@ -818,13 +808,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
         true -> departure |> Departure.time() |> serialize_timestamp()
       end
 
-    # Only the DUP app supports displaying the originally-scheduled time of a departure, either
-    # alongside a predicted time or as a "cancelled" time. Guard against use on other screens so,
-    # in the latter case, the client will crash rather than show misleading data (but this should
-    # be handled by "producers" of this widget not including cancelled departures at all).
     serialized_scheduled_time =
-      with %Screen{app_id: :dup_v2} <- screen,
-           true <- not is_nil(scheduled_time),
+      with true <- not is_nil(scheduled_time),
            time when is_nil(time) or time.type == :timestamp <- serialized_predicted_time,
            serialized = serialize_timestamp(scheduled_time),
            true <- serialized != serialized_predicted_time do

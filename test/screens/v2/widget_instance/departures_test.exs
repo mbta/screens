@@ -1118,7 +1118,10 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
-    test "returns only scheduled time for skipped/cancelled departures", %{dup_screen: screen} do
+    test "returns only scheduled time for skipped/cancelled departures", %{
+      dup_screen: screen,
+      bus_shelter_screen: bus_shelter_screen
+    } do
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -1136,10 +1139,16 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert [%{time: nil, scheduled_time: %{type: :timestamp}}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
 
+      assert [%{time: nil, scheduled_time: %{type: :timestamp}}] =
+               Departures.serialize_times_with_crowding([departure], bus_shelter_screen, now)
+
       departure = put_in(departure.prediction.schedule_relationship, :skipped)
 
       assert [%{time: nil, scheduled_time: %{type: :timestamp}}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
+
+      assert [%{time: nil, scheduled_time: %{type: :timestamp}}] =
+               Departures.serialize_times_with_crowding([departure], bus_shelter_screen, now)
     end
 
     test "correctly serializes timestamps", %{bus_shelter_screen: screen} do
@@ -1158,7 +1167,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_times_with_crowding([departure], screen, now)
     end
 
-    test "includes originally scheduled time on DUPs when it differs from the predicted time",
+    test "includes originally scheduled time when it differs from the predicted time",
          %{bus_shelter_screen: bus_shelter_screen, dup_screen: dup_screen} do
       now = ~U[2020-01-01T00:00:00Z]
 
@@ -1177,20 +1186,29 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       }
 
-      assert [
-               %{
-                 id: nil,
-                 crowding: nil,
-                 time: %{hour: 9, minute: 20, type: :timestamp},
-                 scheduled_time: %{hour: 9, minute: 15, type: :timestamp}
-               }
-             ] = Departures.serialize_times_with_crowding([departure], dup_screen, now)
+      expected_time =
+        [
+          %{
+            id: nil,
+            crowding: nil,
+            time: %{hour: 9, minute: 20, type: :timestamp},
+            scheduled_time: %{hour: 9, minute: 15, type: :timestamp},
+            is_live: true,
+            time_in_epoch: 1_577_845_200
+          }
+        ]
 
-      assert [%{scheduled_time: nil}] =
+      assert ^expected_time =
+               Departures.serialize_times_with_crowding([departure], dup_screen, now)
+
+      assert ^expected_time =
                Departures.serialize_times_with_crowding([departure], bus_shelter_screen, now)
     end
 
-    test "omits scheduled time when it serializes the same as predicted", %{dup_screen: screen} do
+    test "omits scheduled time when it serializes the same as predicted", %{
+      dup_screen: screen,
+      bus_shelter_screen: bus_shelter_screen
+    } do
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -1211,9 +1229,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert [%{scheduled_time: nil}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
+
+      assert [%{scheduled_time: nil}] =
+               Departures.serialize_times_with_crowding([departure], bus_shelter_screen, now)
     end
 
-    test "omits scheduled time when predicted time is not a timestamp", %{dup_screen: screen} do
+    test "omits scheduled time when predicted time is not a timestamp", %{
+      dup_screen: screen,
+      bus_shelter_screen: bus_shelter_screen
+    } do
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -1233,9 +1257,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert [%{time: %{type: :text}, scheduled_time: nil}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
+
+      assert [%{time: %{type: :text}, scheduled_time: nil}] =
+               Departures.serialize_times_with_crowding([departure], bus_shelter_screen, now)
     end
 
-    test "omits scheduled time when departure has no schedule", %{dup_screen: screen} do
+    test "omits scheduled time when departure has no schedule", %{
+      dup_screen: screen,
+      bus_shelter_screen: bus_shelter_screen
+    } do
       now = ~U[2020-01-01T00:00:00Z]
 
       departure = %Departure{
@@ -1249,6 +1279,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       assert [%{scheduled_time: nil}] =
                Departures.serialize_times_with_crowding([departure], screen, now)
+
+      assert [%{scheduled_time: nil}] =
+               Departures.serialize_times_with_crowding([departure], bus_shelter_screen, now)
     end
 
     test "serializes stops away status when provided", %{dup_screen: screen} do

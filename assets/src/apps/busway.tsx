@@ -43,6 +43,8 @@ import PageLoadNoDataDuo from "Components/lcd/page_load_no_data_duo";
 import MultiScreenPage from "Components/multi_screen_page";
 import SimulationScreenPage from "Components/simulation_screen_page";
 
+import { Provider as CurrentPageProvider } from "Context/current_page_provider";
+
 const TYPE_TO_COMPONENT = {
   // Layouts
   body_left_normal: NormalBodyLeft,
@@ -100,20 +102,25 @@ const blinkConfig: BlinkConfig = {
 
 const App = (): JSX.Element => {
   return (
-    <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-      <ResponseMapperContext.Provider value={responseMapper}>
-        <BlinkConfigContext.Provider value={blinkConfig}>
-          <Router basename="v2/screen">
-            <Routes>
-              <Route path="bus_shelter_v2" element={<MultiScreenPage />} />
-              <Route path=":id" element={<ScreenPage />} />
+    <CurrentPageProvider>
+      <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+        <ResponseMapperContext.Provider value={responseMapper}>
+          <BlinkConfigContext.Provider value={blinkConfig}>
+            <Router basename="v2/screen">
+              <Routes>
+                <Route path="bus_shelter_v2" element={<MultiScreenPage />} />
+                <Route path=":id" element={<ScreenPage />} />
 
-              <Route path=":id/simulation" element={<SimulationScreenPage />} />
-            </Routes>
-          </Router>
-        </BlinkConfigContext.Provider>
-      </ResponseMapperContext.Provider>
-    </MappingContext.Provider>
+                <Route
+                  path=":id/simulation"
+                  element={<SimulationScreenPage />}
+                />
+              </Routes>
+            </Router>
+          </BlinkConfigContext.Provider>
+        </ResponseMapperContext.Provider>
+      </MappingContext.Provider>
+    </CurrentPageProvider>
   );
 };
 

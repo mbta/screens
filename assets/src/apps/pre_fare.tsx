@@ -44,6 +44,7 @@ import MultiScreenPage from "Components/multi_screen_page";
 import SimulationScreenPage from "Components/pre_fare/simulation_screen_page";
 import PreFareSingleScreenAlert from "Components/pre_fare_single_screen_alert";
 import Departures from "Components/departures";
+import { Provider as CurrentPageProvider } from "Context/current_page_provider";
 
 const TYPE_TO_COMPONENT = {
   // Slots
@@ -101,20 +102,25 @@ const blinkConfig: BlinkConfig = {
 
 const App = (): JSX.Element => {
   return (
-    <MappingContext.Provider value={TYPE_TO_COMPONENT}>
-      <ResponseMapperContext.Provider value={responseMapper}>
-        <BlinkConfigContext.Provider value={blinkConfig}>
-          <Router basename="v2/screen">
-            <Routes>
-              <Route path="pre_fare_v2" element={<MultiScreenPage />} />
-              <Route path=":id" element={<ScreenPage />} />
+    <CurrentPageProvider>
+      <MappingContext.Provider value={TYPE_TO_COMPONENT}>
+        <ResponseMapperContext.Provider value={responseMapper}>
+          <BlinkConfigContext.Provider value={blinkConfig}>
+            <Router basename="v2/screen">
+              <Routes>
+                <Route path="pre_fare_v2" element={<MultiScreenPage />} />
+                <Route path=":id" element={<ScreenPage />} />
 
-              <Route path=":id/simulation" element={<SimulationScreenPage />} />
-            </Routes>
-          </Router>
-        </BlinkConfigContext.Provider>
-      </ResponseMapperContext.Provider>
-    </MappingContext.Provider>
+                <Route
+                  path=":id/simulation"
+                  element={<SimulationScreenPage />}
+                />
+              </Routes>
+            </Router>
+          </BlinkConfigContext.Provider>
+        </ResponseMapperContext.Provider>
+      </MappingContext.Provider>
+    </CurrentPageProvider>
   );
 };
 

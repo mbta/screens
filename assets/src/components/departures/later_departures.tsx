@@ -89,7 +89,11 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
         }
       >
         {departures.map((departure) => (
-          <DepartureRow key={departure.id} {...departure} />
+          <DepartureRow
+            key={departure.id}
+            {...departure}
+            enableTimePaging={false}
+          />
         ))}
       </div>
     </div>

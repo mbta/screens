@@ -1,7 +1,7 @@
 import { type ComponentType, useLayoutEffect, useRef, useState } from "react";
 
 import type DestinationBase from "Components/departures/destination";
-import { useCurrentPage } from "Context/dup_page";
+import { useCurrentPage } from "Context/current_page_provider";
 import { classWithModifier, hasOverflowX } from "Util/utils";
 
 type DupDestination = DestinationBase & { classModifier: string };

@@ -43,7 +43,7 @@ import DeparturesNoData from "Components/dup/departures_no_data";
 import DeparturesNoService from "Components/dup/departures_no_service";
 import OvernightDepartures from "Components/dup/overnight_departures";
 
-import { Provider as CurrentPageProvider } from "Context/dup_page";
+import { Provider as CurrentPageProvider } from "Context/current_page_provider";
 import { usePlayerName } from "Hooks/outfront";
 
 const TYPE_TO_COMPONENT = {

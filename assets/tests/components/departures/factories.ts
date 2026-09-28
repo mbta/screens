@@ -30,6 +30,7 @@ export const departureRow = Factory.define<Row>(({ sequence }) => ({
   direction_id: 0,
   isBeforeDirectionSplit: false,
   is_first_trip: false,
+  enableTimePaging: true,
 }));
 
 export const timeWithCrowding = Factory.define<TimeWithCrowding>(
