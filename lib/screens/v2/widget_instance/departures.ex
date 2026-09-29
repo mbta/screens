@@ -131,6 +131,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
           variation: String.t() | nil
         }
 
+  @type free_text_route_pill ::
+          Route.icon() | :green_b | :green_c | :green_d | :green_e | pos_integer()
+
   @type serialized_headsign :: serialized_headsign_lcd | serialized_headsign_mercury
 
   # Limits how many rows per section will be sent to the client.
@@ -138,6 +141,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @sl_route_ids ~w[741 742 743 746 749 751]
 
   @eink_app_ids [:bus_eink_v2, :gl_eink_v2]
+  @icons_by_route_id %{
+    "Green-B" => :green_b,
+    "Green-C" => :green_c,
+    "Green-D" => :green_d,
+    "Green-E" => :green_e
+  }
 
   defimpl Screens.V2.WidgetInstance do
     def priority(%Departures{screen: %Screen{app_params: %PreFare{}}}), do: [1]
@@ -199,14 +208,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _now,
         _is_only_section
       ) do
-    route_pill =
-      routes
-      |> Enum.map(&Route.icon(&1))
-      |> Enum.uniq()
-      |> Enum.at(0)
-
     text = %FreeTextLine{
-      icon: route_pill,
+      icon: route_pill(routes),
       text: [
         if headsign != nil do
           %{format: :bold, text: headsign}
@@ -316,10 +319,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _now,
         _is_only_section
       ) do
-    route_pill = routes |> Enum.map(&Route.icon/1) |> List.first()
-
     text = %FreeTextLine{
-      icon: route_pill,
+      icon: route_pill(routes),
       text: [
         if headsign do
           %{format: :bold, text: headsign}
@@ -940,6 +941,22 @@ defmodule Screens.V2.WidgetInstance.Departures do
       text: [%{format: :bold, text: headsign}, %{format: :small, text: "every #{lo}-#{hi}m"}]
     }
   end
+
+  @spec route_pill([Route.t()]) :: free_text_route_pill()
+  defp(route_pill([%Route{id: id} = single_route])) do
+    case id do
+      "Green-" <> _ ->
+        Map.get(@icons_by_route_id, id)
+
+      id ->
+        case Integer.parse(id) do
+          {number, ""} -> number
+          :error -> Route.icon(single_route)
+        end
+    end
+  end
+
+  defp route_pill([route | _]), do: Route.icon(route)
 
   @spec parse_status_pages(Departure.t(), Screen.t()) :: [String.t()] | nil
   defp parse_status_pages(
