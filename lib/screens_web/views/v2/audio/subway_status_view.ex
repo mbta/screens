@@ -222,17 +222,18 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
 
       # Location is actually a cause (single tracking)
       String.starts_with?(location_string, "Due to") ->
-        ~E|<%= status %> <%= location_string %>|
+        # e.g. "Delays up to 15 minutes, Due to Single Tracking"
+        ~E|<%= status %>, <%= location_string %>|
 
       # Shuttle Bus/Suspension/Delays + Xbound
       location_string =~ ~r/^(?:North|East|South|West)bound$/ ->
-        # E.g. "Southbound Shuttle bus", "Northbound Suspension", "Eastbound Delays up to 20 minutes"
-        ~E|<%= location_string %> <%= status %>|
+        # E.g. "Southbound, Shuttle bus", "Northbound, Suspension", "Eastbound, Delays up to 20 minutes"
+        ~E|<%= location_string %>, <%= status %>|
 
       # Shuttle Bus/Suspension/Delays/Single Tracking + $STATION ↔ $STATION
       String.contains?(location_string, " ↔ ") ->
-        # E.g. "Suspension between Back Bay and North Station", "Shuttle Bus between Ashmont and JFK/UMass"
-        ~E|<%= status %> between <%= String.replace(location_string, " ↔ ", " and ") %>|
+        # E.g. "Suspension between Back Bay, and, North Station", "Shuttle Bus between Ashmont, and, JFK/UMass"
+        ~E|<%= status %> between <%= String.replace(location_string, " ↔ ", ", and, ") %>|
 
       # Shuttle Bus/Service Change/SERVICE SUSPENDED + Entire line
       location_string == "Entire line" ->
@@ -241,8 +242,8 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusView do
 
       # Shuttle Bus/Suspension/Delays + $STATION
       status =~ ~r/^(?:Shuttle Bus|Suspension|Delays)/ ->
-        # E.g. "Suspension at Quincy Center"
-        ~E|<%= status %> at <%= location_string %>|
+        # E.g. "Suspension at, Quincy Center"
+        ~E|<%= status %> at, <%= location_string %>|
 
       # Skipping + $STOP | $STOP and $STOP | $STOP, $STOP, and $STOP
       true ->
