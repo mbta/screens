@@ -126,16 +126,16 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
       }
 
       assert render(assigns) =~
-               "The next Green Line B train to Boston College arrives in 1 minute"
+               "The next, Green Line B, train to, Boston College; arrives in, 1, minute"
 
       assert render(assigns) =~
-               "The following Green Line B train to Boston College arrives in 6 minutes"
+               "The following, Green Line B, train to, Boston College; arrives in, 6, minutes"
 
       assert render(assigns) =~
-               "The next Red Line train to Alewife arrives in 1 minute"
+               "The next, Red Line, train to, Alewife; arrives in, 1, minute"
 
       assert render(assigns) =~
-               "The following Red Line train arrives in 6 minutes"
+               "The following, Red Line, train arrives in, 6, minutes"
     end
 
     test "reads track_number as 'at berth' for bus and 'on track' for CR" do
@@ -181,10 +181,10 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
       }
 
       assert render(assigns) =~
-               "The next <say-as interpret-as=\"address\">73</say-as> bus to Waverley at berth <break strength=\"weak\"/><say-as interpret-as=\"spell-out\">E</say-as>"
+               "The next, <say-as interpret-as=\"address\">73</say-as>, bus to, Waverley; at berth, <break strength=\"weak\"/><say-as interpret-as=\"spell-out\">E</say-as>"
 
       assert render(assigns) =~
-               "The next Needham Line train to South Station on track 5"
+               "The next, Needham Line, train to, South Station; on track, 5<break/> arrives at, 12:31"
     end
   end
 

@@ -75,7 +75,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
 
     content =
       build_text([
-        full_name,
+        full_name <> ",",
         {plural_vehicle_type, fn v -> ~E|<%= v %>| end},
         "every",
         lo,
@@ -94,7 +94,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
 
     content =
       build_text([
-        "The next",
+        "The next,",
         route_headsign_rendered,
         if(time_is_arr_brd?(time), do: nil, else: "arrives"),
         preposition,
@@ -118,8 +118,8 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
 
     prefix =
       case time.type do
-        :timestamp -> "A later"
-        _ -> "The following"
+        :timestamp -> "A later,"
+        _ -> "The following,"
       end
 
     content =
@@ -138,7 +138,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp render_time_with_crowding({%{time: %{type: :overnight}}, _}, _route, %{
          headsigns: [full_name | _]
        }) do
-    build_text([full_name, "service has ended."])
+    build_text([full_name, ", service has ended."])
   end
 
   defp render_route_headsign(
@@ -148,7 +148,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     build_text([
       {route_text, &render_route/1},
       {vehicle_type || "trip", fn v -> ~E|<%= v %>| end},
-      {headsign, fn h -> ~E|to <%= render_headsign(h) %>| end},
+      {headsign, fn h -> ~E|to, <%= render_headsign(h) %>;| end},
       {track_number, fn tn -> render_track_number(tn, vehicle_type) end}
     ])
   end
@@ -163,23 +163,23 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
         ~S(<break strength="weak"/><say-as interpret-as="spell-out">\0</say-as>)
       )
 
-    ~E|at berth <%= raw(track_number) %><break/>|
+    ~E|at berth, <%= raw(track_number) %><break/>|
   end
 
-  defp render_track_number(track_number, _), do: ~E|on track <%= track_number %><break/>|
+  defp render_track_number(track_number, _), do: ~E|on track, <%= track_number %><break/>|
 
   defp render_route(route_text) do
     cond do
       String.contains?(route_text, "/") and match?([_, _], String.split(route_text, "/")) ->
         [part1, part2] = String.split(route_text, "/")
 
-        ~E|<say-as interpret-as="address"><%= part1 %></say-as><say-as interpret-as="address"><%= part2 %></say-as>|
+        ~E|<say-as interpret-as="address"><%= part1 %></say-as>,<say-as interpret-as="address"><%= part2 %></say-as>,|
 
       match?({_bus_route, ""}, Integer.parse(route_text)) ->
-        ~E|<say-as interpret-as="address"><%= route_text %></say-as>|
+        ~E|<say-as interpret-as="address"><%= route_text %></say-as>,|
 
       true ->
-        ~E|<%= route_text %>|
+        ~E|<%= route_text %>,|
     end
   end
 
@@ -196,7 +196,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp render_time(%{type: :text, text: "Now"}), do: "is now arriving"
 
   defp render_time(%{type: :minutes, minutes: minute_diff}) do
-    ~E|<%= minute_diff %> <%= pluralize_minutes(minute_diff) %>|
+    ~E|<%= minute_diff %>, <%= pluralize_minutes(minute_diff) %>|
   end
 
   defp render_time(%{type: :timestamp, hour: hour, minute: minute}) do
@@ -208,8 +208,8 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp pluralize_minutes(_), do: "minutes"
 
   defp preposition_for_time_type(:text), do: nil
-  defp preposition_for_time_type(:minutes), do: "in"
-  defp preposition_for_time_type(:timestamp), do: "at"
+  defp preposition_for_time_type(:minutes), do: "in,"
+  defp preposition_for_time_type(:timestamp), do: "at,"
 
   defp render_crowding_level(1), do: "is currently not crowded"
   defp render_crowding_level(2), do: "currently has some crowding"
@@ -222,7 +222,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
 
   defp identity_render(value), do: ~E|<%= value %>|
 
-  def build_text(value_renderers) do
+  defp build_text(value_renderers) do
     value_renderers
     |> Enum.reject(fn
       {value, renderer} when is_function(renderer) -> is_nil(value)
@@ -235,7 +235,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     |> Enum.intersperse(~E| |)
   end
 
-  # `section_text/2` will eventually be changd to use modes in Params
+  # `section_text/2` will eventually be changed to use modes in Params
   # but will require a slight overhaul in our Departures Sections
   defp section_text(section_type, nil, []) do
     case section_type do
