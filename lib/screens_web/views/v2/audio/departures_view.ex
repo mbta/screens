@@ -160,13 +160,13 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
       String.replace(
         track_number,
         ~r/\D+/,
-        ~S(<break strength="weak"/><say-as interpret-as="spell-out">\0</say-as>)
+        ~S(<say-as interpret-as="spell-out">\0</say-as>)
       )
 
-    ~E|at berth, <%= raw(track_number) %><break/>|
+    ~E|at berth, <%= raw(track_number) %>,|
   end
 
-  defp render_track_number(track_number, _), do: ~E|on track, <%= track_number %><break/>|
+  defp render_track_number(track_number, _), do: ~E|on track, <%= track_number %>,|
 
   defp render_route(route_text) do
     cond do
