@@ -7,10 +7,6 @@ on:
   schedule:
     # Tuesday at 5:00 AM EST/ 6:00 AM EDT.
     - cron: '0 10 * * 2'
-  # TEMPORARY: Run the scheduled deployments when this branch is updated for testing.
-  push:
-    branches:
-      - 'rs/chore/weekly-dev-deploys'
 
 permissions:
   contents: read
@@ -23,9 +19,7 @@ jobs:
       # Do not cancel in-progress jobs if one fails.
       fail-fast: false
       matrix:
-        # TEMPORARY: Run the scheduled deployments when this branch is updated for testing.
-
-        environment: [dev-green]
+        environment: [dev-blue, dev-green]
     uses: $/.github/workflows/deploy-ecs.yml
     with:
       environment: ${{ matrix.environment }}
