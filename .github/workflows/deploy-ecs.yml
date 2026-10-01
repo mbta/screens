@@ -6,6 +6,19 @@ on:
       environment:
         type: string
         required: true
+    secrets:
+      AWS_ROLE_ARN:
+        required: true
+      DOCKER_REPO:
+        required: true
+      SLACK_WEBHOOK:
+        required: true
+      SENTRY_AUTH_TOKEN:
+        required: true
+      SENTRY_ORG:
+        required: true
+      SENTRY_PROJECT:
+        required: true
   workflow_dispatch:
     inputs:
       environment:

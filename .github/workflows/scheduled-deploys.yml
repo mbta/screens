@@ -10,7 +10,6 @@ on:
 
 permissions:
   contents: read
-  id-token: write
 
 jobs:
   deploy:
@@ -21,6 +20,15 @@ jobs:
       matrix:
         environment: [dev-blue, dev-green]
     uses: $/.github/workflows/deploy-ecs.yml
+    permissions:
+      contents: read
+      id-token: write # Required by the deploy workflow to authenticate to AWS via OIDC.
     with:
       environment: ${{ matrix.environment }}
-    secrets: inherit
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+      DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
