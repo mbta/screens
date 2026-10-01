@@ -17,7 +17,7 @@ defmodule ScreensWeb.V2.Audio.NormalHeaderViewTest do
       }
 
       assert render_normal_header(assigns) =~
-               "This is the Green Line C branch to Cleveland Circle"
+               "This is the Green Line, C, branch to, Cleveland Circle"
     end
 
     test "renders a non-green line route" do

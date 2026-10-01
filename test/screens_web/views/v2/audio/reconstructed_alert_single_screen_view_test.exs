@@ -53,7 +53,7 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertSingleScreenViewTest do
 
       assert render(alert) =~
                "Attention, riders to Union Square, and, Medford Tufts. Green Line branches, \
-D, and, E trains are skipping Lechmere, Science Park, North Station, Haymarket, and, \
+D, and, E, trains are skipping, Lechmere, Science Park, North Station, Haymarket, and, \
 Government Center. Please seek an alternate route."
     end
 
@@ -65,8 +65,8 @@ Government Center. Please seek an alternate route."
       }
 
       assert render(alert) =~
-               "Attention, Green line riders. Shuttle buses replace Green Line trains between \
-Government Center and Lechmere. All shuttle buses are accessible."
+               "Attention, Green line riders. Shuttle buses replace Green Line, trains between \
+Government Center, and Lechmere. All shuttle buses are accessible."
     end
 
     test "renders a boundary shuttle alert", %{base_alert: base_alert} do
@@ -78,7 +78,7 @@ Government Center and Lechmere. All shuttle buses are accessible."
 
       assert render(alert) =~
                "Attention, Green line riders. There are No Green Line trains. Please use the \
-shuttle bus. Shuttle buses are replacing Green Line trains between Government Center and Lechmere. \
+shuttle bus. Shuttle buses are replacing, Green Line, trains between Government Center, and Lechmere. \
 All shuttle buses are accessible."
     end
 
@@ -92,7 +92,7 @@ All shuttle buses are accessible."
 
       assert render(alert) =~
                "There are No Green Line trains. Please seek an alternate route. Please note that \
-there are no Green Line trains between Government Center and Lechmere due to maintenance"
+there are no Green Line, trains between Government Center, and Lechmere, due to maintenance"
     end
 
     test "renders a single line, multiple station closure alert", %{base_alert: base_alert} do
@@ -105,7 +105,7 @@ there are no Green Line trains between Government Center and Lechmere due to mai
 
       assert render(alert) =~
                "Attention, Green line riders. This station is closed due to maintenance. \
-Please seek an alternate route. Green Line trains are skipping this station and Coolidge Corner."
+Please seek an alternate route. Green Line, trains are skipping this station and, Coolidge Corner."
     end
 
     test "renders a single line, transfer station closure alert", %{base_alert: base_alert} do
@@ -117,8 +117,8 @@ Please seek an alternate route. Green Line trains are skipping this station and 
       }
 
       assert render(alert) =~
-               "Green Line trains are skipping this station due to maintenance. Please seek an \
-alternate route. Red Line trains are stopping here as usual."
+               "Green Line, trains are skipping this station due to maintenance. Please seek an \
+alternate route. Red Line, trains are stopping here as usual."
     end
 
     test "renders a shuttle alert at a transfer station", %{base_alert: base_alert} do
@@ -129,8 +129,8 @@ alternate route. Red Line trains are stopping here as usual."
       }
 
       assert render(alert) =~
-               "There are no Green Line trains. Please use the shuttle bus. Shuttle buses are replacing \
-Green Line trains between Government Center and Lechmere due to maintenance."
+               "There are no Green Line, trains. Please use the shuttle bus. Shuttle buses are replacing \
+Green Line, trains between Government Center, and Lechmere, due to maintenance."
     end
 
     test "renders a shuttle alert at a non-transfer station", %{base_alert: base_alert} do
@@ -144,7 +144,7 @@ Green Line trains between Government Center and Lechmere due to maintenance."
 
       assert render(alert) =~
                "This station is closed. Please use the shuttle bus. Shuttle buses are replacing \
-Green Line trains between Government Center and Lechmere due to maintenance."
+Green Line, trains between Government Center, and Lechmere, due to maintenance."
     end
 
     test "renders a suspension at a transfer station", %{base_alert: base_alert} do
@@ -155,8 +155,8 @@ Green Line trains between Government Center and Lechmere due to maintenance."
       }
 
       assert render(alert) =~
-               "There are no Green Line trains. Please seek an alternate route. \
-Please note that there are no Green Line trains between Government Center and Lechmere."
+               "There are no Green Line, trains. Please seek an alternate route. \
+Please note that there are no Green Line, trains between Government Center, and Lechmere."
     end
 
     test "renders a suspension at a non-transfer station", %{base_alert: base_alert} do
@@ -170,7 +170,7 @@ Please note that there are no Green Line trains between Government Center and Le
 
       assert render(alert) =~
                "This station is closed. Please seek an alternate route. \
-Please note that there are no Green Line trains between Government Center and Lechmere."
+Please note that there are no Green Line, trains between Government Center, and Lechmere."
     end
   end
 

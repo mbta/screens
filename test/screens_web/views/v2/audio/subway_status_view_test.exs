@@ -44,7 +44,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusViewTest do
       }
 
       assert render_subway_status(assigns) =~
-               "Green Line branch, #{say_as_spell_out("C")}, has Delays up to 15 minutes Due to Single Tracking"
+               "Green Line branch, #{say_as_spell_out("C")}, has Delays up to 15 minutes, Due to Single Tracking"
     end
 
     test "renders a route with the location text 'Entire line' for whole-line alerts" do
@@ -77,7 +77,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusViewTest do
           }
       }
 
-      assert render_subway_status(assigns) =~ "The Green Line has a Southbound Shuttle Bus"
+      assert render_subway_status(assigns) =~ "The Green Line has a Southbound, Shuttle Bus"
     end
 
     test "renders partial line suspensions that apply to multiple GL branches" do
@@ -96,7 +96,7 @@ defmodule ScreensWeb.V2.Audio.SubwayStatusViewTest do
       assert render_subway_status(assigns) =~
                "Green Line branches, #{say_as_spell_out("B")}, \
 #{say_as_spell_out("C")}, and, #{say_as_spell_out("D")}, have a Suspension \
-between North Station and Park Street"
+between North Station, and, Park Street"
     end
 
     test "renders with an alert for a single location" do
@@ -112,7 +112,7 @@ between North Station and Park Street"
           }
       }
 
-      assert render_subway_status(assigns) =~ "The Green Line has a Shuttle Bus at Science Park"
+      assert render_subway_status(assigns) =~ "The Green Line has a Shuttle Bus at, Science Park"
     end
   end
 end

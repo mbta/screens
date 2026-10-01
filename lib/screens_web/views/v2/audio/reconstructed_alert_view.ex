@@ -68,9 +68,9 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertView do
     routes
     |> Enum.filter(&Map.has_key?(&1, :branches))
     |> Enum.map(fn
-      %{branches: [branch]} -> "Green Line: #{branch} Branch"
-      %{branches: [b1, b2]} -> "Green Line: #{b1} and #{b2} Branches"
-      %{branches: [b1, b2, b3]} -> "Green Line: #{b1}, #{b2}, and #{b3} Branches"
+      %{branches: [branch]} -> "Green Line, #{branch}, Branch"
+      %{branches: [b1, b2]} -> "Green Line, #{b1}, and #{b2}, Branches"
+      %{branches: [b1, b2, b3]} -> "Green Line, #{b1}, #{b2}, and #{b3}, Branches"
     end)
     |> List.first("")
   end

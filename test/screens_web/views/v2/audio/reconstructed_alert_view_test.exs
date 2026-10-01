@@ -46,13 +46,13 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertViewTest do
         "Delays of about 20 minutes affecting Park Street",
         "Delays of about 20 minutes affecting Park St"
       ],
-      routes: [%{color: "Green-B"}],
+      routes: [%{color: "Green", branches: [:b]}],
       urgent: false,
       effect: :delay
     }
 
     assert render(assigns) ==
-             "<p>Green-B Line delay. Delays of about 20 minutes affecting Park Street.</p>"
+             "<p>Green Line, b, Branch delay. Delays of about 20 minutes affecting Park Street.</p>"
   end
 
   test "renders a delay affecting two green line branches" do
@@ -61,13 +61,13 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertViewTest do
         "Delays of about 20 minutes affecting Park Street",
         "Delays of about 20 minutes affecting Park St"
       ],
-      routes: [%{color: "Green-B"}, %{color: "Green-C"}],
+      routes: [%{color: "Green", branches: [:b, :c]}],
       urgent: false,
       effect: :delay
     }
 
     assert render(assigns) ==
-             "<p>Green-B and Green-C Lines delay. Delays of about 20 minutes affecting Park Street.</p>"
+             "<p>Green Line, b, and c, Branches delay. Delays of about 20 minutes affecting Park Street.</p>"
   end
 
   test "renders a delay affecting three green line branches" do
@@ -76,13 +76,13 @@ defmodule ScreensWeb.V2.Audio.ReconstructedAlertViewTest do
         "Delays of about 20 minutes affecting Park Street",
         "Delays of about 20 minutes affecting Park St"
       ],
-      routes: [%{color: "Green-B"}, %{color: "Green-C"}, %{color: "Green-D"}],
+      routes: [%{color: "Green-B", branches: [:b, :c, :d]}],
       urgent: false,
       effect: :delay
     }
 
     assert render(assigns) ==
-             "<p>Green-B, Green-C, and Green-D Lines delay. Delays of about 20 minutes affecting Park Street.</p>"
+             "<p>Green Line, b, c, and d, Branches delay. Delays of about 20 minutes affecting Park Street.</p>"
   end
 
   test "renders a delay affecting two non-green line branches" do
