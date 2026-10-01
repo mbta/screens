@@ -5,7 +5,7 @@ name: Scheduled dev-green & dev-blue Deploys
 
 on:
   schedule:
-    # Tuesday at 5:00 AM EST/ 6:00 AM EDT.
+    # Tuesday at 5:00 AM EST/ 6:00 AM EDT. See: https://crontab.guru/#0_10_*_*_2
     - cron: '0 10 * * 2'
 
 permissions:
