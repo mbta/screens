@@ -6,20 +6,20 @@
   border: 1px solid #777;
 
   &::backdrop {
-    background: rgb(0 0 0 / 55%);
+    background-color: rgb(0 0 0 / 55%);
   }
 
-  > header,
-  > footer {
+  & > header,
+  & > footer {
     display: flex;
     gap: 1em;
     align-items: center;
     justify-content: space-between;
     padding: 0.75em 1em;
-    background: #f4f4f4;
+    background-color: #f4f4f4;
   }
 
-  > header {
+  & > header {
     border-bottom: 1px solid #ccc;
 
     h3,
@@ -31,14 +31,14 @@
       margin-top: 0.35em;
     }
 
-    > button {
+    & > button {
       align-self: flex-start;
       font-size: 1.5em;
       line-height: 1;
     }
   }
 
-  > footer {
+  & > footer {
     justify-content: flex-end;
     border-top: 1px solid #ccc;
   }
@@ -66,7 +66,7 @@
     min-height: 180px;
     padding: 2em;
     font-size: 14px;
-    background: rgb(255 255 255 / 92%);
+    background-color: rgb(255 255 255 / 92%);
 
     progress {
       width: min(360px, 70vw);
@@ -79,7 +79,7 @@
     gap: 0.75em;
     align-items: baseline;
     padding: 0.75em 1em;
-    background: #fff;
+    background-color: #fff;
     border-bottom: 1px solid #ccc;
 
     code {
