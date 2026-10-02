@@ -28,15 +28,11 @@ const sortJson = (value: unknown): unknown => {
 };
 
 // Since the loading indicator should only ever show very briefly, it is a static progress bar.
-const DiffLoadingIndicator = ({ message }: { message: string }) => (
+const DiffLoadingIndicator = (message = "Preparing configuration diff...") => (
   <div className="daily-backup-diff__loading" role="status">
     <progress />
     <span>{message}</span>
   </div>
-);
-
-const DiffComputationLoadingIndicator = () => (
-  <DiffLoadingIndicator message="Preparing configuration diff..." />
 );
 
 const RestoreFromBackup = () => {
@@ -117,8 +113,15 @@ const RestoreFromBackup = () => {
 
   return (
     <section>
-      <h2>Restore from Daily Backup</h2>
-      <p>Select one of this environment&apos;s daily configuration backups.</p>
+      <h2>Restore Live Configs from a Daily Backup</h2>
+      <p>
+        Select one of this environment&apos;s daily configuration backups to see
+        a diff between the live configurations and the backup.
+      </p>
+      <p>
+        After viewing the differences, you can choose to proceed with a rollback
+        of configurations to the selected backup.
+      </p>
       <select
         value={date}
         onChange={(event) => compare(event.target.value)}
@@ -146,8 +149,8 @@ const RestoreFromBackup = () => {
           <div>
             <h3>Restore configurations from {date}</h3>
             <p>
-              Only configurations that differ are shown. Configurations missing
-              from the backup will be deleted from Postgres.
+              Only configurations that differ and screens that have been created
+              or deleted since the backup will be shown
             </p>
           </div>
           <button type="button" onClick={closeDialog} aria-label="Close">
@@ -156,7 +159,7 @@ const RestoreFromBackup = () => {
         </header>
         <div className="daily-backup-diff__viewer">
           {isLoadingComparison ? (
-            <DiffLoadingIndicator message="Loading configurations..." />
+            DiffLoadingIndicator("Loading configurations...")
           ) : (
             <>
               <div className="daily-backup-diff__screen-ids">
@@ -172,9 +175,9 @@ const RestoreFromBackup = () => {
                 compareMethod={DiffMethod.LINES}
                 leftTitle="Current Live Configurations"
                 rightTitle={`Backup Configurations (${date})`}
-                showDiffOnly={false}
+                showDiffOnly={true}
                 highlightLanguage="json"
-                loadingElement={DiffComputationLoadingIndicator}
+                loadingElement={() => DiffLoadingIndicator()}
                 styles={{
                   titleBlock: {
                     minHeight: "48px",
@@ -201,7 +204,9 @@ const RestoreFromBackup = () => {
           <button
             type="button"
             onClick={restore}
-            disabled={isLoadingComparison || isRestoring}
+            disabled={
+              isLoadingComparison || isRestoring || differingIds.length === 0
+            }
           >
             {isRestoring ? "Restoring..." : `Restore ${date} backup`}
           </button>
