@@ -1,0 +1,34 @@
+# To prevent our multiple pre-production testing environments from becoming stale,
+# deploy main on a weekly cadence outside of working hours.
+
+name: Scheduled dev-green & dev-blue Deploys
+
+on:
+  schedule:
+    # Tuesday at 5:00 AM EST/ 6:00 AM EDT. See: https://crontab.guru/#0_10_*_*_2
+    - cron: '0 10 * * 2'
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to ${{ matrix.environment }}
+    strategy:
+      # Do not cancel in-progress jobs if one fails.
+      fail-fast: false
+      matrix:
+        environment: [dev-blue, dev-green]
+    uses: $/.github/workflows/deploy-ecs.yml
+    permissions:
+      contents: read
+      id-token: write # Required by the deploy workflow to authenticate to AWS via OIDC.
+    with:
+      environment: ${{ matrix.environment }}
+    secrets:
+      AWS_ROLE_ARN: ${{ secrets.AWS_ROLE_ARN }}
+      DOCKER_REPO: ${{ secrets.DOCKER_REPO }}
+      SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+      SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
