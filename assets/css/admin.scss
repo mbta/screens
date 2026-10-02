@@ -1,5 +1,6 @@
 @use "admin/editor";
 @use "admin/inspector";
+@use "admin/rollback";
 @use "colors" as *;
 
 @mixin admin-env-modifiers($property, $opacity: 100%) {

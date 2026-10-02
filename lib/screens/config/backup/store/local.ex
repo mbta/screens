@@ -14,6 +14,25 @@ defmodule Screens.Config.Backup.Store.Local do
   end
 
   @impl true
+  def fetch_daily(environment, date) do
+    case File.read(Path.join(daily_directory(environment), "#{date}.json")) do
+      {:ok, contents} -> {:ok, contents}
+      {:error, _} -> :error
+    end
+  end
+
+  @impl true
+  def list_daily(environment) do
+    dates =
+      daily_directory(environment)
+      |> Path.join("*.json")
+      |> Path.wildcard()
+      |> Enum.map(&(&1 |> Path.basename() |> Path.rootname()))
+
+    {:ok, dates}
+  end
+
+  @impl true
   def put_latest(file_contents) do
     path = backup_path()
 
@@ -23,7 +42,7 @@ defmodule Screens.Config.Backup.Store.Local do
   @impl true
   def put_daily(file_contents, date) do
     environment = Application.get_env(:screens, :environment_name)
-    path = Path.join([Path.dirname(backup_path()), "backups", environment, "#{date}.json"])
+    path = Path.join(daily_directory(environment), "#{date}.json")
 
     write(path, file_contents)
   end
@@ -42,5 +61,9 @@ defmodule Screens.Config.Backup.Store.Local do
       :code.priv_dir(:screens),
       Application.get_env(:screens, __MODULE__)[:local_backup_path]
     ])
+  end
+
+  defp daily_directory(environment) do
+    Path.join([Path.dirname(backup_path()), "backups", environment])
   end
 end

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
+import RestoreFromBackup from "Components/admin/tools/restore_from_backup";
 import { adminEnvironment, fetch } from "Util/admin";
 
 const API_PATH = "/api/admin/maintenance";
@@ -12,6 +13,7 @@ const Tools = () => {
       <EvergreenContentCleanup />
       <ImportConfigs />
       <SyncFromSnapshot />
+      <RestoreFromBackup />
     </main>
   );
 };
