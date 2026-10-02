@@ -1,6 +1,6 @@
 import { ComponentType } from "react";
 
-import { useCurrentPage } from "Context/dup_page";
+import { useCurrentPage } from "Context/current_page_provider";
 import { useCurrentTime } from "Hooks/use_current_time";
 import MoonIcon from "Images/moon.svg";
 import LiveDataSvg from "Images/live-data-small.svg";
@@ -89,6 +89,7 @@ interface Props {
   scheduled_time?: DepartureTime;
   is_live: boolean;
   isFirstTrip: boolean;
+  enableTimePaging: boolean;
 }
 
 const DepartureTime: ComponentType<Props> = ({
@@ -97,9 +98,10 @@ const DepartureTime: ComponentType<Props> = ({
   scheduled_time,
   is_live: isLive,
   isFirstTrip,
+  enableTimePaging,
 }) => {
   const currentPage = useCurrentPage();
-  if (time && (currentPage === 0 || !scheduled_time)) {
+  if (time && (!enableTimePaging || currentPage === 0 || !scheduled_time)) {
     return (
       <div className={classWithModifier("departure-time", time.type)}>
         {showLiveIcon(isLive, time.type, currentPage) && (

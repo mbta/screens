@@ -88,6 +88,7 @@ export const NormalSection: ComponentType<FoldedSection> = ({
                 groupingType === "destination" &&
                 index === rowToAddDivider(aboveFold)
               }
+              enableTimePaging={true}
             />
           );
         } else {

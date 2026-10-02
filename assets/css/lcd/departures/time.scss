@@ -53,6 +53,15 @@
   font-variant-numeric: tabular-nums;
   vertical-align: middle;
   color: colors.$cool-black-15;
+
+  &--cancelled,
+  &--delayed {
+    text-decoration: line-through;
+  }
+
+  &--delayed {
+    color: colors.$true-grey-40;
+  }
 }
 
 .departure-time__text {
@@ -82,6 +91,7 @@
   font-weight: 800;
   line-height: 64px;
   vertical-align: center;
+  text-decoration: inherit;
 }
 
 .departure-time__live-icon {
