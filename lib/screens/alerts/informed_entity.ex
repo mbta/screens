@@ -20,7 +20,8 @@ defmodule Screens.Alerts.InformedEntity do
           activities: nonempty_list(Alert.activity()),
           direction_id: Trip.direction() | nil,
           facility: Facility.t() | nil,
-          route: Route.id() | nil,
+          # TODO - Can/should we convert this to `Route | nil`. Need to TAL at rest of code
+          route: Route.t() | Route.id() | nil,
           route_type: non_neg_integer() | nil,
           stop: Stop.t() | nil
         }

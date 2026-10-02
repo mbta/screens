@@ -146,8 +146,9 @@ defmodule Screens.Alerts.Alert do
   @type result :: {:ok, [t()]} | :error
   @type fetch :: (options() -> result())
 
-  @base_includes ~w[facilities stops.child_stops]
-  @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops stops]
+  # TODO: Which fields exactly should routes be added to?
+  @base_includes ~w[facilities routes stops.child_stops]
+  @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops routes stops]
 
   @service_eliminating_effects ~w[
     detour
