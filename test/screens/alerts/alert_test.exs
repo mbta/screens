@@ -623,42 +623,42 @@ defmodule Screens.Alerts.AlertTest do
         id: "1",
         effect: :delay,
         severity: 3,
-        informed_entities: [ie(route: "Red")]
+        informed_entities: [ie(route_id: "Red")]
       }
 
       red_alert_2 = %Alert{
         id: "2",
         effect: :delay,
         severity: 5,
-        informed_entities: [ie(route: "Red")]
+        informed_entities: [ie(route_id: "Red")]
       }
 
       red_alert_3 = %Alert{
         id: "3",
         effect: :delay,
         severity: 4,
-        informed_entities: [ie(route: "Red")]
+        informed_entities: [ie(route_id: "Red")]
       }
 
       orange_alert_1 = %Alert{
         id: "4",
         effect: :delay,
         severity: 2,
-        informed_entities: [ie(route: "Orange")]
+        informed_entities: [ie(route_id: "Orange")]
       }
 
       orange_alert_2 = %Alert{
         id: "5",
         effect: :delay,
         severity: 4,
-        informed_entities: [ie(route: "Orange")]
+        informed_entities: [ie(route_id: "Orange")]
       }
 
       blue_alert = %Alert{
         id: "6",
         effect: :delay,
         severity: 1,
-        informed_entities: [ie(route: "Blue")]
+        informed_entities: [ie(route_id: "Blue")]
       }
 
       result =
@@ -679,10 +679,10 @@ defmodule Screens.Alerts.AlertTest do
 
     test "properly consolidates a multi-branch GL delay" do
       gl_ies = [
-        ie(route: "Green-B"),
-        ie(route: "Green-C"),
-        ie(route: "Green-D"),
-        ie(route: "Green-E")
+        ie(route_id: "Green-B"),
+        ie(route_id: "Green-C"),
+        ie(route_id: "Green-D"),
+        ie(route_id: "Green-E")
       ]
 
       alerts = [

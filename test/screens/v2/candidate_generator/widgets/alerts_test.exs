@@ -54,7 +54,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "2",
           effect: :stop_closure,
-          informed_entities: [ie(route: "22")],
+          informed_entities: [ie(route_id: "22")],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -130,7 +130,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
             alert: %Alert{
               id: "2",
               effect: :stop_closure,
-              informed_entities: [ie(route: "22")],
+              informed_entities: [ie(route_id: "22")],
               active_period: [{now, nil}]
             }
           },
@@ -202,7 +202,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
             alert: %Alert{
               id: "2",
               effect: :stop_closure,
-              informed_entities: [ie(route: "22")],
+              informed_entities: [ie(route_id: "22")],
               active_period: [{now, nil}]
             }
           },
@@ -290,25 +290,25 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "2",
           effect: :suspension,
-          informed_entities: [ie(route: "11")],
+          informed_entities: [ie(route_id: "11")],
           active_period: [{now, nil}]
         },
         %Alert{
           id: "3",
           effect: :suspension,
-          informed_entities: [ie(stop_id: "1", route: "11")],
+          informed_entities: [ie(stop_id: "1", route_id: "11")],
           active_period: [{now, nil}]
         },
         %Alert{
           id: "4",
           effect: :suspension,
-          informed_entities: [ie(route: "88")],
+          informed_entities: [ie(route_id: "88")],
           active_period: [{now, nil}]
         },
         %Alert{
           id: "5",
           effect: :suspension,
-          informed_entities: [ie(stop_id: "1", route: "99")],
+          informed_entities: [ie(stop_id: "1", route_id: "99")],
           active_period: [{now, nil}]
         }
       ]
@@ -333,13 +333,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "2",
           effect: :suspension,
-          informed_entities: [ie(route: "11")],
+          informed_entities: [ie(route_id: "11")],
           active_period: [{now, nil}]
         },
         %Alert{
           id: "3",
           effect: :suspension,
-          informed_entities: [ie(stop_id: "1", route: "22")],
+          informed_entities: [ie(stop_id: "1", route_id: "22")],
           active_period: [{now, nil}]
         },
         %Alert{
@@ -351,7 +351,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "5",
           effect: :suspension,
-          informed_entities: [ie(stop_id: "9", route: "33")],
+          informed_entities: [ie(stop_id: "9", route_id: "33")],
           active_period: [{now, nil}]
         }
       ]
@@ -382,7 +382,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
         %Alert{
           id: "3",
           effect: :suspension,
-          informed_entities: [ie(route: "99", route_type: 1)],
+          informed_entities: [ie(route_id: "99", route_type: 1)],
           active_period: [{now, nil}]
         }
       ]

@@ -235,7 +235,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
     end
 
     test "serializes an alert widget", %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(route: "a"), ie(route: "b"), ie(route: "c")])
+      widget =
+        put_informed_entities(widget, [ie(route_id: "a"), ie(route_id: "b"), ie(route_id: "c")])
 
       expected_json_map = %{
         route_pills: [
@@ -256,10 +257,10 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget =
         widget
         |> put_informed_entities([
-          ie(route: "Green-B"),
-          ie(route: "Green-C"),
-          ie(route: "Green-D"),
-          ie(route: "Green-E")
+          ie(route_id: "Green-B"),
+          ie(route_id: "Green-C"),
+          ie(route_id: "Green-D"),
+          ie(route_id: "Green-E")
         ])
         |> put_app_id(:gl_eink_v2)
 
@@ -280,8 +281,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget =
         widget
         |> put_informed_entities([
-          ie(route: "Green-B"),
-          ie(route: "Green-C")
+          ie(route_id: "Green-B"),
+          ie(route_id: "Green-C")
         ])
         |> put_app_id(:gl_eink_v2)
 
@@ -303,7 +304,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
       widget =
         widget
         |> put_informed_entities([
-          ie(route: "Green-B")
+          ie(route_id: "Green-B")
         ])
         |> put_app_id(:gl_eink_v2)
 
@@ -348,7 +349,12 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
           %{route_id: "d", active?: true},
           %{route_id: "e", active?: true}
         ])
-        |> put_informed_entities([ie(route: "a"), ie(route: "b"), ie(route: "c"), ie(route: "d")])
+        |> put_informed_entities([
+          ie(route_id: "a"),
+          ie(route_id: "b"),
+          ie(route_id: "c"),
+          ie(route_id: "d")
+        ])
 
       expected_json_map = %{
         route_pills: [%{type: :icon, icon: :bus, color: :yellow}],
@@ -399,8 +405,8 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
         informed_entities =
           if(unquote(set_informs_all_active_routes?),
-            do: [ie(route: "a"), ie(route: "c")],
-            else: [ie(route: "a"), ie(route: "b")]
+            do: [ie(route_id: "a"), ie(route_id: "c")],
+            else: [ie(route_id: "a"), ie(route_id: "b")]
           )
 
         widget =
@@ -420,7 +426,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
         |> put_home_stop(BusEink, "5")
         |> put_active_period([{~U[2021-01-02T00:00:00Z], ~U[2021-01-02T22:00:00Z]}])
         |> put_effect(:snow_route)
-        |> put_informed_entities([ie(route: "a"), ie(route: "b")])
+        |> put_informed_entities([ie(route_id: "a"), ie(route_id: "b")])
 
       assert [:medium] == AlertWidget.slot_names(widget)
     end
@@ -597,7 +603,7 @@ defmodule Screens.V2.WidgetInstance.AlertTest do
 
       assert :no_render == AlertWidget.tiebreaker_location(upstream_widget)
 
-      elsewhere_widget = put_informed_entities(widget, [ie(route: "doesnt_serve_this_stop")])
+      elsewhere_widget = put_informed_entities(widget, [ie(route_id: "doesnt_serve_this_stop")])
 
       assert :no_render == AlertWidget.tiebreaker_location(elsewhere_widget)
     end

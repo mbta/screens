@@ -147,7 +147,7 @@ defmodule Screens.V2.LocalizedAlertTest do
 
     test "returns :elsewhere if an alert's informed entities only apply to routes not serving this stop",
          %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(route: "x"), ie(route: "y")])
+      widget = put_informed_entities(widget, [ie(route_id: "x"), ie(route_id: "y")])
 
       assert :elsewhere == LocalizedAlert.location(widget)
     end
@@ -158,8 +158,8 @@ defmodule Screens.V2.LocalizedAlertTest do
         put_informed_entities(widget, [
           ie(stop_id: "0"),
           ie(route_type: RouteType.to_id(:bus)),
-          ie(route: "x"),
-          ie(stop_id: "20", route: "a"),
+          ie(route_id: "x"),
+          ie(stop_id: "20", route_id: "a"),
           ie()
         ])
 
@@ -170,8 +170,8 @@ defmodule Screens.V2.LocalizedAlertTest do
       widget =
         put_informed_entities(widget, [
           ie(stop_id: "1", route_type: RouteType.to_id(:bus)),
-          ie(route: "x", route_type: RouteType.to_id(:bus)),
-          ie(stop_id: "1", route: "x", route_type: RouteType.to_id(:bus))
+          ie(route_id: "x", route_type: RouteType.to_id(:bus)),
+          ie(stop_id: "1", route_id: "x", route_type: RouteType.to_id(:bus))
         ])
 
       assert :upstream == LocalizedAlert.location(widget)
@@ -188,8 +188,8 @@ defmodule Screens.V2.LocalizedAlertTest do
       widget =
         put_informed_entities(widget, [
           ie(stop_id: "0"),
-          ie(route: "b"),
-          ie(stop_id: "20", route: "a")
+          ie(route_id: "b"),
+          ie(stop_id: "20", route_id: "a")
         ])
 
       assert :inside == LocalizedAlert.location(widget)
@@ -198,10 +198,10 @@ defmodule Screens.V2.LocalizedAlertTest do
     test "treats active and inactive (not running on the current day) routes the same", %{
       widget: widget
     } do
-      widget = put_informed_entities(widget, [ie(route: "a")])
+      widget = put_informed_entities(widget, [ie(route_id: "a")])
       assert :inside == LocalizedAlert.location(widget)
 
-      widget = put_informed_entities(widget, [ie(route: "b")])
+      widget = put_informed_entities(widget, [ie(route_id: "b")])
       assert :inside == LocalizedAlert.location(widget)
     end
 
@@ -209,7 +209,7 @@ defmodule Screens.V2.LocalizedAlertTest do
       widget =
         put_informed_entities(widget, [
           ie(stop_id: "1"),
-          ie(route: "x")
+          ie(route_id: "x")
         ])
 
       assert :upstream == LocalizedAlert.location(widget)
@@ -219,7 +219,7 @@ defmodule Screens.V2.LocalizedAlertTest do
       widget =
         put_informed_entities(widget, [
           ie(stop_id: "0"),
-          ie(stop_id: "20", route: "a")
+          ie(stop_id: "20", route_id: "a")
         ])
 
       assert :upstream == LocalizedAlert.location(widget)
@@ -232,7 +232,7 @@ defmodule Screens.V2.LocalizedAlertTest do
         put_informed_entities(widget, [
           ie(stop_id: "0"),
           ie(stop_id: "5"),
-          ie(stop_id: "20", route: "a")
+          ie(stop_id: "20", route_id: "a")
         ])
 
       assert :boundary_upstream == LocalizedAlert.location(widget)
@@ -243,7 +243,7 @@ defmodule Screens.V2.LocalizedAlertTest do
         put_informed_entities(widget, [
           ie(stop_id: "5"),
           ie(stop_id: "5", route_type: RouteType.to_id(:bus)),
-          ie(stop_id: "5", route: "a")
+          ie(stop_id: "5", route_id: "a")
         ])
 
       assert :inside == LocalizedAlert.location(widget)
@@ -269,7 +269,7 @@ defmodule Screens.V2.LocalizedAlertTest do
         put_informed_entities(widget, [
           ie(stop_id: "6"),
           ie(stop_id: "5"),
-          ie(stop_id: "90", route: "a")
+          ie(stop_id: "90", route_id: "a")
         ])
 
       assert :boundary_downstream == LocalizedAlert.location(widget)
@@ -279,7 +279,7 @@ defmodule Screens.V2.LocalizedAlertTest do
       widget =
         put_informed_entities(widget, [
           ie(stop_id: "6"),
-          ie(stop_id: "90", route: "a")
+          ie(stop_id: "90", route_id: "a")
         ])
 
       assert :downstream == LocalizedAlert.location(widget)
