@@ -3,6 +3,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.Stops.Subway
   alias Screens.V2.AlertsWidget
@@ -1291,8 +1292,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-asmnl")
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-portr", route_id: "Red", route_type: 1),
-          ie(stop_id: "70065", route_id: "Red", route_type: 1)
+          ie(
+            stop_id: "place-portr",
+            route: %Route{id: "Red", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 1
+          ),
+          ie(
+            stop_id: "70065",
+            route: %Route{id: "Red", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 1
+          )
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [["place-portr", "place-asmnl"]]
@@ -1378,7 +1389,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:station_closure)
         |> put_informed_station_names(["Jackson Square"])
         |> put_informed_entities([
-          ie(stop_id: "place-jaksn", route_id: "Orange", route_type: 1)
+          ie(
+            stop_id: "place-jaksn",
+            route: %Route{id: "Orange", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 0
+          )
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1401,7 +1417,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         issue: "Forest Hills platform closed",
         remedy: "Some information typed into the alert",
         cause: nil,
-        routes: [%{route_id: "Orange", svg_name: "ol"}],
+        routes: [%{route_id: "Orange", svg_name: "ol-forest-hills", headsign: "Forest Hills"}],
         effect: :station_closure,
         updated_at: "Jun 9",
         end_time: "tomorrow",
@@ -1422,7 +1438,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:station_closure)
         |> put_informed_station_names(["Jackson Square"])
         |> put_informed_entities([
-          ie(stop_id: "place-jaksn", route_id: "Orange", route_type: 1, direction_id: 0)
+          ie(
+            stop_id: "place-jaksn",
+            route: %Route{id: "Orange", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 0
+          )
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -2101,8 +2122,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-asmnl")
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-portr", route_id: "Red", route_type: 1, direction_id: 0),
-          ie(stop_id: "70065", route_id: "Red", route_type: 1, direction_id: 0)
+          ie(
+            stop_id: "place-portr",
+            route: %Route{id: "Red", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 0
+          ),
+          ie(
+            stop_id: "70065",
+            route: %Route{id: "Red", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 0
+          )
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [["place-portr", "place-asmnl"]]
@@ -2134,9 +2165,24 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-andrw")
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-jfk", route_id: "Red", route_type: 1),
-          ie(stop_id: "70085", route_id: "Red", route_type: 1),
-          ie(stop_id: "70095", route_id: "Red", route_type: 1)
+          ie(
+            stop_id: "place-jfk",
+            route: %Route{id: "Red", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 0
+          ),
+          ie(
+            stop_id: "70085",
+            route: %Route{id: "Red", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 0
+          ),
+          ie(
+            stop_id: "70095",
+            route: %Route{id: "Red", direction_names: ["Southbound", "Northbound"]},
+            route_type: 1,
+            direction_id: 0
+          )
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [["place-jfk", "place-andrw"]]
