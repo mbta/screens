@@ -53,8 +53,7 @@ const abbreviationList: { [string: string]: string } = {
 };
 
 type DisruptionDiagramData =
-  | ContinuousDisruptionDiagram
-  | DiscreteDisruptionDiagram;
+  ContinuousDisruptionDiagram | DiscreteDisruptionDiagram;
 
 interface DisruptionDiagramBase {
   line: LineColor;
@@ -475,8 +474,7 @@ const MiddleSlotComponent: ComponentType<MiddleSlotComponentProps> = ({
 
 interface EffectBackgroundComponentProps {
   effectRegionSlotIndexRange:
-    | [range_start: number, range_end: number]
-    | number[];
+    [range_start: number, range_end: number] | number[];
   effect: Effect;
   spaceBetween: number;
 }
@@ -525,8 +523,7 @@ const EffectBackgroundComponent: ComponentType<
 
 interface AlertEmphasisComponentProps {
   effectRegionSlotIndexRange:
-    | [range_start: number, range_end: number]
-    | number[];
+    [range_start: number, range_end: number] | number[];
   spaceBetween: number;
   effect: "suspension" | "shuttle";
   scaleFactor: number;

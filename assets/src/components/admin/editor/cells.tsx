@@ -26,8 +26,7 @@ const ifChanged = (
 };
 
 type JSONParseResult =
-  | { success: true; json: JSON }
-  | { success: false; error: string };
+  { success: true; json: JSON } | { success: false; error: string };
 
 const tryParse = (text: string): JSONParseResult => {
   try {
