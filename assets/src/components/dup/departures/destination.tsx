@@ -41,9 +41,7 @@ type TwoLinesPhaseUpdate = {
   headsignIndex: number;
 };
 export type SizingStateUpdate =
-  | FinishedUpdate
-  | IndexUpdate
-  | TwoLinesPhaseUpdate;
+  FinishedUpdate | IndexUpdate | TwoLinesPhaseUpdate;
 
 // Returns changes to make to the state given the current line-fit measurements
 export const nextSizingState = (state: SizingState): SizingStateUpdate => {

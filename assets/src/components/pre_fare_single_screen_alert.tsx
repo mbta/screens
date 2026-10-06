@@ -27,11 +27,7 @@ interface PreFareSingleScreenAlertProps {
   unaffected_routes?: EnrichedRoute[];
   endpoints: [string, string];
   effect:
-    | "suspension"
-    | "shuttle"
-    | "station_closure"
-    | "delay"
-    | "information";
+    "suspension" | "shuttle" | "station_closure" | "delay" | "information";
   region: Region;
   updated_at: string;
   end_time?: string;
