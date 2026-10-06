@@ -176,7 +176,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       |> Enum.filter(& &1)
       |> Enum.uniq()
 
-    {direction_id, route_id} = select_direction_and_route(list_of_directions_and_routes)
+    {direction_id, route_id} = select_direction_and_route_ids(list_of_directions_and_routes)
 
     cond do
       # When the alert is non-directional but the station is at the boundary:
@@ -282,16 +282,16 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        do: {direction_id, route_id}
 
   # Select 1 direction + route from this list of directions + routes for multiple branches
-  defp select_direction_and_route([direction_and_route]), do: direction_and_route
+  defp select_direction_and_route_ids([direction_and_route]), do: direction_and_route
 
   # If there are multiple route ids in that informed entities list, then the alert includes branching
-  defp select_direction_and_route([{direction_id, "Red" <> _} | _]),
+  defp select_direction_and_route_ids([{direction_id, "Red" <> _} | _]),
     do: {direction_id, "Red"}
 
-  defp select_direction_and_route([{direction_id, "Green" <> _} | _]),
+  defp select_direction_and_route_ids([{direction_id, "Green" <> _} | _]),
     do: {direction_id, "Green-trunk"}
 
-  defp select_direction_and_route(_), do: {nil, nil}
+  defp select_direction_and_route_ids(_), do: {nil, nil}
 
   defp get_route_pills(t, location \\ nil)
 
