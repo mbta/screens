@@ -23,7 +23,6 @@ const initSentry = (appString: string) => {
       dsn,
       environment,
       transport: Sentry.makeBrowserOfflineTransport(Sentry.makeFetchTransport),
-      sendDefaultPii: true,
     });
 
     // Outfront devices load the page anew every time our content is displayed,
