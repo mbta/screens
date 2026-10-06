@@ -373,8 +373,8 @@ defmodule Screens.V2.DisruptionDiagram.Builder do
 
     informed_route_id =
       Enum.find_value(localized_alert.alert.informed_entities, fn
-        %{route: "Green" <> _ = route_id} -> route_id
-        %{route: route_id} when route_id in ["Blue", "Orange", "Red"] -> route_id
+        %{route: %Route{id: "Green" <> _ = route_id}} -> route_id
+        %{route: %Route{id: route_id}} when route_id in ["Blue", "Orange", "Red"] -> route_id
         _ -> false
       end)
 

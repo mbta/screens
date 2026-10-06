@@ -65,15 +65,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
       when not is_nil(route_type) ->
         true
 
-      %InformedEntity{stop: %{id: stop_id}, route: route}
-      when not is_nil(stop_id) and not is_nil(route) ->
-        stop_id in stop_id_set and route in route_id_set
+      %InformedEntity{stop: %{id: stop_id}, route: %Route{id: route_id}}
+      when not is_nil(stop_id) ->
+        stop_id in stop_id_set and route_id in route_id_set
 
       %InformedEntity{stop: %{id: stop_id}, route: nil} when not is_nil(stop_id) ->
         stop_id in stop_id_set
 
-      %InformedEntity{stop: nil, route: route} ->
-        route in route_id_set
+      %InformedEntity{stop: nil, route: %Route{id: route_id}} ->
+        route_id in route_id_set
 
       _ ->
         false

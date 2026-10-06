@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.DupAlert
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
@@ -15,13 +16,21 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
   end
 
   defp route_informed_entities(route_ids) do
-    Enum.map(route_ids, &%InformedEntity{route_type: 1, route: &1, stop: nil, direction_id: nil})
+    Enum.map(
+      route_ids,
+      &%InformedEntity{route_type: 1, route: %Route{id: &1}, stop: nil, direction_id: nil}
+    )
   end
 
   defp stop_informed_entities(route_id, stop_ids) do
     Enum.map(
       stop_ids,
-      &%InformedEntity{route_type: 1, route: route_id, stop: %Stop{id: &1}, direction_id: nil}
+      &%InformedEntity{
+        route_type: 1,
+        route: %Route{id: route_id},
+        stop: %Stop{id: &1},
+        direction_id: nil
+      }
     )
   end
 

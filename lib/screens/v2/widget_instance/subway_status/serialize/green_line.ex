@@ -256,8 +256,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
         %{stop: nil} ->
           false
 
-        ie ->
-          InformedEntity.parent_station?(ie) and ie.route in @green_line_branches
+        %{route: nil} ->
+          false
+
+        %{route: %Route{id: route_id}} = ie ->
+          InformedEntity.parent_station?(ie) and route_id in @green_line_branches
       end)
       |> Enum.map(fn %{stop: %{id: stop_id}} -> stop_id end)
       |> MapSet.new()
@@ -273,7 +276,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.GreenLine do
   defp alert_affects_whole_green_line?(%Alert{informed_entities: informed_entities}) do
     alert_whole_line_stops =
       informed_entities
-      |> Enum.map(fn e -> Map.get(e, :route) end)
+      |> Enum.map(fn e -> get_in(e, [Access.key(:route), Access.key(:id)]) end)
       |> Enum.filter(&(&1 in @green_line_branches))
       |> Enum.uniq()
       |> Enum.sort()

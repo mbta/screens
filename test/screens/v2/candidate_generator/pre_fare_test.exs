@@ -3,6 +3,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.V2.CandidateGenerator.PreFare
   alias Screens.V2.WidgetInstance.AudioOnly.{AlertsIntro, AlertsOutro, ContentSummary}
   alias Screens.V2.WidgetInstance.MockWidget
@@ -45,7 +46,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     downstream_ie = [
       %Screens.Alerts.InformedEntity{
         stop: %Screens.Stops.Stop{id: "place-dwnxg"},
-        route: "Red",
+        route: %Route{id: "Red"},
         direction_id: 0
       }
     ]
@@ -53,7 +54,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     inside_ie = [
       %Screens.Alerts.InformedEntity{
         stop: %Screens.Stops.Stop{id: "place-gover"},
-        route: "Red",
+        route: %Route{id: "Red"},
         direction_id: 0
       }
     ]
@@ -61,7 +62,7 @@ defmodule Screens.V2.CandidateGenerator.PreFareTest do
     upstream_ie = [
       %Screens.Alerts.InformedEntity{
         stop: %Screens.Stops.Stop{id: "place-pktrm"},
-        route: "Red",
+        route: %Route{id: "Red"},
         direction_id: 0
       }
     ]

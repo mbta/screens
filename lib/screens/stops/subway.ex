@@ -344,7 +344,7 @@ defmodule Screens.Stops.Subway do
   @spec stops_in_alert([station()], [InformedEntity.t()], Route.id()) :: [station()]
   defp stops_in_alert(stop_sequence, informed_entities, route_id) do
     informed_entities
-    |> Enum.filter(&(&1.route == route_id and !is_nil(&1.stop)))
+    |> Enum.filter(&(!is_nil(&1.route) and &1.route.id == route_id and !is_nil(&1.stop)))
     |> Enum.map(fn %InformedEntity{stop: %Stop{id: stop_id}} -> stop_id end)
     |> case do
       [] -> []

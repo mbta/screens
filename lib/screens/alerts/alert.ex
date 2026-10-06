@@ -146,8 +146,8 @@ defmodule Screens.Alerts.Alert do
   @type result :: {:ok, [t()]} | :error
   @type fetch :: (options() -> result())
 
-  @base_includes ~w[facilities stops.child_stops]
-  @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops stops]
+  @base_includes ~w[facilities routes.line stops.child_stops]
+  @all_includes ~w[facilities.stop.child_stops facilities.stop.parent_station.child_stops routes.line stops]
 
   @service_eliminating_effects ~w[
     detour
@@ -378,7 +378,8 @@ defmodule Screens.Alerts.Alert do
 
   @doc "Returns IDs of all subway routes affected by the alert. Green Line routes are not consolidated."
   def informed_subway_routes(%__MODULE__{} = alert) do
-    informed_route_ids = MapSet.new(alert.informed_entities, & &1.route)
+    informed_route_ids =
+      MapSet.new(alert.informed_entities, &get_in(&1, [Access.key(:route), Access.key(:id)]))
 
     Enum.filter(
       ["Blue", "Orange", "Red", "Green-B", "Green-C", "Green-D", "Green-E", "Mattapan"],
@@ -504,7 +505,12 @@ defmodule Screens.Alerts.Alert do
   @spec consolidate_whole_route_delays(list(t())) :: list(t())
   def consolidate_whole_route_delays(alerts) do
     alerts
-    |> Enum.group_by(&Enum.uniq_by(&1.informed_entities, fn ie -> ie.route end))
+    |> Enum.group_by(
+      &Enum.uniq_by(&1.informed_entities, fn
+        %InformedEntity{route: %Route{id: route_id}} -> route_id
+        _ -> nil
+      end)
+    )
     |> Enum.flat_map(fn {_affected_routes, alerts_for_route} ->
       consolidate_delays_for_route(alerts_for_route)
     end)

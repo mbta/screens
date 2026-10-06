@@ -4,6 +4,7 @@ defmodule Screens.V2.DisruptionDiagramTest do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.TestSupport.DisruptionDiagramLocalizedAlert, as: DDAlert
   alias Screens.TestSupport.SubwayTaggedStopSequences, as: TaggedSeq
@@ -1755,7 +1756,9 @@ defmodule Screens.V2.DisruptionDiagramTest do
       delay_scenario = %{
         alert: %Alert{
           effect: :delay,
-          informed_entities: [%InformedEntity{route: "Orange", stop: %Stop{id: ~P"rugg"}}]
+          informed_entities: [
+            %InformedEntity{route: %Route{id: "Orange"}, stop: %Stop{id: ~P"rugg"}}
+          ]
         },
         location_context: %LocationContext{
           home_stop: ~P"bbsta",
@@ -1770,7 +1773,7 @@ defmodule Screens.V2.DisruptionDiagramTest do
       whole_route_scenario = %{
         alert: %Alert{
           effect: :suspension,
-          informed_entities: [%InformedEntity{route: "Orange", stop: nil}]
+          informed_entities: [%InformedEntity{route: %Route{id: "Orange"}, stop: nil}]
         },
         location_context: %LocationContext{
           home_stop: ~P"bbsta",
@@ -1800,10 +1803,10 @@ defmodule Screens.V2.DisruptionDiagramTest do
         alert: %Alert{
           effect: :station_closure,
           informed_entities: [
-            %InformedEntity{route: "Blue", stop: %Stop{id: ~P"gover"}}
+            %InformedEntity{route: %Route{id: "Blue"}, stop: %Stop{id: ~P"gover"}}
             | Enum.map(
                 ~w[B C D E],
-                &%InformedEntity{route: "Green-#{&1}", stop: %Stop{id: ~P"gover"}}
+                &%InformedEntity{route: %Route{id: "Green-#{&1}"}, stop: %Stop{id: ~P"gover"}}
               )
           ]
         },
@@ -1827,8 +1830,8 @@ defmodule Screens.V2.DisruptionDiagramTest do
         alert: %Alert{
           effect: :station_closure,
           informed_entities: [
-            %InformedEntity{route: "Green-D", stop: %Stop{id: ~P"unsqu"}},
-            %InformedEntity{route: "Green-E", stop: %Stop{id: ~P"mdftf"}}
+            %InformedEntity{route: %Route{id: "Green-D"}, stop: %Stop{id: ~P"unsqu"}},
+            %InformedEntity{route: %Route{id: "Green-E"}, stop: %Stop{id: ~P"mdftf"}}
           ]
         },
         location_context: %LocationContext{
@@ -1846,9 +1849,9 @@ defmodule Screens.V2.DisruptionDiagramTest do
         alert: %Alert{
           effect: :shuttle,
           informed_entities: [
-            %InformedEntity{route: "Green-E", stop: %Stop{id: ~P"coecl"}},
-            %InformedEntity{route: "Green-E", stop: %Stop{id: ~P"prmnl"}},
-            %InformedEntity{route: "Green-E", stop: %Stop{id: ~P"symcl"}}
+            %InformedEntity{route: %Route{id: "Green-E"}, stop: %Stop{id: ~P"coecl"}},
+            %InformedEntity{route: %Route{id: "Green-E"}, stop: %Stop{id: ~P"prmnl"}},
+            %InformedEntity{route: %Route{id: "Green-E"}, stop: %Stop{id: ~P"symcl"}}
           ]
         },
         location_context: %LocationContext{
@@ -1870,10 +1873,10 @@ defmodule Screens.V2.DisruptionDiagramTest do
         alert: %Alert{
           effect: :station_closure,
           informed_entities: [
-            %InformedEntity{route: "Blue", stop: %Stop{id: ~P"gover"}}
+            %InformedEntity{route: %Route{id: "Blue"}, stop: %Stop{id: ~P"gover"}}
             | Enum.map(
                 ~w[B C D E],
-                &%InformedEntity{route: "Green-#{&1}", stop: %Stop{id: ~P"gover"}}
+                &%InformedEntity{route: %Route{id: "Green-#{&1}"}, stop: %Stop{id: ~P"gover"}}
               )
           ]
         },
@@ -1915,10 +1918,10 @@ defmodule Screens.V2.DisruptionDiagramTest do
         alert: %Alert{
           effect: :station_closure,
           informed_entities: [
-            %InformedEntity{route: "Blue", stop: %Stop{id: ~P"gover"}}
+            %InformedEntity{route: %Route{id: "Blue"}, stop: %Stop{id: ~P"gover"}}
             | Enum.map(
                 ~w[B C D E],
-                &%InformedEntity{route: "Green-#{&1}", stop: %Stop{id: ~P"gover"}}
+                &%InformedEntity{route: %Route{id: "Green-#{&1}"}, stop: %Stop{id: ~P"gover"}}
               )
           ]
         },
@@ -1961,10 +1964,10 @@ defmodule Screens.V2.DisruptionDiagramTest do
         alert: %Alert{
           effect: :station_closure,
           informed_entities: [
-            %InformedEntity{route: "Red", stop: %Stop{id: ~P"pktrm"}}
+            %InformedEntity{route: %Route{id: "Red"}, stop: %Stop{id: ~P"pktrm"}}
             | Enum.map(
                 ~w[B C D E],
-                &%InformedEntity{route: "Green-#{&1}", stop: %Stop{id: ~P"pktrm"}}
+                &%InformedEntity{route: %Route{id: "Green-#{&1}"}, stop: %Stop{id: ~P"pktrm"}}
               )
           ]
         },

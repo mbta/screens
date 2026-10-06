@@ -714,7 +714,7 @@ defmodule Screens.V2.RDS do
   @spec ie_affects_destination?(InformedEntity.t(), RoutePattern.t(), Stop.t()) :: boolean()
   # Alert effects the entire route
   defp ie_affects_destination?(
-         %InformedEntity{route: route_id, direction_id: nil, stop: nil},
+         %InformedEntity{route: %Route{id: route_id}, direction_id: nil, stop: nil},
          %RoutePattern{route: %Route{id: route_id}},
          _home_stop
        ),
@@ -722,7 +722,7 @@ defmodule Screens.V2.RDS do
 
   # Alert effects the entire route in the direction of the destination
   defp ie_affects_destination?(
-         %InformedEntity{route: route_id, direction_id: direction_id, stop: nil},
+         %InformedEntity{route: %Route{id: route_id}, direction_id: direction_id, stop: nil},
          %RoutePattern{route: %Route{id: route_id}, direction_id: direction_id},
          _home_stop
        ),
