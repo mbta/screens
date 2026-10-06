@@ -1405,6 +1405,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     )
   end
 
+  @spec serialize(t()) :: serialized_response()
   def serialize(%__MODULE__{is_terminal_station: is_terminal_station} = t) do
     location = LocalizedAlert.location(t, is_terminal_station)
 
