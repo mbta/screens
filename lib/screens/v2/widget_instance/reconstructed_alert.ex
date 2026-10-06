@@ -172,7 +172,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     # and their affiliated route id
     list_of_directions_and_routes =
       relevant_ies
-      |> Enum.map(&get_direction_and_route_from_entity(&1, effect, location))
+      |> Enum.map(&get_direction_and_route_ids_from_entity(&1, effect, location))
       |> Enum.filter(& &1)
       |> Enum.uniq()
 
@@ -198,12 +198,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Given an entity and the directionality of the alert from the home stop,
   # return a tuple with the affected direction_id and route_id
-  @spec get_direction_and_route_from_entity(
+  @spec get_direction_and_route_ids_from_entity(
           InformedEntity.t(),
           Alert.effect(),
           LocalizedAlert.location()
         ) :: {0 | 1 | nil, Route.id()} | nil
-  defp get_direction_and_route_from_entity(
+  defp get_direction_and_route_ids_from_entity(
          %InformedEntity{stop: %Stop{id: "place-jfk"}},
          :station_closure,
          _location
@@ -212,7 +212,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Skip processing JFK, because it is a branching node station. The other stations in the alert
   # will determine the destination needed for this alert
-  defp get_direction_and_route_from_entity(
+  defp get_direction_and_route_ids_from_entity(
          %InformedEntity{stop: %Stop{id: "place-jfk"}},
          _,
          _location
@@ -221,7 +221,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # If the route is red and the alert is downstream, we have to figure out whether the alert
   # only affects one branch or both
-  defp get_direction_and_route_from_entity(
+  defp get_direction_and_route_ids_from_entity(
          %InformedEntity{direction_id: nil, route: %Route{id: "Red"}, stop: %Stop{id: stop_id}},
          _,
          location
@@ -240,7 +240,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Same with RL upstream alerts
-  defp get_direction_and_route_from_entity(
+  defp get_direction_and_route_ids_from_entity(
          %InformedEntity{direction_id: nil, route: %Route{id: "Red"}, stop: %Stop{id: stop_id}},
          _,
          location
@@ -258,7 +258,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp get_direction_and_route_from_entity(
+  defp get_direction_and_route_ids_from_entity(
          %InformedEntity{direction_id: nil, route: %Route{id: route_id}},
          _,
          location
@@ -266,7 +266,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        when location in [:downstream, :boundary_downstream],
        do: {0, route_id}
 
-  defp get_direction_and_route_from_entity(
+  defp get_direction_and_route_ids_from_entity(
          %InformedEntity{direction_id: nil, route: %Route{id: route_id}},
          _,
          location
@@ -274,7 +274,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
        when location in [:upstream, :boundary_upstream],
        do: {1, route_id}
 
-  defp get_direction_and_route_from_entity(
+  defp get_direction_and_route_ids_from_entity(
          %InformedEntity{direction_id: direction_id, route: %Route{id: route_id}},
          _,
          _
