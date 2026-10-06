@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@fullstory/browser": "^2.1.2",
-    "@sentry/react": "^10.58.0",
+    "@sentry/react": "^11.1.0",
     "classnames": "^2.5.1",
     "core-js": "^3.50.0",
     "lodash": "^4.18.1",
