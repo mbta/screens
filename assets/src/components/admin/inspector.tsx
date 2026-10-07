@@ -50,7 +50,6 @@ const buildIframeUrl = (screen: ScreenWithId | null, isSimulation: boolean) => {
 
 const Inspector: ComponentType = () => {
   const [config, setConfig] = useState<Config | null>(null);
-  const [configMigrationEnabled, setConfigMigrationEnabled] = useState(false);
   const [frameLoadedAt, setFrameLoadedAt] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -59,7 +58,6 @@ const Inspector: ComponentType = () => {
       const response = await fetch.get("/api/admin");
       const config: Config = JSON.parse(response.config);
       setConfig(config);
-      setConfigMigrationEnabled(response.config_migration || false);
     });
   };
 
@@ -124,7 +122,6 @@ const Inspector: ComponentType = () => {
               <>
                 <ConfigControls
                   config={config}
-                  configMigrationEnabled={configMigrationEnabled}
                   screen={screen}
                   isLoading={isLoading}
                   onUpdated={(config) => onScreenUpdated(screen.id, config)}
@@ -237,11 +234,10 @@ const ScreenSelector: ComponentType<{
 
 const ConfigControls: ComponentType<{
   config: Config | null;
-  configMigrationEnabled: boolean;
   screen: ScreenWithId;
   isLoading: boolean;
   onUpdated: (newConfig: Screen) => void;
-}> = ({ config, configMigrationEnabled, screen, isLoading, onUpdated }) => {
+}> = ({ config, screen, isLoading, onUpdated }) => {
   const [editableConfig, setEditableConfig] = useState<Screen | null>(null);
   const [isRequestingReload, setIsRequestingReload] = useState(false);
   const dialogRef = useRef<HTMLDialogElement>(null);
@@ -263,7 +259,6 @@ const ConfigControls: ComponentType<{
     };
 
     const response = await commitScreenConfigChanges(
-      configMigrationEnabled,
       [screen.id],
       [],
       updatedConfig,

@@ -8,24 +8,8 @@ defmodule ScreensWeb.Plug.ScreenRequestTest do
   alias ScreensWeb.Plug.ScreenRequest
   alias ScreensWeb.Plug.ScreenRequest.Options
 
-  import Mox
-  setup :verify_on_exit!
-
-  import Screens.Inject
-  @cache injected(Screens.Config.Cache)
-
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-
-    stub(@cache, :screen, fn _id -> nil end)
-
-    previous_config_migration = Application.get_env(:screens, :config_migration)
-    Application.put_env(:screens, :config_migration, false)
-
-    on_exit(fn ->
-      restore_app_env(:screens, :config_migration, previous_config_migration)
-    end)
-
     :ok
   end
 
@@ -53,7 +37,7 @@ defmodule ScreensWeb.Plug.ScreenRequestTest do
 
     defp make_successful(%Conn{} = conn, screen \\ @screen) do
       id = System.unique_integer() |> to_string()
-      expect(@cache, :screen, fn ^id -> screen end)
+      Repo.insert!(%ScreenConfig{id: id, config: screen})
       %Conn{conn | path_params: %{"id" => id}}
     end
 
@@ -68,19 +52,6 @@ defmodule ScreensWeb.Plug.ScreenRequestTest do
     end
 
     test "assigns screen ID and configuration", %{conn: %Conn{} = conn} do
-      expect(@cache, :screen, fn "1" -> @screen end)
-
-      %Conn{assigns: assigns} =
-        ScreenRequest.call(%Conn{conn | path_params: %{"id" => "1"}}, %Options{})
-
-      assert %{screen_id: "1", screen: %{app_id: :pre_fare_v2}} = assigns
-    end
-
-    test "fetches screen config from Postgres when migration flag is true", %{
-      conn: %Conn{} = conn
-    } do
-      Application.put_env(:screens, :config_migration, true)
-
       Repo.insert!(%ScreenConfig{id: "1", config: @screen})
 
       %Conn{assigns: assigns} =
@@ -141,7 +112,4 @@ defmodule ScreensWeb.Plug.ScreenRequestTest do
       assert Logger.metadata() |> Keyword.get(:request_type) == :foo
     end
   end
-
-  defp restore_app_env(app, key, nil), do: Application.delete_env(app, key)
-  defp restore_app_env(app, key, value), do: Application.put_env(app, key, value)
 end

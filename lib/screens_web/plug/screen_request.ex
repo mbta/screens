@@ -26,7 +26,6 @@ defmodule ScreensWeb.Plug.ScreenRequest do
       conn |> Conn.fetch_query_params() |> assign(options, id, screen)
     else
       {:params, _conn} -> error(conn, 400)
-      {:screen, {:error, :cache_unavailable}} -> error(conn, 503)
       {:screen, {:ok, nil}} -> error(conn, 404)
     end
   end

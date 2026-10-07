@@ -20,7 +20,4 @@ export SCREENS_API_CLIENT_KEY="local_screens_api_client_key"
 # export DATABASE_USER=
 # export DATABASE_PASSWORD=
 
-## Feature flag. Setting to true uses the Postgres DB for screen configurations
-export CONFIG_MIGRATION="false"
-
 export ENVIRONMENT_NAME="screens-local"

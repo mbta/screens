@@ -12,7 +12,6 @@ defmodule Screens.Application do
         Screens.Repo,
         Screens.Migrate,
         {DNSCluster, query: Application.get_env(:screens, :dns_cluster_query, :ignore)},
-        {Screens.Cache.Owner, engine_module: Screens.Config.Cache.Engine},
         {Screens.Cache.Owner, engine_module: Screens.SignsUiConfig.Cache.Engine},
         {Finch,
          name: Screens.V3Api.Finch, pools: %{default: [size: 100, start_pool_metrics?: true]}},

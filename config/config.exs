@@ -95,7 +95,6 @@ config :ex_cldr,
   json_library: Jason
 
 config :screens,
-  config_fetcher: Screens.Config.Fetch.S3,
   config_s3_bucket: "mbta-ctd-config",
   signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.S3,
   signs_ui_s3_path: "config.json"

@@ -1,19 +1,20 @@
 defmodule ScreensWeb.V2.ScreenApiControllerTest do
   use ScreensWeb.ConnCase
 
+  alias Screens.Config.ScreenConfig
   alias Screens.Repo
   alias Screens.ScreensByAlert
   alias Screens.TestSupport.CandidateGeneratorStub, as: Stub
   alias Screens.TestSupport.ScreenDataCache
-  alias ScreensConfig.Screen
 
   import Mox
+  import Screens.Inject
+  import Screens.TestSupport.ScreenConfigBuilder
+
   setup :verify_on_exit!
   setup {ScreenDataCache, :passthrough}
 
-  import Screens.Inject
   @build_info injected(Screens.Util.BuildInfo)
-  @cache injected(Screens.Config.Cache)
   @parameters injected(Screens.V2.ScreenData.Parameters)
 
   require Stub
@@ -21,23 +22,14 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
   Stub.candidate_generator(StubGenerator, fn _ -> [placeholder(:blue)] end)
 
   setup do
-    previous_config_migration = Application.get_env(:screens, :config_migration)
-    Application.put_env(:screens, :config_migration, false)
-
     stub(@build_info, :build_identifier, fn -> ~U[2020-01-01 00:00:00Z] end)
-    stub(@cache, :screen, fn _id -> struct(Screen) end)
     stub(@parameters, :candidate_generator, fn _screen -> StubGenerator end)
     stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
     stub(ScreensByAlert.Mock, :put_data, fn _screen_id, _alert_ids -> :ok end)
 
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
 
-    on_exit(fn ->
-      case previous_config_migration do
-        nil -> Application.delete_env(:screens, :config_migration)
-        value -> Application.put_env(:screens, :config_migration, value)
-      end
-    end)
+    Repo.insert!(%ScreenConfig{id: "1", config: screen_config(:dup_v2)})
 
     :ok
   end
@@ -54,9 +46,11 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
     test "tells client to reload based on refresh_if_loaded_before", %{conn: conn} do
       expect(@build_info, :build_identifier, fn -> ~U[2026-01-01 12:00:00Z] end)
 
-      expect(@cache, :screen, fn "1" ->
-        struct(Screen, refresh_if_loaded_before: ~U[2026-01-01 14:00:00Z])
-      end)
+      Repo.get!(ScreenConfig, "1")
+      |> ScreenConfig.changeset(%{
+        config: %{screen_config(:dup_v2) | refresh_if_loaded_before: ~U[2026-01-01 14:00:00Z]}
+      })
+      |> Repo.update!()
 
       conn = get(conn, "/v2/api/screen/1?last_refresh=2026-01-01T13:00:00Z")
 
@@ -76,9 +70,10 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
     end
 
     test "returns flex_zone for Mercury screens", %{conn: conn} do
-      expect(@cache, :screen, fn
-        "EIG-604" -> struct(Screen, app_id: :gl_eink_v2, vendor: :mercury)
-      end)
+      Repo.insert!(%ScreenConfig{
+        id: "EIG-604",
+        config: screen_config(:bus_eink_v2, vendor: :mercury)
+      })
 
       conn = get(conn, "/v2/api/screen/EIG-604?last_refresh=2024-12-02T00:00:00Z")
 
@@ -96,9 +91,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
     end
 
     test "omits flex_zone from non-Mercury screens", %{conn: conn} do
-      expect(@cache, :screen, fn
-        "1401" -> struct(Screen, app_id: :bus_shelter_v2, vendor: :lg_mri)
-      end)
+      Repo.insert!(%ScreenConfig{id: "1401", config: screen_config(:dup_v2, vendor: :lg_mri)})
 
       conn = get(conn, "/v2/api/screen/1401?last_refresh=2024-12-02T00:00:00Z")
 

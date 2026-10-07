@@ -180,10 +180,6 @@ const Destination: ComponentType<DupDestination> = ({
   const [partsIndex2, setPartsIndex2] = useState(parts.length);
   const [phase, setPhase] = useState<PHASES>(PHASES.OneLine);
 
-  /* eslint-disable-next-line react-hooks/exhaustive-deps --
-   * TODO: Replace this with `useAutoSize`. For now, we know this logic cannot
-   * cause infinite update loops, so we don't need to be warned that it might.
-   */
   useLayoutEffect(() => {
     // Wait for fonts to load before measuring text width
     document.fonts.ready.then(() => {

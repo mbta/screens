@@ -2,23 +2,20 @@ defmodule Screens.TestSupport.ScreenConfigBuilder do
   @moduledoc """
   Helpers for building screen config fixtures in tests.
 
-  Provides normalized and legacy-shaped config payloads used by tests that
-  exercise screen config parsing, loading, and compatibility behavior.
-
-  During post_config_migration_cleanup, this file can be simplified to remove the legacy config helpers.
+  Provides screen structs and JSON payloads for Postgres-backed configuration tests.
   """
 
   alias ScreensConfig.Screen
 
   def screen_config_json(app_id), do: app_id |> screen_config() |> Screen.to_json()
 
-  def screen_config(app_id) do
+  def screen_config(app_id, opts \\ []) do
     %{
       "app_id" => Atom.to_string(app_id),
       "app_params" => minimal_app_params(app_id),
       "device_id" => "test-device",
       "name" => "test-screen",
-      "vendor" => "gds"
+      "vendor" => opts |> Keyword.get(:vendor, :gds) |> Atom.to_string()
     }
     |> Screen.from_json()
   end
@@ -45,27 +42,6 @@ defmodule Screens.TestSupport.ScreenConfigBuilder do
       "departures" => %{"sections" => []},
       "footer" => %{"stop_id" => "place-test"},
       "header" => %{"stop_name" => "Test Stop"}
-    }
-  end
-
-  def legacy_config(screen_dup_config, screen_busway_config) do
-    %{
-      "screens" => %{
-        "dup_1" => screen_dup_config,
-        "busway_1" => screen_busway_config
-      }
-    }
-  end
-
-  def legacy_config_dup_only do
-    dup_old_config =
-      screen_config_json(:dup_v2)
-      |> Map.put("app_id", "dup_old")
-
-    %{
-      "screens" => %{
-        "dup_1" => dup_old_config
-      }
     }
   end
 

@@ -10,8 +10,6 @@ defmodule Screens.ScreenConfigs do
   alias Screens.Repo
   alias ScreensConfig.Screen
 
-  @config_cache injected(Screens.Config.Cache)
-  @config_fetcher injected(Screens.Config.Fetch)
   @data_cache injected(Screens.V2.ScreenData.Cache)
 
   @type screen_id :: String.t()
@@ -20,23 +18,8 @@ defmodule Screens.ScreenConfigs do
           {:upsert_failed, String.t()}
           | {:delete_failed, String.t()}
           | {:transaction_failed, Nebulex.Error.t()}
-          | {:legacy_fetch_failed, term()}
-          | {:legacy_decode_failed, Jason.DecodeError.t()}
-          | {:legacy_encode_failed, Jason.EncodeError.t()}
-          | :legacy_write_failed
-          | :legacy_screens_invalid
 
   @type replace_result :: %{upserted: non_neg_integer(), deleted: non_neg_integer()}
-
-  @spec import_from_file() :: {:ok, replace_result()} | {:error, commit_error()}
-  def import_from_file do
-    # This should be a part of post_config_migration_cleanup
-    with {:ok, config, _version} <- @config_fetcher.fetch_config(),
-         config = Jason.decode!(config),
-         screens when is_map(screens) <- Map.get(config, "screens", %{}) do
-      replace_all(screens)
-    end
-  end
 
   @doc """
   Replaces all persisted screen configs with the given map of screen ID to JSON config,
@@ -56,19 +39,12 @@ defmodule Screens.ScreenConfigs do
     end
   end
 
-  @spec fetch(screen_id()) :: {:ok, Screen.t() | nil} | {:error, :cache_unavailable}
+  @doc "Fetches a single screen's configuration by its ID."
+  @spec fetch(screen_id()) :: {:ok, Screen.t() | nil}
   def fetch(id) do
-    if config_migration_enabled?() do
-      case Repo.get(ScreenConfig, id) do
-        %ScreenConfig{config: %Screen{} = screen} -> {:ok, screen}
-        nil -> {:ok, nil}
-      end
-    else
-      if Screens.Config.Cache.ok?() do
-        {:ok, @config_cache.screen(id)}
-      else
-        {:error, :cache_unavailable}
-      end
+    case Repo.get(ScreenConfig, id) do
+      %ScreenConfig{config: %Screen{} = screen} -> {:ok, screen}
+      nil -> {:ok, nil}
     end
   end
 
@@ -79,88 +55,53 @@ defmodule Screens.ScreenConfigs do
   end
 
   @doc "Returns all Configs as JSON with the ID as a key and the configuration as the value."
-  @spec list_all() :: String.t() | :error
+  @spec list_all() :: String.t()
   def list_all do
-    if config_migration_enabled?() do
-      screens =
-        ScreenConfig
-        |> Repo.all()
-        |> Map.new(fn %ScreenConfig{id: id, config: config} ->
-          {id, Screen.to_json(config)}
-        end)
+    screens =
+      ScreenConfig
+      |> Repo.all()
+      |> Map.new(fn %ScreenConfig{id: id, config: config} ->
+        {id, Screen.to_json(config)}
+      end)
 
-      Jason.encode!(%{screens: screens})
-    else
-      with {:ok, config, _version} <- @config_fetcher.fetch_config() do
-        config
-      end
-    end
+    Jason.encode!(%{screens: screens})
   end
 
   @doc "Returns screen IDs for screens matching the given app ID."
   @spec screen_ids_for_app(Screen.app_id()) :: [screen_id()]
   def screen_ids_for_app(target_app_id) do
-    if config_migration_enabled?() do
-      ScreenConfig
-      |> Repo.all()
-      |> Enum.filter(&match?(%ScreenConfig{config: %Screen{app_id: ^target_app_id}}, &1))
-      |> Enum.map(& &1.id)
-    else
-      Screens.Config.Cache.screen_ids(&match?({_screen_id, %Screen{app_id: ^target_app_id}}, &1))
-    end
+    ScreenConfig
+    |> Repo.all()
+    |> Enum.filter(&match?(%ScreenConfig{config: %Screen{app_id: ^target_app_id}}, &1))
+    |> Enum.map(& &1.id)
   end
 
   @doc "Returns screen IDs that are eligible for Screenplay self-refresh."
   @spec self_refresh_screen_ids() :: [screen_id()]
   def self_refresh_screen_ids do
-    if config_migration_enabled?() do
-      ScreenConfig
-      |> Repo.all()
-      |> Enum.filter(
-        &match?(
-          %ScreenConfig{config: %Screen{disabled: false, hidden_from_screenplay: false}},
-          &1
-        )
+    ScreenConfig
+    |> Repo.all()
+    |> Enum.filter(
+      &match?(
+        %ScreenConfig{config: %Screen{disabled: false, hidden_from_screenplay: false}},
+        &1
       )
-      |> Enum.map(& &1.id)
-    else
-      Screens.Config.Cache.screen_ids(fn {_id,
-                                          %Screen{
-                                            disabled: disabled,
-                                            hidden_from_screenplay: hidden
-                                          }} ->
-        not disabled and not hidden
-      end)
-    end
+    )
+    |> Enum.map(& &1.id)
   end
 
-  @doc """
-  Returns Configs filtered by a list of screen IDs as JSON with the ID as a key and the configuration as the value.
-  When config_migration_enabled? is true, filters in the Postgres query.
-  When false, filters after fetching the config.
-  """
-  @spec list_by_ids(ids :: [screen_id()]) :: String.t() | :error
+  @doc "Returns Configs filtered by a list of screen IDs as JSON with the ID as a key and the configuration as the value."
+  @spec list_by_ids(ids :: [screen_id()]) :: String.t()
   def list_by_ids(ids) when is_list(ids) do
-    if config_migration_enabled?() do
-      screens =
-        ScreenConfig
-        |> where([screen_config], screen_config.id in ^ids)
-        |> Repo.all()
-        |> Map.new(fn %ScreenConfig{id: id, config: config} ->
-          {id, Screen.to_json(config)}
-        end)
+    screens =
+      ScreenConfig
+      |> where([screen_config], screen_config.id in ^ids)
+      |> Repo.all()
+      |> Map.new(fn %ScreenConfig{id: id, config: config} ->
+        {id, Screen.to_json(config)}
+      end)
 
-      Jason.encode!(%{screens: screens})
-    else
-      with {:ok, config, _version} <- @config_fetcher.fetch_config() do
-        config_map = Jason.decode!(config)
-        screens = Map.get(config_map, "screens", %{})
-
-        filtered_screens = Map.take(screens, ids)
-
-        Jason.encode!(%{screens: filtered_screens})
-      end
-    end
+    Jason.encode!(%{screens: screens})
   end
 
   @doc """
@@ -178,13 +119,7 @@ defmodule Screens.ScreenConfigs do
     (update_ids ++ deletes)
     |> Enum.uniq()
     |> @data_cache.invalidate(fn ->
-      if config_migration_enabled?() do
-        with :ok <- upsert_all(updates), do: delete_all(deletes)
-      else
-        # This branch will be removed as part of post_config_migration_cleanup.
-        # When the feature flag is disabled, continue to update the JSON config.
-        update_to_legacy_json(updates, deletes)
-      end
+      with :ok <- upsert_all(updates), do: delete_all(deletes)
     end)
     |> case do
       {:ok, result} -> result
@@ -195,37 +130,22 @@ defmodule Screens.ScreenConfigs do
   @doc "Deletes multiple screen configs based on a list of IDs."
   @spec commit_deletes([screen_id()]) :: :ok | {:error, commit_error()}
   def commit_deletes(deletes) do
-    if config_migration_enabled?() do
-      delete_all(deletes)
-    else
-      # This branch will be removed as part of post_config_migration_cleanup.
-      # When the feature flag is disabled, continue to update the JSON config.
-      update_to_legacy_json([], deletes)
-    end
+    delete_all(deletes)
   end
 
   @doc "Schedules the requested screens to refresh by setting `refresh_if_loaded_before`."
   @spec schedule_refresh_for_screen_ids([screen_id()], DateTime.t()) ::
           :ok | {:error, commit_error()}
   def schedule_refresh_for_screen_ids(screen_ids, now \\ DateTime.utc_now()) do
-    if config_migration_enabled?() do
-      updates =
-        ScreenConfig
-        |> where([screen_config], screen_config.id in ^screen_ids)
-        |> Repo.all()
-        |> Enum.map(fn %ScreenConfig{id: id, config: config} ->
-          %{id: id, config: Screen.schedule_refresh_at_time(config, now)}
-        end)
-
-      commit_updates(updates)
-    else
-      # This branch will be removed as part of post_config_migration_cleanup.
-      screen_ids
-      |> Enum.map(fn id ->
-        %{"id" => id, "config" => %{"refresh_if_loaded_before" => now}}
+    updates =
+      ScreenConfig
+      |> where([screen_config], screen_config.id in ^screen_ids)
+      |> Repo.all()
+      |> Enum.map(fn %ScreenConfig{id: id, config: config} ->
+        %{id: id, config: Screen.schedule_refresh_at_time(config, now)}
       end)
-      |> commit_updates()
-    end
+
+    commit_updates(updates)
   end
 
   @spec upsert_all([screen_update()]) :: :ok | {:error, commit_error()}
@@ -242,16 +162,6 @@ defmodule Screens.ScreenConfigs do
     end)
   end
 
-  @spec delete_all([screen_id()]) :: :ok | {:error, commit_error()}
-  defp delete_all(ids) do
-    Enum.reduce_while(ids, :ok, fn id, _acc ->
-      case delete(id) do
-        :ok -> {:cont, :ok}
-        {:error, _} = error -> {:halt, error}
-      end
-    end)
-  end
-
   # Creates a screen configuration.
   # Upserts so an existing config with the same ID will be overwritten.
   @spec upsert(params :: map()) :: {:ok, ScreenConfig.t()} | {:error, Ecto.Changeset.t()}
@@ -262,6 +172,16 @@ defmodule Screens.ScreenConfigs do
       on_conflict: {:replace, [:config, :updated_at]},
       conflict_target: :id
     )
+  end
+
+  @spec delete_all([screen_id()]) :: :ok | {:error, commit_error()}
+  defp delete_all(ids) do
+    Enum.reduce_while(ids, :ok, fn id, _acc ->
+      case delete(id) do
+        :ok -> {:cont, :ok}
+        {:error, _} = error -> {:halt, error}
+      end
+    end)
   end
 
   @spec delete(screen_id()) :: :ok | {:error, commit_error()}
@@ -277,65 +197,4 @@ defmodule Screens.ScreenConfigs do
         {:error, {:delete_failed, "Unexpected delete operation response: #{inspect(response)}"}}
     end
   end
-
-  # This will be a part of post_config_migration_cleanup
-  # Merges updates into the existing config and removes deleted screens, then writes back to the legacy source.
-  # We need to fetch the existing config before writing updates to prevent overwriting any existing configs.
-  @spec update_to_legacy_json([screen_update()], [screen_id()]) ::
-          :ok | {:error, commit_error()}
-  defp update_to_legacy_json(updates, deletes) do
-    with {:ok, config_json, _version} <- @config_fetcher.fetch_config(),
-         {:ok, decoded_config} <- Jason.decode(config_json) do
-      screens = Map.get(decoded_config, "screens", %{})
-
-      if is_map(screens) do
-        updated_screens =
-          Enum.reduce(updates, screens, fn update, acc ->
-            id = extract_id(update)
-
-            merged_config =
-              acc
-              |> Map.get(id, %{})
-              |> Map.merge(extract_config(update))
-
-            Map.put(acc, id, merged_config)
-          end)
-
-        final_screens = Map.drop(updated_screens, deletes)
-        updated_config = Map.put(decoded_config, "screens", final_screens)
-
-        case Jason.encode(updated_config) do
-          {:ok, encoded_config} ->
-            case @config_fetcher.put_config(encoded_config) do
-              :ok -> :ok
-              :error -> {:error, :legacy_write_failed}
-            end
-
-          {:error, %Jason.EncodeError{} = reason} ->
-            {:error, {:legacy_encode_failed, reason}}
-        end
-      else
-        {:error, :legacy_screens_invalid}
-      end
-    else
-      {:error, %Jason.DecodeError{} = reason} -> {:error, {:legacy_decode_failed, reason}}
-      reason -> {:error, {:legacy_fetch_failed, reason}}
-    end
-  end
-
-  @spec config_migration_enabled?() :: boolean()
-  def config_migration_enabled? do
-    # This will be a part of post_config_migration_cleanup
-    Application.get_env(:screens, :config_migration, false)
-  end
-
-  # This will be a part of post_config_migration_cleanup
-  defp extract_id(%{"id" => id}), do: id
-  defp extract_id(%{id: id}), do: id
-  defp extract_id(_), do: nil
-
-  # This will be a part of post_config_migration_cleanup
-  defp extract_config(%{"config" => config}), do: config
-  defp extract_config(%{config: config}), do: config
-  defp extract_config(_), do: %{}
 end

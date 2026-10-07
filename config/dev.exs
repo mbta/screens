@@ -14,7 +14,6 @@ config :screens, ScreensWeb.Endpoint,
   watchers: [npx: ["exit_on_eof", "npm run watch", cd: "assets"]]
 
 config :screens,
-  config_fetcher: Screens.Config.Fetch.Local,
   local_config_file_spec: {:priv, "local.json"},
   local_signs_ui_config_file_spec: {:priv, "signs_ui_config.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.Local
