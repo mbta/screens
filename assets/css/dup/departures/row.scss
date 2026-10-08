@@ -2,7 +2,10 @@
 
 .departure-row {
   position: relative;
+  display: flex;
+  align-items: center;
   height: 208px;
+  white-space: nowrap;
 
   &:not(:first-child)::before {
     position: absolute;
@@ -15,53 +18,40 @@
   }
 }
 
-.departure-row__route {
-  display: inline-block;
-  width: 248px;
-  height: 144px;
-  margin: 32px;
-  vertical-align: middle;
-
-  .departure-row--extended-route_pill & {
-    width: 351px;
-  }
-
-  &.departure-row__route--yellow {
-    width: auto;
-    height: auto;
-    margin: 0;
-  }
+.departure-row__headsign-and-time-container {
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
 }
 
-.departure-row__destination {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.departure-row__time {
-  display: inline-block;
-  width: 506px;
-  margin-right: 32px;
-  font-size: 138px;
-  vertical-align: middle;
-  color: colors.$cool-black-15;
-  text-align: right;
-
-  .departures-section--extended-times & {
-    width: 733px;
-  }
-}
-
-.departure-row__time--shortened-headsign {
-  width: 663px;
+.departure-destination {
+  min-width: 0;
 }
 
 .departure-times-with-crowding {
-  display: inline-block;
+  width: 370px;
+  margin-right: 32px;
+
+  .departures-section--timestamp & {
+    width: 508px;
+  }
+
+  .departures-section--first & {
+    width: 580px;
+  }
+
+  // Ensure we have enough space just for the "Stopped X stops away presentation"
+  // and that each row fulfills this space requirement
+  .departures-section--status &,
+  .departures-section--headway & {
+    width: 720px;
+  }
 }
 
-.departure-row__first {
-  display: inline-block;
+.departure-time__first {
   margin-right: 0.5ex;
   font-size: 108px;
   vertical-align: center;

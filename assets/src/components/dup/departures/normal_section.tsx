@@ -11,7 +11,7 @@ import { classWithModifier } from "Util/utils";
 const NormalSection: ComponentType<Props> = ({ rows }) => {
   if (rows.length === 0) return null;
 
-  const classModifier = sectionHasWideTimeCol(rows) ? "extended-times" : "";
+  const classModifier = widestTimeType(rows);
 
   return (
     <div className={classWithModifier("departures-section", classModifier)}>
@@ -28,15 +28,25 @@ const NormalSection: ComponentType<Props> = ({ rows }) => {
   );
 };
 
-const sectionHasWideTimeCol = (rows: Row[]) => {
-  // Stop away messages, headway information, and First Trip text take up a larger block of space,
-  // so we need to shorten the space designated for headsigns.
-  return rows.some(
-    (row) =>
-      row.type === "departure_row" &&
-      (row.times_with_crowding?.some((time) => time.time?.type === "status") ||
-        row.is_first_trip),
-  );
+const widestTimeType = (rows: Row[]): string => {
+  const widestPriority = ["status", "headway", "first", "timestamp"];
+  const timeTypes = new Set<string>();
+
+  rows.forEach((row) => {
+    if (row.type !== "departure_row") return;
+
+    if (row.is_first_trip) {
+      timeTypes.add("first");
+      return;
+    }
+
+    (row.times_with_crowding ?? []).forEach((time) => {
+      const type = time.time?.type;
+      if (type) timeTypes.add(type);
+    });
+  });
+
+  return widestPriority.find((type) => timeTypes.has(type)) ?? "";
 };
 
 export default NormalSection;
