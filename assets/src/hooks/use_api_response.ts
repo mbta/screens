@@ -26,49 +26,36 @@ type SimulationData = { fullPage: WidgetData; flexZone: WidgetData[] };
 
 type Success = { state: "success"; data: WidgetData };
 type SimulationSuccess = { state: "simulation_success"; data: SimulationData };
-type NonSuccess =
-  // The request was successful, but this screen is disabled via config.
-  | { state: "disabled" }
-  // Either:
-  // - The request failed.
-  // - The server responded, but did not successfully fetch data. Riders may
-  //   still be able to find data from other sources.
-  | { state: "failure" }
-  // Initial state when no data has been received yet.
-  | { state: "loading" };
+const DISABLED_RESPONSE = { state: "disabled" } as const;
+const FAILURE_RESPONSE = { state: "failure" } as const;
+const LOADING_RESPONSE = { state: "loading" } as const;
 
-type ApiResponse = Success | SimulationSuccess | NonSuccess;
-
-const FAILURE_RESPONSE: ApiResponse = { state: "failure" };
-const LOADING_RESPONSE: ApiResponse = { state: "loading" };
+type ApiResponse =
+  | Success
+  | SimulationSuccess
+  | typeof DISABLED_RESPONSE
+  | typeof FAILURE_RESPONSE
+  | typeof LOADING_RESPONSE;
 
 const parseRawResponse = (json): ApiResponse => {
   if (json.disabled) {
-    return { state: "disabled" };
+    return DISABLED_RESPONSE;
   } else if (json.data) {
     if ("full_page" in json.data) {
       const { data } = json as DataResponse<SimulationResponse>;
 
       return {
         state: "simulation_success",
-        data: parseSimulationResponse(data),
+        data: { fullPage: data.full_page, flexZone: data.flex_zone },
       };
     } else {
       const { data } = json as DataResponse<WidgetData>;
       return { state: "success", data };
     }
   } else {
-    return { state: "failure" };
+    return FAILURE_RESPONSE;
   }
 };
-
-const parseSimulationResponse = ({
-  full_page,
-  flex_zone,
-}: SimulationResponse): SimulationData => ({
-  fullPage: full_page,
-  flexZone: flex_zone,
-});
 
 const doFailureBuffer = (
   lastSuccess: number | null,
