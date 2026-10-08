@@ -1389,21 +1389,21 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   @spec route_direction_name(ReconstructedAlert.t()) :: String.t() | nil
-  defp route_direction_name(
-         %ReconstructedAlert{alert: %Alert{informed_entities: ies} = alert} = t
-       ) do
-    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
+  defp route_direction_name(%ReconstructedAlert{alert: %Alert{informed_entities: ies} = alert}) do
+    routes_by_unique_direction =
+      ies
+      |> Enum.flat_map(fn
+        %InformedEntity{route: %Route{} = route} -> [route]
+        _ -> []
+      end)
+      |> Enum.uniq_by(&Route.normalized_direction_names/1)
 
-    with [affected_route | _] <- affected_routes,
-         ie <- Enum.find(ies, &(not is_nil(&1.route) and &1.route.id === affected_route)),
-         direction_id <- Alert.direction_id(alert),
-         normalized_direction_names <- Route.normalized_direction_names(ie.route),
-         direction when is_number(direction_id) <-
-           Enum.at(normalized_direction_names, direction_id) do
-      direction
-    else
-      [] -> nil
-      nil -> nil
+    case {routes_by_unique_direction, Alert.direction_id(alert)} do
+      {[route], direction_id} when is_number(direction_id) ->
+        Route.normalized_direction_names(route) |> Enum.at(direction_id)
+
+      _ ->
+        nil
     end
   end
 
