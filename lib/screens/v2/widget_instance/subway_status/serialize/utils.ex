@@ -184,10 +184,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
 
   def alert_routes(%{alert: %Alert{informed_entities: entities}}) do
     entities
-    |> Enum.map(fn e -> Map.get(e, :route) end)
-    |> Enum.reject(&is_nil/1)
-    |> Enum.map(& &1.id)
-    |> Enum.filter(&(&1 in @subway_routes))
+    |> Enum.flat_map(fn
+      %InformedEntity{route: %Route{id: route_id}} when route_id in @subway_routes -> [route_id]
+      _ -> []
+    end)
     |> Enum.uniq()
   end
 end
