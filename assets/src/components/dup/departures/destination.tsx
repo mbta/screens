@@ -2,9 +2,7 @@ import { type ComponentType, useLayoutEffect, useRef, useState } from "react";
 
 import type DestinationBase from "Components/departures/destination";
 import { useCurrentPage } from "Context/current_page_provider";
-import { classWithModifier, hasOverflowX } from "Util/utils";
-
-type DupDestination = DestinationBase & { classModifier: string };
+import { hasOverflowX } from "Util/utils";
 
 export const PHASES = {
   OneLine: "ONE_LINE",
@@ -143,12 +141,10 @@ export const buildPageContent = ({
 
 type RenderedDestinationProps = {
   pageContent: ReadonlyArray<string>;
-  classModifier: string;
 };
 
 const RenderedDestination: ComponentType<RenderedDestinationProps> = ({
   pageContent,
-  classModifier,
 }) => {
   const currentPage = useCurrentPage();
 
@@ -161,16 +157,13 @@ const RenderedDestination: ComponentType<RenderedDestinationProps> = ({
   }
 
   return (
-    <div className={classWithModifier("departure-destination", classModifier)}>
+    <div className="departure-destination">
       <div className="departure-destination__headsign">{currentContent}</div>
     </div>
   );
 };
 
-const Destination: ComponentType<DupDestination> = ({
-  headsigns,
-  classModifier,
-}) => {
+const Destination: ComponentType<DestinationBase> = ({ headsigns }) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
@@ -225,12 +218,7 @@ const Destination: ComponentType<DupDestination> = ({
       entireMessageByWord: parts,
       firstLineEndIndex: partsIndex1,
     });
-    return (
-      <RenderedDestination
-        pageContent={pageContent}
-        classModifier={classModifier}
-      />
-    );
+    return <RenderedDestination pageContent={pageContent} />;
   }
 
   // Version just for determining line breaks, never visible to riders
@@ -245,7 +233,7 @@ const Destination: ComponentType<DupDestination> = ({
   }
 
   return (
-    <div className={classWithModifier("departure-destination", classModifier)}>
+    <div className="departure-destination">
       <div className="departure-destination__headsign" ref={firstLineRef}>
         {firstLine}
       </div>
