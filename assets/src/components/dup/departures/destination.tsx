@@ -41,7 +41,9 @@ type TwoLinesPhaseUpdate = {
   headsignIndex: number;
 };
 export type SizingStateUpdate =
-  FinishedUpdate | IndexUpdate | TwoLinesPhaseUpdate;
+  | FinishedUpdate
+  | IndexUpdate
+  | TwoLinesPhaseUpdate;
 
 // Returns changes to make to the state given the current line-fit measurements
 export const nextSizingState = (state: SizingState): SizingStateUpdate => {
@@ -148,7 +150,6 @@ type RenderedDestinationProps = {
 
 const RenderedDestination: ComponentType<RenderedDestinationProps> = ({
   pageContent,
-  classModifier,
 }) => {
   const currentPage = useCurrentPage();
 
@@ -161,16 +162,13 @@ const RenderedDestination: ComponentType<RenderedDestinationProps> = ({
   }
 
   return (
-    <div className={classWithModifier("departure-destination", classModifier)}>
+    <div className="departure-destination">
       <div className="departure-destination__headsign">{currentContent}</div>
     </div>
   );
 };
 
-const Destination: ComponentType<DupDestination> = ({
-  headsigns,
-  classModifier,
-}) => {
+const Destination: ComponentType<DupDestination> = ({ headsigns }) => {
   const firstLineRef = useRef<HTMLDivElement>(null);
   const secondLineRef = useRef<HTMLDivElement>(null);
 
@@ -229,12 +227,7 @@ const Destination: ComponentType<DupDestination> = ({
       entireMessageByWord: parts,
       firstLineEndIndex: partsIndex1,
     });
-    return (
-      <RenderedDestination
-        pageContent={pageContent}
-        classModifier={classModifier}
-      />
-    );
+    return <RenderedDestination pageContent={pageContent} />;
   }
 
   // Version just for determining line breaks, never visible to riders
@@ -249,7 +242,7 @@ const Destination: ComponentType<DupDestination> = ({
   }
 
   return (
-    <div className={classWithModifier("departure-destination", classModifier)}>
+    <div className="departure-destination">
       <div className="departure-destination__headsign" ref={firstLineRef}>
         {firstLine}
       </div>

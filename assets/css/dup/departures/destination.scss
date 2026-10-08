@@ -1,30 +1,7 @@
 @use "CSS/colors";
 
 .departure-destination {
-  display: inline-block;
-  width: 1070px;
-  font-size: 138px;
-  vertical-align: middle;
-  color: colors.$cool-black-15;
   white-space: nowrap;
-
-  // The width of the destination is reduced if either/both of the
-  // route pill and time columns need to take up more space.
-  .departure-row--extended-route_pill & {
-    width: 810px;
-  }
-
-  .departures-section--extended-times & {
-    width: 843px;
-  }
-
-  .departure-row--extended-route_pill.departures-section--extended-times & {
-    width: 740px;
-  }
-}
-
-.departure-destination--shortened-headsign {
-  width: 913px;
 }
 
 .departure-destination__headsign {
@@ -32,5 +9,5 @@
   text-overflow: ellipsis;
   font-size: 138px;
   font-weight: 600;
-  color: black;
+  color: colors.$cool-black-15;
 }

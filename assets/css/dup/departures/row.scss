@@ -3,6 +3,9 @@
 .departure-row {
   position: relative;
   height: 208px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
 
   &:not(:first-child)::before {
     position: absolute;
@@ -15,54 +18,20 @@
   }
 }
 
-.departure-row__route {
-  display: inline-block;
-  width: 248px;
-  height: 144px;
-  margin: 32px;
-  vertical-align: middle;
-
-  .departure-row--extended-route_pill & {
-    width: 351px;
-  }
-
-  &.departure-row__route--yellow {
-    width: auto;
-    height: auto;
-    margin: 0;
-  }
+.departure-row__headsign-and-time-container {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  justify-content: space-between;
+  min-width: 0;
+  gap: 32px;
 }
 
-.departure-row__destination {
-  display: inline-block;
-  vertical-align: middle;
-}
-
-.departure-row__time {
-  display: inline-block;
-  width: 506px;
-  margin-right: 32px;
-  font-size: 138px;
-  vertical-align: middle;
-  color: colors.$cool-black-15;
-  text-align: right;
-
-  .departures-section--extended-times & {
-    width: 733px;
-  }
-}
-
-.departure-row__time--shortened-headsign {
-  width: 663px;
+.departure-destination {
+  width: 100%;
+  min-width: 0;
 }
 
 .departure-times-with-crowding {
-  display: inline-block;
-}
-
-.departure-row__first {
-  display: inline-block;
-  margin-right: 0.5ex;
-  font-size: 108px;
-  vertical-align: center;
+  margin-right: 32px;
 }

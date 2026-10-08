@@ -113,7 +113,7 @@ const DepartureTime: ComponentType<Props> = ({
             className="departure-time__live-icon"
           />
         )}
-        {isFirstTrip && <div className="departure-time__first">First</div>}
+        {isFirstTrip && <span className="departure-time__first">First</span>}
         <DepartureTimePart
           currentPage={currentPage}
           time={time}

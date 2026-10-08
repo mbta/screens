@@ -3,15 +3,16 @@
 
 .route-pill {
   position: relative;
-  width: 100%;
-  height: 100%;
+  width: 280px;
+  height: 144px;
   font-family: Helvetica, sans-serif;
   border-radius: 100px;
+  margin: 32px;
 
   @include mixins.pill-background-colors;
 
   &--yellow {
-    width: 280px;
+    width: 312px;
     height: 168px;
     margin: 20px 32px 20px 0;
     color: black;
@@ -19,6 +20,10 @@
     background-color: colors.$line-bus;
     border-radius: 0 20px 20px 0;
     box-shadow: 2px 4px 2px rgb(0 0 0 / 25%);
+  }
+
+  &--dual {
+    width: 450px;
   }
 }
 
