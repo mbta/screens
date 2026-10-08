@@ -3,11 +3,14 @@ import { useEffect, useRef, useState } from "react";
 const noop = () => {};
 
 /**
- * @param periodMs The number of milliseconds between each fetch.
- * @param offsetMs Number of milliseconds to delay fetch. Primarily used to reduce number of fetches performed at the same time.
- * @returns Number of milliseconds until next fetch.
+ * Given a repeating time interval pinned to the Unix epoch, plus an offset,
+ * returns the time until the next tick.
+ *
+ * @param periodMs Milliseconds between each tick.
+ * @param offsetMs Milliseconds to offset the timeline.
+ * @returns Number of milliseconds until next tick.
  */
-const calculateMsToNextCall = (periodMs: number, offsetMs: number) => {
+const driftlessInterval = (periodMs: number, offsetMs: number) => {
   // Now, as a Unix timestamp (Milliseconds since Unix epoch)
   const now = Date.now();
 
@@ -36,6 +39,10 @@ const calculateMsToNextCall = (periodMs: number, offsetMs: number) => {
   return nextCallTimestamp - now;
 };
 
+/**
+ * Calls the provided function at intervals calculated by `driftlessInterval`.
+ * When `periodMs` is `0`, the function is not called.
+ */
 const useDriftlessInterval = (
   callback: () => void,
   periodMs: number,
@@ -55,11 +62,12 @@ const useDriftlessInterval = (
     };
 
     if (periodMs > 0) {
-      const id = setTimeout(tick, calculateMsToNextCall(periodMs, offsetMs));
+      const id = setTimeout(tick, driftlessInterval(periodMs, offsetMs));
       return () => clearTimeout(id);
     }
     return;
   }, [tickSignal, periodMs, offsetMs]);
 };
 
+export { driftlessInterval };
 export default useDriftlessInterval;
