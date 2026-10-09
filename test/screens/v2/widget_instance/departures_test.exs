@@ -333,7 +333,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_section(section, bus_shelter_screen, now, false)
     end
 
-    test "serializes normal section with countdown and headway rows", %{
+    test "serializes normal section with countdown and headway rows for dups", %{
       dup_screen: dup_screen,
       now: now
     } do
@@ -347,7 +347,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
             stop: %Stop{}
           }
         },
-        {%Route{id: "Green-E", line: %Line{id: "line-Green"}}, 0, {20, 30}, "Westbound"}
+        {route(id: "Green-E", type: :subway), 0, {20, 30}, "Westbound"}
       ]
 
       section = %NormalSection{
@@ -370,6 +370,38 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                ]
              } =
                Departures.serialize_section(section, dup_screen, now, false)
+    end
+
+    test "serializes normal section with countdown and headway rows for lcd, filters for departures",
+         %{
+           bus_shelter_screen: bus_shelter_screen,
+           now: now
+         } do
+      rows = [
+        %Departure{
+          prediction: %Prediction{
+            id: "one",
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: route(id: "Green-E", type: :subway),
+            trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+            stop: %Stop{}
+          }
+        },
+        {route(id: "Green-E", type: :subway), 0, {20, 30}, "Medford/Tufts"}
+      ]
+
+      section = %NormalSection{
+        rows: rows,
+        layout: %Layout{},
+        header: %Header{title: "Section Header"},
+        grouping_type: :time
+      }
+
+      assert %{
+               type: :normal_section,
+               rows: [%{headsign: %{headsigns: ["Medford/Tufts", "Medfd/Tufts"]}}]
+             } =
+               Departures.serialize_section(section, bus_shelter_screen, now, false)
     end
 
     test "serializes normal section with first trip row", %{dup_screen: dup_screen, now: now} do
