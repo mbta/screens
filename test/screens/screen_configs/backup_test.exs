@@ -13,15 +13,6 @@ defmodule Screens.ScreenConfigs.BackupTest do
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-
-    # Backups and rollbacks operate on Postgres configs only.
-    previous_config_migration = Application.get_env(:screens, :config_migration)
-    Application.put_env(:screens, :config_migration, true)
-
-    on_exit(fn ->
-      restore_app_env(:screens, :config_migration, previous_config_migration)
-    end)
-
     :ok
   end
 
@@ -202,7 +193,4 @@ defmodule Screens.ScreenConfigs.BackupTest do
              } = Jason.decode!(contents)
     end
   end
-
-  defp restore_app_env(app, key, nil), do: Application.delete_env(app, key)
-  defp restore_app_env(app, key, value), do: Application.put_env(app, key, value)
 end

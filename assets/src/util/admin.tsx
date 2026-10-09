@@ -234,43 +234,33 @@ const doFetch = async (
 };
 
 export const commitScreenConfigChanges = async (
-  configMigrationEnabled: boolean,
   changedScreenIds: string[],
   deletedScreenIds: string[],
   localConfig: Config,
 ) => {
-  if (configMigrationEnabled) {
-    const changedConfigs = changedScreenIds.map((id) => ({
-      id,
-      config: localConfig.screens[id],
-    }));
+  const changedConfigs = changedScreenIds.map((id) => ({
+    id,
+    config: localConfig.screens[id],
+  }));
 
-    const [updateResponse, deleteResponse] = await Promise.all([
-      changedConfigs.length > 0
-        ? fetch.post("/api/admin/screen_configs/update", {
-            screen_configs: changedConfigs,
-          })
-        : Promise.resolve({ success: true }),
+  const [updateResponse, deleteResponse] = await Promise.all([
+    changedConfigs.length > 0
+      ? fetch.post("/api/admin/screen_configs/update", {
+          screen_configs: changedConfigs,
+        })
+      : Promise.resolve({ success: true }),
 
-      deletedScreenIds.length > 0
-        ? fetch.post("/api/admin/screen_configs/delete", {
-            deleted_screen_ids: deletedScreenIds,
-          })
-        : Promise.resolve({ success: true }),
-    ]);
+    deletedScreenIds.length > 0
+      ? fetch.post("/api/admin/screen_configs/delete", {
+          deleted_screen_ids: deletedScreenIds,
+        })
+      : Promise.resolve({ success: true }),
+  ]);
 
-    if (!updateResponse.success) return updateResponse;
-    if (!deleteResponse.success) return deleteResponse;
+  if (!updateResponse.success) return updateResponse;
+  if (!deleteResponse.success) return deleteResponse;
 
-    return { success: true };
-  } else {
-    const response = await fetch.post("/api/admin/screens/confirm", {
-      config: JSON.stringify(localConfig),
-      changed_ids: changedScreenIds,
-    });
-
-    return response;
-  }
+  return { success: true };
 };
 
 // Returns the current admin environment, stripping the "screens-" prefix if present.

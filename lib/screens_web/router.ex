@@ -75,10 +75,8 @@ defmodule ScreensWeb.Router do
     post "/screen_configs/delete", AdminApiController, :delete_screen_configs
     post "/screens/validate", AdminApiController, :validate
     post "/screens/validate/:id", AdminApiController, :validate
-    post "/screens/confirm", AdminApiController, :confirm
     post "/refresh", AdminApiController, :refresh
     post "/maintenance", AdminApiController, :maintenance
-    post "/import_configs", AdminApiController, :import_configs
     post "/sync_from_snapshot", AdminApiController, :sync_from_snapshot
     get "/sync_environments", AdminApiController, :sync_environments
     get "/backup_dates", AdminApiController, :backup_dates

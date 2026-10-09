@@ -46,7 +46,6 @@ const Editor = () => {
   const [remoteConfig, setRemoteConfig] = useState<Config>(EMPTY_CONFIG);
   const [appIdFilter, setAppIdFilter] = useState<AppId | null>(null);
   const [selectedIDs, setSelectedIDs] = useState<Set<string>>(new Set());
-  const [configMigrationEnabled, setConfigMigrationEnabled] = useState(false);
 
   const { dialog: navBlockDialog, ref: navBlockDialogRef } = useModalDialog();
 
@@ -118,7 +117,6 @@ const Editor = () => {
       const config: Config = JSON.parse(response.config);
       setLocalConfig(config);
       setRemoteConfig(config);
-      setConfigMigrationEnabled(response.config_migration || false);
       setSelectedIDs(new Set());
       resetTableDataKey();
       setIsCommitReady(false);
@@ -141,7 +139,6 @@ const Editor = () => {
       const changedIds = Array.from(changedIDs);
       const deletedIds = Array.from(deletedIDs);
       const commitResponse = await commitScreenConfigChanges(
-        configMigrationEnabled,
         changedIds,
         deletedIds,
         localConfig,

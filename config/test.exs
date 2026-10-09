@@ -19,7 +19,6 @@ config :screens, Screens.Config.Backup.Store.Local,
   local_backup_path: "local/config_backups/screens-test.json"
 
 config :screens,
-  config_fetcher: Screens.Config.Fetch.Local,
   local_config_file_spec: {:test, "config.json"},
   local_signs_ui_config_file_spec: {:test, "signs_ui_config.json"},
   signs_ui_config_fetcher: Screens.SignsUiConfig.Fetch.Local,

@@ -3,18 +3,15 @@ defmodule ScreensWeb.AdminApiController do
 
   alias Screens.Config.Backup
   alias Screens.Config.Backup.Rollback
-  alias Screens.Config.Fetch, as: ConfigFetch
   alias Screens.{Image, Util}
   alias Screens.ScreenConfigs
-  alias Screens.V2.ScreenData
   alias ScreensConfig.{Config, Screen}
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
   def index(conn, _params) do
     config = ScreenConfigs.list_all()
-    config_migration = ScreenConfigs.config_migration_enabled?()
-    json(conn, %{config: config, config_migration: config_migration})
+    json(conn, %{config: config})
   end
 
   def update_screen_configs(conn, %{"screen_configs" => screen_configs})
@@ -65,14 +62,6 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{success: true, config: validated_json})
   end
 
-  def confirm(conn, %{"config" => config, "changed_ids" => changed_ids}) do
-    config
-    |> Jason.decode!()
-    |> Config.from_json()
-    |> put_config(changed_ids)
-    |> to_success_response(conn)
-  end
-
   def refresh(conn, %{"screen_ids" => screen_ids}) do
     screen_ids
     |> ScreenConfigs.schedule_refresh_for_screen_ids()
@@ -81,20 +70,6 @@ defmodule ScreensWeb.AdminApiController do
 
   def list_images(conn, _params) do
     json(conn, %{images: Image.list()})
-  end
-
-  @spec import_configs(Plug.Conn.t(), map()) :: Plug.Conn.t()
-  # This should be a part of post_config_migration_cleanup
-  def import_configs(conn, _params) do
-    case ScreenConfigs.import_from_file() do
-      {:ok, %{upserted: upserted, deleted: deleted}} ->
-        json(conn, %{upserted: upserted, deleted: deleted})
-
-      {:error, reason} ->
-        conn
-        |> put_status(500)
-        |> json(%{success: false, error: inspect(reason)})
-    end
   end
 
   @doc "Environments whose config backups can be restored into this environment."
@@ -208,17 +183,7 @@ defmodule ScreensWeb.AdminApiController do
   def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date, "dry_run" => _}) do
     before_date = Date.from_iso8601!(iso_date)
 
-    affected =
-      if ScreenConfigs.config_migration_enabled?() do
-        ScreenConfigs.all()
-        |> Util.Admin.expired_evergreen_content_count(before_date)
-      else
-        %Config{screens: screens} = fetch_config()
-
-        Enum.count(screens, fn {_id, screen} ->
-          screen != Util.Admin.cleanup_evergreen_content(screen, before_date)
-        end)
-      end
+    affected = Util.Admin.expired_evergreen_content_count(ScreenConfigs.all(), before_date)
 
     json(conn, %{affected: affected})
   end
@@ -226,54 +191,19 @@ defmodule ScreensWeb.AdminApiController do
   def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date}) do
     before_date = Date.from_iso8601!(iso_date)
 
-    if ScreenConfigs.config_migration_enabled?() do
-      response =
-        ScreenConfigs.all()
-        |> Util.Admin.evergreen_content_cleanup_updates(before_date)
-        |> ScreenConfigs.commit_updates()
+    response =
+      ScreenConfigs.all()
+      |> Util.Admin.evergreen_content_cleanup_updates(before_date)
+      |> ScreenConfigs.commit_updates()
 
-      case response do
-        :ok ->
-          json(conn, %{success: true})
+    case response do
+      :ok ->
+        json(conn, %{success: true})
 
-        {:error, reason} ->
-          conn
-          |> put_status(500)
-          |> json(%{success: false, error: inspect(reason)})
-      end
-    else
-      %Config{screens: screens} = config = fetch_config()
-
-      new_screens =
-        screens
-        |> Enum.map(fn {id, screen} ->
-          {id, Util.Admin.cleanup_evergreen_content(screen, before_date)}
-        end)
-        |> Map.new()
-
-      %Config{config | screens: new_screens}
-      |> put_config()
-      |> to_success_response(conn)
-    end
-  end
-
-  @spec fetch_config() :: Config.t()
-  defp fetch_config do
-    {:ok, config_json, _version} = ConfigFetch.fetch_config()
-    config_json |> Jason.decode!() |> Config.from_json()
-  end
-
-  @spec put_config(Config.t()) :: :ok | :error
-  defp put_config(%Config{} = config, ids_changed \\ []) do
-    ScreenData.Cache.invalidate(ids_changed, fn ->
-      config
-      |> Config.to_json()
-      |> Jason.encode!(pretty: true)
-      |> ConfigFetch.put_config()
-    end)
-    |> case do
-      {:ok, result} -> result
-      {:error, _} -> :error
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: inspect(reason)})
     end
   end
 

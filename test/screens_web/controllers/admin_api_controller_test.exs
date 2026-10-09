@@ -15,13 +15,6 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
   setup do
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
-
-    previous_config_migration = Application.get_env(:screens, :config_migration)
-
-    on_exit(fn ->
-      restore_app_env(:screens, :config_migration, previous_config_migration)
-    end)
-
     :ok
   end
 
@@ -81,7 +74,6 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
     @tag :authenticated
     test "restores screen configs from the selected daily backup", %{conn: conn} do
-      Application.put_env(:screens, :config_migration, true)
       restored_config = screen_config_json(:dup_v2)
 
       expect(Store.Mock, :fetch_daily, fn "screens-local", ~D[2026-09-23] ->
@@ -104,9 +96,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
   describe "screen config admin endpoints" do
     @tag :authenticated
-    test "updates screen configs in Postgres when migration flag is true", %{conn: conn} do
-      Application.put_env(:screens, :config_migration, true)
-
+    test "updates screen configs in Postgres", %{conn: conn} do
       screen_dup_config = screen_config(:dup_v2)
       screen_busway_config = screen_config(:busway_v2)
 
@@ -127,30 +117,6 @@ defmodule ScreensWeb.AdminApiControllerTest do
     end
 
     @tag :authenticated
-    test "updates full config when migration flag is false", %{conn: conn} do
-      Application.put_env(:screens, :config_migration, false)
-
-      screen_busway_config = screen_config_json(:busway_v2)
-
-      # Mock the fetch and put to prevent writing to the fixture file
-      expect(Screens.Config.Fetch.Mock, :fetch_config, fn ->
-        {:ok, ~s({"screens": {"screen-2": {"app_id": "dup_v2"}}}), 1}
-      end)
-
-      expect(Screens.Config.Fetch.Mock, :put_config, fn _config -> :ok end)
-      expect(@data_cache, :invalidate, fn ["screen-2"], fun -> {:ok, fun.()} end)
-
-      conn =
-        post(conn, "/api/admin/screen_configs/update", %{
-          screen_configs: [
-            %{"id" => "screen-2", "config" => screen_busway_config}
-          ]
-        })
-
-      assert json_response(conn, 200) == %{"success" => true}
-    end
-
-    @tag :authenticated
     test "returns 400 when screen_configs param is missing", %{conn: conn} do
       capture_log([level: :warning], fn ->
         conn = post(conn, "/api/admin/screen_configs/update", %{})
@@ -159,9 +125,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
     end
 
     @tag :authenticated
-    test "deletes screen configs in Postgres when migration flag is true", %{conn: conn} do
-      Application.put_env(:screens, :config_migration, true)
-
+    test "deletes screen configs in Postgres", %{conn: conn} do
       screen_dup_config = screen_config(:dup_v2)
       screen_busway_config = screen_config(:busway_v2)
 
@@ -187,22 +151,24 @@ defmodule ScreensWeb.AdminApiControllerTest do
     end
 
     @tag :authenticated
-    test "index endpoint returns config_migration flag", %{conn: conn} do
-      Application.put_env(:screens, :config_migration, true)
+    test "index endpoint returns Postgres screen configs", %{conn: conn} do
+      config = screen_config(:dup_v2)
+      Repo.insert!(%ScreenConfig{id: "screen-1", config: config})
 
       conn = get(conn, "/api/admin")
 
-      assert conn.status == 200
-      %{"config_migration" => config_migration} = json_response(conn, 200)
-      assert config_migration == true
+      assert %{"config" => config_json} = response = json_response(conn, 200)
+      assert Map.keys(response) == ["config"]
+
+      assert Jason.decode!(config_json) == %{
+               "screens" => %{"screen-1" => normalize_json(ScreensConfig.Screen.to_json(config))}
+             }
     end
   end
 
   describe "/refresh" do
     @tag :authenticated
     test "schedules a Postgres screen refresh at the specified time", %{conn: conn} do
-      Application.put_env(:screens, :config_migration, true)
-
       Repo.insert!(%ScreenConfig{id: "screen-1", config: screen_config(:dup_v2)})
       Repo.insert!(%ScreenConfig{id: "screen-2", config: screen_config(:busway_v2)})
       expect(@data_cache, :invalidate, fn ["screen-1"], fun -> {:ok, fun.()} end)
@@ -212,27 +178,6 @@ defmodule ScreensWeb.AdminApiControllerTest do
       assert json_response(conn, 200) == %{"success" => true}
       assert Repo.get!(ScreenConfig, "screen-1").config.refresh_if_loaded_before
       refute Repo.get!(ScreenConfig, "screen-2").config.refresh_if_loaded_before
-    end
-
-    @tag :authenticated
-    test "schedules a legacy screen refresh at the specified time", %{conn: conn} do
-      Application.put_env(:screens, :config_migration, false)
-      config = legacy_config(screen_config_json(:dup_v2), screen_config_json(:busway_v2))
-
-      expect(Screens.Config.Fetch.Mock, :fetch_config, fn -> {:ok, Jason.encode!(config), 1} end)
-
-      expect(Screens.Config.Fetch.Mock, :put_config, fn updated_config ->
-        screens = updated_config |> Jason.decode!() |> Map.fetch!("screens")
-        assert screens["dup_1"]["refresh_if_loaded_before"] != nil
-        assert is_nil(screens["busway_1"]["refresh_if_loaded_before"])
-        :ok
-      end)
-
-      expect(@data_cache, :invalidate, fn ["dup_1"], fun -> {:ok, fun.()} end)
-
-      conn = post(conn, "/api/admin/refresh", %{screen_ids: ["dup_1"]})
-
-      assert json_response(conn, 200) == %{"success" => true}
     end
   end
 
@@ -273,8 +218,6 @@ defmodule ScreensWeb.AdminApiControllerTest do
       mixed_ended_screen_config: mixed_ended_screen_config,
       null_ended_screen_config: null_ended_screen_config
     } do
-      Application.put_env(:screens, :config_migration, true)
-
       Repo.insert!(%ScreenConfig{
         id: "all-ended",
         config: all_ended_screen_config
@@ -308,8 +251,6 @@ defmodule ScreensWeb.AdminApiControllerTest do
       mixed_ended_screen_config: mixed_ended_screen_config,
       null_ended_screen_config: null_ended_screen_config
     } do
-      Application.put_env(:screens, :config_migration, true)
-
       Repo.insert!(%ScreenConfig{id: "all-ended", config: all_ended_screen_config})
       Repo.insert!(%ScreenConfig{id: "mixed-ended", config: mixed_ended_screen_config})
       Repo.insert!(%ScreenConfig{id: "null-ended", config: null_ended_screen_config})
@@ -329,7 +270,4 @@ defmodule ScreensWeb.AdminApiControllerTest do
       assert Repo.get!(ScreenConfig, "null-ended").config == null_ended_screen_config
     end
   end
-
-  defp restore_app_env(app, key, nil), do: Application.delete_env(app, key)
-  defp restore_app_env(app, key, value), do: Application.put_env(app, key, value)
 end

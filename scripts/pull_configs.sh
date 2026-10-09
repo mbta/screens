@@ -1,7 +1,6 @@
 #!/bin/sh
 
-# Copies live configuration from S3 to the local paths expected by
-# `Screens.Config.Fetch.Local`.
+# Copies signs_ui_config from S3 to the local paths expected by Screens.SignsUiConfig.Fetch.Local
 
 set -eu
 
@@ -31,5 +30,4 @@ maybe_cp() {
   fi
 }
 
-maybe_cp s3://mbta-ctd-config/screens/screens-"$1".json priv/local.json
 maybe_cp s3://mbta-signs/config.json priv/signs_ui_config.json
