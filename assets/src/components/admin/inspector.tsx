@@ -379,7 +379,7 @@ const DataControls: ComponentType<{
 
   const updateIsRefreshEnabled = (isEnabled) => {
     setIsRefreshEnabled(isEnabled);
-    sendToFrame({ type: "set_refresh_rate", ms: isEnabled ? null : 0 });
+    sendToFrame({ type: "set_refresh_paused", isPaused: !isEnabled });
   };
 
   return (

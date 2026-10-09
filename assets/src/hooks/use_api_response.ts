@@ -1,24 +1,19 @@
-import {
-  type Dispatch,
-  type SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { useEffect, useMemo, useState } from "react";
 import { captureException } from "@sentry/react";
+import useSWR from "swr";
 
 import { WidgetData } from "Components/widget";
-import useDriftlessInterval from "Hooks/use_driftless_interval";
 import { getDatasetValue } from "Util/dataset";
 import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
 import { getRotationIndex, getVersion } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/utils";
 import { report } from "Util/sentry";
+
+import { driftlessInterval } from "./use_driftless_interval";
 import useRefreshRate from "./use_refresh_rate";
 
 const BASE_PATH = "/v2/api/screen";
-const MINUTE_IN_MS = 60_000;
+const STALE_THRESHOLD_MS = 60_000;
 
 type SimulationResponse = { full_page: WidgetData; flex_zone: WidgetData[] };
 type DataResponse<T extends SimulationResponse | WidgetData> = { data: T };
@@ -37,52 +32,31 @@ type ApiResponse =
   | typeof FAILURE_RESPONSE
   | typeof LOADING_RESPONSE;
 
-const parseRawResponse = (json): ApiResponse => {
-  if (json.disabled) {
-    return DISABLED_RESPONSE;
-  } else if (json.data) {
-    if ("full_page" in json.data) {
-      const { data } = json as DataResponse<SimulationResponse>;
+const apiResponseFetcher = (path: string): Promise<ApiResponse> =>
+  fetch(path)
+    .then((response) => response.json())
+    .then((json) => {
+      if (json.force_reload) {
+        window.location.reload();
+        return DISABLED_RESPONSE;
+      } else if (json.disabled) {
+        return DISABLED_RESPONSE;
+      } else if (json.data) {
+        if ("full_page" in json.data) {
+          const { data } = json as DataResponse<SimulationResponse>;
 
-      return {
-        state: "simulation_success",
-        data: { fullPage: data.full_page, flexZone: data.flex_zone },
-      };
-    } else {
-      const { data } = json as DataResponse<WidgetData>;
-      return { state: "success", data };
-    }
-  } else {
-    return FAILURE_RESPONSE;
-  }
-};
-
-const doFailureBuffer = (
-  lastSuccess: number | null,
-  setApiResponse: Dispatch<SetStateAction<ApiResponse>>,
-  apiResponse: ApiResponse = FAILURE_RESPONSE,
-) => {
-  if (lastSuccess === null) {
-    // We haven't had a successful request since initial page load.
-    // Show the "no data" state.
-    setApiResponse(FAILURE_RESPONSE);
-  } else {
-    const elapsedMs = Date.now() - lastSuccess;
-
-    if (elapsedMs < MINUTE_IN_MS) {
-      setApiResponse((state) => state);
-    }
-    if (elapsedMs >= MINUTE_IN_MS) {
-      // This will trigger until a success API response is received.
-      setApiResponse((prevApiResponse) => {
-        if (isSuccess(prevApiResponse)) {
-          report("info", "Entering no-data state.");
+          return {
+            state: "simulation_success",
+            data: { fullPage: data.full_page, flexZone: data.flex_zone },
+          };
+        } else {
+          const { data } = json as DataResponse<WidgetData>;
+          return { state: "success", data };
         }
-        return apiResponse;
-      });
-    }
-  }
-};
+      } else {
+        return FAILURE_RESPONSE;
+      }
+    });
 
 const isSuccess = (
   response: ApiResponse,
@@ -124,85 +98,84 @@ interface UseApiResponseReturn {
   lastSuccess: number | null;
 }
 
+const useTimer = (ms: number) => {
+  const [hasExpired, setHasExpired] = useState(false);
+  const [resetTrigger, setResetTrigger] = useState(false);
+
+  useEffect(() => {
+    setHasExpired(false);
+    const timer = setTimeout(() => setHasExpired(true), ms);
+    return () => clearTimeout(timer);
+  }, [resetTrigger]);
+
+  return { hasExpired, reset: () => setResetTrigger((t) => !t) };
+};
+
 const useBaseApiResponse = ({
   id,
   appendPath,
 }: UseBaseApiResponseOpts): UseApiResponseReturn => {
   const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
-  const adjustedRefreshRateMs = useInspectorRateOverride() ?? refreshRateMs;
-  const [apiResponse, setApiResponse] = useState<ApiResponse>(LOADING_RESPONSE);
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
-  const [initialFetchDone, setInitialFetchDone] = useState(false);
+  const { hasExpired, reset: resetStaleTimer } = useTimer(STALE_THRESHOLD_MS);
+  const isPaused = useInspectorPause();
 
   const apiPath = useApiPath(id, appendPath);
 
-  const fetchData = useCallback(async () => {
-    try {
-      const now = Date.now();
-      const result = await fetch(apiPath);
-      const json = await result.json();
-
-      if (json.force_reload) window.location.reload();
-
-      const response = parseRawResponse(json);
-
-      if (response.state === "failure") {
-        report("info", "Request failed.", { json });
-        doFailureBuffer(lastSuccess, setApiResponse, response);
-      } else {
-        setApiResponse((prevApiResponse) => {
-          if (!isSuccess(prevApiResponse)) {
-            report("info", "Exiting no-data state.");
-          }
-          return response;
-        });
-        setLastSuccess(now);
-      }
-    } catch (err) {
-      captureException(err);
-      doFailureBuffer(lastSuccess, setApiResponse);
-    }
-
-    setRequestCount((count) => count + 1);
-  }, [apiPath, lastSuccess]);
-
-  // Fetch data once, immediately, on first render
-  if (!initialFetchDone) {
-    fetchData();
-    setInitialFetchDone(true);
-  }
-
-  // Schedule subsequent data fetches, if we need to
-  useDriftlessInterval(
-    () => {
-      fetchData();
+  const { data, mutate } = useSWR(apiPath, apiResponseFetcher, {
+    fallbackData: LOADING_RESPONSE,
+    isPaused: () => isPaused,
+    onError: (error) => {
+      setRequestCount((count) => count + 1);
+      captureException(error);
     },
-    adjustedRefreshRateMs,
-    refreshRateOffsetMs,
-  );
+    onErrorRetry: (_error, _key, _config, revalidate, opts) => {
+      setTimeout(
+        () => revalidate(opts),
+        // Retry less often with more failures, max 8 seconds at 8+ retries.
+        Math.pow(Math.min(opts.retryCount / 2, 4), 1.5) * 1_000,
+      );
+    },
+    onSuccess: (response) => {
+      setRequestCount((count) => count + 1);
+      if (isSuccess(response)) {
+        resetStaleTimer();
+        setLastSuccess(Date.now());
+      }
+    },
+    refreshInterval: () =>
+      driftlessInterval(refreshRateMs, refreshRateOffsetMs),
+    // Disable default features that look at the state of the browser window or
+    // the "visibility" of content; these are not relevant to our usage and may
+    // not be reliable on screen devices
+    refreshWhenHidden: true,
+    revalidateOnFocus: false,
+  });
 
-  useInspectorControls(fetchData, lastSuccess);
+  useInspectorControls(mutate, lastSuccess);
 
+  const apiResponse = hasExpired ? FAILURE_RESPONSE : data;
   return { apiResponse, requestCount, lastSuccess };
 };
 
-const useInspectorRateOverride = (): number | null => {
-  const [override, setOverride] = useState<number | null>(null);
+const useInspectorPause = (): boolean => {
+  const [isPaused, setIsPaused] = useState(false);
 
   useReceiveFromInspector((message) => {
-    if (message.type === "set_refresh_rate") setOverride(message.ms);
+    if (message.type === "set_refresh_paused") setIsPaused(message.isPaused);
   });
 
-  return override;
+  return isPaused;
 };
 
 const useInspectorControls = (
-  fetchData: () => void,
+  refreshFn: () => void,
   lastSuccess: number | null,
 ): void => {
   useReceiveFromInspector((message) => {
-    if (message.type === "refresh_data") fetchData();
+    if (message.type === "refresh_data") refreshFn();
+    if (message.type === "set_refresh_paused") null;
   });
 
   useEffect(() => {
