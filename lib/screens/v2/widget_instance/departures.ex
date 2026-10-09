@@ -5,7 +5,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   alias Screens.Headsigns.Headsign
   alias Screens.Headways
-  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -578,7 +577,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_departure_group(
-         [{route, direction_id, {lo, hi}, headsign} | _],
+         [{route, direction_id, {lo, hi}, headsign}],
          %Screen{app_id: :dup_v2} = screen,
          _now,
          route_pill_serializer
@@ -596,7 +595,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_departure_group(
-         [{route, direction_id, {lo, hi}, headsign} | _],
+         [{route, direction_id, {lo, hi}, headsign}],
          screen,
          _now,
          route_pill_serializer
@@ -634,18 +633,15 @@ defmodule Screens.V2.WidgetInstance.Departures do
          now,
          route_pill_serializer
        ) do
-    row_id =
-      rows
-      |> Enum.map(fn
-        %Departure{} = departure ->
-          Departure.id(departure)
-
-        {%Route{line: %Line{id: line_id}}, _direction_id, _range, headsign} ->
-          hash_and_encode(line_id <> (headsign || ""))
-
-        {%Schedule{id: id}, _special_trip_type} ->
-          id
+    departures =
+      Enum.filter(rows, fn
+        %Departure{} -> true
+        _ -> false
       end)
+
+    row_id =
+      departures
+      |> Enum.map(&Departure.id(&1))
       |> Enum.sort()
       |> Enum.join("")
       |> hash_and_encode()
@@ -653,10 +649,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       id: row_id,
       type: :departure_row,
-      route: serialize_route(rows, route_pill_serializer, screen),
-      headsign: serialize_headsign(rows, screen),
-      times_with_crowding: serialize_times_with_crowding(rows, screen, now),
-      direction_id: serialize_direction_id(rows)
+      route: serialize_route(departures, route_pill_serializer, screen),
+      headsign: serialize_headsign(departures, screen),
+      times_with_crowding: serialize_times_with_crowding(departures, screen, now),
+      direction_id: serialize_direction_id(departures)
     }
   end
 
