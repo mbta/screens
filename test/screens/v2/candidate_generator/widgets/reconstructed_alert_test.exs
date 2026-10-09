@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
 
   alias Screens.Alerts.Alert
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.ReconstructedAlert, as: ReconstructedAlertWidget
   alias ScreensConfig.Screen
@@ -657,7 +658,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                     location_type: 1,
                     child_stops: [oak_grove_nb, oak_grove_sb]
                   },
-                  route: "Orange",
+                  route: %Route{id: "Orange"},
                   route_type: 1
                 ),
                 ie(stop: oak_grove_sb)

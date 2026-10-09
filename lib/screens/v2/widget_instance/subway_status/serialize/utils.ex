@@ -111,7 +111,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
     informed_entities
     |> filter_entities_by_route(route_id)
     |> Enum.flat_map(fn
-      %InformedEntity{stop: %Stop{id: stop_id}, route: route_id} ->
+      %InformedEntity{stop: %Stop{id: stop_id}, route: %Route{id: route_id}} ->
         stop_names = Subway.route_stop_names(route_id)
 
         case Map.get(stop_names, stop_id) do
@@ -167,7 +167,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
 
   def filter_entities_by_route(informed_entities, route_id) do
     Enum.filter(informed_entities, fn
-      %{route: entity_route} -> matches_route?(entity_route, route_id)
+      %{route: %Route{id: entity_route_id}} -> matches_route?(entity_route_id, route_id)
       _ -> false
     end)
   end
@@ -184,9 +184,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
 
   def alert_routes(%{alert: %Alert{informed_entities: entities}}) do
     entities
-    |> Enum.map(fn e -> Map.get(e, :route) end)
-    |> Enum.reject(&is_nil/1)
-    |> Enum.filter(&(&1 in @subway_routes))
+    |> Enum.flat_map(fn
+      %InformedEntity{route: %Route{id: route_id}} when route_id in @subway_routes -> [route_id]
+      _ -> []
+    end)
     |> Enum.uniq()
   end
 end

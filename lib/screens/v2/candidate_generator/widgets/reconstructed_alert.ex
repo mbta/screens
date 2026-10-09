@@ -6,6 +6,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.ReconstructedAlert
@@ -204,7 +205,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
     ies
     |> Enum.filter(fn
       # Alert affects entire line
-      %InformedEntity{stop: nil, route: route} -> is_binary(route)
+      %InformedEntity{stop: nil, route: %Route{}} -> true
       ie -> InformedEntity.parent_station?(ie)
     end)
     |> Enum.map(&get_distance(stop_id, home_stop_distance_map, &1))
@@ -220,14 +221,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
   defp get_distance(_home_stop_id, _home_stop_distance_map, %InformedEntity{stop: nil}), do: 0
 
   defp get_distance(home_stop_id, home_stop_distance_map, %InformedEntity{
-         route: "Green" <> _,
+         route: %Route{id: "Green" <> _},
          stop: %Stop{id: ie_stop_id}
        })
        when home_stop_id in @gl_trunk_stop_ids and ie_stop_id in @gl_eastbound_split_stops,
        do: Map.get(home_stop_distance_map, "place-lech", @default_distance)
 
   defp get_distance(home_stop_id, home_stop_distance_map, %{
-         route: "Green" <> _,
+         route: %Route{id: "Green" <> _},
          stop: %{id: ie_stop_id}
        })
        when home_stop_id in @gl_trunk_stop_ids and ie_stop_id not in @gl_trunk_stop_ids,

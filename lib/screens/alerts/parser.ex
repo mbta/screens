@@ -56,7 +56,7 @@ defmodule Screens.Alerts.Parser do
       activities: Enum.map(ie["activities"], &Map.fetch!(@activities, &1)),
       direction_id: ie["direction_id"],
       facility: parse_informed_facility(ie["facility"], included),
-      route: ie["route"],
+      route: parse_informed_route(ie["route"], included),
       route_type: ie["route_type"],
       stop: parse_informed_stop(ie["stop"], included)
     }
@@ -66,6 +66,12 @@ defmodule Screens.Alerts.Parser do
 
   defp parse_informed_facility(id, included),
     do: V3Api.Parser.included!(%{"data" => %{"id" => id, "type" => "facility"}}, included)
+
+  defp parse_informed_route(nil, _included), do: nil
+
+  defp parse_informed_route(id, included) do
+    V3Api.Parser.included!(%{"data" => %{"id" => id, "type" => "route"}}, included)
+  end
 
   defp parse_informed_stop(nil, _included), do: nil
 

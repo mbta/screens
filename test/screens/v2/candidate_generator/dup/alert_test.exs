@@ -5,6 +5,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.CandidateGenerator.Dup.Alerts
   alias ScreensConfig.Alerts, as: AlertsConfig
@@ -30,7 +31,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
     informed_entities: [
       %InformedEntity{
         stop: %Stop{id: "place-bbsta"},
-        route: "Orange",
+        route: %Route{id: "Orange"},
         direction_id: nil,
         route_type: nil,
         activities: ~w[board exit ride]a,
@@ -112,7 +113,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    informed_entities: [
                      %InformedEntity{
                        stop: %Stop{id: "place-bbsta"},
-                       route: "Orange",
+                       route: %Route{id: "Orange"},
                        direction_id: nil,
                        route_type: nil,
                        activities: [:board, :exit, :ride],
@@ -139,7 +140,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    informed_entities: [
                      %InformedEntity{
                        stop: %Stop{id: "place-bbsta"},
-                       route: "Orange",
+                       route: %Route{id: "Orange"},
                        direction_id: nil,
                        route_type: nil,
                        activities: [:board, :exit, :ride],
@@ -166,7 +167,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    informed_entities: [
                      %InformedEntity{
                        stop: %Stop{id: "place-bbsta"},
-                       route: "Orange",
+                       route: %Route{id: "Orange"},
                        direction_id: nil,
                        route_type: nil,
                        activities: [:board, :exit, :ride],
@@ -208,7 +209,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    informed_entities: [
                      %InformedEntity{
                        stop: %Stop{id: "place-bbsta"},
-                       route: "Orange",
+                       route: %Route{id: "Orange"},
                        direction_id: nil,
                        route_type: nil,
                        activities: ~w[board exit ride]a,
@@ -231,7 +232,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    informed_entities: [
                      %InformedEntity{
                        stop: %Stop{id: "place-bbsta"},
-                       route: "Orange",
+                       route: %Route{id: "Orange"},
                        direction_id: nil,
                        route_type: nil,
                        activities: [:board, :exit, :ride],
@@ -258,7 +259,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.AlertTest do
                    informed_entities: [
                      %InformedEntity{
                        stop: %Stop{id: "place-bbsta"},
-                       route: "Orange",
+                       route: %Route{id: "Orange"},
                        direction_id: nil,
                        route_type: nil,
                        activities: [:board, :exit, :ride],

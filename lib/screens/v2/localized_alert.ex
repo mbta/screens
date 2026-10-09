@@ -141,10 +141,9 @@ defmodule Screens.V2.LocalizedAlert do
   end
 
   # Only route is not nil (route type ignored)
-  defp informed_entity_to_zone(%InformedEntity{stop: nil, route: route}, context)
-       when not is_nil(route) do
+  defp informed_entity_to_zone(%InformedEntity{stop: nil, route: %Route{id: route_id}}, context) do
     route_ids = LocationContext.route_ids(context)
-    if route in route_ids, do: [:upstream, :home_stop, :downstream], else: []
+    if route_id in route_ids, do: [:upstream, :home_stop, :downstream], else: []
   end
 
   # Both stop and route are not nil (route type ignored)
@@ -155,7 +154,7 @@ defmodule Screens.V2.LocalizedAlert do
        when not is_nil(stop) and not is_nil(route) do
     route_ids = LocationContext.route_ids(context)
 
-    if route in route_ids do
+    if route.id in route_ids do
       informed_entity_to_zone(%{informed_entity | route: nil}, context)
     else
       []
@@ -331,16 +330,16 @@ defmodule Screens.V2.LocalizedAlert do
           {:halt, empty_set}
 
         # If entity is home stop AND a route, then just that route is marked informed
-        %InformedEntity{stop: %Stop{id: ^home_stop}, route: route}, uninformed ->
-          {:cont, MapSet.delete(uninformed, route)}
+        %InformedEntity{stop: %Stop{id: ^home_stop}, route: %Route{id: route_id}}, uninformed ->
+          {:cont, MapSet.delete(uninformed, route_id)}
 
         # Removed the case with downstream alerts because:
         #  - we don't want to consider downstream alerts for a takeover (bus, prefare, dup)
         #  - we don't want to ever show downstream alerts on bus shelter / bus e-ink
 
         # If the entity has a route, but no stop, that route is marked informed
-        %InformedEntity{stop: nil, route: route}, uninformed ->
-          {:cont, MapSet.delete(uninformed, route)}
+        %InformedEntity{stop: nil, route: %Route{id: route_id}}, uninformed ->
+          {:cont, MapSet.delete(uninformed, route_id)}
 
         _ie, uninformed ->
           {:cont, uninformed}

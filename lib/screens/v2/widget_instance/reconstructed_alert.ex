@@ -164,7 +164,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     relevant_ies =
       Enum.filter(informed_entities, fn entity ->
         (InformedEntity.parent_station?(entity) or is_nil(entity.stop)) and
-          (is_nil(route_id) or String.starts_with?(entity.route, route_id))
+          (is_nil(route_id) or
+             (not is_nil(entity.route) and String.starts_with?(entity.route.id, route_id)))
       end)
 
     # Consolidate the list of entities into their direction from current station
@@ -221,7 +222,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # If the route is red and the alert is downstream, we have to figure out whether the alert
   # only affects one branch or both
   defp get_direction_and_route_from_entity(
-         %InformedEntity{direction_id: nil, route: "Red", stop: %Stop{id: stop_id}},
+         %InformedEntity{direction_id: nil, route: %Route{id: "Red"}, stop: %Stop{id: stop_id}},
          _,
          location
        )
@@ -240,7 +241,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Same with RL upstream alerts
   defp get_direction_and_route_from_entity(
-         %InformedEntity{direction_id: nil, route: "Red", stop: %Stop{id: stop_id}},
+         %InformedEntity{direction_id: nil, route: %Route{id: "Red"}, stop: %Stop{id: stop_id}},
          _,
          location
        )
@@ -258,33 +259,34 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   defp get_direction_and_route_from_entity(
-         %InformedEntity{direction_id: nil, route: route},
+         %InformedEntity{direction_id: nil, route: %Route{id: route_id}},
          _,
          location
        )
        when location in [:downstream, :boundary_downstream],
-       do: {0, route}
+       do: {0, route_id}
 
   defp get_direction_and_route_from_entity(
-         %InformedEntity{direction_id: nil, route: route},
+         %InformedEntity{direction_id: nil, route: %Route{id: route_id}},
          _,
          location
        )
        when location in [:upstream, :boundary_upstream],
-       do: {1, route}
+       do: {1, route_id}
 
   defp get_direction_and_route_from_entity(
-         %InformedEntity{direction_id: direction_id, route: route},
+         %InformedEntity{direction_id: direction_id, route: %Route{id: route_id}},
          _,
          _
        ),
-       do: {direction_id, route}
+       do: {direction_id, route_id}
 
   # Select 1 direction + route from this list of directions + routes for multiple branches
   defp select_direction_and_route([direction_and_route]), do: direction_and_route
 
   # If there are multiple route ids in that informed entities list, then the alert includes branching
-  defp select_direction_and_route([{direction_id, "Red" <> _} | _]), do: {direction_id, "Red"}
+  defp select_direction_and_route([{direction_id, "Red" <> _} | _]),
+    do: {direction_id, "Red"}
 
   defp select_direction_and_route([{direction_id, "Green" <> _} | _]),
     do: {direction_id, "Green-trunk"}

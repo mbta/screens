@@ -11,6 +11,7 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
 
@@ -29,9 +30,9 @@ defmodule Screens.V2.DisruptionDiagram.Validator do
   defp validate_stop_count(%{effect: continuous_effect} = alert)
        when continuous_effect in [:shuttle, :suspension] do
     informed_stops =
-      for %InformedEntity{stop: %Stop{id: "place-" <> _ = stop_id}, route: route} <-
+      for %InformedEntity{stop: %Stop{id: "place-" <> _ = stop_id}, route: %Route{id: route_id}} <-
             alert.informed_entities,
-          route in ~w[Blue Orange Red Green-B Green-C Green-D Green-E Mattapan],
+          route_id in ~w[Blue Orange Red Green-B Green-C Green-D Green-E Mattapan],
           uniq: true,
           do: stop_id
 

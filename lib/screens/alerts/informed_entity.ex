@@ -20,25 +20,21 @@ defmodule Screens.Alerts.InformedEntity do
           activities: nonempty_list(Alert.activity()),
           direction_id: Trip.direction() | nil,
           facility: Facility.t() | nil,
-          route: Route.id() | nil,
+          route: Route.t() | nil,
           route_type: non_neg_integer() | nil,
           stop: Stop.t() | nil
         }
 
   @spec whole_route?(t()) :: boolean
   def whole_route?(ie) do
-    match?(
-      %{route: route_id, direction_id: nil, stop: nil}
-      when not is_nil(route_id),
-      ie
-    )
+    match?(%{route: %Route{id: _route_id}, direction_id: nil, stop: nil}, ie)
   end
 
   @spec whole_direction?(t()) :: boolean
   def whole_direction?(ie) do
     match?(
-      %{route: route_id, direction_id: direction_id, stop: nil}
-      when not is_nil(route_id) and not is_nil(direction_id),
+      %{route: %Route{id: _route_id}, direction_id: direction_id, stop: nil}
+      when not is_nil(direction_id),
       ie
     )
   end

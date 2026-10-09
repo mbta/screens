@@ -4,6 +4,8 @@ defmodule Screens.Alerts.AlertTest do
   alias Screens.Alerts.Alert
   alias Screens.Alerts.InformedEntity
   alias Screens.Facilities.Facility
+  alias Screens.Lines.Line
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
 
   import Screens.TestSupport.InformedEntityBuilder
@@ -17,25 +19,128 @@ defmodule Screens.Alerts.AlertTest do
     "description" => nil,
     "duration_certainty" => "UNKNOWN",
     "effect" => "DELAY",
-    "header" => "Route 1 experiencing delays up to 20 minutes due to an accident.",
+    "header" => "Blue line experiencing delays up to 20 minutes due to an accident.",
     "image" => nil,
     "image_alternative_text" => nil,
-    "informed_entity" => [%{"activities" => ~w[BOARD EXIT RIDE], "route" => "1"}],
+    "informed_entity" => [%{"activities" => ~w[BOARD EXIT RIDE], "route" => "Blue"}],
     "lifecycle" => "ONGOING",
-    "service_effect" => "Route 1 delay",
+    "service_effect" => "Blue delay",
     "severity" => 5,
-    "short_header" => "Route 1 delayed up to 20 minutes due to an accident.",
+    "short_header" => "Blue line delayed up to 20 minutes due to an accident.",
     "timeframe" => nil,
     "updated_at" => "2017-08-14T14:54:01-04:00",
     "url" => nil
   }
 
+  # Minimal valid included fields to tie routes and lines to retrieved alerts.
+  @minimal_included [
+    %{
+      "attributes" => %{
+        "short_name" => "",
+        "long_name" => "Blue Line",
+        "direction_names" => ["West", "East"],
+        "direction_destinations" => ["Bowdoin", "Wonderland"],
+        "type" => 1
+      },
+      "id" => "Blue",
+      "links" => %{"self" => "/routes/Blue"},
+      "relationships" => %{
+        "agency" => %{"data" => %{"id" => "1", "type" => "agency"}},
+        "line" => %{"data" => %{"id" => "line-Blue", "type" => "line"}}
+      },
+      "type" => "route"
+    },
+    %{
+      "attributes" => %{
+        "long_name" => "Blue Line",
+        "short_name" => "",
+        "sort_order" => 10040
+      },
+      "id" => "line-Blue",
+      "links" => %{"self" => "/lines/line-Blue"},
+      "type" => "line"
+    }
+  ]
+
   describe "fetch/2" do
-    test "fetches and parses alerts" do
-      get_json_fn = fn "alerts", %{"filter[route]" => "1"} ->
+    setup do
+      blue_route = %Route{
+        direction_destinations: ["Bowdoin", "Wonderland"],
+        direction_names: ["West", "East"],
+        id: "Blue",
+        line: %Line{
+          id: "line-Blue",
+          long_name: "Blue Line",
+          short_name: "",
+          sort_order: 10040
+        },
+        long_name: "Blue Line",
+        short_name: "",
+        type: :subway
+      }
+
+      red_route = %Route{
+        direction_destinations: ["Ashmont/Braintree", "Alewife"],
+        direction_names: ["South", "North"],
+        id: "Red",
+        line: %Screens.Lines.Line{
+          id: "line-Red",
+          long_name: "Red Line",
+          short_name: "",
+          sort_order: 10010
+        },
+        long_name: "Red Line",
+        short_name: "",
+        type: :subway
+      }
+
+      included_blue_and_red_lines = [
+        %{
+          "attributes" => %{
+            "short_name" => "",
+            "long_name" => "Red Line",
+            "direction_names" => ["South", "North"],
+            "direction_destinations" => ["Ashmont/Braintree", "Alewife"],
+            "type" => 1
+          },
+          "id" => "Red",
+          "links" => %{"self" => "/routes/Red"},
+          "relationships" => %{
+            "agency" => %{"data" => %{"id" => "1", "type" => "agency"}},
+            "line" => %{"data" => %{"id" => "line-Red", "type" => "line"}}
+          },
+          "type" => "route"
+        },
+        %{
+          "attributes" => %{
+            "long_name" => "Red Line",
+            "short_name" => "",
+            "sort_order" => 10010
+          },
+          "id" => "line-Red",
+          "links" => %{"self" => "/lines/line-Red"},
+          "type" => "line"
+        }
+        | @minimal_included
+      ]
+
+      %{
+        blue_route: blue_route,
+        included_blue_and_red_lines: included_blue_and_red_lines,
+        red_route: red_route
+      }
+    end
+
+    test "fetches and parses alerts", context do
+      %{blue_route: blue_route} = context
+
+      get_json_fn = fn "alerts", %{"filter[route]" => "Blue"} ->
         {
           :ok,
-          %{"data" => [%{"id" => "999", "type" => "alert", "attributes" => @minimal_attributes}]}
+          %{
+            "data" => [%{"id" => "Blue", "type" => "alert", "attributes" => @minimal_attributes}],
+            "included" => @minimal_included
+          }
         }
       end
 
@@ -45,12 +150,12 @@ defmodule Screens.Alerts.AlertTest do
         created_at: ~U[2017-08-14 18:54:01Z],
         description: nil,
         effect: :delay,
-        header: "Route 1 experiencing delays up to 20 minutes due to an accident.",
-        id: "999",
+        header: "Blue line experiencing delays up to 20 minutes due to an accident.",
+        id: "Blue",
         informed_entities: [
           %InformedEntity{
             stop: nil,
-            route: "1",
+            route: blue_route,
             direction_id: nil,
             route_type: nil,
             activities: ~w[board exit ride]a,
@@ -63,7 +168,7 @@ defmodule Screens.Alerts.AlertTest do
         updated_at: ~U[2017-08-14 18:54:01Z]
       }
 
-      assert Alert.fetch([route_ids: ["1"]], get_json_fn) == {:ok, [expected]}
+      assert Alert.fetch([route_ids: ["Blue"]], get_json_fn) == {:ok, [expected]}
     end
 
     test "parses related facilities" do
@@ -106,25 +211,31 @@ defmodule Screens.Alerts.AlertTest do
                alert
     end
 
-    test "combine informed entities by direction_id" do
+    test "combine informed entities by direction_id", context do
+      %{
+        included_blue_and_red_lines: included_blue_and_red_lines,
+        blue_route: blue_route,
+        red_route: red_route
+      } = context
+
       attributes = %{
         @minimal_attributes
         | "informed_entity" => [
             %{
               "activities" => ~w[BOARD EXIT RIDE],
-              "route" => "1",
+              "route" => "Blue",
               "stop" => "stop_one",
               "direction_id" => 1
             },
             %{
               "activities" => ~w[BOARD EXIT RIDE],
-              "route" => "2",
+              "route" => "Red",
               "stop" => "stop_two",
               "direction_id" => 1
             },
             %{
               "activities" => ~w[BOARD EXIT RIDE],
-              "route" => "2",
+              "route" => "Red",
               "stop" => "stop_two",
               "direction_id" => 0
             }
@@ -161,6 +272,7 @@ defmodule Screens.Alerts.AlertTest do
                 },
                 "relationships" => %{}
               }
+              | included_blue_and_red_lines
             ]
           }
         }
@@ -172,7 +284,7 @@ defmodule Screens.Alerts.AlertTest do
                informed_entities: [
                  %InformedEntity{
                    stop: %Stop{id: "stop_one"},
-                   route: "1",
+                   route: ^blue_route,
                    direction_id: 1,
                    route_type: nil,
                    activities: ~w[board exit ride]a,
@@ -180,7 +292,7 @@ defmodule Screens.Alerts.AlertTest do
                  },
                  %InformedEntity{
                    stop: %Stop{id: "stop_two"},
-                   route: "2",
+                   route: ^red_route,
                    direction_id: nil,
                    route_type: nil,
                    activities: ~w[board exit ride]a,
@@ -190,37 +302,43 @@ defmodule Screens.Alerts.AlertTest do
              } = alert
     end
 
-    test "combine informed entities by direction_id while handling nil direction_ids" do
+    test "combine informed entities by direction_id while handling nil direction_ids", context do
+      %{
+        included_blue_and_red_lines: included_blue_and_red_lines,
+        blue_route: blue_route,
+        red_route: red_route
+      } = context
+
       attributes = %{
         @minimal_attributes
         | "informed_entity" => [
             %{
               "activities" => ~w[BOARD EXIT RIDE],
-              "route" => "1",
+              "route" => "Blue",
               "stop" => "stop_one",
               "direction_id" => nil
             },
             %{
               "activities" => ~w[BOARD EXIT RIDE],
-              "route" => "1",
+              "route" => "Blue",
               "stop" => "stop_one",
               "direction_id" => 0
             },
             %{
               "activities" => ~w[BOARD EXIT RIDE],
-              "route" => "2",
+              "route" => "Red",
               "stop" => "stop_two",
               "direction_id" => nil
             },
             %{
               "activities" => ~w[BOARD EXIT RIDE],
-              "route" => "2",
+              "route" => "Red",
               "stop" => "stop_two",
               "direction_id" => 1
             },
             %{
               "activities" => ~w[BOARD EXIT RIDE],
-              "route" => "2",
+              "route" => "Red",
               "stop" => "stop_two",
               "direction_id" => 0
             }
@@ -257,6 +375,7 @@ defmodule Screens.Alerts.AlertTest do
                 },
                 "relationships" => %{}
               }
+              | included_blue_and_red_lines
             ]
           }
         }
@@ -268,7 +387,7 @@ defmodule Screens.Alerts.AlertTest do
                informed_entities: [
                  %InformedEntity{
                    stop: %Stop{id: "stop_one", platform_name: "Stop One Platform"},
-                   route: "1",
+                   route: ^blue_route,
                    direction_id: nil,
                    route_type: nil,
                    activities: ~w[board exit ride]a,
@@ -276,7 +395,7 @@ defmodule Screens.Alerts.AlertTest do
                  },
                  %InformedEntity{
                    stop: %Stop{id: "stop_two"},
-                   route: "2",
+                   route: ^red_route,
                    direction_id: nil,
                    route_type: nil,
                    activities: ~w[board exit ride]a,
@@ -290,8 +409,8 @@ defmodule Screens.Alerts.AlertTest do
       attributes = %{
         @minimal_attributes
         | "informed_entity" => [
-            %{"activities" => ~w[BOARD], "route" => "1"},
-            %{"activities" => ~w[EXIT], "route" => "1"}
+            %{"activities" => ~w[BOARD], "route" => "Blue"},
+            %{"activities" => ~w[EXIT], "route" => "Blue"}
           ]
       }
 
@@ -300,7 +419,7 @@ defmodule Screens.Alerts.AlertTest do
           :ok,
           %{
             "data" => [%{"id" => "999", "type" => "alert", "attributes" => attributes}],
-            "included" => []
+            "included" => @minimal_included
           }
         }
       end
@@ -329,18 +448,21 @@ defmodule Screens.Alerts.AlertTest do
         route_ids: ~w[22 29 44],
         get_json_fn: fn
           _, %{"filter[stop]" => ^stop_ids_param, "filter[route]" => ^route_ids_param} ->
-            {:ok, %{"data" => stop_based_alerts}}
+            {:ok, %{"data" => stop_based_alerts, "included" => @minimal_included}}
 
           _, %{"filter[route]" => ^route_ids_param} ->
-            {:ok, %{"data" => route_based_alerts}}
+            {:ok, %{"data" => route_based_alerts, "included" => @minimal_included}}
         end,
         x_get_json_fn1: fn
-          _, %{"filter[stop]" => ^stop_ids_param, "filter[route]" => ^route_ids_param} -> :error
-          _, %{"filter[route]" => ^route_ids_param} -> {:ok, %{"data" => route_based_alerts}}
+          _, %{"filter[stop]" => ^stop_ids_param, "filter[route]" => ^route_ids_param} ->
+            :error
+
+          _, %{"filter[route]" => ^route_ids_param} ->
+            {:ok, %{"data" => route_based_alerts, "included" => @minimal_included}}
         end,
         x_get_json_fn2: fn
           _, %{"filter[stop]" => ^stop_ids_param, "filter[route]" => ^route_ids_param} ->
-            {:ok, %{"data" => stop_based_alerts}}
+            {:ok, %{"data" => stop_based_alerts, "included" => @minimal_included}}
 
           _, %{"filter[route]" => ^route_ids_param} ->
             :error
@@ -470,7 +592,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: 0,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: %Stop{id: "12345"}
           },
@@ -478,7 +600,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: nil,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: %Stop{id: "place-a"}
           }
@@ -497,7 +619,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: 0,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: %Stop{id: "place-a"}
           },
@@ -505,7 +627,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: nil,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: %Stop{id: "place-b"}
           },
@@ -513,7 +635,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: 1,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: %Stop{id: "place-c"}
           }
@@ -531,7 +653,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: 0,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: "place-a"
           },
@@ -539,7 +661,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: 1,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: "place-b"
           }
@@ -556,7 +678,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: nil,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: %Stop{id: "12345"}
           },
@@ -564,7 +686,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: 0,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: %Stop{id: "place-a"}
           },
@@ -572,7 +694,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: 0,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: %Stop{id: "place-b"}
           }
@@ -589,7 +711,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: nil,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: nil
           }
@@ -606,7 +728,7 @@ defmodule Screens.Alerts.AlertTest do
             activities: ~w[board exit ride]a,
             direction_id: 1,
             facility: nil,
-            route: "1",
+            route: %Route{id: "1"},
             route_type: nil,
             stop: nil
           }

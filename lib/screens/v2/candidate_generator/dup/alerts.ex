@@ -8,6 +8,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
   alias Screens.Alerts.KenmoreAlertHelper
   alias Screens.LocationContext
   alias Screens.Report
+  alias Screens.Routes.Route
   alias Screens.Stops.Stop
   alias Screens.V2.LocalizedAlert
   alias Screens.V2.WidgetInstance.{DupAlert, DupSpecialCaseAlert}
@@ -276,7 +277,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.Alerts do
       alert
       |> Map.get(:informed_entities)
       |> Enum.map(fn
-        %InformedEntity{stop: %{id: "place-wtcst"}, route: route} -> route
+        %InformedEntity{stop: %{id: "place-wtcst"}, route: %Route{id: route_id}} -> route_id
         _ -> nil
       end)
       |> Enum.filter(& &1)
