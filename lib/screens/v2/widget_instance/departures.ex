@@ -5,7 +5,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   alias Screens.Headsigns.Headsign
   alias Screens.Headways
-  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
