@@ -58,7 +58,7 @@ Remember to refresh your environment variables with `direnv allow` if storing in
 ### Loading Screen Configurations into Postgres
 1. Visit <http://localhost:4000/admin/tools>.
 1. Within the section to "Sync Configurations from Source Environment", select 
-an environment to sync  from as a source. Starting with prod configurations is 
+an environment to sync from as a source. Starting with prod configurations is 
 recommended, as these are guaranteed to be up-to-date and in expected working order.
 1. Visit <http://localhost:4000/v2/screen/PRE-201> (one of our screens, chosen 
 because North Station is cool) to check that everything is working!
