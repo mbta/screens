@@ -1389,20 +1389,22 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   @spec route_direction_name(ReconstructedAlert.t()) :: String.t() | nil
-  defp route_direction_name(%ReconstructedAlert{alert: alert} = t) do
-    affected_routes = LocalizedAlert.consolidated_informed_subway_routes(t)
-    routes_at_stop = LocalizedAlert.active_routes_at_stop(t)
+  defp route_direction_name(%ReconstructedAlert{alert: %Alert{informed_entities: ies} = alert}) do
+    routes_by_unique_direction =
+      ies
+      |> Enum.flat_map(fn
+        %InformedEntity{route: %Route{} = route} -> [route]
+        _ -> []
+      end)
+      |> Enum.uniq_by(&Route.normalized_direction_names/1)
 
-    collapse_all_green? = all_green_routes_at_stop_affected?(affected_routes, routes_at_stop)
+    case {routes_by_unique_direction, Alert.direction_id(alert)} do
+      {[route], direction_id} when is_number(direction_id) ->
+        Route.normalized_direction_names(route) |> Enum.at(direction_id)
 
-    Route.direction_name(
-      case affected_routes do
-        ["Green" <> _] -> "Green"
-        [route_id] -> route_id
-        _route_ids when collapse_all_green? -> "Green"
-      end,
-      Alert.direction_id(alert)
-    )
+      _ ->
+        nil
+    end
   end
 
   @spec serialize(t()) :: serialized_response()

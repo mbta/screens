@@ -32,6 +32,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
   # Location Helpers    #
   #######################
 
+  @spec get_location([InformedEntity.t()], String.t()) ::
+          String.t() | %{:abbrev => binary(), :full => binary()} | Endpoints.endpoints_t() | nil
   def get_location(informed_entities, route_id) do
     cond do
       alert_is_whole_route?(informed_entities) ->
@@ -41,7 +43,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
         end
 
       alert_is_whole_direction?(informed_entities) ->
-        get_direction(informed_entities, route_id)
+        get_direction(informed_entities)
 
       true ->
         Endpoints.get(informed_entities, route_id)
@@ -56,12 +58,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatus.Serialize.Utils do
     Enum.any?(informed_entities, &InformedEntity.whole_direction?/1)
   end
 
-  defp get_direction(informed_entities, route_id) do
-    [%{direction_id: direction_id} | _] =
+  defp get_direction(informed_entities) do
+    [%InformedEntity{direction_id: direction_id, route: %Route{} = route} | _] =
       Enum.filter(informed_entities, &InformedEntity.whole_direction?/1)
 
-    direction =
-      Route.direction_name(route_id, direction_id)
+    direction = Route.normalized_direction_names(route) |> Enum.at(direction_id)
 
     %{full: direction, abbrev: direction}
   end
