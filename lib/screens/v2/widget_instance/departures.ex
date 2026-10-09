@@ -567,7 +567,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         case special_trip_type do
           # First Trip Types are currently just departures, this will be modified later
           :first_trip ->
-            serialize_times_with_crowding(departures, screen, now)
+            Enum.map(departures, &serialize_time_with_crowding(&1, screen, now))
 
           :service_ended ->
             [%{id: id, time: %{type: :overnight, with_text: app_id != :dup_v2, is_live: false}}]
@@ -655,7 +655,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :departure_row,
       route: serialize_route(rows, route_pill_serializer, screen),
       headsign: serialize_headsign(rows, screen),
-      times_with_crowding: serialize_times_with_crowding(rows, screen, now),
+      times_with_crowding: Enum.map(rows, &serialize_time_with_crowding(&1, screen, now)),
       direction_id: serialize_direction_id(rows)
     }
   end
@@ -749,13 +749,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
     {base_headsign, variation}
   end
 
-  def serialize_times_with_crowding(departures, screen, now) do
-    Enum.map(departures, &serialize_time_with_crowding(&1, screen, now))
-  end
-
   @spec serialize_time_with_crowding(Departure.t(), Screen.t(), DateTime.t()) ::
           serialized_time_with_crowding()
-  defp serialize_time_with_crowding(departure, screen, now) do
+  def serialize_time_with_crowding(departure, screen, now) do
     departure
     |> serialize_time(screen, now)
     |> Map.merge(%{id: Departure.id(departure), crowding: serialize_crowding(departure, screen)})
