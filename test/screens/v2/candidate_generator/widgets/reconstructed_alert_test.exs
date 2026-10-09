@@ -99,7 +99,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
           id: "1",
           effect: :station_closure,
           informed_entities: [
-            ie(stop: oak_grove_parent, route: "Orange", route_type: 1),
+            ie(stop: oak_grove_parent, route_id: "Orange", route_type: 1),
             ie(stop: oak_grove_sb)
           ],
           active_period: happening_now_active_period

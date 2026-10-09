@@ -19,29 +19,29 @@ defmodule Screens.Alerts.InformedEntityTest do
     end
 
     test "deduplicates entities with the same stop ID, regardless of other attributes" do
-      ie1 = ie(stop_id: "place-park", route: "Red", direction_id: 0)
-      ie2 = ie(stop_id: "place-park", route: "Green", direction_id: 0)
-      ie3 = ie(stop_id: "place-park", route: "Red", direction_id: 1)
-      ie4 = ie(stop_id: "place-park", route: "Green", direction_id: 1)
+      ie1 = ie(stop_id: "place-park", route_id: "Red", direction_id: 0)
+      ie2 = ie(stop_id: "place-park", route_id: "Green", direction_id: 0)
+      ie3 = ie(stop_id: "place-park", route_id: "Red", direction_id: 1)
+      ie4 = ie(stop_id: "place-park", route_id: "Green", direction_id: 1)
 
       assert [^ie1] = InformedEntity.uniq_by_stop([ie1, ie2, ie3, ie4])
     end
 
     test "removes ies with nil stops" do
-      ie1 = ie(route: "Red")
-      ie2 = ie(route: "Orange")
+      ie1 = ie(route_id: "Red")
+      ie2 = ie(route_id: "Orange")
 
       assert [] = InformedEntity.uniq_by_stop([ie1, ie2])
     end
 
     test "deduplicates correctly with interleaved duplicates and nil stops" do
-      ie1 = ie(stop_id: "place-park", route: "Red")
-      ie2 = ie(stop_id: "place-sstat", route: "Green")
-      ie3 = ie(stop_id: "place-park", route: "Green")
-      ie4 = ie(stop_id: "place-dwnxg", route: "Blue")
-      ie5 = ie(stop_id: "place-park", route: "Silver")
-      ie_nil_1 = ie(route: "Red")
-      ie_nil_2 = ie(route: "Orange")
+      ie1 = ie(stop_id: "place-park", route_id: "Red")
+      ie2 = ie(stop_id: "place-sstat", route_id: "Green")
+      ie3 = ie(stop_id: "place-park", route_id: "Green")
+      ie4 = ie(stop_id: "place-dwnxg", route_id: "Blue")
+      ie5 = ie(stop_id: "place-park", route_id: "Silver")
+      ie_nil_1 = ie(route_id: "Red")
+      ie_nil_2 = ie(route_id: "Orange")
 
       assert [^ie1, ^ie2, ^ie4] =
                InformedEntity.uniq_by_stop([ie1, ie2, ie3, ie_nil_1, ie4, ie5, ie_nil_2])

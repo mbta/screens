@@ -1144,7 +1144,10 @@ defmodule Screens.V2.RDSTest do
            %Alert{
              id: "1",
              effect: :stop_closure,
-             informed_entities: [ie(stop_id: "s0", route: "r1"), ie(stop_id: "sA", route: "r1")],
+             informed_entities: [
+               ie(stop_id: "s0", route_id: "r1"),
+               ie(stop_id: "sA", route_id: "r1")
+             ],
              active_period: [{now, nil}]
            }
          ]}
@@ -1173,7 +1176,7 @@ defmodule Screens.V2.RDSTest do
            %Alert{
              id: "1",
              effect: :suspension,
-             informed_entities: [ie(route: "r1")],
+             informed_entities: [ie(route_id: "r1")],
              active_period: [{now, nil}]
            }
          ]}
@@ -1202,7 +1205,7 @@ defmodule Screens.V2.RDSTest do
            %Alert{
              id: "1",
              effect: :shuttle,
-             informed_entities: [ie(route: "r2", direction_id: 0)],
+             informed_entities: [ie(route_id: "r2", direction_id: 0)],
              active_period: [{now, nil}]
            }
          ]}
@@ -1286,7 +1289,11 @@ defmodule Screens.V2.RDSTest do
            %Alert{
              id: "1",
              effect: :detour,
-             informed_entities: [ie(route: 4), ie(route: "otherRoute"), ie(stop_id: "otherStop")],
+             informed_entities: [
+               ie(route_id: "4"),
+               ie(route_id: "otherRoute"),
+               ie(stop_id: "otherStop")
+             ],
              active_period: [{now, nil}]
            }
          ]}

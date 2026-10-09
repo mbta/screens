@@ -452,8 +452,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       widget =
         widget
         |> put_informed_entities([
-          ie(route: "Red", route_type: 1, stop_id: "place-dwnxg"),
-          ie(route: "Orange", route_type: 1, stop_id: "place-dwnxg")
+          ie(route_id: "Red", route_type: 1, stop_id: "place-dwnxg"),
+          ie(route_id: "Orange", route_type: 1, stop_id: "place-dwnxg")
         ])
         |> put_is_priority(true)
 
@@ -461,7 +461,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
     end
 
     test "suspension that affects some station trips", %{widget: widget} do
-      widget = put_informed_entities(widget, [ie(route: "Red", route_type: 1)])
+      widget = put_informed_entities(widget, [ie(route_id: "Red", route_type: 1)])
 
       assert_values(widget, {3, @flex_zone})
     end
@@ -588,8 +588,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -635,8 +635,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-welln")
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1),
-          ie(stop_id: "place-astao", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-astao", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -680,7 +680,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -743,8 +743,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-welln")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1),
-          ie(stop_id: "place-astao", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-astao", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
         |> put_is_priority(true)
@@ -789,8 +789,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-ogmnl", route: "Orange", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-mlmnl", route: "Orange", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-ogmnl", route_id: "Orange", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-mlmnl", route_id: "Orange", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_terminal_station(true)
@@ -834,8 +834,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-ogmnl", route: "Orange", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-mlmnl", route: "Orange", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-ogmnl", route_id: "Orange", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-mlmnl", route_id: "Orange", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_terminal_station(true)
@@ -878,8 +878,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-ogmnl", route: "Orange", route_type: 1, direction_id: 1),
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1, direction_id: 1)
+          ie(stop_id: "place-ogmnl", route_id: "Orange", route_type: 1, direction_id: 1),
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1, direction_id: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -924,8 +924,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-ogmnl", route: "Orange", route_type: 1, direction_id: 1),
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1, direction_id: 1)
+          ie(stop_id: "place-ogmnl", route_id: "Orange", route_type: 1, direction_id: 1),
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1, direction_id: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -969,8 +969,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-astao", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-astao", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:single_tracking)
         |> put_severity(1)
@@ -1001,7 +1001,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
@@ -1032,7 +1032,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
@@ -1063,7 +1063,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1, direction_id: 0)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1, direction_id: 0)
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
@@ -1094,7 +1094,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
         |> put_severity(10)
@@ -1125,7 +1125,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
@@ -1156,8 +1156,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1),
-          ie(stop_id: "place-astao", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-astao", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1199,8 +1199,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1),
-          ie(stop_id: "place-astao", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-astao", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1244,8 +1244,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-portr")
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-portr", route: "Red", route_type: 1),
-          ie(stop_id: "70065", route: "Red", route_type: 1)
+          ie(stop_id: "place-portr", route_id: "Red", route_type: 1),
+          ie(stop_id: "70065", route_id: "Red", route_type: 1)
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [["place-portr", "place-asmnl"]]
@@ -1291,8 +1291,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-asmnl")
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-portr", route: "Red", route_type: 1),
-          ie(stop_id: "70065", route: "Red", route_type: 1)
+          ie(stop_id: "place-portr", route_id: "Red", route_type: 1),
+          ie(stop_id: "70065", route_id: "Red", route_type: 1)
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [["place-portr", "place-asmnl"]]
@@ -1343,8 +1343,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-asmnl")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-asmnl", route: "Mattapan", route_type: 0, direction_id: 0),
-          ie(stop_id: "place-cedgr", route: "Mattapan", route_type: 0, direction_id: 0)
+          ie(stop_id: "place-asmnl", route_id: "Mattapan", route_type: 0, direction_id: 0),
+          ie(stop_id: "place-cedgr", route_id: "Mattapan", route_type: 0, direction_id: 0)
         ])
         |> put_tagged_stop_sequences(%{
           "Mattapan" => [
@@ -1378,7 +1378,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:station_closure)
         |> put_informed_station_names(["Jackson Square"])
         |> put_informed_entities([
-          ie(stop_id: "place-jaksn", route: "Orange", route_type: 1)
+          ie(stop_id: "place-jaksn", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1422,7 +1422,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:station_closure)
         |> put_informed_station_names(["Jackson Square"])
         |> put_informed_entities([
-          ie(stop_id: "place-jaksn", route: "Orange", route_type: 1, direction_id: 0)
+          ie(stop_id: "place-jaksn", route_id: "Orange", route_type: 1, direction_id: 0)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1472,7 +1472,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:suspension)
         |> put_alert_header("Simulation of PIO text")
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1503,7 +1503,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:suspension)
         |> put_alert_header("Simulation of PIO text")
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1532,7 +1532,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-forhl")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-forhl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-forhl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1558,7 +1558,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Orange", route_type: 1)
+          ie(stop_id: "place-dwnxg", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1603,10 +1603,10 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-chncl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-dwnxg", route: "Orange", route_type: 1),
-          ie(stop_id: "place-state", route: "Orange", route_type: 1),
-          ie(stop_id: "place-haecl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-chncl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-dwnxg", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-state", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-haecl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1653,9 +1653,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-state", route: "Orange", route_type: 1),
-          ie(stop_id: "place-dwnxg", route: "Orange", route_type: 1),
-          ie(stop_id: "place-chncl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-state", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-dwnxg", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-chncl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -1701,8 +1701,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Orange", route_type: 1),
-          ie(stop_id: "place-dwnxg", route: "Red", route_type: 0)
+          ie(stop_id: "place-dwnxg", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-dwnxg", route_id: "Red", route_type: 0)
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
@@ -1736,7 +1736,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Red")
+          ie(stop_id: "place-dwnxg", route_id: "Red")
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
@@ -1761,7 +1761,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Red")
+          ie(stop_id: "place-dwnxg", route_id: "Red")
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
@@ -1786,9 +1786,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-asmnl", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-asmnl", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-dwnxg", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-pktrm", route_id: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -1814,9 +1814,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_cause(:single_tracking)
         |> put_severity(1)
         |> put_informed_entities([
-          ie(stop_id: "place-asmnl", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-asmnl", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-dwnxg", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-pktrm", route_id: "Red", direction_id: 1, route_type: 1)
         ])
 
       expected = %{
@@ -1843,8 +1843,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-dwnxg", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-pktrm", route_id: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -1868,8 +1868,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-dwnxg", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-pktrm", route_id: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -1893,8 +1893,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-dwnxg", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-pktrm", route_id: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(5)
@@ -1919,8 +1919,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-dwnxg", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-pktrm", route_id: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_severity(10)
@@ -1945,8 +1945,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:delay)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Red", direction_id: 1, route_type: 1),
-          ie(stop_id: "place-pktrm", route: "Red", direction_id: 1, route_type: 1)
+          ie(stop_id: "place-dwnxg", route_id: "Red", direction_id: 1, route_type: 1),
+          ie(stop_id: "place-pktrm", route_id: "Red", direction_id: 1, route_type: 1)
         ])
         |> put_cause(:construction)
         |> put_severity(10)
@@ -1975,7 +1975,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", direction_id: 1, route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", direction_id: 1, route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -1999,8 +1999,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1),
-          ie(stop_id: "place-astao", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-astao", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -2024,8 +2024,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", direction_id: 1, route: "Orange", route_type: 1),
-          ie(stop_id: "place-astao", direction_id: 1, route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", direction_id: 1, route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-astao", direction_id: 1, route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -2049,7 +2049,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", direction_id: 1, route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", direction_id: 1, route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -2073,7 +2073,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_informed_station_names(["Wellington"])
@@ -2101,8 +2101,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-asmnl")
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-portr", route: "Red", route_type: 1, direction_id: 0),
-          ie(stop_id: "70065", route: "Red", route_type: 1, direction_id: 0)
+          ie(stop_id: "place-portr", route_id: "Red", route_type: 1, direction_id: 0),
+          ie(stop_id: "70065", route_id: "Red", route_type: 1, direction_id: 0)
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [["place-portr", "place-asmnl"]]
@@ -2134,9 +2134,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-andrw")
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-jfk", route: "Red", route_type: 1),
-          ie(stop_id: "70085", route: "Red", route_type: 1),
-          ie(stop_id: "70095", route: "Red", route_type: 1)
+          ie(stop_id: "place-jfk", route_id: "Red", route_type: 1),
+          ie(stop_id: "70085", route_id: "Red", route_type: 1),
+          ie(stop_id: "70095", route_id: "Red", route_type: 1)
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [["place-jfk", "place-andrw"]]
@@ -2168,8 +2168,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:delay)
         |> put_severity(5)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1),
-          ie(stop_id: "place-astao", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-astao", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -2193,7 +2193,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
         |> put_informed_station_names(["Wellington"])
@@ -2225,12 +2225,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-gover")
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-north", route: "Green-B", route_type: 0),
-          ie(stop_id: "place-north", route: "Green-C", route_type: 0),
-          ie(stop_id: "place-north", route: "Green-D", route_type: 0),
-          ie(stop_id: "place-north", route: "Green-E", route_type: 0),
-          ie(stop_id: "place-spmnl", route: "Green-D", route_type: 0),
-          ie(stop_id: "place-spmnl", route: "Green-E", route_type: 0)
+          ie(stop_id: "place-north", route_id: "Green-B", route_type: 0),
+          ie(stop_id: "place-north", route_id: "Green-C", route_type: 0),
+          ie(stop_id: "place-north", route_id: "Green-D", route_type: 0),
+          ie(stop_id: "place-north", route_id: "Green-E", route_type: 0),
+          ie(stop_id: "place-spmnl", route_id: "Green-D", route_type: 0),
+          ie(stop_id: "place-spmnl", route_id: "Green-E", route_type: 0)
         ])
         |> put_cause(:unknown)
         |> put_tagged_stop_sequences(%{
@@ -2293,13 +2293,13 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-portr")
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-andrw", route: "Red", route_type: 1),
-          ie(stop_id: "place-asmnl", route: "Red", route_type: 1),
-          ie(stop_id: "place-brdwy", route: "Red", route_type: 1),
-          ie(stop_id: "place-fldcr", route: "Red", route_type: 1),
-          ie(stop_id: "place-jfk", route: "Red", route_type: 1),
-          ie(stop_id: "place-shmnl", route: "Red", route_type: 1),
-          ie(stop_id: "place-smmnl", route: "Red", route_type: 1)
+          ie(stop_id: "place-andrw", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-asmnl", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-brdwy", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-fldcr", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-jfk", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-shmnl", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-smmnl", route_id: "Red", route_type: 1)
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [
@@ -2420,11 +2420,11 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-portr")
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-asmnl", route: "Red", route_type: 1),
-          ie(stop_id: "place-fldcr", route: "Red", route_type: 1),
-          ie(stop_id: "place-jfk", route: "Red", route_type: 1),
-          ie(stop_id: "place-shmnl", route: "Red", route_type: 1),
-          ie(stop_id: "place-smmnl", route: "Red", route_type: 1)
+          ie(stop_id: "place-asmnl", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-fldcr", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-jfk", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-shmnl", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-smmnl", route_id: "Red", route_type: 1)
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [
@@ -2542,12 +2542,12 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:shuttle)
         |> put_alert_header("Simulation of PIO text")
         |> put_informed_entities([
-          ie(stop_id: "place-nqncy", route: "Red", route_type: 1),
-          ie(stop_id: "place-asmnl", route: "Red", route_type: 1),
-          ie(stop_id: "place-fldcr", route: "Red", route_type: 1),
-          ie(stop_id: "place-jfk", route: "Red", route_type: 1),
-          ie(stop_id: "place-shmnl", route: "Red", route_type: 1),
-          ie(stop_id: "place-smmnl", route: "Red", route_type: 1)
+          ie(stop_id: "place-nqncy", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-asmnl", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-fldcr", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-jfk", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-shmnl", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-smmnl", route_id: "Red", route_type: 1)
         ])
         |> put_tagged_stop_sequences(%{
           "Red" => [
@@ -2634,14 +2634,14 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-kencl")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-hymnl", route: "Green-B", route_type: 0),
-          ie(stop_id: "place-hymnl", route: "Green-C", route_type: 0),
-          ie(stop_id: "place-hymnl", route: "Green-D", route_type: 0),
-          ie(stop_id: "place-kencl", route: "Green-B", route_type: 0),
-          ie(stop_id: "place-kencl", route: "Green-C", route_type: 0),
-          ie(stop_id: "place-kencl", route: "Green-D", route_type: 0),
-          ie(stop_id: "70149", route: "Green-B", route_type: 0),
-          ie(stop_id: "70211", route: "Green-C", route_type: 0)
+          ie(stop_id: "place-hymnl", route_id: "Green-B", route_type: 0),
+          ie(stop_id: "place-hymnl", route_id: "Green-C", route_type: 0),
+          ie(stop_id: "place-hymnl", route_id: "Green-D", route_type: 0),
+          ie(stop_id: "place-kencl", route_id: "Green-B", route_type: 0),
+          ie(stop_id: "place-kencl", route_id: "Green-C", route_type: 0),
+          ie(stop_id: "place-kencl", route_id: "Green-D", route_type: 0),
+          ie(stop_id: "70149", route_id: "Green-B", route_type: 0),
+          ie(stop_id: "70211", route_id: "Green-C", route_type: 0)
         ])
         |> put_cause(:unknown)
         |> put_alert_header("Kenmore Partial Suspension")
@@ -2706,9 +2706,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-mvbcl")
         |> put_effect(:shuttle)
         |> put_informed_entities([
-          ie(stop_id: "place-orhte", route: "Blue", route_type: 0),
-          ie(stop_id: "place-wimnl", route: "Blue", route_type: 0),
-          ie(stop_id: "place-aport", route: "Blue", route_type: 0)
+          ie(stop_id: "place-orhte", route_id: "Blue", route_type: 0),
+          ie(stop_id: "place-wimnl", route_id: "Blue", route_type: 0),
+          ie(stop_id: "place-aport", route_id: "Blue", route_type: 0)
         ])
         |> put_cause(:unknown)
         |> put_tagged_stop_sequences(%{
@@ -2761,18 +2761,18 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-gover")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-pktrm", route: "Green-B", route_type: 0),
-          ie(stop_id: "place-pktrm", route: "Green-C", route_type: 0),
-          ie(stop_id: "place-pktrm", route: "Green-D", route_type: 0),
-          ie(stop_id: "place-pktrm", route: "Green-E", route_type: 0),
-          ie(stop_id: "place-boyls", route: "Green-B", route_type: 0),
-          ie(stop_id: "place-boyls", route: "Green-C", route_type: 0),
-          ie(stop_id: "place-boyls", route: "Green-D", route_type: 0),
-          ie(stop_id: "place-boyls", route: "Green-E", route_type: 0),
-          ie(stop_id: "place-armnl", route: "Green-B", route_type: 0),
-          ie(stop_id: "place-armnl", route: "Green-C", route_type: 0),
-          ie(stop_id: "place-armnl", route: "Green-D", route_type: 0),
-          ie(stop_id: "place-armnl", route: "Green-E", route_type: 0)
+          ie(stop_id: "place-pktrm", route_id: "Green-B", route_type: 0),
+          ie(stop_id: "place-pktrm", route_id: "Green-C", route_type: 0),
+          ie(stop_id: "place-pktrm", route_id: "Green-D", route_type: 0),
+          ie(stop_id: "place-pktrm", route_id: "Green-E", route_type: 0),
+          ie(stop_id: "place-boyls", route_id: "Green-B", route_type: 0),
+          ie(stop_id: "place-boyls", route_id: "Green-C", route_type: 0),
+          ie(stop_id: "place-boyls", route_id: "Green-D", route_type: 0),
+          ie(stop_id: "place-boyls", route_id: "Green-E", route_type: 0),
+          ie(stop_id: "place-armnl", route_id: "Green-B", route_type: 0),
+          ie(stop_id: "place-armnl", route_id: "Green-C", route_type: 0),
+          ie(stop_id: "place-armnl", route_id: "Green-D", route_type: 0),
+          ie(stop_id: "place-armnl", route_id: "Green-E", route_type: 0)
         ])
         |> put_cause(:unknown)
         |> put_tagged_stop_sequences(%{
@@ -2869,9 +2869,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-symcl")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mfa", route: "Green-E", route_type: 0),
-          ie(stop_id: "place-lngmd", route: "Green-E", route_type: 0),
-          ie(stop_id: "place-brmnl", route: "Green-E", route_type: 0)
+          ie(stop_id: "place-mfa", route_id: "Green-E", route_type: 0),
+          ie(stop_id: "place-lngmd", route_id: "Green-E", route_type: 0),
+          ie(stop_id: "place-brmnl", route_id: "Green-E", route_type: 0)
         ])
         |> put_cause(:unknown)
         |> put_tagged_stop_sequences(%{
@@ -2917,9 +2917,9 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_home_stop(PreFare, "place-esomr")
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-balsq", route: "Green-E", route_type: 0),
-          ie(stop_id: "place-mgngl", route: "Green-E", route_type: 0),
-          ie(stop_id: "place-gilmn", route: "Green-E", route_type: 0)
+          ie(stop_id: "place-balsq", route_id: "Green-E", route_type: 0),
+          ie(stop_id: "place-mgngl", route_id: "Green-E", route_type: 0),
+          ie(stop_id: "place-gilmn", route_id: "Green-E", route_type: 0)
         ])
         |> put_cause(:unknown)
         |> put_tagged_stop_sequences(%{
@@ -2967,8 +2967,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-alfcl", route: "Red", route_type: 1),
-          ie(stop_id: "place-alfcl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-alfcl", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-alfcl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
 
@@ -2984,7 +2984,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-dwnxg", route: "Red", route_type: 1)
+          ie(stop_id: "place-dwnxg", route_id: "Red", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -2997,8 +2997,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:station_closure)
         |> put_informed_entities([
-          ie(stop_id: "place-alfcl", route: "Red", route_type: 1),
-          ie(stop_id: "place-alfcl", route: "Orange", route_type: 1)
+          ie(stop_id: "place-alfcl", route_id: "Red", route_type: 1),
+          ie(stop_id: "place-alfcl", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:construction)
 
@@ -3011,7 +3011,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         |> put_effect(:delay)
         |> put_severity(5)
         |> put_informed_entities([
-          ie(stop_id: "place-alfcl", route: "Red", route_type: 1)
+          ie(stop_id: "place-alfcl", route_id: "Red", route_type: 1)
         ])
         |> put_cause(:unknown)
 
@@ -3071,27 +3071,27 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             "Orange Line is suspended between North Station and Back Bay due to a structural issue with the Government Center garage. ",
           id: "450523",
           informed_entities: [
-            ie(stop_id: "70014", route: "Orange", route_type: 1),
-            ie(stop_id: "70015", route: "Orange", route_type: 1),
-            ie(stop_id: "70016", route: "Orange", route_type: 1),
-            ie(stop_id: "70017", route: "Orange", route_type: 1),
-            ie(stop_id: "70018", route: "Orange", route_type: 1),
-            ie(stop_id: "70019", route: "Orange", route_type: 1),
-            ie(stop_id: "70020", route: "Orange", route_type: 1),
-            ie(stop_id: "70021", route: "Orange", route_type: 1),
-            ie(stop_id: "70022", route: "Orange", route_type: 1),
-            ie(stop_id: "70023", route: "Orange", route_type: 1),
-            ie(stop_id: "70024", route: "Orange", route_type: 1),
-            ie(stop_id: "70025", route: "Orange", route_type: 1),
-            ie(stop_id: "70026", route: "Orange", route_type: 1),
-            ie(stop_id: "70027", route: "Orange", route_type: 1),
-            ie(stop_id: "place-bbsta", route: "Orange", route_type: 1),
-            ie(stop_id: "place-chncl", route: "Orange", route_type: 1),
-            ie(stop_id: "place-dwnxg", route: "Orange", route_type: 1),
-            ie(stop_id: "place-haecl", route: "Orange", route_type: 1),
-            ie(stop_id: "place-north", route: "Orange", route_type: 1),
-            ie(stop_id: "place-state", route: "Orange", route_type: 1),
-            ie(stop_id: "place-tumnl", route: "Orange", route_type: 1)
+            ie(stop_id: "70014", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70015", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70016", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70017", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70018", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70019", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70020", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70021", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70022", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70023", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70024", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70025", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70026", route_id: "Orange", route_type: 1),
+            ie(stop_id: "70027", route_id: "Orange", route_type: 1),
+            ie(stop_id: "place-bbsta", route_id: "Orange", route_type: 1),
+            ie(stop_id: "place-chncl", route_id: "Orange", route_type: 1),
+            ie(stop_id: "place-dwnxg", route_id: "Orange", route_type: 1),
+            ie(stop_id: "place-haecl", route_id: "Orange", route_type: 1),
+            ie(stop_id: "place-north", route_id: "Orange", route_type: 1),
+            ie(stop_id: "place-state", route_id: "Orange", route_type: 1),
+            ie(stop_id: "place-tumnl", route_id: "Orange", route_type: 1)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -3252,42 +3252,42 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
             "Green Line is replaced by shuttle buses between Government Center and Union Square due to a structural issue with the Government Center Garage. Shuttle buses are not servicing Haymarket Station.",
           id: "450522",
           informed_entities: [
-            ie(stop_id: "place-north", route: "Green-D", route_type: 0),
-            ie(stop_id: "70504", route: "Green-E", route_type: 0),
-            ie(stop_id: "place-unsqu", route: "Green-E", route_type: 0),
-            ie(stop_id: "place-spmnl", route: "Green-C", route_type: 0),
-            ie(stop_id: "70204", route: "Green-C", route_type: 0),
-            ie(stop_id: "70202", route: "Green-D", route_type: 0),
-            ie(stop_id: "70501", route: "Green-D", route_type: 0),
-            ie(stop_id: "70202", route: "Green-B", route_type: 0),
-            ie(stop_id: "70207", route: "Green-D", route_type: 0),
-            ie(stop_id: "place-unsqu", route: "Green-D", route_type: 0),
-            ie(stop_id: "place-north", route: "Green-E", route_type: 0),
-            ie(stop_id: "70208", route: "Green-D", route_type: 0),
-            ie(stop_id: "70208", route: "Green-E", route_type: 0),
-            ie(stop_id: "70206", route: "Green-B", route_type: 0),
-            ie(stop_id: "place-lech", route: "Green-B", route_type: 0),
-            ie(stop_id: "70205", route: "Green-B", route_type: 0),
-            ie(stop_id: "place-north", route: "Green-B", route_type: 0),
-            ie(stop_id: "70203", route: "Green-B", route_type: 0),
-            ie(stop_id: "70201", route: "Green-C", route_type: 0),
-            ie(stop_id: "place-gover", route: "Green-B", route_type: 0),
-            ie(stop_id: "70206", route: "Green-C", route_type: 0),
-            ie(stop_id: "place-unsqu", route: "Green-C", route_type: 0),
-            ie(stop_id: "70504", route: "Green-C", route_type: 0),
-            ie(stop_id: "70202", route: "Green-C", route_type: 0),
-            ie(stop_id: "place-gover", route: "Green-C", route_type: 0),
-            ie(stop_id: "70201", route: "Green-B", route_type: 0),
-            ie(stop_id: "70504", route: "Green-B", route_type: 0),
-            ie(stop_id: "place-lech", route: "Green-C", route_type: 0),
-            ie(stop_id: "70501", route: "Green-B", route_type: 0),
-            ie(stop_id: "70202", route: "Green-E", route_type: 0),
-            ie(stop_id: "70208", route: "Green-B", route_type: 0),
-            ie(stop_id: "place-gover", route: "Green-D", route_type: 0),
-            ie(stop_id: "place-spmnl", route: "Green-D", route_type: 0),
-            ie(stop_id: "70207", route: "Green-E", route_type: 0),
-            ie(stop_id: "70204", route: "Green-B", route_type: 0),
-            ie(stop_id: "70203", route: "Green-C", route_type: 0)
+            ie(stop_id: "place-north", route_id: "Green-D", route_type: 0),
+            ie(stop_id: "70504", route_id: "Green-E", route_type: 0),
+            ie(stop_id: "place-unsqu", route_id: "Green-E", route_type: 0),
+            ie(stop_id: "place-spmnl", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "70204", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "70202", route_id: "Green-D", route_type: 0),
+            ie(stop_id: "70501", route_id: "Green-D", route_type: 0),
+            ie(stop_id: "70202", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "70207", route_id: "Green-D", route_type: 0),
+            ie(stop_id: "place-unsqu", route_id: "Green-D", route_type: 0),
+            ie(stop_id: "place-north", route_id: "Green-E", route_type: 0),
+            ie(stop_id: "70208", route_id: "Green-D", route_type: 0),
+            ie(stop_id: "70208", route_id: "Green-E", route_type: 0),
+            ie(stop_id: "70206", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "place-lech", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "70205", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "place-north", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "70203", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "70201", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "place-gover", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "70206", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "place-unsqu", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "70504", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "70202", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "place-gover", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "70201", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "70504", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "place-lech", route_id: "Green-C", route_type: 0),
+            ie(stop_id: "70501", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "70202", route_id: "Green-E", route_type: 0),
+            ie(stop_id: "70208", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "place-gover", route_id: "Green-D", route_type: 0),
+            ie(stop_id: "place-spmnl", route_id: "Green-D", route_type: 0),
+            ie(stop_id: "70207", route_id: "Green-E", route_type: 0),
+            ie(stop_id: "70204", route_id: "Green-B", route_type: 0),
+            ie(stop_id: "70203", route_id: "Green-C", route_type: 0)
           ],
           lifecycle: "NEW",
           severity: 7,
@@ -3411,56 +3411,56 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
       ]
 
       gl_ies = [
-        ie(stop_id: "70201", route: "Green-D", route_type: "0", direction_id: "1"),
-        ie(stop_id: "70201", route: "Green-E", route_type: "0", direction_id: "1"),
-        ie(stop_id: "70202", route: "Green-D", route_type: "0", direction_id: "0"),
-        ie(stop_id: "70202", route: "Green-E", route_type: "0", direction_id: "0"),
-        ie(stop_id: "70203", route: "Green-D", route_type: "0", direction_id: "1"),
-        ie(stop_id: "70203", route: "Green-E", route_type: "0", direction_id: "1"),
-        ie(stop_id: "70204", route: "Green-D", route_type: "0", direction_id: "0"),
-        ie(stop_id: "70204", route: "Green-E", route_type: "0", direction_id: "0"),
-        ie(stop_id: "70205", route: "Green-D", route_type: "0", direction_id: "1"),
-        ie(stop_id: "70205", route: "Green-E", route_type: "0", direction_id: "1"),
-        ie(stop_id: "70206", route: "Green-D", route_type: "0", direction_id: "0"),
-        ie(stop_id: "70206", route: "Green-E", route_type: "0", direction_id: "0"),
-        ie(stop_id: "70207", route: "Green-D", route_type: "0", direction_id: "1"),
-        ie(stop_id: "70207", route: "Green-E", route_type: "0", direction_id: "1"),
-        ie(stop_id: "70208", route: "Green-D", route_type: "0", direction_id: "0"),
-        ie(stop_id: "70208", route: "Green-E", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70201", route_id: "Green-D", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70201", route_id: "Green-E", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70202", route_id: "Green-D", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70202", route_id: "Green-E", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70203", route_id: "Green-D", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70203", route_id: "Green-E", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70204", route_id: "Green-D", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70204", route_id: "Green-E", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70205", route_id: "Green-D", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70205", route_id: "Green-E", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70206", route_id: "Green-D", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70206", route_id: "Green-E", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70207", route_id: "Green-D", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70207", route_id: "Green-E", route_type: "0", direction_id: "1"),
+        ie(stop_id: "70208", route_id: "Green-D", route_type: "0", direction_id: "0"),
+        ie(stop_id: "70208", route_id: "Green-E", route_type: "0", direction_id: "0"),
         ie(
           stop: %Stop{id: "70501", name: "Lechmere"},
-          route: "Green-D",
+          route_id: "Green-D",
           route_type: "0",
           direction_id: "1"
         ),
         ie(
           stop: %Stop{id: "70501", name: "Lechmere"},
-          route: "Green-E",
+          route_id: "Green-E",
           route_type: "0",
           direction_id: "1"
         ),
         ie(
           stop: %Stop{id: "70502", name: "Lechmere"},
-          route: "Green-D",
+          route_id: "Green-D",
           route_type: "0",
           direction_id: "0"
         ),
         ie(
           stop: %Stop{id: "70502", name: "Lechmere"},
-          route: "Green-E",
+          route_id: "Green-E",
           route_type: "0",
           direction_id: "0"
         ),
-        ie(stop_id: "place-gover", route: "Green-D", route_type: "0"),
-        ie(stop_id: "place-gover", route: "Green-E", route_type: "0"),
-        ie(stop_id: "place-haecl", route: "Green-D", route_type: "0"),
-        ie(stop_id: "place-haecl", route: "Green-E", route_type: "0"),
-        ie(stop: %Stop{id: "place-lech", name: "Lechmere"}, route: "Green-D", route_type: "0"),
-        ie(stop: %Stop{id: "place-lech", name: "Lechmere"}, route: "Green-E", route_type: "0"),
-        ie(stop_id: "place-north", route: "Green-D", route_type: "0"),
-        ie(stop_id: "place-north", route: "Green-E", route_type: "0"),
-        ie(stop_id: "place-spmnl", route: "Green-D", route_type: "0"),
-        ie(stop_id: "place-spmnl", route: "Green-E", route_type: "0")
+        ie(stop_id: "place-gover", route_id: "Green-D", route_type: "0"),
+        ie(stop_id: "place-gover", route_id: "Green-E", route_type: "0"),
+        ie(stop_id: "place-haecl", route_id: "Green-D", route_type: "0"),
+        ie(stop_id: "place-haecl", route_id: "Green-E", route_type: "0"),
+        ie(stop: %Stop{id: "place-lech", name: "Lechmere"}, route_id: "Green-D", route_type: "0"),
+        ie(stop: %Stop{id: "place-lech", name: "Lechmere"}, route_id: "Green-E", route_type: "0"),
+        ie(stop_id: "place-north", route_id: "Green-D", route_type: "0"),
+        ie(stop_id: "place-north", route_id: "Green-E", route_type: "0"),
+        ie(stop_id: "place-spmnl", route_id: "Green-D", route_type: "0"),
+        ie(stop_id: "place-spmnl", route_id: "Green-E", route_type: "0")
       ]
 
       base_alert =
@@ -3791,8 +3791,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3811,8 +3811,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3831,8 +3831,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3851,8 +3851,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3869,8 +3869,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3887,8 +3887,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3908,8 +3908,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3930,8 +3930,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3952,8 +3952,8 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_effect(:suspension)
         |> put_informed_entities([
-          ie(stop_id: "place-mlmnl", route: "Orange", route_type: 1),
-          ie(stop_id: "place-welln", route: "Orange", route_type: 1)
+          ie(stop_id: "place-mlmnl", route_id: "Orange", route_type: 1),
+          ie(stop_id: "place-welln", route_id: "Orange", route_type: 1)
         ])
         |> put_cause(:unknown)
         |> put_is_priority(true)
@@ -3978,7 +3978,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_home_stop(PreFare, "place-asmnl")
         |> put_informed_entities([
-          ie(route: "Red", route_type: 1, stop_id: "place-asmnl")
+          ie(route_id: "Red", route_type: 1, stop_id: "place-asmnl")
         ])
         |> put_effect(:suspension)
 
@@ -3990,7 +3990,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlertTest do
         widget
         |> put_home_stop(PreFare, "place-asmnl")
         |> put_informed_entities([
-          ie(route: "Red", route_type: 1, stop_id: "place-asmnl")
+          ie(route_id: "Red", route_type: 1, stop_id: "place-asmnl")
         ])
         |> put_effect(:delay)
         |> put_severity(7)

@@ -405,9 +405,9 @@ defmodule Screens.V2.WidgetInstance.DupAlertTest do
           informed_entities:
             stop_informed_entities("Blue", ~w[place-x]) ++
               [
-                ie(route: "Blue", stop: %Stop{id: "place-x"}, route_type: 1),
+                ie(route_id: "Blue", stop: %Stop{id: "place-x"}, route_type: 1),
                 ie(
-                  route: "Blue",
+                  route_id: "Blue",
                   stop: %Stop{
                     id: "child_plat_b0",
                     platform_name: "Northbound",

@@ -49,10 +49,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport"),
-                ie(route: "Blue", stop_id: "place-mvbcl"),
-                ie(route: "Blue", stop_id: "place-aqucl"),
-                ie(route: "Blue", stop_id: "place-state")
+                ie(route_id: "Blue", stop_id: "place-aport"),
+                ie(route_id: "Blue", stop_id: "place-mvbcl"),
+                ie(route_id: "Blue", stop_id: "place-aqucl"),
+                ie(route_id: "Blue", stop_id: "place-state")
               ]
             }
           ])
@@ -81,9 +81,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport"),
-                ie(route: "Blue", stop_id: "place-mvbcl"),
-                ie(route: "Blue", stop_id: "place-aqucl")
+                ie(route_id: "Blue", stop_id: "place-aport"),
+                ie(route_id: "Blue", stop_id: "place-mvbcl"),
+                ie(route_id: "Blue", stop_id: "place-aqucl")
               ]
             }
           ])
@@ -115,8 +115,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport"),
-                ie(route: "Blue", stop_id: "place-mvbcl")
+                ie(route_id: "Blue", stop_id: "place-aport"),
+                ie(route_id: "Blue", stop_id: "place-mvbcl")
               ]
             }
           ])
@@ -145,19 +145,19 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport"),
-                ie(route: "Blue", stop_id: "place-mvbcl"),
-                ie(route: "Blue", stop_id: "place-aqucl")
+                ie(route_id: "Blue", stop_id: "place-aport"),
+                ie(route_id: "Blue", stop_id: "place-mvbcl"),
+                ie(route_id: "Blue", stop_id: "place-aqucl")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil),
-                ie(route: "Green-C", stop_id: nil),
-                ie(route: "Green-D", stop_id: nil),
-                ie(route: "Green-E", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil),
+                ie(route_id: "Green-C", stop_id: nil),
+                ie(route_id: "Green-D", stop_id: nil),
+                ie(route_id: "Green-E", stop_id: nil)
               ]
             }
           ])
@@ -189,13 +189,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport")
+                ie(route_id: "Blue", stop_id: "place-aport")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aqucl")
+                ie(route_id: "Blue", stop_id: "place-aqucl")
               ]
             }
           ])
@@ -224,13 +224,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aqucl")
+                ie(route_id: "Blue", stop_id: "place-aqucl")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aqucl")
+                ie(route_id: "Blue", stop_id: "place-aqucl")
               ]
             }
           ])
@@ -259,13 +259,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-C", stop_id: "place-hwsst")
+                ie(route_id: "Green-C", stop_id: "place-hwsst")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-C", stop_id: "place-kntst")
+                ie(route_id: "Green-C", stop_id: "place-kntst")
               ]
             }
           ])
@@ -294,13 +294,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green", stop_id: "place-gover")
+                ie(route_id: "Green", stop_id: "place-gover")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green", stop_id: "place-pktrm")
+                ie(route_id: "Green", stop_id: "place-pktrm")
               ]
             }
           ])
@@ -332,16 +332,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport")
+                ie(route_id: "Blue", stop_id: "place-aport")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport"),
-                ie(route: "Blue", stop_id: "place-mvbcl"),
-                ie(route: "Blue", stop_id: "place-aqucl")
+                ie(route_id: "Blue", stop_id: "place-aport"),
+                ie(route_id: "Blue", stop_id: "place-mvbcl"),
+                ie(route_id: "Blue", stop_id: "place-aqucl")
               ]
             }
           ])
@@ -375,35 +375,35 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport"),
-                ie(route: "Blue", stop_id: "place-mvbcl"),
-                ie(route: "Blue", stop_id: "place-aqucl")
+                ie(route_id: "Blue", stop_id: "place-aport"),
+                ie(route_id: "Blue", stop_id: "place-mvbcl"),
+                ie(route_id: "Blue", stop_id: "place-aqucl")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport"),
-                ie(route: "Blue", stop_id: "place-mvbcl"),
-                ie(route: "Blue", stop_id: "place-aqucl")
+                ie(route_id: "Blue", stop_id: "place-aport"),
+                ie(route_id: "Blue", stop_id: "place-mvbcl"),
+                ie(route_id: "Blue", stop_id: "place-aqucl")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl"),
-                ie(route: "Orange", stop_id: "place-mlmnl"),
-                ie(route: "Orange", stop_id: "place-welln")
+                ie(route_id: "Orange", stop_id: "place-ogmnl"),
+                ie(route_id: "Orange", stop_id: "place-mlmnl"),
+                ie(route_id: "Orange", stop_id: "place-welln")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl"),
-                ie(route: "Orange", stop_id: "place-mlmnl"),
-                ie(route: "Orange", stop_id: "place-welln")
+                ie(route_id: "Orange", stop_id: "place-ogmnl"),
+                ie(route_id: "Orange", stop_id: "place-mlmnl"),
+                ie(route_id: "Orange", stop_id: "place-welln")
               ]
             }
           ])
@@ -435,24 +435,24 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-aport")
+                ie(route_id: "Blue", stop_id: "place-aport")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl"),
-                ie(route: "Orange", stop_id: "place-mlmnl"),
-                ie(route: "Orange", stop_id: "place-welln")
+                ie(route_id: "Orange", stop_id: "place-ogmnl"),
+                ie(route_id: "Orange", stop_id: "place-mlmnl"),
+                ie(route_id: "Orange", stop_id: "place-welln")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl"),
-                ie(route: "Orange", stop_id: "place-mlmnl"),
-                ie(route: "Orange", stop_id: "place-welln")
+                ie(route_id: "Orange", stop_id: "place-ogmnl"),
+                ie(route_id: "Orange", stop_id: "place-mlmnl"),
+                ie(route_id: "Orange", stop_id: "place-welln")
               ]
             }
           ])
@@ -497,16 +497,16 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Green-C", stop_id: "place-hwsst"),
-                ie(route: "Green-C", stop_id: "place-kntst"),
-                ie(route: "Green-C", stop_id: "place-stpul")
+                ie(route_id: "Green-C", stop_id: "place-hwsst"),
+                ie(route_id: "Green-C", stop_id: "place-kntst"),
+                ie(route_id: "Green-C", stop_id: "place-stpul")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-D", stop_id: "place-gover"),
-                ie(route: "Green-D", stop_id: "place-river")
+                ie(route_id: "Green-D", stop_id: "place-gover"),
+                ie(route_id: "Green-D", stop_id: "place-river")
               ]
             }
           ])
@@ -548,26 +548,26 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Green-C", stop_id: "place-hwsst"),
-                ie(route: "Green-C", stop_id: "place-kntst"),
-                ie(route: "Green-C", stop_id: "place-stpul")
+                ie(route_id: "Green-C", stop_id: "place-hwsst"),
+                ie(route_id: "Green-C", stop_id: "place-kntst"),
+                ie(route_id: "Green-C", stop_id: "place-stpul")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil)
               ]
             },
             %Alert{
               effect: :delay,
               severity: 6,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil),
-                ie(route: "Green-C", stop_id: nil),
-                ie(route: "Green-D", stop_id: nil),
-                ie(route: "Green-E", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil),
+                ie(route_id: "Green-C", stop_id: nil),
+                ie(route_id: "Green-D", stop_id: nil),
+                ie(route_id: "Green-E", stop_id: nil)
               ]
             }
           ])
@@ -598,18 +598,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Green-C", stop_id: "place-gover"),
-                ie(route: "Green-C", stop_id: "place-pktrm")
+                ie(route_id: "Green-C", stop_id: "place-gover"),
+                ie(route_id: "Green-C", stop_id: "place-pktrm")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil),
-                ie(route: "Green-C", stop_id: nil),
-                ie(route: "Green-D", stop_id: nil),
-                ie(route: "Green-E", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil),
+                ie(route_id: "Green-C", stop_id: nil),
+                ie(route_id: "Green-D", stop_id: nil),
+                ie(route_id: "Green-E", stop_id: nil)
               ]
             }
           ])
@@ -644,14 +644,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                ie(route: "Green-C", stop_id: nil)
+                ie(route_id: "Green-C", stop_id: nil)
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil)
               ]
             }
           ])
@@ -679,21 +679,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                ie(route: "Green-C", stop_id: nil)
+                ie(route_id: "Green-C", stop_id: nil)
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil)
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-E", stop_id: "place-symcl"),
-                ie(route: "Green-E", stop_id: "place-nuniv")
+                ie(route_id: "Green-E", stop_id: "place-symcl"),
+                ie(route_id: "Green-E", stop_id: "place-nuniv")
               ]
             }
           ])
@@ -724,21 +724,21 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                ie(route: "Green-C", stop_id: "first_stop")
+                ie(route_id: "Green-C", stop_id: "first_stop")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-C", stop_id: "second_stop")
+                ie(route_id: "Green-C", stop_id: "second_stop")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-C", stop_id: "third_stop"),
-                ie(route: "Green-C", stop_id: "fourth_stop")
+                ie(route_id: "Green-C", stop_id: "third_stop"),
+                ie(route_id: "Green-C", stop_id: "fourth_stop")
               ]
             }
           ])
@@ -769,20 +769,20 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                ie(route: "Green-C", stop_id: nil)
+                ie(route_id: "Green-C", stop_id: nil)
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil)
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl")
+                ie(route_id: "Orange", stop_id: "place-ogmnl")
               ]
             }
           ])
@@ -821,23 +821,23 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                ie(route: "Green-C", stop_id: nil)
+                ie(route_id: "Green-C", stop_id: nil)
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil),
-                ie(route: "Green-C", stop_id: nil),
-                ie(route: "Green-D", stop_id: nil),
-                ie(route: "Green-E", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil),
+                ie(route_id: "Green-C", stop_id: nil),
+                ie(route_id: "Green-D", stop_id: nil),
+                ie(route_id: "Green-E", stop_id: nil)
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-D", stop_id: "place-kencl")
+                ie(route_id: "Green-D", stop_id: "place-kencl")
               ]
             }
           ])
@@ -864,27 +864,27 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                ie(route: "Green-C", stop_id: nil)
+                ie(route_id: "Green-C", stop_id: nil)
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Green-B", stop_id: nil)
+                ie(route_id: "Green-B", stop_id: nil)
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl")
+                ie(route_id: "Orange", stop_id: "place-ogmnl")
               ]
             },
             %Alert{
               effect: :delay,
               severity: 5,
               informed_entities: [
-                ie(route: "Orange", stop_id: nil)
+                ie(route_id: "Orange", stop_id: nil)
               ]
             }
           ])
@@ -921,20 +921,20 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-D", stop_id: "place-lech"),
-                ie(route: "Green-E", stop_id: "place-lech")
+                ie(route_id: "Green-D", stop_id: "place-lech"),
+                ie(route_id: "Green-E", stop_id: "place-lech")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl")
+                ie(route_id: "Orange", stop_id: "place-ogmnl")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Blue", stop_id: "place-bmmnl")
+                ie(route_id: "Blue", stop_id: "place-bmmnl")
               ]
             }
           ])
@@ -986,11 +986,11 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :delay,
               severity: 9,
-              informed_entities: [ie(route: "Green-C", stop_id: nil)]
+              informed_entities: [ie(route_id: "Green-C", stop_id: nil)]
             },
             %Alert{
               effect: :station_closure,
-              informed_entities: [ie(route: "Orange", stop_id: "place-ogmnl")]
+              informed_entities: [ie(route_id: "Orange", stop_id: "place-ogmnl")]
             }
           ])
       }
@@ -1023,9 +1023,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                ie(route: "Green-C", stop_id: nil),
-                ie(route: "Blue", stop_id: nil),
-                ie(route: "Orange", stop_id: nil)
+                ie(route_id: "Green-C", stop_id: nil),
+                ie(route_id: "Blue", stop_id: nil),
+                ie(route_id: "Orange", stop_id: nil)
               ]
             }
           ])
@@ -1059,13 +1059,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-cenav")
+                ie(route_id: "Mattapan", stop_id: "place-cenav")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-portr")
+                ie(route_id: "Red", stop_id: "place-portr")
               ]
             }
           ])
@@ -1107,8 +1107,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-valrd"),
-                ie(route: "Mattapan", stop_id: "place-capst")
+                ie(route_id: "Mattapan", stop_id: "place-valrd"),
+                ie(route_id: "Mattapan", stop_id: "place-capst")
               ]
             }
           ])
@@ -1139,14 +1139,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-valrd"),
-                ie(route: "Mattapan", stop_id: "place-capst")
+                ie(route_id: "Mattapan", stop_id: "place-valrd"),
+                ie(route_id: "Mattapan", stop_id: "place-capst")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-cenav")
+                ie(route_id: "Mattapan", stop_id: "place-cenav")
               ]
             }
           ])
@@ -1181,13 +1181,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-portr")
+                ie(route_id: "Red", stop_id: "place-portr")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-davis")
+                ie(route_id: "Red", stop_id: "place-davis")
               ]
             }
           ])
@@ -1216,13 +1216,13 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-valrd")
+                ie(route_id: "Mattapan", stop_id: "place-valrd")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-capst")
+                ie(route_id: "Mattapan", stop_id: "place-capst")
               ]
             }
           ])
@@ -1251,20 +1251,20 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-portr")
+                ie(route_id: "Red", stop_id: "place-portr")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-valrd"),
-                ie(route: "Mattapan", stop_id: "place-capst")
+                ie(route_id: "Mattapan", stop_id: "place-valrd"),
+                ie(route_id: "Mattapan", stop_id: "place-capst")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-cenav")
+                ie(route_id: "Mattapan", stop_id: "place-cenav")
               ]
             }
           ])
@@ -1300,26 +1300,26 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-portr")
+                ie(route_id: "Red", stop_id: "place-portr")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-chmnl")
+                ie(route_id: "Red", stop_id: "place-chmnl")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-valrd"),
-                ie(route: "Mattapan", stop_id: "place-capst")
+                ie(route_id: "Mattapan", stop_id: "place-valrd"),
+                ie(route_id: "Mattapan", stop_id: "place-capst")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-cenav")
+                ie(route_id: "Mattapan", stop_id: "place-cenav")
               ]
             }
           ])
@@ -1354,26 +1354,26 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-D", stop_id: "place-lech")
+                ie(route_id: "Green-D", stop_id: "place-lech")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-B", stop_id: "place-brico")
+                ie(route_id: "Green-B", stop_id: "place-brico")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-valrd"),
-                ie(route: "Mattapan", stop_id: "place-capst")
+                ie(route_id: "Mattapan", stop_id: "place-valrd"),
+                ie(route_id: "Mattapan", stop_id: "place-capst")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-cenav")
+                ie(route_id: "Mattapan", stop_id: "place-cenav")
               ]
             }
           ])
@@ -1420,26 +1420,26 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-D", stop_id: "place-lech")
+                ie(route_id: "Green-D", stop_id: "place-lech")
               ]
             },
             %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-B", stop_id: "place-brico")
+                ie(route_id: "Green-B", stop_id: "place-brico")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Mattapan", stop_id: "place-valrd"),
-                ie(route: "Mattapan", stop_id: "place-capst")
+                ie(route_id: "Mattapan", stop_id: "place-valrd"),
+                ie(route_id: "Mattapan", stop_id: "place-capst")
               ]
             },
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-portr")
+                ie(route_id: "Red", stop_id: "place-portr")
               ]
             }
           ])
@@ -1487,7 +1487,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :station_closure,
               informed_entities: [
                 ie(
-                  route: "Red",
+                  route_id: "Red",
                   stop: %Stop{
                     id: "place-portr",
                     child_stops: [
@@ -1508,7 +1508,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                   route_type: 1
                 ),
                 ie(
-                  route: "Red",
+                  route_id: "Red",
                   stop: %Stop{id: "70065", platform_name: "Ashmont/Braintree"},
                   route_type: 1
                 )
@@ -1544,7 +1544,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :station_closure,
               informed_entities: [
                 ie(
-                  route: "Green-D",
+                  route_id: "Green-D",
                   stop: %Stop{
                     id: "place-eliot",
                     child_stops: [
@@ -1565,7 +1565,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                   route_type: 1
                 ),
                 ie(
-                  route: "Green-D",
+                  route_id: "Green-D",
                   stop: %Stop{
                     id: "70166",
                     platform_name: "Park Street & North",
@@ -1622,14 +1622,14 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %Alert{
               effect: :station_closure,
               informed_entities: [
-                ie(route: "Green-B", stop: %Stop{id: "place-gover", child_stops: child_stops}),
-                ie(route: "Green-C", stop: %Stop{id: "place-gover", child_stops: child_stops}),
-                ie(route: "Green-D", stop: %Stop{id: "place-gover", child_stops: child_stops}),
-                ie(route: "Green-E", stop: %Stop{id: "place-gover", child_stops: child_stops}),
-                ie(route: "Green-B", stop: closed_child_stop),
-                ie(route: "Green-C", stop: closed_child_stop),
-                ie(route: "Green-D", stop: closed_child_stop),
-                ie(route: "Green-E", stop: closed_child_stop)
+                ie(route_id: "Green-B", stop: %Stop{id: "place-gover", child_stops: child_stops}),
+                ie(route_id: "Green-C", stop: %Stop{id: "place-gover", child_stops: child_stops}),
+                ie(route_id: "Green-D", stop: %Stop{id: "place-gover", child_stops: child_stops}),
+                ie(route_id: "Green-E", stop: %Stop{id: "place-gover", child_stops: child_stops}),
+                ie(route_id: "Green-B", stop: closed_child_stop),
+                ie(route_id: "Green-C", stop: closed_child_stop),
+                ie(route_id: "Green-D", stop: closed_child_stop),
+                ie(route_id: "Green-E", stop: closed_child_stop)
               ]
             }
           }
@@ -1690,7 +1690,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :station_closure,
               informed_entities: [
                 ie(
-                  route: "Red",
+                  route_id: "Red",
                   route_type: 1,
                   stop: %Stop{
                     id: "place-portr",
@@ -1698,9 +1698,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                     child_stops: [porter_to_ashmont_stop, porter_to_alewife_stop]
                   }
                 ),
-                ie(route: "Red", route_type: 1, stop: porter_to_ashmont_stop),
+                ie(route_id: "Red", route_type: 1, stop: porter_to_ashmont_stop),
                 ie(
-                  route: "Red",
+                  route_id: "Red",
                   route_type: 1,
                   stop: %Stop{
                     id: "place-davis",
@@ -1708,7 +1708,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                     child_stops: [davis_to_ashmont_stop, davis_to_alewife_stop]
                   }
                 ),
-                ie(route: "Red", route_type: 1, stop: davis_to_ashmont_stop)
+                ie(route_id: "Red", route_type: 1, stop: davis_to_ashmont_stop)
               ]
             }
           }
@@ -1741,8 +1741,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             alert: %Alert{
               effect: :service_change,
               informed_entities: [
-                ie(route: "Red", stop_id: "place-portr", route_type: 1),
-                ie(route: "Red", stop_id: "70065", route_type: 1)
+                ie(route_id: "Red", stop_id: "place-portr", route_type: 1),
+                ie(route_id: "Red", stop_id: "70065", route_type: 1)
               ]
             }
           }
@@ -1773,9 +1773,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 1,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl"),
-                ie(route: "Orange", stop_id: "place-mlmnl"),
-                ie(route: "Orange", stop_id: "place-welln")
+                ie(route_id: "Orange", stop_id: "place-ogmnl"),
+                ie(route_id: "Orange", stop_id: "place-mlmnl"),
+                ie(route_id: "Orange", stop_id: "place-welln")
               ]
             }
           }
@@ -1806,9 +1806,9 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 4,
               informed_entities: [
-                ie(route: "Orange", stop_id: "place-ogmnl"),
-                ie(route: "Orange", stop_id: "place-mlmnl"),
-                ie(route: "Orange", stop_id: "place-welln")
+                ie(route_id: "Orange", stop_id: "place-ogmnl"),
+                ie(route_id: "Orange", stop_id: "place-mlmnl"),
+                ie(route_id: "Orange", stop_id: "place-welln")
               ]
             }
           }
@@ -1838,7 +1838,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :station_closure,
               informed_entities: [
                 ie(
-                  route: "Red",
+                  route_id: "Red",
                   route_type: 1,
                   stop: %Stop{
                     id: "place-jfk",
@@ -1861,8 +1861,8 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
                     location_type: 1
                   }
                 ),
-                ie(route: "Red", stop_id: "70085", route_type: 1),
-                ie(route: "Red", stop_id: "70095", route_type: 1)
+                ie(route_id: "Red", stop_id: "70085", route_type: 1),
+                ie(route_id: "Red", stop_id: "70095", route_type: 1)
               ]
             }
           }
@@ -1891,7 +1891,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :shuttle,
               informed_entities: [
-                ie(stop_id: nil, route: "Blue", route_type: 1, direction_id: nil)
+                ie(stop_id: nil, route_id: "Blue", route_type: 1, direction_id: nil)
               ]
             }
           ])
@@ -1915,7 +1915,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(stop_id: nil, route: "Blue", route_type: 1, direction_id: nil)
+                ie(stop_id: nil, route_id: "Blue", route_type: 1, direction_id: nil)
               ]
             }
           ])
@@ -1939,10 +1939,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :suspension,
               informed_entities: [
-                ie(stop_id: nil, route: "Green-B", route_type: 0, direction_id: nil),
-                ie(stop_id: nil, route: "Green-C", route_type: 0, direction_id: nil),
-                ie(stop_id: nil, route: "Green-D", route_type: 0, direction_id: nil),
-                ie(stop_id: nil, route: "Green-E", route_type: 0, direction_id: nil)
+                ie(stop_id: nil, route_id: "Green-B", route_type: 0, direction_id: nil),
+                ie(stop_id: nil, route_id: "Green-C", route_type: 0, direction_id: nil),
+                ie(stop_id: nil, route_id: "Green-D", route_type: 0, direction_id: nil),
+                ie(stop_id: nil, route_id: "Green-E", route_type: 0, direction_id: nil)
               ]
             }
           ])
@@ -1967,7 +1967,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               effect: :delay,
               severity: 9,
               informed_entities: [
-                ie(stop_id: nil, route: "Blue", route_type: 1, direction_id: nil)
+                ie(stop_id: nil, route_id: "Blue", route_type: 1, direction_id: nil)
               ]
             }
           ])
@@ -1991,7 +1991,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :shuttle,
               informed_entities: [
-                ie(stop_id: nil, route: "Mattapan", route_type: 1, direction_id: nil)
+                ie(stop_id: nil, route_id: "Mattapan", route_type: 1, direction_id: nil)
               ]
             }
           ])
@@ -2019,10 +2019,10 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
             %Alert{
               effect: :shuttle,
               informed_entities: [
-                ie(stop_id: "place-kencl", route: "Green-C", route_type: 0, direction_id: nil),
-                ie(stop_id: "place-smary", route: "Green-C", route_type: 0, direction_id: nil),
-                ie(stop_id: "place-hwsst", route: "Green-C", route_type: 0, direction_id: nil),
-                ie(stop_id: "place-kntst", route: "Green-C", route_type: 0, direction_id: nil)
+                ie(stop_id: "place-kencl", route_id: "Green-C", route_type: 0, direction_id: nil),
+                ie(stop_id: "place-smary", route_id: "Green-C", route_type: 0, direction_id: nil),
+                ie(stop_id: "place-hwsst", route_id: "Green-C", route_type: 0, direction_id: nil),
+                ie(stop_id: "place-kntst", route_id: "Green-C", route_type: 0, direction_id: nil)
               ]
             }
           ])
@@ -2057,7 +2057,7 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
       entities_at_common_stops =
         for route <- all_gl_routes,
             stop <- stops_closed_all_lines do
-          ie(stop_id: stop, route: route, direction_id: nil)
+          ie(stop_id: stop, route_id: route, direction_id: nil)
         end
 
       instance = %SubwayStatus{
@@ -2068,18 +2068,18 @@ defmodule Screens.V2.WidgetInstance.SubwayStatusTest do
               severity: 9,
               informed_entities:
                 [
-                  ie(stop_id: "place-hymnl", route: "Green-B", direction_id: nil),
-                  ie(stop_id: "place-amory", route: "Green-B", direction_id: nil),
-                  ie(stop_id: "place-hymnl", route: "Green-C", direction_id: nil),
-                  ie(stop_id: "place-kencl", route: "Green-C", direction_id: nil),
-                  ie(stop_id: "place-hymnl", route: "Green-D", direction_id: nil),
-                  ie(stop_id: "place-haecl", route: "Green-D", direction_id: nil),
-                  ie(stop_id: "place-kencl", route: "Green-D", direction_id: nil),
-                  ie(stop_id: "place-north", route: "Green-D", direction_id: nil),
-                  ie(stop_id: "place-brmnl", route: "Green-E", direction_id: nil),
-                  ie(stop_id: "place-prmnl", route: "Green-E", direction_id: nil),
-                  ie(stop_id: "place-north", route: "Green-E", direction_id: nil),
-                  ie(stop_id: "place-nuniv", route: "Green-E", direction_id: nil)
+                  ie(stop_id: "place-hymnl", route_id: "Green-B", direction_id: nil),
+                  ie(stop_id: "place-amory", route_id: "Green-B", direction_id: nil),
+                  ie(stop_id: "place-hymnl", route_id: "Green-C", direction_id: nil),
+                  ie(stop_id: "place-kencl", route_id: "Green-C", direction_id: nil),
+                  ie(stop_id: "place-hymnl", route_id: "Green-D", direction_id: nil),
+                  ie(stop_id: "place-haecl", route_id: "Green-D", direction_id: nil),
+                  ie(stop_id: "place-kencl", route_id: "Green-D", direction_id: nil),
+                  ie(stop_id: "place-north", route_id: "Green-D", direction_id: nil),
+                  ie(stop_id: "place-brmnl", route_id: "Green-E", direction_id: nil),
+                  ie(stop_id: "place-prmnl", route_id: "Green-E", direction_id: nil),
+                  ie(stop_id: "place-north", route_id: "Green-E", direction_id: nil),
+                  ie(stop_id: "place-nuniv", route_id: "Green-E", direction_id: nil)
                 ] ++ entities_at_common_stops
             }
           ])
