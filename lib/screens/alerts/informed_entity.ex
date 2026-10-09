@@ -43,22 +43,6 @@ defmodule Screens.Alerts.InformedEntity do
   def parent_station?(%__MODULE__{stop: %Stop{id: "place-" <> _}}), do: true
   def parent_station?(_), do: false
 
-  @spec present_alert_for_route?(t(), Route.id(), Trip.direction() | nil) :: boolean()
-  def present_alert_for_route?(
-        %__MODULE__{route: entity_route_id, direction_id: entity_direction},
-        route_id,
-        direction_id
-      )
-      when entity_route_id == route_id do
-    case entity_direction do
-      ^direction_id -> true
-      nil -> true
-      _ -> false
-    end
-  end
-
-  def present_alert_for_route?(_, _, _), do: false
-
   @doc """
   Returns a deduplicated list of informed entities based on stop ID.
   Removes any Informed Entities with nil stops.
