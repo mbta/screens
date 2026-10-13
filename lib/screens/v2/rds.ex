@@ -19,6 +19,7 @@ defmodule Screens.V2.RDS do
   alias Screens.Headways, as: Headway
   alias Screens.LastTrip.LastTrip
   alias Screens.Lines.Line
+  alias Screens.Predictions.Prediction
   alias Screens.Report
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
@@ -51,6 +52,10 @@ defmodule Screens.V2.RDS do
              |> Enum.flat_map(& &1)
              |> Enum.map(&Integer.to_string(&1))
   @last_trip_buffer_seconds 3
+  @replacement_stop_ids %{
+    "Union Square-01" => "70504",
+    "Union Square-02" => "70504"
+  }
 
   defmodule NoService do
     @moduledoc """
@@ -170,7 +175,9 @@ defmodule Screens.V2.RDS do
          {:ok, schedules} <- @schedule.fetch(params_struct, Util.service_date(now)),
          {:ok, alerts} <- fetch_relevant_alerts(stop_ids, now),
          {:ok, departures} <-
-           params_struct |> @departure.fetch(now: now, include_scheduled_cancelled?: true) do
+           params_struct
+           |> @departure.fetch(now: now, include_scheduled_cancelled?: true)
+           |> process_departures() do
       case create_routes_for_section(departures, schedules, typical_patterns, params) do
         [_ | _] = routes_for_section ->
           create_section_rds(
@@ -208,6 +215,32 @@ defmodule Screens.V2.RDS do
       {:ok, child_stops}
     end
   end
+
+  @spec process_departures(data()) :: data()
+  defp process_departures({:ok, departures}) do
+    {:ok, departures |> Enum.map(&replace_single_track_stop_id(&1))}
+  end
+
+  defp process_departures(item), do: item
+
+  @spec replace_single_track_stop_id(Departure.t()) :: Departure.t()
+  defp replace_single_track_stop_id(
+         %Departure{prediction: %Prediction{stop: %Stop{id: stop_id}}} = departure
+       ) do
+    case Map.get(@replacement_stop_ids, stop_id) do
+      nil ->
+        departure
+
+      replacement_stop_id ->
+        put_in(
+          departure,
+          [Access.key(:prediction), Access.key(:stop), Access.key(:id)],
+          replacement_stop_id
+        )
+    end
+  end
+
+  defp replace_single_track_stop_id(departure), do: departure
 
   defp create_section_rds(
          departures,
