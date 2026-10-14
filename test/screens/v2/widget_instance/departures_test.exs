@@ -3,7 +3,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
   alias Screens.V2.WidgetInstance.Departures.OvernightSection
   alias ScreensConfig.Schedule, as: ScreensConfigSchedule
-  alias ScreensConfig.Departures.Header.WayfindingInformation
   alias Screens.V2.WidgetInstance.Departures.NoServiceSection
   alias Screens.Departures.Departure
   alias Screens.Lines.Line
@@ -89,8 +88,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           title: "Simple Test Header",
           arrow: :n,
           read_as: "Special read-as text",
-          wayfinding_information: %WayfindingInformation{
-            image_path: "testing/wayfinding/image.png",
+          wayfinding_information: %{
+            "image_path" => "testing/wayfinding/image.png",
             schedule: [
               %ScreensConfigSchedule{
                 start_dt: ~U[2021-01-01T00:00:00Z],
@@ -107,9 +106,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                  title: "Simple Test Header",
                  arrow: :n,
                  read_as: "Special read-as text",
-                 wayfinding_information: %WayfindingInformation{
-                   image_path:
-                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
+                 wayfinding_information: %{
+                   "image_path" => "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %ScreensConfigSchedule{
                        start_dt: ~U[2021-01-01T00:00:00Z],
@@ -187,8 +185,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     } do
       section = %NoServiceSection{
         header: %Header{
-          wayfinding_information: %WayfindingInformation{
-            image_path: "testing/wayfinding/image.png",
+          wayfinding_information: %{
+            "image_path" => "testing/wayfinding/image.png",
             schedule: [
               %ScreensConfigSchedule{
                 start_dt: ~U[2021-01-01T00:00:00Z],
@@ -204,7 +202,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                header: %{
                  wayfinding_information: %{
-                   image_path:
+                   "image_path" =>
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %ScreensConfigSchedule{
@@ -224,8 +222,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     } do
       section = %OvernightSection{
         header: %Header{
-          wayfinding_information: %WayfindingInformation{
-            image_path: "testing/wayfinding/image.png",
+          wayfinding_information: %{
+            "image_path" => "testing/wayfinding/image.png",
             schedule: [
               %ScreensConfigSchedule{
                 start_dt: ~U[2021-01-01T00:00:00Z],
@@ -241,7 +239,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                header: %{
                  wayfinding_information: %{
-                   image_path:
+                   "image_path" =>
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %ScreensConfigSchedule{
@@ -457,8 +455,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         layout: %Layout{},
         header: %Header{
           title: "Section Header",
-          wayfinding_information: %WayfindingInformation{
-            image_path: "testing/wayfinding/image.png",
+          wayfinding_information: %{
+            "image_path" => "testing/wayfinding/image.png",
             schedule: [
               %ScreensConfigSchedule{
                 start_dt: ~U[2021-01-01T00:00:00Z],
@@ -473,8 +471,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       assert %{
                type: :normal_section,
                header: %{
-                 wayfinding_information: %WayfindingInformation{
-                   image_path:
+                 wayfinding_information: %{
+                   "image_path" =>
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %ScreensConfigSchedule{
