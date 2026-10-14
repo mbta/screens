@@ -67,6 +67,78 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
     end
   end
 
+  describe "overnight sections" do
+    test "renders 'Service has ended' when routes is empty" do
+      assigns = %{
+        order: 0,
+        sections: [
+          %{
+            type: :overnight_section,
+            header: "Header",
+            departure_groups: [],
+            headsign: nil,
+            routes: []
+          }
+        ]
+      }
+
+      assert render(assigns) =~ "Service has ended"
+    end
+
+    test "renders '<Route> service has ended' for a named route" do
+      assigns = %{
+        order: 0,
+        sections: [
+          %{
+            type: :overnight_section,
+            header: "Header",
+            departure_groups: [],
+            headsign: nil,
+            routes: [%{long_name: "Blue Line"}]
+          }
+        ]
+      }
+
+      assert render(assigns) =~ "Blue Line service has ended"
+    end
+  end
+
+  describe "no service sections" do
+    test "renders 'No service today' when routes is empty" do
+      assigns = %{
+        order: 0,
+        sections: [
+          %{
+            type: :no_service_section,
+            header: "Header",
+            departure_groups: [],
+            headsign: nil,
+            routes: []
+          }
+        ]
+      }
+
+      assert render(assigns) =~ "No service today"
+    end
+
+    test "renders '<Route> has no service today' for a named route" do
+      assigns = %{
+        order: 0,
+        sections: [
+          %{
+            type: :no_service_section,
+            header: "Header",
+            departure_groups: [],
+            headsign: nil,
+            routes: [%{long_name: "Blue Line"}]
+          }
+        ]
+      }
+
+      assert render(assigns) =~ "Blue Line has no service today"
+    end
+  end
+
   describe "normal sections" do
     test "always read GL headsign" do
       assigns = %{

@@ -242,6 +242,7 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
       :overnight_section -> "Service has ended"
       :no_service_section -> "No service today"
     end
+    |> List.wrap()
     |> build_text()
   end
 
