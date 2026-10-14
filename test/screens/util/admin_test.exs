@@ -1,6 +1,9 @@
 defmodule Screens.Util.AdminTest do
   use ExUnit.Case, async: true
 
+  import Mox
+
+  alias Screens.Alerts.Alert
   alias Screens.Config.ScreenConfig
   alias Screens.Util.Admin
   alias ScreensConfig.{AlertSchedule, EvergreenContentItem, RecurrentSchedule, Schedule, Screen}
@@ -123,6 +126,47 @@ defmodule Screens.Util.AdminTest do
       expected = Enum.sort_by(varied_expected_updates, & &1.id)
 
       assert result == expected
+    end
+  end
+
+  describe "expired_alert_content_cleanup_updates/1" do
+    setup :verify_on_exit!
+
+    test "removes alert-linked content only when none of its alerts are present" do
+      expired = build_item(%AlertSchedule{alert_ids: ["expired"]})
+      partially_expired = build_item(%AlertSchedule{alert_ids: ["expired", "active"]})
+      no_alerts = build_item(%AlertSchedule{alert_ids: []})
+      scheduled = build_item([%Schedule{end_dt: ~U[2026-10-13T00:00:00Z]}])
+
+      configs = [
+        %ScreenConfig{id: "mixed", config: build_screen([expired, partially_expired, scheduled])},
+        %ScreenConfig{id: "active", config: build_screen([partially_expired, no_alerts])},
+        %ScreenConfig{id: "none", config: build_screen([scheduled])}
+      ]
+
+      expect(Alert.Mock, :fetch, fn _opts -> {:ok, [%Alert{id: "active"}]} end)
+
+      assert Admin.expired_alert_content_cleanup_updates(configs) ==
+               {:ok, [%{id: "mixed", config: build_screen([partially_expired, scheduled])}]}
+    end
+
+    test "does not fetch alerts when no content is alert-linked" do
+      configs = [%ScreenConfig{id: "none", config: build_screen([])}]
+
+      assert Admin.expired_alert_content_cleanup_updates(configs) == {:ok, []}
+    end
+
+    test "returns an error when alerts cannot be fetched" do
+      configs = [
+        %ScreenConfig{
+          id: "alert",
+          config: build_screen([build_item(%AlertSchedule{alert_ids: ["1"]})])
+        }
+      ]
+
+      expect(Alert.Mock, :fetch, fn _opts -> :error end)
+
+      assert Admin.expired_alert_content_cleanup_updates(configs) == :error
     end
   end
 end

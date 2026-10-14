@@ -54,6 +54,14 @@ defmodule Screens.ScreenConfigs do
     Repo.all(ScreenConfig)
   end
 
+  @doc "Returns configs with the given IDs as a list of ScreenConfig structs."
+  @spec all_by_ids([screen_id()]) :: [ScreenConfig.t()]
+  def all_by_ids(ids) when is_list(ids) do
+    ScreenConfig
+    |> where([screen_config], screen_config.id in ^ids)
+    |> Repo.all()
+  end
+
   @doc "Returns all Configs as JSON with the ID as a key and the configuration as the value."
   @spec list_all() :: String.t()
   def list_all do

@@ -8,7 +8,7 @@ const SYNC_FROM_SNAPSHOT_PATH = "/api/admin/sync_from_snapshot";
 
 const Tools = () => {
   return (
-    <main className="admin-page">
+    <main className="admin-page admin-tools">
       <EvergreenContentCleanup />
       <SyncFromSnapshot />
       <RestoreFromBackup />
@@ -17,6 +17,16 @@ const Tools = () => {
 };
 
 const EvergreenContentCleanup = () => {
+  return (
+    <section>
+      <h2>Evergreen Content Cleanup</h2>
+      <ScheduledContentCleanup />
+      <AlertContentCleanup />
+    </section>
+  );
+};
+
+const ScheduledContentCleanup = () => {
   const today = useMemo(() => new Date().toISOString().split("T")[0], []);
   const [contentCleanupDate, setContentCleanupDate] = useState(today);
 
@@ -51,7 +61,7 @@ const EvergreenContentCleanup = () => {
 
   return (
     <section>
-      <h2>Evergreen Content Cleanup</h2>
+      <h3>Schedule-Based Content Cleanup</h3>
       <p>
         Delete inactive evergreen content which ended before the specified date.
       </p>
@@ -68,6 +78,73 @@ const EvergreenContentCleanup = () => {
           onChange={(event) => setContentCleanupDate(event.target.value)}
         />
         <button type="submit">Cleanup</button>
+      </form>
+    </section>
+  );
+};
+
+const AlertContentCleanup = () => {
+  const [isRunning, setIsRunning] = useState(false);
+
+  const cleanupContent = async () => {
+    const dryRun = await fetch.post(API_PATH, {
+      action: "alert_content_cleanup",
+      dry_run: true,
+    });
+
+    if (dryRun.status !== 200) {
+      window.alert(`Error: ${dryRun.error || "Unknown error"}`);
+      return;
+    }
+
+    const screenIds: string[] = dryRun.screen_ids;
+
+    if (screenIds.length === 0) {
+      window.alert("No screens would be affected.");
+      return;
+    }
+
+    const prompt =
+      `Delete evergreen content tied to expired alerts? ` +
+      `This will affect ${screenIds.length} screens.`;
+
+    if (!window.confirm(prompt)) return;
+
+    const { status, error } = await fetch.post(API_PATH, {
+      action: "alert_content_cleanup",
+      screen_ids: screenIds,
+    });
+
+    window.alert(
+      status === 200
+        ? "Configuration updated."
+        : `Error: Configuration update failed. ${error || ""}`,
+    );
+  };
+
+  return (
+    <section>
+      <h3>Alert-Linked Content Cleanup </h3>
+      <p>
+        Delete evergreen content tied to alerts that are no longer present in
+        the alerts feed.
+      </p>
+      <form
+        onSubmit={async (event) => {
+          event.preventDefault();
+          if (isRunning) return;
+
+          setIsRunning(true);
+          try {
+            await cleanupContent();
+          } finally {
+            setIsRunning(false);
+          }
+        }}
+      >
+        <button type="submit" disabled={isRunning}>
+          Cleanup
+        </button>
       </form>
     </section>
   );
