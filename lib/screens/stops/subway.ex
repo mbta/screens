@@ -237,6 +237,11 @@ defmodule Screens.Stops.Subway do
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
+  @track_to_full_station_stop_ids %{
+    "Union Square-01" => "70504",
+    "Union Square-02" => "70504"
+  }
+
   @type station :: {Stop.id(), station_names()}
   @type station_names :: {full :: String.t(), abbreviated :: String.t()}
 
@@ -352,5 +357,10 @@ defmodule Screens.Stops.Subway do
       # Finding union with stop_sequence ensures we remove these
       ie_stops -> Enum.filter(stop_sequence, fn {id, _} -> Enum.member?(ie_stops, id) end)
     end
+  end
+
+  @spec full_station_id_for_track_id(Stop.id()) :: Stop.id() | nil
+  def full_station_id_for_track_id(stop_id) do
+    Map.get(@track_to_full_station_stop_ids, stop_id, nil)
   end
 end

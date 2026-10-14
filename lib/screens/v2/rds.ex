@@ -26,6 +26,7 @@ defmodule Screens.V2.RDS do
   alias Screens.RouteType
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
+  alias Screens.Stops.Subway
   alias Screens.Trips.Trip
   alias Screens.Util
 
@@ -52,10 +53,6 @@ defmodule Screens.V2.RDS do
              |> Enum.flat_map(& &1)
              |> Enum.map(&Integer.to_string(&1))
   @last_trip_buffer_seconds 3
-  @replacement_stop_ids %{
-    "Union Square-01" => "70504",
-    "Union Square-02" => "70504"
-  }
 
   defmodule NoService do
     @moduledoc """
@@ -227,7 +224,7 @@ defmodule Screens.V2.RDS do
   defp replace_single_track_stop_id(
          %Departure{prediction: %Prediction{stop: %Stop{id: stop_id}}} = departure
        ) do
-    case Map.get(@replacement_stop_ids, stop_id) do
+    case Subway.full_station_id_for_track_id(stop_id) do
       nil ->
         departure
 
