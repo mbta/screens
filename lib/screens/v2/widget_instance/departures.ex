@@ -201,7 +201,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   def serialize_section(
         %NoServiceSection{
-          header: %Header{wayfinding_information: wayfinding_information} = header,
+          header: %Header{} = header,
           headsign: headsign,
           routes: routes
         },
@@ -222,9 +222,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :no_service_section,
-      header:
-        %{header | wayfinding_information: get_wayfinding_s3_image_path(wayfinding_information)}
-        |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
       text: FreeTextLine.to_json(text),
       with_headsign: headsign != nil
     }
@@ -257,7 +255,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(
         %NormalSection{
           rows: rows,
-          header: %Header{wayfinding_information: wayfinding_information} = header,
+          header: %Header{} = header,
           layout: %Layout{max: max},
           grouping_type: :destination
         },
@@ -281,9 +279,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           min: 2,
           include_later: false
         }),
-      header:
-        %{header | wayfinding_information: get_wayfinding_s3_image_path(wayfinding_information)}
-        |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
       grouping_type: :destination
     }
   end
@@ -292,7 +288,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         %NormalSection{
           rows: rows,
           layout: layout,
-          header: %Header{wayfinding_information: wayfinding_information} = header,
+          header: %Header{} = header,
           grouping_type: grouping_type
         },
         screen,
@@ -309,16 +305,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :normal_section,
       rows: serialized_rows,
       layout: Layout.to_json(layout),
-      header:
-        %{header | wayfinding_information: get_wayfinding_s3_image_path(wayfinding_information)}
-        |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
       grouping_type: grouping_type
     }
   end
 
   def serialize_section(
         %OvernightSection{
-          header: %Header{wayfinding_information: wayfinding_information} = header,
+          header: %Header{} = header,
           headsign: headsign,
           routes: routes
         },
@@ -339,20 +333,19 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :overnight_section,
-      header:
-        %{header | wayfinding_information: get_wayfinding_s3_image_path(wayfinding_information)}
-        |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
       text: FreeTextLine.to_json(text),
       with_headsign: headsign != nil
     }
   end
 
-  @spec get_wayfinding_s3_image_path(WayfindingInformation.t()) :: WayfindingInformation.t() | nil
-  defp get_wayfinding_s3_image_path(%WayfindingInformation{image_path: image_path} = wayfinding) do
-    %WayfindingInformation{wayfinding | image_path: Assets.s3_asset_url(image_path)}
+  defp wayfinding_with_s3_image_path(%{} = header) do
+    if match?(%{wayfinding_information: %{"image_path" => _}}, header) do
+      update_in(header, [Access.key(:wayfinding_information), Access.key("image_path")], &Assets.s3_asset_url/1)
+    else
+      header
+    end
   end
-
-  defp get_wayfinding_s3_image_path(_), do: nil
 
   def audio_serialize_section(%NormalSection{header: header} = section, screen, now) do
     header_readout =
