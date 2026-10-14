@@ -21,10 +21,11 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp render_section(%{
          type: :normal_section,
          header: header,
+         wayfinding_readout: wayfinding_readout,
          departure_groups: departure_groups
        })
        when is_binary(header) do
-    ~E|<p><%= header %></p><%= Enum.map(departure_groups, &render_departure_group/1) %>|
+    ~E|<p><%= header %></p><%= wayfinding(wayfinding_readout) %><%= Enum.map(departure_groups, &render_departure_group/1) %>|
   end
 
   defp render_section(%{type: :normal_section, departure_groups: departure_groups}) do
@@ -34,17 +35,21 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
   defp render_section(%{
          type: type,
          header: header,
+         wayfinding_readout: wayfinding_readout,
          headsign: headsign,
          routes: routes
        })
        when is_binary(header) and type in [:overnight_section, :no_service_section] do
-    ~E|<p><%= header %></p><%= section_text(type, headsign, routes) %>|
+    ~E|<p><%= header %></p><%= wayfinding(wayfinding_readout) %><%= section_text(type, headsign, routes) %>|
   end
 
   defp render_section(%{type: type, headsign: headsign, routes: routes})
        when type in [:overnight_section, :no_service_section] do
     ~E|<%= section_text(type, headsign, routes) %>|
   end
+
+  defp wayfinding(readout) when is_binary(readout), do: ~E|<p><%= readout %></p>|
+  defp wayfinding(_), do: ""
 
   defp render_departure_group({:notice, text}) do
     ~E|<p><s><%= text %></s></p>|

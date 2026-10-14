@@ -1,5 +1,5 @@
 import cx from "classnames";
-import { type JSX } from "react";
+import { ComponentType, type JSX } from "react";
 
 import Arrow45 from "Images/arrow-45.svg";
 import { IMAGE_EXTENSIONS, extensionForAsset } from "Util/utils";
@@ -12,8 +12,12 @@ type CardinalDirection = "n" | "ne" | "e" | "se" | "s" | "sw" | "w" | "nw";
 type Header = {
   title: string | null;
   arrow: CardinalDirection | null;
-  image_path: string | null;
   subtitle: string | null;
+  wayfinding_information: WayfindingInformation | null;
+};
+
+type WayfindingInformation = {
+  image_path: string | null;
   wayfinding_point: WayfindingPointProps | null;
 };
 
@@ -31,13 +35,14 @@ const DirectionArrow = ({ arrow }: { arrow: CardinalDirection }) => (
   />
 );
 
-const Header = ({
+const Header: ComponentType<Header> = ({
   title,
   arrow,
   subtitle,
-  image_path: imagePath,
-  wayfinding_point: wayfindingPoint,
+  wayfinding_information: wayfindingInformation,
 }: Header) => {
+  const imagePath = wayfindingInformation?.image_path;
+  const wayfindingPoint = wayfindingInformation?.wayfinding_point;
   return (
     <>
       <header className="departures-header">
