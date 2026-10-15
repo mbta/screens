@@ -207,6 +207,41 @@ defmodule ScreensWeb.AdminApiController do
     end
   end
 
+  def maintenance(conn, %{"action" => "alert_content_cleanup", "dry_run" => _}) do
+    case Util.Admin.expired_alert_content_cleanup_updates(ScreenConfigs.all()) do
+      {:ok, updates} ->
+        json(conn, %{screen_ids: updates |> Enum.map(& &1.id) |> Enum.sort()})
+
+      :error ->
+        alerts_fetch_error(conn)
+    end
+  end
+
+  def maintenance(conn, %{"action" => "alert_content_cleanup", "screen_ids" => screen_ids})
+      when is_list(screen_ids) do
+    with {:ok, updates} <-
+           screen_ids
+           |> ScreenConfigs.all_by_ids()
+           |> Util.Admin.expired_alert_content_cleanup_updates(),
+         :ok <- ScreenConfigs.commit_updates(updates) do
+      json(conn, %{success: true, updated: length(updates)})
+    else
+      :error ->
+        alerts_fetch_error(conn)
+
+      {:error, reason} ->
+        conn
+        |> put_status(500)
+        |> json(%{success: false, error: inspect(reason)})
+    end
+  end
+
+  defp alerts_fetch_error(conn) do
+    conn
+    |> put_status(502)
+    |> json(%{success: false, error: "Failed to fetch alerts from the V3 API"})
+  end
+
   @spec to_success_response(:ok | :error, Plug.Conn.t()) :: Plug.Conn.t()
   defp to_success_response(result, conn) do
     response =

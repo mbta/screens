@@ -6,10 +6,11 @@ defmodule ScreensWeb.AdminApiControllerTest do
   import Screens.Inject
   import Screens.TestSupport.ScreenConfigBuilder
 
+  alias Screens.Alerts.Alert
   alias Screens.Config.Backup.Store
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
-  alias ScreensConfig.{EvergreenContentItem, Schedule}
+  alias ScreensConfig.{AlertSchedule, EvergreenContentItem, Schedule}
 
   @data_cache injected(Screens.V2.ScreenData.Cache)
 
@@ -29,6 +30,19 @@ defmodule ScreensWeb.AdminApiControllerTest do
         Enum.map(end_dts, fn end_dt ->
           %Schedule{start_dt: ~U[2024-01-01 00:00:00Z], end_dt: end_dt}
         end)
+    }
+
+    %{screen | app_params: %{screen.app_params | evergreen_content: [item]}}
+  end
+
+  defp screen_with_alert_ids(alert_ids) do
+    screen = screen_config(:busway_v2)
+
+    item = %EvergreenContentItem{
+      slot_names: [],
+      asset_path: "test-asset.png",
+      priority: 1,
+      schedule: %AlertSchedule{alert_ids: alert_ids}
     }
 
     %{screen | app_params: %{screen.app_params | evergreen_content: [item]}}
@@ -268,6 +282,64 @@ defmodule ScreensWeb.AdminApiControllerTest do
       assert Repo.get!(ScreenConfig, "all-ended").config.app_params.evergreen_content == []
       assert Repo.get!(ScreenConfig, "mixed-ended").config == mixed_ended_screen_config
       assert Repo.get!(ScreenConfig, "null-ended").config == null_ended_screen_config
+    end
+  end
+
+  describe "/maintenance alert_content_cleanup" do
+    setup do
+      Repo.insert!(%ScreenConfig{id: "expired", config: screen_with_alert_ids(["old"])})
+      Repo.insert!(%ScreenConfig{id: "active", config: screen_with_alert_ids(["current"])})
+      :ok
+    end
+
+    @tag :authenticated
+    test "dry_run returns IDs of screens with content tied to expired alerts", %{conn: conn} do
+      expect(Alert.Mock, :fetch, fn _opts -> {:ok, [%Alert{id: "current"}]} end)
+
+      conn =
+        post(conn, "/api/admin/maintenance", %{
+          "action" => "alert_content_cleanup",
+          "dry_run" => "true"
+        })
+
+      assert json_response(conn, 200) == %{"screen_ids" => ["expired"]}
+    end
+
+    @tag :authenticated
+    test "removes content tied to expired alerts from the given screens", %{conn: conn} do
+      expect(Alert.Mock, :fetch, fn opts ->
+        assert opts[:ids] == ["old"]
+        {:ok, []}
+      end)
+
+      expect(@data_cache, :invalidate, fn ["expired"], fun -> {:ok, fun.()} end)
+
+      conn =
+        post(conn, "/api/admin/maintenance", %{
+          "action" => "alert_content_cleanup",
+          "screen_ids" => ["expired"]
+        })
+
+      assert json_response(conn, 200) == %{"success" => true, "updated" => 1}
+      assert Repo.get!(ScreenConfig, "expired").config.app_params.evergreen_content == []
+      assert Repo.get!(ScreenConfig, "active").config == screen_with_alert_ids(["current"])
+    end
+
+    @tag :authenticated
+    test "does not update configs when alerts cannot be fetched", %{conn: conn} do
+      expect(Alert.Mock, :fetch, fn _opts -> :error end)
+
+      capture_log(fn ->
+        conn =
+          post(conn, "/api/admin/maintenance", %{
+            "action" => "alert_content_cleanup",
+            "screen_ids" => ["expired"]
+          })
+
+        assert json_response(conn, 502)["success"] == false
+      end)
+
+      assert Repo.get!(ScreenConfig, "expired").config == screen_with_alert_ids(["old"])
     end
   end
 end

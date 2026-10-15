@@ -1,8 +1,13 @@
 defmodule Screens.Util.Admin do
   @moduledoc "Common functions used for administrative tasks."
 
+  import Screens.Inject
+
+  alias Screens.Alerts.Alert
   alias Screens.Config.ScreenConfig
-  alias ScreensConfig.{EvergreenContentItem, RecurrentSchedule, Schedule, Screen}
+  alias ScreensConfig.{AlertSchedule, EvergreenContentItem, RecurrentSchedule, Schedule, Screen}
+
+  @alert injected(Screens.Alerts.Alert)
 
   @doc """
   Counts screen configs that contain expired evergreen content, i.e. those where
@@ -64,4 +69,63 @@ defmodule Screens.Util.Admin do
   # Cleaning up alert-linked content is not supported
   defp should_cleanup_evergreen_item?(%EvergreenContentItem{schedule: _other}, _before_date),
     do: false
+
+  @doc """
+  Returns a list of updates for Postgres that will remove alert-linked evergreen content where
+  none of the linked alerts are present in the alerts feed (i.e. they have expired).
+  """
+  @spec expired_alert_content_cleanup_updates([ScreenConfig.t()]) :: {:ok, [map()]} | :error
+  def expired_alert_content_cleanup_updates(screen_configs) do
+    alert_ids = screen_configs |> Enum.flat_map(&linked_alert_ids/1) |> Enum.uniq()
+
+    with {:ok, present_ids} <- fetch_present_alert_ids(alert_ids) do
+      {:ok,
+       Enum.flat_map(screen_configs, fn %ScreenConfig{id: id, config: screen} ->
+         cleaned = cleanup_expired_alert_content(screen, present_ids)
+         if cleaned == screen, do: [], else: [%{id: id, config: cleaned}]
+       end)}
+    end
+  end
+
+  @spec linked_alert_ids(ScreenConfig.t()) :: [Alert.id()]
+  defp linked_alert_ids(%ScreenConfig{
+         config: %Screen{app_params: %_app{evergreen_content: items}}
+       }) do
+    Enum.flat_map(items, fn
+      %EvergreenContentItem{schedule: %AlertSchedule{alert_ids: ids}} -> ids
+      _ -> []
+    end)
+  end
+
+  defp linked_alert_ids(_screen_config), do: []
+
+  @spec fetch_present_alert_ids([Alert.id()]) :: {:ok, [Alert.id()]} | :error
+  defp fetch_present_alert_ids([]), do: {:ok, []}
+
+  defp fetch_present_alert_ids(alert_ids) do
+    with {:ok, alerts} <- @alert.fetch(ids: alert_ids, activities: :all) do
+      {:ok, Enum.map(alerts, & &1.id)}
+    end
+  end
+
+  @spec cleanup_expired_alert_content(Screen.t(), [Alert.id()]) :: Screen.t()
+  defp cleanup_expired_alert_content(
+         %Screen{app_params: %_app{evergreen_content: _}} = screen,
+         present_ids
+       ) do
+    update_in(screen.app_params.evergreen_content, fn items ->
+      Enum.reject(items, &alert_content_expired?(&1, present_ids))
+    end)
+  end
+
+  defp cleanup_expired_alert_content(screen, _present_ids), do: screen
+
+  @spec alert_content_expired?(EvergreenContentItem.t(), [Alert.id()]) :: boolean()
+  defp alert_content_expired?(
+         %EvergreenContentItem{schedule: %AlertSchedule{alert_ids: [_ | _] = alert_ids}},
+         present_ids
+       ),
+       do: not Enum.any?(alert_ids, &Enum.member?(present_ids, &1))
+
+  defp alert_content_expired?(_item, _present_ids), do: false
 end
