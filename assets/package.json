@@ -16,7 +16,9 @@
     "styles": "stylelint --fix \"css/**/*\"",
     "styles:check": "stylelint \"css/**/*\"",
     "format": "prettier --write --list-different .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "typecheck": "npx tsc",
+    "check": "npm run typecheck && npm run lint:check && npm run format:check && npm run styles:check && npm run unused"
   },
   "dependencies": {
     "@fullstory/browser": "^2.1.2",
