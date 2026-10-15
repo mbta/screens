@@ -82,6 +82,7 @@ defmodule Screens.RoutePatterns.RoutePattern do
   # legacy behavior involving multi-route trips, so if we want to "really" filter by route ID we
   # have to do it ourselves.
   defp refilter_by_route_ids(patterns, nil), do: patterns
+  defp refilter_by_route_ids(patterns, []), do: patterns
 
   defp refilter_by_route_ids(patterns, route_ids) do
     route_ids = MapSet.new(route_ids)
