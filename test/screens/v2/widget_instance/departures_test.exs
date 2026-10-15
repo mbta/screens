@@ -12,7 +12,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Departures.{NoServiceSection, OvernightSection}
   alias ScreensConfig.Departures.Header.WayfindingInformation
-  alias ScreensConfig.Schedule, as: ScreensConfigSchedule
+  alias ScreensConfig.Schedule, as: ScheduleConfig
 
   alias Screens.V2.WidgetInstance.Departures.{
     HeadwaySection,
@@ -38,6 +38,22 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
   describe "serialize_section/3" do
     setup do
+      wayfinding_info = %WayfindingInformation{
+        image_path: "testing/wayfinding/image.png",
+        schedule: []
+      }
+
+      section = %NormalSection{
+        rows: [],
+        layout: %Layout{},
+        header: %Header{
+          title: "Simple Test Header",
+          arrow: :n,
+          read_as: "Special read-as text",
+          wayfinding_information: wayfinding_info
+        }
+      }
+
       %{
         bus_shelter_screen: %Screen{
           app_id: :bus_shelter_v2,
@@ -46,8 +62,17 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           name: "TEST",
           app_params: nil
         },
-        now: ~U[2020-01-01T00:00:00Z]
+        now: ~U[2020-01-01T00:00:00Z],
+        section: section
       }
+    end
+
+    defp update_wayfinding_in_section(section, updated_wayfinding_info) do
+      update_in(
+        section,
+        [Access.key(:header, %{}), Access.key(:wayfinding_information, %{})],
+        fn wayfinding_info -> struct!(wayfinding_info, updated_wayfinding_info) end
+      )
     end
 
     test "returns serialized normal_section", %{bus_shelter_screen: bus_shelter_screen, now: now} do
@@ -79,26 +104,23 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "returns serialized normal_section with wayfinding information if it exists", %{
       bus_shelter_screen: bus_shelter_screen,
-      now: now
+      now: now,
+      section: section
     } do
-      section = %NormalSection{
-        rows: [],
-        layout: %Layout{},
-        header: %Header{
-          title: "Simple Test Header",
-          arrow: :n,
-          read_as: "Special read-as text",
-          wayfinding_information: %WayfindingInformation{
-            image_path: "testing/wayfinding/image.png",
-            schedule: [
-              %ScreensConfigSchedule{
-                start_dt: ~U[2021-01-01T00:00:00Z],
-                end_dt: ~U[2021-01-02T00:00:00Z]
-              }
-            ]
-          }
-        }
-      }
+      start_dt = DateTime.add(now, -1)
+      end_dt = DateTime.add(now, 1)
+      expected_start = DateTime.to_iso8601(start_dt)
+      expected_end = DateTime.to_iso8601(end_dt)
+
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [
+            %ScheduleConfig{
+              start_dt: start_dt,
+              end_dt: end_dt
+            }
+          ]
+        })
 
       assert %{
                type: :normal_section,
@@ -111,10 +133,191 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %{
-                       start_dt: "2021-01-01T00:00:00Z",
-                       end_dt: "2021-01-02T00:00:00Z"
+                       start_dt: ^expected_start,
+                       end_dt: ^expected_end
                      }
                    ]
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets the wayfinding info when the schedule is empty", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section = update_wayfinding_in_section(section, %{schedule: []})
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png"
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets the wayfinding info when the schedule has nil start & end times", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: nil, end_dt: nil}]
+        })
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png"
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets the wayfinding info when the schedule has a start time before now", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: DateTime.add(now, -1), end_dt: nil}]
+        })
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png"
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets the wayfinding info to nil when the schedule has a start time after now", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: DateTime.add(now, 1), end_dt: nil}]
+        })
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path: nil
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets wayfinding info when the schedule has an end time after now", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: nil, end_dt: DateTime.add(now, 1)}]
+        })
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png"
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets wayfinding info to nil when the schedule has an end time before now", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: nil, end_dt: DateTime.add(now, -1)}]
+        })
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path: nil
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets wayfinding info when the schedule is inside of a schedule window", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [
+            %ScheduleConfig{start_dt: DateTime.add(now, -1), end_dt: DateTime.add(now, 1)}
+          ]
+        })
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png"
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets wayfinding info when any schedule applies", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [
+            %ScheduleConfig{start_dt: DateTime.add(now, -2), end_dt: DateTime.add(now, -1)},
+            %ScheduleConfig{start_dt: now, end_dt: DateTime.add(now, 1)}
+          ]
+        })
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png"
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
+    test "sets wayfinding info to nil when it is outside of the schedule window", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now,
+      section: section
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [
+            %ScheduleConfig{start_dt: DateTime.add(now, -2), end_dt: DateTime.add(now, -1)}
+          ]
+        })
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path: nil
                  }
                }
              } = Departures.serialize_section(section, bus_shelter_screen, now)
@@ -184,14 +387,19 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       dup_screen: dup_screen,
       now: now
     } do
+      start_dt = DateTime.add(now, -1)
+      end_dt = DateTime.add(now, 1)
+      expected_start = DateTime.to_iso8601(start_dt)
+      expected_end = DateTime.to_iso8601(end_dt)
+
       section = %NoServiceSection{
         header: %Header{
           wayfinding_information: %WayfindingInformation{
             image_path: "testing/wayfinding/image.png",
             schedule: [
-              %ScreensConfigSchedule{
-                start_dt: ~U[2021-01-01T00:00:00Z],
-                end_dt: ~U[2021-01-02T00:00:00Z]
+              %ScheduleConfig{
+                start_dt: start_dt,
+                end_dt: end_dt
               }
             ]
           }
@@ -207,28 +415,32 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %{
-                       start_dt: "2021-01-01T00:00:00Z",
-                       end_dt: "2021-01-02T00:00:00Z"
+                       start_dt: ^expected_start,
+                       end_dt: ^expected_end
                      }
                    ]
                  }
                }
-             } =
-               Departures.serialize_section(section, dup_screen, now, false)
+             } = Departures.serialize_section(section, dup_screen, now, false)
     end
 
     test "serializes an image path for an overnight_section", %{
       dup_screen: dup_screen,
       now: now
     } do
+      start_dt = DateTime.add(now, -1)
+      end_dt = DateTime.add(now, 1)
+      expected_start = DateTime.to_iso8601(start_dt)
+      expected_end = DateTime.to_iso8601(end_dt)
+
       section = %OvernightSection{
         header: %Header{
           wayfinding_information: %WayfindingInformation{
             image_path: "testing/wayfinding/image.png",
             schedule: [
-              %ScreensConfigSchedule{
-                start_dt: ~U[2021-01-01T00:00:00Z],
-                end_dt: ~U[2021-01-02T00:00:00Z]
+              %ScheduleConfig{
+                start_dt: start_dt,
+                end_dt: end_dt
               }
             ]
           }
@@ -244,8 +456,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %{
-                       start_dt: "2021-01-01T00:00:00Z",
-                       end_dt: "2021-01-02T00:00:00Z"
+                       start_dt: ^expected_start,
+                       end_dt: ^expected_end
                      }
                    ]
                  }
@@ -451,6 +663,11 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         }
       ]
 
+      start_dt = DateTime.add(now, -1)
+      end_dt = DateTime.add(now, 1)
+      expected_start = DateTime.to_iso8601(start_dt)
+      expected_end = DateTime.to_iso8601(end_dt)
+
       section = %NormalSection{
         rows: rows,
         layout: %Layout{},
@@ -459,9 +676,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           wayfinding_information: %WayfindingInformation{
             image_path: "testing/wayfinding/image.png",
             schedule: [
-              %ScreensConfigSchedule{
-                start_dt: ~U[2021-01-01T00:00:00Z],
-                end_dt: ~U[2021-01-02T00:00:00Z]
+              %ScheduleConfig{
+                start_dt: start_dt,
+                end_dt: end_dt
               }
             ]
           }
@@ -477,8 +694,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %{
-                       start_dt: "2021-01-01T00:00:00Z",
-                       end_dt: "2021-01-02T00:00:00Z"
+                       start_dt: ^expected_start,
+                       end_dt: ^expected_end
                      }
                    ]
                  }
@@ -1584,15 +1801,29 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       stop: %Stop{id: "place-test"}
     }
 
-    test "can serialize a :normal_section" do
+    setup do
       screen = struct(Screen, %{app_id: :gl_eink_v2})
+
+      wayfinding_info = %WayfindingInformation{
+        image_path: "mock/path/to/image.webp",
+        read_as: "Wayfinding info to read",
+        schedule: []
+      }
 
       section = %NormalSection{
         rows: [],
-        header: %Header{title: "Section Header", subtitle: nil},
+        header: %Header{
+          title: "Section Header",
+          subtitle: nil,
+          wayfinding_information: wayfinding_info
+        },
         layout: %Layout{}
       }
 
+      %{screen: screen, section: section}
+    end
+
+    test "can serialize a :normal_section", %{screen: screen, section: section} do
       assert %{
                type: :normal_section,
                departure_groups: [],
@@ -1837,6 +2068,129 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                   }}
                ]
              } = Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets a wayfinding_readout when the schedule is empty", %{
+      section: section,
+      screen: screen
+    } do
+      section = update_wayfinding_in_section(section, %{schedule: []})
+
+      assert %{wayfinding_readout: "Wayfinding info to read"} =
+               Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets a wayfinding_readout when the schedule has nil start & end times", %{
+      section: section,
+      screen: screen
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: nil, end_dt: nil}]
+        })
+
+      assert %{wayfinding_readout: "Wayfinding info to read"} =
+               Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets a wayfinding_readout when the schedule has a start time before now", %{
+      section: section,
+      screen: screen
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: DateTime.add(@now, -1), end_dt: nil}]
+        })
+
+      assert %{
+               wayfinding_readout: "Wayfinding info to read"
+             } = Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets wayfinding_readout to nil when the schedule has a start time after now", %{
+      section: section,
+      screen: screen
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: DateTime.add(@now, 1), end_dt: nil}]
+        })
+
+      assert %{wayfinding_readout: nil} =
+               Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets a wayfinding_readout when the schedule has an end time after now", %{
+      section: section,
+      screen: screen
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: nil, end_dt: DateTime.add(@now, 1)}]
+        })
+
+      assert %{wayfinding_readout: "Wayfinding info to read"} =
+               Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets wayfinding_readout to nil when the schedule has an end time before now", %{
+      section: section,
+      screen: screen
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [%ScheduleConfig{start_dt: nil, end_dt: DateTime.add(@now, -1)}]
+        })
+
+      assert %{wayfinding_readout: nil} =
+               Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets a wayfinding_readout when the schedule is inside of a schedule window", %{
+      section: section,
+      screen: screen
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [
+            %ScheduleConfig{start_dt: DateTime.add(@now, -1), end_dt: DateTime.add(@now, 1)}
+          ]
+        })
+
+      assert %{wayfinding_readout: "Wayfinding info to read"} =
+               Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets a wayfinding_readout when any schedule applies", %{
+      section: section,
+      screen: screen
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [
+            %ScheduleConfig{start_dt: DateTime.add(@now, -2), end_dt: DateTime.add(@now, -1)},
+            %ScheduleConfig{start_dt: @now, end_dt: DateTime.add(@now, 1)}
+          ]
+        })
+
+      assert %{
+               wayfinding_readout: "Wayfinding info to read"
+             } = Departures.audio_serialize_section(section, screen, @now)
+    end
+
+    test "sets wayfinding_readout to nil when it is outside of the schedule window", %{
+      section: section,
+      screen: screen
+    } do
+      section =
+        update_wayfinding_in_section(section, %{
+          schedule: [
+            %ScheduleConfig{start_dt: DateTime.add(@now, -2), end_dt: DateTime.add(@now, -1)}
+          ]
+        })
+
+      assert %{wayfinding_readout: nil} =
+               Departures.audio_serialize_section(section, screen, @now)
     end
   end
 
