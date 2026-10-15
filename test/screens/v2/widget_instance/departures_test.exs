@@ -107,7 +107,8 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                  arrow: :n,
                  read_as: "Special read-as text",
                  wayfinding_information: %{
-                   "image_path" => "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
+                   "image_path" =>
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
                      %ScreensConfigSchedule{
                        start_dt: ~U[2021-01-01T00:00:00Z],
