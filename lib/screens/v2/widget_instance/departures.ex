@@ -339,10 +339,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp wayfinding_with_s3_image_path(%{} = header) do
-    if match?(%{wayfinding_information: %{"image_path" => _}}, header) do
+    if match?(%{wayfinding_information: %{image_path: _}}, header) do
       update_in(
         header,
-        [Access.key(:wayfinding_information), Access.key("image_path")],
+        [Access.key(:wayfinding_information), Access.key(:image_path)],
         &Assets.s3_asset_url/1
       )
     else
