@@ -437,7 +437,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
-  defp wayfinding_readout(%Header{wayfinding_information: %{"read_as" => read_as}})
+  defp wayfinding_readout(%Header{wayfinding_information: %{read_as: read_as}})
        when is_binary(read_as), do: read_as
 
   defp wayfinding_readout(_), do: nil
