@@ -123,15 +123,17 @@ defmodule Screens.V2.ScreenData.Parameters do
     generator
   end
 
-  @callback refresh_rate(Screen.t() | Screen.app_id()) :: pos_integer() | nil
-  @callback refresh_rate(Screen.t() | Screen.app_id(), static_params()) :: pos_integer() | nil
-  def refresh_rate(screen_or_app_id, static_params \\ @static_params)
-
-  def refresh_rate(%Screen{app_id: app_id}, static_params),
-    do: refresh_rate(app_id, static_params)
-
-  def refresh_rate(app_id, static_params) do
+  @callback refresh_rate(Screen.app_id()) :: pos_integer()
+  @callback refresh_rate(Screen.app_id(), static_params()) :: pos_integer()
+  def refresh_rate(app_id, static_params \\ @static_params) do
     %Static{refresh_rate: refresh_rate} = Map.fetch!(static_params, app_id)
     refresh_rate
+  end
+
+  @spec refresh_offset(id :: String.t(), Screen.app_id()) :: pos_integer()
+  @spec refresh_offset(id :: String.t(), Screen.app_id(), static_params()) :: pos_integer()
+  def refresh_offset(screen_id, app_id, static_params \\ @static_params) do
+    refresh_rate = refresh_rate(app_id, static_params)
+    screen_id |> Base.encode16() |> String.to_integer(16) |> rem(refresh_rate)
   end
 end

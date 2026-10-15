@@ -74,8 +74,8 @@ defmodule Screens.V2.ScreenData do
   defp log_cache_meta(%Cache.Meta{what: what, where: where}),
     do: Logger.metadata(cache_result: what, cache_location: where)
 
-  defp resolve_paging(layout, config),
-    do: Layout.resolve_paging(layout, @parameters.refresh_rate(config))
+  defp resolve_paging(layout, %Screen{app_id: app_id}),
+    do: Layout.resolve_paging(layout, @parameters.refresh_rate(app_id))
 
   @spec serialize(Layout.non_paged()) :: map() | nil
   def serialize({layout, instance_map, paging_metadata}) do

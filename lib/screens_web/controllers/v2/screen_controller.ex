@@ -28,12 +28,10 @@ defmodule ScreensWeb.V2.ScreenController do
   end
 
   def index_multi(%{assigns: %{app_id: app_id}} = conn, _params) do
-    refresh_rate = Parameters.refresh_rate(app_id)
-
     conn
     |> assign(:app_id, strip_v2(app_id))
-    |> assign(:refresh_rate, refresh_rate)
-    |> assign(:screen_ids_with_offset_map, screen_ids(app_id, refresh_rate))
+    |> assign(:refresh_rate, Parameters.refresh_rate(app_id))
+    |> assign(:screen_ids_with_offset_map, screen_ids(app_id))
     |> render("index_multi.html")
   end
 
@@ -87,28 +85,19 @@ defmodule ScreensWeb.V2.ScreenController do
          %{assigns: %{screen_id: screen_id, screen: %Screen{app_id: app_id} = screen}} = conn,
          params
        ) do
-    refresh_rate = Parameters.refresh_rate(app_id)
-
     merge_assigns(conn,
       app_id: strip_v2(app_id),
-      refresh_rate: refresh_rate,
+      refresh_rate: Parameters.refresh_rate(app_id),
       audio_readout_interval: Parameters.audio_interval_minutes(screen),
       audio_interval_offset_seconds: Parameters.audio_interval_offset_seconds(screen),
       sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
-      refresh_rate_offset: calculate_refresh_rate_offset(screen_id, refresh_rate)
+      refresh_rate_offset: Parameters.refresh_offset(screen_id, app_id)
     )
   end
 
-  defp calculate_refresh_rate_offset(screen_id, refresh_rate) do
-    screen_id
-    |> Base.encode16()
-    |> String.to_integer(16)
-    |> rem(refresh_rate)
-  end
-
-  defp screen_ids(target_app_id, refresh_rate) do
-    ScreenConfigs.screen_ids_for_app(target_app_id)
-    |> Enum.map(&%{id: &1, refresh_rate_offset: calculate_refresh_rate_offset(&1, refresh_rate)})
+  defp screen_ids(app_id) do
+    ScreenConfigs.screen_ids_for_app(app_id)
+    |> Enum.map(&%{id: &1, refresh_rate_offset: Parameters.refresh_offset(&1, app_id)})
   end
 
   # While app IDs in configuration still have the "_v2" suffix, but this suffix has been removed
