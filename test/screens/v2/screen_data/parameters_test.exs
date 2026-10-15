@@ -1,5 +1,6 @@
 defmodule Screens.V2.ScreenData.ParametersTest do
   use ExUnit.Case, async: true
+  use ExUnitProperties
 
   alias Screens.V2.ScreenData.{Parameters, Static}
   alias Screens.V2.ScreenData.Static.PeriodicAudio
@@ -138,7 +139,20 @@ defmodule Screens.V2.ScreenData.ParametersTest do
   describe "refresh_rate/1" do
     test "returns the configured refresh rate for a screen type" do
       static_params = build_params(refresh_rate: 25)
-      assert Parameters.refresh_rate(build_screen(), static_params) == 25
+      [app_id] = Map.keys(static_params)
+
+      assert Parameters.refresh_rate(app_id, static_params) == 25
+    end
+  end
+
+  describe "refresh_offset/2" do
+    property "returns an offset within the refresh rate for a screen" do
+      static_params = build_params(refresh_rate: 5)
+      [app_id] = Map.keys(static_params)
+
+      check all(id <- StreamData.string(:alphanumeric, min_length: 1)) do
+        assert Parameters.refresh_offset(id, app_id, static_params) in 0..4
+      end
     end
   end
 end
