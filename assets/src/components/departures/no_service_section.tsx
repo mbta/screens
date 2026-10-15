@@ -21,7 +21,9 @@ export const NoServiceSection: ComponentType<NoServiceSection> = ({
       <div
         className={classWithModifier(
           "departures-section-divider",
-          !header.title && header.image_path ? "only-image-header" : "",
+          !header.title && header.wayfinding_information?.image_path
+            ? "only-image-header"
+            : "",
         )}
       ></div>
       <Header {...header} />

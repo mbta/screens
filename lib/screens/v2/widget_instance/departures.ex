@@ -200,7 +200,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   def serialize_section(
         %NoServiceSection{
-          header: %Header{image_path: image_path} = header,
+          header: %Header{} = header,
           headsign: headsign,
           routes: routes
         },
@@ -221,7 +221,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :no_service_section,
-      header: Map.put(header, :image_path, Assets.s3_asset_url(image_path)) |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
       text: FreeTextLine.to_json(text),
       with_headsign: headsign != nil
     }
@@ -254,7 +254,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(
         %NormalSection{
           rows: rows,
-          header: %Header{image_path: image_path} = header,
+          header: %Header{} = header,
           layout: %Layout{max: max},
           grouping_type: :destination
         },
@@ -278,7 +278,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           min: 2,
           include_later: false
         }),
-      header: Map.put(header, :image_path, Assets.s3_asset_url(image_path)) |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
       grouping_type: :destination
     }
   end
@@ -287,7 +287,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         %NormalSection{
           rows: rows,
           layout: layout,
-          header: %Header{image_path: image_path} = header,
+          header: %Header{} = header,
           grouping_type: grouping_type
         },
         screen,
@@ -304,14 +304,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :normal_section,
       rows: serialized_rows,
       layout: Layout.to_json(layout),
-      header: Map.put(header, :image_path, Assets.s3_asset_url(image_path)) |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
       grouping_type: grouping_type
     }
   end
 
   def serialize_section(
         %OvernightSection{
-          header: %Header{image_path: image_path} = header,
+          header: %Header{} = header,
           headsign: headsign,
           routes: routes
         },
@@ -332,14 +332,26 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :overnight_section,
-      header: Map.put(header, :image_path, Assets.s3_asset_url(image_path)) |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
       text: FreeTextLine.to_json(text),
       with_headsign: headsign != nil
     }
   end
 
+  defp wayfinding_with_s3_image_path(%{} = header) do
+    if match?(%{wayfinding_information: %{image_path: _}}, header) do
+      update_in(
+        header,
+        [Access.key(:wayfinding_information), Access.key(:image_path)],
+        &Assets.s3_asset_url/1
+      )
+    else
+      header
+    end
+  end
+
   def audio_serialize_section(%NormalSection{header: header} = section, screen, now) do
-    header =
+    header_readout =
       case header do
         %{read_as: header} when is_binary(header) ->
           header
@@ -361,8 +373,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :normal_section,
-      header: header,
-      departure_groups: serialized_departure_groups
+      header: header_readout,
+      departure_groups: serialized_departure_groups,
+      wayfinding_readout: wayfinding_readout(header)
     }
   end
 
@@ -371,7 +384,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _screen,
         _now
       ) do
-    header =
+    header_readout =
       case header do
         %{read_as: header} when is_binary(header) ->
           header
@@ -389,8 +402,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       type: :overnight_section,
       headsign: headsign,
-      header: header,
-      routes: routes
+      header: header_readout,
+      routes: routes,
+      wayfinding_readout: wayfinding_readout(header)
     }
   end
 
@@ -399,7 +413,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         _screen,
         _now
       ) do
-    header =
+    header_readout =
       case header do
         %{read_as: header} when is_binary(header) ->
           header
@@ -417,10 +431,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
     %{
       type: :no_service_section,
       headsign: headsign,
-      header: header,
-      routes: routes
+      header: header_readout,
+      routes: routes,
+      wayfinding_readout: wayfinding_readout(header)
     }
   end
+
+  defp wayfinding_readout(%Header{wayfinding_information: %{read_as: read_as}})
+       when is_binary(read_as), do: read_as
+
+  defp wayfinding_readout(_), do: nil
 
   defp audio_serialize_row_group({:notice, free_text}, _, _now) do
     {:notice, FreeTextLine.to_plaintext(free_text)}

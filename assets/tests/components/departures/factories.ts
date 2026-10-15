@@ -12,8 +12,7 @@ export const normalSection = Factory.define<Section>(() => ({
     title: null,
     arrow: null,
     subtitle: null,
-    image_path: null,
-    wayfinding_point: null,
+    wayfinding_information: null,
   },
   grouping_type: "time",
 }));

@@ -10,6 +10,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias Screens.Trips.Trip
   alias Screens.V2.{Departure, WidgetInstance}
   alias Screens.V2.WidgetInstance.Departures
+  alias Screens.V2.WidgetInstance.Departures.{NoServiceSection, OvernightSection}
+  alias ScreensConfig.Departures.Header.WayfindingInformation
+  alias ScreensConfig.Schedule, as: ScreensConfigSchedule
 
   alias Screens.V2.WidgetInstance.Departures.{
     HeadwaySection,
@@ -74,6 +77,49 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
              } = Departures.serialize_section(section, bus_shelter_screen, now)
     end
 
+    test "returns serialized normal_section with wayfinding information if it exists", %{
+      bus_shelter_screen: bus_shelter_screen,
+      now: now
+    } do
+      section = %NormalSection{
+        rows: [],
+        layout: %Layout{},
+        header: %Header{
+          title: "Simple Test Header",
+          arrow: :n,
+          read_as: "Special read-as text",
+          wayfinding_information: %WayfindingInformation{
+            image_path: "testing/wayfinding/image.png",
+            schedule: [
+              %ScreensConfigSchedule{
+                start_dt: ~U[2021-01-01T00:00:00Z],
+                end_dt: ~U[2021-01-02T00:00:00Z]
+              }
+            ]
+          }
+        }
+      }
+
+      assert %{
+               type: :normal_section,
+               header: %{
+                 title: "Simple Test Header",
+                 arrow: :n,
+                 read_as: "Special read-as text",
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
+                   schedule: [
+                     %ScreensConfigSchedule{
+                       start_dt: ~U[2021-01-01T00:00:00Z],
+                       end_dt: ~U[2021-01-02T00:00:00Z]
+                     }
+                   ]
+                 }
+               }
+             } = Departures.serialize_section(section, bus_shelter_screen, now)
+    end
+
     test "returns serialized normal_section with notice", %{
       bus_shelter_screen: bus_shelter_screen,
       now: now
@@ -108,6 +154,104 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         },
         now: ~U[2020-01-01T00:00:00Z]
       }
+    end
+
+    test "returns serialized no_service_section for one configured section", %{
+      dup_screen: dup_screen,
+      now: now
+    } do
+      section = %NoServiceSection{
+        header: %Header{},
+        headsign: nil,
+        routes: [%Route{id: "Red"}]
+      }
+
+      assert %{
+               type: :no_service_section,
+               header: %{
+                 arrow: nil,
+                 read_as: nil,
+                 subtitle: nil,
+                 title: nil,
+                 wayfinding_information: nil
+               },
+               text: %{icon: :red, text: ["No service today"]},
+               with_headsign: false
+             } = Departures.serialize_section(section, dup_screen, now, false)
+    end
+
+    test "serializes an image path for a no_service_section", %{
+      dup_screen: dup_screen,
+      now: now
+    } do
+      section = %NoServiceSection{
+        header: %Header{
+          wayfinding_information: %WayfindingInformation{
+            image_path: "testing/wayfinding/image.png",
+            schedule: [
+              %ScreensConfigSchedule{
+                start_dt: ~U[2021-01-01T00:00:00Z],
+                end_dt: ~U[2021-01-02T00:00:00Z]
+              }
+            ]
+          }
+        },
+        headsign: nil,
+        routes: [%Route{id: "Red"}]
+      }
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
+                   schedule: [
+                     %ScreensConfigSchedule{
+                       start_dt: ~U[2021-01-01T00:00:00Z],
+                       end_dt: ~U[2021-01-02T00:00:00Z]
+                     }
+                   ]
+                 }
+               }
+             } =
+               Departures.serialize_section(section, dup_screen, now, false)
+    end
+
+    test "serializes an image path for an overnight_section", %{
+      dup_screen: dup_screen,
+      now: now
+    } do
+      section = %OvernightSection{
+        header: %Header{
+          wayfinding_information: %WayfindingInformation{
+            image_path: "testing/wayfinding/image.png",
+            schedule: [
+              %ScreensConfigSchedule{
+                start_dt: ~U[2021-01-01T00:00:00Z],
+                end_dt: ~U[2021-01-02T00:00:00Z]
+              }
+            ]
+          }
+        },
+        headsign: nil,
+        routes: [%Route{id: "Red"}]
+      }
+
+      assert %{
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
+                   schedule: [
+                     %ScreensConfigSchedule{
+                       start_dt: ~U[2021-01-01T00:00:00Z],
+                       end_dt: ~U[2021-01-02T00:00:00Z]
+                     }
+                   ]
+                 }
+               }
+             } =
+               Departures.serialize_section(section, dup_screen, now, false)
     end
 
     test "returns serialized headway_section for one configured section", %{
@@ -310,12 +454,35 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       section = %NormalSection{
         rows: rows,
         layout: %Layout{},
-        header: %Header{title: "Section Header"},
+        header: %Header{
+          title: "Section Header",
+          wayfinding_information: %WayfindingInformation{
+            image_path: "testing/wayfinding/image.png",
+            schedule: [
+              %ScreensConfigSchedule{
+                start_dt: ~U[2021-01-01T00:00:00Z],
+                end_dt: ~U[2021-01-02T00:00:00Z]
+              }
+            ]
+          }
+        },
         grouping_type: :destination
       }
 
       assert %{
                type: :normal_section,
+               header: %{
+                 wayfinding_information: %{
+                   image_path:
+                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
+                   schedule: [
+                     %ScreensConfigSchedule{
+                       start_dt: ~U[2021-01-01T00:00:00Z],
+                       end_dt: ~U[2021-01-02T00:00:00Z]
+                     }
+                   ]
+                 }
+               },
                grouping_type: :destination,
                layout: %{
                  max: nil,
