@@ -11,24 +11,19 @@ defmodule Screens.Alerts.Endpoints do
 
   @typep direction_id_t() :: 0 | 1
   @typep direction_name_map_t() :: %{forward: String.t(), backward: String.t()}
+
+  @typep endpoint_name :: String.t()
+  @typep endpoints :: {{endpoint_name(), endpoint_name()}, {endpoint_name(), endpoint_name()}}
   @type endpoints_t :: %{:abbrev => String.t(), :full => String.t()}
   @typep traversal_fun_t() :: (UnrootedPolytree.Edges.t() -> [UnrootedPolytree.Node.t()])
 
   @spec get([InformedEntity.t()], Route.id()) :: endpoints_t() | nil
   def get(informed_entities, route_id) do
-    case informed_entities
-         |> Subway.affected_stops_on_route(route_id)
-         |> Enum.reject(&is_nil(&1)) do
-      [] ->
+    case get_endpoints(informed_entities, route_id) do
+      nil ->
         nil
 
-      stop_lists ->
-        {{min_full_name, min_abbreviated_name}, {max_full_name, max_abbreviated_name}} =
-          to_endpoints(
-            stop_lists,
-            direction_names_for_route(route_id, affected_direction_id(informed_entities))
-          )
-
+      {{min_full_name, min_abbreviated_name}, {max_full_name, max_abbreviated_name}} ->
         if min_full_name == max_full_name and min_abbreviated_name == max_abbreviated_name do
           %{
             full: "#{min_full_name}",
@@ -40,6 +35,22 @@ defmodule Screens.Alerts.Endpoints do
             abbrev: "#{min_abbreviated_name} ↔ #{max_abbreviated_name}"
           }
         end
+    end
+  end
+
+  @spec get_endpoints([InformedEntity.t()], Route.id()) :: endpoints() | nil
+  def get_endpoints(informed_entities, route_id) do
+    case informed_entities
+         |> Subway.affected_stops_on_route(route_id)
+         |> Enum.reject(&is_nil(&1)) do
+      [] ->
+        nil
+
+      stop_lists ->
+        to_endpoints(
+          stop_lists,
+          direction_names_for_route(route_id, affected_direction_id(informed_entities))
+        )
     end
   end
 
