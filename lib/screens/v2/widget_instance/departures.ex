@@ -3,6 +3,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Provides real-time departure information, consisting of an ordered list of "sections".
   """
 
+  alias Screens.Alerts.Alert
+  alias Screens.Alerts.AlertTextUtil
   alias Screens.Headsigns.Headsign
   alias Screens.Headways
   alias Screens.Lines.Line
@@ -47,10 +49,24 @@ defmodule Screens.V2.WidgetInstance.Departures do
       defstruct [:route, :direction_id, :range, :displayed_headsign]
     end
 
+    defmodule AlertRow do
+      @moduledoc "Row that displays Alert information about destination(s)"
+
+      @type t :: %__MODULE__{
+              alert: Alert.t(),
+              route: Route.t(),
+              direction_id: Trip.direction(),
+              displayed_headsign: String.t(),
+              location: :here | :downstream
+            }
+      defstruct [:alert, :route, :direction_id, :displayed_headsign, :location]
+    end
+
     @type row ::
             Departure.t()
             | SpecialTripRow.t()
             | HeadwayRow.t()
+            | AlertRow.t()
             | FreeTextLine.t()
 
     @type t :: %__MODULE__{
@@ -274,6 +290,35 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
+        %OvernightSection{
+          header: %Header{} = header,
+          headsign: headsign,
+          routes: routes
+        },
+        _screen,
+        now,
+        _is_only_section
+      ) do
+    text = %FreeTextLine{
+      icon: route_pill(routes),
+      text: [
+        if headsign do
+          %{format: :bold, text: headsign}
+        else
+          "Service ended"
+        end
+      ]
+    }
+
+    %{
+      type: :overnight_section,
+      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
+      text: FreeTextLine.to_json(text),
+      with_headsign: headsign != nil
+    }
+  end
+
+  def serialize_section(
         %NormalSection{
           rows: rows,
           layout: layout,
@@ -327,7 +372,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
           min: 2,
           include_later: false
         }),
-      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
+      header:
+        header
+        |> wayfinding_with_s3_image_path(now)
+        |> Header.to_json(),
       grouping_type: :destination
     }
   end
@@ -353,37 +401,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :normal_section,
       rows: serialized_rows,
       layout: Layout.to_json(layout),
-      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
+      header:
+        header
+        |> wayfinding_with_s3_image_path(now)
+        |> Header.to_json(),
       grouping_type: grouping_type
-    }
-  end
-
-  def serialize_section(
-        %OvernightSection{
-          header: %Header{} = header,
-          headsign: headsign,
-          routes: routes
-        },
-        _screen,
-        now,
-        _is_only_section
-      ) do
-    text = %FreeTextLine{
-      icon: route_pill(routes),
-      text: [
-        if headsign do
-          %{format: :bold, text: headsign}
-        else
-          "Service ended"
-        end
-      ]
-    }
-
-    %{
-      type: :overnight_section,
-      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
-      text: FreeTextLine.to_json(text),
-      with_headsign: headsign != nil
     }
   end
 
@@ -514,11 +536,21 @@ defmodule Screens.V2.WidgetInstance.Departures do
     {:notice, FreeTextLine.to_plaintext(free_text)}
   end
 
-  defp audio_serialize_row_group({:normal, departures}, screen, now) do
+  defp audio_serialize_row_group(
+         {:alert, [%NormalSection.AlertRow{} = alert_row]},
+         _screen,
+         now
+       ) do
+    {header_text, additional_text} = alert_row_text(alert_row, now)
+
+    {:alert, FreeTextLine.to_plaintext(header_text), FreeTextLine.to_plaintext(additional_text)}
+  end
+
+  defp audio_serialize_row_group({:normal, rows}, screen, now) do
     {
       :normal,
       serialize_departure_group(
-        departures,
+        rows,
         screen,
         now,
         &RoutePill.serialize_for_audio_departure/4
@@ -562,6 +594,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
             | {:notice, FreeTextLine.t()}
             | {:normal, [NormalSection.SpecialTripRow.t()]}
             | {:normal, [NormalSection.HeadwayRow.t()]}
+            | {:alert, [NormalSection.AlertRow.t()]}
           )
   defp group_section_rows_for_audio(
          %NormalSection{rows: rows, grouping_type: grouping_type} = section,
@@ -583,6 +616,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
       {_key, [%NormalSection.SpecialTripRow{}] = special_trip} ->
         {:normal, special_trip}
+
+      {_key, [%NormalSection.AlertRow{}] = alert} ->
+        {:alert, alert}
     end)
   end
 
@@ -607,6 +643,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
        do: {route, Schedule.headsign(schedule)}
 
   defp row_departure_grouping(%NormalSection.HeadwayRow{
+         route: route,
+         displayed_headsign: displayed_headsign
+       }),
+       do: {route, displayed_headsign}
+
+  defp row_departure_grouping(%NormalSection.AlertRow{
          route: route,
          displayed_headsign: displayed_headsign
        }),
@@ -730,6 +772,33 @@ defmodule Screens.V2.WidgetInstance.Departures do
       headsign: headsign,
       times_with_crowding: [%{id: id, time: %{type: :headway, range: %{lo: lo, hi: hi}}}],
       direction_id: direction_id
+    }
+  end
+
+  defp serialize_departure_group(
+         [
+           %NormalSection.AlertRow{
+             alert: %Alert{effect: effect},
+             route: %Route{id: route_id} = route,
+             displayed_headsign: headsign
+           } = alert_row
+         ],
+         screen,
+         now,
+         route_pill_serializer
+       ) do
+    {header_text, additional_text} = alert_row_text(alert_row, now)
+
+    %{
+      id: hash_and_encode(route.id <> (headsign || "")),
+      type: :alert_row,
+      route: route_pill_serializer.(route, nil, screen, true),
+      header_text: FreeTextLine.to_json(header_text),
+      additional_text: FreeTextLine.to_json(additional_text),
+      icon: %{
+        effect: effect,
+        color: Route.color(route_id)
+      }
     }
   end
 
@@ -1069,4 +1138,68 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp hash_and_encode(departure_to_encode),
     do: :crypto.hash(:md5, departure_to_encode) |> Base.encode64()
+
+  defp alert_row_text(
+         %NormalSection.AlertRow{
+           alert: %Alert{
+             active_period: active_period,
+             effect: effect,
+             informed_entities: informed_entities
+           },
+           route: %Route{id: route_id},
+           displayed_headsign: headsign,
+           location: location
+         },
+         now
+       ) do
+    header_text =
+      %FreeTextLine{
+        icon: nil,
+        text:
+          if location == :inside do
+            if effect == :shuttle do
+              ["No #{route_id} Line service", %{special: :break}, "Use Shuttle Buses"]
+            else
+              ["No #{route_id} Line trains"]
+            end
+          else
+            [headsign]
+          end
+      }
+
+    {effect_text, extra_text} =
+      case effect do
+        :shuttle ->
+          {%{format: "bold", text: "Shuttle buses"}, ""}
+
+        :suspension ->
+          {%{format: "bold", text: "Service suspended"}, "Plan a new trip at mbta.com/alerts."}
+      end
+
+    {{min_full_name, _min_abbr_name}, {max_full_name, _max_abbr_name}} =
+      Screens.Alerts.Endpoints.get_endpoints(informed_entities, route_id)
+
+    endpoint_text = [
+      "from",
+      %{format: "bold", text: min_full_name},
+      "to",
+      %{format: "bold", text: max_full_name}
+    ]
+
+    end_time = AlertTextUtil.end_time_text(active_period, now)
+
+    end_time_text =
+      if is_nil(end_time) do
+        [""]
+      else
+        ["through", "#{end_time}."]
+      end
+
+    additional_text = %FreeTextLine{
+      icon: nil,
+      text: [effect_text] ++ endpoint_text ++ end_time_text ++ [extra_text]
+    }
+
+    {header_text, additional_text}
+  end
 end

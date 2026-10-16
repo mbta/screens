@@ -319,7 +319,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                  order: 0,
                  screen: ^config,
                  sections: [
-                   %NormalSection{header: %Header{title: "Test Header"}, rows: []},
+                   %NormalSection{
+                     grouping_type: :time,
+                     header: %Header{title: "Test Header"},
+                     mode: nil,
+                     rows: []
+                   },
                    %Screens.V2.WidgetInstance.Departures.NoServiceSection{
                      header: %ScreensConfig.Departures.Header{},
                      headsign: nil,
