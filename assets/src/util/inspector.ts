@@ -13,7 +13,7 @@ import { type AudioConfig } from "Components/screen_container";
 
 export type Message =
   | { type: "audio_config"; config: AudioConfig | null }
-  | { type: "data_refreshed"; timestamp: number }
+  | { type: "data_refreshed"; ttl: number }
   | { type: "refresh_data" }
   | { type: "set_refresh_paused"; isPaused: boolean };
 

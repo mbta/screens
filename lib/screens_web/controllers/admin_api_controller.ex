@@ -7,6 +7,9 @@ defmodule ScreensWeb.AdminApiController do
   alias Screens.ScreenConfigs
   alias ScreensConfig.{Config, Screen}
 
+  import Screens.Inject
+  @data_cache injected(Screens.V2.ScreenData.Cache)
+
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
   def index(conn, _params) do
@@ -66,6 +69,10 @@ defmodule ScreensWeb.AdminApiController do
     screen_ids
     |> ScreenConfigs.schedule_refresh_for_screen_ids()
     |> to_success_response(conn)
+  end
+
+  def expire_cache(conn, %{"id" => id}) do
+    @data_cache.invalidate([id]) |> to_success_response(conn)
   end
 
   def list_images(conn, _params) do
@@ -249,11 +256,13 @@ defmodule ScreensWeb.AdminApiController do
     |> json(%{success: false, error: "Failed to fetch alerts from the V3 API"})
   end
 
-  @spec to_success_response(:ok | :error, Plug.Conn.t()) :: Plug.Conn.t()
+  @spec to_success_response(:ok | {:ok, any()} | :error | {:error, any()}, Plug.Conn.t()) ::
+          Plug.Conn.t()
   defp to_success_response(result, conn) do
     response =
       case result do
         :ok -> %{success: true}
+        {:ok, _} -> %{success: true}
         :error -> %{success: false}
         {:error, reason} -> %{success: false, error: inspect(reason)}
       end

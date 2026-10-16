@@ -69,5 +69,4 @@ const useDriftlessInterval = (
   }, [tickSignal, periodMs, offsetMs]);
 };
 
-export { driftlessInterval };
 export default useDriftlessInterval;

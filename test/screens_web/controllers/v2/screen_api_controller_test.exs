@@ -25,6 +25,7 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
     stub(@build_info, :build_identifier, fn -> ~U[2020-01-01 00:00:00Z] end)
     stub(@parameters, :candidate_generator, fn _screen -> StubGenerator end)
     stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
+    stub(@parameters, :seconds_until_refresh, fn _id, _app_id, _now -> 5 end)
     stub(ScreensByAlert.Mock, :put_data, fn _screen_id, _alert_ids -> :ok end)
 
     :ok = Ecto.Adapters.SQL.Sandbox.checkout(Repo)
@@ -86,7 +87,8 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
                "disabled" => false,
                "flex_zone" => [],
                "force_reload" => false,
-               "last_deploy_timestamp" => "2020-01-01T00:00:00Z"
+               "last_deploy_timestamp" => "2020-01-01T00:00:00Z",
+               "ttl" => 5
              } == json_response(conn, 200)
     end
 
@@ -101,7 +103,8 @@ defmodule ScreensWeb.V2.ScreenApiControllerTest do
                  "type" => "normal"
                },
                "disabled" => false,
-               "force_reload" => false
+               "force_reload" => false,
+               "ttl" => 5
              } == json_response(conn, 200)
     end
   end

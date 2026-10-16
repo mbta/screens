@@ -31,7 +31,7 @@ defmodule ScreensWeb.V2.ScreenController do
     conn
     |> assign(:app_id, strip_v2(app_id))
     |> assign(:refresh_rate, Parameters.refresh_rate(app_id))
-    |> assign(:screen_ids_with_offset_map, screen_ids(app_id))
+    |> assign(:screen_ids, ScreenConfigs.screen_ids_for_app(app_id))
     |> render("index_multi.html")
   end
 
@@ -81,23 +81,14 @@ defmodule ScreensWeb.V2.ScreenController do
     |> text("POST /v2/widget/#{app_id} request must contain a JSON body with `widget` key")
   end
 
-  defp page_assigns(
-         %{assigns: %{screen_id: screen_id, screen: %Screen{app_id: app_id} = screen}} = conn,
-         params
-       ) do
+  defp page_assigns(%{assigns: %{screen: %Screen{app_id: app_id} = screen}} = conn, params) do
     merge_assigns(conn,
       app_id: strip_v2(app_id),
       refresh_rate: Parameters.refresh_rate(app_id),
       audio_readout_interval: Parameters.audio_interval_minutes(screen),
       audio_interval_offset_seconds: Parameters.audio_interval_offset_seconds(screen),
-      sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn()),
-      refresh_rate_offset: Parameters.refresh_offset(screen_id, app_id)
+      sentry_dsn: if(params["disable_sentry"], do: nil, else: Sentry.get_dsn())
     )
-  end
-
-  defp screen_ids(app_id) do
-    ScreenConfigs.screen_ids_for_app(app_id)
-    |> Enum.map(&%{id: &1, refresh_rate_offset: Parameters.refresh_offset(&1, app_id)})
   end
 
   # While app IDs in configuration still have the "_v2" suffix, but this suffix has been removed

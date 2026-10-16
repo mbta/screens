@@ -33,16 +33,17 @@ defmodule Screens.V2.ScreenDataTest do
   describe "get/2" do
     setup do
       stub(@parameters, :refresh_rate, fn _app_id -> 0 end)
+      stub(@parameters, :seconds_until_refresh, fn _id, _app_id, _now -> 5 end)
       :ok
     end
 
-    test "gets widget data for a screen" do
+    test "gets widget data and cache TTL for a screen" do
       screen = build_screen(%{app_id: :test_app})
 
       stub(@parameters, :candidate_generator, fn %Screen{app_id: :test_app} -> GrayGenerator end)
 
       assert ScreenData.get("test", screen) ==
-               %{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}
+               {%{type: :normal, main: %{type: :placeholder, color: :gray, text: ""}}, 5}
     end
   end
 
@@ -92,7 +93,9 @@ defmodule Screens.V2.ScreenDataTest do
 
       assert expected_data ==
                ScreenData.audio("test", build_screen(),
-                 generate_fn: fn _id, _screen -> {:layout, @layout} end,
+                 generate_fn: fn _id, _screen, transform_fn ->
+                   {transform_fn.({:layout, @layout}), 10}
+                 end,
                  audio_only_instances_fn: audio_only_instances_fn
                )
     end
@@ -131,7 +134,9 @@ defmodule Screens.V2.ScreenDataTest do
 
       assert expected_data ==
                ScreenData.audio("test", build_screen(),
-                 generate_fn: fn _id, _screen -> {:layout, @layout} end,
+                 generate_fn: fn _id, _screen, transform_fn ->
+                   {transform_fn.({:layout, @layout}), 10}
+                 end,
                  audio_only_instances_fn: audio_only_instances_fn
                )
     end
