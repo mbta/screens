@@ -200,7 +200,7 @@ defmodule ScreensWeb.AdminApiController do
 
     response =
       ScreenConfigs.all()
-      |> Util.Admin.image_content_cleanup_updates(before_date)
+      |> Util.Admin.evergreen_content_cleanup_updates(before_date)
       |> ScreenConfigs.commit_updates()
 
     case response do
