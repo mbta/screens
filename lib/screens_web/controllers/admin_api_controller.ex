@@ -180,7 +180,11 @@ defmodule ScreensWeb.AdminApiController do
     key |> Image.delete() |> to_success_response(conn)
   end
 
-  def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date, "dry_run" => _}) do
+  def maintenance(conn, %{
+        "action" => "evergreen_content_cleanup",
+        "before" => iso_date,
+        "dry_run" => _
+      }) do
     before_date = Date.from_iso8601!(iso_date)
 
     affected = Util.Admin.expired_evergreen_content_count(ScreenConfigs.all(), before_date)
@@ -188,7 +192,10 @@ defmodule ScreensWeb.AdminApiController do
     json(conn, %{affected: affected})
   end
 
-  def maintenance(conn, %{"action" => "content_cleanup", "before" => iso_date}) do
+  def maintenance(conn, %{
+        "action" => "evergreen_content_cleanup",
+        "before" => iso_date
+      }) do
     before_date = Date.from_iso8601!(iso_date)
 
     response =
