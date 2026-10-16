@@ -5,7 +5,6 @@
   data-environment-name="<%= @environment_name %>"
   data-is-real-screen="<%= @is_real_screen %>"
   data-last-refresh="<%= @last_refresh %>"
-  data-refresh-rate-offset="<%= @refresh_rate_offset %>"
   data-refresh-rate="<%= @refresh_rate %>"
   <%= if assigns[:requestor] do %>
     data-requestor="<%= @requestor %>"

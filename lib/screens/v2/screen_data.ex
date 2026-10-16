@@ -18,24 +18,26 @@ defmodule Screens.V2.ScreenData do
   @type simulation_data :: %{full_page: t(), flex_zone: [t()]}
   @type audio_data :: [{view :: module(), assigns :: %{optional(atom()) => any()}}]
 
-  @callback get(String.t(), Screen.t()) :: t()
+  @type with_ttl(a) :: {a, ttl :: non_neg_integer()}
+
+  @callback get(String.t(), Screen.t()) :: with_ttl(t())
   def get(id, screen) do
-    generate(id, screen) |> resolve_paging(screen) |> serialize()
+    generate(id, screen, fn layout -> layout |> resolve_paging(screen) |> serialize() end)
   end
 
-  @spec simulation(String.t(), Screen.t()) :: simulation_data()
+  @spec simulation(String.t(), Screen.t()) :: with_ttl(simulation_data())
   def simulation(id, %Screen{app_id: app_id} = screen) do
-    layout = generate(id, screen)
-
-    %{
-      full_page: layout |> resolve_paging(screen) |> serialize(),
-      flex_zone: layout |> serialize_paged_slots(app_id)
-    }
+    generate(id, screen, fn layout ->
+      %{
+        full_page: layout |> resolve_paging(screen) |> serialize(),
+        flex_zone: layout |> serialize_paged_slots(app_id)
+      }
+    end)
   end
 
   @spec audio(String.t(), Screen.t()) :: audio_data()
   def audio(id, screen, opts \\ []) do
-    generate_fn = Keyword.get(opts, :generate_fn, &generate/2)
+    generate_fn = Keyword.get(opts, :generate_fn, &generate/3)
 
     audio_only_instances_fn =
       Keyword.get_lazy(opts, :audio_only_instances_fn, fn ->
@@ -43,7 +45,7 @@ defmodule Screens.V2.ScreenData do
         &candidate_generator.audio_only_instances/2
       end)
 
-    widgets = generate_fn.(id, screen) |> elem(1) |> Map.values()
+    {widgets, _ttl} = generate_fn.(id, screen, fn layout -> layout |> elem(1) |> Map.values() end)
     audio_only_widgets = audio_only_instances_fn.(widgets, screen)
 
     (widgets ++ audio_only_widgets)
@@ -52,18 +54,19 @@ defmodule Screens.V2.ScreenData do
     |> Enum.map(&{WidgetInstance.audio_view(&1), WidgetInstance.audio_serialize(&1)})
   end
 
-  @spec generate(String.t(), Screen.t()) :: Layout.t()
-  defp generate(id, screen) do
+  @spec generate(String.t(), Screen.t(), (Layout.t() -> a)) :: with_ttl(a) when a: any()
+  defp generate(id, screen, transform_fn) do
     generator = @parameters.candidate_generator(screen)
     screen_template = generator.screen_template(screen)
 
-    {instances, meta} = Cache.instances(id, screen)
+    {instances, %Cache.Meta{ttl: ttl} = meta} = Cache.instances(id, screen)
     log_cache_meta(meta)
 
     instances
     |> Enum.filter(&WidgetInstance.valid_candidate?/1)
     |> Layout.pick_instances(screen_template)
     |> tap(&update_visible_alerts(&1, id, screen))
+    |> then(&{transform_fn.(&1), ttl})
   end
 
   defp log_cache_meta(%Cache.Meta{what: {:error, operation, error}, where: where}) do

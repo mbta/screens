@@ -195,6 +195,27 @@ defmodule ScreensWeb.AdminApiControllerTest do
     end
   end
 
+  describe "/cache" do
+    @describetag :authenticated
+
+    test "expires the cache for a screen ID", %{conn: conn} do
+      expect(@data_cache, :invalidate, fn ["A"] -> {:ok, nil} end)
+
+      conn = delete(conn, "/api/admin/cache/A")
+
+      assert json_response(conn, 200) == %{"success" => true}
+    end
+
+    @tag :capture_log
+    test "returns error code on error", %{conn: conn} do
+      expect(@data_cache, :invalidate, fn ["B"] -> {:error, :oops} end)
+
+      conn = delete(conn, "/api/admin/cache/B")
+
+      assert json_response(conn, 200) == %{"success" => false, "error" => ":oops"}
+    end
+  end
+
   describe "/maintenance" do
     setup do
       before_date = ~D[2025-01-01]

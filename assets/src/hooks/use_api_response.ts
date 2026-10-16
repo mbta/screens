@@ -8,9 +8,6 @@ import { sendToInspector, useReceiveFromInspector } from "Util/inspector";
 import { getRotationIndex, getVersion } from "Util/outfront";
 import { getScreenSide, isRealScreen } from "Util/utils";
 
-import { driftlessInterval } from "./use_driftless_interval";
-import useRefreshRate from "./use_refresh_rate";
-
 const BASE_PATH = "/v2/api/screen";
 
 // The default SWR retry handler uses exponential backoff with random jitter,
@@ -20,6 +17,10 @@ const BASE_PATH = "/v2/api/screen";
 // with each retry up to 64s at 8+ retries. (N.B. this is an undocumented
 // implementation detail, and may change in future versions of the library)
 const MIN_ERROR_RETRY_MS = 250;
+
+// How often to refresh data when the server hasn't indicated when we should
+// refresh next. In practice should only occur when the screen is disabled.
+const FALLBACK_INTERVAL_MS = 30_000;
 
 // After this long without refreshing data, consider the previous data "stale"
 // and don't continue to display it.
@@ -32,17 +33,21 @@ const FAILURE_RESPONSE = { state: "failure" } as const;
 const LOADING_RESPONSE = { state: "loading" } as const;
 
 type ApiResponse =
-  | { state: "success"; data: WidgetData }
-  | { state: "simulation_success"; data: SimulationData }
+  | { state: "success"; data: WidgetData; ttl: number }
+  | { state: "simulation_success"; data: SimulationData; ttl: number }
   | typeof DISABLED_RESPONSE
   | typeof FAILURE_RESPONSE
   | typeof LOADING_RESPONSE;
 
-type RawResponse = {
-  data: null | WidgetData | { full_page: WidgetData; flex_zone: WidgetData[] };
-  disabled: boolean;
-  force_reload: boolean;
-};
+type RawResponse =
+  | { disabled: true; force_reload: boolean; data: null; ttl: null }
+  | { disabled: boolean; force_reload: true; data: null; ttl: null }
+  | {
+      data: WidgetData | { full_page: WidgetData; flex_zone: WidgetData[] };
+      disabled: false;
+      force_reload: false;
+      ttl: number;
+    };
 
 const apiResponseFetcher = (path: string): Promise<ApiResponse> =>
   fetch(path)
@@ -53,21 +58,20 @@ const apiResponseFetcher = (path: string): Promise<ApiResponse> =>
         throw new Error(`API response status error: ${response.status}`);
       }
     })
-    .then(({ data, disabled, force_reload }: RawResponse) => {
+    .then(({ data, disabled, force_reload, ttl }: RawResponse) => {
       if (force_reload) {
         window.location.reload();
-        return DISABLED_RESPONSE;
+        return LOADING_RESPONSE;
       } else if (disabled) {
         return DISABLED_RESPONSE;
-      } else if (data === null) {
-        return FAILURE_RESPONSE;
       } else if ("full_page" in data) {
         return {
           state: "simulation_success",
           data: { fullPage: data.full_page, flexZone: data.flex_zone },
+          ttl,
         };
       } else {
-        return { state: "success", data };
+        return { state: "success", data, ttl };
       }
     });
 
@@ -106,8 +110,6 @@ const useBaseApiResponse = ({
   id: string;
   appendPath?: string;
 }): UseApiResponseReturn => {
-  const { refreshRateMs, refreshRateOffsetMs } = useRefreshRate();
-
   const [requestCount, setRequestCount] = useState<number>(0);
   const [lastSuccess, setLastSuccess] = useState<number | null>(null);
   const [isStale, setIsStale] = useState(false);
@@ -118,7 +120,6 @@ const useBaseApiResponse = ({
   const { data, mutate } = useSWR(apiPath, apiResponseFetcher, {
     errorRetryInterval: MIN_ERROR_RETRY_MS,
     fallbackData: LOADING_RESPONSE,
-    isPaused: () => isPaused,
     onError: (error) => {
       captureException(error);
       setRequestCount((count) => count + 1);
@@ -128,10 +129,13 @@ const useBaseApiResponse = ({
       setLastSuccess(Date.now());
       setRequestCount((count) => count + 1);
     },
-    refreshInterval:
-      refreshRateMs === 0
-        ? 0 // disables interval
-        : () => driftlessInterval(refreshRateMs, refreshRateOffsetMs),
+    refreshInterval: (resp) => {
+      if (isPaused) return 0;
+      if (!resp || !("ttl" in resp)) return FALLBACK_INTERVAL_MS;
+      // Though `ttl` is expected to only be a positive integer, take care to
+      // never return 0 here, since this means "no interval".
+      return Math.max(1, resp.ttl * 1_000);
+    },
     // On real screens, disable default features that look at the state of the
     // browser window or the "visibility" of content; these are not relevant to
     // our usage and may not be reliable there
@@ -139,7 +143,7 @@ const useBaseApiResponse = ({
     revalidateOnFocus: !isRealScreen(),
   });
 
-  useInspectorControls(mutate, lastSuccess);
+  useInspectorControls(mutate, data);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsStale(true), STALE_THRESHOLD_MS);
@@ -162,17 +166,17 @@ const useInspectorPause = (): boolean => {
 
 const useInspectorControls = (
   refreshFn: () => void,
-  lastSuccess: number | null,
+  response: ApiResponse,
 ): void => {
   useReceiveFromInspector((message) => {
     if (message.type === "refresh_data") refreshFn();
   });
 
   useEffect(() => {
-    if (lastSuccess) {
-      sendToInspector({ type: "data_refreshed", timestamp: lastSuccess });
+    if ("ttl" in response) {
+      sendToInspector({ type: "data_refreshed", ttl: response.ttl });
     }
-  }, [lastSuccess]);
+  }, [response]);
 };
 
 const useApiResponse = ({ id }): UseApiResponseReturn =>

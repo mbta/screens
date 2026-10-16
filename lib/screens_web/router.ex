@@ -76,6 +76,7 @@ defmodule ScreensWeb.Router do
     post "/screens/validate", AdminApiController, :validate
     post "/screens/validate/:id", AdminApiController, :validate
     post "/refresh", AdminApiController, :refresh
+    delete "/cache/:id", AdminApiController, :expire_cache
     post "/maintenance", AdminApiController, :maintenance
     post "/sync_from_snapshot", AdminApiController, :sync_from_snapshot
     get "/sync_environments", AdminApiController, :sync_environments

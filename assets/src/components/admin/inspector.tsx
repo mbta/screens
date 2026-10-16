@@ -135,6 +135,7 @@ const Inspector: ComponentType = () => {
                   // Reset when the iframe reloads, since the screen will no
                   // longer be aware of previously-sent inspector messages
                   key={"data-controls-" + frameLoadedAt}
+                  screenId={screen.id}
                   sendToFrame={sendToFrame}
                 />
                 <AudioControls
@@ -350,31 +351,44 @@ const ViewControls: ComponentType<{
 };
 
 const DataControls: ComponentType<{
+  screenId: string;
   sendToFrame: (message: Message) => void;
-}> = ({ sendToFrame }) => {
-  const [dataTimestamp, setDataTimestamp] = useState<number | null>(null);
-  const [dataSecondsOld, setDataSecondsOld] = useState<number | null>(null);
+}> = ({ screenId, sendToFrame }) => {
+  const [nextRefreshIn, setNextRefreshIn] = useState<number>(0);
   const [isRefreshEnabled, setIsRefreshEnabled] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useReceiveMessage((message) => {
     if (message.type === "data_refreshed") {
-      setDataTimestamp(message.timestamp);
-      setDataSecondsOld(0);
+      const nextRefresh = Date.now() + message.ttl * 1000;
+      setNextRefreshIn(Math.round((nextRefresh - Date.now()) / 1000));
+      setIsRefreshing(false);
     }
   });
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setDataSecondsOld(
-        dataTimestamp ? Math.round((Date.now() - dataTimestamp) / 1000) : null,
-      );
-    }, 1000);
+    const interval = setInterval(
+      () => setNextRefreshIn((seconds) => seconds - 1),
+      1000,
+    );
     return () => clearInterval(interval);
-  }, [dataTimestamp]);
+  }, []);
 
-  const updateIsRefreshEnabled = (isEnabled) => {
+  const forceRefresh = async () => {
+    setIsRefreshing(true);
+    const json = await fetch.delete(`/api/admin/cache/${screenId}`);
+    if (json.success) {
+      sendToFrame({ type: "refresh_data" });
+    } else {
+      window.alert(`Failed to clear screen data cache: ${json.error}`);
+      setIsRefreshing(false);
+    }
+  };
+
+  const updateIsRefreshEnabled = (isEnabled: boolean) => {
     setIsRefreshEnabled(isEnabled);
     sendToFrame({ type: "set_refresh_paused", isPaused: !isEnabled });
+    if (isEnabled) sendToFrame({ type: "refresh_data" });
   };
 
   return (
@@ -382,24 +396,25 @@ const DataControls: ComponentType<{
       <fieldset>
         <legend>Data</legend>
 
-        <div>
-          <button onClick={() => sendToFrame({ type: "refresh_data" })}>
-            Refresh
-          </button>
-
-          {isRefreshEnabled && dataSecondsOld !== null && (
-            <span>⏱️ {dataSecondsOld} seconds ago</span>
-          )}
-        </div>
-
         <label>
           <input
             type="checkbox"
             checked={isRefreshEnabled}
             onChange={(event) => updateIsRefreshEnabled(event.target.checked)}
           />
-          Enable refresh interval
+          Enable auto refresh
         </label>
+
+        <div>
+          ⏱️{" "}
+          {isRefreshEnabled ? `Next refresh in ${nextRefreshIn} seconds` : "—"}
+        </div>
+
+        <div>
+          <button disabled={isRefreshing} onClick={forceRefresh}>
+            Force Refresh
+          </button>
+        </div>
       </fieldset>
     </>
   );

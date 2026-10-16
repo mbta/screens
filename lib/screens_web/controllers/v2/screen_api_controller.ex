@@ -9,7 +9,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   import Screens.Inject
   @build_info injected(Screens.Util.BuildInfo)
 
-  @base_response %{data: nil, disabled: false, force_reload: false}
+  @base_response %{data: nil, disabled: false, force_reload: false, ttl: nil}
 
   @show_actions [:show, :show_dup, :simulation]
 
@@ -25,7 +25,8 @@ defmodule ScreensWeb.V2.ScreenApiController do
   def show_dup(conn, params), do: show(conn, params)
 
   def simulation(%{assigns: %{screen_id: id, screen: screen}} = conn, _params) do
-    json(conn, %{@base_response | data: ScreenData.simulation(id, screen)})
+    {data, ttl} = ScreenData.simulation(id, screen)
+    json(conn, %{@base_response | data: data, ttl: ttl})
   end
 
   def log_frontend_error(conn, params) do
@@ -66,12 +67,13 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   # See `docs/mercury_api.md`
   defp screen_response(id, %Screen{vendor: :mercury} = screen) do
-    %{full_page: data, flex_zone: flex_zone} = ScreenData.simulation(id, screen)
-    Map.merge(%{@base_response | data: data}, %{flex_zone: flex_zone})
+    {%{full_page: data, flex_zone: flex_zone}, ttl} = ScreenData.simulation(id, screen)
+    Map.merge(%{@base_response | data: data, ttl: ttl}, %{flex_zone: flex_zone})
   end
 
   defp screen_response(id, screen) do
-    %{@base_response | data: ScreenData.get(id, screen)}
+    {data, ttl} = ScreenData.get(id, screen)
+    %{@base_response | data: data, ttl: ttl}
   end
 
   # See `docs/mercury_api.md`

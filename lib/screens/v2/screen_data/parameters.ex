@@ -130,10 +130,19 @@ defmodule Screens.V2.ScreenData.Parameters do
     refresh_rate
   end
 
-  @spec refresh_offset(id :: String.t(), Screen.app_id()) :: pos_integer()
-  @spec refresh_offset(id :: String.t(), Screen.app_id(), static_params()) :: pos_integer()
-  def refresh_offset(screen_id, app_id, static_params \\ @static_params) do
-    refresh_rate = refresh_rate(app_id, static_params)
-    screen_id |> Base.encode16() |> String.to_integer(16) |> rem(refresh_rate)
+  @doc """
+  Returns the number of seconds from `now` at which a screen's data should be refreshed.
+
+  Refresh "moments" are anchored to an absolute timeline and shifted by an offset randomly
+  generated for each screen ID. If refreshes always occur at these moments, the requests will be
+  consistently spread out over time, avoiding a "thundering herd".
+  """
+  @callback seconds_until_refresh(String.t(), Screen.app_id(), DateTime.t()) :: pos_integer()
+  @callback seconds_until_refresh(String.t(), Screen.app_id(), DateTime.t(), static_params()) ::
+              pos_integer()
+  def seconds_until_refresh(screen_id, app_id, now, static_params \\ @static_params) do
+    rate = refresh_rate(app_id, static_params)
+    offset = screen_id |> Base.encode16() |> String.to_integer(16) |> rem(rate)
+    rate - rem(DateTime.to_unix(now) - offset, rate)
   end
 end

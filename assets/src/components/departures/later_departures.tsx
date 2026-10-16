@@ -9,8 +9,8 @@ import {
 import _ from "lodash";
 import cx from "classnames";
 
+import { fetchDatasetValue } from "Util/dataset";
 import { hasOverflowX } from "Util/utils";
-import useRefreshRate from "Hooks/use_refresh_rate";
 
 import DepartureRow from "./departure_row";
 import RoutePill from "./route_pill";
@@ -27,8 +27,9 @@ const MAX_LATER_DEPARTURES = 5;
 // few later departures
 const MAX_PAGE_RATE_MS = 3750;
 
+const REFRESH_RATE_MS = parseFloat(fetchDatasetValue("refreshRate")) * 1_000;
+
 const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
-  const { refreshRateMs } = useRefreshRate();
   const [limit, setLimit] = useState(MAX_LATER_DEPARTURES);
   const departures = useMemo(() => _.take(rows, limit), [rows, limit]);
 
@@ -46,7 +47,7 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
 
     const pageDurationMs = Math.min(
       MAX_PAGE_RATE_MS,
-      refreshRateMs / departures.length,
+      REFRESH_RATE_MS / departures.length,
     );
 
     const interval = setInterval(() => {
@@ -54,7 +55,7 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
     }, pageDurationMs);
 
     return () => clearInterval(interval);
-  }, [refreshRateMs, departures.length]);
+  }, [departures.length]);
 
   return (
     <div className="later-departures">
