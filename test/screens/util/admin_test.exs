@@ -143,25 +143,37 @@ defmodule Screens.Util.AdminTest do
     setup :verify_on_exit!
 
     test "removes alert-linked content only when none of its alerts are present" do
-      expired = build_item(%AlertSchedule{alert_ids: ["expired"]})
-      partially_expired = build_item(%AlertSchedule{alert_ids: ["expired", "active"]})
-      no_alerts = build_item(%AlertSchedule{alert_ids: []})
-      scheduled = build_item([%Schedule{end_dt: ~U[2026-10-13T00:00:00Z]}])
+      expired = build_evergreen_item(%AlertSchedule{alert_ids: ["expired"]})
+      partially_expired = build_evergreen_item(%AlertSchedule{alert_ids: ["expired", "active"]})
+      no_alerts = build_evergreen_item(%AlertSchedule{alert_ids: []})
+      scheduled = build_evergreen_item([%Schedule{end_dt: ~U[2026-10-13T00:00:00Z]}])
 
       configs = [
-        %ScreenConfig{id: "mixed", config: build_screen([expired, partially_expired, scheduled])},
-        %ScreenConfig{id: "active", config: build_screen([partially_expired, no_alerts])},
-        %ScreenConfig{id: "none", config: build_screen([scheduled])}
+        %ScreenConfig{
+          id: "mixed",
+          config: build_screen_with_evergreen([expired, partially_expired, scheduled])
+        },
+        %ScreenConfig{
+          id: "active",
+          config: build_screen_with_evergreen([partially_expired, no_alerts])
+        },
+        %ScreenConfig{id: "none", config: build_screen_with_evergreen([scheduled])}
       ]
 
       expect(Alert.Mock, :fetch, fn _opts -> {:ok, [%Alert{id: "active"}]} end)
 
       assert Admin.expired_alert_content_cleanup_updates(configs) ==
-               {:ok, [%{id: "mixed", config: build_screen([partially_expired, scheduled])}]}
+               {:ok,
+                [
+                  %{
+                    id: "mixed",
+                    config: build_screen_with_evergreen([partially_expired, scheduled])
+                  }
+                ]}
     end
 
     test "does not fetch alerts when no content is alert-linked" do
-      configs = [%ScreenConfig{id: "none", config: build_screen([])}]
+      configs = [%ScreenConfig{id: "none", config: build_screen_with_evergreen([])}]
 
       assert Admin.expired_alert_content_cleanup_updates(configs) == {:ok, []}
     end
@@ -170,7 +182,8 @@ defmodule Screens.Util.AdminTest do
       configs = [
         %ScreenConfig{
           id: "alert",
-          config: build_screen([build_item(%AlertSchedule{alert_ids: ["1"]})])
+          config:
+            build_screen_with_evergreen([build_evergreen_item(%AlertSchedule{alert_ids: ["1"]})])
         }
       ]
 
