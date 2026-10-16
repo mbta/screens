@@ -181,7 +181,7 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def maintenance(conn, %{
-        "action" => "evergreen_content_cleanup",
+        "action" => "image_content_cleanup",
         "before" => iso_date,
         "dry_run" => _
       }) do
@@ -193,14 +193,14 @@ defmodule ScreensWeb.AdminApiController do
   end
 
   def maintenance(conn, %{
-        "action" => "evergreen_content_cleanup",
+        "action" => "image_content_cleanup",
         "before" => iso_date
       }) do
     before_date = Date.from_iso8601!(iso_date)
 
     response =
       ScreenConfigs.all()
-      |> Util.Admin.evergreen_content_cleanup_updates(before_date)
+      |> Util.Admin.image_content_cleanup_updates(before_date)
       |> ScreenConfigs.commit_updates()
 
     case response do

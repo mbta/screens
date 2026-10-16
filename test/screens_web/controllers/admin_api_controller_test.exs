@@ -249,7 +249,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
       conn =
         post(conn, "/api/admin/maintenance", %{
-          "action" => "evergreen_content_cleanup",
+          "action" => "image_content_cleanup",
           "before" => Date.to_iso8601(before_date),
           "dry_run" => "true"
         })
@@ -273,7 +273,7 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
       conn =
         post(conn, "/api/admin/maintenance", %{
-          "action" => "evergreen_content_cleanup",
+          "action" => "image_content_cleanup",
           "before" => Date.to_iso8601(before_date)
         })
 
