@@ -1,5 +1,9 @@
 .departure-destination {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   width: 452px;
+  min-height: 144px;
 }
 
 .departure-destination__headsign {
