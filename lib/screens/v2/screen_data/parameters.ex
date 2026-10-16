@@ -136,4 +136,23 @@ defmodule Screens.V2.ScreenData.Parameters do
     refresh_rate = refresh_rate(app_id, static_params)
     screen_id |> Base.encode16() |> String.to_integer(16) |> rem(refresh_rate)
   end
+
+  @doc """
+  Returns the number of seconds from `now` at which a screen should refresh its data, given the
+  screen's refresh rate and offset.
+  """
+  @callback seconds_until_refresh(id :: String.t(), Screen.app_id(), DateTime.t()) ::
+              pos_integer()
+  @callback seconds_until_refresh(
+              id :: String.t(),
+              Screen.app_id(),
+              DateTime.t(),
+              static_params()
+            ) ::
+              non_neg_integer()
+  def seconds_until_refresh(screen_id, app_id, now, static_params \\ @static_params) do
+    rate = refresh_rate(app_id, static_params)
+    offset = refresh_offset(screen_id, app_id, static_params)
+    rem(DateTime.to_unix(now) + offset, rate)
+  end
 end

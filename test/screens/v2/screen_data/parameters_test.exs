@@ -155,4 +155,17 @@ defmodule Screens.V2.ScreenData.ParametersTest do
       end
     end
   end
+
+  describe "seconds_until_refresh/1" do
+    test "determines time until next refresh for a screen" do
+      static_params = build_params(refresh_rate: 20)
+      [app_id] = Map.keys(static_params)
+
+      # Screen ID "A" with refresh rate 20 has an offset of 5 ("A" == <<65>>, remainder 5 when
+      # divided by 20), so it would refresh at Unix time 5, 25, 45, etc. So at Unix time 10, we
+      # have 15 seconds until refresh.
+      now = DateTime.from_unix!(10)
+      assert Parameters.seconds_until_refresh("A", app_id, now, static_params) == 15
+    end
+  end
 end

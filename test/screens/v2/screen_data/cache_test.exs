@@ -22,24 +22,31 @@ defmodule Screens.V2.ScreenData.CacheTest do
 
   setup do
     stub(@parameters, :candidate_generator, fn %Screen{app_id: :test_app} -> TestGenerator end)
+    stub(@parameters, :seconds_until_refresh, fn _screen_id, :test_app, _now -> 0 end)
     stub(@store, :fetch, fn _key -> {:error, %Nebulex.KeyError{reason: :not_found}} end)
     stub(@store, :find_node, fn _key -> {:ok, node()} end)
     stub(@store, :transaction, fn fun, _opts -> {:ok, fun.()} end)
     :ok
   end
 
+  @now ~U[2026-01-01 00:00:00Z]
+
   describe "instances/2" do
     test "retrieves cached instances for a given screen" do
       expect(@store, :fetch, fn "1" -> {:ok, [@widget]} end)
+      expect(@parameters, :seconds_until_refresh, fn "1", :test_app, @now -> 5 end)
 
-      assert Cache.instances("1", @screen) == {[@widget], %Cache.Meta{what: :hit, where: :local}}
+      assert Cache.instances("1", @screen, now_fn: fn -> @now end) ==
+               {[@widget], %Cache.Meta{what: :hit, where: :local, ttl: 5}}
     end
 
     test "generates and caches instances for a screen owned by this node" do
       expect(@store, :transaction, fn fun, [keys: ["1"]] -> {:ok, fun.()} end)
-      expect(@store, :put, fn "1", [@widget], _opts -> :ok end)
+      expect(@parameters, :seconds_until_refresh, fn "1", :test_app, @now -> 5 end)
+      expect(@store, :put, fn "1", [@widget], ttl: 4_500 -> :ok end)
 
-      assert Cache.instances("1", @screen) == {[@widget], %Cache.Meta{what: :miss, where: :local}}
+      assert Cache.instances("1", @screen, now_fn: fn -> @now end) ==
+               {[@widget], %Cache.Meta{what: :miss, where: :local, ttl: 5}}
     end
 
     test "retrieves instances for a screen not owned by this node" do
@@ -48,15 +55,18 @@ defmodule Screens.V2.ScreenData.CacheTest do
       # completes, which could not happen until it acquired the lock...)
       deny(@store, :transaction, 2)
       expect(@store, :find_node, fn "1" -> {:ok, :other_node} end)
+      now = ~U[2026-01-01 12:34:56Z]
 
-      expect(@store, :call, fn :other_node, Cache, :instances, ["1", @screen], _timeout ->
+      expect(@store, :call, fn :other_node, Cache, :instances, ["1", @screen, opts], _timeout ->
+        # Ensure options were forwarded
+        assert opts[:now_fn].() == now
         # From the remote node's perspective this is a "local" key; the local node should
         # correctly tell the caller this was a remote key, leaving the "what" alone
-        {:ok, {[@widget], %Cache.Meta{what: {:error, :foo, @error}, where: :local}}}
+        {:ok, {[@widget], %Cache.Meta{what: {:error, :foo, @error}, where: :local, ttl: 10}}}
       end)
 
-      assert Cache.instances("1", @screen) ==
-               {[@widget], %Cache.Meta{what: {:error, :foo, @error}, where: :remote}}
+      assert Cache.instances("1", @screen, now_fn: fn -> now end) ==
+               {[@widget], %Cache.Meta{what: {:error, :foo, @error}, where: :remote, ttl: 10}}
     end
 
     test "falls back to local generation when unable to find the owner node" do
@@ -92,7 +102,7 @@ defmodule Screens.V2.ScreenData.CacheTest do
       expect(@store, :call, fn :other_node, _, _, _, _ -> {:error, {:erpc, :noconnection}} end)
 
       assert Cache.instances("1", @screen) ==
-               {[@widget], %Cache.Meta{what: {:error, :no_connection, nil}, where: :remote}}
+               {[@widget], %Cache.Meta{what: {:error, :rpc_connect, nil}, where: :local}}
     end
 
     test "raises when calling a remote owner node times out" do
