@@ -55,10 +55,11 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
 
     secondary_rds_sections = @rds.get(secondary_departures, now)
 
-    primary_departure_sections =
+    {primary_departure_sections, _primary_section} =
       RdsDepartures.create_departure_sections(
         primary_rds_sections,
         primary_departures,
+        config,
         &post_process_rows/3
       )
 
@@ -66,11 +67,15 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       if secondary_rds_sections == [] or Enum.all?(secondary_rds_sections, &(&1 == {:ok, []})) do
         primary_departure_sections
       else
-        RdsDepartures.create_departure_sections(
-          secondary_rds_sections,
-          secondary_departures,
-          &post_process_rows/3
-        )
+        {departure_sections, _secondary_section} =
+          RdsDepartures.create_departure_sections(
+            secondary_rds_sections,
+            secondary_departures,
+            config,
+            &post_process_rows/3
+          )
+
+        departure_sections
       end
 
     sections_state =

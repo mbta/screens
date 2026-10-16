@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   require Screens.Alerts.Alert
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.AlertTextUtil
   alias Screens.Alerts.InformedEntity
   alias Screens.Alerts.KenmoreAlertHelper
   alias Screens.Headsigns.Headsign
@@ -560,7 +561,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: format_cause(cause),
       routes: get_route_pills(t),
       effect: :suspension,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       alternate_route_url: WebLink.alternate_route_url(),
       qr_code_url: qr_code_url(t)
@@ -597,7 +598,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: format_cause(cause),
       routes: get_route_pills(t),
       effect: :shuttle,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       alternate_route_url: WebLink.alternate_route_url(),
       qr_code_url: qr_code_url(t)
@@ -643,7 +644,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: format_cause(cause),
       routes: get_route_pills(t),
       effect: :station_closure,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       other_closures: other_closures,
       alternate_route_url: WebLink.alternate_route_url(),
@@ -675,7 +676,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: format_cause(cause),
       routes: get_route_pills(t),
       effect: effect,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       alternate_route_url: WebLink.alternate_route_url(),
       qr_code_url: qr_code_url(t)
@@ -747,7 +748,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :suspension,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       endpoints: endpoints,
@@ -815,7 +816,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :shuttle,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       endpoints: endpoints,
@@ -866,7 +867,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :station_closure,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: region,
       stations: informed_station_names,
@@ -923,7 +924,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: get_cause(cause),
       routes: get_route_pills(t, :inside),
       effect: :station_closure,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: :here,
       alternate_route_url: WebLink.alternate_route_url(),
@@ -948,7 +949,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: get_cause(cause),
       routes: get_route_pills(t, location),
       effect: :station_closure,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       stations: informed_station_names,
@@ -987,7 +988,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: if(severity <= 1, do: nil, else: get_cause(cause)),
       routes: routes,
       effect: if(severity <= 1, do: :information, else: :delay),
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       alternate_route_url: WebLink.alternate_route_url(),
@@ -1020,7 +1021,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
       cause: format_cause(cause),
       routes: get_route_pills(t, location),
       effect: effect,
-      end_time: end_time_text(active_period, now),
+      end_time: AlertTextUtil.end_time_text(active_period, now),
       updated_at: format_updated_at(updated_at, now),
       region: get_region_from_location(location),
       alternate_route_url: WebLink.alternate_route_url(),
@@ -1266,33 +1267,6 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  defp end_time_text([{_start_time, nil} | _], _now), do: nil
-
-  defp end_time_text([{_start_time, end_time} | _], now) do
-    end_time_eastern = Util.to_eastern(end_time)
-    end_date = Util.service_date(end_time)
-    now_date = Util.service_date(now)
-
-    cond do
-      end_date == now_date and
-        end_time_eastern.hour >= 2 and
-          end_time_eastern.hour < 5 ->
-        "end of service"
-
-      end_date == now_date ->
-        Calendar.strftime(end_time_eastern, "%-I:%M %p")
-
-      Date.diff(end_date, now_date) == 1 ->
-        "tomorrow"
-
-      Date.beginning_of_week(end_date) == Date.beginning_of_week(now_date) ->
-        "this #{Calendar.strftime(end_date, "%A")}"
-
-      true ->
-        Calendar.strftime(end_date, "%b %-d")
-    end
-  end
-
   defp abbreviate_station_name("Massachusetts Avenue"), do: "Mass Ave"
   defp abbreviate_station_name(full_name), do: full_name
 
@@ -1301,7 +1275,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   @spec get_endpoints(list(InformedEntity.t()), Route.id(), Stop.id()) ::
           {String.t(), String.t()} | nil
-  defp get_endpoints(informed_entities, route_id, home_stop) do
+  def get_endpoints(informed_entities, route_id, home_stop) do
     with {left_endpoint, right_endpoint} <- do_get_endpoints(informed_entities, route_id) do
       orient_endpoints({left_endpoint, right_endpoint}, informed_entities, route_id, home_stop)
     end

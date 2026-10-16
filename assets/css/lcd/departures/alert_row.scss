@@ -15,7 +15,7 @@
   flex-shrink: 0;
   width: 144px;
   height: 74px;
-  margin-top: 0;
+  margin-top: 8px;
 }
 
 .departures-alert__pill-and-text-container {
@@ -26,26 +26,27 @@
 .departures-alert__text-container {
   display: flex;
   flex-direction: column;
-  margin-left: 32px;
+  margin-right: 32px;
 }
 
 .departures-alert__icon {
   flex-shrink: 0;
   max-height: 88px;
   max-width: 88px;
+  margin-top: 8px;
 }
 
 .departures-alert__disruption-text {
   font-weight: 600;
-  font-size: 64px;
+  font-size: 64px !important;
 }
 
 .departures-alert__remedy-text {
   font-weight: 600;
-  font-size: 64px;
+  font-size: 64px !important;
 }
 
 .departures-alert__additional-text {
-  font-size: 34px;
+  font-size: 34px !important;
   line-height: 45px;
 }

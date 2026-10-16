@@ -59,6 +59,7 @@ export const NormalSection: ComponentType<FoldedSection> = ({
   grouping_type: groupingType,
   rows: { aboveFold, belowFold },
 }) => {
+  console.log(aboveFold);
   const rowToAddDivider = (aboveFold: Row[]) =>
     aboveFold.findIndex((row, index, arr) => {
       const nextRow = arr[index + 1];

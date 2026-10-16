@@ -34,9 +34,15 @@ defmodule Screens.V2.RDS do
   alias ScreensConfig.Departures
   alias ScreensConfig.Departures.{Mode, Params, Section}
 
-  alias __MODULE__.{Countdowns, FirstTrip, Headways, NoService, ServiceEnded}
+  alias __MODULE__.{Countdowns, FirstTrip, Headways, NoService, ServiceEnded, ImpactedByAlert}
 
-  @type item :: NoService.t() | Countdowns.t() | FirstTrip.t() | ServiceEnded.t() | Headways.t()
+  @type item ::
+          NoService.t()
+          | Countdowns.t()
+          | FirstTrip.t()
+          | ServiceEnded.t()
+          | Headways.t()
+          | ImpactedByAlert.t()
 
   @enforce_keys ~w[data]a
   defstruct @enforce_keys
@@ -44,6 +50,7 @@ defmodule Screens.V2.RDS do
   @type data :: {:ok, [item()]} | :error
   @type destination_key :: {Stop.id(), Line.id(), String.t()}
   @type destination :: {Stop.t(), Line.t(), String.t()}
+  @type destination_alert_map :: %{optional(destination()) => Alert.t()}
 
   @typep scheduled_service_state :: :after | :before | :none | :within
 
@@ -119,10 +126,24 @@ defmodule Screens.V2.RDS do
             direction_id: Trip.direction() | nil,
             displayed_headsign: String.t(),
             destinations: [Screens.V2.RDS.destination()],
-            range: Headway.range(),
             routes: [Route.t()]
           }
     defstruct ~w[direction_id displayed_headsign destinations range routes]a
+  end
+
+  defmodule ImpactedByAlert do
+    @moduledoc """
+    State for if we have an active alert for the particular destination.
+    """
+    @type t :: %__MODULE__{
+            alerts: [Alert.t()],
+            destinations: [Screens.V2.RDS.destination()],
+            direction_id: Trip.direction() | nil,
+            displayed_headsign: String.t(),
+            location: :here | :downstream,
+            routes: [Route.t()]
+          }
+    defstruct ~w[alerts destinations direction_id displayed_headsign location routes]a
   end
 
   @alert injected(Alert)
@@ -161,7 +182,7 @@ defmodule Screens.V2.RDS do
   @spec from_section(Section.t(), DateTime.t()) :: data()
   defp from_section(%Section{params: nil}, _now), do: {:ok, []}
 
-  defp from_section(%Section{params: %Params{stop_ids: stop_ids} = params}, now)
+  defp from_section(%Section{params: %Params{stop_ids: stop_ids, mode: mode} = params}, now)
        when stop_ids != [] do
     with params_struct <- Map.from_struct(params),
          {:ok, typical_patterns} <-
@@ -180,6 +201,7 @@ defmodule Screens.V2.RDS do
             child_stops,
             routes_for_section,
             alerts,
+            mode,
             now
           )
 
@@ -209,6 +231,16 @@ defmodule Screens.V2.RDS do
     end
   end
 
+  @spec create_section_rds(
+          [Departure.t()],
+          [Schedule.t()],
+          [RoutePattern.t()],
+          [Stop.t()],
+          [Route.t()],
+          [Alert.t()],
+          Mode.t(),
+          DateTime.t()
+        ) :: [data()]
   defp create_section_rds(
          departures,
          schedules,
@@ -216,6 +248,7 @@ defmodule Screens.V2.RDS do
          child_stops,
          routes_for_section,
          alerts,
+         mode,
          now
        ) do
     departures_by_destination = group_by_destination(departures)
@@ -226,8 +259,7 @@ defmodule Screens.V2.RDS do
          tuples_from_patterns(typical_patterns, child_stops))
       |> Enum.uniq_by(fn {stop, line, headsign} -> {stop.id, line.id, headsign} end)
 
-    # Destinations that are affected by current alerts at the present stop ID
-    impacted_destinations = informed_destinations(destinations, alerts, typical_patterns)
+    destination_alerts = alerts_for_destinations(destinations, alerts, typical_patterns)
 
     items =
       destinations
@@ -240,7 +272,8 @@ defmodule Screens.V2.RDS do
           Map.get(schedules_by_destination, key, []),
           routes_for_section,
           last_trip_departed?(key, now),
-          destination in impacted_destinations,
+          destination_alerts,
+          mode,
           now
         )
       end)
@@ -278,7 +311,8 @@ defmodule Screens.V2.RDS do
           [Schedule.t()],
           [Route.t()],
           boolean(),
-          boolean(),
+          destination_alert_map(),
+          Mode.t(),
           DateTime.t()
         ) :: item() | nil
   defp destination_state(
@@ -287,10 +321,12 @@ defmodule Screens.V2.RDS do
          schedules,
          routes_for_section,
          last_trip_departed?,
-         impacted_by_alert?,
+         destination_alerts,
+         mode,
          now
        ) do
     headways = @headways.get(stop_id, now)
+    impacted_by_alert? = Map.has_key?(destination_alerts, destination)
 
     {first_schedule, last_schedule} =
       schedules
@@ -311,7 +347,22 @@ defmodule Screens.V2.RDS do
         %Countdowns{destinations: [destination], departures: presented_departures}
 
       impacted_by_alert? ->
-        nil
+        if Mode.to_route_type(mode) == :subway do
+          %ImpactedByAlert{
+            alerts: Map.get(destination_alerts, destination),
+            destinations: [destination],
+            displayed_headsign: headsign,
+            direction_id:
+              case first_schedule || last_schedule do
+                %Schedule{trip: %Trip{direction_id: direction_id}} -> direction_id
+                nil -> nil
+              end,
+            location: :here,
+            routes: routes_for_section
+          }
+        else
+          nil
+        end
 
       departures == [] and service_state == :none ->
         %NoService{
@@ -373,25 +424,32 @@ defmodule Screens.V2.RDS do
   @spec maybe_combine_states([item()]) :: [item()]
   defp maybe_combine_states([]), do: []
 
+  defp maybe_combine_states([single_state]), do: [single_state]
+
   defp maybe_combine_states(states) do
-    cond do
-      no_service?(states) ->
+    case section_state(states) do
+      :alert ->
+        combine_alert_states_for_section(states)
+
+      :no_service ->
         combine_no_service_states_for_section(states)
 
-      service_ended?(states) ->
+      :service_ended ->
         combine_service_ended_states_for_section(states)
 
-      headways?(states) ->
+      :headways ->
         combine_headway_states_for_section(states)
 
-      true ->
+      :normal ->
         grouped_rds =
           Enum.group_by(states, fn
+            %ImpactedByAlert{} -> :alert
             %Headways{} -> :headways
             %Countdowns{} -> :countdowns
             _ -> :other
           end)
 
+        alert_states = Map.get(grouped_rds, :alert, [])
         other_states = Map.get(grouped_rds, :other, [])
         countdowns_states = Map.get(grouped_rds, :countdowns, [])
 
@@ -405,8 +463,23 @@ defmodule Screens.V2.RDS do
           |> Map.get(:headways, [])
           |> maybe_combine_headway_states(lines_in_other_states)
 
-        countdowns_states ++ headway_states ++ other_states
+        alert_states ++ countdowns_states ++ headway_states ++ other_states
     end
+  end
+
+  @spec combine_alert_states_for_section([RDS.ImpactedByAlert.t()]) :: [RDS.ImpactedByAlert.t()]
+  defp combine_alert_states_for_section([%ImpactedByAlert{routes: [route]} | _] = states) do
+    {state_destinations, routes, direction_id} =
+      get_combined_destinations_routes_direction_ids(states)
+
+    [
+      %ImpactedByAlert{
+        alerts: Enum.flat_map(states, & &1.alerts),
+        displayed_headsign: get_common_headsign(state_destinations, route, direction_id),
+        destinations: state_destinations,
+        routes: routes
+      }
+    ]
   end
 
   @spec combine_no_service_states_for_section([RDS.NoService.t()]) :: [RDS.NoService.t()]
@@ -470,6 +543,7 @@ defmodule Screens.V2.RDS do
         %NoService{direction_id: direction_id} -> direction_id
         %ServiceEnded{last_schedule: %Schedule{direction_id: direction_id}} -> direction_id
         %Headways{direction_id: direction_id} -> direction_id
+        %ImpactedByAlert{direction_id: direction_id} -> direction_id
       end)
       |> Enum.uniq()
       |> case do
@@ -665,26 +739,29 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  @spec informed_destinations([destination()], [Alert.t()], [RoutePattern.t()]) ::
-          MapSet.t(destination())
-  defp informed_destinations(destinations, alerts, typical_patterns) do
-    # Filters destinations to return only those that are affected by at least one alert.
-    # Stops checking as soon as an alert is found that affects the destination.
-    destinations
-    |> Enum.filter(fn {stop, _line, _headsign} = destination ->
-      case pattern_for_destination(destination, typical_patterns) do
-        nil ->
-          nil
+  @spec alerts_for_destinations([destination()], [Alert.t()], [RoutePattern.t()]) ::
+          destination_alert_map()
+  defp alerts_for_destinations(destinations, alerts, typical_patterns) do
+    Enum.reduce(destinations, %{}, fn {stop, _line, _headsign} = destination, acc ->
+      alerts =
+        case pattern_for_destination(destination, typical_patterns) do
+          nil ->
+            []
 
-        pattern ->
-          Enum.any?(alerts, fn alert ->
-            Enum.any?(alert.informed_entities, fn ie ->
-              ie_affects_destination?(ie, pattern, stop)
+          pattern ->
+            Enum.reduce(alerts, [], fn %Alert{informed_entities: informed_entities} = alert,
+                                       acc ->
+              if Enum.any?(informed_entities, &ie_affects_destination?(&1, pattern, stop)),
+                do: acc ++ [alert]
             end)
-          end)
+        end
+
+      if match?([_ | _], alerts) do
+        Map.put(acc, destination, alerts)
+      else
+        acc
       end
     end)
-    |> MapSet.new()
   end
 
   @spec pattern_for_destination(destination(), [RoutePattern.t()]) :: RoutePattern.t() | nil
@@ -699,16 +776,15 @@ defmodule Screens.V2.RDS do
     end)
   end
 
-  defp no_service?(states) do
-    Enum.all?(states, &is_struct(&1, NoService))
-  end
-
-  defp service_ended?(states) do
-    Enum.all?(states, &is_struct(&1, ServiceEnded))
-  end
-
-  defp headways?(states) do
-    Enum.all?(states, &is_struct(&1, Headways))
+  @spec section_state([RDS.item()]) :: :alert | :no_service | :service_ended | :headways | :normal
+  defp section_state(states) do
+    cond do
+      Enum.all?(states, &is_struct(&1, ImpactedByAlert)) -> :alert
+      Enum.all?(states, &is_struct(&1, NoService)) -> :no_service
+      Enum.all?(states, &is_struct(&1, ServiceEnded)) -> :service_ended
+      Enum.all?(states, &is_struct(&1, Headways)) -> :headways
+      true -> :normal
+    end
   end
 
   @spec ie_affects_destination?(InformedEntity.t(), RoutePattern.t(), Stop.t()) :: boolean()
@@ -769,6 +845,9 @@ defmodule Screens.V2.RDS do
     case state do
       %NoService{direction_id: nil} ->
         []
+
+      %ImpactedByAlert{direction_id: direction_id} ->
+        [{line_id, direction_id}]
 
       %NoService{direction_id: direction_id} ->
         [{line_id, direction_id}]

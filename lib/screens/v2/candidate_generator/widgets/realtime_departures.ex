@@ -22,6 +22,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
   }
 
   alias Screens.V2.WidgetInstance.Departures.NormalSection.{
+    AlertRow,
     HeadwayRow,
     SpecialTripRow
   }
@@ -54,101 +55,84 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
        do: []
 
   defp generate_instances(
-         %Departures{sections: sections} = departures,
+         departures,
          slot_names,
          order,
          screen,
          now
        ) do
-    sections_data =
+    {departure_sections, adjusted_sections} =
       departures
       |> @rds.get(now)
-      |> RdsDepartures.create_departure_sections(departures, &post_process_rows/3)
+      |> RdsDepartures.create_departure_sections(departures, screen, &post_process_rows/3)
 
-    [create_departures_instance(sections_data, sections, screen, slot_names, order, now)]
+    [
+      Enum.zip(departure_sections, adjusted_sections)
+      |> create_departures_instance(
+        screen,
+        slot_names,
+        order,
+        now
+      )
+    ]
   end
 
   @spec create_departures_instance(
-          [DeparturesWidget.section()],
-          Section.t(),
+          [{DeparturesWidget.section(), Section.t()}],
           Screen.t(),
           [atom()],
           non_neg_integer(),
           DateTime.t()
         ) :: widget()
   defp create_departures_instance(
-         sections_data,
-         sections,
+         sections_data_with_sections_config,
          screen,
          slot_names,
          order,
          now
        ) do
-    sections_data_with_sections_config = Enum.zip(sections_data, sections)
+    %DeparturesWidget{
+      screen: screen,
+      sections:
+        sections_data_with_sections_config
+        |> Enum.map(fn
+          {%OvernightSection{} = overnight_section, _section} ->
+            overnight_section
 
-    # As we begin to support other rows/sections/widgets, add them in here
-    if has_valid_section?(sections_data_with_sections_config) do
-      %DeparturesWidget{
-        screen: screen,
-        sections:
-          sections_data_with_sections_config
-          |> Enum.map(fn
-            {%OvernightSection{} = overnight_section, _section} ->
-              overnight_section
+          {%NoServiceSection{} = no_service_section, _section} ->
+            no_service_section
 
-            {%NoServiceSection{} = no_service_section, _section} ->
-              no_service_section
+          # The current headway section presentation is just one row with a headway value, 
+          # so we can reuse a NormalSection with a single Headway row
+          {%HeadwaySection{
+             headsign: headsign,
+             route: route,
+             time_range: time_range
+           }, %Section{header: header, layout: layout, grouping_type: grouping_type}} ->
+            %NormalSection{
+              header: header,
+              layout: layout,
+              grouping_type: grouping_type,
+              rows: [
+                %HeadwayRow{
+                  displayed_headsign: headsign,
+                  route: route,
+                  range: time_range,
+                  direction_id: nil
+                }
+              ]
+            }
 
-            # The current headway section presentation is just one row with a headway value, 
-            # so we can reuse a NormalSection with a single Headway row
-            {%HeadwaySection{
-               headsign: headsign,
-               route: route,
-               time_range: time_range
-             }, %Section{header: header, layout: layout, grouping_type: grouping_type}} ->
-              %NormalSection{
-                header: header,
-                layout: layout,
-                grouping_type: grouping_type,
-                rows: [
-                  %HeadwayRow{
-                    displayed_headsign: headsign,
-                    route: route,
-                    range: time_range,
-                    direction_id: nil
-                  }
-                ]
-              }
+          {%NormalSection{} = normal_section, _section} ->
+            normal_section
 
-            {%NormalSection{} = normal_section, _section} ->
-              normal_section
-
-            {no_data_section, section} ->
-              no_data_section(no_data_section, section)
-          end),
-        slot_names: slot_names,
-        order: order,
-        now: now
-      }
-    else
-      %DeparturesNoData{screen: screen, show_alternatives?: true}
-    end
-  end
-
-  defp has_valid_section?(sections_data) do
-    Enum.any?(sections_data, fn {section_data, %Section{params: params}} ->
-      is_nil(params) or
-        (is_struct(section_data, NormalSection) and has_valid_normal_section_row?(section_data)) or
-        is_struct(section_data, OvernightSection) or
-        is_struct(section_data, NoServiceSection) or
-        is_struct(section_data, HeadwaySection)
-    end)
-  end
-
-  defp has_valid_normal_section_row?(%NormalSection{rows: rows}) do
-    Enum.any?(rows, fn row ->
-      is_struct(row, Departure) || is_struct(row, SpecialTripRow) || is_struct(row, HeadwayRow)
-    end)
+          {no_data_section, section} ->
+            no_data_section(no_data_section, section)
+        end),
+      slot_names: slot_names,
+      order: order,
+      now: now
+    }
   end
 
   defp no_data_section(%NoDataSection{mode: mode}, %Section{
@@ -221,6 +205,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   defp route_direction(%HeadwayRow{route: %Route{id: id}, direction_id: direction_id}) do
     %RouteDirection{route_id: id, direction_id: direction_id}
+  end
+
+  defp route_direction(%AlertRow{route: route, direction_id: direction_id}) do
+    %RouteDirection{route_id: route.id, direction_id: direction_id}
   end
 
   defp maybe_sort_by_direction_id(departures, :destination),

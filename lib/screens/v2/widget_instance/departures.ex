@@ -3,6 +3,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Provides real-time departure information, consisting of an ordered list of "sections".
   """
 
+  alias Screens.Alerts.Alert
+  alias Screens.Alerts.AlertTextUtil
   alias Screens.Headsigns.Headsign
   alias Screens.Headways
   alias Screens.Lines.Line
@@ -47,10 +49,25 @@ defmodule Screens.V2.WidgetInstance.Departures do
       defstruct [:route, :direction_id, :range, :displayed_headsign]
     end
 
+    defmodule AlertRow do
+      @moduledoc "Row that displays Alert information about destination(s)"
+
+      @type t :: %__MODULE__{
+              alert: Alert.t(),
+              route: Route.t(),
+              direction_id: Trip.direction(),
+              displayed_headsign: String.t(),
+              effect: Alert.effect(),
+              location: :here | :downstream
+            }
+      defstruct [:alert, :route, :direction_id, :displayed_headsign, :effect, :location]
+    end
+
     @type row ::
             Departure.t()
             | SpecialTripRow.t()
             | HeadwayRow.t()
+            | AlertRow.t()
             | FreeTextLine.t()
 
     @type t :: %__MODULE__{
@@ -273,64 +290,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   def serialize_section(
-        %NormalSection{
-          rows: rows,
-          header: %Header{} = header,
-          layout: %Layout{max: max},
-          grouping_type: :destination
-        },
-        screen,
-        now,
-        _is_only_section
-      ) do
-    serialized_rows =
-      rows
-      |> group_by_unique_destination()
-      |> Enum.take(@max_rows_per_section)
-      |> Enum.map(&serialize_departure_group(&1, screen, now))
-
-    %{
-      type: :normal_section,
-      rows: serialized_rows,
-      layout:
-        Layout.to_json(%Layout{
-          max: max,
-          base: length(serialized_rows),
-          min: 2,
-          include_later: false
-        }),
-      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
-      grouping_type: :destination
-    }
-  end
-
-  def serialize_section(
-        %NormalSection{
-          rows: rows,
-          layout: layout,
-          header: %Header{} = header,
-          grouping_type: grouping_type
-        },
-        screen,
-        now,
-        _is_only_section
-      ) do
-    serialized_rows =
-      rows
-      |> Enum.take(@max_rows_per_section)
-      |> group_consecutive_departures(screen)
-      |> Enum.map(&serialize_departure_group(&1, screen, now))
-
-    %{
-      type: :normal_section,
-      rows: serialized_rows,
-      layout: Layout.to_json(layout),
-      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
-      grouping_type: grouping_type
-    }
-  end
-
-  def serialize_section(
         %OvernightSection{
           header: %Header{} = header,
           headsign: headsign,
@@ -359,6 +318,72 @@ defmodule Screens.V2.WidgetInstance.Departures do
     }
   end
 
+  def serialize_section(
+        %NormalSection{
+          rows: rows,
+          header: %Header{} = header,
+          layout: %Layout{max: max},
+          grouping_type: :destination
+        },
+        screen,
+        now,
+        _is_only_section
+      ) do
+    serialized_rows =
+      rows
+      |> group_by_unique_destination()
+      |> Enum.take(@max_rows_per_section)
+      |> Enum.map(&serialize_departure_group(&1, screen, now))
+
+    %{
+      type: :normal_section,
+      rows: serialized_rows,
+      layout:
+        Layout.to_json(%Layout{
+          max: max,
+          base: length(serialized_rows),
+          min: 2,
+          include_later: false
+        }),
+      header:
+        header
+        |> wayfinding_with_s3_image_path(now)
+        |> maybe_adjust_header_for_alerts(rows)
+        |> Header.to_json(),
+      grouping_type: :destination
+    }
+  end
+
+  def serialize_section(
+        %NormalSection{
+          rows: rows,
+          layout: layout,
+          header: %Header{} = header,
+          grouping_type: grouping_type
+        },
+        screen,
+        now,
+        _is_only_section
+      ) do
+    serialized_rows =
+      rows
+      |> Enum.take(@max_rows_per_section)
+      |> group_consecutive_departures(screen)
+      |> Enum.map(&serialize_departure_group(&1, screen, now))
+
+    %{
+      type: :normal_section,
+      rows: serialized_rows,
+      layout: Layout.to_json(layout),
+      header:
+        header
+        |> wayfinding_with_s3_image_path(now)
+        |> maybe_adjust_header_for_alerts(rows)
+        |> Header.to_json(),
+      grouping_type: grouping_type
+    }
+  end
+
   defp wayfinding_with_s3_image_path(
          %{wayfinding_information: %{schedule: schedule}} = header,
          now
@@ -378,6 +403,18 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp wayfinding_with_s3_image_path(header, _now), do: header
+
+  @spec maybe_adjust_header_for_alerts(Header.t(), [NormalSection.row()]) :: Header.t()
+  defp maybe_adjust_header_for_alerts(header, rows) do
+    if Enum.all?(
+         rows,
+         &match?({_alert, _route, _direction_id, _headsign, _effect, :here, :alert}, &1)
+       ) do
+      put_in(header, [Access.key(:arrow)], "")
+    else
+      header
+    end
+  end
 
   def audio_serialize_section(%NormalSection{header: header} = section, screen, now) do
     header_readout =
@@ -584,6 +621,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
        }),
        do: {route, displayed_headsign}
 
+  defp row_departure_grouping(%NormalSection.AlertRow{
+         route: route,
+         displayed_headsign: displayed_headsign
+       }),
+       do: {route, displayed_headsign}
+
   defp row_departure_grouping(%FreeTextLine{}), do: make_ref()
 
   # When using destination-based grouping, only read out the "next" departure, in line with the
@@ -702,6 +745,76 @@ defmodule Screens.V2.WidgetInstance.Departures do
       headsign: headsign,
       times_with_crowding: [%{id: id, time: %{type: :headway, range: %{lo: lo, hi: hi}}}],
       direction_id: direction_id
+    }
+  end
+
+  defp serialize_departure_group(
+         [
+           %NormalSection.AlertRow{
+             alert: %Alert{active_period: active_period, informed_entities: informed_entities},
+             route: %Route{id: route_id} = route,
+             displayed_headsign: headsign,
+             effect: effect,
+             location: location
+           }
+         ],
+         screen,
+         now,
+         route_pill_serializer
+       ) do
+    header_text =
+      %FreeTextLine{
+        icon: nil,
+        text:
+          if location == :here do
+            if effect == :shuttle do
+              ["No #{route_id} Line service", %{special: "break"}, "Use Shuttle Buses"]
+            else
+              ["No #{route_id} Line trains"]
+            end
+          else
+            headsign
+          end
+      }
+
+    {effect_text, extra_text} =
+      case effect do
+        :shuttle ->
+          {%{format: "bold", text: "Shuttle buses"}, ""}
+
+        :suspension ->
+          {%{format: "bold", text: "Service suspended"}, "Plan a new trip at mbta.com/alerts."}
+      end
+
+    {{min_full_name, _min_abbr_name}, {max_full_name, _max_abbr_name}} =
+      Screens.Alerts.Endpoints.get_endpoints(informed_entities, route_id)
+
+    endpoint_text = [
+      "from",
+      %{format: "bold", text: min_full_name},
+      "to",
+      %{format: "bold", text: max_full_name}
+    ]
+
+    end_time_text = ["through", "#{AlertTextUtil.end_time_text(active_period, now)}."]
+
+    additional_text = %FreeTextLine{
+      icon: nil,
+      text: [effect_text] ++ endpoint_text ++ end_time_text ++ [extra_text]
+    }
+
+    IO.inspect(route)
+
+    %{
+      id: hash_and_encode(route.id <> (headsign || "")),
+      type: :alert_row,
+      route: route_pill_serializer.(route, nil, screen, true),
+      header_text: FreeTextLine.to_json(header_text),
+      additional_text: FreeTextLine.to_json(additional_text),
+      icon: %{
+        effect: effect,
+        color: Route.color(route_id)
+      }
     }
   end
 

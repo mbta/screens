@@ -1,6 +1,6 @@
 import type { ComponentType } from "react";
 import RoutePill, { Pill } from "./route_pill";
-import NoServiceIcon from "Images/no-service.svg";
+import NoServiceIcon from "Images/no-service-white-x.svg";
 import ShuttleBusIcon from "Images/shuttle-icon.svg";
 import { getHexColor } from "Util/svg_utils";
 import FreeText, { FreeTextType } from "Components/free_text";
