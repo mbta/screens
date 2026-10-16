@@ -21,22 +21,20 @@ interface Props {
 const Departures: ComponentType<Props> = ({ sections }) => {
   return (
     <div className="departures-container">
-      <div className="departures">
-        {sections.map((section, i) => {
-          switch (section.type) {
-            case "normal_section":
-              return <NormalSection {...section} key={i} />;
-            case "headway_section":
-              return <HeadwaySection {...section} key={i} />;
-            case "no_data_section":
-              return <NoDataSection {...section} key={i} />;
-            case "no_service_section":
-              return <NoServiceSection {...section} key={i} />;
-            case "overnight_section":
-              return <OvernightSection {...section} key={i} />;
-          }
-        })}
-      </div>
+      {sections.map((section, i) => {
+        switch (section.type) {
+          case "normal_section":
+            return <NormalSection {...section} key={i} />;
+          case "headway_section":
+            return <HeadwaySection {...section} key={i} />;
+          case "no_data_section":
+            return <NoDataSection {...section} key={i} />;
+          case "no_service_section":
+            return <NoServiceSection {...section} key={i} />;
+          case "overnight_section":
+            return <OvernightSection {...section} key={i} />;
+        }
+      })}
     </div>
   );
 };
