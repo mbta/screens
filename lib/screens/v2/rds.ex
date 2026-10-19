@@ -62,9 +62,14 @@ defmodule Screens.V2.RDS do
             direction_id: Trip.direction() | nil,
             displayed_headsign: String.t() | nil,
             destinations: [Screens.V2.RDS.destination()],
-            routes: [Route.t()]
+            routes: [Route.t()],
+            caused_by_alert?: boolean()
           }
-    defstruct ~w[direction_id displayed_headsign destinations routes]a
+    defstruct direction_id: nil,
+              displayed_headsign: nil,
+              destinations: nil,
+              routes: nil,
+              caused_by_alert?: false
   end
 
   defmodule Countdowns do
@@ -113,7 +118,7 @@ defmodule Screens.V2.RDS do
     State for if we're in an active period, but we have no predictions
     and there are no alerts associated with the destination.
 
-    Shows an every “X-Y” minutes message. 
+    Shows an every “X-Y” minutes message.
     """
     @type t :: %__MODULE__{
             direction_id: Trip.direction() | nil,
@@ -310,9 +315,6 @@ defmodule Screens.V2.RDS do
       presented_departures != [] ->
         %Countdowns{destinations: [destination], departures: presented_departures}
 
-      impacted_by_alert? ->
-        nil
-
       departures == [] and service_state == :none ->
         %NoService{
           destinations: [destination],
@@ -321,8 +323,12 @@ defmodule Screens.V2.RDS do
             case first_schedule || last_schedule do
               %Schedule{trip: %Trip{direction_id: direction_id}} -> direction_id
               nil -> nil
-            end
+            end,
+          caused_by_alert?: impacted_by_alert?
         }
+
+      impacted_by_alert? ->
+        nil
 
       departures == [] and service_state == :after ->
         %Schedule{route: route} = last_schedule
@@ -411,8 +417,16 @@ defmodule Screens.V2.RDS do
 
   @spec combine_no_service_states_for_section([RDS.NoService.t()]) :: [RDS.NoService.t()]
   defp combine_no_service_states_for_section([%NoService{} | _] = states) do
+    states_to_combine =
+      if Enum.any?(states, &(not &1.caused_by_alert?)) do
+        # Do not include destinations affected by alerts unless there are no other non-alert states
+        Enum.reject(states, & &1.caused_by_alert?)
+      else
+        states
+      end
+
     {state_destinations, routes, direction_id} =
-      get_combined_destinations_routes_direction_ids(states)
+      get_combined_destinations_routes_direction_ids(states_to_combine)
 
     representative_route = List.first(routes)
 
@@ -426,7 +440,8 @@ defmodule Screens.V2.RDS do
             get_common_headsign(state_destinations, representative_route, direction_id)
           end,
         routes: routes,
-        direction_id: direction_id
+        direction_id: direction_id,
+        caused_by_alert?: Enum.all?(states_to_combine, & &1.caused_by_alert?)
       }
     ]
   end
