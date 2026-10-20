@@ -46,7 +46,13 @@ type RawResponse = {
 
 const apiResponseFetcher = (path: string): Promise<ApiResponse> =>
   fetch(path)
-    .then((response) => response.json())
+    .then((response) => {
+      if (response.ok) {
+        return response.json();
+      } else {
+        throw new Error(`API response status error: ${response.status}`);
+      }
+    })
     .then(({ data, disabled, force_reload }: RawResponse) => {
       if (force_reload) {
         window.location.reload();
