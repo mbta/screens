@@ -479,12 +479,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.AlertsTest do
             upstream_stop
           ],
           active_period: [{ten_weeks_ago, nil}]
-        },
-        %Alert{
-          id: "4",
-          effect: :suspension,
-          informed_entities: [ie(route_type: 1)],
-          active_period: [{ten_weeks_ago, nil}]
         }
       ]
 

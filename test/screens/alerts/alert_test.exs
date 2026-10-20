@@ -500,87 +500,21 @@ defmodule Screens.Alerts.AlertTest do
     end
   end
 
-  describe "stale?/2" do
-    setup do
-      %{
-        now: ~U[2026-07-01 00:00:00Z],
-        one_week_in_seconds: 604_800
-      }
+  describe "stale?/1" do
+    test "Marks alerts unrelated to the symphony work as fresh" do
+      entities = [ie(stop_id: "place-pktrm")]
+
+      alert = %Alert{effect: :detour, informed_entities: entities}
+
+      assert !Alert.stale?(alert), "Alert unrelated to symphony expected to be fresh, but was not"
     end
 
-    test "returns false when there are no active periods remaining" do
-      refute Alert.stale?(%Alert{
-               active_period: []
-             })
-    end
+    test "Marks symphony alert as stale" do
+      entities = [ie(stop_id: "place-symcl")]
 
-    test "returns false when the current active period started less than five weeks ago",
-         context do
-      %{
-        now: now,
-        one_week_in_seconds: one_week_in_seconds
-      } = context
+      alert = %Alert{effect: :station_closure, informed_entities: entities}
 
-      refute Alert.stale?(
-               %Alert{
-                 active_period: [
-                   {DateTime.add(now, -one_week_in_seconds), nil}
-                 ]
-               },
-               now
-             )
-    end
-
-    test "returns false when the current active period started exactly five weeks ago",
-         context do
-      %{
-        now: now,
-        one_week_in_seconds: one_week_in_seconds
-      } = context
-
-      refute Alert.stale?(
-               %Alert{
-                 active_period: [
-                   {DateTime.add(now, -5 * one_week_in_seconds), nil}
-                 ]
-               },
-               now
-             )
-    end
-
-    test "returns true when the current active period started more than five weeks ago",
-         context do
-      %{
-        now: now,
-        one_week_in_seconds: one_week_in_seconds
-      } = context
-
-      assert Alert.stale?(
-               %Alert{
-                 active_period: [
-                   {DateTime.add(now, -5 * one_week_in_seconds - 1), nil}
-                 ]
-               },
-               now
-             )
-    end
-
-    test "returns true when the current active period is stale and there are future active periods",
-         context do
-      %{
-        now: now,
-        one_week_in_seconds: one_week_in_seconds
-      } = context
-
-      assert Alert.stale?(
-               %Alert{
-                 active_period: [
-                   {DateTime.add(now, -5 * one_week_in_seconds - 1), nil},
-                   {DateTime.add(now, 5 * one_week_in_seconds), nil}
-                 ]
-               },
-               now
-             )
+      assert Alert.stale?(alert), "Symphony alert expected to be stale, but was not"
     end
   end
 

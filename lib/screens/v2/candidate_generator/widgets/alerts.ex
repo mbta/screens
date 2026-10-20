@@ -83,7 +83,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Alerts do
     |> Stream.filter(&Alert.active?(&1, now))
     |> Stream.filter(&(&1.effect in @relevant_effects))
     |> Stream.filter(&Enum.any?(&1.informed_entities, relevant_ie?))
-    |> Stream.reject(&LocalizedAlert.suppressable_alert?(&1, location_context, now))
+    |> Stream.reject(&LocalizedAlert.suppressable_alert?(&1, location_context))
     |> Enum.to_list()
   end
 
