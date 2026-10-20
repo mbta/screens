@@ -142,7 +142,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
              } = Departures.serialize_section(section, bus_shelter_screen, now)
     end
 
-    test "sets the wayfinding info when the schedule is empty", %{
+    test "doesn't display wayfinding image when the schedule is empty", %{
       bus_shelter_screen: bus_shelter_screen,
       now: now,
       section: section
@@ -150,12 +150,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       section = update_wayfinding_in_section(section, %{schedule: []})
 
       assert %{
-               header: %{
-                 wayfinding_information: %{
-                   image_path:
-                     "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png"
-                 }
-               }
+               header: %{wayfinding_information: %{image_path: nil}}
              } = Departures.serialize_section(section, bus_shelter_screen, now)
     end
 
@@ -2070,13 +2065,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
              } = Departures.audio_serialize_section(section, screen, @now)
     end
 
-    test "sets a wayfinding_readout when the schedule is empty", %{
+    test "doesn't set a wayfinding_readout when the schedule is empty", %{
       section: section,
       screen: screen
     } do
       section = update_wayfinding_in_section(section, %{schedule: []})
 
-      assert %{wayfinding_readout: "Wayfinding info to read"} =
+      assert %{wayfinding_readout: nil} =
                Departures.audio_serialize_section(section, screen, @now)
     end
 

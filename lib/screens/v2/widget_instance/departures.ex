@@ -346,7 +346,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
          now
        ) do
     image_path_updater =
-      if schedule == [] or Utils.in_schedule_windows?(schedule, now) do
+      if Utils.in_schedule_windows?(schedule, now) do
         &Assets.s3_asset_url/1
       else
         fn _ -> nil end
@@ -449,12 +449,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   @spec wayfinding_readout(Header.t(), DateTime.t()) :: String.t() | nil
-  defp wayfinding_readout(
-         %Header{wayfinding_information: %{read_as: read_as, schedule: []}},
-         _now
-       )
-       when is_binary(read_as), do: read_as
-
   defp wayfinding_readout(
          %Header{
            wayfinding_information: %WayfindingInformation{
