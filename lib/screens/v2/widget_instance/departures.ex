@@ -16,8 +16,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.V2.Departure
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
+  alias Screens.V2.WidgetInstance.Utils
   alias ScreensConfig.Departures.{Header, Layout, Mode}
+  alias ScreensConfig.Departures.Header.WayfindingInformation
   alias ScreensConfig.{FreeTextLine, Screen}
+  alias ScreensConfig.Schedule, as: ScheduleConfig
   alias ScreensConfig.Screen.PreFare
 
   defmodule NormalSection do
@@ -205,7 +208,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           routes: routes
         },
         _screen,
-        _now,
+        now,
         _is_only_section
       ) do
     text = %FreeTextLine{
@@ -221,7 +224,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :no_service_section,
-      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
       text: FreeTextLine.to_json(text),
       with_headsign: headsign != nil
     }
@@ -278,7 +281,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           min: 2,
           include_later: false
         }),
-      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
       grouping_type: :destination
     }
   end
@@ -304,7 +307,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :normal_section,
       rows: serialized_rows,
       layout: Layout.to_json(layout),
-      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
       grouping_type: grouping_type
     }
   end
@@ -316,7 +319,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
           routes: routes
         },
         _screen,
-        _now,
+        now,
         _is_only_section
       ) do
     text = %FreeTextLine{
@@ -332,23 +335,31 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
     %{
       type: :overnight_section,
-      header: wayfinding_with_s3_image_path(header) |> Header.to_json(),
+      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
       text: FreeTextLine.to_json(text),
       with_headsign: headsign != nil
     }
   end
 
-  defp wayfinding_with_s3_image_path(%{} = header) do
-    if match?(%{wayfinding_information: %{image_path: _}}, header) do
-      update_in(
-        header,
-        [Access.key(:wayfinding_information), Access.key(:image_path)],
+  defp wayfinding_with_s3_image_path(
+         %{wayfinding_information: %{schedule: schedule}} = header,
+         now
+       ) do
+    image_path_updater =
+      if Utils.in_schedule_windows?(schedule, now) do
         &Assets.s3_asset_url/1
-      )
-    else
-      header
-    end
+      else
+        fn _ -> nil end
+      end
+
+    update_in(
+      header,
+      [Access.key(:wayfinding_information), Access.key(:image_path)],
+      image_path_updater
+    )
   end
+
+  defp wayfinding_with_s3_image_path(header, _now), do: header
 
   def audio_serialize_section(%NormalSection{header: header} = section, screen, now) do
     header_readout =
@@ -375,14 +386,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
       type: :normal_section,
       header: header_readout,
       departure_groups: serialized_departure_groups,
-      wayfinding_readout: wayfinding_readout(header)
+      wayfinding_readout: wayfinding_readout(header, now)
     }
   end
 
   def audio_serialize_section(
         %OvernightSection{header: header, headsign: headsign, routes: routes},
         _screen,
-        _now
+        now
       ) do
     header_readout =
       case header do
@@ -404,14 +415,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
       headsign: headsign,
       header: header_readout,
       routes: routes,
-      wayfinding_readout: wayfinding_readout(header)
+      wayfinding_readout: wayfinding_readout(header, now)
     }
   end
 
   def audio_serialize_section(
         %NoServiceSection{header: header, headsign: headsign, routes: routes},
         _screen,
-        _now
+        now
       ) do
     header_readout =
       case header do
@@ -433,14 +444,25 @@ defmodule Screens.V2.WidgetInstance.Departures do
       headsign: headsign,
       header: header_readout,
       routes: routes,
-      wayfinding_readout: wayfinding_readout(header)
+      wayfinding_readout: wayfinding_readout(header, now)
     }
   end
 
-  defp wayfinding_readout(%Header{wayfinding_information: %{read_as: read_as}})
-       when is_binary(read_as), do: read_as
+  @spec wayfinding_readout(Header.t(), DateTime.t()) :: String.t() | nil
+  defp wayfinding_readout(
+         %Header{
+           wayfinding_information: %WayfindingInformation{
+             read_as: read_as,
+             schedule: [%ScheduleConfig{} | _] = schedule
+           }
+         },
+         now
+       )
+       when is_binary(read_as) do
+    if Utils.in_schedule_windows?(schedule, now), do: read_as, else: nil
+  end
 
-  defp wayfinding_readout(_), do: nil
+  defp wayfinding_readout(_header, _now), do: nil
 
   defp audio_serialize_row_group({:notice, free_text}, _, _now) do
     {:notice, FreeTextLine.to_plaintext(free_text)}

@@ -4,6 +4,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   alias Screens.Alerts.Alert
   alias Screens.Util
   alias Screens.V2.WidgetInstance
+  alias Screens.V2.WidgetInstance.Utils
   alias ScreensConfig.{AlertSchedule, RecurrentSchedule, Schedule, Screen}
 
   @enforce_keys ~w[screen slot_names asset_url priority now]a
@@ -44,22 +45,7 @@ defmodule Screens.V2.WidgetInstance.EvergreenContent do
   def page_groups(%__MODULE__{page_groups: page_groups}), do: page_groups
 
   def valid_candidate?(%__MODULE__{schedule: schedule, now: now}) when is_list(schedule) do
-    # Valid if any of the schedule items contains `now`.
-
-    schedule
-    |> Enum.any?(fn
-      %Schedule{start_dt: nil, end_dt: nil} ->
-        true
-
-      %Schedule{start_dt: start_dt, end_dt: nil} ->
-        DateTime.compare(start_dt, now) in [:lt, :eq]
-
-      %Schedule{start_dt: nil, end_dt: end_dt} ->
-        DateTime.compare(end_dt, now) == :gt
-
-      %Schedule{start_dt: start_dt, end_dt: end_dt} ->
-        DateTime.compare(start_dt, now) in [:lt, :eq] and DateTime.compare(end_dt, now) == :gt
-    end)
+    Utils.in_schedule_windows?(schedule, now)
   end
 
   # Widget is valid if:
