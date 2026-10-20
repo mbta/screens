@@ -14,7 +14,7 @@ defmodule Screens.Repo.Migrations.BackfillWayfindingInfo do
       2. Initialize the following fields on `wayfinding_information`:
           -  `image_path` is initialized using the section's existing `image_path` value
           -  `read_as: null`
-          -  `schedule: []`
+          -  `schedule: [end_dt: null, start_dt: null]`
           -  `wayfinding_point` is initialized using the section's existing `wayfinding_point` value
       3. Delete the section's `image_path` and `wayfinding_point` fields
   """
@@ -45,7 +45,10 @@ defmodule Screens.Repo.Migrations.BackfillWayfindingInfo do
                         jsonb_build_object(
                           'image_path', section #> '{header,image_path}',
                           'read_as', 'null'::jsonb,
-                          'schedule', '[]'::jsonb,
+                          'schedule', jsonb_build_object(
+                              'start_dt', 'null'::jsonb,
+                              'end_dt', 'null'::jsonb
+                          ),
                           'wayfinding_point',
                           COALESCE(section #> '{header,wayfinding_point}', 'null'::jsonb)
                         )
