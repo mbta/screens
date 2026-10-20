@@ -281,16 +281,14 @@ defmodule Screens.Alerts.Alert do
   @spec stale?(t()) :: boolean()
   def stale?(%__MODULE__{informed_entities: ies, effect: effect}) do
     symphony? =
-      ies
-      |> Enum.flat_map(fn
-        %{stop: %{id: stop_id}} -> [stop_id]
-        _ -> []
+      Enum.find(ies, fn
+        %{stop: %{id: stop_id}} -> stop_id == @symphony_stop_id
+        _ -> false
       end)
-      |> Enum.member?(@symphony_stop_id)
 
     closed? = effect == :station_closure or effect == :stop_closure
 
-    symphony? and closed?
+    not is_nil(symphony?) and closed?
   end
 
   # Rules for grammatically describing alert causes.
