@@ -108,7 +108,7 @@ const App = (): JSX.Element => {
           <BlinkConfigContext.Provider value={blinkConfig}>
             <Router basename="v2/screen">
               <Routes>
-                <Route path="bus_shelter_v2" element={<MultiScreenPage />} />
+                <Route path="busway_v2" element={<MultiScreenPage />} />
                 <Route path=":id" element={<ScreenPage />} />
 
                 <Route
