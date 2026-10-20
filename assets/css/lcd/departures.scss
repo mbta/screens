@@ -7,6 +7,7 @@
 @use "departures/row";
 @use "departures/section";
 @use "departures/time";
+@use "departures/alert_row";
 
 .departures-container {
   box-sizing: border-box;

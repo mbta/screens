@@ -3,6 +3,7 @@ import weakKey from "weak-key";
 
 import DepartureRow from "./departure_row";
 import NoticeRow from "./notice_row";
+import AlertRow from "./alert_row";
 import Header from "./header";
 import LaterDepartures, { MIN_LATER_DEPARTURES } from "./later_departures";
 import { classWithModifier } from "Util/utils";
@@ -16,7 +17,8 @@ export type Layout = {
 
 export type Row =
   | (DepartureRow & { type: "departure_row" })
-  | (NoticeRow & { type: "notice_row" });
+  | (NoticeRow & { type: "notice_row" })
+  | (AlertRow & { type: "alert_row" });
 
 export type NormalSection = {
   layout: Layout;
@@ -93,6 +95,8 @@ export const NormalSection: ComponentType<FoldedSection> = ({
               enableTimePaging={true}
             />
           );
+        } else if (row.type === "alert_row") {
+          return <AlertRow {...row} key={weakKey(row)} />;
         } else {
           return <NoticeRow row={row} key={weakKey(row)} />;
         }

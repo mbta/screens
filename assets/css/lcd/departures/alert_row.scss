@@ -1,0 +1,51 @@
+@use "CSS/colors";
+
+.departures-alert {
+  display: flex;
+  padding: 16px 32px;
+  background-color: colors.$warm-neutral-80;
+  border-top: 4px solid colors.$true-grey-70;
+}
+
+.departures-alert:last-of-type:not(:last-child) {
+  border-bottom: 4px solid colors.$true-grey-70;
+}
+
+.departures-alert__route {
+  flex-shrink: 0;
+  width: 144px;
+  height: 74px;
+  margin-top: 0;
+}
+
+.departures-alert__pill-and-text-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.departures-alert__text-container {
+  display: flex;
+  flex-direction: column;
+  margin-left: 32px;
+}
+
+.departures-alert__icon {
+  flex-shrink: 0;
+  max-height: 88px;
+  max-width: 88px;
+}
+
+.departures-alert__disruption-text {
+  font-weight: 600;
+  font-size: 64px;
+}
+
+.departures-alert__remedy-text {
+  font-weight: 600;
+  font-size: 64px;
+}
+
+.departures-alert__additional-text {
+  font-size: 34px;
+  line-height: 45px;
+}
