@@ -27,7 +27,8 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
           },
           headsign: %{headsigns: ["Ashmont"], variation: nil}
         }
-      ]
+      ],
+      wayfinding_readout: nil
     }
 
     test "announces no content when it is the first departures widget" do
@@ -58,7 +59,8 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
             header: "Header",
             departure_groups: [
               {:notice, "Notice"}
-            ]
+            ],
+            wayfinding_readout: nil
           }
         ]
       }
@@ -101,6 +103,28 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
 
       assert render(assigns) =~ "Blue Line service has ended"
     end
+
+    test "renders wayfinding content" do
+      wayfinding = "Use the crosswalk at College Ave to cross to the other side of the street."
+
+      assigns = %{
+        order: 0,
+        sections: [
+          %{
+            type: :overnight_section,
+            header: "Header",
+            departure_groups: [
+              {:notice, "Notice"}
+            ],
+            headsign: nil,
+            routes: [],
+            wayfinding_readout: wayfinding
+          }
+        ]
+      }
+
+      assert render(assigns) =~ wayfinding
+    end
   end
 
   describe "no service sections" do
@@ -136,6 +160,28 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
       }
 
       assert render(assigns) =~ "Blue Line has no service today"
+    end
+
+    test "renders wayfinding content" do
+      wayfinding = "Use the crosswalk at College Ave to cross to the other side of the street."
+
+      assigns = %{
+        order: 0,
+        sections: [
+          %{
+            type: :no_service_section,
+            header: "Header",
+            departure_groups: [
+              {:notice, "Notice"}
+            ],
+            headsign: nil,
+            routes: [],
+            wayfinding_readout: wayfinding
+          }
+        ]
+      }
+
+      assert render(assigns) =~ wayfinding
     end
   end
 
@@ -192,7 +238,8 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                 },
                 headsign: %{headsigns: ["Alewife"], variation: nil}
               }
-            ]
+            ],
+            wayfinding_readout: nil
           }
         ]
       }
@@ -247,7 +294,8 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
                 },
                 headsign: %{headsigns: ["South Station"], variation: nil}
               }
-            ]
+            ],
+            wayfinding_readout: nil
           }
         ]
       }
@@ -257,6 +305,26 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
 
       assert render(assigns) =~
                "The next, Needham Line, train to, South Station; on track, 5, arrives at, 12:31"
+    end
+
+    test "renders wayfinding content" do
+      wayfinding = "Use the crosswalk at College Ave to cross to the other side of the street."
+
+      assigns = %{
+        order: 0,
+        sections: [
+          %{
+            type: :normal_section,
+            header: "Header",
+            departure_groups: [
+              {:notice, "Notice"}
+            ],
+            wayfinding_readout: wayfinding
+          }
+        ]
+      }
+
+      assert render(assigns) =~ wayfinding
     end
   end
 
