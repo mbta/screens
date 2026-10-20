@@ -1,6 +1,14 @@
 @use "CSS/colors";
 @use "CSS/lcd/free_text_mixin" as freeText;
 
+.free-text__line {
+  display: inline-block;
+  margin-left: 24px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+}
+
 .free-text__element {
   &:not(:last-child)::after {
     content: " ";
