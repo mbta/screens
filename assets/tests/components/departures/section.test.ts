@@ -14,8 +14,7 @@ const overnightSection: OvernightSection = {
     title: null,
     arrow: null,
     subtitle: null,
-    image_path: null,
-    wayfinding_point: null,
+    wayfinding_information: null,
   },
   text: {
     icon: undefined,

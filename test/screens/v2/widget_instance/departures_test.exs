@@ -110,9 +110,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                    image_path:
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
-                     %ScreensConfigSchedule{
-                       start_dt: ~U[2021-01-01T00:00:00Z],
-                       end_dt: ~U[2021-01-02T00:00:00Z]
+                     %{
+                       start_dt: "2021-01-01T00:00:00Z",
+                       end_dt: "2021-01-02T00:00:00Z"
                      }
                    ]
                  }
@@ -206,9 +206,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                    image_path:
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
-                     %ScreensConfigSchedule{
-                       start_dt: ~U[2021-01-01T00:00:00Z],
-                       end_dt: ~U[2021-01-02T00:00:00Z]
+                     %{
+                       start_dt: "2021-01-01T00:00:00Z",
+                       end_dt: "2021-01-02T00:00:00Z"
                      }
                    ]
                  }
@@ -243,9 +243,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                    image_path:
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
-                     %ScreensConfigSchedule{
-                       start_dt: ~U[2021-01-01T00:00:00Z],
-                       end_dt: ~U[2021-01-02T00:00:00Z]
+                     %{
+                       start_dt: "2021-01-01T00:00:00Z",
+                       end_dt: "2021-01-02T00:00:00Z"
                      }
                    ]
                  }
@@ -476,9 +476,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                    image_path:
                      "https://mbta-screens.s3.amazonaws.com/screens-local/testing/wayfinding/image.png",
                    schedule: [
-                     %ScreensConfigSchedule{
-                       start_dt: ~U[2021-01-01T00:00:00Z],
-                       end_dt: ~U[2021-01-02T00:00:00Z]
+                     %{
+                       start_dt: "2021-01-01T00:00:00Z",
+                       end_dt: "2021-01-02T00:00:00Z"
                      }
                    ]
                  }
