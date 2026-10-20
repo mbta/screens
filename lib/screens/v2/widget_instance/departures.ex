@@ -14,9 +14,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Util
   alias Screens.Util.Assets
   alias Screens.V2.Departure
-  alias Screens.V2.WidgetInstance.Utils
   alias Screens.V2.WidgetInstance.Departures
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
+  alias Screens.V2.WidgetInstance.Utils
   alias ScreensConfig.Departures.{Header, Layout, Mode}
   alias ScreensConfig.Departures.Header.WayfindingInformation
   alias ScreensConfig.{FreeTextLine, Screen}

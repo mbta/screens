@@ -1,4 +1,8 @@
 defmodule Screens.V2.WidgetInstance.Utils do
+  @moduledoc """
+  Utility functions to be shared by modules in the `Screens.V2.WidgetInstance` namespace.
+  """
+
   alias ScreensConfig.Schedule
 
   @spec in_schedule_windows?([Schedule.t()], DateTime.t()) :: boolean()
