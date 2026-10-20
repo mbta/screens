@@ -45,9 +45,11 @@ defmodule Screens.Repo.Migrations.BackfillWayfindingInfo do
                         jsonb_build_object(
                           'image_path', section #> '{header,image_path}',
                           'read_as', 'null'::jsonb,
-                          'schedule', jsonb_build_object(
-                              'start_dt', 'null'::jsonb,
-                              'end_dt', 'null'::jsonb
+                          'schedule', jsonb_build_array(
+                              jsonb_build_object(
+                                  'start_dt', 'null'::jsonb,
+                                  'end_dt', 'null'::jsonb
+                              )
                           ),
                           'wayfinding_point',
                           COALESCE(section #> '{header,wayfinding_point}', 'null'::jsonb)
