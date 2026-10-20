@@ -41,7 +41,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
 
       now = ~U[2021-01-01T00:00:00Z]
       happening_now_active_period = [{~U[2020-12-31T00:00:00Z], ~U[2021-01-02T00:00:00Z]}]
-      ten_weeks_ago = DateTime.add(now, -10 * 604_800)
 
       oak_grove_sb = %Stop{
         id: "70036",
@@ -152,6 +151,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         }
       ]
 
+      stale_alert = %Alert{
+        id: "stale_id",
+        effect: :station_closure,
+        informed_entities: [ie(stop: %Stop{id: "place-symcl", name: "Symphony"})],
+        active_period: [{now, nil}]
+      }
+
       tagged_stop_sequences = %{
         "A" => [["place-ogmnl", "place-mlmnl", "place-welln", "place-astao"]]
       }
@@ -179,7 +185,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         bad_config: bad_config,
         location_context: location_context,
         now: now,
-        ten_weeks_ago: ten_weeks_ago,
         happening_now_active_period: happening_now_active_period,
         malden_center_nb: malden_center_nb,
         malden_center_sb: malden_center_sb,
@@ -193,7 +198,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
         fetch_location_context_fn: fn _, _, _ -> {:ok, location_context} end,
         x_fetch_alerts_fn: fn _ -> :error end,
         x_fetch_stop_name_fn: fn _ -> nil end,
-        x_fetch_location_context_fn: fn _, _, _ -> :error end
+        x_fetch_location_context_fn: fn _, _, _ -> :error end,
+        stale_alert: stale_alert
       }
     end
 
@@ -855,80 +861,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlertTest do
                )
     end
 
-    test "doesn't filter stale alerts that affect the stop", context do
+    test "filters stale alerts outside an alert's location", context do
       %{
         config: config,
         location_context: location_context,
         now: now,
-        ten_weeks_ago: ten_weeks_ago,
         fetch_stop_name_fn: fetch_stop_name_fn,
-        fetch_location_context_fn: fetch_location_context_fn
+        fetch_location_context_fn: fetch_location_context_fn,
+        stale_alert: stale_alert
       } = context
 
       alerts = [
-        %Alert{
-          id: "1",
-          effect: :station_closure,
-          informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
-          active_period: [{ten_weeks_ago, nil}]
-        }
-      ]
-
-      fetch_alerts_fn = fn _ -> {:ok, alerts} end
-
-      expected_common_data = %{
-        screen: config,
-        location_context: location_context,
-        now: now,
-        ten_weeks_ago: ten_weeks_ago,
-        is_terminal_station: true,
-        is_priority: true,
-        home_station_name: "Oak Grove"
-      }
-
-      expected_widget = [
-        struct(
-          %ReconstructedAlertWidget{
-            alert: %Alert{
-              id: "1",
-              effect: :station_closure,
-              informed_entities: [ie(stop: %Stop{id: "place-ogmnl", name: "Oak Grove"})],
-              active_period: [{ten_weeks_ago, nil}]
-            },
-            informed_station_names: ["Oak Grove"],
-            is_priority: false
-          },
-          expected_common_data
-        )
-      ]
-
-      assert expected_widget ==
-               reconstructed_alert_instances(
-                 config,
-                 now,
-                 fetch_alerts_fn,
-                 fetch_stop_name_fn,
-                 fetch_location_context_fn
-               )
-    end
-
-    test "filters stale alerts at an outside an alert's location", context do
-      %{
-        config: config,
-        location_context: location_context,
-        now: now,
-        ten_weeks_ago: ten_weeks_ago,
-        fetch_stop_name_fn: fetch_stop_name_fn,
-        fetch_location_context_fn: fetch_location_context_fn
-      } = context
-
-      alerts = [
-        %Alert{
-          id: "1",
-          effect: :station_closure,
-          informed_entities: [ie(stop: %Stop{id: "place-astao", name: "Assembly"})],
-          active_period: [{ten_weeks_ago, nil}]
-        },
+        stale_alert,
         %Alert{
           id: "2",
           effect: :station_closure,

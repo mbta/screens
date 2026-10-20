@@ -163,6 +163,8 @@ defmodule Screens.Alerts.Alert do
 
   defguard is_service_eliminating_effect(effect) when effect in @service_eliminating_effects
 
+  @symphony_stop_id "place-symcl"
+
   @callback fetch(options()) :: result()
   def fetch(opts \\ [], get_json_fn \\ &V3Api.get_json/2) do
     {options, filters} = Keyword.split(opts, [:include_all?])
@@ -276,18 +278,20 @@ defmodule Screens.Alerts.Alert do
     DateTime.compare(t, start_t) in [:gt, :eq] && DateTime.compare(t, end_t) in [:lt, :eq]
   end
 
-  @spec stale?(t(), DateTime.t()) :: boolean()
-  def stale?(alert, now \\ DateTime.utc_now())
+  @spec stale?(t()) :: boolean()
+  def stale?(%__MODULE__{informed_entities: ies, effect: effect}) do
+    symphony? =
+      ies
+      |> Enum.flat_map(fn
+        %{stop: %{id: stop_id}} -> [stop_id]
+        _ -> []
+      end)
+      |> Enum.member?(@symphony_stop_id)
 
-  def stale?(%__MODULE__{active_period: [{current_start, _current_end} | _]}, now) do
-    five_weeks_ago_in_seconds = -3_024_000
+    closed? = effect == :station_closure or effect == :stop_closure
 
-    now
-    |> DateTime.add(five_weeks_ago_in_seconds)
-    |> DateTime.compare(current_start) == :gt
+    symphony? and closed?
   end
-
-  def stale?(_, _), do: false
 
   # Rules for grammatically describing alert causes.
   @cause_description_rules %{

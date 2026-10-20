@@ -350,14 +350,13 @@ defmodule Screens.V2.LocalizedAlert do
     |> Enum.to_list()
   end
 
-  @spec suppressable_alert?(Alert.t(), LocationContext.t() | nil, DateTime.t()) :: boolean()
-  def suppressable_alert?(alert, location_context \\ nil, now)
+  @spec suppressable_alert?(Alert.t(), LocationContext.t() | nil) :: boolean()
+  def suppressable_alert?(alert, location_context \\ nil)
 
-  def suppressable_alert?(alert, nil, now), do: Alert.stale?(alert, now)
+  def suppressable_alert?(alert, nil), do: Alert.stale?(alert)
 
-  def suppressable_alert?(alert, location_context, now) do
-    Alert.stale?(alert, now) and
-      !stop_in_alert_boundary?(alert, location_context)
+  def suppressable_alert?(alert, location_context) do
+    Alert.stale?(alert) and !stop_in_alert_boundary?(alert, location_context)
   end
 
   @spec stop_in_alert_boundary?(Alert.t(), LocationContext.t()) :: boolean()

@@ -17,7 +17,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.SubwayStatus do
     relevant_alerts =
       alerts
       |> Enum.filter(&(relevant_alert?(&1) and Alert.active?(&1, now)))
-      |> Enum.reject(&LocalizedAlert.suppressable_alert?(&1, now))
+      |> Enum.reject(&LocalizedAlert.suppressable_alert?(&1))
       |> Alert.consolidate_whole_route_delays()
       |> Enum.map(&%SubwayStatus.SubwayStatusAlert{alert: &1})
 
