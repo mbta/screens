@@ -199,19 +199,19 @@ defmodule ScreensWeb.AdminApiControllerTest do
     setup do
       before_date = ~D[2025-01-01]
 
-      all_ended_screen_config =
+      all_ended_evergreen_screen_config =
         screen_with_evergreen_end_dts([
           ~U[2024-10-03 00:00:00Z],
           ~U[2024-11-03 00:00:00Z]
         ])
 
-      mixed_ended_screen_config =
+      mixed_ended_evergreen_screen_config =
         screen_with_evergreen_end_dts([
           ~U[2024-10-03 00:00:00Z],
           ~U[2025-02-03 00:00:00Z]
         ])
 
-      null_ended_screen_config =
+      null_ended_evergreen_screen_config =
         screen_with_evergreen_end_dts([
           ~U[2024-10-03 00:00:00Z],
           nil
@@ -219,37 +219,37 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
       {:ok,
        before_date: before_date,
-       all_ended_screen_config: all_ended_screen_config,
-       mixed_ended_screen_config: mixed_ended_screen_config,
-       null_ended_screen_config: null_ended_screen_config}
+       all_ended_evergreen_screen_config: all_ended_evergreen_screen_config,
+       mixed_ended_evergreen_screen_config: mixed_ended_evergreen_screen_config,
+       null_ended_evergreen_screen_config: null_ended_evergreen_screen_config}
     end
 
     @tag :authenticated
     test "dry_run only counts configs with evergreen schedule end_dt before cutoff", %{
       conn: conn,
       before_date: before_date,
-      all_ended_screen_config: all_ended_screen_config,
-      mixed_ended_screen_config: mixed_ended_screen_config,
-      null_ended_screen_config: null_ended_screen_config
+      all_ended_evergreen_screen_config: all_ended_evergreen_screen_config,
+      mixed_ended_evergreen_screen_config: mixed_ended_evergreen_screen_config,
+      null_ended_evergreen_screen_config: null_ended_evergreen_screen_config
     } do
       Repo.insert!(%ScreenConfig{
         id: "all-ended",
-        config: all_ended_screen_config
+        config: all_ended_evergreen_screen_config
       })
 
       Repo.insert!(%ScreenConfig{
         id: "mixed-ended",
-        config: mixed_ended_screen_config
+        config: mixed_ended_evergreen_screen_config
       })
 
       Repo.insert!(%ScreenConfig{
         id: "null-ended",
-        config: null_ended_screen_config
+        config: null_ended_evergreen_screen_config
       })
 
       conn =
         post(conn, "/api/admin/maintenance", %{
-          "action" => "content_cleanup",
+          "action" => "image_content_cleanup",
           "before" => Date.to_iso8601(before_date),
           "dry_run" => "true"
         })
@@ -261,27 +261,27 @@ defmodule ScreensWeb.AdminApiControllerTest do
     test "only updates configs with all evergreen schedule end_dt before cutoff", %{
       conn: conn,
       before_date: before_date,
-      all_ended_screen_config: all_ended_screen_config,
-      mixed_ended_screen_config: mixed_ended_screen_config,
-      null_ended_screen_config: null_ended_screen_config
+      all_ended_evergreen_screen_config: all_ended_evergreen_screen_config,
+      mixed_ended_evergreen_screen_config: mixed_ended_evergreen_screen_config,
+      null_ended_evergreen_screen_config: null_ended_evergreen_screen_config
     } do
-      Repo.insert!(%ScreenConfig{id: "all-ended", config: all_ended_screen_config})
-      Repo.insert!(%ScreenConfig{id: "mixed-ended", config: mixed_ended_screen_config})
-      Repo.insert!(%ScreenConfig{id: "null-ended", config: null_ended_screen_config})
+      Repo.insert!(%ScreenConfig{id: "all-ended", config: all_ended_evergreen_screen_config})
+      Repo.insert!(%ScreenConfig{id: "mixed-ended", config: mixed_ended_evergreen_screen_config})
+      Repo.insert!(%ScreenConfig{id: "null-ended", config: null_ended_evergreen_screen_config})
 
       expect(@data_cache, :invalidate, fn ["all-ended"], fun -> {:ok, fun.()} end)
 
       conn =
         post(conn, "/api/admin/maintenance", %{
-          "action" => "content_cleanup",
+          "action" => "image_content_cleanup",
           "before" => Date.to_iso8601(before_date)
         })
 
       assert json_response(conn, 200) == %{"success" => true}
 
       assert Repo.get!(ScreenConfig, "all-ended").config.app_params.evergreen_content == []
-      assert Repo.get!(ScreenConfig, "mixed-ended").config == mixed_ended_screen_config
-      assert Repo.get!(ScreenConfig, "null-ended").config == null_ended_screen_config
+      assert Repo.get!(ScreenConfig, "mixed-ended").config == mixed_ended_evergreen_screen_config
+      assert Repo.get!(ScreenConfig, "null-ended").config == null_ended_evergreen_screen_config
     end
   end
 

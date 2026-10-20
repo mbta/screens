@@ -34,7 +34,7 @@ const ScheduledContentCleanup = () => {
     const doRequest = (params = {}) =>
       fetch.post(API_PATH, {
         ...params,
-        action: "content_cleanup",
+        action: "image_content_cleanup",
         before: contentCleanupDate,
       });
 
