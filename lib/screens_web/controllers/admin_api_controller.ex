@@ -187,7 +187,11 @@ defmodule ScreensWeb.AdminApiController do
       }) do
     before_date = Date.from_iso8601!(iso_date)
 
-    affected = Util.Admin.expired_evergreen_content_count(ScreenConfigs.all(), before_date)
+    all_screen_configs = ScreenConfigs.all()
+
+    affected =
+      Util.Admin.expired_evergreen_content_count(all_screen_configs, before_date) +
+        Util.Admin.expired_wayfinding_content_count(all_screen_configs, before_date)
 
     json(conn, %{affected: affected})
   end
@@ -197,10 +201,11 @@ defmodule ScreensWeb.AdminApiController do
         "before" => iso_date
       }) do
     before_date = Date.from_iso8601!(iso_date)
+    all_screen_configs = ScreenConfigs.all()
 
     response =
-      ScreenConfigs.all()
-      |> Util.Admin.evergreen_content_cleanup_updates(before_date)
+      (Util.Admin.evergreen_content_cleanup_updates(all_screen_configs, before_date) ++
+         Util.Admin.wayfinding_content_cleanup_updates(all_screen_configs, before_date))
       |> ScreenConfigs.commit_updates()
 
     case response do

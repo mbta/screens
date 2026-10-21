@@ -10,6 +10,9 @@ defmodule ScreensWeb.AdminApiControllerTest do
   alias Screens.Config.Backup.Store
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
+  alias ScreensConfig.Departures
+  alias ScreensConfig.Departures.{Header, Section}
+  alias ScreensConfig.Departures.Header.WayfindingInformation
   alias ScreensConfig.{AlertSchedule, EvergreenContentItem, Schedule}
 
   @data_cache injected(Screens.V2.ScreenData.Cache)
@@ -33,6 +36,28 @@ defmodule ScreensWeb.AdminApiControllerTest do
     }
 
     %{screen | app_params: %{screen.app_params | evergreen_content: [item]}}
+  end
+
+  defp screen_with_wayfinding_end_dts(end_dts) do
+    screen = screen_config(:busway_v2)
+
+    item = %WayfindingInformation{
+      image_path: "test-asset.png",
+      schedule:
+        Enum.map(end_dts, fn end_dt ->
+          %Schedule{start_dt: ~U[2024-01-01 00:00:00Z], end_dt: end_dt}
+        end)
+    }
+
+    %{
+      screen
+      | app_params: %{
+          screen.app_params
+          | departures: %Departures{
+              sections: [%Section{header: %Header{wayfinding_information: item}, params: nil}]
+            }
+        }
+    }
   end
 
   defp screen_with_alert_ids(alert_ids) do
@@ -205,8 +230,20 @@ defmodule ScreensWeb.AdminApiControllerTest do
           ~U[2024-11-03 00:00:00Z]
         ])
 
+      all_ended_wayfinding_screen_config =
+        screen_with_wayfinding_end_dts([
+          ~U[2024-10-03 00:00:00Z],
+          ~U[2024-11-03 00:00:00Z]
+        ])
+
       mixed_ended_evergreen_screen_config =
         screen_with_evergreen_end_dts([
+          ~U[2024-10-03 00:00:00Z],
+          ~U[2025-02-03 00:00:00Z]
+        ])
+
+      mixed_ended_wayfinding_screen_config =
+        screen_with_wayfinding_end_dts([
           ~U[2024-10-03 00:00:00Z],
           ~U[2025-02-03 00:00:00Z]
         ])
@@ -217,11 +254,20 @@ defmodule ScreensWeb.AdminApiControllerTest do
           nil
         ])
 
+      null_ended_wayfinding_screen_config =
+        screen_with_wayfinding_end_dts([
+          ~U[2024-10-03 00:00:00Z],
+          nil
+        ])
+
       {:ok,
        before_date: before_date,
        all_ended_evergreen_screen_config: all_ended_evergreen_screen_config,
+       all_ended_wayfinding_screen_config: all_ended_wayfinding_screen_config,
        mixed_ended_evergreen_screen_config: mixed_ended_evergreen_screen_config,
-       null_ended_evergreen_screen_config: null_ended_evergreen_screen_config}
+       mixed_ended_wayfinding_screen_config: mixed_ended_wayfinding_screen_config,
+       null_ended_evergreen_screen_config: null_ended_evergreen_screen_config,
+       null_ended_wayfinding_screen_config: null_ended_wayfinding_screen_config}
     end
 
     @tag :authenticated
@@ -282,6 +328,70 @@ defmodule ScreensWeb.AdminApiControllerTest do
       assert Repo.get!(ScreenConfig, "all-ended").config.app_params.evergreen_content == []
       assert Repo.get!(ScreenConfig, "mixed-ended").config == mixed_ended_evergreen_screen_config
       assert Repo.get!(ScreenConfig, "null-ended").config == null_ended_evergreen_screen_config
+    end
+
+    @tag :authenticated
+    test "dry_run only counts configs with wayfinding schedule end_dt before cutoff", %{
+      conn: conn,
+      before_date: before_date,
+      all_ended_wayfinding_screen_config: all_ended_wayfinding_screen_config,
+      mixed_ended_wayfinding_screen_config: mixed_ended_wayfinding_screen_config,
+      null_ended_wayfinding_screen_config: null_ended_wayfinding_screen_config
+    } do
+      Repo.insert!(%ScreenConfig{
+        id: "all-ended",
+        config: all_ended_wayfinding_screen_config
+      })
+
+      Repo.insert!(%ScreenConfig{
+        id: "mixed-ended",
+        config: mixed_ended_wayfinding_screen_config
+      })
+
+      Repo.insert!(%ScreenConfig{
+        id: "null-ended",
+        config: null_ended_wayfinding_screen_config
+      })
+
+      conn =
+        post(conn, "/api/admin/maintenance", %{
+          "action" => "image_content_cleanup",
+          "before" => Date.to_iso8601(before_date),
+          "dry_run" => "true"
+        })
+
+      assert json_response(conn, 200) == %{"affected" => 1}
+    end
+
+    @tag :authenticated
+    test "only updates configs with all wayfinding schedule end_dt before cutoff", %{
+      conn: conn,
+      before_date: before_date,
+      all_ended_wayfinding_screen_config: all_ended_wayfinding_screen_config,
+      mixed_ended_wayfinding_screen_config: mixed_ended_wayfinding_screen_config,
+      null_ended_wayfinding_screen_config: null_ended_wayfinding_screen_config
+    } do
+      Repo.insert!(%ScreenConfig{id: "all-ended", config: all_ended_wayfinding_screen_config})
+      Repo.insert!(%ScreenConfig{id: "mixed-ended", config: mixed_ended_wayfinding_screen_config})
+      Repo.insert!(%ScreenConfig{id: "null-ended", config: null_ended_wayfinding_screen_config})
+
+      expect(@data_cache, :invalidate, fn ["all-ended"], fun -> {:ok, fun.()} end)
+
+      conn =
+        post(conn, "/api/admin/maintenance", %{
+          "action" => "image_content_cleanup",
+          "before" => Date.to_iso8601(before_date)
+        })
+
+      assert json_response(conn, 200) == %{"success" => true}
+
+      actual_all_ended_sections =
+        Repo.get!(ScreenConfig, "all-ended").config.app_params.departures.sections
+
+      assert length(actual_all_ended_sections) == 1
+      assert is_nil(List.last(actual_all_ended_sections).header.wayfinding_information)
+      assert Repo.get!(ScreenConfig, "mixed-ended").config == mixed_ended_wayfinding_screen_config
+      assert Repo.get!(ScreenConfig, "null-ended").config == null_ended_wayfinding_screen_config
     end
   end
 

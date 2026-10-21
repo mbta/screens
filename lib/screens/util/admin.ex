@@ -6,6 +6,10 @@ defmodule Screens.Util.Admin do
   alias Screens.Alerts.Alert
   alias Screens.Config.ScreenConfig
   alias ScreensConfig.{AlertSchedule, EvergreenContentItem, RecurrentSchedule, Schedule, Screen}
+  alias ScreensConfig.Departures
+  alias ScreensConfig.Departures.Header
+  alias ScreensConfig.Departures.Header.WayfindingInformation
+  alias ScreensConfig.Departures.Section
 
   @alert injected(Screens.Alerts.Alert)
 
@@ -69,6 +73,60 @@ defmodule Screens.Util.Admin do
   # Cleaning up alert-linked content is not supported
   defp should_cleanup_evergreen_item?(%EvergreenContentItem{schedule: _other}, _before_date),
     do: false
+
+  @doc """
+  Counts screen configs that contain expired wayfinding content, i.e. those where
+  all non-empty schedule `end_dt` values are before `before_date`.
+  """
+  @spec expired_wayfinding_content_count([ScreenConfig.t()], Date.t()) :: non_neg_integer()
+  def expired_wayfinding_content_count(screen_configs, before_date) do
+    screen_configs
+    |> wayfinding_content_cleanup_updates(before_date)
+    |> Enum.count()
+  end
+
+  @doc "Returns a list of updates for Postgres that will clean up expired wayfinding content."
+  @spec wayfinding_content_cleanup_updates([ScreenConfig.t()], Date.t()) :: [map()]
+  def wayfinding_content_cleanup_updates(screen_configs, before_date) do
+    Enum.reduce(screen_configs, [], fn %{id: id, config: screen}, acc ->
+      cleaned = cleanup_wayfinding_content(screen, before_date)
+
+      if cleaned == screen do
+        acc
+      else
+        [%{id: id, config: cleaned} | acc]
+      end
+    end)
+  end
+
+  @spec cleanup_wayfinding_content(Screen.t(), Date.t()) :: Screen.t()
+  def cleanup_wayfinding_content(
+        %Screen{app_params: %_app{departures: %Departures{sections: _sections}}} = screen,
+        before_date
+      ) do
+    update_in(screen.app_params.departures.sections, fn sections ->
+      Enum.map(sections, fn
+        %Section{header: %Header{wayfinding_information: wayfinding_information}} = section ->
+          if should_cleanup_wayfinding_item?(wayfinding_information, before_date) do
+            %{section | header: %Header{wayfinding_information: nil}}
+          else
+            section
+          end
+      end)
+    end)
+  end
+
+  def cleanup_wayfinding_content(screen, _before_date), do: screen
+
+  @spec should_cleanup_wayfinding_item?(WayfindingInformation.t() | nil, Date.t()) :: boolean()
+  defp should_cleanup_wayfinding_item?(nil, _before_date), do: false
+
+  defp should_cleanup_wayfinding_item?(wayfinding_information, before_date) do
+    Enum.all?(wayfinding_information.schedule, fn
+      %Schedule{end_dt: nil} -> false
+      %Schedule{end_dt: datetime} -> Date.compare(datetime, before_date) == :lt
+    end)
+  end
 
   @doc """
   Returns a list of updates for Postgres that will remove alert-linked evergreen content where

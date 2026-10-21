@@ -9,17 +9,17 @@ const SYNC_FROM_SNAPSHOT_PATH = "/api/admin/sync_from_snapshot";
 const Tools = () => {
   return (
     <main className="admin-page admin-tools">
-      <EvergreenContentCleanup />
+      <ImageContentCleanup />
       <SyncFromSnapshot />
       <RestoreFromBackup />
     </main>
   );
 };
 
-const EvergreenContentCleanup = () => {
+const ImageContentCleanup = () => {
   return (
     <section>
-      <h2>Evergreen Content Cleanup</h2>
+      <h2>Content Cleanup</h2>
       <ScheduledContentCleanup />
       <AlertContentCleanup />
     </section>
@@ -42,7 +42,7 @@ const ScheduledContentCleanup = () => {
 
     if (affected > 0) {
       const prompt =
-        `Delete evergreen content that ended before ${contentCleanupDate}? ` +
+        `Delete evergreen and wayfinding content that ended before ${contentCleanupDate}? ` +
         `This will affect ${affected} screens.`;
 
       if (window.confirm(prompt)) {
@@ -63,7 +63,8 @@ const ScheduledContentCleanup = () => {
     <section>
       <h3>Schedule-Based Content Cleanup</h3>
       <p>
-        Delete inactive evergreen content which ended before the specified date.
+        Delete inactive evergreen and wayfinding content which ended before the
+        specified date.
       </p>
       <form
         onSubmit={(event) => {
