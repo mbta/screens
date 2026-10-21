@@ -10,10 +10,10 @@ defmodule ScreensWeb.AdminApiControllerTest do
   alias Screens.Config.Backup.Store
   alias Screens.Config.ScreenConfig
   alias Screens.Repo
+  alias ScreensConfig.{AlertSchedule, EvergreenContentItem, Schedule}
   alias ScreensConfig.Departures
   alias ScreensConfig.Departures.{Header, Section}
   alias ScreensConfig.Departures.Header.WayfindingInformation
-  alias ScreensConfig.{AlertSchedule, EvergreenContentItem, Schedule}
 
   @data_cache injected(Screens.V2.ScreenData.Cache)
 
