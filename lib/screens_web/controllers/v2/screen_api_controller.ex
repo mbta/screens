@@ -80,7 +80,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
   defp put_extra_fields(response, id, %Screen{vendor: :mercury} = screen) do
     response
     |> Map.put(:audio_data, fetch_ssml(id, screen))
-    |> Map.put(:last_deploy_timestamp, @build_info.build_identifier())
+    |> Map.put(:last_deploy_timestamp, @build_info.datetime)
   end
 
   defp put_extra_fields(response, _id, _screen), do: response
@@ -118,7 +118,7 @@ defmodule ScreensWeb.V2.ScreenApiController do
     with param when is_binary(param) <- params["last_refresh"],
          {:ok, last_refresh_at, _offset} <- DateTime.from_iso8601(param) do
       should_refresh_at =
-        [@build_info.build_identifier(), refresh_if_loaded_before]
+        [@build_info.datetime, refresh_if_loaded_before]
         |> Enum.reject(&is_nil/1)
         |> Enum.max(DateTime, fn -> nil end)
 
