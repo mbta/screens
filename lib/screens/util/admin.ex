@@ -78,10 +78,10 @@ defmodule Screens.Util.Admin do
   end
 
   @spec cleanup_wayfinding_content(Screen.t(), Date.t()) :: Screen.t()
-  def cleanup_wayfinding_content(
-        %Screen{app_params: %_app{departures: %Departures{sections: _sections}}} = screen,
-        before_date
-      ) do
+  defp cleanup_wayfinding_content(
+         %Screen{app_params: %_app{departures: %Departures{sections: _sections}}} = screen,
+         before_date
+       ) do
     update_in(screen.app_params.departures.sections, fn sections ->
       Enum.map(sections, fn
         %Section{header: %Header{wayfinding_information: wayfinding_information}} = section ->
@@ -94,7 +94,7 @@ defmodule Screens.Util.Admin do
     end)
   end
 
-  def cleanup_wayfinding_content(screen, _before_date), do: screen
+  defp cleanup_wayfinding_content(screen, _before_date), do: screen
 
   @spec should_cleanup_wayfinding_item?(WayfindingInformation.t() | nil, Date.t()) :: boolean()
   defp should_cleanup_wayfinding_item?(nil, _before_date), do: false

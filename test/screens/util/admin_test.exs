@@ -196,19 +196,6 @@ defmodule Screens.Util.AdminTest do
     end
   end
 
-  describe "cleanup_wayfinding_content/2" do
-    test "removes wayfinding content items where all schedules end before the given date", %{
-      before_date: before_date,
-      wayfinding_screen_after_cleanup: wayfinding_screen_after_cleanup,
-      wayfinding_screen_before_cleanup: wayfinding_screen_before_cleanup
-    } do
-      cleaned_screen =
-        Admin.cleanup_wayfinding_content(wayfinding_screen_before_cleanup, before_date)
-
-      assert cleaned_screen == wayfinding_screen_after_cleanup
-    end
-  end
-
   describe "wayfinding_content_cleanup_updates/2" do
     test "counts only configs changed by wayfinding cleanup", %{
       wayfinding_varied_configs: wayfinding_varied_configs,
@@ -231,6 +218,20 @@ defmodule Screens.Util.AdminTest do
       expected = Enum.sort_by(wayfinding_varied_expected_updates, & &1.id)
 
       assert result == expected
+    end
+
+    test "removes wayfinding content items where all schedules end before the given date", %{
+      before_date: before_date,
+      wayfinding_screen_after_cleanup: wayfinding_screen_after_cleanup,
+      wayfinding_screen_before_cleanup: wayfinding_screen_before_cleanup
+    } do
+      [cleaned_screen] =
+        Admin.wayfinding_content_cleanup_updates(
+          [%ScreenConfig{id: "composite", config: wayfinding_screen_before_cleanup}],
+          before_date
+        )
+
+      assert cleaned_screen.config == wayfinding_screen_after_cleanup
     end
   end
 
