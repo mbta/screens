@@ -23,6 +23,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
     OvernightSection
   }
 
+  alias Screens.V2.WidgetInstance.Departures.NormalSection.{
+    HeadwayRow,
+    SpecialTripRow
+  }
+
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.Departures
   alias ScreensConfig.Departures.{Params, Section}
@@ -167,7 +172,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
     )
   end
 
-  @spec headways_from_rds([RDS.Headways.t()]) :: [NormalSection.headway_row()]
+  @spec headways_from_rds([RDS.Headways.t()]) :: [NormalSection.HeadwayRow.t()]
   defp headways_from_rds(headway_states) do
     Enum.flat_map(headway_states, fn
       %Headways{
@@ -176,29 +181,49 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
         range: range,
         displayed_headsign: displayed_headsign
       } ->
-        [{route, direction_id, range, displayed_headsign}]
+        [
+          %HeadwayRow{
+            route: route,
+            direction_id: direction_id,
+            range: range,
+            displayed_headsign: displayed_headsign
+          }
+        ]
     end)
   end
 
   @spec departure_rows_from_state(RDS.item()) ::
-          [Departure.t()] | [NormalSection.special_trip()]
+          [Departure.t()] | [NormalSection.SpecialTripRow.t()]
   defp departure_rows_from_state(%Countdowns{departures: departures}), do: departures
 
   defp departure_rows_from_state(%FirstTrip{first_schedule: first_schedule}) do
-    [{first_schedule, :first_trip}]
+    [
+      %SpecialTripRow{
+        schedule: first_schedule,
+        special_trip_type: :first_trip
+      }
+    ]
   end
 
   defp departure_rows_from_state(%ServiceEnded{last_schedule: last_schedule}) do
-    [{last_schedule, :service_ended}]
+    [
+      %SpecialTripRow{
+        schedule: last_schedule,
+        special_trip_type: :service_ended
+      }
+    ]
   end
 
   defp departure_rows_from_state(%NoService{}), do: []
 
-  @spec departure_time(Departure.t() | NormalSection.special_trip()) :: DateTime.t()
+  @spec departure_time(Departure.t() | NormalSection.SpecialTripRow.t()) :: DateTime.t()
   defp departure_time(%Departure{} = departure), do: Departure.time(departure)
-  defp departure_time({%Schedule{} = schedule, _type}), do: Schedule.time(schedule)
+  defp departure_time(%SpecialTripRow{schedule: schedule}), do: Schedule.time(schedule)
 
   def departure_direction_id(%Departure{} = departure), do: Departure.direction_id(departure)
-  def departure_direction_id({%Schedule{direction_id: direction_id}, _type}), do: direction_id
-  def departure_direction_id({_route, direction_id, _range, _headsign}), do: direction_id
+
+  def departure_direction_id(%SpecialTripRow{schedule: %Schedule{direction_id: direction_id}}),
+    do: direction_id
+
+  def departure_direction_id(%HeadwayRow{direction_id: direction_id}), do: direction_id
 end

@@ -11,8 +11,10 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
+  alias Screens.V2.WidgetInstance.Departures.NormalSection.{HeadwayRow, SpecialTripRow}
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService}
   alias Screens.V2.WidgetInstance.OvernightDepartures
+
   alias ScreensConfig.{Alerts, Departures, Header}
   alias ScreensConfig.Departures.{Params, Section}
   alias ScreensConfig.Screen
@@ -745,8 +747,16 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
         }
 
-      expected_primary_departures = [{expected_primary_schedule, :first_trip}]
-      expected_secondary_departures = [{expected_secondary_schedule, :first_trip}]
+      expected_primary_departures = [
+        %SpecialTripRow{
+          schedule: expected_primary_schedule,
+          special_trip_type: :first_trip
+        }
+      ]
+
+      expected_secondary_departures = [
+        %SpecialTripRow{schedule: expected_secondary_schedule, special_trip_type: :first_trip}
+      ]
 
       expected_primary_sections = [
         %Screens.V2.WidgetInstance.Departures.NormalSection{
@@ -835,8 +845,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         }
 
       expected_departures = [
-        {expected_first_schedule, :first_trip},
-        {expected_last_schedule, :service_ended}
+        %SpecialTripRow{
+          schedule: expected_first_schedule,
+          special_trip_type: :first_trip
+        },
+        %SpecialTripRow{
+          schedule: expected_last_schedule,
+          special_trip_type: :service_ended
+        }
       ]
 
       expected_primary_sections = [
@@ -911,7 +927,9 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           trip: %Trip{headsign: "other3", pattern_headsign: "h3"}
         }
 
-      expected_departures = [{expected_first_schedule, :first_trip}]
+      expected_departures = [
+        %SpecialTripRow{schedule: expected_first_schedule, special_trip_type: :first_trip}
+      ]
 
       expected_sections = [
         %Screens.V2.WidgetInstance.Departures.NormalSection{
@@ -1139,7 +1157,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           grouping_type: :time,
           rows: [
             expected_primary_departure,
-            {%Route{id: "r1"}, 0, {6, 10}, "other_headsign"}
+            %HeadwayRow{
+              route: %Route{id: "r1"},
+              direction_id: 0,
+              range: {6, 10},
+              displayed_headsign: "other_headsign"
+            }
           ],
           mode: :bus
         }
