@@ -4,11 +4,13 @@ defmodule Screens.Util.BuildInfo do
   application.
   """
 
+  # Evaluated at compile time, so all instances running the same release share this value.
+  @build_time DateTime.utc_now()
+
   @doc """
-  Return an identifier that uniquely identifies a build of the project.
+  Return a datetime that acts as a unique identifier of a build of the project.
+  Set at compile time so all instances running the same image share this value.
   """
-  @callback build_identifier() :: String.t()
-  def build_identifier do
-    Application.fetch_env!(:screens, :build_identifier)
-  end
+  @callback datetime() :: DateTime.t()
+  def datetime, do: @build_time
 end
