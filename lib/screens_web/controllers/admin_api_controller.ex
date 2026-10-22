@@ -189,11 +189,17 @@ defmodule ScreensWeb.AdminApiController do
 
     all_screen_configs = ScreenConfigs.all()
 
-    affected =
-      Util.Admin.expired_evergreen_content_count(all_screen_configs, before_date) +
-        Util.Admin.expired_wayfinding_content_count(all_screen_configs, before_date)
+    affected_evergreen_content_count =
+      all_screen_configs
+      |> Util.Admin.evergreen_content_cleanup_updates(before_date)
+      |> Enum.count()
 
-    json(conn, %{affected: affected})
+    affected_wayfinding_content_count =
+      all_screen_configs
+      |> Util.Admin.wayfinding_content_cleanup_updates(before_date)
+      |> Enum.count()
+
+    json(conn, %{affected: affected_evergreen_content_count + affected_wayfinding_content_count})
   end
 
   def maintenance(conn, %{

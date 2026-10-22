@@ -171,16 +171,16 @@ defmodule Screens.Util.AdminTest do
     end
   end
 
-  describe "expired_evergreen_content_count/2" do
+  describe "evergreen_content_cleanup_updates/2" do
     test "counts only configs changed by evergreen cleanup", %{
       evergreen_varied_configs: evergreen_varied_configs,
       before_date: before_date
     } do
-      assert Admin.expired_evergreen_content_count(evergreen_varied_configs, before_date) == 2
+      assert evergreen_varied_configs
+             |> Admin.evergreen_content_cleanup_updates(before_date)
+             |> Enum.count() == 2
     end
-  end
 
-  describe "evergreen_content_cleanup_updates/2" do
     test "returns updates only for configs changed by cleanup across varied schedule types", %{
       evergreen_varied_configs: evergreen_varied_configs,
       evergreen_varied_expected_updates: evergreen_varied_expected_updates,
@@ -209,16 +209,16 @@ defmodule Screens.Util.AdminTest do
     end
   end
 
-  describe "expired_wayfinding_content_count/2" do
+  describe "wayfinding_content_cleanup_updates/2" do
     test "counts only configs changed by wayfinding cleanup", %{
       wayfinding_varied_configs: wayfinding_varied_configs,
       before_date: before_date
     } do
-      assert Admin.expired_wayfinding_content_count(wayfinding_varied_configs, before_date) == 1
+      assert wayfinding_varied_configs
+             |> Admin.wayfinding_content_cleanup_updates(before_date)
+             |> Enum.count() == 1
     end
-  end
 
-  describe "wayfinding_content_cleanup_updates/2" do
     test "returns updates only for configs changed by cleanup across varied schedule types", %{
       wayfinding_varied_configs: wayfinding_varied_configs,
       wayfinding_varied_expected_updates: wayfinding_varied_expected_updates,

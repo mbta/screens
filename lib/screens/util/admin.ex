@@ -13,17 +13,6 @@ defmodule Screens.Util.Admin do
 
   @alert injected(Screens.Alerts.Alert)
 
-  @doc """
-  Counts screen configs that contain expired evergreen content, i.e. those where
-  all non-empty schedule `end_dt` values are before `before_date`.
-  """
-  @spec expired_evergreen_content_count([ScreenConfig.t()], Date.t()) :: non_neg_integer()
-  def expired_evergreen_content_count(screen_configs, before_date) do
-    screen_configs
-    |> evergreen_content_cleanup_updates(before_date)
-    |> Enum.count()
-  end
-
   @doc "Returns a list of updates for Postgres that will clean up expired evergreen content."
   @spec evergreen_content_cleanup_updates([ScreenConfig.t()], Date.t()) :: [map()]
   def evergreen_content_cleanup_updates(screen_configs, before_date) do
@@ -73,17 +62,6 @@ defmodule Screens.Util.Admin do
   # Cleaning up alert-linked content is not supported
   defp should_cleanup_evergreen_item?(%EvergreenContentItem{schedule: _other}, _before_date),
     do: false
-
-  @doc """
-  Counts screen configs that contain expired wayfinding content, i.e. those where
-  all non-empty schedule `end_dt` values are before `before_date`.
-  """
-  @spec expired_wayfinding_content_count([ScreenConfig.t()], Date.t()) :: non_neg_integer()
-  def expired_wayfinding_content_count(screen_configs, before_date) do
-    screen_configs
-    |> wayfinding_content_cleanup_updates(before_date)
-    |> Enum.count()
-  end
 
   @doc "Returns a list of updates for Postgres that will clean up expired wayfinding content."
   @spec wayfinding_content_cleanup_updates([ScreenConfig.t()], Date.t()) :: [map()]
