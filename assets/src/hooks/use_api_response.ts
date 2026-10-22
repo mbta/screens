@@ -141,7 +141,7 @@ const useBaseApiResponse = ({
     revalidateOnFocus: !isRealScreen(),
   });
 
-  useInspectorControls(mutate, data);
+  useInspectorControls(mutate, data, lastSuccess);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsStale(true), STALE_THRESHOLD_MS);
@@ -165,6 +165,7 @@ const useInspectorPause = (): boolean => {
 const useInspectorControls = (
   refreshFn: () => void,
   response: ApiResponse,
+  lastSuccess: number | null,
 ): void => {
   useReceiveFromInspector((message) => {
     if (message.type === "refresh_data") refreshFn();
@@ -174,7 +175,7 @@ const useInspectorControls = (
     if ("ttl" in response) {
       sendToInspector({ type: "data_refreshed", ttl: response.ttl });
     }
-  }, [response]);
+  }, [response, lastSuccess]);
 };
 
 const useApiResponse = ({ id }): UseApiResponseReturn =>
