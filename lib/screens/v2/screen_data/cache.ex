@@ -119,8 +119,8 @@ defmodule Screens.V2.ScreenData.Cache do
           {:error, {:erpc, :timeout}} ->
             raise Timeout
 
-          {:error, {:exception, Timeout, stacktrace}} ->
-            reraise Timeout, stacktrace
+          {:error, {:exception, %Timeout{} = exception, stacktrace}} ->
+            reraise exception, stacktrace
         end
 
       {:error, error} ->
