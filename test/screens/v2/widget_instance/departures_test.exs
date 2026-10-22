@@ -2,7 +2,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Departures.Departure
-  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -18,6 +17,11 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     HeadwaySection,
     NoDataSection,
     NormalSection
+  }
+
+  alias Screens.V2.WidgetInstance.Departures.NormalSection.{
+    HeadwayRow,
+    SpecialTripRow
   }
 
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
@@ -726,7 +730,12 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
             stop: %Stop{}
           }
         },
-        {%Route{id: "Green-E", line: %Line{id: "line-Green"}}, 0, {20, 30}, "Westbound"}
+        %HeadwayRow{
+          route: route(id: "Green-e", line: "line-Green", type: :subway),
+          direction_id: 0,
+          range: {20, 30},
+          displayed_headsign: "Westbound"
+        }
       ]
 
       section = %NormalSection{
@@ -753,13 +762,16 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "serializes normal section with first trip row", %{dup_screen: dup_screen, now: now} do
       rows = [
-        {%Schedule{
-           id: "one",
-           departure_time: ~U[2020-01-01T00:01:10Z],
-           route: route(id: "Green-E", type: :subway),
-           trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
-           stop: %Stop{}
-         }, :first_trip}
+        %SpecialTripRow{
+          schedule: %Schedule{
+            id: "one",
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: route(id: "Green-E", type: :subway),
+            trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+            stop: %Stop{}
+          },
+          special_trip_type: :first_trip
+        }
       ]
 
       section = %NormalSection{
@@ -790,13 +802,16 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "serializes normal section with service ended row", %{dup_screen: dup_screen, now: now} do
       rows = [
-        {%Schedule{
-           id: "one",
-           departure_time: ~U[2020-01-01T00:01:10Z],
-           route: route(id: "Green-E", type: :subway),
-           trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
-           stop: %Stop{}
-         }, :service_ended}
+        %SpecialTripRow{
+          schedule: %Schedule{
+            id: "one",
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: route(id: "Green-E", type: :subway),
+            trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+            stop: %Stop{}
+          },
+          special_trip_type: :service_ended
+        }
       ]
 
       section = %NormalSection{

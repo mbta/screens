@@ -1,6 +1,8 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   use ExUnit.Case, async: true
 
+  alias Screens.V2.WidgetInstance.Departures.NormalSection.SpecialTripRow
+  alias Screens.V2.WidgetInstance.Departures.NormalSection.HeadwayRow
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -174,29 +176,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       assert [%DeparturesNoData{}] = RealtimeDepartures.departures_instances(config, @now)
     end
 
-    test "returns DeparturesNoData when all sections are sections we don't support" do
-      config = build_config(["route_A"])
-
-      expect(@rds, :get, fn _departures, @now ->
-        [
-          {:ok,
-           [
-             no_service("stop_id_one", "line_id_one", "test_headsign_one"),
-             headways(
-               "stop_id_three",
-               "line_id_three",
-               "test_headsign_three",
-               "route_id_three",
-               "direction_zero",
-               0
-             )
-           ]}
-        ]
-      end)
-
-      assert [%DeparturesNoData{}] = RealtimeDepartures.departures_instances(config, @now)
-    end
-
     test "returns NormalSection with departures when RDS returns supported and unsupported states" do
       config = build_config(["route_A"])
 
@@ -229,15 +208,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      layout: %Layout{},
                      rows: [
                        ^departure,
-                       {%Screens.Schedules.Schedule{
-                          trip: %Screens.Trips.Trip{
-                            direction_id: 0
-                          },
-                          stop: nil,
-                          route: ^expected_route,
-                          arrival_time: ~U[2026-01-01 12:37:00Z],
-                          departure_time: ~U[2026-01-01 12:38:00Z]
-                        }, :first_trip}
+                       %SpecialTripRow{
+                         schedule: %Screens.Schedules.Schedule{
+                           trip: %Screens.Trips.Trip{
+                             direction_id: 0
+                           },
+                           stop: nil,
+                           route: ^expected_route,
+                           arrival_time: ~U[2026-01-01 12:37:00Z],
+                           departure_time: ~U[2026-01-01 12:38:00Z]
+                         },
+                         special_trip_type: :first_trip
+                       }
                      ]
                    }
                  ]
@@ -286,15 +268,18 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      layout: %Layout{},
                      rows: [
                        ^departure,
-                       {%Screens.Schedules.Schedule{
-                          id: nil,
-                          trip: %Screens.Trips.Trip{
-                            direction_id: 0
-                          },
-                          route: ^expected_route,
-                          arrival_time: ~U[2026-01-01 12:37:00Z],
-                          departure_time: ~U[2026-01-01 12:38:00Z]
-                        }, :first_trip}
+                       %SpecialTripRow{
+                         schedule: %Screens.Schedules.Schedule{
+                           id: nil,
+                           trip: %Screens.Trips.Trip{
+                             direction_id: 0
+                           },
+                           route: ^expected_route,
+                           arrival_time: ~U[2026-01-01 12:37:00Z],
+                           departure_time: ~U[2026-01-01 12:38:00Z]
+                         },
+                         special_trip_type: :first_trip
+                       }
                      ]
                    },
                    %Screens.V2.WidgetInstance.Departures.NoServiceSection{
@@ -372,7 +357,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      header: %Header{},
                      grouping_type: :time,
                      layout: %Layout{},
-                     rows: [^departure, {^schedule, :service_ended}]
+                     rows: [
+                       ^departure,
+                       %SpecialTripRow{
+                         schedule: ^schedule,
+                         special_trip_type: :service_ended
+                       }
+                     ]
                    }
                  ]
                }
@@ -385,7 +376,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
       departure = build_departure("r1", 0, :bus)
 
       route = route(id: "route_id_one", line_id: "line_id_two")
-      headway = {route, 0, {5, 10}, "Westbound"}
+
+      headway = %HeadwayRow{
+        route: route,
+        direction_id: 0,
+        range: {5, 10},
+        displayed_headsign: "Westbound"
+      }
 
       expect(@rds, :get, fn _departures, @now ->
         [
@@ -469,7 +466,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      grouping_type: :time,
                      layout: %Layout{},
                      rows: [
-                       {%Screens.Routes.Route{id: "route_one"}, nil, {5, 10}, "Westbound"}
+                       %HeadwayRow{
+                         route: %Screens.Routes.Route{id: "route_one"},
+                         direction_id: nil,
+                         range: {5, 10},
+                         displayed_headsign: "Westbound"
+                       }
                      ]
                    }
                  ]
