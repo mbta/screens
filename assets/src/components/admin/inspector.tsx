@@ -315,7 +315,7 @@ const ConfigControls: ComponentType<{
             validatePath={`/api/admin/screens/validate/${screen.id}`}
             onConfirm={handleConfirmEdit}
             onUpdated={(newConfig) => {
-              alert("Success. Allow 5 seconds for changes to propagate.");
+              alert("Config updated successfully.");
               closeDialog();
               onUpdated(newConfig);
             }}
