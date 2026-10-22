@@ -97,7 +97,8 @@ defmodule ScreensWeb.V2.ScreenApiController do
 
   defp disabled_response(%{assigns: %{screen: %Screen{disabled: true}}} = conn, _) do
     Logger.metadata(response_type: :disabled)
-    conn |> json(%{@base_response | disabled: true}) |> halt()
+    # Set a reasonable default time-to-next-refresh for disabled screens.
+    conn |> json(%{@base_response | disabled: true, ttl: 30}) |> halt()
   end
 
   defp disabled_response(conn, _), do: conn

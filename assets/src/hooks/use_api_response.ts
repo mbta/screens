@@ -18,29 +18,24 @@ const BASE_PATH = "/v2/api/screen";
 // implementation detail, and may change in future versions of the library)
 const MIN_ERROR_RETRY_MS = 250;
 
-// How often to refresh data when the server hasn't indicated when we should
-// refresh next. In practice should only occur when the screen is disabled.
-const FALLBACK_INTERVAL_MS = 30_000;
-
 // After this long without refreshing data, consider the previous data "stale"
 // and don't continue to display it.
 const STALE_THRESHOLD_MS = 60_000;
 
 type SimulationData = { fullPage: WidgetData; flexZone: WidgetData[] };
 
-const DISABLED_RESPONSE = { state: "disabled" } as const;
 const FAILURE_RESPONSE = { state: "failure" } as const;
 const LOADING_RESPONSE = { state: "loading" } as const;
 
 type ApiResponse =
   | { state: "success"; data: WidgetData; ttl: number }
   | { state: "simulation_success"; data: SimulationData; ttl: number }
-  | typeof DISABLED_RESPONSE
+  | { state: "disabled"; ttl: number }
   | typeof FAILURE_RESPONSE
   | typeof LOADING_RESPONSE;
 
 type RawResponse =
-  | { disabled: true; force_reload: boolean; data: null; ttl: null }
+  | { disabled: true; force_reload: boolean; data: null; ttl: number }
   | { disabled: boolean; force_reload: true; data: null; ttl: null }
   | {
       data: WidgetData | { full_page: WidgetData; flex_zone: WidgetData[] };
@@ -63,7 +58,7 @@ const apiResponseFetcher = (path: string): Promise<ApiResponse> =>
         window.location.reload();
         return LOADING_RESPONSE;
       } else if (disabled) {
-        return DISABLED_RESPONSE;
+        return { state: "disabled", ttl };
       } else if ("full_page" in data) {
         return {
           state: "simulation_success",
@@ -131,7 +126,10 @@ const useBaseApiResponse = ({
     },
     refreshInterval: (resp) => {
       if (isPaused) return 0;
-      if (!resp || !("ttl" in resp)) return FALLBACK_INTERVAL_MS;
+
+      // Use a reasonable fallback, but this should never occur in practice.
+      if (!resp || !("ttl" in resp)) return 30_000;
+
       // Though `ttl` is expected to only be a positive integer, take care to
       // never return 0 here, since this means "no interval".
       return Math.max(1, resp.ttl * 1_000);
