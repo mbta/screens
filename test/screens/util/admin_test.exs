@@ -7,6 +7,9 @@ defmodule Screens.Util.AdminTest do
   alias Screens.Config.ScreenConfig
   alias Screens.Util.Admin
   alias ScreensConfig.{AlertSchedule, EvergreenContentItem, RecurrentSchedule, Schedule, Screen}
+  alias ScreensConfig.Departures
+  alias ScreensConfig.Departures.{Header, Section}
+  alias ScreensConfig.Departures.Header.WayfindingInformation
   alias ScreensConfig.Screen.BusShelter
 
   defp build_evergreen_item(schedule), do: struct(EvergreenContentItem, schedule: schedule)
@@ -15,26 +18,50 @@ defmodule Screens.Util.AdminTest do
     struct(Screen, app_params: struct(BusShelter, evergreen_content: evergreen_content))
   end
 
+  defp build_wayfinding_item([_first | _] = schedule),
+    do: struct(WayfindingInformation, schedule: schedule)
+
+  defp build_wayfinding_item(_schedule), do: nil
+
+  defp build_screen_with_wayfinding(wayfinding_schedules) do
+    struct(Screen,
+      app_params:
+        struct(BusShelter,
+          departures:
+            struct(Departures,
+              sections:
+                Enum.map(wayfinding_schedules, fn schedule ->
+                  struct(Section,
+                    header:
+                      struct(Header, wayfinding_information: build_wayfinding_item(schedule))
+                  )
+                end)
+            )
+        )
+    )
+  end
+
   setup_all do
     before_date = ~D[2025-01-01]
 
-    evergreen_config_all_ended =
-      build_evergreen_item([
-        %Schedule{start_dt: ~U[2024-10-01T00:00:00Z], end_dt: ~U[2024-10-03T00:00:00Z]},
-        %Schedule{start_dt: ~U[2024-11-01T00:00:00Z], end_dt: ~U[2024-11-03T00:00:00Z]}
-      ])
+    all_ended = [
+      %Schedule{start_dt: ~U[2024-10-01T00:00:00Z], end_dt: ~U[2024-10-03T00:00:00Z]},
+      %Schedule{start_dt: ~U[2024-11-01T00:00:00Z], end_dt: ~U[2024-11-03T00:00:00Z]}
+    ]
 
-    evergreen_config_some_ended =
-      build_evergreen_item([
-        %Schedule{start_dt: ~U[2024-10-01T00:00:00Z], end_dt: ~U[2024-10-03T00:00:00Z]},
-        %Schedule{start_dt: ~U[2025-02-01T00:00:00Z], end_dt: ~U[2025-02-03T00:00:00Z]}
-      ])
+    some_ended = [
+      %Schedule{start_dt: ~U[2024-10-01T00:00:00Z], end_dt: ~U[2024-10-03T00:00:00Z]},
+      %Schedule{start_dt: ~U[2025-02-01T00:00:00Z], end_dt: ~U[2025-02-03T00:00:00Z]}
+    ]
 
-    evergreen_config_indefinite =
-      build_evergreen_item([
-        %Schedule{start_dt: ~U[2024-10-01T00:00:00Z], end_dt: ~U[2024-10-03T00:00:00Z]},
-        %Schedule{start_dt: ~U[2024-11-01T00:00:00Z], end_dt: nil}
-      ])
+    indefinite = [
+      %Schedule{start_dt: ~U[2024-10-01T00:00:00Z], end_dt: ~U[2024-10-03T00:00:00Z]},
+      %Schedule{start_dt: ~U[2024-11-01T00:00:00Z], end_dt: nil}
+    ]
+
+    evergreen_config_all_ended = build_evergreen_item(all_ended)
+    evergreen_config_some_ended = build_evergreen_item(some_ended)
+    evergreen_config_indefinite = build_evergreen_item(indefinite)
 
     evergreen_config_recurring_ended =
       build_evergreen_item(%RecurrentSchedule{
@@ -72,6 +99,20 @@ defmodule Screens.Util.AdminTest do
         evergreen_config_alert_linked
       ])
 
+    wayfinding_screen_before_cleanup =
+      build_screen_with_wayfinding([
+        all_ended,
+        some_ended,
+        indefinite
+      ])
+
+    wayfinding_screen_after_cleanup =
+      build_screen_with_wayfinding([
+        [],
+        some_ended,
+        indefinite
+      ])
+
     evergreen_varied_configs = [
       %ScreenConfig{id: "composite", config: evergreen_screen_before_cleanup},
       %ScreenConfig{
@@ -88,9 +129,21 @@ defmodule Screens.Util.AdminTest do
       }
     ]
 
+    wayfinding_varied_configs = [
+      %ScreenConfig{id: "composite", config: wayfinding_screen_before_cleanup},
+      %ScreenConfig{
+        id: "indefinite-only",
+        config: build_screen_with_wayfinding([indefinite])
+      }
+    ]
+
     evergreen_varied_expected_updates = [
       %{id: "composite", config: evergreen_screen_after_cleanup},
       %{id: "recurring-ended", config: build_screen_with_evergreen([])}
+    ]
+
+    wayfinding_varied_expected_updates = [
+      %{id: "composite", config: wayfinding_screen_after_cleanup}
     ]
 
     {:ok,
@@ -98,7 +151,11 @@ defmodule Screens.Util.AdminTest do
      evergreen_screen_after_cleanup: evergreen_screen_after_cleanup,
      evergreen_screen_before_cleanup: evergreen_screen_before_cleanup,
      evergreen_varied_configs: evergreen_varied_configs,
-     evergreen_varied_expected_updates: evergreen_varied_expected_updates}
+     evergreen_varied_expected_updates: evergreen_varied_expected_updates,
+     wayfinding_screen_after_cleanup: wayfinding_screen_after_cleanup,
+     wayfinding_screen_before_cleanup: wayfinding_screen_before_cleanup,
+     wayfinding_varied_configs: wayfinding_varied_configs,
+     wayfinding_varied_expected_updates: wayfinding_varied_expected_updates}
   end
 
   describe "cleanup_evergreen_content/2" do
@@ -114,16 +171,16 @@ defmodule Screens.Util.AdminTest do
     end
   end
 
-  describe "expired_evergreen_content_count/2" do
+  describe "evergreen_content_cleanup_updates/2" do
     test "counts only configs changed by evergreen cleanup", %{
       evergreen_varied_configs: evergreen_varied_configs,
       before_date: before_date
     } do
-      assert Admin.expired_evergreen_content_count(evergreen_varied_configs, before_date) == 2
+      assert evergreen_varied_configs
+             |> Admin.evergreen_content_cleanup_updates(before_date)
+             |> Enum.count() == 2
     end
-  end
 
-  describe "evergreen_content_cleanup_updates/2" do
     test "returns updates only for configs changed by cleanup across varied schedule types", %{
       evergreen_varied_configs: evergreen_varied_configs,
       evergreen_varied_expected_updates: evergreen_varied_expected_updates,
@@ -136,6 +193,45 @@ defmodule Screens.Util.AdminTest do
       expected = Enum.sort_by(evergreen_varied_expected_updates, & &1.id)
 
       assert result == expected
+    end
+  end
+
+  describe "wayfinding_content_cleanup_updates/2" do
+    test "counts only configs changed by wayfinding cleanup", %{
+      wayfinding_varied_configs: wayfinding_varied_configs,
+      before_date: before_date
+    } do
+      assert wayfinding_varied_configs
+             |> Admin.wayfinding_content_cleanup_updates(before_date)
+             |> Enum.count() == 1
+    end
+
+    test "returns updates only for configs changed by cleanup across varied schedule types", %{
+      wayfinding_varied_configs: wayfinding_varied_configs,
+      wayfinding_varied_expected_updates: wayfinding_varied_expected_updates,
+      before_date: before_date
+    } do
+      result =
+        Admin.wayfinding_content_cleanup_updates(wayfinding_varied_configs, before_date)
+        |> Enum.sort_by(& &1.id)
+
+      expected = Enum.sort_by(wayfinding_varied_expected_updates, & &1.id)
+
+      assert result == expected
+    end
+
+    test "removes wayfinding content items where all schedules end before the given date", %{
+      before_date: before_date,
+      wayfinding_screen_after_cleanup: wayfinding_screen_after_cleanup,
+      wayfinding_screen_before_cleanup: wayfinding_screen_before_cleanup
+    } do
+      [cleaned_screen] =
+        Admin.wayfinding_content_cleanup_updates(
+          [%ScreenConfig{id: "composite", config: wayfinding_screen_before_cleanup}],
+          before_date
+        )
+
+      assert cleaned_screen.config == wayfinding_screen_after_cleanup
     end
   end
 
