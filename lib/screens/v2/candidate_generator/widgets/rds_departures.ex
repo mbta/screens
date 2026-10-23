@@ -1,6 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   @moduledoc """
-  Candidate Generator for RDS Items. 
+  Candidate Generator for RDS Items.
   Takes in RDS items and generates Screens.V2.WidgetInstance.Departures sections
   to eventually be serialized and used as a part of the Departures Widget.
 
@@ -29,19 +29,23 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   @type post_process_rows_fn_t :: ([NormalSection.row()], Section.t(), non_neg_integer() ->
                                      [NormalSection.row()])
+  @type create_departure_sections_opt :: {:keep_alert_empty_section?, boolean()}
   @type widget :: DeparturesNoData.t() | DeparturesWidget.t()
 
   @spec create_departure_sections(
           [RDS.item()],
           Departures.t(),
-          post_process_rows_fn_t()
+          post_process_rows_fn_t(),
+          [create_departure_sections_opt()]
         ) :: [DeparturesWidget.section()]
   def create_departure_sections(
         rds_sections,
         %Departures{sections: departure_sections},
-        post_process_rows_fn \\ fn rows, _section, _total_section_count -> rows end
+        post_process_rows_fn \\ fn rows, _section, _total_section_count -> rows end,
+        opts \\ []
       ) do
     total_section_count = length(rds_sections)
+    keep_alert_empty_section? = Keyword.get(opts, :keep_alert_empty_section?, false)
 
     Enum.zip(rds_sections, departure_sections)
     |> Enum.map(fn {rds_section, section} ->
@@ -49,7 +53,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
         rds_section,
         section,
         total_section_count,
-        post_process_rows_fn
+        post_process_rows_fn,
+        keep_alert_empty_section?
       )
     end)
   end
@@ -58,13 +63,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           RDS.data(),
           Section.t(),
           non_neg_integer(),
-          post_process_rows_fn_t()
+          post_process_rows_fn_t(),
+          boolean()
         ) ::
           DeparturesWidget.section()
 
   defp map_to_departure_section(
          data,
          %Section{params: %Params{mode: mode}},
+         _,
          _,
          _
        )
@@ -75,20 +82,32 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
          {:ok, items},
          %Section{header: header, layout: layout, grouping_type: grouping_type} = section,
          section_count,
-         post_process_rows_fn
+         post_process_rows_fn,
+         keep_alert_empty_section?
        ) do
     case items do
       [
         %NoService{
           displayed_headsign: displayed_headsign,
-          routes: routes
+          routes: routes,
+          caused_by_alert?: caused_by_alert?
         }
       ] ->
-        %NoServiceSection{
-          headsign: displayed_headsign,
-          header: header,
-          routes: routes
-        }
+        if caused_by_alert? and keep_alert_empty_section? do
+          # DUP displays the alert separately; an additional no-service message is confusing
+          %NormalSection{
+            rows: [],
+            layout: layout,
+            header: header,
+            grouping_type: grouping_type
+          }
+        else
+          %NoServiceSection{
+            headsign: displayed_headsign,
+            header: header,
+            routes: routes
+          }
+        end
 
       [%ServiceEnded{displayed_headsign: displayed_headsign, routes: routes}] ->
         %OvernightSection{headsign: displayed_headsign, header: header, routes: routes}

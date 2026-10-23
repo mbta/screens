@@ -52,13 +52,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
     }
   end
 
-  defp no_service(stop_id, line_id, headsign, routes \\ []) do
+  defp no_service(stop_id, line_id, headsign, routes \\ [], caused_by_alert? \\ false) do
     destination = {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
 
     %RDS.NoService{
       destinations: [destination],
       routes: routes,
-      direction_id: 0
+      direction_id: 0,
+      caused_by_alert?: caused_by_alert?
     }
   end
 
@@ -246,6 +247,35 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       actual_instances = Dup.Departures.instances(config, @now)
 
       assert actual_instances == expected_instances
+    end
+
+    test "returns an empty NormalSection for alert-caused NoService states" do
+      primary_departures = [%Section{params: %Params{mode: :bus, stop_ids: ["place-A"]}}]
+
+      config =
+        @config
+        |> put_primary_departures(primary_departures)
+        |> put_secondary_departures_sections([])
+
+      expect(@rds, :get, fn _departures, @now ->
+        [{:ok, [no_service("place-A", "line-A", "headsign", [], true)]}]
+      end)
+
+      expect(@rds, :get, fn _departures, @now -> [] end)
+
+      section = hd(primary_departures)
+
+      expected_empty_section = %Screens.V2.WidgetInstance.Departures.NormalSection{
+        header: section.header,
+        layout: section.layout,
+        grouping_type: section.grouping_type,
+        rows: []
+      }
+
+      expected_instances =
+        expected_departures_widget(config, [expected_empty_section], [expected_empty_section])
+
+      assert Dup.Departures.instances(config, @now) == expected_instances
     end
 
     test "secondary departures fallback to primary departures when empty" do
