@@ -27,7 +27,8 @@ const MAX_LATER_DEPARTURES = 5;
 // few later departures
 const MAX_PAGE_RATE_MS = 3750;
 
-const REFRESH_RATE_MS = parseFloat(fetchDatasetValue("refreshRate")) * 1_000;
+const refreshRateMs = () =>
+  parseFloat(fetchDatasetValue("refreshRate")) * 1_000;
 
 const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
   const [limit, setLimit] = useState(MAX_LATER_DEPARTURES);
@@ -47,7 +48,7 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
 
     const pageDurationMs = Math.min(
       MAX_PAGE_RATE_MS,
-      REFRESH_RATE_MS / departures.length,
+      refreshRateMs() / departures.length,
     );
 
     const interval = setInterval(() => {
