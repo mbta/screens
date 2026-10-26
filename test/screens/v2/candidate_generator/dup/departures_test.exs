@@ -284,7 +284,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_departures
+          rows: expected_departures,
+          mode: :bus
         }
       ]
 
@@ -343,7 +344,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_departures
+          rows: expected_departures,
+          mode: :gl
         },
         %Screens.V2.WidgetInstance.Departures.NoDataSection{mode: :gl}
       ]
@@ -406,7 +408,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_departures
+          rows: expected_departures,
+          mode: :bus
         },
         %Screens.V2.WidgetInstance.Departures.NoServiceSection{
           header: %ScreensConfig.Departures.Header{},
@@ -474,7 +477,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_departures
+          rows: expected_departures,
+          mode: :bus
         },
         %Screens.V2.WidgetInstance.Departures.NoServiceSection{
           header: %ScreensConfig.Departures.Header{},
@@ -555,7 +559,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_primary_departures
+          rows: expected_primary_departures,
+          mode: :bus
         }
       ]
 
@@ -574,7 +579,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_secondary_departures
+          rows: expected_secondary_departures,
+          mode: :ferry
         }
       ]
 
@@ -688,7 +694,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_departures
+          rows: expected_departures,
+          mode: :bus
         }
       ]
 
@@ -756,7 +763,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_primary_departures
+          rows: expected_primary_departures,
+          mode: :rl
         }
       ]
 
@@ -775,7 +783,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_secondary_departures
+          rows: expected_secondary_departures,
+          mode: :rl
         }
       ]
 
@@ -845,7 +854,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_departures
+          rows: expected_departures,
+          mode: :rl
         }
       ]
 
@@ -918,7 +928,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
             min: 1
           },
           grouping_type: :time,
-          rows: expected_departures
+          rows: expected_departures,
+          mode: :rl
         },
         %Screens.V2.WidgetInstance.Departures.OvernightSection{
           header: %ScreensConfig.Departures.Header{},
@@ -1129,7 +1140,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           rows: [
             expected_primary_departure,
             {%Route{id: "r1"}, 0, {6, 10}, "other_headsign"}
-          ]
+          ],
+          mode: :bus
         }
       ]
 
