@@ -75,6 +75,73 @@ defmodule ScreensWeb.AdminApiControllerTest do
 
   setup :verify_on_exit!
 
+  describe "unused asset cleanup" do
+    @tag :authenticated
+    test "previews eligible assets without deleting", %{conn: conn} do
+      screen = screen_with_evergreen_end_dts([~U[2024-02-01 00:00:00Z]])
+      Repo.insert!(%ScreenConfig{id: "retained", config: screen})
+
+      expect(Screens.Assets.Cleanup.Mock, :preview, fn configs ->
+        assert [%ScreenConfig{id: "retained", config: ^screen}] = configs
+        {:ok, ["screens-local/images/unused.png"]}
+      end)
+
+      conn =
+        post(conn, "/api/admin/maintenance", %{action: "unused_asset_cleanup", dry_run: true})
+
+      assert json_response(conn, 200) == %{"keys" => ["screens-local/images/unused.png"]}
+    end
+
+    @tag :authenticated
+    test "deletes confirmed keys using current configurations", %{conn: conn} do
+      keys = ["screens-local/images/unused.png"]
+
+      expect(Screens.Assets.Cleanup.Mock, :delete, fn [], ^keys -> {:ok, 1} end)
+
+      conn = post(conn, "/api/admin/maintenance", %{action: "unused_asset_cleanup", keys: keys})
+      assert json_response(conn, 200) == %{"success" => true, "deleted" => 1}
+    end
+
+    @tag :authenticated
+    @tag :capture_log
+    test "reports listing errors", %{conn: conn} do
+      expect(Screens.Assets.Cleanup.Mock, :preview, fn [] -> {:error, :unavailable} end)
+
+      conn =
+        post(conn, "/api/admin/maintenance", %{action: "unused_asset_cleanup", dry_run: true})
+
+      assert %{"success" => false, "error" => _} = json_response(conn, 502)
+    end
+
+    @tag :authenticated
+    @tag :capture_log
+    test "reports deletion errors", %{conn: conn} do
+      expect(Screens.Assets.Cleanup.Mock, :delete, fn [], [] -> {:error, :forbidden} end)
+
+      conn = post(conn, "/api/admin/maintenance", %{action: "unused_asset_cleanup", keys: []})
+      assert %{"success" => false, "error" => _} = json_response(conn, 502)
+    end
+
+    @tag :authenticated
+    @tag :capture_log
+    test "rejects missing confirmation and invalid keys", %{conn: conn} do
+      for params <- [%{}, %{dry_run: false}, %{keys: "invalid"}, %{keys: [1]}] do
+        response =
+          post(conn, "/api/admin/maintenance", Map.put(params, :action, "unused_asset_cleanup"))
+
+        assert %{"success" => false} = json_response(response, 400)
+      end
+    end
+
+    @tag :capture_log
+    test "requires authentication", %{conn: conn} do
+      conn =
+        post(conn, "/api/admin/maintenance", %{action: "unused_asset_cleanup", dry_run: true})
+
+      assert conn.status == 401
+    end
+  end
+
   describe "/backup_dates" do
     @tag :authenticated
     test "returns the current environment's daily backup dates", %{conn: conn} do

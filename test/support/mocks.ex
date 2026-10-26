@@ -1,5 +1,6 @@
 injected_modules = [
   Screens.Alerts.Alert,
+  Screens.Assets.Cleanup,
   Screens.Config.Backup.Store,
   Screens.Elevator,
   Screens.Facilities.Facility,

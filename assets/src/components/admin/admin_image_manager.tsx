@@ -226,6 +226,11 @@ const ImageManager = (): JSX.Element => {
         </div>
       )}
       <h2>Upload New Image</h2>
+      <p>
+        To reserve an image indefinitely for future reuse, store it under the
+        `reusable/` directory. Images within this directory are always excluded
+        from cleanup.
+      </p>
       <ImageUpload
         onUploaded={loadImages}
         selectedPrefix={selectedKey ? keyPrefix(selectedKey) : undefined}
