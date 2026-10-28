@@ -19,6 +19,7 @@ defmodule Screens.V2.RDS do
   alias Screens.Headways, as: Headway
   alias Screens.LastTrip.LastTrip
   alias Screens.Lines.Line
+  alias Screens.LocationContext
   alias Screens.Report
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
@@ -264,14 +265,12 @@ defmodule Screens.V2.RDS do
     items =
       destinations
       |> Enum.map(fn destination ->
-        key = to_destination_key(destination)
-
         destination_state(
           destination,
-          Map.get(departures_by_destination, key, []),
-          Map.get(schedules_by_destination, key, []),
+          typical_patterns,
+          departures_by_destination,
+          schedules_by_destination,
           routes_for_section,
-          last_trip_departed?(key, now),
           destination_alerts,
           mode,
           now
@@ -307,24 +306,29 @@ defmodule Screens.V2.RDS do
 
   @spec destination_state(
           destination(),
-          [Departure.t()],
-          [Schedule.t()],
+          [RoutePattern.t()],
+          %{destination_key() => [Departure.t()]},
+          %{destination_key() => [Schedule.t()]},
           [Route.t()],
-          boolean(),
           destination_alert_map(),
           Mode.t(),
           DateTime.t()
         ) :: item() | nil
   defp destination_state(
          {%Stop{id: stop_id}, _line, headsign} = destination,
-         departures,
-         schedules,
+         typical_patterns,
+         departures_by_destination,
+         schedules_by_destination,
          routes_for_section,
-         last_trip_departed?,
          destination_alerts,
          mode,
          now
        ) do
+    destination_key = to_destination_key(destination)
+
+    departures = Map.get(departures_by_destination, destination_key, [])
+    schedules = Map.get(schedules_by_destination, destination_key, [])
+
     headways = @headways.get(stop_id, now)
     impacted_by_alert? = Map.has_key?(destination_alerts, destination)
 
@@ -340,7 +344,13 @@ defmodule Screens.V2.RDS do
       )
 
     service_state =
-      scheduled_service_state(first_schedule, last_schedule, headways, last_trip_departed?, now)
+      scheduled_service_state(
+        first_schedule,
+        last_schedule,
+        headways,
+        last_trip_departed?(destination_key, now),
+        now
+      )
 
     cond do
       presented_departures != [] ->
@@ -349,7 +359,9 @@ defmodule Screens.V2.RDS do
       impacted_by_alert? ->
         alert = Map.get(destination_alerts, destination)
 
-        if supports_alert?(alert, mode) do
+        location = calculate_location_for_alerts(alert, stop_id, typical_patterns, mode)
+
+        if supports_alert?(alert, mode, location) do
           %ImpactedByAlert{
             alert: alert,
             destinations: [destination],
@@ -359,8 +371,7 @@ defmodule Screens.V2.RDS do
                 %Schedule{trip: %Trip{direction_id: direction_id}} -> direction_id
                 nil -> nil
               end,
-            # added in a stacked PR
-            location: :inside,
+            location: location,
             routes: routes_for_section
           }
         else
@@ -807,10 +818,13 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  @spec supports_alert?(Alert.t(), Mode.t()) :: boolean()
-  # To be removed once we start supporting all effects we want
-  defp supports_alert?(%Alert{effect: effect}, mode),
-    do: effect in [:suspension, :shuttle] and Mode.to_route_type(mode) in [:subway, :light_rail]
+  @spec supports_alert?(Alert.t(), Mode.t(), LocationContext.location()) :: boolean()
+  # To be removed once we start supporting all effects, locations and modes we want
+  # Right now is just a filter as we build out support for all types of alerts
+  defp supports_alert?(%Alert{effect: effect}, mode, location),
+    do:
+      effect in [:suspension, :shuttle] and Mode.to_route_type(mode) in [:subway, :light_rail] and
+        location == :inside
 
   @spec ie_affects_destination?(InformedEntity.t(), RoutePattern.t(), Stop.t()) :: boolean()
   # Alert effects the entire route
@@ -840,6 +854,26 @@ defmodule Screens.V2.RDS do
   # Alert does not affect the route or a specific stop
   defp ie_affects_destination?(%InformedEntity{stop: nil}, _pattern, _home_stop),
     do: false
+
+  # Alert has a specific stop, but it has the same route as the pattern.
+  # Could be upstream or downstream and has a specific direction_id
+  defp ie_affects_destination?(
+         %InformedEntity{route: %Route{id: route_id}, direction_id: direction_id, stop: stop},
+         %RoutePattern{route: %Route{id: route_id}, direction_id: direction_id},
+         _home_stop
+       )
+       when not is_nil(direction_id) and not is_nil(stop),
+       do: true
+
+  # Alert has a specific stop, but it has the same route as the pattern. 
+  # Could be upstream or downstream but no direction_id specified
+  defp ie_affects_destination?(
+         %InformedEntity{route: %Route{id: route_id}, direction_id: nil, stop: stop},
+         %RoutePattern{route: %Route{id: route_id}},
+         _home_stop
+       )
+       when not is_nil(stop),
+       do: true
 
   # Alert effects the child stop
   defp ie_affects_destination?(%InformedEntity{stop: %Stop{id: id}}, _pattern, %Stop{id: id}),
@@ -885,6 +919,86 @@ defmodule Screens.V2.RDS do
 
       %ServiceEnded{last_schedule: %Schedule{trip: %Trip{direction_id: direction_id}}} ->
         [{line_id, direction_id}]
+    end
+  end
+
+  @spec calculate_location_for_alerts(Alert.t(), Stop.id(), [RoutePattern.t()], Mode.t()) ::
+          LocationContext.location()
+  defp calculate_location_for_alerts(
+         %Alert{effect: effect, informed_entities: ies},
+         home_stop_id,
+         route_patterns,
+         mode
+       ) do
+    stop_sequences =
+      Enum.map(route_patterns, fn %RoutePattern{stops: stops} -> Enum.map(stops, & &1.id) end)
+
+    route_ids = Enum.map(route_patterns, fn %RoutePattern{route: %Route{id: id}} -> id end)
+    downstream_stops = LocationContext.downstream_stop_id_set([home_stop_id], stop_sequences)
+    upstream_stops = LocationContext.upstream_stop_id_set([home_stop_id], stop_sequences)
+    terminal = LocationContext.terminal?(home_stop_id, stop_sequences)
+
+    Enum.flat_map(ies, fn ie ->
+      zones(ie, home_stop_id, route_ids, mode, downstream_stops, upstream_stops)
+    end)
+    |> Enum.uniq()
+    |> Enum.sort()
+    |> LocationContext.get_location(effect, terminal)
+  end
+
+  defp zones(
+         %InformedEntity{stop: nil, route: nil, route_type: nil},
+         _home_stop_id,
+         _route_ids,
+         _mode,
+         _downstream_stops,
+         _upstream_stops
+       ),
+       do: []
+
+  defp zones(
+         %InformedEntity{stop: nil, route: nil, route_type: route_type_id},
+         _home_stop_id,
+         _route_ids,
+         mode,
+         _downstream_stops,
+         _upstream_stops
+       ) do
+    if RouteType.from_id(route_type_id) == Mode.to_route_type(mode) do
+      [:upstream, :home_stop, :downstream]
+    else
+      []
+    end
+  end
+
+  defp zones(
+         %InformedEntity{stop: %Stop{id: stop_id}},
+         home_stop_id,
+         _route_ids,
+         _mode,
+         downstream_stops,
+         upstream_stops
+       ) do
+    cond do
+      stop_id == home_stop_id -> [:home_stop]
+      stop_id in downstream_stops -> [:downstream]
+      stop_id in upstream_stops -> [:upstream]
+      true -> []
+    end
+  end
+
+  defp zones(
+         %InformedEntity{stop: nil, route: %Route{id: route_id}},
+         _home_stop_id,
+         route_ids,
+         _mode,
+         _downstream_stops,
+         _upstream_stops
+       ) do
+    if route_id in route_ids do
+      [:upstream, :home_stop, :downstream]
+    else
+      []
     end
   end
 end
