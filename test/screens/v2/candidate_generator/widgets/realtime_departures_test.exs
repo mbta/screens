@@ -54,7 +54,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
     }
   end
 
-  defp no_service(stop_id, line_id, headsign) do
+  defp no_service(stop_id, line_id, headsign, caused_by_alert? \\ false) do
     %RDS.NoService{
       destinations: [{%Stop{id: stop_id}, %Line{id: line_id}, headsign}],
       routes: [
@@ -86,7 +86,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
             sort_order: nil
           }
         }
-      ]
+      ],
+      caused_by_alert?: caused_by_alert?
     }
   end
 
@@ -341,6 +342,27 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      headsign: nil,
                      routes: ^expected_routes
                    }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "uses the no-data fallback for alert-caused no service on LCD screens" do
+      config = build_config(["route_A", "route_B"])
+      departure = build_departure("r1", 0, :bus)
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok, [no_service("stop_id_one", "line_id_one", "headsign", true)]},
+          {:ok, [countdowns("stop_id_two", "line_id_two", "headsign", [departure])]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 sections: [
+                   %Screens.V2.WidgetInstance.Departures.NoServiceSection{},
+                   %NormalSection{rows: [^departure]}
                  ]
                }
              ] = RealtimeDepartures.departures_instances(config, @now)
