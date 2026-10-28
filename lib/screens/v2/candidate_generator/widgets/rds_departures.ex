@@ -73,7 +73,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   defp map_to_departure_section(
          {:ok, items},
-         %Section{header: header, layout: layout, grouping_type: grouping_type} = section,
+         %Section{header: header, layout: layout, grouping_type: grouping_type, params: params} =
+           section,
          section_count,
          post_process_rows_fn
        ) do
@@ -107,7 +108,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           rows: items |> create_and_sort_rows() |> post_process_rows_fn.(section, section_count),
           layout: layout,
           header: header,
-          grouping_type: grouping_type
+          grouping_type: grouping_type,
+          mode: get_in(params, [Access.key(:mode)])
         }
     end
   end

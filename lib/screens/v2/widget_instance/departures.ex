@@ -39,9 +39,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
             header: Header.t(),
             layout: Layout.t(),
             grouping_type: :time | :destination,
+            mode: Mode.t(),
             rows: [row()]
           }
-    defstruct header: nil, layout: nil, grouping_type: :time, rows: []
+    defstruct header: nil, layout: nil, grouping_type: :time, mode: nil, rows: []
   end
 
   defmodule HeadwaySection do
@@ -252,6 +253,33 @@ defmodule Screens.V2.WidgetInstance.Departures do
     text = get_headway_text(headsign, time_range, pill_color, route_id, is_only_section)
 
     %{type: :headway_section, text: FreeTextLine.to_json(text), layout: layout}
+  end
+
+  def serialize_section(
+        %NormalSection{
+          rows: rows,
+          layout: layout,
+          header: %Header{} = header,
+          grouping_type: grouping_type,
+          mode: :ferry
+        },
+        screen,
+        now,
+        _is_only_section
+      ) do
+    serialized_rows =
+      rows
+      |> Enum.take(@max_rows_per_section)
+      |> group_consecutive_departures(screen)
+      |> Enum.map(&serialize_departure_group(&1, screen, now))
+
+    %{
+      type: :normal_section,
+      rows: serialized_rows,
+      layout: Layout.to_json(%{layout | min: 1}),
+      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
+      grouping_type: grouping_type
+    }
   end
 
   def serialize_section(

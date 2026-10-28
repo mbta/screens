@@ -193,11 +193,19 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
     end
   end
 
-  defp post_process_rows(rows, %Section{bidirectional: bidirectional}, total_section_count) do
+  defp post_process_rows(
+         rows,
+         %Section{bidirectional: bidirectional, params: params},
+         total_section_count
+       ) do
     num_departures_per_section = div(@max_departures_per_rotation, total_section_count)
 
+    # credo:disable-for-next-line Credo.Check.Design.TagTODO
+    # TODO(dept_group): clean up mode-related logic in this function
+    make_bidirectional? = bidirectional and not is_nil(params) and params.mode not in [:ferry]
+
     rows
-    |> RdsDepartures.maybe_make_bidirectional(bidirectional)
+    |> RdsDepartures.maybe_make_bidirectional(make_bidirectional?)
     |> Enum.take(num_departures_per_section)
   end
 end
