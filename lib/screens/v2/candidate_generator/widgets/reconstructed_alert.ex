@@ -64,7 +64,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
          {:ok, alerts} <- fetch_alerts_fn.(route_ids: route_ids) do
       stop_sequences = LocationContext.stop_sequences(location_context)
       distance_map = build_distance_map(stop_id, stop_sequences)
-      is_terminal_station = terminal?(stop_id, stop_sequences)
+      is_terminal_station = LocationContext.terminal?(stop_id, stop_sequences)
 
       # Assign alerts to groups (or no group) based on "relevance". The group with the highest
       # relevance will have the `is_priority` flag set on the corresponding alert widgets, giving
@@ -284,13 +284,4 @@ defmodule Screens.V2.CandidateGenerator.Widgets.ReconstructedAlert do
 
   defp format_station_name("Massachusetts Avenue"), do: "Mass Ave"
   defp format_station_name(name), do: name
-
-  defp terminal?(stop_id, stop_sequences) do
-    # Can't use Enum.any, because then Govt Center will be seen as a terminal
-    # Using all is ok because no station is the terminal of one line and NOT the terminal of another line
-    # excluding GL branches
-    Enum.all?(stop_sequences, fn stop_sequence ->
-      List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
-    end)
-  end
 end
