@@ -31,14 +31,6 @@ defmodule Screens.V2.LocalizedAlert do
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
 
-  @type location ::
-          :boundary_downstream
-          | :boundary_upstream
-          | :downstream
-          | :elsewhere
-          | :inside
-          | :upstream
-
   @typedoc """
   A headsign indicating the direction a vehicle is headed in.
 
@@ -161,7 +153,7 @@ defmodule Screens.V2.LocalizedAlert do
     end
   end
 
-  @spec location(t()) :: location()
+  @spec location(t()) :: LocationContext.location()
   def location(
         %{
           alert: %Alert{effect: effect, informed_entities: informed_entities},
@@ -175,49 +167,8 @@ defmodule Screens.V2.LocalizedAlert do
       |> Enum.uniq()
       |> Enum.sort()
 
-    get_location_atom(informed_zones_set, effect, is_terminal_station)
+    LocationContext.get_location(informed_zones_set, effect, is_terminal_station)
   end
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:upstream],
-    do: :upstream
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:downstream],
-    do: :downstream
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:home_stop],
-    do: :inside
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :home_stop, :upstream],
-       do: :inside
-
-  # If station closure, then a boundary_upstream / _downstream is actually :inside
-  defp get_location_atom(informed_zones_set, effect, _)
-       when informed_zones_set == [:home_stop, :upstream] and effect === :station_closure,
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, effect, _)
-       when informed_zones_set == [:downstream, :home_stop] and effect === :station_closure,
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, effect, true)
-       when informed_zones_set in [[:home_stop, :upstream], [:downstream, :home_stop]] and
-              effect in [:suspension, :shuttle],
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:home_stop, :upstream],
-       do: :boundary_upstream
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :home_stop],
-       do: :boundary_downstream
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :upstream],
-       do: :downstream
-
-  defp get_location_atom(_, _, _), do: :elsewhere
 
   @doc """
   Returns all routes affected by an alert.

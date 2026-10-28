@@ -202,7 +202,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   @spec get_direction_and_route_ids_from_entity(
           InformedEntity.t(),
           Alert.effect(),
-          LocalizedAlert.location()
+          LocationContext.location()
         ) :: {0 | 1 | nil, Route.id()} | nil
   defp get_direction_and_route_ids_from_entity(
          %InformedEntity{stop: %Stop{id: "place-jfk"}},
@@ -683,7 +683,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec single_screen_fields(t(), LocalizedAlert.location()) ::
+  @spec single_screen_fields(t(), LocationContext.location()) ::
           single_screen_serialized_response()
   defp single_screen_fields(%__MODULE__{alert: %Alert{effect: :suspension}} = t, location) do
     %__MODULE__{
@@ -997,7 +997,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   end
 
   # Fallback for when we're unable to build a disruption diagram
-  @spec single_screen_fallback_fields(t(), LocalizedAlert.location()) ::
+  @spec single_screen_fallback_fields(t(), LocationContext.location()) ::
           single_screen_serialized_response()
   defp single_screen_fallback_fields(%__MODULE__{alert: alert, now: now} = t, location) do
     %{
@@ -1031,7 +1031,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
 
   # Special case for informational alerts; currently intended only for single-tracking but may
   # work acceptably with other "causes"
-  @spec flex_zone_fields(t(), LocalizedAlert.location()) :: flex_serialized_response()
+  @spec flex_zone_fields(t(), LocationContext.location()) :: flex_serialized_response()
   defp flex_zone_fields(%__MODULE__{alert: %Alert{severity: sev}} = t, location) when sev <= 1 do
     %__MODULE__{
       alert: %Alert{cause: cause, informed_entities: informed_entities},
@@ -1230,7 +1230,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     }
   end
 
-  @spec flex_zone_fallback_fields(t(), LocalizedAlert.location(), boolean()) ::
+  @spec flex_zone_fallback_fields(t(), LocationContext.location(), boolean()) ::
           flex_serialized_response()
   defp flex_zone_fallback_fields(
          %__MODULE__{alert: %Alert{effect: effect, header: header}} = t,
@@ -1400,7 +1400,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  @spec serialize_single_screen(t(), LocalizedAlert.location()) ::
+  @spec serialize_single_screen(t(), LocationContext.location()) ::
           single_screen_serialized_response()
 
   defp serialize_single_screen(%__MODULE__{alert: %Alert{effect: :delay}} = t, location),
@@ -1419,7 +1419,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
   # Use diagram-less presentation for partial station closures
   defp serialize_single_screen(t, location), do: single_screen_fields(t, location)
 
-  @spec serialize_flex_zone(t(), LocalizedAlert.location()) :: flex_serialized_response()
+  @spec serialize_flex_zone(t(), LocationContext.location()) :: flex_serialized_response()
   defp serialize_flex_zone(t, location), do: flex_zone_fields(t, location)
 
   defp report_diagram_error(%__MODULE__{} = t, reason) do
@@ -1495,7 +1495,7 @@ defmodule Screens.V2.WidgetInstance.ReconstructedAlert do
     end
   end
 
-  @spec urgent?(t(), LocalizedAlert.location()) :: boolean()
+  @spec urgent?(t(), LocationContext.location()) :: boolean()
   defp urgent?(%__MODULE__{alert: %Alert{effect: effect, severity: severity}}, location) do
     severity > 1 and location in @inside_locations and
       (Alert.is_service_eliminating_effect(effect) or severity >= 7)
