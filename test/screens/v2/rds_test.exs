@@ -14,10 +14,11 @@ defmodule Screens.V2.RDSTest do
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias ScreensConfig.Departures
-  alias ScreensConfig.Departures.{Params, Section}
+  alias ScreensConfig.Departures.{Mode, Params, Section}
 
   import Screens.Inject
   import Screens.TestSupport.InformedEntityBuilder
+  import Screens.TestSupport.RouteBuilder
   import Mox
   setup :verify_on_exit!
 
@@ -40,7 +41,7 @@ defmodule Screens.V2.RDSTest do
     :ok
   end
 
-  defp no_service(destination_keys) do
+  defp no_service(destination_keys, route_type \\ :bus) do
     destinations =
       Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
         {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
@@ -49,34 +50,8 @@ defmodule Screens.V2.RDSTest do
     %RDS.NoService{
       destinations: destinations,
       routes: [
-        %Screens.Routes.Route{
-          id: "r1",
-          short_name: nil,
-          long_name: nil,
-          direction_names: nil,
-          direction_destinations: nil,
-          type: :bus,
-          line: %Screens.Lines.Line{
-            id: "l1",
-            long_name: nil,
-            short_name: nil,
-            sort_order: nil
-          }
-        },
-        %Screens.Routes.Route{
-          id: "r2",
-          short_name: nil,
-          long_name: nil,
-          direction_names: nil,
-          direction_destinations: nil,
-          type: :bus,
-          line: %Screens.Lines.Line{
-            id: "l2",
-            long_name: nil,
-            short_name: nil,
-            sort_order: nil
-          }
-        }
+        route(id: "r1", line_id: "l1", type: route_type),
+        route(id: "r2", line_id: "l2", type: route_type)
       ]
     }
   end
@@ -136,6 +111,29 @@ defmodule Screens.V2.RDSTest do
     }
   end
 
+  defp impacted_by_alert(
+         alert,
+         destination_keys,
+         direction_id,
+         headsign,
+         location,
+         routes
+       ) do
+    destinations =
+      Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
+        {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+      end)
+
+    %RDS.ImpactedByAlert{
+      alert: alert,
+      destinations: destinations,
+      direction_id: direction_id,
+      displayed_headsign: headsign,
+      location: location,
+      routes: routes
+    }
+  end
+
   defp station(id, child_stop_ids) do
     %Stop{id: id, child_stops: Enum.map(child_stop_ids, &stop/1)}
   end
@@ -143,24 +141,24 @@ defmodule Screens.V2.RDSTest do
   defp stop(id), do: %Stop{id: id, location_type: 0}
 
   # Standard test fixture: 3 route patterns across 2 routes and 2 lines
-  defp standard_route_patterns do
+  defp standard_route_patterns(mode) do
     [
       %RoutePattern{
         id: "A",
         headsign: "hA",
-        route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+        route: route(id: "r1", line_id: "l1", type: Mode.to_route_type(mode)),
         stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
       },
       %RoutePattern{
         id: "B",
         headsign: "hB",
-        route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+        route: route(id: "r2", line_id: "l2", type: Mode.to_route_type(mode)),
         stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
       },
       %RoutePattern{
         id: "C",
         headsign: "hC",
-        route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+        route: route(id: "r2", line_id: "l2", type: Mode.to_route_type(mode)),
         stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
       }
     ]
@@ -172,10 +170,10 @@ defmodule Screens.V2.RDSTest do
     end)
   end
 
-  defp expect_standard_route_patterns(stop_ids, patterns \\ nil) do
-    patterns = patterns || standard_route_patterns()
+  defp expect_standard_route_patterns(stop_ids, patterns \\ nil, mode \\ :bus) do
+    patterns = patterns || standard_route_patterns(mode)
 
-    expect(@route_pattern, :fetch, fn %{mode: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+    expect(@route_pattern, :fetch, fn %{mode: ^mode, stop_ids: ^stop_ids, typicality: 1} ->
       {:ok, patterns}
     end)
   end
@@ -277,7 +275,13 @@ defmodule Screens.V2.RDSTest do
           prediction: %Prediction{
             arrival_time: ~U[2024-10-11 12:27:00Z],
             departure_time: ~U[2024-10-11 12:30:00Z],
-            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+            route: %Route{
+              id: "r1",
+              line: %Line{id: "l1"},
+              type: :bus,
+              direction_names: [],
+              short_name: ""
+            },
             stop: %Stop{id: "s1"},
             trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
           },
@@ -299,7 +303,7 @@ defmodule Screens.V2.RDSTest do
            %RoutePattern{
              id: "p1",
              headsign: "h2",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+             route: route(id: "r2", line_id: "l2", type: :bus),
              stops: [%Stop{id: "s1"}, %Stop{id: "s2"}],
              typicality: 1
            }
@@ -510,18 +514,20 @@ defmodule Screens.V2.RDSTest do
     test "creates service ended state when after last scheduled departure" do
       now = ~U[2024-10-11 10:50:00Z]
       stop_ids = ~w[s0 s1]
+      route_one = route(id: "r1", line_id: "l1", type: :bus)
+      route_two = route(id: "r2", line_id: "l2", type: :bus)
 
       first_schedule =
         %Schedule{
           departure_time: ~U[2024-10-11 10:45:00Z],
-          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+          route: route_one,
           stop: %Stop{id: "sA"},
           trip: %Trip{headsign: "h1", pattern_headsign: "hA"}
         }
 
       second_schedule = %Schedule{
         departure_time: ~U[2024-10-11 10:45:00Z],
-        route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+        route: route_two,
         stop: %Stop{id: "sB"},
         trip: %Trip{headsign: "h2", pattern_headsign: "hB"}
       }
@@ -529,17 +535,14 @@ defmodule Screens.V2.RDSTest do
       third_schedule =
         %Schedule{
           departure_time: ~U[2024-10-11 10:45:00Z],
-          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+          route: route_two,
           stop: %Stop{id: "sC"},
           trip: %Trip{headsign: "h3", pattern_headsign: "hC"}
         }
 
       all_schedules = [first_schedule, second_schedule, third_schedule]
 
-      expected_routes = [
-        %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
-        %Route{id: "r2", line: %Line{id: "l2"}, type: :bus}
-      ]
+      expected_routes = [route_one, route_two]
 
       departures = %Departures{
         sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
@@ -567,17 +570,20 @@ defmodule Screens.V2.RDSTest do
       now = ~U[2024-10-11 10:50:00Z]
       stop_ids = ~w[s0 s1]
 
+      route_one = route(id: "r1", line_id: "l1", type: :bus)
+      route_two = route(id: "r2", line_id: "l2", type: :bus)
+
       first_schedule =
         %Schedule{
           departure_time: ~U[2024-10-11 10:45:00Z],
-          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+          route: route_one,
           stop: %Stop{id: "sA"},
           trip: %Trip{headsign: "h1", pattern_headsign: "h1"}
         }
 
       second_schedule = %Schedule{
         departure_time: ~U[2024-10-11 10:45:00Z],
-        route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+        route: route_two,
         stop: %Stop{id: "sB"},
         trip: %Trip{headsign: "h1", pattern_headsign: "h1"}
       }
@@ -585,17 +591,14 @@ defmodule Screens.V2.RDSTest do
       third_schedule =
         %Schedule{
           departure_time: ~U[2024-10-11 10:45:00Z],
-          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+          route: route_two,
           stop: %Stop{id: "sC"},
           trip: %Trip{headsign: "h1", pattern_headsign: "h1"}
         }
 
       all_schedules = [first_schedule, second_schedule, third_schedule]
 
-      expected_routes = [
-        %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
-        %Route{id: "r2", line: %Line{id: "l2"}, type: :bus}
-      ]
+      expected_routes = [route_one, route_two]
 
       departures = %Departures{
         sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
@@ -610,19 +613,19 @@ defmodule Screens.V2.RDSTest do
         %RoutePattern{
           id: "A",
           headsign: "h1",
-          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+          route: route_one,
           stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
         },
         %RoutePattern{
           id: "B",
           headsign: "h1",
-          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+          route: route_two,
           stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
         },
         %RoutePattern{
           id: "C",
           headsign: "h1",
-          route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+          route: route_two,
           stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
         }
       ]
@@ -1134,106 +1137,122 @@ defmodule Screens.V2.RDSTest do
   end
 
   describe "get/1 alerts" do
-    test "does not create NoService destinations for those affected by an alert that affects the home stop" do
+    test "creates ImpactedByAlert destination for those affected by an alert that affects the home stop" do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
+      route_one = route(id: "r1", line_id: "l1", type: :subway)
+      route_two = route(id: "r2", line_id: "l2", type: :subway)
+      route_three = route(id: "r3", line_id: "l3", type: :subway)
+
+      alert = %Alert{
+        id: "1",
+        effect: :suspension,
+        informed_entities: [
+          ie(stop_id: "sA", route: route_one),
+          ie(stop_id: "s0", route: route_three)
+        ],
+        active_period: [{now, nil}]
+      }
 
       expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
-        {:ok,
-         [
-           %Alert{
-             id: "1",
-             effect: :stop_closure,
-             informed_entities: [
-               ie(stop_id: "s0", route_id: "r1"),
-               ie(stop_id: "sA", route_id: "r1")
-             ],
-             active_period: [{now, nil}]
-           }
-         ]}
+        {:ok, [alert]}
       end)
 
       expect_standard_stations(stop_ids)
-      expect_standard_route_patterns(stop_ids)
+      expect_standard_route_patterns(stop_ids, nil, :rl)
 
       departures = %Departures{
-        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
+        sections: [%Section{params: %Params{mode: :rl, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [
-               {:ok, [no_service([{"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
+               {:ok,
+                [
+                  impacted_by_alert(alert, [{"sA", "l1", "hA"}], nil, "hA", :inside, [
+                    route_one,
+                    route_two
+                  ]),
+                  no_service([{"sB", "l2", "hB"}], :subway),
+                  no_service([{"sC", "l2", "hC"}], :subway)
+                ]}
              ]
     end
 
-    test "does not create NoService for destinations affected by alert on entire route" do
+    test "creates ImpactedByAlert for destinations affected by alert on entire route" do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
+
+      alert = %Alert{
+        id: "1",
+        effect: :suspension,
+        informed_entities: [ie(route_id: "r1")],
+        active_period: [{now, nil}]
+      }
 
       # Alert affects entire route r1 (no direction_id, no stop)
       expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
-        {:ok,
-         [
-           %Alert{
-             id: "1",
-             effect: :suspension,
-             informed_entities: [ie(route_id: "r1")],
-             active_period: [{now, nil}]
-           }
-         ]}
+        {:ok, [alert]}
       end)
 
       expect_standard_stations(stop_ids)
-      expect_standard_route_patterns(stop_ids)
+      expect_standard_route_patterns(stop_ids, nil, :rl)
 
       departures = %Departures{
-        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
+        sections: [%Section{params: %Params{mode: :rl, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [
-               {:ok, [no_service([{"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
+               {:ok,
+                [
+                  impacted_by_alert(alert, [{"sA", "l1", "hA"}], nil, "hA", :inside, [
+                    route(id: "r1", line_id: "l1", type: :subway),
+                    route(id: "r2", line_id: "l2", type: :subway)
+                  ]),
+                  no_service([{"sB", "l2", "hB"}], :subway),
+                  no_service([{"sC", "l2", "hC"}], :subway)
+                ]}
              ]
     end
 
-    test "does not create NoService for destinations affected by alert on route in one direction" do
+    test "creates ImpactedByAlert for destinations affected by alert on route in one direction" do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
 
+      alert = %Alert{
+        id: "1",
+        effect: :suspension,
+        informed_entities: [ie(route_id: "r2", direction_id: 0, stop_id: "sB")],
+        active_period: [{now, nil}]
+      }
+
       # Alert affects route r2 in direction 0 only
       expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
-        {:ok,
-         [
-           %Alert{
-             id: "1",
-             effect: :shuttle,
-             informed_entities: [ie(route_id: "r2", direction_id: 0)],
-             active_period: [{now, nil}]
-           }
-         ]}
+        {:ok, [alert]}
       end)
 
       expect_standard_stations(stop_ids)
 
-      expect(@route_pattern, :fetch, fn %{mode: :bus, stop_ids: ^stop_ids, typicality: 1} ->
+      expect(@route_pattern, :fetch, fn %{mode: :rl, stop_ids: ^stop_ids, typicality: 1} ->
         {:ok,
          [
            %RoutePattern{
              id: "A",
              headsign: "hA",
-             route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+             route: route(id: "r1", line_id: "l1", type: :subway),
              stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}],
              direction_id: 1
            },
            %RoutePattern{
              id: "B",
              headsign: "hB",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
-             stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}],
+             route: route(id: "r2", line_id: "l2", type: :subway),
+             stops: [%Stop{id: "sB"}, %Stop{id: "otherA"}, %Stop{id: "otherY"}],
              direction_id: 0
            },
            %RoutePattern{
              id: "C",
              headsign: "hC",
-             route: %Route{id: "r2", line: %Line{id: "l2"}, type: :bus},
+             route: route(id: "r2", line_id: "l2", type: :subway),
              stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}],
              direction_id: 1
            }
@@ -1241,11 +1260,19 @@ defmodule Screens.V2.RDSTest do
       end)
 
       departures = %Departures{
-        sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
+        sections: [%Section{params: %Params{mode: :rl, stop_ids: stop_ids}}]
       }
 
       assert RDS.get(departures) == [
-               {:ok, [no_service([{"sA", "l1", "hA"}, {"sC", "l2", "hC"}])]}
+               {:ok,
+                [
+                  impacted_by_alert(alert, [{"sB", "l2", "hB"}], nil, "hB", :inside, [
+                    route(id: "r1", line_id: "l1", type: :subway),
+                    route(id: "r2", line_id: "l2", type: :subway)
+                  ]),
+                  no_service([{"sA", "l1", "hA"}], :subway),
+                  no_service([{"sC", "l2", "hC"}], :subway)
+                ]}
              ]
     end
 
@@ -1288,7 +1315,7 @@ defmodule Screens.V2.RDSTest do
          [
            %Alert{
              id: "1",
-             effect: :detour,
+             effect: :suspension,
              informed_entities: [
                ie(route_id: "4"),
                ie(route_id: "otherRoute"),
@@ -1310,6 +1337,77 @@ defmodule Screens.V2.RDSTest do
 
       assert RDS.get(departures) == [
                {:ok, [no_service([{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
+             ]
+    end
+
+    test "returns nil for destinations affected by alert but not a supported effect" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+
+      alert = %Alert{
+        id: "1",
+        effect: :detour,
+        informed_entities: [ie(route_id: "r1")],
+        active_period: [{now, nil}]
+      }
+
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
+        {:ok, [alert]}
+      end)
+
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids, nil, :rl)
+
+      departures = %Departures{
+        sections: [%Section{params: %Params{mode: :rl, stop_ids: stop_ids}}]
+      }
+
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  no_service([{"sB", "l2", "hB"}, {"sC", "l2", "hC"}], :subway)
+                ]}
+             ]
+    end
+
+    test "returns combined ImpactedByAlert for multiple destinations affected by the same alert" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+
+      alert = %Alert{
+        id: "1",
+        effect: :suspension,
+        informed_entities: [ie(route_id: "r2")],
+        active_period: [{now, nil}]
+      }
+
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
+        {:ok, [alert]}
+      end)
+
+      expect_standard_stations(stop_ids)
+      expect_standard_route_patterns(stop_ids, nil, :rl)
+
+      departures = %Departures{
+        sections: [%Section{params: %Params{mode: :rl, stop_ids: stop_ids}}]
+      }
+
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  impacted_by_alert(
+                    alert,
+                    [{"sB", "l2", "hB"}, {"sC", "l2", "hC"}],
+                    nil,
+                    nil,
+                    :inside,
+                    [
+                      route(id: "r1", line_id: "l1", type: :subway),
+                      route(id: "r2", line_id: "l2", type: :subway)
+                    ]
+                  ),
+                  no_service([{"sA", "l1", "hA"}], :subway)
+                ]}
              ]
     end
   end
