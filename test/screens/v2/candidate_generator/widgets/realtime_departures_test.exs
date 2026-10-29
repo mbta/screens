@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -12,14 +13,17 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.{NormalSection, OvernightSection}
-  alias Screens.V2.WidgetInstance.Departures.NormalSection.{HeadwayRow, SpecialTripRow}
+  alias Screens.V2.WidgetInstance.Departures.NormalSection.{AlertRow, HeadwayRow, SpecialTripRow}
   alias Screens.V2.WidgetInstance.DeparturesNoData
+  alias ScreensConfig.Alerts
+  alias ScreensConfig.ContentSummary
   alias ScreensConfig.Departures, as: DeparturesConfig
   alias ScreensConfig.Departures.{Filters, Header, Layout, Params, Section}
   alias ScreensConfig.Departures.Filters.RouteDirections
   alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
+  alias ScreensConfig.ElevatorStatus
   alias ScreensConfig.Screen
-  alias ScreensConfig.Screen.BusShelter
+  alias ScreensConfig.Screen.{BusShelter, PreFare}
 
   import Screens.TestSupport.RouteBuilder
   import Screens.Inject
@@ -131,25 +135,57 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
     }
   end
 
+  defp impacted_by_alert(alert, destinations, direction_id, displayed_headsign, location, routes) do
+    %RDS.ImpactedByAlert{
+      alert: alert,
+      destinations: destinations,
+      direction_id: direction_id,
+      displayed_headsign: displayed_headsign,
+      location: location,
+      routes: routes
+    }
+  end
+
   setup do
     stub(@rds, :get, fn _departures, @now -> [] end)
     :ok
   end
 
   describe "departures_instances/2" do
-    defp build_config(sections_or_route_ids) do
-      %Screen{
-        app_params: %BusShelter{
-          departures: build_departures_config(sections_or_route_ids),
-          header: nil,
-          footer: nil,
-          alerts: nil
-        },
-        vendor: nil,
-        device_id: nil,
-        name: nil,
-        app_id: :bus_shelter_v2
-      }
+    defp build_config(sections_or_route_ids, app_id \\ :bus_shelter_v2) do
+      if app_id == :bus_shelter_v2 do
+        %Screen{
+          app_params: %BusShelter{
+            departures: build_departures_config(sections_or_route_ids),
+            header: nil,
+            footer: nil,
+            alerts: nil
+          },
+          app_id: :bus_shelter_v2,
+          vendor: nil,
+          device_id: nil,
+          name: nil
+        }
+      else
+        %Screen{
+          app_params: %PreFare{
+            departures: build_departures_config(sections_or_route_ids),
+            content_summary: %ContentSummary{parent_station_id: "id"},
+            elevator_status: %ElevatorStatus{parent_station_id: "id"},
+            full_line_map: [],
+            header: %Header{
+              arrow: :ne,
+              subtitle: "This is a subtitle"
+            },
+            reconstructed_alert_widget: %Alerts{stop_id: "id"},
+            template: :duo
+          },
+          app_id: :pre_fare_v2,
+          vendor: nil,
+          device_id: nil,
+          name: nil
+        }
+      end
     end
 
     defp build_departures_config(sections_or_route_ids) do
@@ -475,6 +511,82 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                          direction_id: nil,
                          range: {5, 10},
                          displayed_headsign: "Westbound"
+                       }
+                     ]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "returns NoDataWidget after filtering alerts for Bus Shelters" do
+      bus_shelter_config = build_config(["route_A"])
+
+      stub(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             impacted_by_alert(%Alert{}, [], 0, "Filtered Alert", :here, [])
+           ]}
+        ]
+      end)
+
+      assert [%DeparturesNoData{}] =
+               RealtimeDepartures.departures_instances(bus_shelter_config, @now)
+    end
+
+    test "combines NormalSections with only alerts in it removing arrows and subtitles" do
+      config = build_config(["route_id_one", "route_id_two"], :pre_fare_v2)
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             impacted_by_alert(
+               %Alert{id: "same_id", effect: :shuttle},
+               [],
+               0,
+               "Combined Alert",
+               :inside,
+               [
+                 %Screens.Routes.Route{id: "route_one"}
+               ]
+             )
+           ]},
+          {:ok,
+           [
+             impacted_by_alert(
+               %Alert{id: "same_id", effect: :shuttle},
+               [],
+               0,
+               "Combined Alert",
+               :inside,
+               [
+                 %Screens.Routes.Route{id: "route_one"}
+               ]
+             )
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %NormalSection{
+                     header: %Header{
+                       arrow: "",
+                       subtitle: nil
+                     },
+                     grouping_type: :time,
+                     layout: %Layout{},
+                     mode: :rl,
+                     rows: [
+                       %AlertRow{
+                         direction_id: 0,
+                         displayed_headsign: "Combined Alert"
                        }
                      ]
                    }
