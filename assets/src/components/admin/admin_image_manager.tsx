@@ -65,7 +65,9 @@ const ImageUpload = ({ onUploaded, selectedPrefix }): JSX.Element => {
         setStagedUpload({ file, url: URL.createObjectURL(file) });
         setUploadKey((selectedPrefix ? selectedPrefix + "/" : "") + file.name);
       } else {
-        alert("That file is too large; please try one under 20MB.");
+        alert(
+          "That file is too large or an incorrect format; please try a png, gif, or svg under 20MB.",
+        );
       }
     },
     [selectedPrefix, setStagedUpload],
