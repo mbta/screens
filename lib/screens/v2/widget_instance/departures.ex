@@ -10,6 +10,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
+  alias Screens.Stops.Subway
   alias Screens.Trips.Trip
   alias Screens.Util
   alias Screens.Util.Assets
@@ -924,10 +925,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
          seconds
        ) do
     at_first_stop? = Departure.stop_type(departure) == :first_stop
+    stop_id_for_vehicle = Prediction.stop_for_vehicle(prediction)
 
     stopped_at_predicted_stop? =
       Departure.vehicle_status(departure) == :stopped_at and
-        stop_id == Prediction.stop_for_vehicle(prediction)
+        (stop_id == stop_id_for_vehicle or
+           stop_id == Subway.full_station_id_for_track_id(stop_id_for_vehicle))
 
     (seconds <= 90 and stopped_at_predicted_stop?) or (seconds <= 30 and at_first_stop?)
   end

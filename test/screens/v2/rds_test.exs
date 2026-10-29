@@ -406,6 +406,67 @@ defmodule Screens.V2.RDSTest do
       # headways); we should not produce "no service today" or "service ended"
       assert RDS.get(departures, now) == [{:ok, []}]
     end
+
+    test "creates destinations but replaces track stop ids if they have a full station stop id" do
+      now = ~U[2024-10-11 12:00:00Z]
+
+      expect(@headways, :get, fn _, _ -> nil end)
+
+      expected_departures_one = [
+        %Departure{
+          prediction: %Prediction{
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :light_rail},
+            stop: %Stop{id: "70504"},
+            trip: %Trip{headsign: "Riverside", pattern_headsign: "Riverside"}
+          },
+          schedule: nil
+        }
+      ]
+
+      expected_departures_two = [
+        %Departure{
+          prediction: %Prediction{
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :light_rail},
+            stop: %Stop{id: "Union Square-01"},
+            trip: %Trip{headsign: "Riverside", pattern_headsign: "Riverside"}
+          },
+          schedule: nil
+        }
+      ]
+
+      expected_departures_three = [
+        %Departure{
+          prediction: %Prediction{
+            departure_time: ~U[2024-10-11 12:30:00Z],
+            route: %Route{id: "r1", line: %Line{id: "l1"}, type: :light_rail},
+            stop: %Stop{id: "Union Square-02"},
+            trip: %Trip{headsign: "Riverside", pattern_headsign: "Riverside"}
+          },
+          schedule: nil
+        }
+      ]
+
+      expect(@departure, :fetch, fn
+        %{direction_id: 0, mode: :gl, stop_ids: ["s0"]}, [{:now, ^now} | _] ->
+          {:ok, expected_departures_one ++ expected_departures_two ++ expected_departures_three}
+      end)
+
+      departures = %Departures{
+        sections: [%Section{params: %Params{direction_id: 0, mode: :gl, stop_ids: ["s0"]}}]
+      }
+
+      assert RDS.get(departures, now) == [
+               {:ok,
+                [
+                  countdowns(
+                    [{"70504", "l1", "Riverside"}],
+                    expected_departures_one ++ expected_departures_one ++ expected_departures_one
+                  )
+                ]}
+             ]
+    end
   end
 
   describe "get/1 first trip" do
