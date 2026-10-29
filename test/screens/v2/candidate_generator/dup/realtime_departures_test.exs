@@ -11,7 +11,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.RealtimeDeparturesTest do
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
-  alias Screens.V2.WidgetInstance.Departures.NormalSection.{HeadwayRow, SpecialTripRow}
+
   alias Screens.V2.WidgetInstance.{DeparturesNoData, DeparturesNoService}
   alias Screens.V2.WidgetInstance.OvernightDepartures
 
@@ -22,6 +22,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.RealtimeDeparturesTest do
 
   import Mox
   import Screens.Inject
+  import Screens.TestSupport.NormalSectionRowBuilder
 
   setup :verify_on_exit!
 
@@ -748,14 +749,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.RealtimeDeparturesTest do
         }
 
       expected_primary_departures = [
-        %SpecialTripRow{
+        special_trip_row(
           schedule: expected_primary_schedule,
           special_trip_type: :first_trip
-        }
+        )
       ]
 
       expected_secondary_departures = [
-        %SpecialTripRow{schedule: expected_secondary_schedule, special_trip_type: :first_trip}
+        special_trip_row(schedule: expected_secondary_schedule, special_trip_type: :first_trip)
       ]
 
       expected_primary_sections = [
@@ -845,14 +846,14 @@ defmodule Screens.V2.CandidateGenerator.Dup.RealtimeDeparturesTest do
         }
 
       expected_departures = [
-        %SpecialTripRow{
+        special_trip_row(
           schedule: expected_first_schedule,
           special_trip_type: :first_trip
-        },
-        %SpecialTripRow{
+        ),
+        special_trip_row(
           schedule: expected_last_schedule,
           special_trip_type: :service_ended
-        }
+        )
       ]
 
       expected_primary_sections = [
@@ -928,7 +929,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.RealtimeDeparturesTest do
         }
 
       expected_departures = [
-        %SpecialTripRow{schedule: expected_first_schedule, special_trip_type: :first_trip}
+        special_trip_row(schedule: expected_first_schedule, special_trip_type: :first_trip)
       ]
 
       expected_sections = [
@@ -1157,12 +1158,12 @@ defmodule Screens.V2.CandidateGenerator.Dup.RealtimeDeparturesTest do
           grouping_type: :time,
           rows: [
             expected_primary_departure,
-            %HeadwayRow{
+            headway_row(
               route: %Route{id: "r1"},
               direction_id: 0,
               range: {6, 10},
               displayed_headsign: "other_headsign"
-            }
+            )
           ],
           mode: :bus
         }

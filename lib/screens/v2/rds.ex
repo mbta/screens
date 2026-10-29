@@ -484,7 +484,10 @@ defmodule Screens.V2.RDS do
           {state_destinations, routes, direction_id} =
             get_combined_destinations_routes_direction_ids(states)
 
-          representative_route = List.first(routes)
+          direction_names =
+            routes
+            |> List.first()
+            |> Route.normalized_direction_names()
 
           [
             %ImpactedByAlert{
@@ -492,7 +495,7 @@ defmodule Screens.V2.RDS do
               destinations: state_destinations,
               direction_id: direction_id,
               displayed_headsign:
-                get_common_headsign(state_destinations, representative_route, direction_id),
+                get_common_headsign(state_destinations, direction_names, direction_id),
               routes: routes,
               location: location
             }
@@ -515,7 +518,11 @@ defmodule Screens.V2.RDS do
           if is_nil(representative_route) do
             nil
           else
-            get_common_headsign(state_destinations, representative_route, direction_id)
+            get_common_headsign(
+              state_destinations,
+              Route.normalized_direction_names(representative_route),
+              direction_id
+            )
           end,
         routes: routes,
         direction_id: direction_id
@@ -531,7 +538,12 @@ defmodule Screens.V2.RDS do
     [
       %ServiceEnded{
         destinations: state_destinations,
-        displayed_headsign: get_common_headsign(state_destinations, route, direction_id),
+        displayed_headsign:
+          get_common_headsign(
+            state_destinations,
+            Route.normalized_direction_names(route),
+            direction_id
+          ),
         last_schedule: nil,
         routes: routes
       }
@@ -545,7 +557,12 @@ defmodule Screens.V2.RDS do
 
     [
       %Headways{
-        displayed_headsign: get_common_headsign(state_destinations, route, direction_id),
+        displayed_headsign:
+          get_common_headsign(
+            state_destinations,
+            Route.normalized_direction_names(route),
+            direction_id
+          ),
         destinations: state_destinations,
         range: range,
         routes: routes
@@ -621,10 +638,10 @@ defmodule Screens.V2.RDS do
 
   defp maybe_combine_headway_states(headways, _line_direction_pairs), do: headways
 
-  @spec get_common_headsign([destination()], Route.t(), Trip.direction()) :: String.t()
+  @spec get_common_headsign([destination()], [String.t()], Trip.direction()) :: String.t()
   defp get_common_headsign(
          [{_stop, %Line{id: line_id}, headsign} | _] = destinations,
-         route,
+         direction_names,
          direction_id
        ) do
     cond do
@@ -642,7 +659,7 @@ defmodule Screens.V2.RDS do
               line_id == other_line_id
             end
           ) ->
-        route |> Route.normalized_direction_names() |> Enum.at(direction_id)
+        Enum.at(direction_names, direction_id)
 
       true ->
         nil

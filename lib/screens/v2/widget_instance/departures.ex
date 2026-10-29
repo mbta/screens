@@ -55,7 +55,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
       @type t :: %__MODULE__{
               alert: Alert.t(),
-              direction_id: Trip.direction(),
+              direction_id: Trip.direction() | nil,
               displayed_headsign: String.t(),
               location: :here | :downstream,
               routes: [Route.t()],
