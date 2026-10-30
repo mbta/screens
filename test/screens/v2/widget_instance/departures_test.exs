@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -20,6 +21,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   }
 
   alias Screens.V2.WidgetInstance.Departures.NormalSection.{
+    AlertRow,
     HeadwayRow,
     SpecialTripRow
   }
@@ -31,6 +33,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias ScreensConfig.{FreeTextLine, Screen}
   alias ScreensConfig.Screen.{BusShelter, PreFare}
 
+  import Screens.TestSupport.InformedEntityBuilder
   import Screens.TestSupport.RouteBuilder
 
   describe "priority/1" do
@@ -350,6 +353,13 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
         bus_shelter_screen: %Screen{
           app_id: :bus_shelter_v2,
           vendor: :lg_mri,
+          device_id: "TEST",
+          name: "TEST",
+          app_params: nil
+        },
+        pre_fare_screen: %Screen{
+          app_id: :pre_fare_v2,
+          vendor: :vendor,
           device_id: "TEST",
           name: "TEST",
           app_params: nil
@@ -758,6 +768,75 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                ]
              } =
                Departures.serialize_section(section, dup_screen, now, false)
+    end
+
+    test "serializes normal section with countdown and alert rows", %{
+      pre_fare_screen: pre_fare_screen,
+      now: now
+    } do
+      rows = [
+        %Departure{
+          prediction: %Prediction{
+            id: "one",
+            departure_time: ~U[2020-01-01T00:01:10Z],
+            route: route(id: "Green-E", type: :subway),
+            trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
+            stop: %Stop{}
+          }
+        },
+        %AlertRow{
+          alert: %Alert{
+            effect: :shuttle,
+            active_period: [{~U[2026-01-01T11:00:00Z], nil}],
+            informed_entities: [
+              ie(stop_id: "6"),
+              ie(stop_id: "5"),
+              ie(stop_id: "90", route_id: "a")
+            ]
+          },
+          route: route(id: "Green-E", line: "line-Green", type: :subway),
+          direction_id: 0,
+          displayed_headsign: "Green Line",
+          location: :inside
+        }
+      ]
+
+      section = %NormalSection{
+        rows: rows,
+        layout: %Layout{},
+        header: %Header{title: "Section Header"},
+        grouping_type: :time
+      }
+
+      assert %{
+               type: :normal_section,
+               rows: [
+                 %{headsign: %{headsigns: ["Medford/Tufts", "Medfd/Tufts"]}},
+                 %{
+                   route: %{color: :green, text: "GL", type: :text},
+                   additional_text: %{
+                     icon: nil,
+                     text: [
+                       %{format: "bold", text: "Shuttle buses"},
+                       "from",
+                       %{format: "bold", text: "Eastbound Stops"},
+                       "to",
+                       %{format: "bold", text: "Westbound Stops"},
+                       "",
+                       ""
+                     ]
+                   },
+                   header_text: %{
+                     icon: nil,
+                     text: ["No Green-E Line service", %{special: :break}, "Use Shuttle Buses"]
+                   },
+                   icon: %{color: :green, effect: :shuttle},
+                   id: "W8aGHJ5GuEzNfzNHnVBTqw==",
+                   type: :alert_row
+                 }
+               ]
+             } =
+               Departures.serialize_section(section, pre_fare_screen, now, false)
     end
 
     test "serializes normal section with first trip row", %{dup_screen: dup_screen, now: now} do

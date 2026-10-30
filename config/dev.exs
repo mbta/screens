@@ -81,6 +81,7 @@ config :screens, ScreensWeb.Endpoint,
 
 # Do not include timestamps in development logs
 config :logger, :console, format: "[$level] $message $metadata\n"
+config :logger, truncate: :infinity
 
 # Set a higher stacktrace during development. Avoid configuring such
 # in production as building large stacktraces may be expensive.

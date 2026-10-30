@@ -55,6 +55,10 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<p><s><%= text %></s></p>|
   end
 
+  defp render_departure_group({:alert, header_text, additional_text}) do
+    ~E|<p><s><%= header_text %></s> <s><%=additional_text %></s></p>|
+  end
+
   defp render_departure_group({:normal, departures_group}) do
     %{
       route: route,
