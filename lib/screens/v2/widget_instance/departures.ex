@@ -25,14 +25,32 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defmodule NormalSection do
     @moduledoc "Section which includes a number of independent 'rows' or items."
+    defmodule SpecialTripRow do
+      @moduledoc "Row that indicates if a trip is either a first trip of the day or the service has ended for a particular destination"
 
-    @type special_trip :: {Schedule.t(), :first_trip | :service_ended}
-    @type headway_row :: {Route.t(), Trip.direction(), Headways.range(), String.t()}
+      @type t :: %__MODULE__{
+              schedule: Schedule.t(),
+              special_trip_type: :first_trip | :service_ended
+            }
+      defstruct [:schedule, :special_trip_type]
+    end
+
+    defmodule HeadwayRow do
+      @moduledoc "Row that displays Headway information for a particular destination"
+
+      @type t :: %__MODULE__{
+              route: Route.t(),
+              direction_id: Trip.direction() | nil,
+              range: Headways.range(),
+              displayed_headsign: String.t()
+            }
+      defstruct [:route, :direction_id, :range, :displayed_headsign]
+    end
 
     @type row ::
             Departure.t()
-            | special_trip()
-            | headway_row()
+            | SpecialTripRow.t()
+            | HeadwayRow.t()
             | FreeTextLine.t()
 
     @type t :: %__MODULE__{
@@ -542,8 +560,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
           list(
             {:normal, [Departure.t()]}
             | {:notice, FreeTextLine.t()}
-            | {:normal, [{Schedule.t(), :service_ended}]}
-            | {:normal, [NormalSection.headway_row()]}
+            | {:normal, [NormalSection.SpecialTripRow.t()]}
+            | {:normal, [NormalSection.HeadwayRow.t()]}
           )
   defp group_section_rows_for_audio(
          %NormalSection{rows: rows, grouping_type: grouping_type} = section,
@@ -560,10 +578,10 @@ defmodule Screens.V2.WidgetInstance.Departures do
       {_key, [%Departure{} | _] = departures} ->
         {:normal, filter_audio_departure_group(departures, grouping_type, app_id, now)}
 
-      {_key, [{_route, _direction_id, _time_range, _headsign}] = headway} ->
+      {_key, [%NormalSection.HeadwayRow{}] = headway} ->
         {:normal, headway}
 
-      {_key, [{_schedule, _special_trip_type}] = special_trip} ->
+      {_key, [%NormalSection.SpecialTripRow{}] = special_trip} ->
         {:normal, special_trip}
     end)
   end
@@ -583,11 +601,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp row_departure_grouping(%Departure{} = row),
     do: {Departure.route(row), Departure.headsign(row)}
 
-  defp row_departure_grouping({%Schedule{route: route} = schedule, _special_trip_type}),
-    do: {route, Schedule.headsign(schedule)}
+  defp row_departure_grouping(%NormalSection.SpecialTripRow{
+         schedule: %Schedule{route: route} = schedule
+       }),
+       do: {route, Schedule.headsign(schedule)}
 
-  defp row_departure_grouping({route, _direction_id, _time_range, headsign}),
-    do: {route, headsign}
+  defp row_departure_grouping(%NormalSection.HeadwayRow{
+         route: route,
+         displayed_headsign: displayed_headsign
+       }),
+       do: {route, displayed_headsign}
 
   defp row_departure_grouping(%FreeTextLine{}), do: make_ref()
 
@@ -621,7 +644,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
        )
 
   defp serialize_departure_group(
-         [{%Schedule{id: id} = schedule, special_trip_type}],
+         [
+           %NormalSection.SpecialTripRow{
+             schedule: %Schedule{id: id} = schedule,
+             special_trip_type: special_trip_type
+           }
+         ],
          %Screen{app_id: app_id} = screen,
          now,
          route_pill_serializer
@@ -648,7 +676,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_departure_group(
-         [{route, direction_id, {lo, hi}, headsign} | _],
+         [
+           %NormalSection.HeadwayRow{
+             route: route,
+             direction_id: direction_id,
+             range: {lo, hi},
+             displayed_headsign: headsign
+           }
+         ],
          %Screen{app_id: :dup_v2} = screen,
          _now,
          route_pill_serializer
@@ -666,7 +701,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
   end
 
   defp serialize_departure_group(
-         [{route, direction_id, {lo, hi}, headsign} | _],
+         [
+           %NormalSection.HeadwayRow{
+             route: route,
+             direction_id: direction_id,
+             range: {lo, hi},
+             displayed_headsign: headsign
+           }
+         ],
          screen,
          _now,
          route_pill_serializer
@@ -710,10 +752,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
         %Departure{} = departure ->
           Departure.id(departure)
 
-        {%Route{line: %Line{id: line_id}}, _direction_id, _range, headsign} ->
+        %NormalSection.HeadwayRow{
+          route: %Route{line: %Line{id: line_id}},
+          displayed_headsign: headsign
+        } ->
           hash_and_encode(line_id <> (headsign || ""))
 
-        {%Schedule{id: id}, _special_trip_type} ->
+        %NormalSection.SpecialTripRow{schedule: %Schedule{id: id}} ->
           id
       end)
       |> Enum.sort()

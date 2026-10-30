@@ -21,6 +21,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     OvernightSection
   }
 
+  alias Screens.V2.WidgetInstance.Departures.NormalSection.{
+    HeadwayRow,
+    SpecialTripRow
+  }
+
   alias Screens.V2.WidgetInstance.DeparturesNoData
   alias ScreensConfig.{Departures, FreeTextLine, Screen}
   alias ScreensConfig.Departures.{Filters, Section}
@@ -105,14 +110,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
                 header: header,
                 layout: layout,
                 grouping_type: grouping_type,
-                rows: [{route, nil, time_range, headsign}]
+                rows: [
+                  %HeadwayRow{
+                    displayed_headsign: headsign,
+                    route: route,
+                    range: time_range,
+                    direction_id: nil
+                  }
+                ]
               }
 
             {%NormalSection{} = normal_section, _section} ->
               normal_section
 
-            {unsupported_section, section} ->
-              handle_unsupported_sections(unsupported_section, section)
+            {no_data_section, section} ->
+              no_data_section(no_data_section, section)
           end),
         slot_names: slot_names,
         order: order,
@@ -135,11 +147,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   defp has_valid_normal_section_row?(%NormalSection{rows: rows}) do
     Enum.any?(rows, fn row ->
-      is_struct(row, Departure) || match?({%Schedule{}, _special_trip_type}, row)
+      is_struct(row, Departure) || is_struct(row, SpecialTripRow) || is_struct(row, HeadwayRow)
     end)
   end
 
-  defp handle_unsupported_sections(%NoDataSection{mode: mode}, %Section{
+  defp no_data_section(%NoDataSection{mode: mode}, %Section{
          header: header,
          layout: layout,
          grouping_type: grouping_type
@@ -201,13 +213,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     %RouteDirection{route_id: Departure.route(d).id, direction_id: Departure.direction_id(d)}
   end
 
-  defp route_direction(
-         {%Schedule{route: %Route{id: id}, direction_id: direction_id}, _special_trip_type}
-       ) do
+  defp route_direction(%SpecialTripRow{
+         schedule: %Schedule{route: %Route{id: id}, direction_id: direction_id}
+       }) do
     %RouteDirection{route_id: id, direction_id: direction_id}
   end
 
-  defp route_direction({%Route{id: id}, direction_id, _range, _headsign}) do
+  defp route_direction(%HeadwayRow{route: %Route{id: id}, direction_id: direction_id}) do
     %RouteDirection{route_id: id, direction_id: direction_id}
   end
 
