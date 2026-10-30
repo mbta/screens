@@ -136,6 +136,29 @@ defmodule Screens.V2.RDSTest do
     }
   end
 
+  defp impacted_by_alert(
+         alert,
+         destination_keys,
+         direction_id,
+         headsign,
+         location,
+         routes
+       ) do
+    destinations =
+      Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
+        {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
+      end)
+
+    %RDS.ImpactedByAlert{
+      alert: alert,
+      destinations: destinations,
+      direction_id: direction_id,
+      displayed_headsign: headsign,
+      location: location,
+      routes: routes
+    }
+  end
+
   defp station(id, child_stop_ids) do
     %Stop{id: id, child_stops: Enum.map(child_stop_ids, &stop/1)}
   end
@@ -1162,6 +1185,84 @@ defmodule Screens.V2.RDSTest do
 
       assert RDS.get(departures) == [
                {:ok, [no_service([{"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
+             ]
+    end
+
+    test "does creates ImpactedByAlert destinations for those affected by an alert that affects the home stop" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
+        {:ok,
+         [
+           %Alert{
+             id: "1",
+             effect: :suspension,
+             informed_entities: [
+               ie(stop_id: "s0", route_id: "r1"),
+               ie(stop_id: "sA", route_id: "r1")
+             ],
+             active_period: [{now, nil}]
+           }
+         ]}
+      end)
+
+      expected_route = %Route{id: "r1", line: %Line{id: "l1"}, type: :subway}
+
+      expect_standard_stations(stop_ids)
+
+      expect(@route_pattern, :fetch, fn %{mode: :ol, stop_ids: ^stop_ids, typicality: 1} ->
+        {:ok,
+         [
+           %RoutePattern{
+             id: "A",
+             headsign: "hA",
+             route: expected_route,
+             stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
+           }
+         ]}
+      end)
+
+      departures = %Departures{
+        sections: [%Section{params: %Params{mode: :ol, stop_ids: stop_ids}}]
+      }
+
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  impacted_by_alert(
+                    %Alert{
+                      id: "1",
+                      active_period: [{~U[2024-10-11 10:44:00Z], nil}],
+                      effect: :suspension,
+                      informed_entities: [
+                        %Screens.Alerts.InformedEntity{
+                          activities: [],
+                          route: %Screens.Routes.Route{
+                            id: "r1"
+                          },
+                          stop: %Screens.Stops.Stop{
+                            id: "s0"
+                          }
+                        },
+                        %Screens.Alerts.InformedEntity{
+                          activities: [],
+                          route: %Screens.Routes.Route{
+                            id: "r1"
+                          },
+                          stop: %Screens.Stops.Stop{
+                            id: "sA"
+                          }
+                        }
+                      ]
+                    },
+                    [{"sA", "l1", "hA"}],
+                    nil,
+                    "hA",
+                    :inside,
+                    [expected_route]
+                  )
+                ]}
              ]
     end
 
