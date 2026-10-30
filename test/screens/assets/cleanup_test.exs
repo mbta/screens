@@ -173,7 +173,6 @@ defmodule Screens.Assets.CleanupTest do
   test "stops on deletion failure and reports the number already deleted" do
     objects = [object("images/a.png"), object("images/b.png"), object("images/c.png")]
     first_path = key("images/a.png")
-    second_path = key("images/b.png")
 
     request = fn operation ->
       case operation.http_method do
@@ -183,7 +182,7 @@ defmodule Screens.Assets.CleanupTest do
         :delete ->
           case operation.path do
             ^first_path -> {:ok, %{status_code: 204}}
-            ^second_path -> {:error, :forbidden}
+            _ -> {:error, :forbidden}
           end
       end
     end

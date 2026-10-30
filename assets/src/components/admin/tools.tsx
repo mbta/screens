@@ -212,7 +212,7 @@ const UnusedAssetCleanup = () => {
       <h3>Unused Asset Cleanup</h3>
       <p>
         Delete image and video assets not referenced by any screen configuration
-        in this environment. Assets uploaded or changed within the last seven
+        in this environment. Assets uploaded or changed within the last 30
         days are kept, as are assets in each media folder&apos;s reusable/
         subfolder (for example, images/reusable/).
       </p>

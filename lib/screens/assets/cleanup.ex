@@ -79,7 +79,7 @@ defmodule Screens.Assets.Cleanup do
 
     case request.(S3.list_objects_v2(@bucket, opts)) do
       {:ok, %{body: %{contents: objects, is_truncated: truncated} = body}} ->
-        if truncated in [true, "true"] do
+        if truncated == "true" do
           case Map.get(body, :next_continuation_token) do
             next when is_binary(next) and next != "" and next != token ->
               list_objects(prefix, request, next, objects ++ acc)
@@ -113,7 +113,7 @@ defmodule Screens.Assets.Cleanup do
 
   defp eligible?(_object, _prefix, _environment, _references, _cutoff), do: false
 
-  # Traverse values rather than known schema fields, to future-proof for  new widgets.
+  # Traverse values rather than known schema fields, to future-proof for new widgets.
   defp strings(value) when is_binary(value), do: [value]
   defp strings(value) when is_map(value), do: value |> Map.values() |> Enum.flat_map(&strings/1)
   defp strings(value) when is_list(value), do: Enum.flat_map(value, &strings/1)
