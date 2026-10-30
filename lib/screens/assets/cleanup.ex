@@ -76,6 +76,8 @@ defmodule Screens.Assets.Cleanup do
   end
 
   defp list_objects(prefix, request, token \\ nil, acc \\ []) do
+    # Omit continuation token on first request. For each subsequent page, use the previous
+    # response's next_continuation_token until is_truncated is "false" indicating the last page
     opts = [prefix: prefix] ++ if(token, do: [continuation_token: token], else: [])
 
     case request.(S3.list_objects_v2(@bucket, opts)) do
