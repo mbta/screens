@@ -9,19 +9,20 @@ const SYNC_FROM_SNAPSHOT_PATH = "/api/admin/sync_from_snapshot";
 const Tools = () => {
   return (
     <main className="admin-page admin-tools">
-      <ImageContentCleanup />
+      <ContentCleanup />
       <SyncFromSnapshot />
       <RestoreFromBackup />
     </main>
   );
 };
 
-const ImageContentCleanup = () => {
+const ContentCleanup = () => {
   return (
     <section>
       <h2>Content Cleanup</h2>
       <ScheduledContentCleanup />
       <AlertContentCleanup />
+      <UnusedAssetCleanup />
     </section>
   );
 };
@@ -61,7 +62,7 @@ const ScheduledContentCleanup = () => {
 
   return (
     <section>
-      <h3>Schedule-Based Content Cleanup</h3>
+      <h3>Schedule-Based Config Cleanup</h3>
       <p>
         Delete inactive evergreen and wayfinding content which ended before the
         specified date.
@@ -78,7 +79,7 @@ const ScheduledContentCleanup = () => {
           value={contentCleanupDate}
           onChange={(event) => setContentCleanupDate(event.target.value)}
         />
-        <button type="submit">Cleanup</button>
+        <button type="submit">Preview Cleanup</button>
       </form>
     </section>
   );
@@ -125,7 +126,7 @@ const AlertContentCleanup = () => {
 
   return (
     <section>
-      <h3>Alert-Linked Content Cleanup </h3>
+      <h3>Alert-Linked Config Cleanup </h3>
       <p>
         Delete evergreen content tied to alerts that are no longer present in
         the alerts feed.
@@ -144,7 +145,89 @@ const AlertContentCleanup = () => {
         }}
       >
         <button type="submit" disabled={isRunning}>
-          Cleanup
+          Preview Cleanup
+        </button>
+      </form>
+    </section>
+  );
+};
+
+const UnusedAssetCleanup = () => {
+  const [isRunning, setIsRunning] = useState(false);
+
+  const cleanup = async () => {
+    if (isRunning) return;
+    setIsRunning(true);
+
+    try {
+      const preview = await fetch.post(API_PATH, {
+        action: "unused_asset_cleanup",
+        dry_run: true,
+      });
+
+      if (preview.status !== 200) {
+        window.alert(
+          `Error: ${preview.error || "Could not list unused assets."}`,
+        );
+        return;
+      }
+
+      const keys: string[] = preview.keys;
+      if (keys.length === 0) {
+        window.alert("No unused assets are eligible for deletion.");
+        return;
+      }
+
+      if (
+        !window.confirm(
+          `Delete ${keys.length} unused assets from this environment's S3 storage? ` +
+            "Only assets last modified more than 30 days ago are eligible. " +
+            "This cannot be undone; deleted assets must be re-uploaded if needed.",
+        )
+      ) {
+        return;
+      }
+
+      const result = await fetch.post(API_PATH, {
+        action: "unused_asset_cleanup",
+        keys,
+      });
+
+      window.alert(
+        result.status === 200
+          ? `Deleted ${result.deleted} unused assets.`
+          : `Cleanup failed; some assets may already have been deleted. ${result.error || "Unknown error"}`,
+      );
+    } catch {
+      window.alert(
+        "Asset cleanup request failed. Check the connection and preview again before retrying.",
+      );
+    } finally {
+      setIsRunning(false);
+    }
+  };
+
+  return (
+    <section>
+      <h3>Unused Asset Cleanup</h3>
+      <p>
+        Delete image and video assets not referenced by any screen configuration
+        in this environment. Assets uploaded or changed within the last 30 days
+        are kept, as are assets in each media folder&apos;s reusable/ subfolder
+        (for example, images/reusable/).
+      </p>
+      <p>
+        Keep original custom assets in Figma, not S3. Deleted assets can be
+        re-uploaded if needed from the Image Manager.
+      </p>
+      <form
+        onSubmit={(event) => {
+          event.preventDefault();
+          cleanup();
+        }}
+      >
+        <button type="submit" disabled={isRunning}>
+          Preview Cleanup
         </button>
       </form>
     </section>

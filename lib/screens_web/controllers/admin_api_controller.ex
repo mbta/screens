@@ -9,6 +9,7 @@ defmodule ScreensWeb.AdminApiController do
 
   import Screens.Inject
   @data_cache injected(Screens.V2.ScreenData.Cache)
+  @asset_cleanup injected(Screens.Assets.Cleanup)
 
   plug :accepts, ["multipart/form-data"] when action == :upload_image
 
@@ -259,6 +260,41 @@ defmodule ScreensWeb.AdminApiController do
         |> put_status(500)
         |> json(%{success: false, error: inspect(reason)})
     end
+  end
+
+  def maintenance(conn, %{"action" => "unused_asset_cleanup", "dry_run" => true}) do
+    case @asset_cleanup.preview(ScreenConfigs.all()) do
+      {:ok, keys} -> json(conn, %{keys: keys})
+      {:error, reason} -> asset_cleanup_error(conn, reason)
+    end
+  end
+
+  def maintenance(conn, %{"action" => "unused_asset_cleanup", "keys" => keys})
+      when is_list(keys) do
+    if Enum.all?(keys, &is_binary/1) do
+      case @asset_cleanup.delete(ScreenConfigs.all(), keys) do
+        {:ok, deleted} -> json(conn, %{success: true, deleted: deleted})
+        {:error, reason} -> asset_cleanup_error(conn, reason)
+      end
+    else
+      invalid_asset_cleanup_request(conn)
+    end
+  end
+
+  def maintenance(conn, %{"action" => "unused_asset_cleanup"}) do
+    invalid_asset_cleanup_request(conn)
+  end
+
+  defp invalid_asset_cleanup_request(conn) do
+    conn
+    |> put_status(400)
+    |> json(%{success: false, error: "Provide dry_run: true or a list of confirmed asset keys"})
+  end
+
+  defp asset_cleanup_error(conn, reason) do
+    conn
+    |> put_status(502)
+    |> json(%{success: false, error: inspect(reason)})
   end
 
   defp alerts_fetch_error(conn) do
