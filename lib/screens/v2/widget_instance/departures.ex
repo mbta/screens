@@ -486,7 +486,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
   @spec group_by_unique_destination([NormalSection.row()]) :: [[NormalSection.row()]]
   def group_by_unique_destination(rows) do
     rows
-    |> Enum.uniq_by(&row_destination(&1))
+    |> Enum.uniq_by(&row_departure_grouping(&1))
     |> Enum.map(&[&1])
   end
 
@@ -552,22 +552,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
     Enum.take(rows, (max || base || @max_rows_per_section) + if(include_later, do: 4, else: 0))
   end
 
-  defp row_departure_grouping(%Departure{} = row), do: row_destination(row)
-
-  # Only departures can share a serializer group. Headways and special trips have
-  # their own row serializers, even when their route and headsign match a departure.
-  defp row_departure_grouping(_row), do: make_ref()
-
-  defp row_destination(%Departure{} = row),
+  defp row_departure_grouping(%Departure{} = row),
     do: {Departure.route(row), Departure.headsign(row)}
 
-  defp row_destination({%Schedule{route: route} = schedule, _special_trip_type}),
+  defp row_departure_grouping({%Schedule{route: route} = schedule, _special_trip_type}),
     do: {route, Schedule.headsign(schedule)}
 
-  defp row_destination({route, _direction_id, _time_range, headsign}),
+  defp row_departure_grouping({route, _direction_id, _time_range, headsign}),
     do: {route, headsign}
 
-  defp row_destination(%FreeTextLine{}), do: make_ref()
+  defp row_departure_grouping(%FreeTextLine{}), do: make_ref()
 
   # When using destination-based grouping, only read out the "next" departure, in line with the
   # visual presentation.

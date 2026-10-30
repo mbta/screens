@@ -751,40 +751,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.serialize_section(section, dup_screen, now, false)
     end
 
-    test "keeps matching countdown and headway rows separate on busways", %{now: now} do
-      screen = struct(Screen, app_id: :busway_v2)
-      route = route(id: "Green-D", type: :light_rail, line_id: "line-Green")
-
-      departure = %Departure{
-        prediction: %Prediction{
-          id: "countdown",
-          departure_time: DateTime.add(now, 60),
-          route: route,
-          trip: %Trip{headsign: "Riverside", direction_id: 0},
-          stop: %Stop{}
-        }
-      }
-
-      headway = {route, 0, {7, 12}, "Riverside"}
-
-      for rows <- [[departure, headway], [headway, departure]] do
-        section = %NormalSection{rows: rows, layout: %Layout{}, header: %Header{}}
-        %{rows: serialized_rows} = Departures.serialize_section(section, screen, now)
-
-        expected_times =
-          Enum.map(rows, fn
-            %Departure{} -> %{type: :minutes, minutes: 1}
-            ^headway -> %{type: :headway, range: %{lo: 7, hi: 12}}
-          end)
-
-        assert Enum.map(serialized_rows, fn row ->
-                 assert %{headsign: %{headsigns: ["Riverside"]}, direction_id: 0} = row
-                 assert [%{time: time}] = row.times_with_crowding
-                 time
-               end) == expected_times
-      end
-    end
-
     test "serializes normal section with first trip row", %{dup_screen: dup_screen, now: now} do
       rows = [
         {%Schedule{
@@ -939,27 +905,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       departures = [d1, d2, d3, n1]
       expected = [[d1, d2], [d3], [n1]]
       assert expected == Departures.group_consecutive_departures(departures, bus_shelter_screen)
-    end
-
-    test "never groups headways or special trips with matching departures or each other", %{
-      bus_shelter_screen: screen
-    } do
-      route = route(id: "Green-D", type: :light_rail)
-      trip = %Trip{headsign: "Riverside", direction_id: 0}
-      departure = %Departure{prediction: %Prediction{route: route, trip: trip}}
-      headway = {route, 0, {7, 12}, "Riverside"}
-      first_trip = {%Schedule{route: route, trip: trip}, :first_trip}
-      service_ended = {%Schedule{route: route, trip: trip}, :service_ended}
-      rows = [departure, departure, headway, headway, first_trip, service_ended, departure]
-
-      assert Departures.group_consecutive_departures(rows, screen) == [
-               [departure, departure],
-               [headway],
-               [headway],
-               [first_trip],
-               [service_ended],
-               [departure]
-             ]
     end
 
     test "keeps departures ungrouped for DUPs", %{dup_screen: dup_screen} do
@@ -1983,40 +1928,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                  {:normal, %{route: %{id: "2"}, times_with_crowding: [_]}}
                ]
              } = Departures.audio_serialize_section(section, screen, @now)
-    end
-
-    test "keeps matching countdown and headway audio groups separate" do
-      route = route(id: "Green-D", type: :light_rail, line_id: "line-Green")
-
-      departure = %Departure{
-        prediction: %Prediction{
-          @prediction
-          | arrival_time: DateTime.add(@now, 60),
-            route: route,
-            trip: %Trip{headsign: "Riverside", direction_id: 0}
-        }
-      }
-
-      headway = {route, 0, {7, 12}, "Riverside"}
-
-      for app_id <- [:busway_v2, :bus_shelter_v2],
-          rows <- [[departure, headway], [headway, departure]] do
-        screen = struct(Screen, app_id: app_id)
-        section = %NormalSection{rows: rows, layout: %Layout{}, header: %Header{}}
-
-        %{departure_groups: groups} = Departures.audio_serialize_section(section, screen, @now)
-
-        expected_times =
-          Enum.map(rows, fn
-            %Departure{} -> %{type: :minutes, minutes: 1}
-            ^headway -> %{type: :headway, range: %{lo: 7, hi: 12}}
-          end)
-
-        assert Enum.map(groups, fn {:normal, row} ->
-                 assert [%{time: time}] = row.times_with_crowding
-                 time
-               end) == expected_times
-      end
     end
 
     test "busway_v2 return 1 departure time if first departure is > 2 minutes away" do
