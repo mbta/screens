@@ -8,6 +8,7 @@ defmodule Screens.Assets.Cleanup do
 
   alias ExAws.S3
   alias Screens.Config.ScreenConfig
+  alias Screens.Util.Assets
 
   @bucket "mbta-screens"
   @media_directories ~w[images videos]
@@ -120,8 +121,10 @@ defmodule Screens.Assets.Cleanup do
   defp strings(_value), do: []
 
   defp reference_paths(value, environment) do
+    host = Assets.s3_asset_host()
+
     case URI.parse(value) do
-      %URI{host: "mbta-screens.s3.amazonaws.com", path: path} when is_binary(path) ->
+      %URI{host: ^host, path: path} when is_binary(path) ->
         relative = String.replace_prefix(path, "/#{environment}/", "")
         [relative, URI.decode(relative)]
 
