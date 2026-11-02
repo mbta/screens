@@ -28,6 +28,8 @@
 @use "busway/departures" as *;
 @use "busway/departures_no_data" as *;
 
+@use "lcd/departures/alert_row";
+
 @import "https://rsms.me/inter/inter.css";
 
 .multi-screen-page {

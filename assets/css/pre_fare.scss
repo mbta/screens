@@ -40,6 +40,8 @@
 @use "pre_fare/simulation" as *;
 @use "pre_fare/text" as *;
 
+@use "lcd/departures/alert_row";
+
 @import "https://rsms.me/inter/inter.css";
 
 .multi-screen-page {
