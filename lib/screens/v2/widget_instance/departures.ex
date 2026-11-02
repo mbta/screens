@@ -1002,7 +1002,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       id ->
         case Integer.parse(id) do
           {number, ""} -> number
-          :error -> Route.icon(single_route)
+          _ -> Route.icon(single_route)
         end
     end
   end
