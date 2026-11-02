@@ -11,7 +11,7 @@
 <!--
 #### Elixir
 - [ ] New or changed public Elixir functions have typespecs.
-- Changes to logging used by the Splunk [application dashboard](https://mbta.splunkcloud.com/en-US/app/search/screens_application) or [hardware dashboard](https://mbta.splunkcloud.com/en-US/app/search/screens_prod) are accompanied by an update to the relevant queries.
+- [ ] Changes to logging used by the Splunk [application dashboard](https://mbta.splunkcloud.com/en-US/app/search/screens_application) or [hardware dashboard](https://mbta.splunkcloud.com/en-US/app/search/screens_prod) are accompanied by an update to the relevant queries.
 -->
 
 <!--
