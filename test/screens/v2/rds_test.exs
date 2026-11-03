@@ -40,13 +40,14 @@ defmodule Screens.V2.RDSTest do
     :ok
   end
 
-  defp no_service(destination_keys) do
+  defp no_service(destination_keys, caused_by_alert? \\ false) do
     destinations =
       Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
         {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
       end)
 
     %RDS.NoService{
+      caused_by_alert?: caused_by_alert?,
       destinations: destinations,
       routes: [
         %Screens.Routes.Route{
@@ -1160,7 +1161,7 @@ defmodule Screens.V2.RDSTest do
         sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
-      assert RDS.get(departures) == [
+      assert RDS.get(departures, now) == [
                {:ok, [no_service([{"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
              ]
     end
@@ -1189,7 +1190,7 @@ defmodule Screens.V2.RDSTest do
         sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
-      assert RDS.get(departures) == [
+      assert RDS.get(departures, now) == [
                {:ok, [no_service([{"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
              ]
     end
@@ -1244,12 +1245,12 @@ defmodule Screens.V2.RDSTest do
         sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
-      assert RDS.get(departures) == [
+      assert RDS.get(departures, now) == [
                {:ok, [no_service([{"sA", "l1", "hA"}, {"sC", "l2", "hC"}])]}
              ]
     end
 
-    test "does not create NoService for destinations affected by alert on route type" do
+    test "creates NoService for destinations affected by alert on route type with caused_by_alert? set to true" do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
 
@@ -1273,8 +1274,16 @@ defmodule Screens.V2.RDSTest do
         sections: [%Section{params: %Params{mode: :bus, stop_ids: stop_ids}}]
       }
 
-      # All destinations are affected since the alert targets the entire bus route type
-      assert RDS.get(departures) == [{:ok, []}]
+      # Keep the alert-caused group when there are no unaffected destinations.
+      assert RDS.get(departures, now) == [
+               {:ok,
+                [
+                  no_service(
+                    [{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}],
+                    true
+                  )
+                ]}
+             ]
     end
 
     test "creates NoService for destinations not affected by alerts" do
@@ -1308,7 +1317,7 @@ defmodule Screens.V2.RDSTest do
         ]
       }
 
-      assert RDS.get(departures) == [
+      assert RDS.get(departures, now) == [
                {:ok, [no_service([{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}])]}
              ]
     end

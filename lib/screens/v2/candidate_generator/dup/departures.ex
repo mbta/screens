@@ -59,7 +59,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
       RdsDepartures.create_departure_sections(
         primary_rds_sections,
         primary_departures,
-        &post_process_rows/3
+        &post_process_rows/3,
+        keep_alert_empty_section?: true
       )
 
     secondary_departure_sections =
@@ -69,7 +70,8 @@ defmodule Screens.V2.CandidateGenerator.Dup.Departures do
         RdsDepartures.create_departure_sections(
           secondary_rds_sections,
           secondary_departures,
-          &post_process_rows/3
+          &post_process_rows/3,
+          keep_alert_empty_section?: true
         )
       end
 
