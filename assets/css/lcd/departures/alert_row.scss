@@ -1,0 +1,73 @@
+@use "CSS/colors";
+@use "CSS/lcd/free_text_mixin" as freeText;
+@include freeText.free-text-styles;
+
+.departures-header:not(:empty) ~ .departures-alert {
+  border-top: 4px solid colors.$true-grey-70;
+}
+
+.departures-alert {
+  display: flex;
+  padding: 16px 32px 32px;
+  background-color: colors.$warm-neutral-80;
+}
+
+.departures-section:not(:last-child) .departures-alert:not(:last-child),
+.departures-section:last-child .departures-alert {
+  border-bottom: 4px solid colors.$true-grey-70;
+}
+
+.departures-alert__route {
+  flex-shrink: 0;
+  width: 144px;
+  height: 74px;
+  margin-top: 8px;
+}
+
+.departures-alert__pill-and-text-container {
+  display: flex;
+  flex: 1;
+  justify-content: space-between;
+  min-width: 0;
+}
+
+.departures-alert__text-container {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  margin-top: 8px;
+  margin-right: 32px;
+}
+
+.departures-alert__icon {
+  flex-shrink: 0;
+  max-width: 88px;
+  max-height: 88px;
+  margin-top: 8px;
+
+  &--shuttle {
+    background-color: black;
+    border-radius: 55%;
+    box-shadow: 2px 4px 2px 0 rgb(0 0 0 / 25%);
+
+    path {
+      fill: colors.$line-bus;
+    }
+  }
+}
+
+.departures-alert__disruption-text {
+  font-size: 64px;
+  font-weight: 600;
+}
+
+.departures-alert__remedy-text {
+  font-size: 64px;
+  font-weight: 600;
+}
+
+.departures-alert__additional-text {
+  font-size: 34px;
+  line-height: 45px;
+}

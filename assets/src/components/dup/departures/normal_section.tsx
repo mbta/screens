@@ -35,8 +35,10 @@ const NormalSection: ComponentType<Props> = ({ rows }) => {
           // When the available width for headsigns changes, re-render the
           // departures so headsign abbreviation will be redone.
           return <DepartureRow {...row} key={row.id + classModifier} />;
-        } else {
+        } else if (row.type === "notice_row") {
           return <NoticeRow row={row} key={"notice" + index} />;
+        } else {
+          throw new Error(`Row type not supported: "${row.type}"`);
         }
       })}
     </div>

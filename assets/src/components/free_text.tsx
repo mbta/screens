@@ -268,7 +268,7 @@ const FreeTextLine = ({
 
 export interface FreeTextType {
   icon?: string;
-  text: FreeTextElementType[];
+  text: (string | FreeTextElementType)[];
 }
 
 interface FreeTextProps {
