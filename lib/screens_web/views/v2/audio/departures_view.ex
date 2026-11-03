@@ -92,6 +92,26 @@ defmodule ScreensWeb.V2.Audio.DeparturesView do
     ~E|<s><%= content %></s>|
   end
 
+  # Cancelled departures are serialized with a nil time
+  defp render_time_with_crowding(
+         {%{time: nil, scheduled_time: scheduled_time}, index},
+         route,
+         headsign
+       ) do
+    prefix = if index == 0, do: "The,", else: "The following,"
+    route_headsign_rendered = render_route_headsign(route, headsign)
+
+    content =
+      build_text([
+        prefix,
+        route_headsign_rendered,
+        {scheduled_time, fn t -> ~E|scheduled for, <%= render_time(t) %>,| end},
+        "is cancelled"
+      ])
+
+    ~E|<s><%= content %></s>|
+  end
+
   defp render_time_with_crowding({%{crowding: crowding, time: time}, 0}, route, headsign) do
     route_headsign_rendered = render_route_headsign(route, headsign)
     crowding_rendered = render_crowding_level(crowding)

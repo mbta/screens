@@ -326,6 +326,46 @@ defmodule ScreensWeb.V2.Audio.DeparturesViewTest do
 
       assert render(assigns) =~ wayfinding
     end
+
+    test "reads cancelled departures" do
+      assigns = %{
+        order: 0,
+        sections: [
+          %{
+            type: :normal_section,
+            header: nil,
+            departure_groups: [
+              normal: %{
+                type: :departure_row,
+                times_with_crowding: [
+                  %{
+                    id: "test1",
+                    time: nil,
+                    scheduled_time: %{type: :timestamp, hour: 12, minute: 5},
+                    crowding: nil
+                  },
+                  %{id: "test2", time: nil, scheduled_time: nil, crowding: nil}
+                ],
+                route: %{
+                  id: "CR-Needham",
+                  vehicle_type: :train,
+                  track_number: nil,
+                  route_text: "Needham Line"
+                },
+                headsign: %{headsigns: ["South Station"], variation: nil}
+              }
+            ],
+            wayfinding_readout: nil
+          }
+        ]
+      }
+
+      assert render(assigns) =~
+               "The, Needham Line, train to, South Station; scheduled for, 12:05, is cancelled"
+
+      assert render(assigns) =~
+               "The following, Needham Line, train to, South Station; is cancelled"
+    end
   end
 
   ## helpers
