@@ -8,6 +8,7 @@
 @use "lcd/body/duo_takeover" as *;
 @use "lcd/departures" as *;
 @use "lcd/departures_no_data" as *;
+@use "lcd/departures/alert_row" as *;
 @use "lcd/no_data";
 @use "lcd/no_data_duo";
 @use "lcd/normal_header";
@@ -39,8 +40,6 @@
 @use "pre_fare/screen_container";
 @use "pre_fare/simulation" as *;
 @use "pre_fare/text" as *;
-
-@use "lcd/departures/alert_row";
 
 @import "https://rsms.me/inter/inter.css";
 

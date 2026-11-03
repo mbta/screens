@@ -1,9 +1,10 @@
 import type { ComponentType } from "react";
 import RoutePill, { Pill } from "./route_pill";
 import NoServiceIcon from "Images/no-service-white-x.svg";
-import ShuttleBusIcon from "Images/shuttle-icon.svg";
+import ShuttleBusIcon from "Images/bus.svg";
 import { getHexColor } from "Util/svg_utils";
 import FreeText, { FreeTextType } from "Components/free_text";
+import { classWithModifier } from "Util/utils";
 
 type AlertIcon =
   ({ effect: "suspension" } & { color: string }) | { effect: "shuttle" };
@@ -53,7 +54,12 @@ const effectIcon = (icon: AlertIcon) => {
       />
     );
   } else if (icon.effect === "shuttle") {
-    return <ShuttleBusIcon className="departures-alert__icon" />;
+    return (
+      <ShuttleBusIcon
+        className={classWithModifier("departures-alert__icon", "shuttle")}
+        color="yellow"
+      />
+    );
   }
 };
 
