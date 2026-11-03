@@ -43,7 +43,9 @@ defmodule Screens.Telemetry do
       }
     ]
 
-    Supervisor.init(children, strategy: :one_for_one)
+    audit_children = V3Api.CacheAudit.child_specs(true)
+
+    Supervisor.init(children ++ audit_children, strategy: :one_for_one)
   end
 
   def cache_stats do
