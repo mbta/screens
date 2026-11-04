@@ -9,6 +9,7 @@ defmodule Screens.V2.RDSTest do
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Schedules.Store
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
   alias Screens.V2.Departure
@@ -38,6 +39,28 @@ defmodule Screens.V2.RDSTest do
     stub(@stop, :fetch, fn %{ids: ids} -> {:ok, Enum.map(ids, &stop/1)} end)
     stub(@last_trip, :last_trip_departure_times, fn _ -> [] end)
     :ok
+  end
+
+  @tag :capture_log
+  test "reads parsed schedules using the supplied service date" do
+    stop_id = inspect(make_ref())
+    params = %Params{mode: :gl, stop_ids: [stop_id]}
+    date = ~D[2024-10-11]
+    now = ~U[2024-10-12 07:59:00Z]
+    canonical_params = Map.from_struct(params)
+
+    assert {:ok, _} =
+             Store.fetch_dataset(canonical_params, date,
+               acquire_fn: fn _, _, _ -> {:ok, [], nil} end
+             )
+
+    on_exit(fn -> Store.Cache.delete(Store.key(canonical_params, date)) end)
+
+    expect(@schedule, :fetch, fn ^canonical_params, ^date ->
+      Schedule.fetch(canonical_params, date)
+    end)
+
+    assert [{:ok, []}] = RDS.get(%Departures{sections: [%Section{params: params}]}, now)
   end
 
   defp no_service(destination_keys) do

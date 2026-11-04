@@ -20,6 +20,10 @@ defmodule Screens.Telemetry do
       # log_span(~w[screens v3_api get_json]a, metadata: ~w[path query cache]a),
 
       # events
+      log_event(~w[screens schedules cache lookup]a,
+        metadata: ~w[cache node outcome state result]a,
+        measurements: ~w[count duration]a
+      ),
       log_event(~w[screens cache stats]a,
         metadata: ~w[cache]a,
         measurements: ~w[used total hits misses writes updates evictions expirations]a
@@ -49,7 +53,11 @@ defmodule Screens.Telemetry do
   end
 
   def cache_stats do
-    for {name, mod} <- [api_realtime: V3Api.Cache.Realtime, api_static: V3Api.Cache.Static] do
+    for {name, mod} <- [
+          api_realtime: V3Api.Cache.Realtime,
+          api_static: V3Api.Cache.Static,
+          schedules: Screens.Schedules.Store.Cache
+        ] do
       with {:ok, info} <- mod.info(), do: do_cache_stats(name, info)
     end
 

@@ -37,6 +37,32 @@ defmodule Screens.V3Api do
     end)
   end
 
+  @doc "Fetches JSON without response-body caching, optionally revalidating an HTTP validator."
+  @spec get_json_uncached(String.t(), map(), String.t() | nil) ::
+          {:ok, term(), String.t() | nil} | :not_modified | {:error, term()}
+  def get_json_uncached(path, params, last_modified \\ nil, request_fn \\ &Req.get/2) do
+    url = build_url(path, params)
+
+    headers =
+      api_key_headers(Application.get_env(:screens, :api_v3_key)) ++ cache_headers(last_modified)
+
+    Screens.Telemetry.span([:screens, :v3_api, :get_json_uncached], %{path: path}, fn ->
+      case request_fn.(url, Keyword.put(@request_opts, :headers, headers)) do
+        {:ok, %Req.Response{status: 200, body: body, headers: response_headers}} ->
+          {:ok, body, response_headers |> Map.get("last-modified", []) |> List.first()}
+
+        {:ok, %Req.Response{status: 304}} when not is_nil(last_modified) ->
+          :not_modified
+
+        {:ok, %Req.Response{status: status}} ->
+          {:error, {:http_status, status}}
+
+        {:error, reason} ->
+          {:error, reason}
+      end
+    end)
+  end
+
   defp fetch_json_with_meta(path, params, last_modified \\ nil, cached_body \\ nil) do
     url = build_url(path, params)
     api_key = Application.get_env(:screens, :api_v3_key)

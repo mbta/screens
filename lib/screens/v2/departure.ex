@@ -49,7 +49,7 @@ defmodule Screens.V2.Departure do
     fetch_predictions_fn = Keyword.get(opts, :fetch_predictions_fn, &Prediction.fetch/1)
 
     with {:ok, predictions} <- fetch_predictions_fn.(params),
-         {:ok, schedules} <- fetch_schedules(params, opts) do
+         {:ok, schedules} <- fetch_schedules(params, Keyword.put(opts, :now, now)) do
       departures = Builder.build(predictions, schedules, now, opts)
       @last_trip.update_last_trip_cache(departures, now)
       {:ok, departures}
@@ -59,7 +59,14 @@ defmodule Screens.V2.Departure do
   end
 
   def fetch_schedules(params, opts) do
-    fetch_fn = Keyword.get(opts, :fetch_schedules_fn, &Schedule.fetch/1)
+    fetch_fn =
+      Keyword.get_lazy(opts, :fetch_schedules_fn, fn ->
+        # Public clock default, overridable through the same opts as fetch/2.
+        # credo:disable-for-next-line Screens.Checks.UntestableDateTime
+        now = Keyword.get_lazy(opts, :now, &DateTime.utc_now/0)
+        service_date = Util.service_date(now)
+        fn params -> Schedule.fetch(params, service_date) end
+      end)
 
     # Default to include all route_types, unless params or options include ones to filter on. If
     # route_types to filter on are configured in params AND options, we only include route_types
