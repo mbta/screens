@@ -47,6 +47,7 @@ defmodule Screens.TestSupport.NormalSectionRowBuilder do
         id: opts[:alert_id] || "",
         effect: opts[:effect] || :unknown,
         active_period: opts[:active_period],
+        header: opts[:header],
         informed_entities:
           opts[:informed_entity_ids]
           |> Enum.map(fn
@@ -58,7 +59,8 @@ defmodule Screens.TestSupport.NormalSectionRowBuilder do
       direction_id: opts[:direction_id],
       displayed_headsign: opts[:displayed_headsign],
       location: opts[:location] || :here,
-      stop_id: opts[:stop_id] || ""
+      home_stop: %Stop{id: opts[:stop_id], name: opts[:stop_name]},
+      mode: opts[:mode]
     }
   end
 end

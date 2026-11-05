@@ -123,7 +123,8 @@ defmodule Screens.V2.RDSTest do
          direction_id,
          headsign,
          location,
-         routes
+         routes,
+         mode \\ :rl
        ) do
     destinations =
       Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
@@ -136,7 +137,8 @@ defmodule Screens.V2.RDSTest do
       direction_id: direction_id,
       displayed_headsign: headsign,
       location: location,
-      routes: routes
+      routes: routes,
+      mode: mode
     }
   end
 
