@@ -8,7 +8,10 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   of full screen presentations
 
   """
+  alias Screens.Alerts.Alert
+  alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias Screens.V2.RDS.{Countdowns, FirstTrip, Headways, ImpactedByAlert, NoService, ServiceEnded}
@@ -31,7 +34,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   alias Screens.V2.WidgetInstance.DeparturesNoData
 
   alias ScreensConfig.{Departures, Screen}
-  alias ScreensConfig.Departures.{Header, Params, Section}
+  alias ScreensConfig.Departures.{Header, Mode, Params, Section}
 
   @type post_process_rows_fn_t :: ([NormalSection.row()], Section.t(), non_neg_integer() ->
                                      [NormalSection.row()])
@@ -124,7 +127,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
     alert_section_to_consolidate =
       Enum.find(sections, fn
         {_section_states, %Section{params: %Params{mode: section_mode}}} = section ->
-          valid_alert_section?(section) and mode_to_match == section_mode
+          valid_alert_section?(section) and same_route_type?(section_mode, mode_to_match)
 
         _ ->
           false
@@ -138,23 +141,54 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   end
 
   defp consolidate_alert_sections(
-         {{:ok, section_states},
+         {{:ok, states},
           %Section{header: %Header{title: title}, params: %Params{mode: mode}} = section},
-         {{:ok, states_to_consolidate}, %Section{header: %Header{title: title_to_consolidate}}}
+         {{:ok, states_to_add},
+          %Section{
+            header: %Header{title: title_to_consolidate},
+            params: %Params{mode: mode_to_check}
+          }}
        ) do
-    {{:ok, combine_alert_states(section_states, states_to_consolidate)},
+    # Check if we need to combine sections of different modes,
+    # if so remove the `representative_route` in favor of a different icon
+    alert_states = combine_alert_states(states, states_to_add, mode == mode_to_check)
+
+    {{:ok, alert_states},
      if title == nil and title_to_consolidate == nil do
        section
      else
        section
        |> put_in([Access.key(:header), Access.key(:title)], mode_to_header_title(mode))
-     end
-     |> put_in([Access.key(:header), Access.key(:arrow)], "")}
+     end}
   end
 
-  def combine_alert_states(states, states_to_add) do
-    alert_ids_to_filter = Enum.map(states, & &1.alert.id)
-    states ++ Enum.reject(states_to_add, &(&1.alert.id in alert_ids_to_filter))
+  defp combine_alert_states(states, states_to_add, sections_have_same_mode?) do
+    Enum.reduce(states_to_add, states, fn %ImpactedByAlert{alert: %Alert{id: alert_id}} =
+                                            state_to_add,
+                                          states ->
+      states
+      |> Enum.find_index(&(&1.alert.id == alert_id))
+      |> case do
+        nil ->
+          states ++ state_to_add
+
+        index ->
+          if sections_have_same_mode? do
+            states
+          else
+            List.update_at(states, index, fn state ->
+              state
+              |> update_in([Access.key(:destinations)], fn destinations ->
+                (destinations ++ state_to_add.destinations) |> Enum.uniq()
+              end)
+              |> update_in([Access.key(:routes)], fn routes ->
+                (routes ++ state_to_add.routes) |> Enum.uniq()
+              end)
+              |> put_in([Access.key(:mode)], nil)
+            end)
+          end
+      end
+    end)
   end
 
   defp valid_alert_section?(
@@ -177,6 +211,27 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
         ) ::
           DeparturesWidget.section()
 
+  # Header Only Section
+  defp map_to_departure_section(
+         _rds_section,
+         %Section{
+           header: header,
+           layout: layout,
+           grouping_type: grouping_type,
+           params: nil
+         },
+         _section_count,
+         _post_process_rows_fn
+       ) do
+    %NormalSection{
+      rows: [],
+      layout: layout,
+      header: header,
+      grouping_type: grouping_type,
+      mode: nil
+    }
+  end
+
   defp map_to_departure_section(
          data,
          %Section{params: %Params{mode: mode}},
@@ -188,7 +243,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
 
   defp map_to_departure_section(
          {:ok, items},
-         %Section{header: header, layout: layout, grouping_type: grouping_type, params: params} =
+         %Section{
+           header: header,
+           layout: layout,
+           grouping_type: grouping_type,
+           params: %Params{mode: mode} = params
+         } =
            section,
          section_count,
          post_process_rows_fn
@@ -227,7 +287,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
         %NormalSection{
           rows: rows,
           layout: layout,
-          header: header,
+          header: header |> maybe_adjust_header_for_alerts(rows, mode),
           grouping_type: grouping_type,
           mode: get_in(params, [Access.key(:mode)])
         }
@@ -274,11 +334,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   defp alerts_from_rds(alert_states) do
     Enum.flat_map(alert_states, fn
       %ImpactedByAlert{
+        destinations: [{%Stop{name: name}, _line, _headsign} | _],
         alert: alert,
         direction_id: direction_id,
         displayed_headsign: displayed_headsign,
         location: location,
-        routes: [route | _]
+        mode: mode,
+        routes: routes
       } ->
         [
           %AlertRow{
@@ -286,7 +348,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
             direction_id: direction_id,
             displayed_headsign: displayed_headsign,
             location: location,
-            route: route
+            mode: mode,
+            routes: routes,
+            stop_name: name
           }
         ]
     end)
@@ -376,6 +440,42 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
       :rl -> "Red Line"
       :bl -> "Blue Line"
       :m -> "Mattapan Line"
+      :sl -> "Silver Line"
+      :cr -> "Commuter Rail"
+      :ferry -> "Ferry"
+      :bus -> "Bus"
+    end
+  end
+
+  defp same_route_type?(mode, other_mode) do
+    route_type = Mode.to_route_type(mode)
+    other_route_type = Mode.to_route_type(other_mode)
+    # In this particular case, Light Rail and Subway are both considered "Subway" route types
+    if route_type in [:light_rail, :subway] and other_route_type in [:light_rail, :subway] do
+      true
+    else
+      route_type == other_route_type
+    end
+  end
+
+  defp maybe_adjust_header_for_alerts(header, rows, mode) do
+    cond do
+      Mode.to_route_type(mode) in [:light_rail, :subway] and
+          Enum.all?(rows, fn row ->
+            match?(%AlertRow{alert: %Alert{effect: :station_closure}}, row)
+          end) ->
+        header
+        |> put_in([Access.key(:title)], "Subway Station Closed")
+        |> put_in([Access.key(:subtitle)], nil)
+        |> put_in([Access.key(:arrow)], "")
+
+      Enum.all?(rows, fn row -> match?(%AlertRow{}, row) end) ->
+        header
+        |> put_in([Access.key(:subtitle)], nil)
+        |> put_in([Access.key(:arrow)], "")
+
+      true ->
+        header
     end
   end
 end

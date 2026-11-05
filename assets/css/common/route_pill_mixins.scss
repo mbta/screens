@@ -36,6 +36,10 @@
   &--yellow {
     background-color: colors.$line-bus;
   }
+
+  &--black {
+    background-color: colors.$cool-black-15;
+  }
 }
 
 @mixin pill-text-colors {

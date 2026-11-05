@@ -197,6 +197,22 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
     departures
   end
 
+  defp row_in_route_directions?(%AlertRow{routes: routes, direction_id: nil}, route_directions) do
+    Enum.any?(routes, fn %Route{id: id} ->
+      %RouteDirection{route_id: id, direction_id: 0} in route_directions or
+        %RouteDirection{route_id: id, direction_id: 1} in route_directions
+    end)
+  end
+
+  defp row_in_route_directions?(
+         %AlertRow{routes: routes, direction_id: direction_id},
+         route_directions
+       ) do
+    Enum.any?(routes, fn %Route{id: id} ->
+      %RouteDirection{route_id: id, direction_id: direction_id} in route_directions
+    end)
+  end
+
   defp row_in_route_directions?(row, route_directions) do
     route_direction(row) in route_directions
   end
@@ -213,10 +229,6 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
 
   defp route_direction(%HeadwayRow{route: %Route{id: id}, direction_id: direction_id}) do
     %RouteDirection{route_id: id, direction_id: direction_id}
-  end
-
-  defp route_direction(%AlertRow{route: route, direction_id: direction_id}) do
-    %RouteDirection{route_id: route.id, direction_id: direction_id}
   end
 
   defp maybe_sort_by_direction_id(rows, :destination),

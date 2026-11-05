@@ -46,18 +46,18 @@ const AlertRow: ComponentType<AlertRow> = ({
 };
 
 const effectIcon = (icon: AlertIcon) => {
-  if (icon.effect === "suspension") {
-    return (
-      <NoServiceIcon
-        className="departures-alert__icon"
-        color={getHexColor(icon.color)}
-      />
-    );
-  } else if (icon.effect === "shuttle") {
+  if (icon.effect === "shuttle") {
     return (
       <ShuttleBusIcon
         className={classWithModifier("departures-alert__icon", "shuttle")}
         color="yellow"
+      />
+    );
+  } else {
+    return (
+      <NoServiceIcon
+        className="departures-alert__icon"
+        color={getHexColor(icon.color)}
       />
     );
   }

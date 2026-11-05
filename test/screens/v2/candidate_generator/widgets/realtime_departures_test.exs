@@ -469,14 +469,89 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
                      header: %Header{},
                      grouping_type: :time,
                      layout: %Layout{},
-                     rows: [
-                       %HeadwayRow{
-                         route: %Screens.Routes.Route{id: "route_one"},
-                         direction_id: nil,
-                         range: {5, 10},
-                         displayed_headsign: "Westbound"
-                       }
-                     ]
+                     rows: [^headway]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "returns NoDataWidget after filtering alerts for Bus Shelters" do
+      bus_shelter_config = build_config(["route_A"])
+
+      stub(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             impacted_by_alert(%Alert{}, [], 0, "Filtered Alert", :here, [])
+           ]}
+        ]
+      end)
+
+      assert [%DeparturesNoData{}] =
+               RealtimeDepartures.departures_instances(bus_shelter_config, @now)
+    end
+
+    test "combines NormalSections with only alerts in it removing arrows and subtitles" do
+      config = build_config(["route_id_one", "route_id_two"], :pre_fare_v2)
+      expected_route = route(id: "route_one", name: "short_name", line_id: "line_one")
+      destination_one = {%Stop{id: "sA"}, %Line{id: "l1"}, "hA"}
+      destination_two = {%Stop{id: "sB"}, %Line{id: "l2"}, "hB"}
+
+      alert_row =
+        alert_row(
+          effect: :shuttle,
+          alert_id: "same_id",
+          direction_id: 0,
+          displayed_headsign: "Combined Alert",
+          route: expected_route,
+          location: :inside,
+          informed_entity_ids: []
+        )
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             impacted_by_alert(
+               %Alert{id: "same_id", effect: :shuttle, informed_entities: []},
+               [destination_one],
+               0,
+               "Combined Alert",
+               :inside,
+               [expected_route]
+             )
+           ]},
+          {:ok,
+           [
+             impacted_by_alert(
+               %Alert{id: "same_id", effect: :shuttle, informed_entities: []},
+               [destination_two],
+               0,
+               "Combined Alert",
+               :inside,
+               [expected_route]
+             )
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %NormalSection{
+                     header: %Header{
+                       arrow: "",
+                       subtitle: nil
+                     },
+                     grouping_type: :time,
+                     layout: %Layout{},
+                     mode: :rl,
+                     rows: [^alert_row]
+>>>>>>> ec23a009 (feat: departure alerts for stop moved/stop closed)
                    }
                  ]
                }
