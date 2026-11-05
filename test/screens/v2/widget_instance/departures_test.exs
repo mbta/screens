@@ -817,13 +817,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
           }
         },
         alert_row(
+          alert_id: "alert_id",
           effect: :shuttle,
           active_period: [{~U[2026-01-01T11:00:00Z], nil}],
           informed_entity_ids: ["6", "5", {"90", "a"}],
           route: route(id: "Green-E", line: "line-Green", type: :subway),
           direction_id: 0,
           displayed_headsign: "Green Line",
-          location: :inside
+          location: :inside,
+          mode: :gl
         )
       ]
 
@@ -857,7 +859,92 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                      text: ["No Green Line service", %{special: :break}, "Use Shuttle Buses"]
                    },
                    icon: %{color: :green, effect: :shuttle},
-                   id: "W8aGHJ5GuEzNfzNHnVBTqw==",
+                   id: "1YzFxpljhJdmoKO7KXJyVg==",
+                   type: :alert_row
+                 }
+               ]
+             } =
+               Departures.serialize_section(section, pre_fare_screen, now, false)
+    end
+
+    test "serializes alert rows for station closed", %{
+      pre_fare_screen: pre_fare_screen,
+      now: now
+    } do
+      rows = [
+        alert_row(
+          alert_id: "alert_id",
+          effect: :station_closure,
+          header: "We have a station closure",
+          active_period: [{~U[2026-01-01T11:00:00Z], nil}],
+          informed_entity_ids: ["6", "5", {"90", "a"}],
+          route: route(id: "Red", line: "line-Red", type: :subway),
+          direction_id: nil,
+          displayed_headsign: "Red Line",
+          location: :inside,
+          stop_name: "Stop Name",
+          mode: :rl
+        )
+      ]
+
+      section = %NormalSection{
+        rows: rows,
+        layout: %Layout{},
+        header: %Header{title: "Section Header"},
+        grouping_type: :time
+      }
+
+      assert %{
+               type: :normal_section,
+               rows: [
+                 %{
+                   additional_text: %{icon: nil, text: ["We have a station closure"]},
+                   header_text: %{icon: nil, text: ["Trains skip Stop Name"]},
+                   icon: %{color: :red, effect: :station_closure},
+                   id: "1YzFxpljhJdmoKO7KXJyVg==",
+                   route: %{color: :red, text: "RL", type: :text},
+                   type: :alert_row
+                 }
+               ]
+             } =
+               Departures.serialize_section(section, pre_fare_screen, now, false)
+    end
+
+    test "serializes alert row for stop moved", %{
+      pre_fare_screen: pre_fare_screen,
+      now: now
+    } do
+      rows = [
+        alert_row(
+          alert_id: "alert_id",
+          effect: :stop_moved,
+          header: "We have a stop moved",
+          active_period: [{~U[2026-01-01T11:00:00Z], nil}],
+          informed_entity_ids: ["6", "5", {"90", "a"}],
+          route: route(id: "109", line: "line-bus", type: :bus),
+          direction_id: nil,
+          displayed_headsign: "109",
+          location: :inside,
+          mode: :bus
+        )
+      ]
+
+      section = %NormalSection{
+        rows: rows,
+        layout: %Layout{},
+        header: %Header{title: "Section Header"},
+        grouping_type: :time
+      }
+
+      assert %{
+               type: :normal_section,
+               rows: [
+                 %{
+                   additional_text: %{icon: nil, text: ["We have a stop moved"]},
+                   header_text: %{icon: nil, text: ["Stop Moved"]},
+                   icon: %{color: :yellow, effect: :stop_moved},
+                   id: "1YzFxpljhJdmoKO7KXJyVg==",
+                   route: %{color: :yellow, text: "109", type: :text},
                    type: :alert_row
                  }
                ]

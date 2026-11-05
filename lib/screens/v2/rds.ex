@@ -142,9 +142,10 @@ defmodule Screens.V2.RDS do
             direction_id: Trip.direction() | nil,
             displayed_headsign: String.t(),
             location: :inside,
+            mode: Mode.t() | nil,
             routes: [Route.t()]
           }
-    defstruct ~w[alert destinations direction_id displayed_headsign location routes]a
+    defstruct ~w[alert destinations direction_id displayed_headsign location mode routes]a
   end
 
   @alert injected(Alert)
@@ -361,6 +362,7 @@ defmodule Screens.V2.RDS do
                 nil -> nil
               end,
             location: location,
+            mode: mode,
             routes: routes_for_section
           }
         else
@@ -480,7 +482,7 @@ defmodule Screens.V2.RDS do
         [state] ->
           [state]
 
-        [%ImpactedByAlert{alert: alert, location: location} | _] = states ->
+        [%ImpactedByAlert{alert: alert, location: location, mode: mode} | _] = states ->
           {state_destinations, routes, direction_id} =
             get_combined_destinations_routes_direction_ids(states)
 
@@ -496,8 +498,9 @@ defmodule Screens.V2.RDS do
               direction_id: direction_id,
               displayed_headsign:
                 get_common_headsign(state_destinations, direction_names, direction_id),
-              routes: routes,
-              location: location
+              location: location,
+              mode: mode,
+              routes: routes
             }
           ]
       end
@@ -830,11 +833,19 @@ defmodule Screens.V2.RDS do
   end
 
   @spec supports_alert?(Alert.t(), AlertLocation.t(), Mode.t()) :: boolean()
-  # To be removed once we start supporting all effects we want
-  defp supports_alert?(%Alert{effect: effect}, location, mode),
-    do:
-      effect in [:suspension, :shuttle] and Mode.to_route_type(mode) in [:subway, :light_rail] and
-        (location == :inside or location == :boundary_downstream)
+  # To be removed once we start supporting all effects, locations and modes we want
+  # Right now is just a filter as we build out support for all types of alerts
+  defp supports_alert?(%Alert{effect: effect}, location, mode)
+       when effect in [:suspension, :shuttle],
+       do:
+         Mode.to_route_type(mode) in [:subway, :light_rail] and
+           (location == :inside or location == :boundary_downstream)
+
+  defp supports_alert?(%Alert{effect: effect}, location, mode)
+       when effect in [:station_closure, :stop_closure, :stop_move, :stop_moved],
+       do: Mode.to_route_type(mode) in [:subway, :light_rail, :bus] and location == :inside
+
+  defp supports_alert?(_alert, _location, _mode), do: false
 
   defp red_trunk_to_alewife?(stop_id, "Alewife") when stop_id in @red_trunk, do: true
 

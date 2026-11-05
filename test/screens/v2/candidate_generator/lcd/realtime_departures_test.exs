@@ -541,7 +541,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
                %Alert{id: "same_id", effect: :shuttle, informed_entities: []},
                [destination_one],
                0,
-               "Combined Alert",
+               nil,
                :inside,
                [expected_route]
              )
