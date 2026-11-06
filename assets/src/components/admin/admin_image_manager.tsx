@@ -227,12 +227,27 @@ const ImageManager = (): JSX.Element => {
           </p>
         </div>
       )}
-      <h2>Upload New Image</h2>
-      <p>
-        To reserve an image indefinitely for future reuse, store it under the
-        `reusable/` directory. Images within this directory are always excluded
-        from cleanup.
-      </p>
+      <h2>Upload New Image or Video</h2>
+      <section className="admin-image-manager__upload-guidance">
+        <h3>Guidelines</h3>
+        <ul className="admin-image-manager__upload-guidance-list">
+          <li>
+            File types are automatically recognized as images or videos and
+            processed accordingly.
+          </li>
+          <li>
+            Format your file path appropriately, for example{" "}
+            <code>dup/new_years/my_image.png</code> or{" "}
+            <code>eink/my_video.mp4</code>. Include the extension (e.g.,{" "}
+            <code>.png</code>, <code>.mp4</code>) in the file name.
+          </li>
+          <li>
+            To reserve an image indefinitely for future reuse, store it under
+            the <code>reusable/</code> directory. Images within this directory
+            are always excluded from cleanup.
+          </li>
+        </ul>
+      </section>
       <ImageUpload
         onUploaded={loadImages}
         selectedPrefix={selectedKey ? keyPrefix(selectedKey) : undefined}
