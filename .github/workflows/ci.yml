@@ -39,8 +39,8 @@ jobs:
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
     steps:
       # TODO: Remove once https://github.com/actions/runner-images/issues/15018 is resolved
-      - name: Upgrade CA certificates
-        run: sudo apt-get update && sudo apt-get install -y --only-upgrade ca-certificates
+      - name: Test CA certificates
+        run: grep -i "emSign" /etc/ssl/certs/ca-certificates.crt && exit 0
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
