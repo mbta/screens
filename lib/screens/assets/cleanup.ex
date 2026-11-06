@@ -99,14 +99,14 @@ defmodule Screens.Assets.Cleanup do
     end
   end
 
-  defp eligible?(%{key: key, last_modified: modified}, prefix, environment, references, cutoff)
+  defp eligible?(%{key: key, last_modified: modified}, prefix, env, configured_assets, cutoff)
        when is_binary(key) and is_binary(modified) do
-    relative = String.replace_prefix(key, environment <> "/", "")
+    relative_path = String.replace_prefix(key, env <> "/", "")
 
     with true <- String.starts_with?(key, prefix),
          false <- String.ends_with?(key, "/"),
          false <- String.starts_with?(key, prefix <> "reusable/"),
-         false <- Map.has_key?(references, relative),
+         false <- Map.has_key?(configured_assets, relative_path),
          {:ok, modified, _offset} <- DateTime.from_iso8601(modified) do
       DateTime.compare(modified, cutoff) == :lt
     else
@@ -114,7 +114,7 @@ defmodule Screens.Assets.Cleanup do
     end
   end
 
-  defp eligible?(_object, _prefix, _environment, _references, _cutoff), do: false
+  defp eligible?(_object, _prefix, _env, _configured_assets, _cutoff), do: false
 
   # Traverse values rather than known schema fields, to future-proof for new widgets.
   defp strings(value) when is_binary(value), do: [value]
@@ -128,10 +128,16 @@ defmodule Screens.Assets.Cleanup do
     case URI.parse(value) do
       %URI{host: ^host, path: path} when is_binary(path) ->
         relative = String.replace_prefix(path, "/#{environment}/", "")
-        [relative, URI.decode(relative)]
+        [relative, decode_and_normalize(relative)]
 
       _ ->
-        [value, URI.decode(value)]
+        [value, decode_and_normalize(value)]
     end
+  end
+
+  defp decode_and_normalize(value) do
+    # To normalize asset names from configurations to match the names stored in S3,
+    # decode percent-encoded characters and replace + with space
+    value |> URI.decode() |> String.replace("+", " ")
   end
 end
