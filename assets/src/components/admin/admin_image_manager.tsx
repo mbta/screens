@@ -242,9 +242,9 @@ const ImageManager = (): JSX.Element => {
             <code>.png</code>, <code>.mp4</code>) in the file name.
           </li>
           <li>
-            To reserve an image indefinitely for future reuse, store it under the{" "}
-            <code>reusable/</code> directory. Images within this directory are
-            always excluded from cleanup.
+            To reserve an image indefinitely for future reuse, store it under
+            the <code>reusable/</code> directory. Images within this directory
+            are always excluded from cleanup.
           </li>
         </ul>
       </section>
