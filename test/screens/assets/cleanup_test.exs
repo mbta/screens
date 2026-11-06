@@ -190,4 +190,28 @@ defmodule Screens.Assets.CleanupTest do
     assert Cleanup.delete([], Enum.map(objects, & &1.key), [request: request], @now) ==
              {:error, {:asset_delete_failed, key("images/b.png"), {:error, :forbidden}, 1}}
   end
+
+  test "retains assets with spaces when referenced with + or %20 encoding" do
+    # S3 stores files with actual space characters
+    objects = [
+      object("images/asset with spaces.png"),
+      object("images/unused asset with spaces.png")
+    ]
+
+    # Config might reference the same file with different encodings
+    configs = [
+      %ScreenConfig{
+        config: %{
+          app_params: %{
+            img_1: "images/asset+with+spaces.png",
+            img_2:
+              "https://mbta-screens.s3.amazonaws.com/#{environment()}/images/asset%20with%20spaces.png"
+          }
+        }
+      }
+    ]
+
+    assert {:ok, [unused]} = Cleanup.preview(configs, [request: request_for(objects)], @now)
+    assert unused == key("images/unused asset with spaces.png")
+  end
 end
