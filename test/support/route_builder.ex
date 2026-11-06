@@ -13,7 +13,13 @@ defmodule Screens.TestSupport.RouteBuilder do
       long_name: opts[:name],
       type: opts[:type],
       line:
-        if(opts[:line_id], do: %Line{id: opts[:line_id]}, else: %Line{id: "line-#{opts[:id]}"})
+        if(opts[:line_id], do: %Line{id: opts[:line_id]}, else: %Line{id: "line-#{opts[:id]}"}),
+      direction_names:
+        if opts[:direction_names] do
+          opts[:direction_names]
+        else
+          []
+        end
     }
   end
 end

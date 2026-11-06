@@ -273,6 +273,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   @spec alerts_from_rds([ImpactedByAlert.t()]) :: [NormalSection.AlertRow.t()]
   defp alerts_from_rds(alert_states) do
     Enum.flat_map(alert_states, fn
+      # Use the first alert and route associated with the grouped ImpactedByAlert
       %ImpactedByAlert{
         alert: alert,
         direction_id: direction_id,

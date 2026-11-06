@@ -1,7 +1,6 @@
 defmodule Screens.V2.WidgetInstance.DeparturesTest do
   use ExUnit.Case, async: true
 
-  alias Screens.Alerts.Alert
   alias Screens.Departures.Departure
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -20,12 +19,6 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     NormalSection
   }
 
-  alias Screens.V2.WidgetInstance.Departures.NormalSection.{
-    AlertRow,
-    HeadwayRow,
-    SpecialTripRow
-  }
-
   alias Screens.V2.WidgetInstance.Serializer.RoutePill
   alias Screens.Vehicles.Vehicle
   alias ScreensConfig.Departures.Header
@@ -33,7 +26,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
   alias ScreensConfig.{FreeTextLine, Screen}
   alias ScreensConfig.Screen.{BusShelter, PreFare}
 
-  import Screens.TestSupport.InformedEntityBuilder
+  import Screens.TestSupport.NormalSectionRowBuilder
   import Screens.TestSupport.RouteBuilder
 
   describe "priority/1" do
@@ -740,12 +733,12 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
             stop: %Stop{}
           }
         },
-        %HeadwayRow{
-          route: route(id: "Green-e", line: "line-Green", type: :subway),
+        headway_row(
+          route: route(id: "Green-E", line: "line-Green", type: :subway),
           direction_id: 0,
           range: {20, 30},
           displayed_headsign: "Westbound"
-        }
+        )
       ]
 
       section = %NormalSection{
@@ -823,21 +816,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
             stop: %Stop{}
           }
         },
-        %AlertRow{
-          alert: %Alert{
-            effect: :shuttle,
-            active_period: [{~U[2026-01-01T11:00:00Z], nil}],
-            informed_entities: [
-              ie(stop_id: "6"),
-              ie(stop_id: "5"),
-              ie(stop_id: "90", route_id: "a")
-            ]
-          },
+        alert_row(
+          effect: :shuttle,
+          active_period: [{~U[2026-01-01T11:00:00Z], nil}],
+          informed_entity_ids: ["6", "5", {"90", "a"}],
           route: route(id: "Green-E", line: "line-Green", type: :subway),
           direction_id: 0,
           displayed_headsign: "Green Line",
           location: :inside
-        }
+        )
       ]
 
       section = %NormalSection{
@@ -880,16 +867,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "serializes normal section with first trip row", %{dup_screen: dup_screen, now: now} do
       rows = [
-        %SpecialTripRow{
-          schedule: %Schedule{
-            id: "one",
-            departure_time: ~U[2020-01-01T00:01:10Z],
-            route: route(id: "Green-E", type: :subway),
-            trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
-            stop: %Stop{}
-          },
+        special_trip_row(
+          schedule_id: "one",
+          departure_time: ~U[2020-01-01T00:01:10Z],
+          route: route(id: "Green-E", type: :subway),
+          headsign: "Medford/Tufts",
+          direction_id: 1,
+          stop_id: "stop_id",
           special_trip_type: :first_trip
-        }
+        )
       ]
 
       section = %NormalSection{
@@ -920,16 +906,15 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
     test "serializes normal section with service ended row", %{dup_screen: dup_screen, now: now} do
       rows = [
-        %SpecialTripRow{
-          schedule: %Schedule{
-            id: "one",
-            departure_time: ~U[2020-01-01T00:01:10Z],
-            route: route(id: "Green-E", type: :subway),
-            trip: %Trip{headsign: "Medford/Tufts", direction_id: 1},
-            stop: %Stop{}
-          },
+        special_trip_row(
+          schedule_id: "one",
+          departure_time: ~U[2020-01-01T00:01:10Z],
+          route: route(id: "Green-E", type: :subway),
+          headsign: "Medford/Tufts",
+          direction_id: 1,
+          stop_id: "stop_id",
           special_trip_type: :service_ended
-        }
+        )
       ]
 
       section = %NormalSection{
