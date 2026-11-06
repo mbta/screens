@@ -1176,7 +1176,7 @@ defmodule Screens.V2.RDSTest do
            %Alert{
              id: "1",
              effect: :suspension,
-             informed_entities: [ie(route_id: "r1")],
+             informed_entities: [ie(route_id: "r1", stop_id: "sA")],
              active_period: [{now, nil}]
            }
          ]}
@@ -1205,7 +1205,7 @@ defmodule Screens.V2.RDSTest do
            %Alert{
              id: "1",
              effect: :shuttle,
-             informed_entities: [ie(route_id: "r2", direction_id: 0)],
+             informed_entities: [ie(route_id: "r2", direction_id: 0, stop_id: "sB")],
              active_period: [{now, nil}]
            }
          ]}
@@ -1249,7 +1249,7 @@ defmodule Screens.V2.RDSTest do
              ]
     end
 
-    test "does not create NoService for destinations affected by alert on route type" do
+    test "does not create NoService for destinations affected by alert but not the correct supported mode" do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
 
@@ -1259,7 +1259,7 @@ defmodule Screens.V2.RDSTest do
          [
            %Alert{
              id: "1",
-             effect: :detour,
+             effect: :suspension,
              informed_entities: [ie(route_type: 3)],
              active_period: [{now, nil}]
            }

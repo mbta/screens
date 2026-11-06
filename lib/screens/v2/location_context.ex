@@ -1,6 +1,7 @@
 defmodule Screens.LocationContext do
   @moduledoc false
 
+  alias Screens.Alerts.Alert
   alias Screens.Report
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
@@ -18,6 +19,14 @@ defmodule Screens.LocationContext do
             child_stops_at_station: MapSet.new(),
             routes: [],
             alert_route_types: []
+
+  @type location ::
+          :boundary_downstream
+          | :boundary_upstream
+          | :downstream
+          | :elsewhere
+          | :inside
+          | :upstream
 
   @type t :: %__MODULE__{
           home_stop: Stop.id() | nil,
@@ -80,12 +89,10 @@ defmodule Screens.LocationContext do
     end
   end
 
-  # NOTE: only public due to use in tests. Should be treated as private.
   @spec upstream_stop_id_set([Stop.id()], [[Stop.id()]]) :: MapSet.t(Stop.id())
   def upstream_stop_id_set(stop_ids, stop_sequences),
     do: sliced_stop_id_set(stop_ids, stop_sequences, &Util.slice_before/2)
 
-  # NOTE: only public due to use in tests. Should be treated as private.
   @spec downstream_stop_id_set([Stop.id()], [[Stop.id()]]) :: MapSet.t(Stop.id())
   def downstream_stop_id_set(stop_ids, stop_sequences),
     do: sliced_stop_id_set(stop_ids, stop_sequences, &Util.slice_after/2)
@@ -256,4 +263,59 @@ defmodule Screens.LocationContext do
 
   # Child Stops are only needed for DUP's location context at the time, so return an empty map otherwise
   defp child_stops_at_station(_app, _route_ids_at_stop, _stop_ids), do: {:ok, %{}}
+
+  def terminal?(stop_id, stop_sequences) do
+    # Can't use Enum.any, because then Govt Center will be seen as a terminal
+    # Using all is ok because no station is the terminal of one line and NOT the terminal of another line
+    # excluding GL branches
+    Enum.all?(stop_sequences, fn stop_sequence ->
+      List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
+    end)
+  end
+
+  @spec get_location([:home_stop | :upstream | :downstream], Alert.effect(), boolean()) ::
+          location()
+  def get_location(informed_zones_set, effect, terminal_station?),
+    do: get_location_atom(informed_zones_set, effect, terminal_station?)
+
+  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:upstream],
+    do: :upstream
+
+  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:downstream],
+    do: :downstream
+
+  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:home_stop],
+    do: :inside
+
+  defp get_location_atom(informed_zones_set, _, _)
+       when informed_zones_set == [:downstream, :home_stop, :upstream],
+       do: :inside
+
+  # If station closure, then a boundary_upstream / _downstream is actually :inside
+  defp get_location_atom(informed_zones_set, effect, _)
+       when informed_zones_set == [:home_stop, :upstream] and effect === :station_closure,
+       do: :inside
+
+  defp get_location_atom(informed_zones_set, effect, _)
+       when informed_zones_set == [:downstream, :home_stop] and effect === :station_closure,
+       do: :inside
+
+  defp get_location_atom(informed_zones_set, effect, true)
+       when informed_zones_set in [[:home_stop, :upstream], [:downstream, :home_stop]] and
+              effect in [:suspension, :shuttle],
+       do: :inside
+
+  defp get_location_atom(informed_zones_set, _, _)
+       when informed_zones_set == [:home_stop, :upstream],
+       do: :boundary_upstream
+
+  defp get_location_atom(informed_zones_set, _, _)
+       when informed_zones_set == [:downstream, :home_stop],
+       do: :boundary_downstream
+
+  defp get_location_atom(informed_zones_set, _, _)
+       when informed_zones_set == [:downstream, :upstream],
+       do: :downstream
+
+  defp get_location_atom(_, _, _), do: :elsewhere
 end
