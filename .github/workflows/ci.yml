@@ -40,7 +40,7 @@ jobs:
     steps:
       # TODO: Remove once https://github.com/actions/runner-images/issues/15018 is resolved
       - name: Test CA certificates
-        run: grep -i "emSign" /etc/ssl/certs/ca-certificates.crt && exit 0
+        run: dpkg -l ca-certificates 'libnss3*' | grep ^ii
 
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
