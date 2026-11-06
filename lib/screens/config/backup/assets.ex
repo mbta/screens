@@ -17,23 +17,10 @@ defmodule Screens.Config.Backup.Assets do
   @doc """
   Copies every asset under the source environment's prefix into the current environment.
   `source_environment` is a full environment name, e.g. `screens-dev`.
-  A local backup has no corresponding set of assets in S3, so this function is a no-op
-  when the source or destination environment is `screens-local`.
   """
   @spec sync(String.t()) :: {:ok, result()} | {:error, term()}
-  def sync("screens-local"), do: {:ok, %{copied: 0}}
-
   def sync(source_environment) do
     destination = Application.get_env(:screens, :environment_name)
-
-    if destination == "screens-local" do
-      {:ok, %{copied: 0}}
-    else
-      do_sync(source_environment, destination)
-    end
-  end
-
-  defp do_sync(source_environment, destination) do
     prefix = source_environment <> "/"
 
     @bucket
