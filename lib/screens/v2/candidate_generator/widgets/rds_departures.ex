@@ -148,8 +148,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
      else
        section
        |> put_in([Access.key(:header), Access.key(:title)], mode_to_header_title(mode))
-     end
-     |> put_in([Access.key(:header), Access.key(:arrow)], "")}
+     end}
   end
 
   def combine_alert_states(states, states_to_add) do
@@ -176,6 +175,27 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           post_process_rows_fn_t()
         ) ::
           DeparturesWidget.section()
+
+  # Header Only Section
+  defp map_to_departure_section(
+         _rds_section,
+         %Section{
+           header: header,
+           layout: layout,
+           grouping_type: grouping_type,
+           params: nil
+         },
+         _section_count,
+         _post_process_rows_fn
+       ) do
+    %NormalSection{
+      rows: [],
+      layout: layout,
+      header: header,
+      grouping_type: grouping_type,
+      mode: nil
+    }
+  end
 
   defp map_to_departure_section(
          data,
@@ -227,7 +247,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
         %NormalSection{
           rows: rows,
           layout: layout,
-          header: header,
+          header: header |> maybe_adjust_header_for_alerts(rows),
           grouping_type: grouping_type,
           mode: get_in(params, [Access.key(:mode)])
         }
@@ -376,6 +396,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
       :rl -> "Red Line"
       :bl -> "Blue Line"
       :m -> "Mattapan Line"
+    end
+  end
+
+  defp maybe_adjust_header_for_alerts(header, rows) do
+    if Enum.all?(rows, fn row -> match?(%AlertRow{}, row) end) do
+      header
+      |> put_in([Access.key(:subtitle)], nil)
+      |> put_in([Access.key(:arrow)], "")
+    else
+      header
     end
   end
 end

@@ -1160,15 +1160,22 @@ defmodule Screens.V2.WidgetInstance.Departures do
          },
          now
        ) do
+    route_text =
+      if match?("Green" <> _, route_id) do
+        "Green"
+      else
+        "#{route_id}"
+      end
+
     header_text =
       %FreeTextLine{
         icon: nil,
         text:
           if location == :inside do
             if effect == :shuttle do
-              ["No #{route_id} Line service", %{special: :break}, "Use Shuttle Buses"]
+              ["No #{route_text} Line service", %{special: :break}, "Use Shuttle Buses"]
             else
-              ["No #{route_id} Line trains"]
+              ["No #{route_text} Line trains"]
             end
           else
             [headsign]
