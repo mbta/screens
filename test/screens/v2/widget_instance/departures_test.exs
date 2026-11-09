@@ -867,7 +867,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                    },
                    header_text: %{
                      icon: nil,
-                     text: ["No Green-E Line service", %{special: :break}, "Use Shuttle Buses"]
+                     text: ["No Green Line service", %{special: :break}, "Use Shuttle Buses"]
                    },
                    icon: %{color: :green, effect: :shuttle},
                    id: "W8aGHJ5GuEzNfzNHnVBTqw==",
