@@ -120,7 +120,7 @@ defmodule Screens.V2.RDS do
     State for if we're in an active period, but we have no predictions
     and there are no alerts associated with the destination.
 
-    Shows an every “X-Y” minutes message. 
+    Shows an every “X-Y” minutes message.
     """
     @type t :: %__MODULE__{
             direction_id: Trip.direction() | nil,
