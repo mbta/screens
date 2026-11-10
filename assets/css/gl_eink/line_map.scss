@@ -27,6 +27,11 @@
   &--past {
     fill: #999;
   }
+
+  &--closed {
+    text-decoration: line-through;
+    text-decoration-thickness: 0.1em;
+  }
 }
 
 .line-map__vehicle-droplet {

@@ -12,6 +12,7 @@ defmodule Screens.TestSupport.InformedEntityBuilder do
       stop: if(opts[:stop_id], do: %Stop{id: opts[:stop_id]}, else: opts[:stop]),
       route: if(opts[:route_id], do: %Route{id: opts[:route_id]}, else: opts[:route]),
       route_type: opts[:route_type],
+      activities: opts[:activities],
       direction_id: opts[:direction_id]
     }
   end

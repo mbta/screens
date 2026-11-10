@@ -1,8 +1,9 @@
 import { ComponentType, Fragment, type JSX } from "react";
 
 import { adjustMinute } from "Util/timing";
-import { classWithModifier } from "Util/utils";
+import { classWithModifier, classWithModifiers } from "Util/utils";
 import { useCurrentTime } from "Hooks/use_current_time";
+import ClosedStopIconSvg from "Images/closed-stop-icon.svg";
 
 const WIDTH = 374;
 const HEIGHT = 1312;
@@ -11,6 +12,7 @@ const STOP_SPACING = 112;
 const LEFT_MARGIN = 84;
 const LINE_WIDTH = 40;
 const STOP_RADIUS = 14;
+const CLOSED_STOP_RADIUS = 16;
 const BIG_STOP_RADIUS = 30;
 const TOP_MARGIN = 124;
 const TEXT_LEFT_MARGIN = 18;
@@ -110,6 +112,18 @@ const BaseMapCurrent = ({ stops }) => {
   );
 };
 
+const ClosedStopIcon = ({ cx, cy }) => {
+  const iconSize = CLOSED_STOP_RADIUS * 2;
+
+  return (
+    <g
+      transform={`translate(${cx - CLOSED_STOP_RADIUS}, ${cy - CLOSED_STOP_RADIUS})`}
+    >
+      <ClosedStopIconSvg width={iconSize} height={iconSize} />
+    </g>
+  );
+};
+
 const BaseMapPast = ({ stops }) => {
   const numStops = stops.length;
   const numFutureStops = stops.findIndex((stop) => stop.current);
@@ -147,8 +161,13 @@ const BaseMapPast = ({ stops }) => {
 const BaseMapStops = ({ stops }) => {
   return (
     <>
-      {stops.map(({ label, downstream, current, terminal }, i) => {
-        const stopIcon = (
+      {stops.map(({ label, downstream, current, terminal, closed }, i) => {
+        const stopIcon = closed ? (
+          <ClosedStopIcon
+            cx={LEFT_MARGIN + LINE_WIDTH / 2}
+            cy={TOP_MARGIN + STOP_SPACING * i}
+          />
+        ) : (
           <circle
             cx={LEFT_MARGIN + LINE_WIDTH / 2}
             cy={TOP_MARGIN + STOP_SPACING * i}
@@ -159,15 +178,19 @@ const BaseMapStops = ({ stops }) => {
 
         let stopLabel: JSX.Element | null = null;
         let labelText = abbreviateStop(label);
+
+        const modifiers: string[] = [];
         if (downstream || current || terminal) {
-          let modifier;
           if (current && terminal) {
-            modifier = "current-terminal";
+            modifiers.push("current-terminal");
             labelText = labelText.toUpperCase();
           } else if (current) {
-            modifier = "current";
+            modifiers.push("current");
           } else if (!downstream && !current) {
-            modifier = "past";
+            modifiers.push("past");
+          }
+          if (closed) {
+            modifiers.push("closed");
           }
 
           if (labelText.length > MAXIMUM_STOP_LABEL_LENGTH) {
@@ -176,7 +199,10 @@ const BaseMapStops = ({ stops }) => {
               <text
                 x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
                 y={TEXT_TOP_MARGIN + TOP_MARGIN + STOP_SPACING * i}
-                className={classWithModifier("line-map__stop-label", modifier)}
+                className={classWithModifiers(
+                  "line-map__stop-label",
+                  modifiers,
+                )}
               >
                 <tspan
                   x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
@@ -197,7 +223,10 @@ const BaseMapStops = ({ stops }) => {
               <text
                 x={LEFT_MARGIN + LINE_WIDTH + TEXT_LEFT_MARGIN}
                 y={TEXT_TOP_MARGIN + TOP_MARGIN + STOP_SPACING * i}
-                className={classWithModifier("line-map__stop-label", modifier)}
+                className={classWithModifiers(
+                  "line-map__stop-label",
+                  modifiers,
+                )}
               >
                 {labelText}
               </text>
@@ -478,6 +507,7 @@ type Stop = {
   downstream: boolean;
   current: boolean;
   terminal: boolean;
+  closed: boolean;
 };
 
 type Vehicle = {

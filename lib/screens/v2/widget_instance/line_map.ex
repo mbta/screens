@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.LineMap do
   @moduledoc false
 
+  alias Screens.Alerts.Alert
   alias Screens.Predictions.Prediction
   alias Screens.Trips.Trip
   alias Screens.Util
@@ -12,13 +13,41 @@ defmodule Screens.V2.WidgetInstance.LineMap do
   defstruct screen: nil,
             stops: [],
             reverse_stops: [],
-            departures: []
+            departures: [],
+            alerts: []
 
   @type t :: %__MODULE__{
           screen: Screen.t(),
           stops: list(Screens.Stops.Stop.t()),
           reverse_stops: list(Screens.Stops.Stop.t()),
-          departures: list(Departure.t())
+          departures: list(Departure.t()),
+          alerts: list(Alert.t())
+        }
+
+  @type serialized_stop :: %{
+          label: String.t(),
+          closed: boolean(),
+          downstream: boolean(),
+          current: boolean(),
+          terminal: boolean()
+        }
+
+  @type serialized_vehicle :: %{
+          id: String.t(),
+          index: float(),
+          label: %{type: :text, text: String.t()} | %{type: :minutes, minutes: integer()} | nil,
+          time_in_epoch: integer()
+        }
+
+  @type serialized_scheduled_departure :: %{
+          timestamp: String.t(),
+          station_name: String.t()
+        }
+
+  @type serialized_line_map :: %{
+          stops: [serialized_stop()],
+          vehicles: [serialized_vehicle()],
+          scheduled_departure: serialized_scheduled_departure() | nil
         }
 
   @num_future_stops 2
@@ -29,13 +58,18 @@ defmodule Screens.V2.WidgetInstance.LineMap do
             screen: config,
             stops: stops,
             reverse_stops: reverse_stops,
-            departures: departures
+            departures: departures,
+            alerts: alerts
           },
           now \\ DateTime.utc_now()
         ) do
       %Screen{
         app_params: %Screen.GlEink{
-          line_map: %ScreensConfig.LineMap{stop_id: current_stop, direction_id: direction_id}
+          line_map: %ScreensConfig.LineMap{
+            stop_id: current_stop,
+            direction_id: direction_id,
+            route_id: route_id
+          }
         }
       } = config
 
@@ -44,7 +78,14 @@ defmodule Screens.V2.WidgetInstance.LineMap do
 
       %{
         stops:
-          LineMap.serialize_stops(current_stop, stops, reverse_stops, current_stop_terminal?),
+          LineMap.serialize_stops(
+            current_stop,
+            stops,
+            reverse_stops,
+            current_stop_terminal?,
+            route_id,
+            alerts
+          ),
         vehicles:
           LineMap.serialize_vehicles(
             departures,
@@ -76,16 +117,27 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.NullView
   end
 
-  def serialize_stops(current_stop, stops, reverse_stops, terminal?) do
+  @spec serialize_stops(
+          String.t(),
+          [Screens.Stops.Stop.t()],
+          [Screens.Stops.Stop.t()],
+          boolean(),
+          String.t(),
+          [Alert.t()]
+        ) :: [serialized_stop()]
+  def serialize_stops(current_stop, stops, reverse_stops, terminal?, route_id, alerts \\ []) do
     current_stop_index = Enum.find_index(stops, fn %{id: stop} -> stop == current_stop end)
+
+    closed_stop_ids = get_closed_stop_ids(alerts, route_id)
 
     forward_stops =
       stops
       |> Enum.slice(0, current_stop_index + @num_future_stops + 1)
       |> Enum.with_index()
-      |> Enum.map(fn {%Screens.Stops.Stop{name: label}, i} ->
+      |> Enum.map(fn {%Screens.Stops.Stop{id: stop_id, name: label}, i} ->
         %{
           label: label,
+          closed: MapSet.member?(closed_stop_ids, stop_id),
           downstream: i > current_stop_index,
           current: i == current_stop_index,
           terminal: i == 0 or i == length(stops) - 1
@@ -99,9 +151,10 @@ defmodule Screens.V2.WidgetInstance.LineMap do
         |> Enum.reverse()
         |> Enum.drop(1)
         |> Enum.with_index()
-        |> Enum.map(fn {%Screens.Stops.Stop{name: label}, i} ->
+        |> Enum.map(fn {%Screens.Stops.Stop{id: stop_id, name: label}, i} ->
           %{
             label: label,
+            closed: MapSet.member?(closed_stop_ids, stop_id),
             downstream: false,
             current: false,
             terminal: i == length(reverse_stops) - 2
@@ -114,6 +167,15 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     end
   end
 
+  @spec serialize_vehicles(
+          [Departure.t()],
+          [Screens.Stops.Stop.t()],
+          [Screens.Stops.Stop.t()],
+          integer(),
+          String.t(),
+          DateTime.t(),
+          boolean()
+        ) :: [serialized_vehicle()]
   def serialize_vehicles(
         departures,
         stops,
@@ -259,6 +321,12 @@ defmodule Screens.V2.WidgetInstance.LineMap do
     end
   end
 
+  @spec serialize_scheduled_departure(
+          [Departure.t()],
+          integer(),
+          [Screens.Stops.Stop.t()],
+          boolean()
+        ) :: serialized_scheduled_departure() | nil
   def serialize_scheduled_departure(_departures, _direction_id, _stops, true = _terminal?),
     do: nil
 
@@ -283,5 +351,29 @@ defmodule Screens.V2.WidgetInstance.LineMap do
 
       %{timestamp: timestamp, station_name: origin_stop_name}
     end
+  end
+
+  @spec get_closed_stop_ids([Alert.t()], String.t()) :: MapSet.t()
+  defp get_closed_stop_ids(alerts, route_id) do
+    alerts
+    |> Enum.filter(&closure_alert?/1)
+    |> Enum.flat_map(&closure_affected_stop_ids(&1, route_id))
+    |> MapSet.new()
+  end
+
+  @spec closure_alert?(Alert.t()) :: boolean()
+  defp closure_alert?(%Alert{effect: effect}) do
+    effect in [:station_closure, :stop_closure, :suspension, :shuttle, :stop_moved]
+  end
+
+  @spec closure_affected_stop_ids(Alert.t(), String.t()) :: [String.t()]
+  defp closure_affected_stop_ids(%Alert{informed_entities: informed_entities}, route_id) do
+    informed_entities
+    |> Enum.filter(fn entity ->
+      not is_nil(entity.stop) and entity.route.id == route_id and
+        Enum.find(entity.activities, &(&1 == :exit))
+    end)
+    |> Enum.map(fn entity -> entity.stop.id end)
+    |> Enum.uniq()
   end
 end
