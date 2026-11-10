@@ -19,7 +19,8 @@ defmodule Screens.Alerts.KenmoreAlertHelper do
   ]
 
   @spec kenmore_only_some_branches_affected?([Alert.t()], String.t()) :: boolean()
-  def kenmore_only_some_branches_affected?(alerts, "place-kencl") do
+  def kenmore_only_some_branches_affected?(alerts, kenmore_station)
+      when kenmore_station in ["place-kencl", "71151"] do
     length =
       alerts
       |> get_branches_if_entity_matches_stop(@kenmore_stop_matchers)

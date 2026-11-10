@@ -1,12 +1,12 @@
 defmodule Screens.LocationContext do
   @moduledoc false
 
+  alias Screens.Alerts.AlertLocation
   alias Screens.Report
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
   alias Screens.RouteType
   alias Screens.Stops.Stop
-  alias Screens.Util
 
   alias ScreensConfig.Screen.{BusEink, BusShelter, Dup, GlEink, PreFare}
 
@@ -67,8 +67,8 @@ defmodule Screens.LocationContext do
             end,
           child_stops_at_station: child_stops,
           tagged_stop_sequences: tagged_stop_sequences,
-          upstream_stops: upstream_stop_id_set(stop_ids, stop_sequences),
-          downstream_stops: downstream_stop_id_set(stop_ids, stop_sequences),
+          upstream_stops: AlertLocation.upstream_stop_id_set(stop_ids, stop_sequences),
+          downstream_stops: AlertLocation.downstream_stop_id_set(stop_ids, stop_sequences),
           routes: routes_at_stops,
           alert_route_types: alert_route_types
         }
@@ -81,22 +81,16 @@ defmodule Screens.LocationContext do
   end
 
   # NOTE: only public due to use in tests. Should be treated as private.
+  # Also can eventually be removed, but is being using in many tests
   @spec upstream_stop_id_set([Stop.id()], [[Stop.id()]]) :: MapSet.t(Stop.id())
   def upstream_stop_id_set(stop_ids, stop_sequences),
-    do: sliced_stop_id_set(stop_ids, stop_sequences, &Util.slice_before/2)
+    do: AlertLocation.upstream_stop_id_set(stop_ids, stop_sequences)
 
   # NOTE: only public due to use in tests. Should be treated as private.
+  # Also can eventually be removed, but is being using in many tests
   @spec downstream_stop_id_set([Stop.id()], [[Stop.id()]]) :: MapSet.t(Stop.id())
   def downstream_stop_id_set(stop_ids, stop_sequences),
-    do: sliced_stop_id_set(stop_ids, stop_sequences, &Util.slice_after/2)
-
-  defp sliced_stop_id_set(stop_ids, stop_sequences, slice_fn) do
-    stop_ids
-    |> Enum.flat_map(fn stop_id ->
-      Enum.flat_map(stop_sequences, fn stop_sequence -> slice_fn.(stop_sequence, stop_id) end)
-    end)
-    |> MapSet.new()
-  end
+    do: AlertLocation.downstream_stop_id_set(stop_ids, stop_sequences)
 
   @doc """
   Returns IDs of routes that serve this location.

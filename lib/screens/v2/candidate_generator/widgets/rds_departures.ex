@@ -8,7 +8,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   of full screen presentations
 
   """
+  alias Screens.Alerts.Alert
   alias Screens.Schedules.Schedule
+  alias Screens.Stops.Stop
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias Screens.V2.RDS.{Countdowns, FirstTrip, Headways, ImpactedByAlert, NoService, ServiceEnded}
@@ -163,9 +165,29 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
      end}
   end
 
-  def combine_alert_states(states, states_to_add) do
-    alert_ids_to_filter = Enum.map(states, & &1.alert.id)
-    states ++ Enum.reject(states_to_add, &(&1.alert.id in alert_ids_to_filter))
+  defp combine_alert_states(states, states_to_add) do
+    Enum.reduce(states_to_add, states, fn %ImpactedByAlert{alert: %Alert{id: alert_id}} =
+                                            state_to_add,
+                                          states ->
+      states
+      |> Enum.find_index(&(&1.alert.id == alert_id))
+      |> case do
+        nil ->
+          states ++ state_to_add
+
+        index ->
+          List.update_at(states, index, fn state ->
+            state
+            |> update_in([Access.key(:destinations)], fn destinations ->
+              (destinations ++ state_to_add.destinations) |> Enum.uniq()
+            end)
+            |> update_in([Access.key(:routes)], fn routes ->
+              (routes ++ state_to_add.routes) |> Enum.uniq()
+            end)
+            |> put_in([Access.key(:displayed_headsign)], nil)
+          end)
+      end
+    end)
   end
 
   defp valid_alert_section?(
@@ -317,10 +339,11 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
     Enum.flat_map(alert_states, fn
       %ImpactedByAlert{
         alert: alert,
+        destinations: [{%Stop{id: stop_id}, _line, _headsign} | _],
         direction_id: direction_id,
         displayed_headsign: displayed_headsign,
         location: location,
-        routes: [route | _]
+        routes: routes
       } ->
         [
           %AlertRow{
@@ -328,7 +351,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
             direction_id: direction_id,
             displayed_headsign: displayed_headsign,
             location: location,
-            route: route
+            routes: routes,
+            stop_id: stop_id
           }
         ]
     end)

@@ -833,7 +833,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
               ie(stop_id: "90", route_id: "a")
             ]
           },
-          route: route(id: "Green-E", line: "line-Green", type: :subway),
+          routes: [route(id: "Green-E", line: "line-Green", type: :subway)],
           direction_id: 0,
           displayed_headsign: "Green Line",
           location: :inside
