@@ -12,6 +12,9 @@ defmodule Screens.Assets.Cleanup do
 
   @bucket "mbta-screens"
   @media_directories ~w[images videos]
+
+  # We won't delete assets in the this subdirectory
+  @reusable_subdirectory "reusable/"
   # 30 days in seconds - we won't delete assets modified within this period
   @grace_period_seconds 30 * 24 * 60 * 60
 
@@ -39,10 +42,23 @@ defmodule Screens.Assets.Cleanup do
 
       case list_objects(prefix, request) do
         {:ok, objects} ->
-          eligible =
-            objects
-            |> Enum.filter(&eligible?(&1, prefix, environment, references, cutoff))
+          {directories, files} = Enum.split_with(objects, &String.ends_with?(&1.key, "/"))
+
+          # First pass: find eligible non-directory objects
+          eligible_files =
+            files
+            |> Enum.filter(&eligible_file?(&1, prefix, environment, references, cutoff))
+            |> MapSet.new(&Map.get(&1, :key))
+
+          # Second pass: find empty directories (those with no remaining children after planned deletion)
+          all_files = MapSet.new(Enum.map(files, &Map.get(&1, :key)))
+
+          eligible_directories =
+            directories
+            |> Enum.filter(&eligible_dir?(&1, all_files, eligible_files, prefix))
             |> Enum.map(& &1.key)
+
+          eligible = (MapSet.to_list(eligible_files) ++ eligible_directories) |> Enum.uniq()
 
           {:cont, {:ok, eligible ++ keys}}
 
@@ -99,14 +115,12 @@ defmodule Screens.Assets.Cleanup do
     end
   end
 
-  defp eligible?(%{key: key, last_modified: modified}, prefix, env, configured_assets, cutoff)
+  @spec eligible_file?(map(), String.t(), String.t(), map(), DateTime.t()) :: boolean()
+  defp eligible_file?(%{key: key, last_modified: modified}, prefix, env, configured_files, cutoff)
        when is_binary(key) and is_binary(modified) do
-    relative_path = String.replace_prefix(key, env <> "/", "")
-
     with true <- String.starts_with?(key, prefix),
-         false <- String.ends_with?(key, "/"),
-         false <- String.starts_with?(key, prefix <> "reusable/"),
-         false <- Map.has_key?(configured_assets, relative_path),
+         false <- String.starts_with?(key, prefix <> @reusable_subdirectory),
+         false <- Map.has_key?(configured_files, relative_path(key, env)),
          {:ok, modified, _offset} <- DateTime.from_iso8601(modified) do
       DateTime.compare(modified, cutoff) == :lt
     else
@@ -114,7 +128,24 @@ defmodule Screens.Assets.Cleanup do
     end
   end
 
-  defp eligible?(_object, _prefix, _env, _configured_assets, _cutoff), do: false
+  defp eligible_file?(_object, _prefix, _env, _configured_files, _cutoff), do: false
+
+  @spec eligible_dir?(map(), MapSet.t(String.t()), MapSet.t(String.t()), String.t()) :: boolean()
+  defp eligible_dir?(%{key: key, last_modified: modified}, all_files, eligible_files, prefix)
+       when is_binary(key) and is_binary(modified) do
+    with true <- String.starts_with?(key, prefix),
+         false <- key == prefix,
+         false <- String.starts_with?(key, prefix <> @reusable_subdirectory) do
+      # Directory is eligible only if all its children will be deleted
+      Enum.all?(all_files, fn obj_key ->
+        not String.starts_with?(obj_key, key) or MapSet.member?(eligible_files, obj_key)
+      end)
+    else
+      _ -> false
+    end
+  end
+
+  defp eligible_dir?(_object, _all_files, _eligible_files, _prefix), do: false
 
   # Traverse values rather than known schema fields, to future-proof for new widgets.
   defp strings(value) when is_binary(value), do: [value]
@@ -139,5 +170,9 @@ defmodule Screens.Assets.Cleanup do
     # To normalize asset names from configurations to match the names stored in S3,
     # decode percent-encoded characters and replace + with space
     value |> URI.decode() |> String.replace("+", " ")
+  end
+
+  defp relative_path(key, env) do
+    String.replace_prefix(key, env <> "/", "")
   end
 end

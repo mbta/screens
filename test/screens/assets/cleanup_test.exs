@@ -58,22 +58,58 @@ defmodule Screens.Assets.CleanupTest do
   end
 
   test "only old objects in media directories are eligible, never reusable subfolders or markers" do
-    objects = [
-      object("images/unused.png"),
-      object("videos/unused.mp4"),
-      object("images/reusable/future.png"),
-      object("videos/reusable/future.mp4"),
-      object("images/evergreen/old-prefix.png"),
+    directories = [
       object("images/"),
-      object("images/nested/"),
-      object("images/recent.png", "2026-10-21T12:00:00Z"),
+      object("images/mixed/"),
+      object("images/reusable/"),
+      object("videos/"),
+      object("videos/reusable/")
+    ]
+
+    files = [
+      object("images/mixed/active.png", "2026-10-21T12:00:00Z"),
+      object("images/mixed/expired.png", "2026-09-01T12:00:00Z"),
+      object("images/reusable/future.png"),
       object("images/boundary.png", "2026-09-22T12:00:00Z"),
       object("images/future.png", "2026-10-23T12:00:00Z"),
+      object("images/recent.png", "2026-10-21T12:00:00Z"),
       object("images/unknown.png", "not a timestamp"),
-      %{key: key("images/no-timestamp.png")},
+      object("images/unused.png", "2026-10-21T12:00:00Z"),
+      object("videos/reusable/future.mp4"),
+      object("videos/unused.mp4"),
       object("other/unused.png"),
       object("LAST_DEPLOY"),
+      %{key: key("images/no-timestamp.png")},
       %{key: "another-environment/images/unused.png", last_modified: @old}
+    ]
+
+    objects = directories ++ files
+
+    request = fn operation ->
+      # Even unexpected out-of-scope objects in an S3 response must not be deleted.
+      assert operation.bucket == "mbta-screens"
+      listing(objects)
+    end
+
+    assert Cleanup.preview([], [request: request], @now) ==
+             {:ok,
+              Enum.map(
+                ~w[images/mixed/expired.png videos/unused.mp4],
+                &key/1
+              )}
+  end
+
+  test "never deletes empty base directories, but deletes empty subdirectories" do
+    objects = [
+      object("images/"),
+      object("videos/"),
+      object("images/mixed/"),
+      object("images/mixed/unused.png"),
+      object("images/mixed/used_dir/active.png", "2026-10-21T12:00:00Z"),
+      object("videos/unused_dir/"),
+      object("videos/unused_dir/unused.mp4"),
+      object("videos/unused_dir/unused_subdir/"),
+      object("videos/unused_dir/unused_subdir/unused.mp4")
     ]
 
     request = fn operation ->
@@ -85,7 +121,7 @@ defmodule Screens.Assets.CleanupTest do
     assert Cleanup.preview([], [request: request], @now) ==
              {:ok,
               Enum.map(
-                ~w[images/evergreen/old-prefix.png images/unused.png videos/unused.mp4],
+                ~w[images/mixed/unused.png videos/unused_dir/ videos/unused_dir/unused.mp4 videos/unused_dir/unused_subdir/ videos/unused_dir/unused_subdir/unused.mp4],
                 &key/1
               )}
   end
