@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
+defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Lines.Line
@@ -7,7 +7,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDeparturesTest do
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
-  alias Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures
+  alias Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDepartures
   alias Screens.V2.Departure
   alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget

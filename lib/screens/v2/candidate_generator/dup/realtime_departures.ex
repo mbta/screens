@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Dup.Departures do
+defmodule Screens.V2.CandidateGenerator.Dup.RealtimeDepartures do
   @moduledoc false
 
   alias Screens.Routes.Route

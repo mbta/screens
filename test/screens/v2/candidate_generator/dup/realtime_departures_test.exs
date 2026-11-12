@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
+defmodule Screens.V2.CandidateGenerator.Dup.RealtimeDeparturesTest do
   use ExUnit.Case, async: true
 
   alias Screens.Lines.Line
@@ -206,7 +206,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         %DeparturesNoData{screen: config, slot_name: :main_content_reduced_two}
       ]
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -245,7 +245,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
         %DeparturesNoService{screen: config, slot_name: :main_content_reduced_two}
       ]
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -305,7 +305,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -369,7 +369,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -436,7 +436,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -505,7 +505,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -602,7 +602,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_secondary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -714,7 +714,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_sections, expected_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -814,7 +814,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_secondary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -897,7 +897,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           now
         )
 
-      actual_instances = Dup.Departures.instances(config, now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, now)
 
       assert actual_instances == expected_instances
     end
@@ -977,7 +977,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
           now
         )
 
-      actual_instances = Dup.Departures.instances(config, now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, now)
 
       assert actual_instances == expected_instances
     end
@@ -1022,7 +1022,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
 
       expected_instances = expected_overnight_departures_widget(config)
 
-      actual_instances = Dup.Departures.instances(config, now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, now)
 
       assert actual_instances == expected_instances
     end
@@ -1068,7 +1068,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -1114,7 +1114,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end
@@ -1192,7 +1192,7 @@ defmodule Screens.V2.CandidateGenerator.Dup.DeparturesTest do
       expected_instances =
         expected_departures_widget(config, expected_primary_sections, expected_primary_sections)
 
-      actual_instances = Dup.Departures.instances(config, @now)
+      actual_instances = Dup.RealtimeDepartures.instances(config, @now)
 
       assert actual_instances == expected_instances
     end

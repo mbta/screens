@@ -1,4 +1,4 @@
-defmodule Screens.V2.CandidateGenerator.Widgets.RealtimeDepartures do
+defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDepartures do
   @moduledoc """
   Candidate generator for LCD RDS Items
   Takes in the generated sections from Screens.V2.CandidateGenerator.Widgets.RdsDepartures and
