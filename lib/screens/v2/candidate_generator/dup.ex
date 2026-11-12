@@ -3,7 +3,7 @@ defmodule Screens.V2.CandidateGenerator.Dup do
 
   alias Screens.V2.CandidateGenerator
   alias Screens.V2.CandidateGenerator.Dup.Alerts, as: AlertsGenerator
-  alias Screens.V2.CandidateGenerator.Dup.Departures, as: DeparturesGenerator
+  alias Screens.V2.CandidateGenerator.Dup.RealtimeDepartures, as: DeparturesGenerator
   alias Screens.V2.CandidateGenerator.Widgets
   alias Screens.V2.Template.Builder
 
