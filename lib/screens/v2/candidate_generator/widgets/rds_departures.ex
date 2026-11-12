@@ -1,6 +1,6 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   @moduledoc """
-  Candidate Generator for RDS Items. 
+  Candidate Generator for RDS Items.
   Takes in RDS items and generates Screens.V2.WidgetInstance.Departures sections
   to eventually be serialized and used as a part of the Departures Widget.
 
@@ -33,6 +33,9 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   alias ScreensConfig.{Departures, Screen}
   alias ScreensConfig.Departures.{Header, Params, Section}
 
+  # These screen types not display alerts within Departures because they already have Alert widgets
+  # that should cover all alerts we would otherwise be showing in Departures
+  @app_ids_without_departure_alerts [:bus_shelter_v2, :dup_v2]
   @type post_process_rows_fn_t :: ([NormalSection.row()], Section.t(), non_neg_integer() ->
                                      [NormalSection.row()])
   @type widget :: DeparturesNoData.t() | DeparturesWidget.t()
@@ -64,17 +67,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           rds_section,
           section,
           total_section_count,
-          post_process_rows_fn
+          post_process_rows_fn,
+          screen
         )
       }
     end)
   end
 
+  @spec filter_alerts_for_app_ids([RDS.data()], Screen.t()) :: [RDS.data()]
   defp filter_alerts_for_app_ids(rds_data, %Screen{app_id: app_id})
-       when app_id in [:bus_shelter_v2, :dup_v2] do
+       when app_id in @app_ids_without_departure_alerts do
     Enum.map(rds_data, fn
       {:ok, rds_items} ->
-        {:ok, Enum.reject(rds_items, &match?(%RDS.ImpactedByAlert{}, &1))}
+        filtered = Enum.reject(rds_items, &match?(%RDS.ImpactedByAlert{}, &1))
+
+        # Only use the filtered list if there are other items besides alerts to show
+        if Enum.empty?(filtered) do
+          {:ok, rds_items}
+        else
+          {:ok, filtered}
+        end
 
       other ->
         other
@@ -84,7 +96,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
   defp filter_alerts_for_app_ids(rds_data, _screen), do: rds_data
 
   defp maybe_combine_alert_sections(rds_and_sections_data, %Screen{app_id: app_id})
-       when app_id in [:bus_shelter_v2, :dup_v2], do: rds_and_sections_data
+       when app_id in @app_ids_without_departure_alerts, do: rds_and_sections_data
 
   defp maybe_combine_alert_sections(rds_and_section_data, _screen) do
     # If we have all of the states in one section be an alert, we'll try and combine with other sections
@@ -172,7 +184,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
           RDS.data(),
           Section.t(),
           non_neg_integer(),
-          post_process_rows_fn_t()
+          post_process_rows_fn_t(),
+          Screen.t()
         ) ::
           DeparturesWidget.section()
 
@@ -186,7 +199,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
            params: nil
          },
          _section_count,
-         _post_process_rows_fn
+         _post_process_rows_fn,
+         _screen
        ) do
     %NormalSection{
       rows: [],
@@ -201,7 +215,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
          data,
          %Section{params: %Params{mode: mode}},
          _,
-         _
+         _,
+         _screen
        )
        when data == :error or data == {:ok, []},
        do: %NoDataSection{mode: mode}
@@ -211,7 +226,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
          %Section{header: header, layout: layout, grouping_type: grouping_type, params: params} =
            section,
          section_count,
-         post_process_rows_fn
+         post_process_rows_fn,
+         screen
        ) do
     case items do
       [
@@ -241,7 +257,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
       _ ->
         rows =
           items
-          |> create_and_sort_rows()
+          |> create_and_sort_rows(screen)
           |> post_process_rows_fn.(section, section_count)
 
         %NormalSection{
@@ -254,8 +270,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
     end
   end
 
-  @spec create_and_sort_rows([RDS.item()]) :: [NormalSection.row()]
-  defp create_and_sort_rows(rds_items) do
+  @spec create_and_sort_rows([RDS.item()], Screen.t()) :: [NormalSection.row()]
+  defp create_and_sort_rows(rds_items, screen) do
     grouped_items =
       Enum.group_by(rds_items, fn
         %ImpactedByAlert{} -> :alert
@@ -269,7 +285,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
     headway_items = Map.get(grouped_items, :headways, [])
     other_items = Map.get(grouped_items, :other, [])
 
-    alerts_from_rds(alert_items) ++
+    alerts_from_rds(alert_items, screen) ++
       sorted_departures_from_rds(other_items) ++
       headways_from_rds(headway_items) ++
       sorted_departures_from_rds(service_ended_items, true)
@@ -290,8 +306,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDepartures do
     Enum.reject([first, opposite?], &is_nil/1)
   end
 
-  @spec alerts_from_rds([ImpactedByAlert.t()]) :: [NormalSection.AlertRow.t()]
-  defp alerts_from_rds(alert_states) do
+  @spec alerts_from_rds([ImpactedByAlert.t()], Screen.t()) :: [NormalSection.row()]
+  defp alerts_from_rds(_alert_states, %Screen{app_id: app_id})
+       when app_id in @app_ids_without_departure_alerts do
+    # Return empty list when all items are alerts, since we will show the alert separately
+    []
+  end
+
+  defp alerts_from_rds(alert_states, _screen) do
     Enum.flat_map(alert_states, fn
       %ImpactedByAlert{
         alert: alert,
