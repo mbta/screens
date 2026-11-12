@@ -15,14 +15,13 @@ defmodule Screens.V2.RDS do
   require Screens.Alerts.Alert
 
   alias Screens.Alerts.Alert
-  alias Screens.Alerts.InformedEntity
+  alias Screens.Alerts.AlertLocation
   alias Screens.Headways, as: Headway
   alias Screens.LastTrip.LastTrip
   alias Screens.Lines.Line
   alias Screens.Report
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Routes.Route
-  alias Screens.RouteType
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
   alias Screens.Trips.Trip
@@ -50,7 +49,9 @@ defmodule Screens.V2.RDS do
   @type data :: {:ok, [item()]} | :error
   @type destination_key :: {Stop.id(), Line.id(), String.t()}
   @type destination :: {Stop.t(), Line.t(), String.t()}
-  @type destination_alert_map :: %{optional(destination()) => Alert.t()}
+  @type destination_alert_map :: %{
+          optional(destination()) => {Alert.t(), AlertLocation.t()}
+        }
 
   @typep scheduled_service_state :: :after | :before | :none | :within
 
@@ -259,7 +260,7 @@ defmodule Screens.V2.RDS do
          tuples_from_patterns(typical_patterns, child_stops))
       |> Enum.uniq_by(fn {stop, line, headsign} -> {stop.id, line.id, headsign} end)
 
-    destination_alerts = alerts_for_destinations(destinations, alerts, typical_patterns)
+    destination_alerts = alerts_for_destinations(destinations, alerts, typical_patterns, mode)
 
     items =
       destinations
@@ -347,9 +348,9 @@ defmodule Screens.V2.RDS do
         %Countdowns{destinations: [destination], departures: presented_departures}
 
       impacted_by_alert? ->
-        alert = Map.get(destination_alerts, destination)
+        {alert, location} = Map.get(destination_alerts, destination)
 
-        if supports_alert?(alert, mode) do
+        if supports_alert?(alert, location, mode) do
           %ImpactedByAlert{
             alert: alert,
             destinations: [destination],
@@ -359,8 +360,7 @@ defmodule Screens.V2.RDS do
                 %Schedule{trip: %Trip{direction_id: direction_id}} -> direction_id
                 nil -> nil
               end,
-            # added in a stacked PR
-            location: :inside,
+            location: location,
             routes: routes_for_section
           }
         else
@@ -758,27 +758,32 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  @spec alerts_for_destinations([destination()], [Alert.t()], [RoutePattern.t()]) ::
+  @spec alerts_for_destinations([destination()], [Alert.t()], [RoutePattern.t()], Mode.t()) ::
           destination_alert_map()
-  defp alerts_for_destinations(destinations, alerts, typical_patterns) do
-    Enum.reduce(destinations, %{}, fn {stop, _line, _headsign} = destination, acc ->
+  defp alerts_for_destinations(destinations, alerts, typical_patterns, mode) do
+    Enum.reduce(destinations, %{}, fn {home_stop, _line, _headsign} = destination, acc ->
       case pattern_for_destination(destination, typical_patterns) do
         nil ->
           acc
 
         pattern ->
-          first_alert =
+          alert_and_location =
             alerts
-            |> Enum.filter(fn %Alert{informed_entities: ies} ->
-              Enum.any?(ies, &ie_affects_destination?(&1, pattern, stop))
+            |> Enum.map(
+              &{&1, AlertLocation.location_from_route_pattern(&1, pattern, home_stop, mode)}
+            )
+            |> Enum.reject(fn
+              {_alert, location} ->
+                location == :elsewhere or location == :boundary_upstream or
+                  location == :upstream
             end)
-            |> Enum.sort_by(& &1.severity)
+            |> Enum.sort_by(fn {alert, _location} -> alert.severity end)
             |> List.first()
 
-          if is_nil(first_alert) do
+          if is_nil(alert_and_location) do
             acc
           else
-            Map.put(acc, destination, first_alert)
+            Map.put(acc, destination, alert_and_location)
           end
       end
     end)
@@ -807,45 +812,12 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  @spec supports_alert?(Alert.t(), Mode.t()) :: boolean()
+  @spec supports_alert?(Alert.t(), AlertLocation.t(), Mode.t()) :: boolean()
   # To be removed once we start supporting all effects we want
-  defp supports_alert?(%Alert{effect: effect}, mode),
-    do: effect in [:suspension, :shuttle] and Mode.to_route_type(mode) in [:subway, :light_rail]
-
-  @spec ie_affects_destination?(InformedEntity.t(), RoutePattern.t(), Stop.t()) :: boolean()
-  # Alert effects the entire route
-  defp ie_affects_destination?(
-         %InformedEntity{route: %Route{id: route_id}, direction_id: nil, stop: nil},
-         %RoutePattern{route: %Route{id: route_id}},
-         _home_stop
-       ),
-       do: true
-
-  # Alert effects the entire route in the direction of the destination
-  defp ie_affects_destination?(
-         %InformedEntity{route: %Route{id: route_id}, direction_id: direction_id, stop: nil},
-         %RoutePattern{route: %Route{id: route_id}, direction_id: direction_id},
-         _home_stop
-       ),
-       do: true
-
-  # Alert effects the entire route in both directions
-  defp ie_affects_destination?(
-         %InformedEntity{route_type: informed_route_type, stop: nil},
-         %RoutePattern{route: %Route{type: route_type}},
-         _home_stop
-       ),
-       do: RouteType.to_id(route_type) == informed_route_type
-
-  # Alert does not affect the route or a specific stop
-  defp ie_affects_destination?(%InformedEntity{stop: nil}, _pattern, _home_stop),
-    do: false
-
-  # Alert effects the child stop
-  defp ie_affects_destination?(%InformedEntity{stop: %Stop{id: id}}, _pattern, %Stop{id: id}),
-    do: true
-
-  defp ie_affects_destination?(_, _, _), do: false
+  defp supports_alert?(%Alert{effect: effect}, location, mode),
+    do:
+      effect in [:suspension, :shuttle] and Mode.to_route_type(mode) in [:subway, :light_rail] and
+        (location == :inside or location == :boundary_downstream)
 
   defp red_trunk_to_alewife?(stop_id, "Alewife") when stop_id in @red_trunk, do: true
 

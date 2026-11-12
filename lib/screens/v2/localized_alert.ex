@@ -4,6 +4,7 @@ defmodule Screens.V2.LocalizedAlert do
   """
 
   alias Screens.Alerts.Alert
+  alias Screens.Alerts.AlertLocation
   alias Screens.Alerts.InformedEntity
   alias Screens.LocationContext
   alias Screens.Routes.Route
@@ -30,14 +31,6 @@ defmodule Screens.V2.LocalizedAlert do
   @type route_id :: String.t()
 
   @green_line_branches ["Green-B", "Green-C", "Green-D", "Green-E"]
-
-  @type location ::
-          :boundary_downstream
-          | :boundary_upstream
-          | :downstream
-          | :elsewhere
-          | :inside
-          | :upstream
 
   @typedoc """
   A headsign indicating the direction a vehicle is headed in.
@@ -100,124 +93,10 @@ defmodule Screens.V2.LocalizedAlert do
       MapSet.disjoint?(not_informed, informed_stop_ids)
   end
 
-  @spec informed_entity_to_zone(InformedEntity.t(), LocationContext.t()) ::
-          list(:upstream | :home_stop | :downstream)
-  defp informed_entity_to_zone(informed_entity, location_context)
-
-  # All values nil
-  defp informed_entity_to_zone(
-         %InformedEntity{stop: nil, route: nil, route_type: nil},
-         _location_context
-       ) do
-    []
+  @spec location(t()) :: AlertLocation.t()
+  def location(%{alert: alert, location_context: location_context}, is_terminal_station \\ false) do
+    AlertLocation.location_from_context(alert, location_context, is_terminal_station)
   end
-
-  # Only route type is not nil--this is the only time we consider route type,
-  # since it's implied by other values when they are not nil
-  defp informed_entity_to_zone(
-         %InformedEntity{stop: nil, route: nil, route_type: route_type_id},
-         %{
-           alert_route_types: alert_route_types
-         }
-       ) do
-    if RouteType.from_id(route_type_id) in alert_route_types do
-      [:upstream, :home_stop, :downstream]
-    else
-      []
-    end
-  end
-
-  # Only stop is not nil (route type ignored)
-  defp informed_entity_to_zone(%InformedEntity{stop: %Stop{id: stop_id}, route: nil}, context)
-       when not is_nil(stop_id) do
-    cond do
-      stop_id == context.home_stop -> [:home_stop]
-      # Stops can be both upstream and downstream simultaneously, on different routes through the home stop.
-      # We check whether it's downstream first, since that takes priority.
-      stop_id in context.downstream_stops -> [:downstream]
-      stop_id in context.upstream_stops -> [:upstream]
-      true -> []
-    end
-  end
-
-  # Only route is not nil (route type ignored)
-  defp informed_entity_to_zone(%InformedEntity{stop: nil, route: %Route{id: route_id}}, context) do
-    route_ids = LocationContext.route_ids(context)
-    if route_id in route_ids, do: [:upstream, :home_stop, :downstream], else: []
-  end
-
-  # Both stop and route are not nil (route type ignored)
-  defp informed_entity_to_zone(
-         %InformedEntity{stop: stop, route: route} = informed_entity,
-         context
-       )
-       when not is_nil(stop) and not is_nil(route) do
-    route_ids = LocationContext.route_ids(context)
-
-    if route.id in route_ids do
-      informed_entity_to_zone(%{informed_entity | route: nil}, context)
-    else
-      []
-    end
-  end
-
-  @spec location(t()) :: location()
-  def location(
-        %{
-          alert: %Alert{effect: effect, informed_entities: informed_entities},
-          location_context: location_context
-        },
-        is_terminal_station \\ false
-      ) do
-    informed_zones_set =
-      informed_entities
-      |> Enum.flat_map(&informed_entity_to_zone(&1, location_context))
-      |> Enum.uniq()
-      |> Enum.sort()
-
-    get_location_atom(informed_zones_set, effect, is_terminal_station)
-  end
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:upstream],
-    do: :upstream
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:downstream],
-    do: :downstream
-
-  defp get_location_atom(informed_zones_set, _, _) when informed_zones_set == [:home_stop],
-    do: :inside
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :home_stop, :upstream],
-       do: :inside
-
-  # If station closure, then a boundary_upstream / _downstream is actually :inside
-  defp get_location_atom(informed_zones_set, effect, _)
-       when informed_zones_set == [:home_stop, :upstream] and effect === :station_closure,
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, effect, _)
-       when informed_zones_set == [:downstream, :home_stop] and effect === :station_closure,
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, effect, true)
-       when informed_zones_set in [[:home_stop, :upstream], [:downstream, :home_stop]] and
-              effect in [:suspension, :shuttle],
-       do: :inside
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:home_stop, :upstream],
-       do: :boundary_upstream
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :home_stop],
-       do: :boundary_downstream
-
-  defp get_location_atom(informed_zones_set, _, _)
-       when informed_zones_set == [:downstream, :upstream],
-       do: :downstream
-
-  defp get_location_atom(_, _, _), do: :elsewhere
 
   @doc """
   Returns all routes affected by an alert.

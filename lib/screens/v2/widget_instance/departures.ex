@@ -5,6 +5,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.AlertTextUtil
+  alias Screens.Alerts.KenmoreAlertHelper
   alias Screens.Headsigns.Headsign
   alias Screens.Headways
   alias Screens.Lines.Line
@@ -54,12 +55,13 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
       @type t :: %__MODULE__{
               alert: Alert.t(),
-              route: Route.t(),
               direction_id: Trip.direction(),
               displayed_headsign: String.t(),
-              location: :here | :downstream
+              location: :here | :downstream,
+              routes: [Route.t()],
+              stop_id: String.t()
             }
-      defstruct [:alert, :route, :direction_id, :displayed_headsign, :location]
+      defstruct [:alert, :direction_id, :displayed_headsign, :location, :routes, :stop_id]
     end
 
     @type row ::
@@ -656,11 +658,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
        }),
        do: {route, displayed_headsign}
 
-  defp row_destination(%NormalSection.AlertRow{
-         route: route,
-         displayed_headsign: displayed_headsign
-       }),
-       do: {route, displayed_headsign}
+  defp row_destination(%NormalSection.AlertRow{}), do: make_ref()
 
   defp row_destination(%FreeTextLine{}), do: make_ref()
 
@@ -787,7 +785,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
          [
            %NormalSection.AlertRow{
              alert: %Alert{effect: effect},
-             route: %Route{id: route_id} = route,
+             routes: [%Route{id: route_id} = representative_route | _],
              displayed_headsign: headsign
            } = alert_row
          ],
@@ -798,9 +796,9 @@ defmodule Screens.V2.WidgetInstance.Departures do
     {header_text, additional_text} = alert_row_text(alert_row, now)
 
     %{
-      id: hash_and_encode(route.id <> (headsign || "")),
+      id: hash_and_encode(route_id <> (headsign || "")),
       type: :alert_row,
-      route: route_pill_serializer.(route, nil, screen, true),
+      route: route_pill_serializer.(representative_route, nil, screen, true),
       header_text: FreeTextLine.to_json(header_text),
       additional_text: FreeTextLine.to_json(additional_text),
       icon: %{
@@ -1149,33 +1147,48 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp alert_row_text(
          %NormalSection.AlertRow{
-           alert: %Alert{
-             active_period: active_period,
-             effect: effect,
-             informed_entities: informed_entities
-           },
-           route: %Route{id: route_id},
+           alert:
+             %Alert{
+               active_period: active_period,
+               effect: effect,
+               informed_entities: informed_entities
+             } = alert,
            displayed_headsign: headsign,
-           location: location
+           location: location,
+           routes: [%Route{id: representative_route_id} = representative_route | _] = routes,
+           stop_id: stop_id
          },
          now
        ) do
-    route_text =
-      if match?("Green" <> _, route_id) do
-        "Green"
-      else
-        "#{route_id}"
+    headsign_text =
+      cond do
+        # Kenmore special case, display the direction names for the affected branches
+        KenmoreAlertHelper.kenmore_only_some_branches_affected?([alert], stop_id) ->
+          KenmoreAlertHelper.get_branches_if_entity_matches_stop([alert])
+          |> Enum.map_join(" and ", &KenmoreAlertHelper.branch_headsign(&1, false))
+
+        # Multiple routes ala Green Line - combine them
+        match?([_ | [_ | _]], routes) and match?("Green" <> _, representative_route_id) ->
+          "Green Line"
+
+        # Fallback to just using whatever headsign or route ID is first
+        true ->
+          if headsign do
+            headsign
+          else
+            "#{representative_route.id} Line"
+          end
       end
 
     header_text =
       %FreeTextLine{
         icon: nil,
         text:
-          if location == :inside do
+          if location == :inside or location == :boundary_downstream do
             if effect == :shuttle do
-              ["No #{route_text} Line service", %{special: :break}, "Use Shuttle Buses"]
+              ["No #{headsign_text} service", %{special: :break}, "Use Shuttle Buses"]
             else
-              ["No #{route_text} Line trains"]
+              ["No #{headsign_text} trains"]
             end
           else
             [headsign]
@@ -1192,7 +1205,14 @@ defmodule Screens.V2.WidgetInstance.Departures do
       end
 
     {{min_full_name, _min_abbr_name}, {max_full_name, _max_abbr_name}} =
-      Screens.Alerts.Endpoints.get_endpoints(informed_entities, route_id)
+      Screens.Alerts.Endpoints.get_endpoints(
+        informed_entities,
+        if match?("Green" <> _, representative_route_id) do
+          "Green"
+        else
+          representative_route_id
+        end
+      )
 
     endpoint_text = [
       "from",
