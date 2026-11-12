@@ -246,6 +246,12 @@ const ImageManager = (): JSX.Element => {
             the <code>reusable/</code> directory. Images within this directory
             are always excluded from cleanup.
           </li>
+          <li>
+            You can overwrite existing assets by uploading a new file with the
+            same path. If so, you'll need to clear your browser's cache
+            (Ctrl+Shift+R on Windows/Linux or Cmd+Shift+R on macOS) to see the
+            updated asset in the manager above.
+          </li>
         </ul>
       </section>
       <ImageUpload
