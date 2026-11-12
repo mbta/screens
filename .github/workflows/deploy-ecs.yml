@@ -53,7 +53,7 @@ jobs:
       - working-directory: ./assets
         run: npm run deploy
   call-workflow:
-    uses: mbta/workflows/.github/workflows/deploy-ecs.yml@8452b00f886c5cbaad3035cdbe259665aea7e166 # v5.1.2
+    uses: mbta/workflows/.github/workflows/deploy-ecs.yml@70e114f5f86aa991f1d4f96f24cf228883d1533c # v5.2.0
     with:
       app-name: screens
       environment: ${{ inputs.environment || 'dev' }}
