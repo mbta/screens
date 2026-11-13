@@ -5,10 +5,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.AlertTextUtil
-  alias Screens.Alerts.KenmoreAlertHelper
   alias Screens.Headsigns.Headsign
   alias Screens.Headways
-  alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
@@ -57,11 +55,20 @@ defmodule Screens.V2.WidgetInstance.Departures do
               alert: Alert.t(),
               direction_id: Trip.direction(),
               displayed_headsign: String.t(),
+              home_stop: Stop.t(),
               location: :here | :downstream,
-              routes: [Route.t()],
-              stop_id: String.t()
+              mode: Mode.t(),
+              routes: [Route.t()]
             }
-      defstruct [:alert, :direction_id, :displayed_headsign, :location, :routes, :stop_id]
+      defstruct [
+        :alert,
+        :direction_id,
+        :displayed_headsign,
+        :home_stop,
+        :location,
+        :mode,
+        :routes
+      ]
     end
 
     @type row ::
@@ -75,7 +82,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
             header: Header.t(),
             layout: Layout.t(),
             grouping_type: :time | :destination,
-            mode: Mode.t(),
+            mode: Mode.t() | :header,
             rows: [row()]
           }
     defstruct header: nil, layout: nil, grouping_type: :time, mode: nil, rows: []
@@ -543,7 +550,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
          _screen,
          now
        ) do
-    {header_text, additional_text} = alert_row_text(alert_row, now)
+    {header_text, additional_text} = AlertTextUtil.alert_row_text(alert_row, now)
 
     {:alert, FreeTextLine.to_plaintext(header_text), FreeTextLine.to_plaintext(additional_text)}
   end
@@ -652,11 +659,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
        }),
        do: {route, Schedule.headsign(schedule)}
 
-  defp row_destination(%NormalSection.HeadwayRow{
-         route: route,
-         displayed_headsign: displayed_headsign
-       }),
-       do: {route, displayed_headsign}
+  defp row_destination(%NormalSection.HeadwayRow{}), do: make_ref()
 
   defp row_destination(%NormalSection.AlertRow{}), do: make_ref()
 
@@ -784,27 +787,45 @@ defmodule Screens.V2.WidgetInstance.Departures do
   defp serialize_departure_group(
          [
            %NormalSection.AlertRow{
-             alert: %Alert{effect: effect},
-             routes: [%Route{id: route_id} = representative_route | _],
-             displayed_headsign: headsign
+             alert: %Alert{id: alert_id, effect: effect},
+             mode: mode,
+             routes: routes
            } = alert_row
          ],
          screen,
          now,
          route_pill_serializer
        ) do
-    {header_text, additional_text} = alert_row_text(alert_row, now)
+    {header_text, additional_text} = AlertTextUtil.alert_row_text(alert_row, now)
+
+    {route_icon, color} =
+      case {mode, routes} do
+        # combined mode sections, show subway black icon
+        {nil, _routes} ->
+          {%{type: :icon, icon: :subway, color: :black}, nil}
+
+        # one route, show that route pill along with the color associated with it
+        {_mode, [single_route]} ->
+          {route_pill_serializer.(single_route, nil, screen, true), Route.color(single_route.id)}
+
+        # if we're a CR, Bus or Ferry mode, we can just combine them into one combined mode pill
+        {mode, _routes} when mode in [:cr, :bus, :ferry] ->
+          route_type = Mode.to_route_type(mode)
+          {RoutePill.serialize_route_type_for_alert(route_type), Route.color_from_mode(mode)}
+
+        # othewise show the regular route (GL pills already are consolidated with this logic)
+        {_mode, [representative_route | _]} ->
+          {route_pill_serializer.(representative_route, nil, screen, true),
+           Route.color(representative_route.id)}
+      end
 
     %{
-      id: hash_and_encode(route_id <> (headsign || "")),
+      id: hash_and_encode(alert_id),
       type: :alert_row,
-      route: route_pill_serializer.(representative_route, nil, screen, true),
+      route: route_icon,
       header_text: FreeTextLine.to_json(header_text),
       additional_text: FreeTextLine.to_json(additional_text),
-      icon: %{
-        effect: effect,
-        color: Route.color(route_id)
-      }
+      icon: %{effect: effect, color: color}
     }
   end
 
@@ -823,19 +844,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
        ) do
     row_id =
       rows
-      |> Enum.map(fn
-        %Departure{} = departure ->
-          Departure.id(departure)
-
-        %NormalSection.HeadwayRow{
-          route: %Route{line: %Line{id: line_id}},
-          displayed_headsign: headsign
-        } ->
-          hash_and_encode(line_id <> (headsign || ""))
-
-        %NormalSection.SpecialTripRow{schedule: %Schedule{id: id}} ->
-          id
-      end)
+      |> Enum.map(&Departure.id(&1))
       |> Enum.sort()
       |> Enum.join("")
       |> hash_and_encode()
@@ -1144,97 +1153,4 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   defp hash_and_encode(departure_to_encode),
     do: :crypto.hash(:md5, departure_to_encode) |> Base.encode64()
-
-  defp alert_row_text(
-         %NormalSection.AlertRow{
-           alert:
-             %Alert{
-               active_period: active_period,
-               effect: effect,
-               informed_entities: informed_entities
-             } = alert,
-           displayed_headsign: headsign,
-           location: location,
-           routes: [%Route{id: representative_route_id} = representative_route | _] = routes,
-           stop_id: stop_id
-         },
-         now
-       ) do
-    headsign_text =
-      cond do
-        # Kenmore special case, display the direction names for the affected branches
-        KenmoreAlertHelper.kenmore_only_some_branches_affected?([alert], stop_id) ->
-          KenmoreAlertHelper.get_branches_if_entity_matches_stop([alert])
-          |> Enum.map_join(" and ", &KenmoreAlertHelper.branch_headsign(&1, false))
-
-        # Multiple routes ala Green Line - combine them
-        match?([_ | [_ | _]], routes) and match?("Green" <> _, representative_route_id) ->
-          "Green Line"
-
-        # Fallback to just using whatever headsign or route ID is first
-        true ->
-          if headsign do
-            headsign
-          else
-            "#{representative_route.id} Line"
-          end
-      end
-
-    header_text =
-      %FreeTextLine{
-        icon: nil,
-        text:
-          if location == :inside or location == :boundary_downstream do
-            if effect == :shuttle do
-              ["No #{headsign_text} service", %{special: :break}, "Use Shuttle Buses"]
-            else
-              ["No #{headsign_text} trains"]
-            end
-          else
-            [headsign]
-          end
-      }
-
-    {effect_text, extra_text} =
-      case effect do
-        :shuttle ->
-          {%{format: "bold", text: "Shuttle buses"}, ""}
-
-        :suspension ->
-          {%{format: "bold", text: "Service suspended"}, "Plan a new trip at mbta.com/alerts."}
-      end
-
-    {{min_full_name, _min_abbr_name}, {max_full_name, _max_abbr_name}} =
-      Screens.Alerts.Endpoints.get_endpoints(
-        informed_entities,
-        if match?("Green" <> _, representative_route_id) do
-          "Green"
-        else
-          representative_route_id
-        end
-      )
-
-    endpoint_text = [
-      "from",
-      %{format: "bold", text: min_full_name},
-      "to",
-      %{format: "bold", text: max_full_name}
-    ]
-
-    end_time = AlertTextUtil.end_time_text(active_period, now)
-
-    end_time_text =
-      if is_nil(end_time) do
-        [""]
-      else
-        ["through", "#{end_time}."]
-      end
-
-    additional_text = %FreeTextLine{
-      icon: nil,
-      text: [effect_text] ++ endpoint_text ++ end_time_text ++ [extra_text]
-    }
-
-    {header_text, additional_text}
-  end
 end

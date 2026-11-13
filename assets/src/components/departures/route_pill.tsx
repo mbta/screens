@@ -80,6 +80,7 @@ const TextRoutePill: ComponentType<TextPill & { outline?: boolean }> = ({
 const pathForIcon = {
   bus: "/bus-black.svg",
   light_rail: "/light-rail.svg",
+  subway: "/subway-white.svg",
   rail: "/commuter-rail.svg",
   boat: "/ferry.svg",
 };

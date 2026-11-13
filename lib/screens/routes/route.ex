@@ -140,6 +140,17 @@ defmodule Screens.Routes.Route do
   def icon(%{type: :rail}), do: :cr
   def icon(_), do: :bus
 
+  @spec color_from_mode(Mode.t()) :: color()
+  def color_from_mode(:bl), do: :blue
+  def color_from_mode(:ol), do: :orange
+  def color_from_mode(:rl), do: :red
+  def color_from_mode(:m), do: :red
+  def color_from_mode(:gl), do: :green
+  def color_from_mode(:sl), do: :silver
+  def color_from_mode(:bus), do: :yellow
+  def color_from_mode(:cr), do: :purple
+  def color_from_mode(:ferry), do: :teal
+
   @spec icon_from_mode(Mode.t()) :: icon()
   def icon_from_mode(:bl), do: :blue
   def icon_from_mode(:ol), do: :orange

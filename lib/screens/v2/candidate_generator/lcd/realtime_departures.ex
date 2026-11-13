@@ -197,18 +197,28 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDepartures do
     departures
   end
 
-  defp row_in_route_directions?(row, route_directions) do
-    case row do
-      %AlertRow{routes: routes, direction_id: direction_id} ->
-        routes
-        |> Enum.map(fn route ->
-          %RouteDirection{route_id: route.id, direction_id: direction_id}
-        end)
-        |> Enum.any?(fn route_direction -> route_direction in route_directions end)
+  defp row_in_route_directions?(
+         %AlertRow{routes: routes, direction_id: direction_id},
+         route_directions
+       ) do
+    routes
+    |> Enum.flat_map(fn route ->
+      # Potential Bug here to fix - if we have an alert for a route direction id we don't care about, this will still pick it up
+      # if we're consoldiating a bunch of alerts. 
+      if direction_id == nil do
+        [
+          %RouteDirection{route_id: route.id, direction_id: 0},
+          %RouteDirection{route_id: route.id, direction_id: 1}
+        ]
+      else
+        [%RouteDirection{route_id: route.id, direction_id: direction_id}]
+      end
+    end)
+    |> Enum.any?(fn route_direction -> route_direction in route_directions end)
+  end
 
-      row ->
-        route_direction(row) in route_directions
-    end
+  defp row_in_route_directions?(row, route_directions) do
+    route_direction(row) in route_directions
   end
 
   defp route_direction(%Departure{} = d) do
