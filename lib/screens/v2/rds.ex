@@ -183,7 +183,7 @@ defmodule Screens.V2.RDS do
   @spec from_section(Section.t(), DateTime.t()) :: data()
   defp from_section(%Section{params: nil}, _now), do: {:ok, []}
 
-  defp from_section(%Section{params: %Params{stop_ids: stop_ids, mode: mode} = params}, now)
+  defp from_section(%Section{params: %Params{stop_ids: stop_ids} = params}, now)
        when stop_ids != [] do
     with params_struct <- Map.from_struct(params),
          {:ok, typical_patterns} <-
@@ -202,7 +202,7 @@ defmodule Screens.V2.RDS do
             child_stops,
             routes_for_section,
             alerts,
-            mode,
+            params,
             now
           )
 
@@ -239,7 +239,7 @@ defmodule Screens.V2.RDS do
           [Stop.t()],
           [Route.t()],
           [Alert.t()],
-          Mode.t(),
+          Params.t(),
           DateTime.t()
         ) :: data()
   defp create_section_rds(
@@ -249,7 +249,7 @@ defmodule Screens.V2.RDS do
          child_stops,
          routes_for_section,
          alerts,
-         mode,
+         %Params{mode: mode} = params,
          now
        ) do
     departures_by_destination = group_by_destination(departures)
@@ -274,7 +274,7 @@ defmodule Screens.V2.RDS do
           routes_for_section,
           last_trip_departed?(key, now),
           destination_alerts,
-          mode,
+          params,
           now
         )
       end)
@@ -313,7 +313,7 @@ defmodule Screens.V2.RDS do
           [Route.t()],
           boolean(),
           destination_alert_map(),
-          Mode.t(),
+          Params.t(),
           DateTime.t()
         ) :: item() | nil
   defp destination_state(
@@ -323,7 +323,7 @@ defmodule Screens.V2.RDS do
          routes_for_section,
          last_trip_departed?,
          destination_alerts,
-         mode,
+         %Params{mode: mode, direction_id: param_direction_id},
          now
        ) do
     headways = @headways.get(stop_id, now)
@@ -343,6 +343,21 @@ defmodule Screens.V2.RDS do
     service_state =
       scheduled_service_state(first_schedule, last_schedule, headways, last_trip_departed?, now)
 
+    direction_id =
+      cond do
+        first_schedule != nil ->
+          Schedule.direction_id(first_schedule)
+
+        last_schedule != nil ->
+          Schedule.direction_id(last_schedule)
+
+        true ->
+          case param_direction_id do
+            :both -> nil
+            _ -> param_direction_id
+          end
+      end
+
     cond do
       presented_departures != [] ->
         %Countdowns{destinations: [destination], departures: presented_departures}
@@ -355,11 +370,7 @@ defmodule Screens.V2.RDS do
             alert: alert,
             destinations: [destination],
             displayed_headsign: headsign,
-            direction_id:
-              case first_schedule || last_schedule do
-                %Schedule{trip: %Trip{direction_id: direction_id}} -> direction_id
-                nil -> nil
-              end,
+            direction_id: direction_id,
             location: location,
             routes: routes_for_section
           }
@@ -371,11 +382,7 @@ defmodule Screens.V2.RDS do
         %NoService{
           destinations: [destination],
           routes: routes_for_section,
-          direction_id:
-            case first_schedule || last_schedule do
-              %Schedule{trip: %Trip{direction_id: direction_id}} -> direction_id
-              nil -> nil
-            end
+          direction_id: direction_id
         }
 
       departures == [] and service_state == :after ->

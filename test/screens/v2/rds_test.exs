@@ -41,7 +41,12 @@ defmodule Screens.V2.RDSTest do
     :ok
   end
 
-  defp no_service(destination_keys, route_type \\ :bus) do
+  defp no_service(
+         destination_keys,
+         route_type \\ :bus,
+         direction_id \\ nil,
+         direction_names \\ []
+       ) do
     destinations =
       Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
         {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
@@ -49,9 +54,10 @@ defmodule Screens.V2.RDSTest do
 
     %RDS.NoService{
       destinations: destinations,
+      direction_id: direction_id,
       routes: [
-        route(id: "r1", line_id: "l1", type: route_type),
-        route(id: "r2", line_id: "l2", type: route_type)
+        route(id: "r1", line_id: "l1", type: route_type, direction_names: direction_names),
+        route(id: "r2", line_id: "l2", type: route_type, direction_names: direction_names)
       ]
     }
   end
@@ -314,7 +320,7 @@ defmodule Screens.V2.RDSTest do
                {:ok,
                 [
                   countdowns([{"s1", "l1", "h1"}], expected_departures),
-                  no_service([{"s1", "l2", "h2"}])
+                  no_service([{"s1", "l2", "h2"}], :bus, 0)
                 ]}
              ]
     end
@@ -1168,6 +1174,93 @@ defmodule Screens.V2.RDSTest do
                   ]),
                   no_service([{"sB", "l2", "hB"}], :subway),
                   no_service([{"sC", "l2", "hC"}], :subway)
+                ]}
+             ]
+    end
+
+    test "creates ImpactedByAlert destination, has a combined headsign with a direction id" do
+      stop_ids = ~w[s0 s1]
+      now = ~U[2024-10-11 10:44:00Z]
+      mode = :rl
+
+      route_one =
+        route(
+          id: "r1",
+          line_id: "l1",
+          type: :subway,
+          direction_names: ["East", "West"],
+          direction_id: 0
+        )
+
+      route_two =
+        route(
+          id: "r2",
+          line_id: "l2",
+          type: :subway,
+          direction_names: ["East", "West"],
+          direction_id: 0
+        )
+
+      alert = %Alert{
+        id: "1",
+        effect: :suspension,
+        informed_entities: [
+          ie(stop_id: "sB", route: route_two),
+          ie(stop_id: "sC", route: route_two)
+        ],
+        active_period: [{now, nil}]
+      }
+
+      expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
+        {:ok, [alert]}
+      end)
+
+      expect_standard_stations(stop_ids)
+
+      patterns = [
+        %RoutePattern{
+          id: "A",
+          headsign: "hA",
+          route: route_one,
+          stops: [%Stop{id: "sA"}, %Stop{id: "otherX"}]
+        },
+        %RoutePattern{
+          id: "B",
+          headsign: "hB",
+          route: route_two,
+          stops: [%Stop{id: "otherA"}, %Stop{id: "sB"}, %Stop{id: "otherY"}]
+        },
+        %RoutePattern{
+          id: "C",
+          headsign: "hC",
+          route: route_two,
+          stops: [%Stop{id: "sC"}, %Stop{id: "otherZ"}]
+        }
+      ]
+
+      expect(@route_pattern, :fetch, fn %{mode: ^mode, stop_ids: ^stop_ids, typicality: 1} ->
+        {:ok, patterns}
+      end)
+
+      departures = %Departures{
+        sections: [%Section{params: %Params{mode: :rl, stop_ids: stop_ids, direction_id: 0}}]
+      }
+
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  impacted_by_alert(
+                    alert,
+                    [{"sB", "l2", "hB"}, {"sC", "l2", "hC"}],
+                    0,
+                    "Eastbound",
+                    :inside,
+                    [
+                      route_one,
+                      route_two
+                    ]
+                  ),
+                  no_service([{"sA", "l1", "hA"}], :subway, 0, ["East", "West"])
                 ]}
              ]
     end
