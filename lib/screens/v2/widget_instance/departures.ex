@@ -1169,7 +1169,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
         # Multiple routes ala Green Line - combine them
         match?([_ | [_ | _]], routes) and match?("Green" <> _, representative_route_id) ->
-          "Green Line"
+          headsign || "Green Line"
 
         # Fallback to just using whatever headsign or route ID is first
         true ->

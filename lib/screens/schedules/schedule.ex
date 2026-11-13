@@ -53,5 +53,10 @@ defmodule Screens.Schedules.Schedule do
   def time(%__MODULE__{arrival_time: arrival, departure_time: departure}),
     do: arrival || departure
 
+  @spec direction_id(t()) :: Trip.direction() | nil
+  def direction_id(%__MODULE__{trip: %Trip{direction_id: direction_id}}) do
+    direction_id
+  end
+
   defp current_service_date(now \\ DateTime.utc_now()), do: Util.service_date(now)
 end

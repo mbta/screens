@@ -40,7 +40,7 @@ defmodule Screens.V2.RDSTest do
     :ok
   end
 
-  defp no_service(destination_keys) do
+  defp no_service(destination_keys, direction_id \\ nil) do
     destinations =
       Enum.map(destination_keys, fn {stop_id, line_id, headsign} ->
         {%Stop{id: stop_id}, %Line{id: line_id}, headsign}
@@ -48,6 +48,7 @@ defmodule Screens.V2.RDSTest do
 
     %RDS.NoService{
       destinations: destinations,
+      direction_id: direction_id,
       routes: [
         %Screens.Routes.Route{
           id: "r1",
@@ -316,7 +317,7 @@ defmodule Screens.V2.RDSTest do
                {:ok,
                 [
                   countdowns([{"s1", "l1", "h1"}], expected_departures),
-                  no_service([{"s1", "l2", "h2"}])
+                  no_service([{"s1", "l2", "h2"}], 0)
                 ]}
              ]
     end
