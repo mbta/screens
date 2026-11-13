@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Lines.Line
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
@@ -12,16 +13,19 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
   alias Screens.V2.RDS
   alias Screens.V2.WidgetInstance.Departures, as: DeparturesWidget
   alias Screens.V2.WidgetInstance.Departures.{NormalSection, OvernightSection}
-  alias Screens.V2.WidgetInstance.Departures.NormalSection.{HeadwayRow, SpecialTripRow}
   alias Screens.V2.WidgetInstance.DeparturesNoData
+  alias ScreensConfig.Alerts
+  alias ScreensConfig.ContentSummary
   alias ScreensConfig.Departures, as: DeparturesConfig
   alias ScreensConfig.Departures.{Filters, Header, Layout, Params, Section}
   alias ScreensConfig.Departures.Filters.RouteDirections
   alias ScreensConfig.Departures.Filters.RouteDirections.RouteDirection
+  alias ScreensConfig.ElevatorStatus
   alias ScreensConfig.Screen
-  alias ScreensConfig.Screen.BusShelter
+  alias ScreensConfig.Screen.{BusShelter, PreFare}
 
   import Screens.TestSupport.RouteBuilder
+  import Screens.TestSupport.NormalSectionRowBuilder
   import Screens.Inject
   import Mox
   setup :verify_on_exit!
@@ -29,14 +33,20 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
 
   @now ~U[2020-04-06T10:00:00Z]
 
-  defp build_schedule(route_id, line_id, type \\ :bus, direction_id \\ 0) do
+  defp build_schedule(route_id, line_id, type \\ :bus, direction_id \\ 0, stop_id \\ nil) do
     route = route(id: route_id, name: "short_name", line_id: line_id, type: type)
 
     %Schedule{
       arrival_time: ~U[2026-01-01 12:37:00Z],
       departure_time: ~U[2026-01-01 12:38:00Z],
       route: route,
-      trip: %Trip{direction_id: direction_id}
+      trip: %Trip{direction_id: direction_id},
+      stop:
+        if is_nil(stop_id) do
+          nil
+        else
+          %Stop{id: stop_id}
+        end
     }
   end
 
@@ -59,34 +69,8 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
     %RDS.NoService{
       destinations: [{%Stop{id: stop_id}, %Line{id: line_id}, headsign}],
       routes: [
-        %Screens.Routes.Route{
-          id: "r1",
-          short_name: "",
-          long_name: nil,
-          direction_names: nil,
-          direction_destinations: nil,
-          type: :bus,
-          line: %Screens.Lines.Line{
-            id: "l1",
-            long_name: nil,
-            short_name: nil,
-            sort_order: nil
-          }
-        },
-        %Screens.Routes.Route{
-          id: "r2",
-          short_name: "",
-          long_name: nil,
-          direction_names: nil,
-          direction_destinations: nil,
-          type: :bus,
-          line: %Screens.Lines.Line{
-            id: "l2",
-            long_name: nil,
-            short_name: nil,
-            sort_order: nil
-          }
-        }
+        route(id: "r1", line_id: "l1", type: :bus),
+        route(id: "r2", line_id: "l2", type: :bus)
       ]
     }
   end
@@ -124,10 +108,21 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
        ) do
     %RDS.Headways{
       destinations: [{%Stop{id: stop_id}, %Line{id: line_id}, headsign}],
-      routes: [%Route{id: route_id, short_name: "", line: %Line{id: line_id}}],
+      routes: [route(id: route_id, line_id: line_id)],
       displayed_headsign: direction_name,
       direction_id: direction_id,
       range: {5, 10}
+    }
+  end
+
+  defp impacted_by_alert(alert, destinations, direction_id, displayed_headsign, location, routes) do
+    %RDS.ImpactedByAlert{
+      alert: alert,
+      destinations: destinations,
+      direction_id: direction_id,
+      displayed_headsign: displayed_headsign,
+      location: location,
+      routes: routes
     }
   end
 
@@ -137,19 +132,40 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
   end
 
   describe "departures_instances/2" do
-    defp build_config(sections_or_route_ids) do
-      %Screen{
-        app_params: %BusShelter{
-          departures: build_departures_config(sections_or_route_ids),
-          header: nil,
-          footer: nil,
-          alerts: nil
-        },
-        vendor: nil,
-        device_id: nil,
-        name: nil,
-        app_id: :bus_shelter_v2
-      }
+    defp build_config(sections_or_route_ids, app_id \\ :bus_shelter_v2) do
+      if app_id == :bus_shelter_v2 do
+        %Screen{
+          app_params: %BusShelter{
+            departures: build_departures_config(sections_or_route_ids),
+            header: nil,
+            footer: nil,
+            alerts: nil
+          },
+          app_id: :bus_shelter_v2,
+          vendor: nil,
+          device_id: nil,
+          name: nil
+        }
+      else
+        %Screen{
+          app_params: %PreFare{
+            departures: build_departures_config(sections_or_route_ids),
+            content_summary: %ContentSummary{parent_station_id: "id"},
+            elevator_status: %ElevatorStatus{parent_station_id: "id"},
+            full_line_map: [],
+            header: %Header{
+              arrow: :ne,
+              subtitle: "This is a subtitle"
+            },
+            reconstructed_alert_widget: %Alerts{stop_id: "id"},
+            template: :duo
+          },
+          app_id: :pre_fare_v2,
+          vendor: nil,
+          device_id: nil,
+          name: nil
+        }
+      end
     end
 
     defp build_departures_config(sections_or_route_ids) do
@@ -178,7 +194,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
     test "returns NormalSection with departures when RDS returns supported and unsupported states" do
       config = build_config(["route_A"])
 
-      schedule = build_schedule("route_two", "line_id_two")
+      schedule = build_schedule("route_two", "line_id_two", :bus, 0, "stop_id")
       departure = build_departure("r1", 0, :bus)
 
       expect(@rds, :get, fn _departures, @now ->
@@ -195,6 +211,16 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
       expected_route =
         route(id: "route_two", line_id: "line_id_two", type: :bus, name: "short_name")
 
+      special_trip =
+        special_trip_row(
+          direction_id: 0,
+          stop_id: "stop_id",
+          route: expected_route,
+          arrival_time: ~U[2026-01-01 12:37:00Z],
+          departure_time: ~U[2026-01-01 12:38:00Z],
+          special_trip_type: :first_trip
+        )
+
       assert [
                %DeparturesWidget{
                  now: @now,
@@ -207,18 +233,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
                      layout: %Layout{},
                      rows: [
                        ^departure,
-                       %SpecialTripRow{
-                         schedule: %Screens.Schedules.Schedule{
-                           trip: %Screens.Trips.Trip{
-                             direction_id: 0
-                           },
-                           stop: nil,
-                           route: ^expected_route,
-                           arrival_time: ~U[2026-01-01 12:37:00Z],
-                           departure_time: ~U[2026-01-01 12:38:00Z]
-                         },
-                         special_trip_type: :first_trip
-                       }
+                       ^special_trip
                      ]
                    }
                  ]
@@ -255,6 +270,15 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
       expected_route =
         route(id: "route_two", line_id: "line_id_two", type: :bus, name: "short_name")
 
+      special_trip_row =
+        special_trip_row(
+          direction_id: 0,
+          route: expected_route,
+          arrival_time: ~U[2026-01-01 12:37:00Z],
+          departure_time: ~U[2026-01-01 12:38:00Z],
+          special_trip_type: :first_trip
+        )
+
       assert [
                %DeparturesWidget{
                  now: @now,
@@ -267,18 +291,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
                      layout: %Layout{},
                      rows: [
                        ^departure,
-                       %SpecialTripRow{
-                         schedule: %Screens.Schedules.Schedule{
-                           id: nil,
-                           trip: %Screens.Trips.Trip{
-                             direction_id: 0
-                           },
-                           route: ^expected_route,
-                           arrival_time: ~U[2026-01-01 12:37:00Z],
-                           departure_time: ~U[2026-01-01 12:38:00Z]
-                         },
-                         special_trip_type: :first_trip
-                       }
+                       ^special_trip_row
                      ]
                    },
                    %Screens.V2.WidgetInstance.Departures.NoServiceSection{
@@ -341,6 +354,12 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
       schedule = build_schedule("route_two", "line_id_two")
       departure = build_departure("r1", 0, :bus)
 
+      special_trip_row =
+        special_trip_row(
+          schedule: schedule,
+          special_trip_type: :service_ended
+        )
+
       expect(@rds, :get, fn _departures, @now ->
         [
           {:ok,
@@ -363,10 +382,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
                      layout: %Layout{},
                      rows: [
                        ^departure,
-                       %SpecialTripRow{
-                         schedule: ^schedule,
-                         special_trip_type: :service_ended
-                       }
+                       ^special_trip_row
                      ]
                    }
                  ]
@@ -379,14 +395,13 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
 
       departure = build_departure("r1", 0, :bus)
 
-      route = route(id: "route_id_one", line_id: "line_id_two")
-
-      headway = %HeadwayRow{
-        route: route,
-        direction_id: 0,
-        range: {5, 10},
-        displayed_headsign: "Westbound"
-      }
+      headway =
+        headway_row(
+          route: route(id: "route_id_one", line_id: "line_id_two"),
+          direction_id: 0,
+          range: {5, 10},
+          displayed_headsign: "Westbound"
+        )
 
       expect(@rds, :get, fn _departures, @now ->
         [
@@ -450,6 +465,14 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
     test "returns NormalSection with a headway row for a HeadwaySection" do
       config = build_config(["route_A"])
 
+      headway =
+        headway_row(
+          route: route(id: "route_one", line_id: "line_id_one"),
+          direction_id: nil,
+          range: {5, 10},
+          displayed_headsign: "Westbound"
+        )
+
       expect(@rds, :get, fn _departures, @now ->
         [
           {:ok,
@@ -469,14 +492,89 @@ defmodule Screens.V2.CandidateGenerator.Widgets.Lcd.RealtimeDeparturesTest do
                      header: %Header{},
                      grouping_type: :time,
                      layout: %Layout{},
-                     rows: [
-                       %HeadwayRow{
-                         route: %Screens.Routes.Route{id: "route_one"},
-                         direction_id: nil,
-                         range: {5, 10},
-                         displayed_headsign: "Westbound"
-                       }
-                     ]
+                     rows: [^headway]
+                   }
+                 ]
+               }
+             ] = RealtimeDepartures.departures_instances(config, @now)
+    end
+
+    test "returns DeparturesWidget after filtering alerts for Bus Shelters" do
+      bus_shelter_config = build_config(["route_A"])
+
+      stub(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             impacted_by_alert(%Alert{}, [], 0, "Filtered Alert", :here, [])
+           ]}
+        ]
+      end)
+
+      assert [%DeparturesWidget{}] =
+               RealtimeDepartures.departures_instances(bus_shelter_config, @now)
+    end
+
+    test "combines NormalSections with only alerts in it removing arrows and subtitles" do
+      config = build_config(["route_id_one", "route_id_two"], :pre_fare_v2)
+      expected_route = route(id: "route_one", name: "short_name", line_id: "line_one")
+      destination_one = {%Stop{id: "stop_id_one"}, %Line{id: "line_id_one"}, "headsign_one"}
+      destination_two = {%Stop{id: "stop_id_one"}, %Line{id: "line_id_two"}, "headsign_two"}
+
+      alert_row =
+        alert_row(
+          effect: :shuttle,
+          alert_id: "same_id",
+          direction_id: 0,
+          displayed_headsign: nil,
+          route: expected_route,
+          location: :inside,
+          informed_entity_ids: [],
+          stop_id: "stop_id_one"
+        )
+
+      expect(@rds, :get, fn _departures, @now ->
+        [
+          {:ok,
+           [
+             impacted_by_alert(
+               %Alert{id: "same_id", effect: :shuttle, informed_entities: []},
+               [destination_one],
+               0,
+               "Combined Alert",
+               :inside,
+               [expected_route]
+             )
+           ]},
+          {:ok,
+           [
+             impacted_by_alert(
+               %Alert{id: "same_id", effect: :shuttle, informed_entities: []},
+               [destination_two],
+               0,
+               "Combined Alert",
+               :inside,
+               [expected_route]
+             )
+           ]}
+        ]
+      end)
+
+      assert [
+               %DeparturesWidget{
+                 now: @now,
+                 order: 0,
+                 screen: ^config,
+                 sections: [
+                   %NormalSection{
+                     header: %Header{
+                       arrow: "",
+                       subtitle: nil
+                     },
+                     grouping_type: :time,
+                     layout: %Layout{},
+                     mode: :rl,
+                     rows: [^alert_row]
                    }
                  ]
                }
