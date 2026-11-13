@@ -1176,7 +1176,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
           if headsign do
             headsign
           else
-            "#{representative_route.id} Line"
+            if match?("Green" <> _, representative_route.id) do
+              "Green Line"
+            else
+              "#{representative_route.id} Line"
+            end
           end
       end
 
