@@ -183,11 +183,10 @@ defmodule Screens.V2.RDS do
   @spec from_section(Section.t(), DateTime.t()) :: data()
   defp from_section(%Section{params: nil}, _now), do: {:ok, []}
 
-  defp from_section(%Section{params: %Params{stop_ids: stop_ids} = params}, now)
+  defp from_section(%Section{params: %Params{stop_ids: stop_ids, mode: mode} = params}, now)
        when stop_ids != [] do
     with params_struct <- Map.from_struct(params),
-         {:ok, typical_patterns} <-
-           params_struct |> Map.put(:typicality, 1) |> @route_pattern.fetch(),
+         {:ok, typical_patterns} <- fetch_route_patterns(params_struct, mode),
          {:ok, child_stops} <- fetch_child_stops(stop_ids),
          {:ok, schedules} <- @schedule.fetch(params_struct, Util.service_date(now)),
          {:ok, alerts} <- fetch_relevant_alerts(stop_ids, now),
@@ -211,6 +210,17 @@ defmodule Screens.V2.RDS do
           {:ok, []}
       end
     end
+  end
+
+  @spec fetch_route_patterns(Params.t(), Mode.t()) :: {:ok, [RoutePattern.t()]} | :error
+  defp fetch_route_patterns(params, :cr) do
+    # Canonical CR routes can be infrequent for some destinations so typicality isn't reliable.
+    params |> Map.put(:canonical?, true) |> @route_pattern.fetch()
+  end
+
+  defp fetch_route_patterns(params, _mode) do
+    # Not all bus or ferry routes have a canonical pattern, so filter by typicality 1.
+    params |> Map.put(:typicality, 1) |> @route_pattern.fetch()
   end
 
   @spec fetch_child_stops([Stop.id()]) :: {:ok, [Stop.t()]} | :error
