@@ -28,7 +28,7 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDeparturesTest do
 
   defp build_section do
     %Section{
-      header: %Header{},
+      header: %Header{subtitle: "Subtitle", arrow: :ne},
       layout: %Layout{},
       grouping_type: :time,
       params: %Params{mode: :bus}
@@ -168,6 +168,26 @@ defmodule Screens.V2.CandidateGenerator.Widgets.RdsDeparturesTest do
 
       assert Enum.any?(widget_section.rows, &match?(%AlertRow{}, &1))
       assert Enum.any?(widget_section.rows, &match?(%Screens.V2.Departure{}, &1))
+    end
+
+    test "combines alert only sections that are the same mode" do
+      screen = build_screen(:pre_fare_v2)
+      section = build_section()
+      section_two = build_section()
+
+      alert_item = build_alert_item("r1", "Downtown")
+      alert_item_two = build_alert_item("r1", "Uptown")
+
+      rds_data = [{:ok, [alert_item]}, {:ok, [alert_item_two]}]
+      departures_config = %Departures{sections: [section, section_two]}
+
+      result = RdsDepartures.create_departure_sections(rds_data, departures_config, screen)
+
+      assert length(result) == 1
+      {_section, widget_section} = List.first(result)
+
+      assert Enum.all?(widget_section.rows, &match?(%AlertRow{displayed_headsign: nil}, &1))
+      assert match?(%Header{arrow: "", subtitle: nil}, widget_section.header)
     end
   end
 end
