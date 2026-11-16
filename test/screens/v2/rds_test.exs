@@ -410,6 +410,67 @@ defmodule Screens.V2.RDSTest do
       # headways); we should not produce "no service today" or "service ended"
       assert RDS.get(departures, now) == [{:ok, []}]
     end
+
+    test "handles commuter rail route without typicality 1 route pattern" do
+      now = ~U[2024-10-11 10:00:00Z]
+      stop_ids = ~w[s0]
+
+      commuter_rail_route =
+        route(id: "CR-Greenbush", line_id: "l1", type: :rail)
+
+      first_schedule = %Schedule{
+        departure_time: ~U[2024-10-11 09:00:00Z],
+        route: commuter_rail_route,
+        stop: %Stop{id: "sA"},
+        trip: %Trip{headsign: "Greenbush", pattern_headsign: "Greenbush"}
+      }
+
+      second_schedule = %Schedule{
+        departure_time: ~U[2024-10-11 13:00:00Z],
+        route: commuter_rail_route,
+        stop: %Stop{id: "sA"},
+        trip: %Trip{headsign: "Greenbush", pattern_headsign: "Greenbush"}
+      }
+
+      canonical_pattern = %RoutePattern{
+        id: "CR-Greenbush",
+        canonical?: true,
+        typicality: 2,
+        headsign: "Greenbush",
+        route: commuter_rail_route,
+        stops: [%Stop{id: "sA"}, %Stop{id: "sTerminal"}]
+      }
+
+      expect(@route_pattern, :fetch, fn params ->
+        assert %{mode: :cr, stop_ids: ^stop_ids, canonical?: true} = params
+        refute Map.has_key?(params, :typicality)
+
+        {:ok, [canonical_pattern]}
+      end)
+
+      expect(@stop, :fetch, fn %{ids: ^stop_ids} ->
+        {:ok, [station("s0", ["sA"])]}
+      end)
+
+      expect(@schedule, :fetch, fn %{stop_ids: ^stop_ids}, _service_date ->
+        {:ok, [first_schedule, second_schedule]}
+      end)
+
+      scheduled_departure = %Departure{schedule: second_schedule}
+
+      expect(@departure, :fetch, fn
+        %{mode: :cr, stop_ids: ^stop_ids}, [{:now, ^now} | _opts] ->
+          {:ok, [scheduled_departure]}
+      end)
+
+      departures = %Departures{
+        sections: [%Section{params: %Params{mode: :cr, stop_ids: stop_ids}}]
+      }
+
+      assert RDS.get(departures, now) == [
+               {:ok, [countdowns([{"sA", "l1", "Greenbush"}], [scheduled_departure])]}
+             ]
+    end
   end
 
   describe "get/1 first trip" do
