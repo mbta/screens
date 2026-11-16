@@ -1167,9 +1167,11 @@ defmodule Screens.V2.WidgetInstance.Departures do
           KenmoreAlertHelper.get_branches_if_entity_matches_stop([alert])
           |> Enum.map_join(" and ", &KenmoreAlertHelper.branch_headsign(&1, false))
 
-        # Multiple routes ala Green Line - combine them
+        # Multiple routes ala Green Line - combine them.
+        # If they have the same directional headsign, use that headsign.
+        # Otherwise use the default "Green Line" text.
         match?([_ | [_ | _]], routes) and match?("Green" <> _, representative_route_id) ->
-          "Green Line"
+          headsign || "Green Line"
 
         # Fallback to just using whatever headsign or route ID is first
         true ->
