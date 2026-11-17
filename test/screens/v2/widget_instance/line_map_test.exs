@@ -44,9 +44,6 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
     LineMap.serialize_stops(current_stop, stops, reverse_stops, false, "Green-C", alerts)
   end
 
-  defp stop_summary(stops) do
-    Enum.map(stops, &{&1.label, &1.current, &1.downstream, &1.terminal})
-  end
 
   describe "priority/1" do
     test "returns 2" do
@@ -61,32 +58,28 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
       reverse_stops: reverse_stops
     } do
       assert [
-               {"Government Center", false, true, false},
-               {"Park Street", false, true, false},
-               {"Washington Square", true, false, false},
-               {"Tappan Street", false, false, false},
-               {"Dean Road", false, false, false},
-               {"Englewood Avenue", false, false, false},
-               {"Cleveland Circle", false, false, true}
-             ] ==
-               call_serialize_stops("70230", stops, reverse_stops)
-               |> stop_summary()
+               %{label: "Government Center", current: false, downstream: true, terminal: false},
+               %{label: "Park Street", current: false, downstream: true, terminal: false},
+               %{label: "Washington Square", current: true, downstream: false, terminal: false},
+               %{label: "Tappan Street", current: false, downstream: false, terminal: false},
+               %{label: "Dean Road", current: false, downstream: false, terminal: false},
+               %{label: "Englewood Avenue", current: false, downstream: false, terminal: false},
+               %{label: "Cleveland Circle", current: false, downstream: false, terminal: true}
+             ] = call_serialize_stops("70230", stops, reverse_stops)
     end
 
     test "handles fewer than two future stops", %{stops: stops, reverse_stops: reverse_stops} do
       assert [
-               {"North Station", false, true, true},
-               {"Haymarket", true, false, false},
-               {"Government Center", false, false, false},
-               {"Park Street", false, false, false},
-               {"Washington Square", false, false, false},
-               {"Tappan Street", false, false, false},
-               {"Dean Road", false, false, false},
-               {"Englewood Avenue", false, false, false},
-               {"Cleveland Circle", false, false, true}
-             ] ==
-               call_serialize_stops("70203", stops, reverse_stops)
-               |> stop_summary()
+               %{label: "North Station", current: false, downstream: true, terminal: true},
+               %{label: "Haymarket", current: true, downstream: false, terminal: false},
+               %{label: "Government Center", current: false, downstream: false, terminal: false},
+               %{label: "Park Street", current: false, downstream: false, terminal: false},
+               %{label: "Washington Square", current: false, downstream: false, terminal: false},
+               %{label: "Tappan Street", current: false, downstream: false, terminal: false},
+               %{label: "Dean Road", current: false, downstream: false, terminal: false},
+               %{label: "Englewood Avenue", current: false, downstream: false, terminal: false},
+               %{label: "Cleveland Circle", current: false, downstream: false, terminal: true}
+             ] = call_serialize_stops("70203", stops, reverse_stops)
     end
 
     test "marks closed stops based on alerts", %{stops: stops, reverse_stops: reverse_stops} do
