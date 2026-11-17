@@ -44,7 +44,6 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
     LineMap.serialize_stops(current_stop, stops, reverse_stops, false, "Green-C", alerts)
   end
 
-
   describe "priority/1" do
     test "returns 2" do
       instance = %LineMap{}
