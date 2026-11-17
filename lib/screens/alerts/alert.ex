@@ -207,7 +207,6 @@ defmodule Screens.Alerts.Alert do
   https://app.asana.com/0/0/1200476247539238/f
   """
   @callback fetch_by_stop_and_route(list(Stop.id()), list(Route.id())) :: result()
-  @spec fetch_by_stop_and_route(any(), any()) :: :error | {:ok, list()}
   def fetch_by_stop_and_route(stop_ids, route_ids, get_json_fn \\ &V3Api.get_json/2) do
     with {:ok, stop_based_alerts} <-
            fetch([stop_ids: stop_ids, route_ids: route_ids], get_json_fn),
