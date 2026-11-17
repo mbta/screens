@@ -52,4 +52,24 @@ defmodule Screens.Headsigns.Headsign do
       text
     end
   end
+
+  @spec headsign_with_variation(String.t()) :: {String.t(), String.t() | nil}
+  def headsign_with_variation(headsign) do
+    via_pattern = ~r/(.+) (via .+)/
+    paren_pattern = ~r/(.+) (\(.+)/
+
+    [base_headsign, variation] =
+      cond do
+        String.match?(headsign, via_pattern) ->
+          Regex.run(via_pattern, headsign, capture: :all_but_first)
+
+        String.match?(headsign, paren_pattern) ->
+          Regex.run(paren_pattern, headsign, capture: :all_but_first)
+
+        true ->
+          [headsign, nil]
+      end
+
+    {base_headsign, variation}
+  end
 end

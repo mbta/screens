@@ -1237,7 +1237,6 @@ defmodule Screens.V2.RDSTest do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
       route_one = route(id: "r1", line_id: "l1", type: :subway)
-      route_two = route(id: "r2", line_id: "l2", type: :subway)
       route_three = route(id: "r3", line_id: "l3", type: :subway)
 
       alert = %Alert{
@@ -1264,10 +1263,7 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures) == [
                {:ok,
                 [
-                  impacted_by_alert(alert, [{"sA", "l1", "hA"}], nil, "hA", :inside, [
-                    route_one,
-                    route_two
-                  ]),
+                  impacted_by_alert(alert, [{"sA", "l1", "hA"}], nil, "hA", :inside, [route_one]),
                   no_service([{"sB", "l2", "hB"}], :subway),
                   no_service([{"sC", "l2", "hC"}], :subway)
                 ]}
@@ -1352,7 +1348,6 @@ defmodule Screens.V2.RDSTest do
                     "Eastbound",
                     :inside,
                     [
-                      route_one,
                       route_two
                     ]
                   ),
@@ -1459,21 +1454,20 @@ defmodule Screens.V2.RDSTest do
              ]
     end
 
-    test "does not create NoService for destinations affected by alert on route type" do
+    test "creates ImpactedByAlert for destination affected by alert on route type" do
       stop_ids = ~w[s0 s1]
       now = ~U[2024-10-11 10:44:00Z]
 
+      alert = %Alert{
+        id: "1",
+        effect: :detour,
+        informed_entities: [ie(route_type: 3)],
+        active_period: [{now, nil}]
+      }
+
       # Alert affects all bus routes (route_type 3)
       expect(@alert, :fetch, fn [activities: [:board], stop_ids: ["s0", "s1"]] ->
-        {:ok,
-         [
-           %Alert{
-             id: "1",
-             effect: :detour,
-             informed_entities: [ie(route_type: 3)],
-             active_period: [{now, nil}]
-           }
-         ]}
+        {:ok, [alert]}
       end)
 
       expect_standard_stations(stop_ids)
@@ -1484,7 +1478,23 @@ defmodule Screens.V2.RDSTest do
       }
 
       # All destinations are affected since the alert targets the entire bus route type
-      assert RDS.get(departures) == [{:ok, []}]
+      assert RDS.get(departures) == [
+               {:ok,
+                [
+                  impacted_by_alert(
+                    alert,
+                    [{"sA", "l1", "hA"}, {"sB", "l2", "hB"}, {"sC", "l2", "hC"}],
+                    nil,
+                    nil,
+                    :inside,
+                    [
+                      route(id: "r1", line_id: "l1", type: :bus),
+                      route(id: "r2", line_id: "l2", type: :bus)
+                    ],
+                    :bus
+                  )
+                ]}
+             ]
     end
 
     test "creates NoService for destinations not affected by alerts" do
