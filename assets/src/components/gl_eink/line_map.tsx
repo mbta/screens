@@ -1,5 +1,6 @@
 import { ComponentType, Fragment, type JSX } from "react";
 
+import NoServiceSvg from "Images/no-service-white.svg";
 import { adjustMinute } from "Util/timing";
 import { classWithModifier, classWithModifiers } from "Util/utils";
 import { useCurrentTime } from "Hooks/use_current_time";
@@ -115,13 +116,10 @@ const ClosedStopIcon = ({ cx, cy }) => {
   const iconSize = CLOSED_STOP_RADIUS * 2;
 
   return (
-    <g transform={`translate(${cx - iconSize / 2}, ${cy - iconSize / 2})`}>
-      <foreignObject width={iconSize} height={iconSize}>
-        <img
-          src="/images/no-service-white.svg"
-          style={{ width: "100%", height: "100%" }}
-        />
-      </foreignObject>
+    <g
+      transform={`translate(${cx - CLOSED_STOP_RADIUS}, ${cy - CLOSED_STOP_RADIUS})`}
+    >
+      <NoServiceSvg width={iconSize} height={iconSize} />
     </g>
   );
 };
@@ -164,19 +162,20 @@ const BaseMapStops = ({ stops }) => {
   return (
     <>
       {stops.map(({ label, downstream, current, terminal, closed }, i) => {
-        const stopIcon = (closed && downstream) ? (
-          <ClosedStopIcon
-            cx={LEFT_MARGIN + LINE_WIDTH / 2}
-            cy={TOP_MARGIN + STOP_SPACING * i}
-          />
-        ) : (
-          <circle
-            cx={LEFT_MARGIN + LINE_WIDTH / 2}
-            cy={TOP_MARGIN + STOP_SPACING * i}
-            r={STOP_RADIUS}
-            className="line-map__stop"
-          />
-        );
+        const stopIcon =
+          closed && downstream ? (
+            <ClosedStopIcon
+              cx={LEFT_MARGIN + LINE_WIDTH / 2}
+              cy={TOP_MARGIN + STOP_SPACING * i}
+            />
+          ) : (
+            <circle
+              cx={LEFT_MARGIN + LINE_WIDTH / 2}
+              cy={TOP_MARGIN + STOP_SPACING * i}
+              r={STOP_RADIUS}
+              className="line-map__stop"
+            />
+          );
 
         let stopLabel: JSX.Element | null = null;
         let labelText = abbreviateStop(label);

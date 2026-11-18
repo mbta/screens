@@ -1,9 +1,9 @@
 defmodule Screens.V2.CandidateGenerator.GlEink.LineMap do
   @moduledoc "Generates the LineMap widget for GL E-ink screens."
 
-  alias Screens.Stops.Stop
   alias Screens.Alerts.Alert
   alias Screens.RoutePatterns.RoutePattern
+  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.LineMap
   alias ScreensConfig.Screen
 
