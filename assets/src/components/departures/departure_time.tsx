@@ -32,15 +32,32 @@ const DepartureTimePart: ComponentType<DepartureTimePartProps> = ({
     case "text":
       return <div className="departure-time__text">{time.text}</div>;
 
-    case "minutes":
-      return (
-        <>
-          <div className="departure-time__minutes">
-            {adjustMinute(new Date(timeInEpoch), currentDateTime)}
-          </div>
-          <div className="departure-time__minutes-label">m</div>
-        </>
+    case "minutes": {
+      const adjustedMinutes = adjustMinute(
+        new Date(timeInEpoch),
+        currentDateTime,
       );
+
+      if (adjustedMinutes < 60) {
+        return (
+          <>
+            <div className="departure-time__minutes">{adjustedMinutes}</div>
+            <div className="departure-time__minutes-label">m</div>
+          </>
+        );
+      } else {
+        const hours = Math.floor(adjustedMinutes / 60);
+        const minutes = adjustedMinutes % 60;
+        return (
+          <>
+            <div className="departure-time__minutes">{hours} </div>
+            <div className="departure-time__minutes-label">h</div>
+            <div className="departure-time__minutes">{minutes}</div>
+            <div className="departure-time__minutes-label">m</div>
+          </>
+        );
+      }
+    }
 
     case "timestamp": {
       const paddedMinute = time.minute < 10 ? "0" + time.minute : time.minute;

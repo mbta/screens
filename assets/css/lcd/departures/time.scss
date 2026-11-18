@@ -1,13 +1,5 @@
 @use "CSS/colors";
 
-.departure-times-with-crowding {
-  width: 328px;
-
-  &:has(.departure-time--headway) {
-    width: 400px;
-  }
-}
-
 .departure-time-with-crowding {
   text-align: right;
 
@@ -15,16 +7,11 @@
     margin-top: 16px;
   }
 
-  .departure-time:not(.departure-time--timestamp, .departure-time--overnight) {
-    width: 210px;
-  }
-
   .departure-time.departure-time--text {
     animation: pulse 500ms cubic-bezier(0.65, 0, 0.35, 1) infinite;
   }
 
   .departure-time.departure-time--overnight {
-    width: 300px;
     font-size: 56px;
   }
 
