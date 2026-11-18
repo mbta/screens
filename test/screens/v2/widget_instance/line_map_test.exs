@@ -1,6 +1,7 @@
 defmodule Screens.V2.WidgetInstance.LineMapTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Predictions.Prediction
   alias Screens.Schedules.Schedule
   alias Screens.Stops.Stop
@@ -8,6 +9,8 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
   alias Screens.V2.{Departure, WidgetInstance}
   alias Screens.V2.WidgetInstance.LineMap
   alias Screens.Vehicles.Vehicle
+
+  import Screens.TestSupport.InformedEntityBuilder
 
   setup do
     stops = [
@@ -37,6 +40,10 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
     %{stops: stops, reverse_stops: reverse_stops}
   end
 
+  defp call_serialize_stops(current_stop, stops, reverse_stops, alerts \\ []) do
+    LineMap.serialize_stops(current_stop, stops, reverse_stops, false, "Green-C", alerts)
+  end
+
   describe "priority/1" do
     test "returns 2" do
       instance = %LineMap{}
@@ -50,28 +57,99 @@ defmodule Screens.V2.WidgetInstance.LineMapTest do
       reverse_stops: reverse_stops
     } do
       assert [
-               %{current: false, downstream: true, label: "Government Center", terminal: false},
-               %{current: false, downstream: true, label: "Park Street", terminal: false},
-               %{current: true, downstream: false, label: "Washington Square", terminal: false},
-               %{current: false, downstream: false, label: "Tappan Street", terminal: false},
-               %{current: false, downstream: false, label: "Dean Road", terminal: false},
-               %{current: false, downstream: false, label: "Englewood Avenue", terminal: false},
-               %{current: false, downstream: false, label: "Cleveland Circle", terminal: true}
-             ] == LineMap.serialize_stops("70230", stops, reverse_stops, false)
+               %{label: "Government Center", current: false, downstream: true, terminal: false},
+               %{label: "Park Street", current: false, downstream: true, terminal: false},
+               %{label: "Washington Square", current: true, downstream: false, terminal: false},
+               %{label: "Tappan Street", current: false, downstream: false, terminal: false},
+               %{label: "Dean Road", current: false, downstream: false, terminal: false},
+               %{label: "Englewood Avenue", current: false, downstream: false, terminal: false},
+               %{label: "Cleveland Circle", current: false, downstream: false, terminal: true}
+             ] = call_serialize_stops("70230", stops, reverse_stops)
     end
 
     test "handles fewer than two future stops", %{stops: stops, reverse_stops: reverse_stops} do
       assert [
-               %{current: false, downstream: true, label: "North Station", terminal: true},
-               %{current: true, downstream: false, label: "Haymarket", terminal: false},
-               %{current: false, downstream: false, label: "Government Center", terminal: false},
-               %{current: false, downstream: false, label: "Park Street", terminal: false},
-               %{current: false, downstream: false, label: "Washington Square", terminal: false},
-               %{current: false, downstream: false, label: "Tappan Street", terminal: false},
-               %{current: false, downstream: false, label: "Dean Road", terminal: false},
-               %{current: false, downstream: false, label: "Englewood Avenue", terminal: false},
-               %{current: false, downstream: false, label: "Cleveland Circle", terminal: true}
-             ] == LineMap.serialize_stops("70203", stops, reverse_stops, false)
+               %{label: "North Station", current: false, downstream: true, terminal: true},
+               %{label: "Haymarket", current: true, downstream: false, terminal: false},
+               %{label: "Government Center", current: false, downstream: false, terminal: false},
+               %{label: "Park Street", current: false, downstream: false, terminal: false},
+               %{label: "Washington Square", current: false, downstream: false, terminal: false},
+               %{label: "Tappan Street", current: false, downstream: false, terminal: false},
+               %{label: "Dean Road", current: false, downstream: false, terminal: false},
+               %{label: "Englewood Avenue", current: false, downstream: false, terminal: false},
+               %{label: "Cleveland Circle", current: false, downstream: false, terminal: true}
+             ] = call_serialize_stops("70203", stops, reverse_stops)
+    end
+
+    test "marks closed stops based on alerts", %{stops: stops, reverse_stops: reverse_stops} do
+      alert = %Alert{
+        effect: :station_closure,
+        informed_entities: [
+          ie(stop_id: "70236", route_id: "Green-C", activities: [:boarding, :exit]),
+          ie(stop_id: "70234", route_id: "Green-C", activities: [:boarding, :exit])
+        ]
+      }
+
+      result = call_serialize_stops("70230", stops, reverse_stops, [alert])
+
+      # Find the stops in the result
+      assert Enum.find(result, &(&1.label == "Englewood Avenue")).closed == true
+      assert Enum.find(result, &(&1.label == "Dean Road")).closed == true
+      assert Enum.find(result, &(&1.label == "Tappan Street")).closed == false
+    end
+
+    test "handles multiple closure alert types", %{stops: stops, reverse_stops: reverse_stops} do
+      alerts = [
+        %Alert{
+          effect: :stop_closure,
+          informed_entities: [
+            ie(stop_id: "70236", route_id: "Green-C", activities: [:boarding, :exit])
+          ]
+        },
+        %Alert{
+          effect: :suspension,
+          informed_entities: [
+            ie(stop_id: "70234", route_id: "Green-C", activities: [:boarding, :exit])
+          ]
+        },
+        %Alert{
+          effect: :shuttle,
+          informed_entities: [
+            ie(stop_id: "70232", route_id: "Green-C", activities: [:boarding, :exit])
+          ]
+        }
+      ]
+
+      result = call_serialize_stops("70230", stops, reverse_stops, alerts)
+
+      assert Enum.find(result, &(&1.label == "Englewood Avenue")).closed == true
+      assert Enum.find(result, &(&1.label == "Dean Road")).closed == true
+      assert Enum.find(result, &(&1.label == "Tappan Street")).closed == true
+    end
+
+    test "does not show downstream stations where you can exit as closed", %{
+      stops: stops,
+      reverse_stops: reverse_stops
+    } do
+      alerts = [
+        %Alert{
+          effect: :stop_closure,
+          informed_entities: [
+            ie(stop_id: "70236", route_id: "Green-C", activities: [:boarding])
+          ]
+        },
+        %Alert{
+          effect: :suspension,
+          informed_entities: [
+            ie(stop_id: "70234", route_id: "Green-C", activities: [:boarding, :exit])
+          ]
+        }
+      ]
+
+      result = call_serialize_stops("70230", stops, reverse_stops, alerts)
+
+      assert Enum.find(result, &(&1.label == "Englewood Avenue")).closed == false
+      assert Enum.find(result, &(&1.label == "Dean Road")).closed == true
     end
   end
 

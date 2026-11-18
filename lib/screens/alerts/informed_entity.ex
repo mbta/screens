@@ -17,7 +17,7 @@ defmodule Screens.Alerts.InformedEntity do
             stop: nil
 
   @type t :: %__MODULE__{
-          activities: nonempty_list(Alert.activity()),
+          activities: list(Alert.activity()),
           direction_id: Trip.direction() | nil,
           facility: Facility.t() | nil,
           route: Route.t() | nil,
