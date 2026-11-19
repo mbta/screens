@@ -1,6 +1,7 @@
 defmodule Screens.V2.CandidateGenerator.GlEink.LineMapTest do
   use ExUnit.Case, async: true
 
+  alias Screens.Alerts.Alert
   alias Screens.Predictions.Prediction
   alias Screens.RoutePatterns.RoutePattern
   alias Screens.Stops.Stop
@@ -13,6 +14,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMapTest do
   setup :verify_on_exit!
 
   import Screens.Inject
+  @alert injected(Alert)
   @departure injected(Screens.V2.Departure)
   @route_pattern injected(RoutePattern)
 
@@ -36,6 +38,7 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMapTest do
       departures = [%Departure{prediction: %Prediction{id: "prediction1"}}]
       stops_dir0 = [%Stop{id: "stop-dir0"}]
       stops_dir1 = [%Stop{id: "stop-dir1"}]
+      alerts = []
 
       expect(@departure, :fetch, fn %{stop_ids: ["parent-test"]}, [now: @now_with_lookback] ->
         {:ok, departures}
@@ -49,11 +52,16 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMapTest do
          ]}
       end)
 
+      expect(@alert, :fetch_by_stop_and_route, fn ["stop-dir0"], ["route-test"] ->
+        {:ok, alerts}
+      end)
+
       expected_widget = %LineMapWidget{
         screen: @screen,
         stops: stops_dir0,
         reverse_stops: stops_dir1,
-        departures: departures
+        departures: departures,
+        alerts: alerts
       }
 
       assert LineMap.instances(@screen, @now) == [expected_widget]

@@ -1,11 +1,14 @@
 defmodule Screens.V2.CandidateGenerator.GlEink.LineMap do
   @moduledoc "Generates the LineMap widget for GL E-ink screens."
 
+  alias Screens.Alerts.Alert
   alias Screens.RoutePatterns.RoutePattern
+  alias Screens.Stops.Stop
   alias Screens.V2.WidgetInstance.LineMap
   alias ScreensConfig.Screen
 
   import Screens.Inject
+  @alert injected(Alert)
   @departure injected(Screens.V2.Departure)
   @route_pattern injected(RoutePattern)
 
@@ -24,13 +27,15 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMap do
         now
       ) do
     with {:ok, stops, reverse_stops} <- fetch_stops(route_id, direction_id),
-         {:ok, departures} <- fetch_departures(route_id, direction_id, station_id, now) do
+         {:ok, departures} <- fetch_departures(route_id, direction_id, station_id, now),
+         {:ok, alerts} <- fetch_alerts(route_id, stops, now) do
       [
         %LineMap{
           screen: screen,
           stops: stops,
           reverse_stops: reverse_stops,
-          departures: departures
+          departures: departures,
+          alerts: alerts
         }
       ]
     else
@@ -61,6 +66,16 @@ defmodule Screens.V2.CandidateGenerator.GlEink.LineMap do
 
       :error ->
         :error
+    end
+  end
+
+  @spec fetch_alerts(String.t(), [Stop.t()], DateTime.t()) :: {:ok, [Alert.t()]} | :error
+  defp fetch_alerts(route_id, stops, now) do
+    stop_ids = Enum.map(stops, & &1.id)
+
+    case @alert.fetch_by_stop_and_route(stop_ids, [route_id]) do
+      {:ok, alerts} -> {:ok, Enum.filter(alerts, &Alert.active?(&1, now))}
+      :error -> :error
     end
   end
 end

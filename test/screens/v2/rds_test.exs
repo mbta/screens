@@ -411,6 +411,39 @@ defmodule Screens.V2.RDSTest do
       assert RDS.get(departures, now) == [{:ok, []}]
     end
 
+    test "considers cancelled bus departures in deciding whether to produce no-service states" do
+      now = ~U[2026-01-01 12:00:00Z]
+
+      skipped_departure = %Departure{
+        prediction: %Prediction{
+          arrival_time: nil,
+          departure_time: nil,
+          schedule_relationship: :skipped,
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+          stop: %Stop{id: "s0"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        },
+        schedule: %Schedule{
+          arrival_time: ~U[2026-01-01 12:37:00Z],
+          departure_time: ~U[2026-01-01 12:38:00Z],
+          route: %Route{id: "r1", line: %Line{id: "l1"}, type: :bus},
+          stop: %Stop{id: "s0"},
+          trip: %Trip{headsign: "other1", pattern_headsign: "h1"}
+        }
+      }
+
+      expect(@departure, :fetch, fn
+        %{direction_id: 0, mode: :bus, stop_ids: ["s0"]}, [{:now, ^now} | _] ->
+          {:ok, [skipped_departure]}
+      end)
+
+      departures = %Departures{
+        sections: [%Section{params: %Params{direction_id: 0, mode: :bus, stop_ids: ["s0"]}}]
+      }
+
+      assert RDS.get(departures, now) == [{:ok, []}]
+    end
+
     test "handles commuter rail route without typicality 1 route pattern" do
       now = ~U[2024-10-11 10:00:00Z]
       stop_ids = ~w[s0]
