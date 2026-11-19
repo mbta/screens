@@ -17,6 +17,7 @@ const TIME_TYPE_PRIORITY = [
   "status",
   "headway",
   "first",
+  "hours-and-minutes",
   "timestamp",
   "text",
   "minutes",
@@ -66,7 +67,12 @@ const widestTimeType = (rows: Row[]): string => {
 
     (row.times_with_crowding ?? []).forEach((time) => {
       const type = time.time?.type;
-      if (type) addTimeType(type);
+      if (type === "minutes" && (time.time?.minutes ?? 0) >= 60) {
+        // Require more space to show XhYYm format
+        addTimeType("hours-and-minutes");
+      } else if (type) {
+        addTimeType(type);
+      }
     });
   });
 
