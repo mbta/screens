@@ -36,22 +36,22 @@
   .departures-section--text &,
   .departures-section--minutes &,
   .departures-section--overnight & {
-    width: 370px;
+    min-width: 370px;
   }
 
   .departures-section--timestamp & {
-    width: 508px;
+    min-width: 508px;
   }
 
   .departures-section--first & {
-    width: 580px;
+    min-width: 580px;
   }
 
   // Ensure we have enough space just for the "Stopped X stops away presentation"
   // and that each row fulfills this space requirement
   .departures-section--status &,
   .departures-section--headway & {
-    width: 720px;
+    min-width: 720px;
   }
 }
 
