@@ -33,9 +33,9 @@
 .departure-times-with-crowding {
   margin: 0 32px;
 
-  .departure-section--text,
-  .departure-section--minutes,
-  .departure-section--overnight {
+  .departures-section--text &,
+  .departures-section--minutes &,
+  .departures-section--overnight & {
     width: 370px;
   }
 
