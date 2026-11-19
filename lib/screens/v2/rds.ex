@@ -347,7 +347,7 @@ defmodule Screens.V2.RDS do
     presented_departures =
       Enum.filter(
         departures,
-        &presented_departure?(&1, not is_nil(headways), impacted_by_alert?)
+        &presented_departure?(&1, not is_nil(headways), impacted_by_alert?, mode)
       )
 
     service_state =
@@ -416,10 +416,15 @@ defmodule Screens.V2.RDS do
     end
   end
 
-  defp presented_departure?(%Departure{prediction: prediction} = departure, headways?, alert?) do
+  defp presented_departure?(
+         %Departure{prediction: prediction} = departure,
+         headways?,
+         alert?,
+         mode
+       ) do
     cond do
       is_nil(prediction) -> not headways? and not alert?
-      Departure.cancelled?(departure) -> not headways?
+      Departure.cancelled?(departure) -> not headways? and mode != :bus
       true -> true
     end
   end

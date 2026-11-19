@@ -994,9 +994,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
         true -> departure |> Departure.time() |> serialize_timestamp()
       end
 
+    show_scheduled_departures? = route_type != :bus or serialized_predicted_time == nil
+
     serialized_scheduled_time =
       with true <- not is_nil(scheduled_time),
            time when is_nil(time) or time.type == :timestamp <- serialized_predicted_time,
+           true <- show_scheduled_departures?,
            serialized = serialize_timestamp(scheduled_time),
            true <- serialized != serialized_predicted_time do
         serialized
