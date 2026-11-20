@@ -24,6 +24,38 @@ updates:
       default-days: 7
     open-pull-requests-limit: 5
     groups:
+      mix-ecto:
+        update-types:
+          - "major"
+        patterns:
+          - "ecto*"
+          - "postgrex"
+      mix-phoenix:
+        update-types:
+          - "major"
+        patterns:
+          - "phoenix*"
+          - "plug_cowboy"
+      mix-ex-aws:
+        update-types:
+          - "major"
+        patterns:
+          - "ex_aws*"
+      mix-nebulex:
+        update-types:
+          - "major"
+        patterns:
+          - "nebulex*"
+      mix-ueberauth:
+        update-types:
+          - "major"
+        patterns:
+          - "ueberauth*"
+      mix-telemetry:
+        update-types:
+          - "major"
+        patterns:
+          - "telemetry*"
       mix-minor:
         update-types:
           - "patch"
@@ -42,6 +74,62 @@ updates:
       - dependency-name: "@types/node"
         update-types: ["version-update:semver-major"]
     groups:
+      # Majors for tightly-coupled packages are grouped so required peers upgrade
+      # together. Dependabot assigns a dependency to the first matching group, so
+      # these come before the catch-all minor/patch group.
+      npm-typescript:
+        update-types:
+          - "major"
+        patterns:
+          - "typescript"
+          - "typescript-eslint"
+          - "ts-jest"
+      npm-eslint:
+        update-types:
+          - "major"
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "globals"
+      npm-react:
+        update-types:
+          - "major"
+        patterns:
+          - "react"
+          - "react-dom"
+          - "@types/react"
+          - "@types/react-dom"
+      npm-babel:
+        update-types:
+          - "major"
+        patterns:
+          - "@babel/*"
+      npm-jest:
+        update-types:
+          - "major"
+        patterns:
+          - "jest"
+          - "jest-*"
+          - "@jest/*"
+          - "@types/jest"
+          - "babel-jest"
+      npm-stylelint:
+        update-types:
+          - "major"
+        patterns:
+          - "stylelint"
+          - "stylelint-*"
+      npm-webpack:
+        update-types:
+          - "major"
+        patterns:
+          - "webpack"
+          - "webpack-*"
+          - "*-loader"
+          - "*-webpack-plugin"
+          - "@svgr/webpack"
+          - "@sentry/webpack-plugin"
       npm-minor:
         update-types:
           - "patch"
