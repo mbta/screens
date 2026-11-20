@@ -1,7 +1,7 @@
 import type { ComponentType } from "react";
 
 import {
-  Row,
+  type Row,
   type NormalSection as Props,
 } from "Components/departures/normal_section";
 import DepartureRow from "./departure_row";

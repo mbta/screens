@@ -30,7 +30,7 @@ const MAX_PAGE_RATE_MS = 3750;
 const refreshRateMs = () =>
   parseFloat(fetchDatasetValue("refreshRate")) * 1_000;
 
-const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
+const LaterDepartures = ({ rows }: { rows: DepartureRow[] }) => {
   const [limit, setLimit] = useState(MAX_LATER_DEPARTURES);
   const departures = useMemo(() => _.take(rows, limit), [rows, limit]);
 
@@ -101,4 +101,4 @@ const LaterDepatures = ({ rows }: { rows: DepartureRow[] }) => {
   );
 };
 
-export default LaterDepatures;
+export default LaterDepartures;

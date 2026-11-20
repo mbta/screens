@@ -1028,6 +1028,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
              } =
                Departures.serialize_section(section, dup_screen, now, false)
     end
+
+    test "groups bus departures" do
+    end
   end
 
   describe "group_consecutive_departures/2" do

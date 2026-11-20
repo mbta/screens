@@ -357,6 +357,36 @@ defmodule Screens.V2.WidgetInstance.Departures do
   def serialize_section(
         %NormalSection{
           rows: rows,
+          layout: layout,
+          header: %Header{} = header,
+          grouping_type: grouping_type,
+          mode: mode
+        },
+        screen,
+        now,
+        _is_only_section
+      ) when mode in [:bus, :sl] do
+    serialized_rows =
+      rows
+      |> Enum.take(@max_rows_per_section)
+      |> group_consecutive_departures(screen)
+      |> Enum.map(&serialize_departure_group(&1, screen, now))
+
+    %{
+      type: :normal_section,
+      rows: serialized_rows,
+      layout: Layout.to_json(%{layout | min: 1}),
+      header: wayfinding_with_s3_image_path(header, now) |> Header.to_json(),
+      grouping_type: grouping_type
+    }
+  end
+
+  # credo:disable-for-next-line Credo.Check.Design.TagTODO
+  # TODO(dept_group): remove this function clause, uniquely matching on
+  # `grouping_type` will not be applicable once `grouping_type` is removed
+  def serialize_section(
+        %NormalSection{
+          rows: rows,
           header: %Header{} = header,
           layout: %Layout{max: max},
           grouping_type: :destination

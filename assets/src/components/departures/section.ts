@@ -87,12 +87,12 @@ export const trimSections = (
 ): DepartureSection[] => {
   const trimmed = _.cloneDeep(sections);
 
-  const sortedSizedSections = trimmed
+  const sortedDescSizedSections = trimmed
     .map((section) => ({ section, length: sectionLength(section) }))
     .sort(({ length: a }, { length: b }) => b - a);
 
   for (const trimStage of [trimOneTowardsBase, trimOneTowardsMin]) {
-    if (trimStage(sortedSizedSections)) return trimmed;
+    if (trimStage(sortedDescSizedSections)) return trimmed;
   }
 
   return sections;
