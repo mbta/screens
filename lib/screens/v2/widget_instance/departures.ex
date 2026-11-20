@@ -770,7 +770,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       if headsign == nil do
         %{headsigns: [], variation: nil}
       else
-        {base_headsign, variation} = headsign_with_variation(headsign)
+        {base_headsign, variation} = Headsign.headsign_with_variation(headsign)
         %{headsigns: Headsign.abbreviations(base_headsign), variation: variation}
       end
 
@@ -886,7 +886,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     {base_headsign, variation} =
       first_departure
       |> Departure.headsign()
-      |> headsign_with_variation()
+      |> Headsign.headsign_with_variation()
 
     %{headsign: base_headsign, headsigns: [base_headsign], variation: variation}
   end
@@ -896,7 +896,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
       first_departure
       |> Departure.headsign()
       |> simplify_shuttle_headsign(first_departure, screen)
-      |> headsign_with_variation()
+      |> Headsign.headsign_with_variation()
 
     %{headsigns: Headsign.abbreviations(base_headsign), variation: variation}
   end
@@ -926,26 +926,6 @@ defmodule Screens.V2.WidgetInstance.Departures do
     else
       headsign
     end
-  end
-
-  @spec headsign_with_variation(String.t()) :: {String.t(), String.t() | nil}
-  def headsign_with_variation(headsign) do
-    via_pattern = ~r/(.+) (via .+)/
-    paren_pattern = ~r/(.+) (\(.+)/
-
-    [base_headsign, variation] =
-      cond do
-        String.match?(headsign, via_pattern) ->
-          Regex.run(via_pattern, headsign, capture: :all_but_first)
-
-        String.match?(headsign, paren_pattern) ->
-          Regex.run(paren_pattern, headsign, capture: :all_but_first)
-
-        true ->
-          [headsign, nil]
-      end
-
-    {base_headsign, variation}
   end
 
   @spec serialize_time_with_crowding(Departure.t(), Screen.t(), DateTime.t()) ::

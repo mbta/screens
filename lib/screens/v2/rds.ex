@@ -16,6 +16,7 @@ defmodule Screens.V2.RDS do
 
   alias Screens.Alerts.Alert
   alias Screens.Alerts.AlertLocation
+  alias Screens.Headsigns.Headsign
   alias Screens.Headways, as: Headway
   alias Screens.LastTrip.LastTrip
   alias Screens.Lines.Line
@@ -377,6 +378,8 @@ defmodule Screens.V2.RDS do
         {alert, location} = Map.get(destination_alerts, destination)
 
         if supports_alert?(alert, location, mode) do
+          routes_for_alert = AlertLocation.routes_for_alert(alert, routes_for_section)
+
           %ImpactedByAlert{
             alert: alert,
             destinations: [destination],
@@ -384,7 +387,12 @@ defmodule Screens.V2.RDS do
             direction_id: direction_id,
             location: location,
             mode: mode,
-            routes: routes_for_section
+            routes:
+              if routes_for_alert == [] do
+                routes_for_section
+              else
+                routes_for_alert
+              end
           }
         else
           nil
@@ -519,7 +527,12 @@ defmodule Screens.V2.RDS do
               destinations: state_destinations,
               direction_id: direction_id,
               displayed_headsign:
-                get_common_headsign(state_destinations, direction_names, direction_id),
+                get_common_headsign(
+                  state_destinations,
+                  direction_names,
+                  direction_id,
+                  mode != :bus
+                ),
               location: location,
               mode: mode,
               routes: routes
@@ -663,11 +676,13 @@ defmodule Screens.V2.RDS do
 
   defp maybe_combine_headway_states(headways, _line_direction_pairs), do: headways
 
-  @spec get_common_headsign([destination()], [String.t()], Trip.direction()) :: String.t()
+  @spec get_common_headsign([destination()], [String.t()], Trip.direction(), boolean()) ::
+          String.t()
   defp get_common_headsign(
          [{_stop, %Line{id: line_id}, headsign} | _] = destinations,
          direction_names,
-         direction_id
+         direction_id,
+         use_directional_name \\ true
        ) do
     cond do
       # Use the headsign if all destinations have the same headsign,
@@ -677,13 +692,14 @@ defmodule Screens.V2.RDS do
         headsign
 
       # Use the direction name if destinations have the same direction name,
-      direction_id != nil and
-          Enum.all?(
-            destinations,
-            fn {_stop, %Line{id: other_line_id}, _other_headsign} ->
-              line_id == other_line_id
-            end
-          ) ->
+      use_directional_name &&
+          (direction_id != nil and
+             Enum.all?(
+               destinations,
+               fn {_stop, %Line{id: other_line_id}, _other_headsign} ->
+                 line_id == other_line_id
+               end
+             )) ->
         Enum.at(direction_names, direction_id)
 
       true ->
@@ -838,7 +854,9 @@ defmodule Screens.V2.RDS do
                                      route: %Route{line: pattern_line},
                                      stops: pattern_stops
                                    } ->
-      line == pattern_line and headsign == pattern_headsign and
+      {base_headsign, _variation} = Headsign.headsign_with_variation(pattern_headsign)
+
+      line == pattern_line and (headsign == base_headsign or headsign == pattern_headsign) and
         Enum.any?(pattern_stops, fn pattern_stop -> stop.id == pattern_stop.id end)
     end)
   end
@@ -857,6 +875,10 @@ defmodule Screens.V2.RDS do
   @spec supports_alert?(Alert.t(), AlertLocation.t(), Mode.t()) :: boolean()
   # To be removed once we start supporting all effects, locations and modes we want
   # Right now is just a filter as we build out support for all types of alerts
+  defp supports_alert?(%Alert{effect: effect}, location, mode)
+       when effect in [:suspension, :detour, :snow_route] and mode == :bus,
+       do: location == :inside or location == :boundary_downstream
+
   defp supports_alert?(%Alert{effect: effect}, location, mode)
        when effect in [:suspension, :shuttle],
        do:

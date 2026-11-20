@@ -43,6 +43,50 @@ defmodule Screens.Alerts.AlertTextUtil do
           {FreeTextLine.t(), FreeTextLine.t()}
   def alert_row_text(
         %NormalSection.AlertRow{
+          alert: %Alert{effect: effect, header: header},
+          displayed_headsign: headsign,
+          location: location,
+          mode: mode
+        },
+        _now
+      )
+      when effect in [:suspension, :detour, :snow_route] and mode == :bus do
+    header_text =
+      %FreeTextLine{
+        icon: nil,
+        text:
+          if location == :inside do
+            if headsign != nil do
+              ["#{headsign}", %{special: :break}]
+            else
+              []
+            end ++
+              [
+                %{
+                  format: :bold,
+                  text:
+                    case effect do
+                      :suspension -> "Route suspended"
+                      :detour -> "Route detoured"
+                      :snow_route -> "Snow route"
+                    end
+                }
+              ]
+          else
+            [headsign]
+          end
+      }
+
+    additional_text = %FreeTextLine{
+      icon: nil,
+      text: [header]
+    }
+
+    {header_text, additional_text}
+  end
+
+  def alert_row_text(
+        %NormalSection.AlertRow{
           alert:
             %Alert{
               active_period: active_period,

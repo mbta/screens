@@ -93,9 +93,7 @@ defmodule Screens.Alerts.AlertLocation do
 
   defp location(
          %Alert{effect: effect, informed_entities: informed_entities},
-         %Context{
-           is_terminal_station: is_terminal_station
-         } = alert_location_context
+         %Context{is_terminal_station: is_terminal_station} = alert_location_context
        ) do
     informed_entities
     |> Enum.flat_map(&informed_entity_to_zone(&1, alert_location_context))
@@ -233,6 +231,7 @@ defmodule Screens.Alerts.AlertLocation do
 
   defp get_location_atom(_, _, _), do: :elsewhere
 
+  @spec terminal?(Stop.id(), [[Stop.id()]]) :: boolean()
   def terminal?(stop_id, stop_sequences) do
     # Can't use Enum.any, because then Govt Center will be seen as a terminal
     # Using all is ok because no station is the terminal of one line and NOT the terminal of another line
@@ -240,5 +239,21 @@ defmodule Screens.Alerts.AlertLocation do
     Enum.all?(stop_sequences, fn stop_sequence ->
       List.first(stop_sequence) == stop_id or List.last(stop_sequence) == stop_id
     end)
+  end
+
+  @spec routes_for_alert(Alert.t(), [Route.t()]) :: [Route.t()]
+  def routes_for_alert(%Alert{informed_entities: informed_entities}, routes_in_section) do
+    Enum.flat_map(informed_entities, fn
+      %InformedEntity{route: route} ->
+        if route in routes_in_section do
+          [route]
+        else
+          []
+        end
+
+      _ ->
+        []
+    end)
+    |> Enum.uniq()
   end
 end
