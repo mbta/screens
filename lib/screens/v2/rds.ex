@@ -365,8 +365,17 @@ defmodule Screens.V2.RDS do
 
         true ->
           case param_direction_id do
-            :both -> nil
-            _ -> param_direction_id
+            :both ->
+              nil
+
+            _ ->
+              if is_binary(param_direction_id) do
+                param_direction_id
+                |> Integer.parse()
+                |> elem(0)
+              else
+                param_direction_id
+              end
           end
       end
 
