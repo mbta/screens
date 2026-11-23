@@ -2,7 +2,7 @@ import type { ComponentType } from "react";
 
 import {
   type Row,
-  type NormalSection as Props,
+  type NormalSection as NormalSectionProps,
 } from "Components/departures/normal_section";
 import DepartureRow from "./departure_row";
 import NoticeRow from "Components/departures/notice_row";
@@ -24,7 +24,7 @@ const TIME_TYPE_PRIORITY = [
   "overnight",
 ];
 
-const NormalSection: ComponentType<Props> = ({ rows }) => {
+const NormalSection: ComponentType<NormalSectionProps> = ({ rows }) => {
   if (rows.length === 0) return null;
 
   const classModifier = widestTimeType(rows);
