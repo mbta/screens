@@ -72,7 +72,6 @@ The majority of the "heavy" business logic should live inside WidgetInstance mod
 The core framework logic—the algorithm that fits widgets into templates—should remain agnostic of any specifics of a given screen type or widget. It should only use protocol functions to manipulate widgets.
 
 ## Anatomy of a template
-
 Each screen type has a template that defines the "slots" that widgets can fit into, as well as layout variations for special cases like high-priority alerts that take over all space below the screen header.
 
 A template is a recursive data structure.
@@ -86,6 +85,8 @@ The recursive case is a tuple representing a region containing one or more layou
 - `list(template)`: the set of slots, or even further nested regions, that fill this region under the given layout variation.
 
 Layout variations provide a mechanism for high-priority widgets, like urgent alerts, to take over large portions of a screen. They also allow paged regions to hold widgets of different sizes per page.
+
+See the [`Busway` candidate generator](/lib/screens/v2/candidate_generator/busway.ex) for a relatively straigthforward implementation of a template with detailed comments that correspond to the definitions laid out here.
 
 ## Feature: Paging
 
