@@ -183,6 +183,47 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type serialized_headsign :: serialized_headsign_lcd | serialized_headsign_mercury
 
+  @type serialized_no_data_section :: %{
+          type: :no_data_section,
+          text: FreeTextLine.t()
+        }
+
+  @type serialized_no_service_section :: %{
+          type: :no_service_section,
+          text: FreeTextLine.t(),
+          header: String.t(),
+          with_headsign: boolean()
+        }
+
+  @type serialized_headway_section_section :: %{
+          type: :headway_section,
+          text: FreeTextLine.t(),
+          layout: :full_screen | :row | :row_with_headsign
+        }
+
+  @type serialized_overnight_service_section :: %{
+          type: :overnight_section,
+          text: FreeTextLine.t(),
+          header: String.t(),
+          with_headsign: boolean()
+        }
+
+  @type serialized_normal_section :: %{
+          type: :normal_section,
+          # TODO: Fix me
+          rows: [any()],
+          layout: Layout.t(),
+          header: String.t(),
+          grouping_type: :time | :departure
+        }
+
+  @type serialized_section ::
+          serialized_no_data_section()
+          | serialized_no_service_section()
+          | serialized_headway_section_section()
+          | serialized_overnight_service_section()
+          | serialized_normal_section()
+
   # Limits how many rows per section will be sent to the client.
   @max_rows_per_section 15
   @sl_route_ids ~w[741 742 743 746 749 751]
@@ -234,6 +275,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     def audio_view(_instance), do: ScreensWeb.V2.Audio.DeparturesView
   end
 
+  @spec serialize_section(section(), Screen.t(), DateTime.t(), boolean()) :: serialized_section()
   def serialize_section(section, screen, now, is_only_section \\ false)
 
   def serialize_section(%NoDataSection{mode: mode}, _screen, _now, _is_only_section) do
@@ -618,7 +660,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
         ]
   def group_consecutive_departures(rows, screen, mode)
 
-  def group_consecutive_departures(rows, %Screen{app_id: :dup_v2}, mode) when mode not in [:bus, :sl] do
+  def group_consecutive_departures(rows, %Screen{app_id: :dup_v2}, mode)
+      when mode not in [:bus, :sl] do
     Enum.chunk_by(rows, fn _ -> make_ref() end)
   end
 
