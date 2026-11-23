@@ -83,7 +83,6 @@ updates:
         patterns:
           - "typescript"
           - "typescript-eslint"
-          - "ts-jest"
       npm-eslint:
         update-types:
           - "major"
@@ -114,6 +113,7 @@ updates:
           - "@jest/*"
           - "@types/jest"
           - "babel-jest"
+          - "ts-jest"
       npm-stylelint:
         update-types:
           - "major"
