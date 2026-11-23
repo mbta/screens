@@ -500,7 +500,13 @@ config :screens,
 
 config :screens,
        Screens.V3Api.Cache.Static,
-       Keyword.merge(shared_cache_options, allocated_memory: 600 * 1024 * 1024)
+       Keyword.merge(shared_cache_options, allocated_memory: 150 * 1024 * 1024)
+
+config :screens,
+       Screens.Schedules.Store.Cache,
+       Keyword.merge(shared_cache_options,
+         allocated_memory: 450 * 1024 * 1024
+       )
 
 config :screens,
        Screens.V2.ScreenData.Cache.Store.Adapter,

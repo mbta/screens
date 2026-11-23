@@ -18,6 +18,7 @@ defmodule Screens.Application do
         Screens.V2.ScreenData.Cache.Store.Adapter,
         Screens.V3Api.Cache.Realtime,
         Screens.V3Api.Cache.Static,
+        Screens.Schedules.Store.Cache,
         Screens.LastTrip.Cache,
         # Task supervisor for ScreensByAlert async updates
         {Task.Supervisor, name: Screens.ScreensByAlert.Memcache.TaskSupervisor},
