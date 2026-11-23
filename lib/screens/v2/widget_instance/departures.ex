@@ -201,6 +201,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
           layout: :full_screen | :row | :row_with_headsign
         }
 
+  @type serialize_normal_section_row :: %{
+          id: String.t(),
+          type: :departure_row,
+          route: RoutePill.t(),
+          headsign: serialized_headsign(),
+          times_with_crowding: [serialized_time_with_crowding()],
+          direction_id: Trip.direction() | nil,
+          is_first_trip: boolean()
+        }
+
   @type serialized_overnight_service_section :: %{
           type: :overnight_section,
           text: FreeTextLine.t(),
@@ -210,8 +220,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
 
   @type serialized_normal_section :: %{
           type: :normal_section,
-          # TODO: Fix me
-          rows: [any()],
+          rows: [serialize_normal_section_row()],
           layout: Layout.t(),
           header: String.t(),
           grouping_type: :time | :departure
