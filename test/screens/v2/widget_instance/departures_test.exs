@@ -1033,7 +1033,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
     end
   end
 
-  describe "group_consecutive_departures/2" do
+  describe "group_consecutive_departures/3" do
     setup do
       %{
         bus_shelter_screen: %Screen{
@@ -1092,7 +1092,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departures = [d1, d2, d3, d4, d5, d6, d7]
       expected = [[d1, d2], [d3], [d4], [d5], [d6, d7]]
-      assert expected == Departures.group_consecutive_departures(departures, bus_shelter_screen)
+
+      assert expected ==
+               Departures.group_consecutive_departures(departures, bus_shelter_screen, :bus)
     end
 
     test "groups departures and ignores notices", %{bus_shelter_screen: bus_shelter_screen} do
@@ -1112,7 +1114,9 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departures = [d1, d2, d3, n1]
       expected = [[d1, d2], [d3], [n1]]
-      assert expected == Departures.group_consecutive_departures(departures, bus_shelter_screen)
+
+      assert expected ==
+               Departures.group_consecutive_departures(departures, bus_shelter_screen, :bus)
     end
 
     test "keeps departures ungrouped for DUPs", %{dup_screen: dup_screen} do
@@ -1134,7 +1138,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
 
       departures = [d1, d2, d3, d4]
       expected = [[d1], [d2], [d3], [d4]]
-      assert expected == Departures.group_consecutive_departures(departures, dup_screen)
+      assert expected == Departures.group_consecutive_departures(departures, dup_screen, :bus)
     end
 
     test "never groups headways or special trips with matching departures or each other", %{
@@ -1148,7 +1152,7 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
       service_ended = {%Schedule{route: route, trip: trip}, :service_ended}
       rows = [departure, departure, headway, headway, first_trip, service_ended, departure]
 
-      assert Departures.group_consecutive_departures(rows, screen) == [
+      assert Departures.group_consecutive_departures(rows, screen, :gl) == [
                [departure, departure],
                [headway],
                [headway],

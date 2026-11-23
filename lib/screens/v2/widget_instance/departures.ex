@@ -342,7 +342,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     serialized_rows =
       rows
       |> Enum.take(@max_rows_per_section)
-      |> group_consecutive_departures(screen)
+      |> group_consecutive_departures(screen, :ferry)
       |> Enum.map(&serialize_departure_group(&1, screen, now))
 
     %{
@@ -365,11 +365,12 @@ defmodule Screens.V2.WidgetInstance.Departures do
         screen,
         now,
         _is_only_section
-      ) when mode in [:bus, :sl] do
+      )
+      when mode in [:bus, :sl] do
     serialized_rows =
       rows
       |> Enum.take(@max_rows_per_section)
-      |> group_consecutive_departures(screen)
+      |> group_consecutive_departures(screen, mode)
       |> Enum.map(&serialize_departure_group(&1, screen, now))
 
     %{
@@ -424,7 +425,8 @@ defmodule Screens.V2.WidgetInstance.Departures do
           rows: rows,
           layout: layout,
           header: %Header{} = header,
-          grouping_type: grouping_type
+          grouping_type: grouping_type,
+          mode: mode
         },
         screen,
         now,
@@ -433,7 +435,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
     serialized_rows =
       rows
       |> Enum.take(@max_rows_per_section)
-      |> group_consecutive_departures(screen)
+      |> group_consecutive_departures(screen, mode)
       |> Enum.map(&serialize_departure_group(&1, screen, now))
 
     %{
@@ -611,14 +613,16 @@ defmodule Screens.V2.WidgetInstance.Departures do
   Groups consecutive departures that have the same route and headsign.
   Rows that are not departures are never grouped.
   """
-  @spec group_consecutive_departures([NormalSection.row()], Screen.t()) :: [[NormalSection.row()]]
-  def group_consecutive_departures(rows, screen)
+  @spec group_consecutive_departures([NormalSection.row()], Screen.t(), Mode.t()) :: [
+          [NormalSection.row()]
+        ]
+  def group_consecutive_departures(rows, screen, mode)
 
-  def group_consecutive_departures(rows, %Screen{app_id: :dup_v2}) do
+  def group_consecutive_departures(rows, %Screen{app_id: :dup_v2}, _mode) do
     Enum.chunk_by(rows, fn _ -> make_ref() end)
   end
 
-  def group_consecutive_departures(rows, _screen) do
+  def group_consecutive_departures(rows, _screen, _mode) do
     Enum.chunk_by(rows, &row_departure_grouping(&1))
   end
 
