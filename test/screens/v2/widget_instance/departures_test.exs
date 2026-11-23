@@ -1119,26 +1119,26 @@ defmodule Screens.V2.WidgetInstance.DeparturesTest do
                Departures.group_consecutive_departures(departures, bus_shelter_screen, :bus)
     end
 
-    test "keeps departures ungrouped for DUPs", %{dup_screen: dup_screen} do
+    test "keeps departures ungrouped for DUPs for ferry", %{dup_screen: dup_screen} do
       d1 = %Departure{
-        prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
+        prediction: %Prediction{route: %Route{id: "r1"}, trip: %Trip{headsign: "Dock1"}}
       }
 
       d2 = %Departure{
-        prediction: %Prediction{route: %Route{id: "1"}, trip: %Trip{headsign: "Nubian"}}
+        prediction: %Prediction{route: %Route{id: "r1"}, trip: %Trip{headsign: "Dock1"}}
       }
 
       d3 = %Departure{
-        schedule: %Schedule{route: %Route{id: "22"}, trip: %Trip{headsign: "Ruggles"}}
+        schedule: %Schedule{route: %Route{id: "r2"}, trip: %Trip{headsign: "Dock2"}}
       }
 
       d4 = %Departure{
-        schedule: %Schedule{route: %Route{id: "22"}, trip: %Trip{headsign: "Ruggles"}}
+        schedule: %Schedule{route: %Route{id: "r2"}, trip: %Trip{headsign: "Dock2"}}
       }
 
       departures = [d1, d2, d3, d4]
       expected = [[d1], [d2], [d3], [d4]]
-      assert expected == Departures.group_consecutive_departures(departures, dup_screen, :bus)
+      assert expected == Departures.group_consecutive_departures(departures, dup_screen, :ferry)
     end
 
     test "never groups headways or special trips with matching departures or each other", %{
