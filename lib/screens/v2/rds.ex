@@ -208,7 +208,7 @@ defmodule Screens.V2.RDS do
           )
 
         [] ->
-          Report.warning("rds_no_section_routes", params: inspect(params))
+          Logster.info(["rds_no_section_routes", inspect(params)])
           {:ok, []}
       end
     end
