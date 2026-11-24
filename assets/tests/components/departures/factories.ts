@@ -15,6 +15,7 @@ export const normalSection = Factory.define<Section>(() => ({
     wayfinding_information: null,
   },
   grouping_type: "time",
+  mode: "bus",
 }));
 
 export const departureRow = Factory.define<Row>(({ sequence }) => ({

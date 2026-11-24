@@ -7,6 +7,7 @@ import AlertRow from "./alert_row";
 import Header from "./header";
 import LaterDepartures, { MIN_LATER_DEPARTURES } from "./later_departures";
 import { classWithModifier } from "Util/utils";
+import { Mode } from "Components/departures/mode";
 
 export type Layout = {
   base: number | null;
@@ -25,6 +26,7 @@ export type NormalSection = {
   header: Header;
   grouping_type: GroupingType;
   rows: Row[];
+  mode: Mode;
 };
 
 export interface BaseFoldedSection {
