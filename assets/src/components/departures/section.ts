@@ -15,7 +15,8 @@ export type Section =
   | (NoServiceSection & { type: "no_service_section" })
   | (OvernightSection & { type: "overnight_section" });
 
-type DepartureSection = FoldedSection | OvernightSection | NoServiceSection;
+export type DepartureSection =
+  FoldedSection | OvernightSection | NoServiceSection;
 
 export const toDepartureSection = (section: Section): DepartureSection => {
   switch (section.type) {

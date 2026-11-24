@@ -1,0 +1,176 @@
+import _ from "lodash";
+import type {
+  FoldedDepartureGroupedSection,
+  FoldedSection,
+  Layout,
+} from "Components/departures/normal_section";
+import { DepartureSection } from "Components/departures/section";
+
+/**
+ * Perform one iteration of "section trimming", i.e. the process of shifting
+ * departures from above-the-fold to below-the-fold while respecting sections'
+ * desired layouts, until they all fit in a container without overflow.
+ *
+ * Operates immutably. If no sections could be trimmed, returns the same array.
+ */
+export const trimSections = (
+  sections: DepartureSection[],
+): DepartureSection[] => {
+  const trimmed = _.cloneDeep(sections);
+
+  const sortedDescSizedSections = trimmed
+    .map((section) => ({ section, length: sectionLength(section) }))
+    .sort(({ length: a }, { length: b }) => b - a);
+
+  for (const trimStage of [trimOneTowardsBase, trimOneTowardsMin]) {
+    if (trimStage(sortedDescSizedSections)) return trimmed;
+  }
+
+  return sections;
+};
+
+// Determine how many above-the-fold departure "items" a section contains, for
+// the purposes of deciding which sections should be trimmed first.
+export const sectionLength = (section: DepartureSection): number => {
+  if (section.type === "folded_section") {
+    return section.rows.aboveFold.reduce(
+      (sum, row) =>
+        sum +
+        (row.type === "departure_row" ? row.times_with_crowding.length : 1),
+      0,
+    );
+  } else {
+    return 0;
+  }
+};
+
+type SizedDepartureSection = {
+  length: number;
+  section: DepartureSection;
+};
+
+// `trimOne` functions destructively trim departures from sections, returning
+// `true` if any trimming occurred. Each iteration of section trimming tries
+// each function in sequence until one succeeds or they have all been tried.
+// They assume the given sections are reverse-sorted by length (largest first).
+
+// Trim one departure from the section with the most, among those with more than
+// their `base`. If no `base` is defined, acts as `trimTowardsMin`.
+const trimOneTowardsBase = (sections: SizedDepartureSection[]): boolean =>
+  trimOneBy(sections, (length, { min, base }) => length > (base || min));
+
+// Trim one departure from the section with the most, among those with more than
+// their `min`.
+const trimOneTowardsMin = (sections: SizedDepartureSection[]): boolean =>
+  trimOneBy(sections, (length, { min }) => length > min);
+
+const trimOneBy = (
+  sections: SizedDepartureSection[],
+  condition: (length: number, layout: Layout) => boolean,
+): boolean => {
+  for (const { section, length } of sections) {
+    if (
+      section.type === "folded_section" &&
+      condition(length, section.layout)
+    ) {
+      if (section.grouping_type === "destination") {
+        if (trimSectionForDestinationGrouping(section)) return true;
+      } else {
+        if (trimSection(section)) return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+// Destructively shift the last above-the-fold departure time in a section to
+// below-the-fold, if possible. Returns `true` if the section was trimmed.
+export const trimSection = (section: FoldedSection): boolean => {
+  if (section.type === "folded_section") {
+    const {
+      rows: { aboveFold, belowFold },
+    } = section;
+
+    for (let aboveIndex = aboveFold.length - 1; aboveIndex >= 0; aboveIndex--) {
+      const row = aboveFold[aboveIndex];
+
+      if (row.type === "departure_row") {
+        const trimmedTimeWithCrowding = _.last(row.times_with_crowding);
+
+        if (row.times_with_crowding.length > 1) {
+          // More than one departure time; trim the last one.
+          row.times_with_crowding.splice(row.times_with_crowding.length - 1);
+        } else {
+          // Only one departure time; trim this row entirely.
+          aboveFold.splice(aboveIndex, 1);
+        }
+
+        if (trimmedTimeWithCrowding) {
+          belowFold.unshift({
+            ...row,
+            id: _.uniqueId(`${row.id}_`),
+            times_with_crowding: [trimmedTimeWithCrowding],
+          });
+        }
+
+        return true;
+      }
+    }
+  }
+
+  return false;
+};
+
+const trimSectionForDestinationGrouping = (
+  section: FoldedDepartureGroupedSection,
+): boolean => {
+  const {
+    rows: { aboveFold },
+    direction_trim_priority: directionTrimPriority,
+  } = section;
+
+  let directionZeroCount = 0;
+  let directionOneCount = 0;
+  let lastDirectionZeroRowIndex = -1;
+  let lastDirectionOneRowIndex = -1;
+
+  for (let aboveIndex = aboveFold.length - 1; aboveIndex >= 0; aboveIndex--) {
+    const row = aboveFold[aboveIndex];
+    if (row.type !== "departure_row") continue;
+
+    if (row.direction_id === 0) {
+      directionZeroCount++;
+      if (lastDirectionZeroRowIndex === -1) {
+        lastDirectionZeroRowIndex = aboveIndex;
+      }
+    } else {
+      directionOneCount++;
+      if (lastDirectionOneRowIndex === -1) {
+        lastDirectionOneRowIndex = aboveIndex;
+      }
+    }
+  }
+
+  if (directionZeroCount === 0 && directionOneCount === 0) {
+    return false;
+  }
+
+  if (directionZeroCount < directionOneCount) {
+    aboveFold.splice(lastDirectionOneRowIndex, 1);
+    return true;
+  }
+
+  if (directionZeroCount > directionOneCount) {
+    aboveFold.splice(lastDirectionZeroRowIndex, 1);
+    return true;
+  }
+
+  const indexToTrim =
+    directionTrimPriority === 0
+      ? lastDirectionZeroRowIndex
+      : lastDirectionOneRowIndex;
+
+  aboveFold.splice(indexToTrim, 1);
+  return true;
+};
