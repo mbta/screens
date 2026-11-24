@@ -5,13 +5,17 @@ import HeadwaySection from "./departures/headway_section";
 import NoDataSection from "./departures/no_data_section";
 import NoServiceSection from "./departures/no_service_section";
 import OvernightSection from "./departures/overnight_section";
-import { DupSection } from "Components/dup/departures/section";
+import {
+  DupSection,
+  toDupDepartureSection,
+} from "Components/dup/departures/section";
 
 interface DeparturesProps {
   sections: DupSection[];
 }
 
 const Departures: ComponentType<DeparturesProps> = ({ sections }) => {
+  const f = sections.map(toDupDepartureSection);
   return (
     <div className="departures-container">
       {sections.map((section, i) => {
