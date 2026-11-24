@@ -1,9 +1,6 @@
 import type { ComponentType } from "react";
 
-import {
-  type Row,
-  type NormalSection as NormalSectionProps,
-} from "Components/departures/normal_section";
+import type { Row, FoldedSection } from "Components/departures/normal_section";
 import DepartureRow from "./departure_row";
 import NoticeRow from "Components/departures/notice_row";
 import { classWithModifier } from "Util/utils";
@@ -24,14 +21,17 @@ const TIME_TYPE_PRIORITY = [
   "overnight",
 ];
 
-const NormalSection: ComponentType<NormalSectionProps> = ({ rows }) => {
-  if (rows.length === 0) return null;
+const NormalSection: ComponentType<FoldedSection> = (foldedSection) => {
+  const {
+    rows: { aboveFold },
+  } = foldedSection;
+  if (aboveFold.length === 0) return null;
 
-  const classModifier = widestTimeType(rows);
+  const classModifier = widestTimeType(aboveFold);
 
   return (
     <div className={classWithModifier("departures-section", classModifier)}>
-      {rows.map((row, index) => {
+      {aboveFold.map((row, index) => {
         if (row.type === "departure_row") {
           // When the available width for headsigns changes, re-render the
           // departures so headsign abbreviation will be redone.

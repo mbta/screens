@@ -15,12 +15,12 @@ interface DeparturesProps {
 }
 
 const Departures: ComponentType<DeparturesProps> = ({ sections }) => {
-  const f = sections.map(toDupDepartureSection);
+  const dupSections = sections.map(toDupDepartureSection);
   return (
     <div className="departures-container">
-      {sections.map((section, i) => {
+      {dupSections.map((section, i) => {
         switch (section.type) {
-          case "normal_section":
+          case "folded_section":
             return <NormalSection {...section} key={i} />;
           case "headway_section":
             return <HeadwaySection {...section} key={i} />;

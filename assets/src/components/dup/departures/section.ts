@@ -33,48 +33,22 @@ export type DupDepartureSection = FoldedSection | DupSectionBase;
 // TODO: Fix
 /**
  * Converts a {@link DupSection} into
- * @param section
+ * @param dupSection
  * @returnsd
  */
 export const toDupDepartureSection = (
-  section: DupSection,
+  dupSection: DupSection,
 ): DupDepartureSection => {
-  switch (section.type) {
-    case "headway_section": {
-      return section;
-    }
-    case "no_data_section": {
-      return section;
-    }
-    case "no_service_section": {
-      return section;
+  switch (dupSection.type) {
+    case "headway_section":
+    case "no_data_section":
+    case "no_service_section":
+    case "overnight_section": {
+      return dupSection;
     }
     case "normal_section": {
-      const baseSection: BaseFoldedSection = {
-        ...section,
-        type: "folded_section",
-        rows: {
-          aboveFold: section.rows,
-          belowFold: [],
-        },
-      };
-
-      // TODO: Replace lodash? Not as important rn
-      const directionCounts = _.countBy(section.rows, "direction_id");
-      const directionPriority =
-        (directionCounts[1] || 0) > (directionCounts[0] || 0) ? 0 : 1;
-
       const foldedSection: FoldedSection =
-        section.grouping_type === "destination"
-          ? {
-              ...baseSection,
-              grouping_type: "destination",
-              direction_trim_priority: directionPriority,
-            }
-          : {
-              ...baseSection,
-              grouping_type: "time",
-            };
+        baseFoldedSectionToSpecialize(dupSection);
 
       if (foldedSection.layout.max) {
         const length = sectionLength(foldedSection);
@@ -85,8 +59,41 @@ export const toDupDepartureSection = (
 
       return foldedSection;
     }
-    case "overnight_section": {
-      return section;
-    }
+  }
+};
+
+const baseFoldedSectionToSpecialize = (
+  dupNormalSection: NormalSection,
+): FoldedSection => {
+  const baseSection: BaseFoldedSection = {
+    ...dupNormalSection,
+    type: "folded_section",
+    rows: {
+      aboveFold: dupNormalSection.rows,
+      belowFold: [],
+    },
+  };
+
+  const directionCounts = _.countBy(dupNormalSection.rows, "direction_id");
+  const directionPriority =
+    (directionCounts[1] || 0) > (directionCounts[0] || 0) ? 0 : 1;
+
+  switch (dupNormalSection.mode) {
+    case "ferry":
+      return {
+        ...baseSection,
+        grouping_type: "time",
+      };
+    default:
+      return dupNormalSection.grouping_type === "destination"
+        ? {
+            ...baseSection,
+            grouping_type: "destination",
+            direction_trim_priority: directionPriority,
+          }
+        : {
+            ...baseSection,
+            grouping_type: "time",
+          };
   }
 };
