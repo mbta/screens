@@ -1,24 +1,17 @@
 import type { ComponentType } from "react";
 
-import { type Section as SectionBase } from "Components/departures/section";
 import NormalSection from "./departures/normal_section";
 import HeadwaySection from "./departures/headway_section";
 import NoDataSection from "./departures/no_data_section";
 import NoServiceSection from "./departures/no_service_section";
 import OvernightSection from "./departures/overnight_section";
+import { DupSection } from "Components/dup/departures/section";
 
-type Section =
-  | SectionBase
-  | (HeadwaySection & { type: "headway_section" })
-  | (NoDataSection & { type: "no_data_section" })
-  | (NoServiceSection & { type: "no_service_section" })
-  | (OvernightSection & { type: "overnight_section" });
-
-interface Props {
-  sections: Section[];
+interface DeparturesProps {
+  sections: DupSection[];
 }
 
-const Departures: ComponentType<Props> = ({ sections }) => {
+const Departures: ComponentType<DeparturesProps> = ({ sections }) => {
   return (
     <div className="departures-container">
       {sections.map((section, i) => {
