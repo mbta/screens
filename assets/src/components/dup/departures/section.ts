@@ -50,6 +50,7 @@ export const toDupDepartureSection = (
       const foldedSection: FoldedSection =
         baseFoldedSectionToSpecialize(dupSection);
 
+      //  TODO: This doesn't get used for bus dups afaict. need now?
       if (foldedSection.layout.max) {
         const length = sectionLength(foldedSection);
 
@@ -84,6 +85,7 @@ const baseFoldedSectionToSpecialize = (
         ...baseSection,
         grouping_type: "time",
       };
+    // TODO: I _think_ bus is gonna be destination only
     default:
       return dupNormalSection.grouping_type === "destination"
         ? {

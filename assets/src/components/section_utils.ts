@@ -4,7 +4,9 @@ import type {
   FoldedSection,
   Layout,
 } from "Components/departures/normal_section";
-import { DepartureSection } from "Components/departures/section";
+// TODO: This type is the reason this is all split out. If we cannot reconcile this with the other, might as well put
+// it in the DUPs file and call it a day
+import {DupDepartureSection} from "Components/dup/departures/section";
 
 /**
  * Perform one iteration of "section trimming", i.e. the process of shifting
@@ -14,8 +16,8 @@ import { DepartureSection } from "Components/departures/section";
  * Operates immutably. If no sections could be trimmed, returns the same array.
  */
 export const trimSections = (
-  sections: DepartureSection[],
-): DepartureSection[] => {
+  sections: DupDepartureSection[],
+): DupDepartureSection[] => {
   const trimmed = _.cloneDeep(sections);
 
   const sortedDescSizedSections = trimmed
@@ -31,7 +33,7 @@ export const trimSections = (
 
 // Determine how many above-the-fold departure "items" a section contains, for
 // the purposes of deciding which sections should be trimmed first.
-export const sectionLength = (section: DepartureSection): number => {
+export const sectionLength = (section: DupDepartureSection): number => {
   if (section.type === "folded_section") {
     return section.rows.aboveFold.reduce(
       (sum, row) =>
@@ -46,7 +48,7 @@ export const sectionLength = (section: DepartureSection): number => {
 
 type SizedDepartureSection = {
   length: number;
-  section: DepartureSection;
+  section: DupDepartureSection;
 };
 
 // `trimOne` functions destructively trim departures from sections, returning
