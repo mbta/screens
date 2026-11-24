@@ -669,8 +669,7 @@ defmodule Screens.V2.WidgetInstance.Departures do
         ]
   def group_consecutive_departures(rows, screen, mode)
 
-  def group_consecutive_departures(rows, %Screen{app_id: :dup_v2}, mode)
-      when mode not in [:bus, :sl] do
+  def group_consecutive_departures(rows, %Screen{app_id: :dup_v2}, :ferry) do
     Enum.chunk_by(rows, fn _ -> make_ref() end)
   end
 
