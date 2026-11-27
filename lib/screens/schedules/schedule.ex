@@ -1,6 +1,7 @@
 defmodule Screens.Schedules.Schedule do
   @moduledoc false
 
+  alias Screens.Schedules.Store
   alias Screens.Trips.Trip
   alias Screens.Util
   alias Screens.V2.Departure
@@ -28,21 +29,13 @@ defmodule Screens.Schedules.Schedule do
           direction_id: Trip.direction()
         }
 
-  @includes ~w[route.line stop trip.route_pattern.representative_trip trip.stops]
-
   @type result :: {:ok, [t()]} | :error
   @type fetch_with_date :: (Departure.params(), Date.t() -> result())
 
   @callback fetch(Departure.params()) :: result()
   @callback fetch(Departure.params(), Date.t()) :: result()
   def fetch(%{} = params, date \\ current_service_date()) do
-    params = Map.put(params, :date, date)
-    result = Departure.do_fetch("schedules", Map.put(params, :include, @includes))
-
-    case result do
-      {:ok, schedules} -> {:ok, Enum.reject(schedules, &is_nil(&1.departure_time))}
-      :error -> :error
-    end
+    Store.fetch(params, date)
   end
 
   @spec headsign(t()) :: String.t()

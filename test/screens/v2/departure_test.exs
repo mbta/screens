@@ -4,6 +4,7 @@ defmodule Screens.V2.DepartureTest do
   alias Screens.Predictions.Prediction
   alias Screens.Routes.Route
   alias Screens.Schedules.Schedule
+  alias Screens.Schedules.Store
   alias Screens.Trips.Trip
   alias Screens.V2.Departure
   alias Screens.Vehicles.Vehicle
@@ -477,6 +478,26 @@ defmodule Screens.V2.DepartureTest do
   describe "fetch_schedules/2" do
     defp build_opts(opts \\ []),
       do: Keyword.put(opts, :fetch_schedules_fn, fn params -> {:test, params} end)
+
+    test "reads the parsed store for the supplied clock's service date" do
+      stop_id = inspect(make_ref())
+      params = %{mode: :gl, stop_ids: [stop_id]}
+      before_rollover = ~U[2024-10-12 07:59:00Z]
+      after_rollover = ~U[2024-10-12 08:00:00Z]
+      schedules = [%Schedule{id: "previous-day"}]
+
+      for {date, records} <- [{~D[2024-10-11], schedules}, {~D[2024-10-12], []}] do
+        assert {:ok, _} =
+                 Store.fetch_dataset(params, date,
+                   acquire_fn: fn _, _, _ -> {:ok, records, nil} end
+                 )
+
+        on_exit(fn -> Store.Cache.delete(Store.key(params, date)) end)
+      end
+
+      assert {:ok, ^schedules} = Departure.fetch_schedules(params, now: before_rollover)
+      assert {:ok, []} = Departure.fetch_schedules(params, now: after_rollover)
+    end
 
     test "fetches with params route_type when no opts route_type is provided" do
       params = %{mode: :rl}
